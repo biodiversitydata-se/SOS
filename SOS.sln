@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Batch.Import.AP", "SOS.Batch.Import.AP\SOS.Batch.Import.AP.csproj", "{84EAD0B6-8020-466D-8EF4-5653F177DFD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Batch.Import.AP.Test", "SOS.Batch.Import.AP.Test\SOS.Batch.Import.AP.Test.csproj", "{20C1D81A-41B5-44A7-AC15-A7940AD9284D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84EAD0B6-8020-466D-8EF4-5653F177DFD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84EAD0B6-8020-466D-8EF4-5653F177DFD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84EAD0B6-8020-466D-8EF4-5653F177DFD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84EAD0B6-8020-466D-8EF4-5653F177DFD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20C1D81A-41B5-44A7-AC15-A7940AD9284D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20C1D81A-41B5-44A7-AC15-A7940AD9284D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20C1D81A-41B5-44A7-AC15-A7940AD9284D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20C1D81A-41B5-44A7-AC15-A7940AD9284D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7CBCE6ED-CC4F-4B55-913F-1231086E92FE}
+	EndGlobalSection
+EndGlobal
