@@ -90,11 +90,13 @@ namespace SOS.Batch.Import.AP.Factories
                 var sightingProjects = new Dictionary<int, List<ProjectAggregate>>();
                 foreach (var (sightingId, projectId) in sightingProjectIds)
                 {
+                    // If no entry exists for sighting, add it
                     if (!sightingProjects.ContainsKey(sightingId))
                     {
                         sightingProjects.Add(sightingId, new List<ProjectAggregate>());
                     }
 
+                    // Add project to sighting
                     sightingProjects[sightingId].Add(projects[projectId]);
                 }
 
@@ -107,10 +109,11 @@ namespace SOS.Batch.Import.AP.Factories
                 await _sightingAggregateRepository.AddCollectionAsync();
 
                 var (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
-                const int chunkSize = 4000000;
+                const int chunkSize = 3000000;
 
                 _logger.LogDebug("Start getting sightings");
 
+                // Loop until all sightings are fetched
                 while (minId <= maxId)
                 {
                     _logger.LogDebug($"Getting sightings from { minId } to { minId + chunkSize -1 }");
