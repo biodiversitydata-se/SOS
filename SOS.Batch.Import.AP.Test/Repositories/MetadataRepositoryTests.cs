@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -10,24 +9,28 @@ using SOS.Batch.Import.AP.Repositories.Source;
 using SOS.Batch.Import.AP.Services.Interfaces;
 using Xunit;
 
-namespace SOS.Batch.Import.AP.Test
+namespace SOS.Batch.Import.AP.Test.Repositories
 {
+    /// <summary>
+    /// Meta data repository tests
+    /// </summary>
     public class MetadataRepositoryTests
     {
-        private Mock<IDbConnection> _connection;
-        private Mock<ISpeciesPortalDataService> _speciesPortalDataServiceMock;
-        private Mock<ILogger<MetadataRepository>> _loggerMock;
+        private readonly Mock<ISpeciesPortalDataService> _speciesPortalDataServiceMock;
+        private readonly Mock<ILogger<MetadataRepository>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
         public MetadataRepositoryTests()
         {
-            _connection = new Mock<IDbConnection>();
             _speciesPortalDataServiceMock = new Mock<ISpeciesPortalDataService>();
             _loggerMock = new Mock<ILogger<MetadataRepository>>();
         }
 
+        /// <summary>
+        /// Test the constructor
+        /// </summary>
         [Fact]
         public void ConstructorTest()
         {
@@ -47,6 +50,10 @@ namespace SOS.Batch.Import.AP.Test
         }
 
         #region Activities
+        /// <summary>
+        /// Test get activities success
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetActivitiesAsyncSuccess()
         {
@@ -74,6 +81,10 @@ namespace SOS.Batch.Import.AP.Test
             result.Should().HaveCount(2);
         }
 
+        /// <summary>
+        /// Test get activities exception
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetActivitiesAsyncException()
         {
@@ -97,6 +108,10 @@ namespace SOS.Batch.Import.AP.Test
         #endregion Activities
 
         #region Genders
+        /// <summary>
+        /// Test get genders success
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetGendersAsyncSuccess()
         {
@@ -124,6 +139,10 @@ namespace SOS.Batch.Import.AP.Test
             result.Should().HaveCount(2);
         }
 
+        /// <summary>
+        /// Test get genders exception
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetGendersAsyncException()
         {
@@ -147,6 +166,10 @@ namespace SOS.Batch.Import.AP.Test
         #endregion Activities
 
         #region Stages
+        /// <summary>
+        /// Test get stages success
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetStagesAsyncSuccess()
         {
@@ -174,6 +197,10 @@ namespace SOS.Batch.Import.AP.Test
             result.Should().HaveCount(2);
         }
 
+        /// <summary>
+        /// Test get stages exception
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetStagesAsyncException()
         {
@@ -197,6 +224,10 @@ namespace SOS.Batch.Import.AP.Test
         #endregion Activities
 
         #region Units
+        /// <summary>
+        /// Test get units success
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetUnitsAsyncSuccess()
         {
@@ -224,6 +255,10 @@ namespace SOS.Batch.Import.AP.Test
             result.Should().HaveCount(2);
         }
 
+        /// <summary>
+        /// Test get units exception
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetUnitsAsyncException()
         {

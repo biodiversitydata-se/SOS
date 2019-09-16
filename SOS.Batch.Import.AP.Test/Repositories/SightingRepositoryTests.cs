@@ -10,24 +10,28 @@ using SOS.Batch.Import.AP.Repositories.Source;
 using SOS.Batch.Import.AP.Services.Interfaces;
 using Xunit;
 
-namespace SOS.Batch.Import.AP.Test
+namespace SOS.Batch.Import.AP.Test.Repositories
 {
+    /// <summary>
+    /// Test sighting repository
+    /// </summary>
     public class SightingRepositoryTests
     {
-        private Mock<IDbConnection> _connection;
-        private Mock<ISpeciesPortalDataService> _speciesPortalDataServiceMock;
-        private Mock<ILogger<SightingRepository>> _loggerMock;
+        private readonly Mock<ISpeciesPortalDataService> _speciesPortalDataServiceMock;
+        private readonly Mock<ILogger<SightingRepository>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
         public SightingRepositoryTests()
         {
-            _connection = new Mock<IDbConnection>();
             _speciesPortalDataServiceMock = new Mock<ISpeciesPortalDataService>();
             _loggerMock = new Mock<ILogger<SightingRepository>>();
         }
 
+        /// <summary>
+        /// Test the constructor
+        /// </summary>
         [Fact]
         public void ConstructorTest()
         {
@@ -46,6 +50,10 @@ namespace SOS.Batch.Import.AP.Test
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
+        /// <summary>
+        /// Test get chunk of sightings success
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetChunkAsyncSuccess()
         {
@@ -73,6 +81,10 @@ namespace SOS.Batch.Import.AP.Test
             result.Should().HaveCount(2);
         }
 
+        /// <summary>
+        /// Test get chunk of sightings exception
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetChunkAsyncException()
         {
@@ -94,6 +106,10 @@ namespace SOS.Batch.Import.AP.Test
             result.Should().BeNull();
         }
 
+        /// <summary>
+        /// Test get sighting project id's success
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetProjectIdsAsyncSuccess()
         {
@@ -121,6 +137,10 @@ namespace SOS.Batch.Import.AP.Test
             result.Should().HaveCount(2);
         }
 
+        /// <summary>
+        /// Test get sightings project id's fail
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetProjectIdsAsyncException()
         {
@@ -142,6 +162,10 @@ namespace SOS.Batch.Import.AP.Test
             result.Should().BeNull();
         }
 
+        /// <summary>
+        /// Test get id span success
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetIdSpanAsyncSuccess()
         {
@@ -168,6 +192,10 @@ namespace SOS.Batch.Import.AP.Test
             result.Should().Be(span[0]);
         }
 
+        /// <summary>
+        /// Test get id span fail
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetIdSpanAsyncException()
         {

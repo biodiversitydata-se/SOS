@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -10,24 +9,28 @@ using SOS.Batch.Import.AP.Repositories.Source;
 using SOS.Batch.Import.AP.Services.Interfaces;
 using Xunit;
 
-namespace SOS.Batch.Import.AP.Test
+namespace SOS.Batch.Import.AP.Test.Repositories
 {
+    /// <summary>
+    /// Tests for taxon repository
+    /// </summary>
     public class TaxonRepositoryTests
     {
-        private Mock<IDbConnection> _connection;
-        private Mock<ISpeciesPortalDataService> _speciesPortalDataServiceMock;
-        private Mock<ILogger<TaxonRepository>> _loggerMock;
+        private readonly Mock<ISpeciesPortalDataService> _speciesPortalDataServiceMock;
+        private readonly Mock<ILogger<TaxonRepository>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
         public TaxonRepositoryTests()
         {
-            _connection = new Mock<IDbConnection>();
             _speciesPortalDataServiceMock = new Mock<ISpeciesPortalDataService>();
             _loggerMock = new Mock<ILogger<TaxonRepository>>();
         }
 
+        /// <summary>
+        /// Constructor test
+        /// </summary>
         [Fact]
         public void ConstructorTest()
         {
@@ -46,6 +49,10 @@ namespace SOS.Batch.Import.AP.Test
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
+        /// <summary>
+        /// Get taxa test success
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetAsyncSuccess()
         {
@@ -73,6 +80,10 @@ namespace SOS.Batch.Import.AP.Test
             result.Should().HaveCount(2);
         }
 
+        /// <summary>
+        /// Test get taxa fail
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetAsyncException()
         {

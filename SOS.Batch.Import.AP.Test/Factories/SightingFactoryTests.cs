@@ -11,17 +11,20 @@ using SOS.Batch.Import.AP.Repositories.Destination.Interfaces;
 using SOS.Batch.Import.AP.Repositories.Source.Interfaces;
 using Xunit;
 
-namespace SOS.Batch.Import.AP.Test
+namespace SOS.Batch.Import.AP.Test.Factories
 {
+    /// <summary>
+    /// Tests for sighting factory
+    /// </summary>
     public class SightingFactoryTests
     {
-        private Mock<IMetadataRepository> _metadataRepositoryMock;
-        private Mock<IProjectRepository> _projectRepositoryMock;
-        private Mock<ISightingRepository> _sightingRepositoryMock;
-        private Mock<ISiteRepository> _siteRepositoryMockMock;
-        private Mock<ISightingAggregateRepository> _sightingAggregateRepositoryMock;
-        private Mock<ITaxonRepository> _taxonRepositoryMock;
-        private Mock<ILogger<SightingFactory>> _loggerMock;
+        private readonly Mock<IMetadataRepository> _metadataRepositoryMock;
+        private readonly Mock<IProjectRepository> _projectRepositoryMock;
+        private readonly Mock<ISightingRepository> _sightingRepositoryMock;
+        private readonly Mock<ISiteRepository> _siteRepositoryMockMock;
+        private readonly Mock<ISightingAggregateRepository> _sightingAggregateRepositoryMock;
+        private readonly Mock<ITaxonRepository> _taxonRepositoryMock;
+        private readonly Mock<ILogger<SightingFactory>> _loggerMock;
 
         /// <summary>
         /// Constructor
@@ -37,6 +40,9 @@ namespace SOS.Batch.Import.AP.Test
             _loggerMock = new Mock<ILogger<SightingFactory>>();
         }
 
+        /// <summary>
+        /// Test constructor
+        /// </summary>
         [Fact]
         public void ConstructorTest()
         {
@@ -120,6 +126,10 @@ namespace SOS.Batch.Import.AP.Test
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
+        /// <summary>
+        /// Make a successful test of aggregation
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task AggregateAsyncSuccess()
         {
@@ -127,7 +137,7 @@ namespace SOS.Batch.Import.AP.Test
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _metadataRepositoryMock.Setup(mdr => mdr.GetActivitiesAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "Activity" } });
+                .ReturnsAsync(new [] { new MetadataEntity { Id = 1, Name = "Activity" } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetGendersAsync())
                 .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "Gender" } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetStagesAsync())
@@ -178,6 +188,10 @@ namespace SOS.Batch.Import.AP.Test
             result.Should().BeTrue();
         }
 
+        /// <summary>
+        /// Test aggregation fail
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task AggregateAsyncFail()
         {

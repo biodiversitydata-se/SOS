@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -10,62 +9,70 @@ using SOS.Batch.Import.AP.Repositories.Source;
 using SOS.Batch.Import.AP.Services.Interfaces;
 using Xunit;
 
-namespace SOS.Batch.Import.AP.Test
+namespace SOS.Batch.Import.AP.Test.Repositories
 {
-    public class ProjectRepositoryTests
+    /// <summary>
+    /// Test site repository
+    /// </summary>
+    public class SiteRepositoryTests
     {
-        private Mock<IDbConnection> _connection;
-        private Mock<ISpeciesPortalDataService> _speciesPortalDataServiceMock;
-        private Mock<ILogger<ProjectRepository>> _loggerMock;
+        private readonly Mock<ISpeciesPortalDataService> _speciesPortalDataServiceMock;
+        private readonly Mock<ILogger<SiteRepository>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ProjectRepositoryTests()
+        public SiteRepositoryTests()
         {
-            _connection = new Mock<IDbConnection>();
             _speciesPortalDataServiceMock = new Mock<ISpeciesPortalDataService>();
-            _loggerMock = new Mock<ILogger<ProjectRepository>>();
+            _loggerMock = new Mock<ILogger<SiteRepository>>();
         }
 
+        /// <summary>
+        /// Constructor tests
+        /// </summary>
         [Fact]
         public void ConstructorTest()
         {
-            new ProjectRepository(
+            new SiteRepository(
                 _speciesPortalDataServiceMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new ProjectRepository(
+            Action create = () => new SiteRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesPortalDataService");
 
-            create = () => new ProjectRepository(
+            create = () => new SiteRepository(
                 _speciesPortalDataServiceMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
+        /// <summary>
+        /// Test get sites success
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetAsyncSuccess()
         {
-            IEnumerable<ProjectEntity> projects = new []
+            IEnumerable<SiteEntity> projects = new []
             {
-                    new ProjectEntity { Id = 1, Name = "Project 1" },
-                    new ProjectEntity { Id = 2, Name = "Project 2" }
+                    new SiteEntity { Id = 1, Name = "Site 1" },
+                    new SiteEntity { Id = 2, Name = "Site 2" }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<ProjectEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<SiteEntity>(It.IsAny<string>()))
                 .ReturnsAsync(projects);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var ProjectRepository = new ProjectRepository(
+            var SiteRepository = new SiteRepository(
                 _speciesPortalDataServiceMock.Object,
                 _loggerMock.Object);
 
-            var result = await ProjectRepository.GetAsync();
+            var result = await SiteRepository.GetAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -73,20 +80,24 @@ namespace SOS.Batch.Import.AP.Test
             result.Should().HaveCount(2);
         }
 
+        /// <summary>
+        /// Test get sites fail
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task GetAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<ProjectEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<SiteEntity>(It.IsAny<string>()))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var ProjectRepository = new ProjectRepository(
+            var SiteRepository = new SiteRepository(
                 _speciesPortalDataServiceMock.Object,
                 _loggerMock.Object);
 
-            var result = await ProjectRepository.GetAsync();
+            var result = await SiteRepository.GetAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
