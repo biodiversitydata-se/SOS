@@ -5,7 +5,13 @@ VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Batch.Import.AP", "SOS.Batch.Import.AP\SOS.Batch.Import.AP.csproj", "{84EAD0B6-8020-466D-8EF4-5653F177DFD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Batch.Import.AP.Test", "SOS.Batch.Import.AP.Test\SOS.Batch.Import.AP.Test.csproj", "{20C1D81A-41B5-44A7-AC15-A7940AD9284D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Batch.Import.AP.Test", "SOS.Batch.Import.AP.Test\SOS.Batch.Import.AP.Test.csproj", "{20C1D81A-41B5-44A7-AC15-A7940AD9284D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Core", "SOS.Core\SOS.Core.csproj", "{53B69406-AD81-40CB-8955-CE088E5B9B6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Hangfire.JobServer", "SOS.Hangfire.JobServer\SOS.Hangfire.JobServer.csproj", "{A0CC7353-2D06-4E8F-8265-73F3D01B004D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Hangfire.UI", "SOS.Hangfire.UI\SOS.Hangfire.UI.csproj", "{A9117471-3D2D-443C-B3AB-3FE8673C05A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +27,18 @@ Global
 		{20C1D81A-41B5-44A7-AC15-A7940AD9284D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20C1D81A-41B5-44A7-AC15-A7940AD9284D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20C1D81A-41B5-44A7-AC15-A7940AD9284D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53B69406-AD81-40CB-8955-CE088E5B9B6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53B69406-AD81-40CB-8955-CE088E5B9B6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53B69406-AD81-40CB-8955-CE088E5B9B6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53B69406-AD81-40CB-8955-CE088E5B9B6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0CC7353-2D06-4E8F-8265-73F3D01B004D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0CC7353-2D06-4E8F-8265-73F3D01B004D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0CC7353-2D06-4E8F-8265-73F3D01B004D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0CC7353-2D06-4E8F-8265-73F3D01B004D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9117471-3D2D-443C-B3AB-3FE8673C05A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9117471-3D2D-443C-B3AB-3FE8673C05A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9117471-3D2D-443C-B3AB-3FE8673C05A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9117471-3D2D-443C-B3AB-3FE8673C05A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
