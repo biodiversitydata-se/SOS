@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Hangfire.JobServer", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Hangfire.UI", "SOS.Hangfire.UI\SOS.Hangfire.UI.csproj", "{A9117471-3D2D-443C-B3AB-3FE8673C05A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Core.Tests", "SOS.Core.Tests\SOS.Core.Tests.csproj", "{C3B3C42C-C94C-48EB-A2B3-4C09EEF97D48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{A9117471-3D2D-443C-B3AB-3FE8673C05A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9117471-3D2D-443C-B3AB-3FE8673C05A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A9117471-3D2D-443C-B3AB-3FE8673C05A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3B3C42C-C94C-48EB-A2B3-4C09EEF97D48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3B3C42C-C94C-48EB-A2B3-4C09EEF97D48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3B3C42C-C94C-48EB-A2B3-4C09EEF97D48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3B3C42C-C94C-48EB-A2B3-4C09EEF97D48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

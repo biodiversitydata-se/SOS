@@ -2,7 +2,7 @@
 
 namespace SOS.Core.Models.Observations
 {
-    public class ProcessedDwcObservation
+    public class ProcessedDwcObservation : IObservationKey, ICloneable
     {
         /// <summary>
         /// A unique record key used to identify an observation.
@@ -30,6 +30,25 @@ namespace SOS.Core.Models.Observations
         /// In the future this id should be stable.
         /// </summary>
         public long Id { get; set; }
+
+        public int DyntaxaTaxonId { get; set; }
+
+        /// <summary>
+        /// Not defined in Darwin Core.
+        /// Information about date and time when the
+        /// species observation started.
+        /// </summary>
+        public DateTime ObservationDateStart { get; set; }
+
+        /// <summary>
+        /// Not defined in Darwin Core.
+        /// Information about date and time when the
+        /// species observation ended.
+        /// </summary>
+        public DateTime? ObservationDateEnd { get; set; }
+
+        //public DateTime Start { get; set; } // Replaced by ObservationDateStart
+        //public DateTime End { get; set; } // Replaced by ObservationDateEnd
 
         /// <summary>
         /// Not defined in Darwin Core.
@@ -105,8 +124,8 @@ namespace SOS.Core.Models.Observations
         public int ProvinceIdByCoordinate { get; set; }
         public int ProvincePartIdByCoordinate { get; set; }
         public int MunicipalityIdByCoordinate { get; set; }
-        public int BirdNestActivityId { get; set; }
-        public int ActivityId { get; set; }
+        public int? BirdNestActivityId { get; set; }
+        public int? ActivityId { get; set; }
         public int DisturbanceRadius { get; set; }
         public int MaxAccuracyOrDisturbanceRadius { get; set; }
         public int DataProviderId { get; set; }
@@ -358,13 +377,6 @@ namespace SOS.Core.Models.Observations
         public int Day { get; set; }
 
         /// <summary>
-        /// Not defined in Darwin Core.
-        /// Information about date and time when the
-        /// species observation ended.
-        /// </summary>
-        public DateTime End { get; set; }
-
-        /// <summary>
         /// Darwin Core term name: endDayOfYear.
         /// The latest ordinal day of the year on which the Event
         /// occurred (1 for January 1, 365 for December 31,
@@ -458,13 +470,6 @@ namespace SOS.Core.Models.Observations
         /// This property is currently not used.
         /// </summary>
         public string SamplingProtocol { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Information about date and time when the
-        /// species observation started.
-        /// </summary>
-        public DateTime Start { get; set; }
 
         /// <summary>
         /// Darwin Core term name: startDayOfYear.
@@ -790,7 +795,7 @@ namespace SOS.Core.Models.Observations
         /// be estimated, or is not applicable (because there are
         /// no coordinates). Zero is not a valid value for this term.
         /// </summary>
-        public string CoordinateUncertaintyInMeters { get; set; }
+        public int? CoordinateUncertaintyInMeters { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
@@ -1961,7 +1966,12 @@ namespace SOS.Core.Models.Observations
         /// A common or vernacular name.
         /// </summary>
         public string VernacularName { get; set; }
+
         #endregion
 
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
     }
 }
