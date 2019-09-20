@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -30,6 +31,7 @@ namespace SOS.Core.Tests.Models.Repositories.VersionedObservationRepositoryTests
             await dbContext.Mongodb.DropCollectionAsync(CollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(dbContext);
 
+            
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Observation versions. One original version and 3 different updated versions.
             //-----------------------------------------------------------------------------------------------------------
@@ -56,13 +58,11 @@ namespace SOS.Core.Tests.Models.Repositories.VersionedObservationRepositoryTests
             await observationRepository.InsertDocumentAsync(observationVersion3); // Version 3, Change [CoordinateX]
             await observationRepository.DeleteDocumentAsync(dataProviderId, catalogNumber); // Version 4, Delete document
             await observationRepository.InsertDocumentAsync(observationVersion4); // Version 5, Change [RecordedBy]
-            await observationRepository.DeleteDocumentAsync(dataProviderId, catalogNumber); // Version 6, Delete document
 
 
             //-----------------------------------------------------------------------------------------------------------
             // Act - Restore versions
             //-----------------------------------------------------------------------------------------------------------
-            var restoredVer6 = await observationRepository.RestoreDocumentAsync(dataProviderId, catalogNumber, 6);
             var restoredVer5 = await observationRepository.RestoreDocumentAsync(dataProviderId, catalogNumber, 5);
             var restoredVer4 = await observationRepository.RestoreDocumentAsync(dataProviderId, catalogNumber, 4);
             var restoredVer3 = await observationRepository.RestoreDocumentAsync(dataProviderId, catalogNumber, 3);
@@ -74,13 +74,13 @@ namespace SOS.Core.Tests.Models.Repositories.VersionedObservationRepositoryTests
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            restoredVer6.Should().BeNull("the observation was deleted in version 6");
             restoredVer5.Should().BeEquivalentTo(observationVersion4, "in version 5, the observationVersion4 was inserted");
             restoredVer4.Should().BeNull("the observation was deleted in version 4");
             restoredVer3.Should().BeEquivalentTo(observationVersion3, "in version 3, the observationVersion3 was inserted");
             restoredVer2.Should().BeEquivalentTo(observationVersion2, "in version 2, the observationVersion2 was inserted");
             restoredVer1.Should().BeEquivalentTo(originalObservation, "in the first version, the observationVersion1 was inserted");
         }
+
 
 
         [Fact]

@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Globalization;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace SOS.Core.Models.Observations
 {
+    //[BsonIgnoreExtraElements]
     public class ProcessedDwcObservation : IObservationKey, ICloneable
     {
         /// <summary>
@@ -374,7 +378,8 @@ namespace SOS.Core.Models.Observations
         /// (start date of observation).
         /// This property is currently not used.
         /// </summary>
-        public int Day { get; set; }
+        [BsonIgnore]
+        public int Day => ObservationDateEnd?.Day ?? ObservationDateStart.Day;
 
         /// <summary>
         /// Darwin Core term name: endDayOfYear.
@@ -383,7 +388,8 @@ namespace SOS.Core.Models.Observations
         /// except in a leap year, in which case it is 366).
         /// This property is currently not used.
         /// </summary>
-        public int EndDayOfYear { get; set; }
+        [BsonIgnore]
+        public int EndDayOfYear => ObservationDateEnd?.DayOfYear ?? ObservationDateStart.DayOfYear;
 
         /// <summary>
         /// Darwin Core term name: eventDate.
@@ -395,7 +401,19 @@ namespace SOS.Core.Models.Observations
         /// For example: ”2007-03-01 13:00:00 - 2008-05-11 15:30:00”
         /// This property is currently not used.
         /// </summary>
-        public string EventDate { get; set; }
+        [BsonIgnore]
+        [BsonRepresentation(BsonType.String)]
+        public string EventDate
+        {
+            get
+            {
+                return CreateDateIntervalString(ObservationDateStart, ObservationDateEnd);
+            }
+            //set
+            //{
+            //    // todo - Parse string value and try set ObservationDateStart and ObservationDateEnd?
+            //}
+        }
 
         /// <summary>
         /// Darwin Core term name: eventID.
@@ -422,7 +440,8 @@ namespace SOS.Core.Models.Observations
         /// For example: ”13:00:00 - 15:30:00”
         /// This property is currently not used.
         /// </summary>
-        public string EventTime { get; set; }
+        [BsonIgnore]
+        public string EventTime => CreateTimeIntervalString(ObservationDateStart, ObservationDateEnd);
 
         /// <summary>
         /// Darwin Core term name: fieldNotes.
@@ -454,7 +473,8 @@ namespace SOS.Core.Models.Observations
         /// The ordinal month in which the Event occurred.
         /// This property is currently not used.
         /// </summary>
-        public int Month { get; set; }
+        [BsonIgnore]
+        public int Month => ObservationDateEnd?.Month ?? ObservationDateStart.Month;
 
         /// <summary>
         /// Darwin Core term name: samplingEffort.
@@ -478,7 +498,8 @@ namespace SOS.Core.Models.Observations
         /// except in a leap year, in which case it is 366).
         /// This property is currently not used.
         /// </summary>
-        public int StartDayOfYear { get; set; }
+        [BsonIgnore]
+        public int StartDayOfYear => ObservationDateStart.DayOfYear;
 
         /// <summary>
         /// Darwin Core term name: verbatimEventDate.
@@ -494,7 +515,8 @@ namespace SOS.Core.Models.Observations
         /// according to the Common Era Calendar.
         /// This property is currently not used.
         /// </summary>
-        public int Year { get; set; }
+        [BsonIgnore]
+        public int Year => ObservationDateEnd?.Year ?? ObservationDateStart.Year;
         #endregion
 
         #region GeologicalContext
@@ -1972,6 +1994,32 @@ namespace SOS.Core.Models.Observations
         public object Clone()
         {
             return MemberwiseClone();
+        }
+
+        private static string CreateDateIntervalString(DateTime date1, DateTime? date2)
+        {
+            if (!date2.HasValue)
+            {
+                return date1.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ssK", CultureInfo.InvariantCulture);
+            }
+
+            return string.Format(
+                "{0}/{1}",
+                date1.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ssK", CultureInfo.InvariantCulture),
+                date2.Value.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ssK", CultureInfo.InvariantCulture));
+        }
+
+        private static string CreateTimeIntervalString(DateTime date1, DateTime? date2)
+        {
+            if (!date2.HasValue)
+            {
+                return date1.ToUniversalTime().ToString("HH:mm:ssK", CultureInfo.InvariantCulture);
+            }
+
+            return string.Format(
+                "{0}/{1}",
+                date1.ToUniversalTime().ToString("HH:mm:ssK", CultureInfo.InvariantCulture),
+                date2.Value.ToUniversalTime().ToString("HH:mm:ssK", CultureInfo.InvariantCulture));
         }
     }
 }

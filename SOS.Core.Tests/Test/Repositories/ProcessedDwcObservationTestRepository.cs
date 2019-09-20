@@ -50,14 +50,14 @@ namespace SOS.Core.Tests.Test.Repositories
             //-----------------------------------------------------------------------------------------------------------
             observation.ReportedDate = new DateTime(Random.Next(1970, 2019), Random.Next(1, 13), Random.Next(1, 29)).ToUniversalTime();
             observation.ObservationDateStart = new DateTime(Random.Next(1970, 2019), Random.Next(1, 13), Random.Next(1, 29)).ToUniversalTime();
-            observation.ObservationDateEnd = GetRandomObservationDateEnd(observation.ObservationDateStart);
-            observation.EventDate = CreateDateIntervalString(observation.ObservationDateStart, observation.ObservationDateEnd); // todo - Remove property and use only ObservationDateStart & ObservationDateEnd?
-            observation.EventTime = CreateTimeIntervalString(observation.ObservationDateStart, observation.ObservationDateEnd); // todo - Remove property and use only ObservationDateStart & ObservationDateEnd?
-            observation.Year = observation.ObservationDateEnd?.Year ?? observation.ObservationDateStart.Year;
-            observation.Month = observation.ObservationDateEnd?.Month ?? observation.ObservationDateStart.Month;
-            observation.Day = observation.ObservationDateEnd?.Day ?? observation.ObservationDateStart.Day;
-            observation.StartDayOfYear = observation.ObservationDateStart.DayOfYear;
-            observation.EndDayOfYear = observation.ObservationDateEnd?.DayOfYear ?? observation.ObservationDateStart.DayOfYear;
+            //observation.ObservationDateEnd = GetRandomObservationDateEnd(observation.ObservationDateStart);
+            //observation.EventDate = CreateDateIntervalString(observation.ObservationDateStart, observation.ObservationDateEnd); // todo - Remove property and use only ObservationDateStart & ObservationDateEnd?
+            //observation.EventTime = CreateTimeIntervalString(observation.ObservationDateStart, observation.ObservationDateEnd); // todo - Remove property and use only ObservationDateStart & ObservationDateEnd?
+            //observation.Year = observation.ObservationDateEnd?.Year ?? observation.ObservationDateStart.Year;
+            //observation.Month = observation.ObservationDateEnd?.Month ?? observation.ObservationDateStart.Month;
+            //observation.Day = observation.ObservationDateEnd?.Day ?? observation.ObservationDateStart.Day;
+            //observation.StartDayOfYear = observation.ObservationDateStart.DayOfYear;
+            //observation.EndDayOfYear = observation.ObservationDateEnd?.DayOfYear ?? observation.ObservationDateStart.DayOfYear;
             observation.Modified = observation.ObservationDateEnd ?? observation.ObservationDateStart;
             //observation.VerbatimEventDate = null;
 
