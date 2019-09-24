@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <Folder Include="Models\Versioning\" />
-    <Folder Include="TestRepositories\" />
   </ItemGroup>
 
 </Project>

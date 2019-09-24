@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SOS.Core.Models.Observations;
 using SOS.Core.Repositories;
-using SOS.Core.Tests.Test.Repositories;
 using Xunit;
 
 namespace SOS.Core.Tests.KnownBugs
@@ -30,7 +29,7 @@ namespace SOS.Core.Tests.KnownBugs
         /// <returns></returns>
         [Fact]
         [Trait("Category", "Unit")]
-        public async Task TestDeserializeDateStringDiff()
+        public void TestDeserializeDateStringDiff()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -63,6 +62,5 @@ namespace SOS.Core.Tests.KnownBugs
             restoredObject.MyDateAsString.Should().Be(myObj.MyDateAsString);
             restoredObjectUsingParsedDiff.MyDateAsString.Should().Be(myObj.MyDateAsString);
         }
-
     }
 }

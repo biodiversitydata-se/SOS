@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using JsonDiffPatchDotNet;
@@ -15,7 +16,7 @@ using SOS.Core.Models.Versioning;
 
 namespace SOS.Core.Repositories
 {
-    public class VersionedObservationRepository<T> where T : class, IObservationKey
+    public class VersionedObservationRepository<T> : IVersionedObservationRepository<T> where T : class, IObservationKey
     {
         private readonly MongoDbContext _dbContext;
         public IMongoCollection<VersionedObservation<T>> Collection { get; private set; }
@@ -33,12 +34,12 @@ namespace SOS.Core.Repositories
             if (currentDocument == null) // The document doesn't exist. First insert.
             {
                 var versionedDoc = new VersionedObservation<T>(doc);
-                Collection.InsertOne(versionedDoc);
+                await Collection.InsertOneAsync(versionedDoc);
                 return;
             }
 
             UpdateVersionedObservationObject(currentDocument, doc);
-            var result = Collection.ReplaceOne(item => item.DataProviderId == doc.DataProviderId && item.CatalogNumber == doc.CatalogNumber, currentDocument);
+            var result = await Collection.ReplaceOneAsync(item => item.DataProviderId == doc.DataProviderId && item.CatalogNumber == doc.CatalogNumber, currentDocument);
 
             if (result.ModifiedCount != 1) // the number of modified documents
             {
@@ -68,6 +69,37 @@ namespace SOS.Core.Repositories
             }
         }
 
+        public async Task<List<ObservationVersionIdentifier>> GetAllObservationVersionIdentifiers()
+        {
+            var observationVersionIdentifiers = await Collection.Find(new BsonDocument())
+                .Project(s => new ObservationVersionIdentifier
+                {
+                    Id = s.Id.ToString(),
+                    CatalogNumber = s.CatalogNumber,
+                    DataProviderId = s.DataProviderId,
+                    Version = s.Version
+                })
+                .ToListAsync();
+
+            return observationVersionIdentifiers;
+        }
+
+        public IEnumerable<ObservationVersionIdentifier> GetAllObservationVersionIdentifiersEnumerable()
+        {
+            IEnumerable<ObservationVersionIdentifier> observationVersionIdentifiers = Collection.Find(new BsonDocument())
+                .Project(s => new ObservationVersionIdentifier
+                {
+                    Id = s.Id.ToString(),
+                    CatalogNumber = s.CatalogNumber,
+                    DataProviderId = s.DataProviderId,
+                    Version = s.Version
+                })
+                .ToEnumerable();
+
+            return observationVersionIdentifiers;
+        }
+
+        
         private async Task<(T[] newObservations, T[] updatedObservations)> GetNewAndUpdatedObservationsAsync(
             List<T> speciesObservations)
         {
@@ -188,7 +220,6 @@ namespace SOS.Core.Repositories
             int version)
         {
             if (version < 1) throw new ArgumentException("Version must be >= 1");
-            var jdp = new JsonDiffPatch();
             var currentDocument = await (await Collection.FindAsync(x => x.DataProviderId == dataProviderId
                                                                       && x.CatalogNumber == catalogNumber)).FirstOrDefaultAsync();
             if (currentDocument == null) return null;
@@ -201,7 +232,7 @@ namespace SOS.Core.Repositories
                 ? JToken.Parse("{}")
                 : JToken.FromObject(currentDocument.Current);
 
-            JToken restoredDocument = jdp.Unpatch(
+            JToken restoredDocument = _jdp.Unpatch(
                 jtokenCurrentDoc,
                 JToken.Parse(currentDocument.Prev[versionCounter - 2].Diff));
             string strType = currentDocument.Prev[versionCounter - 2].Type;
@@ -209,7 +240,7 @@ namespace SOS.Core.Repositories
 
             while (versionCounter > version)
             {
-                restoredDocument = jdp.Unpatch(
+                restoredDocument = _jdp.Unpatch(
                     restoredDocument,
                     JToken.Parse(currentDocument.Prev[versionCounter - 2].Diff));
                 strType = currentDocument.Prev[versionCounter - 2].Type;
@@ -230,6 +261,11 @@ namespace SOS.Core.Repositories
             Type type = Type.GetType(strType);
             T restoredObject = restoredDocument.ToObject(type) as T;
             return restoredObject;
+        }
+
+        public async Task<long> GetTotalNumberOfObservationsAsync()
+        {
+            return await Collection.CountDocumentsAsync(_ => true);
         }
     }
 }

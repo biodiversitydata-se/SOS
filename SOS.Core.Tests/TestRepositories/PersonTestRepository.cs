@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SOS.Core.Tests.Test.Models;
+using SOS.Core.Tests.TestModels;
 
 namespace SOS.Core.Tests.TestRepositories
 {
