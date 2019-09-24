@@ -5,20 +5,47 @@
     /// </summary>
     public class SiteEntity
     {
-        /// <summary>
-        /// County of site
-        /// </summary>
-        public string County { get; set; }
+        public int? CountyId { get; set; }
 
         /// <summary>
-        /// Id of site
+        /// Id of county
+        /// </summary>
+        public string CountyName { get; set; }
+
+        /// <summary>
+        /// Country part id
+        /// </summary>
+        public int? CountryPartId { get; set; }
+
+        /// <summary>
+        /// Name of country part
+        /// </summary>
+        public string CountryPartName { get; set; }
+
+        /// <summary>
+        /// Name of county
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Name of site
+        /// Id of municipality
         /// </summary>
-        public string Municipality { get; set; }
+        public int? MunicipalityId { get; set; }
+
+        /// <summary>
+        /// Name of municipality
+        /// </summary>
+        public string MunicipalityName { get; set; }
+
+        /// <summary>
+        /// Id of province
+        /// </summary>
+        public int? ProvinceId { get; set; }
+
+        /// <summary>
+        /// Name of province
+        /// </summary>
+        public string ProvinceName { get; set; }
 
         /// <summary>
         /// Name of site

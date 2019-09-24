@@ -133,9 +133,11 @@ namespace SOS.Batch.Import.AP.Extensions
         {
             return new SiteAggregate
             {
-                County = entity.County,
+                County = entity.CountyId.HasValue ? new MetadataAggregate{ Id = entity.CountyId.Value, Name = entity.CountyName } : null,
+                CountryPart = entity.CountryPartId.HasValue ? new MetadataAggregate { Id = entity.CountryPartId.Value, Name = entity.CountryPartName } : null,
                 Id = entity.Id,
-                Municipality = entity.Municipality,
+                Municipality = entity.MunicipalityId.HasValue ? new MetadataAggregate { Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName } : null,
+                Province = entity.ProvinceId.HasValue ? new MetadataAggregate { Id = entity.ProvinceId.Value, Name = entity.ProvinceName } : null,
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord

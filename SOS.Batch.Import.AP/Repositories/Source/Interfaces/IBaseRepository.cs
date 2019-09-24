@@ -11,8 +11,11 @@ namespace SOS.Batch.Import.AP.Repositories.Source.Interfaces
         /// <summary>
         /// Query db
         /// </summary>
+        /// <typeparam name="E"></typeparam>
+        /// <param name="query"></param>
+        /// <param name="parameters"></param>
         /// <returns></returns>
-        Task<IEnumerable<E>> QueryAsync<E>(string query);
+        Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters);
 
     }
 }

@@ -32,12 +32,13 @@ namespace SOS.Batch.Import.AP.Repositories.Source {
         /// <summary>
         /// Query data base
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="E"></typeparam>
         /// <param name="query"></param>
+        /// <param name="parameters"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<E>> QueryAsync<E>(string query)
+        public async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters = null)
         {
-            return await _speciesPortalDataService.QueryAsync<E>(query);
+            return await _speciesPortalDataService.QueryAsync<E>(query, parameters);
         }
     }
 }

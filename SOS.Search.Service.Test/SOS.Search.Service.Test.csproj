@@ -18,11 +18,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
+    <Folder Include="Controllers\" />
+    <Folder Include="Factories\" />
+    <Folder Include="Repositories\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SOS.Batch.Import.AP\SOS.Batch.Import.AP.csproj" />
+    <ProjectReference Include="..\SOS.Search.Service\SOS.Search.Service.csproj" />
   </ItemGroup>
 
 </Project>
