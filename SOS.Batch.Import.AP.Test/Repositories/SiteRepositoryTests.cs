@@ -62,7 +62,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
                     new SiteEntity { Id = 2, Name = "Site 2" }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<SiteEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<SiteEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(projects);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
         [Fact]
         public async Task GetAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<SiteEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<SiteEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------

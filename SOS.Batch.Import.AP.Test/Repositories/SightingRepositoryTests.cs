@@ -63,7 +63,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
                     new SightingEntity { Id = 2 }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(projects);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
         [Fact]
         public async Task GetChunkAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>()))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
                 new Tuple<int, int>(1, 2)
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
                 .ReturnsAsync(projectIds);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -144,7 +144,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
         [Fact]
         public async Task GetProjectIdsAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -174,7 +174,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
                 new Tuple<int, int>(1, 2)
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
                 .ReturnsAsync(span);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -199,7 +199,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
         [Fact]
         public async Task GetIdSpanAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------

@@ -8,7 +8,12 @@
         /// <summary>
         /// County of site
         /// </summary>
-        public string County { get; set; }
+        public MetadataAggregate County { get; set; }
+
+        /// <summary>
+        /// Countyry part of site
+        /// </summary>
+        public MetadataAggregate CountryPart { get; set; }
 
         /// <summary>
         /// Id of site
@@ -18,7 +23,12 @@
         /// <summary>
         /// Name of site
         /// </summary>
-        public string Municipality { get; set; }
+        public MetadataAggregate Municipality { get; set; }
+
+        /// <summary>
+        /// Province
+        /// </summary>
+        public MetadataAggregate Province { get; set; }
 
         /// <summary>
         /// Name of site

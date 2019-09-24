@@ -36,7 +36,7 @@ namespace SOS.Batch.Import.AP.Repositories.Source {
 	                Taxon t
 	                INNER JOIN TaxonCategory tc ON t.TaxonCategoryId = tc.Id
 	                INNER JOIN [Resource] rc ON tc.ResourceLabel = rc.Label
-	                INNER JOIN Translation trc ON rc.Id = trc.ResourceId AND trc.GlobalizationCultureId = 175
+	                INNER JOIN Translation trc ON rc.Id = trc.ResourceId AND trc.GlobalizationCultureId = 49
 	                LEFT JOIN TaxonName tn ON t.Id = tn.TaxonId AND tn.SpeciesNamesLanguageId = 1 AND tn.ValidForTaxonomy = 1
 	                LEFT JOIN TaxonName tns ON t.Id = tns.TaxonId AND tns.SpeciesNamesLanguageId = 2 AND tns.ValidForTaxonomy = 1";
 

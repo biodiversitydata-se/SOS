@@ -60,7 +60,7 @@ namespace SOS.Batch.Import.AP.Repositories.Source {
                     AND ss.SightingStateTypeId = 30--Published
                     AND(ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
 
-                return await QueryAsync<SightingEntity>(query);
+                return await QueryAsync<SightingEntity>(query, new { StartId = startId, EndId = startId + maxRows -1 });
             }
             catch (Exception e)
             {

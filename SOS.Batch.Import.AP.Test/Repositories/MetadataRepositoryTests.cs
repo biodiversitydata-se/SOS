@@ -63,7 +63,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
                     new MetadataEntity { Id = 2, Name = "Activity 2" }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
         [Fact]
         public async Task GetActivitiesAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
                     new MetadataEntity { Id = 2, Name = "Gender 2" }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -146,7 +146,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
         [Fact]
         public async Task GetGendersAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -179,7 +179,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
                     new MetadataEntity { Id = 2, Name = "Stage 2" }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -204,7 +204,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
         [Fact]
         public async Task GetStagesAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -237,7 +237,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
                     new MetadataEntity { Id = 2, Name = "Unit 2" }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -262,7 +262,7 @@ namespace SOS.Batch.Import.AP.Test.Repositories
         [Fact]
         public async Task GetUnitsAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>()))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------

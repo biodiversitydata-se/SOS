@@ -32,7 +32,7 @@ namespace SOS.Batch.Import.AP.Services
         private IDbConnection Connection => new SqlConnection(_connectionString);
 
         /// <inheritdoc />
-        public async Task<IEnumerable<T>> QueryAsync<T>(string query)
+        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null)
         {
             using (var conn = Connection)
             {
@@ -41,7 +41,7 @@ namespace SOS.Batch.Import.AP.Services
                 return (await conn.QueryAsync<T>(
                     new CommandDefinition(
                         query,
-                        null,
+                        parameters,
                         null,
                         null,
                         CommandType.Text,

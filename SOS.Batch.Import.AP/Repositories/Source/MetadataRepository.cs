@@ -30,7 +30,7 @@ namespace SOS.Batch.Import.AP.Repositories.Source {
                 FROM 
 	                Activity a 
 	                INNER JOIN [Resource] r ON a.ResourceLabel = r.Label
-	                INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 175";
+	                INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
 
                 return await QueryAsync<MetadataEntity>(query);
             }
@@ -54,7 +54,7 @@ namespace SOS.Batch.Import.AP.Repositories.Source {
                     FROM 
 	                    Gender g 
 	                    INNER JOIN [Resource] r ON g.ResourceLabel = r.Label
-	                    INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 175";
+	                    INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
 
                     return await QueryAsync<MetadataEntity>(query);
             }
@@ -77,7 +77,7 @@ namespace SOS.Batch.Import.AP.Repositories.Source {
                 FROM 
 	                Stage s
 	                INNER JOIN [Resource] r ON s.ResourceLabel = r.Label
-	                INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 175";
+	                INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
 
                 return await QueryAsync<MetadataEntity>(query);
             }
@@ -100,7 +100,7 @@ namespace SOS.Batch.Import.AP.Repositories.Source {
                     FROM 
 	                    Unit u 
 	                    INNER JOIN [Resource] r ON u.ResourceLabel = r.Label
-	                    INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 175";
+	                    INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
 
                     return await QueryAsync<MetadataEntity>(query);
             }
