@@ -34,6 +34,7 @@ namespace SOS.Search.Service
         /// <param name="env"></param>
         public Startup(IHostingEnvironment env)
         {
+            env.EnvironmentName = "local";
             var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
@@ -42,7 +43,7 @@ namespace SOS.Search.Service
             Configuration = configurationBuilder.Build();
 
             //Enable swagger for dev and local only
-            _enableSwagger = env.EnvironmentName == "local" || env.EnvironmentName.ToLower() == "dev";
+            _enableSwagger = new [] { "dev", "local" }.Contains(env.EnvironmentName);
         }
 
         /// <summary>

@@ -144,6 +144,12 @@
             Id of taxon
             </summary>
         </member>
+        <member name="M:SOS.Search.Service.Program.Main(System.String[])">
+            <summary>
+            Starting point
+            </summary>
+            <param name="args"></param>
+        </member>
         <member name="T:SOS.Search.Service.Repositories.AggregateRepository`2">
             <summary>
             Base class for cosmos db repositories
