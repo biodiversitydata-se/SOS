@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using SOS.Core.Models.Observations;
-using SOS.Core.Tests.TestRepositories;
 
-namespace SOS.Core.Tests.Test.Repositories
+namespace SOS.Core.Tests.TestRepositories
 {
     public static class ProcessedDwcObservationTestRepository
     {

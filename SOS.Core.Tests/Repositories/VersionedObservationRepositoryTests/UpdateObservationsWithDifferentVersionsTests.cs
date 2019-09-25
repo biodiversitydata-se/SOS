@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FluentAssertions;
 using MongoDB.Driver;
 using SOS.Core.Models.Observations;
 using SOS.Core.Models.Versioning;
 using SOS.Core.Repositories;
-using SOS.Core.Tests.Test.Repositories;
+using SOS.Core.Tests.TestRepositories;
 using Xunit;
-using System.Linq;
 
-namespace SOS.Core.Tests.Models.Repositories.VersionedObservationRepositoryTests
+namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
 {
     public class UpdateObservationsWithDifferentVersionsTests
     {
@@ -93,7 +88,7 @@ namespace SOS.Core.Tests.Models.Repositories.VersionedObservationRepositoryTests
             MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, CollectionName);
             await dbContext.Mongodb.DropCollectionAsync(CollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(dbContext);
-            const int numberOfObservations = 10000;
+            const int numberOfObservations = 100000;
 
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create <DataProviderId, CatalogNumber> index

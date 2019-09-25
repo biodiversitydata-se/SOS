@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SOS.Core.Tests.Test.Models
+﻿namespace SOS.Core.Tests.TestModels
 {
     public class Person
     {
