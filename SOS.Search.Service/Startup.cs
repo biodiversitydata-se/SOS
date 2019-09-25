@@ -121,8 +121,8 @@ namespace SOS.Search.Service
                         new Info
                         {
                             Version = "v1",
-                            Title = "DataService",
-                            Description = "Asta data repository",
+                            Title = "SOS.SearchService",
+                            Description = "Swedish Observations Services",
                             TermsOfService = "None"
                         });
                     options.IncludeXmlComments(GetXmlCommentsPath());
