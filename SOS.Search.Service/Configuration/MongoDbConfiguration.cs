@@ -38,6 +38,6 @@
         /// <summary>
         /// True if ssl is used
         /// </summary>
-        public bool UseSsl{ get; set; }
+        public bool UseTls { get; set; }
     }
 }

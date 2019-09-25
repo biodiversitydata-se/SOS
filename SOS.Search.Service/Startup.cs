@@ -19,6 +19,9 @@ using Swashbuckle.AspNetCore.Swagger;
 
 namespace SOS.Search.Service
 {
+    /// <summary>
+    /// Startup class
+    /// </summary>
     public class Startup
     {
         /// <summary>
@@ -80,8 +83,8 @@ namespace SOS.Search.Service
             {
                 Servers = mongoConfiguration.Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)),
                 ReplicaSetName = mongoConfiguration.ReplicaSetName,
-                UseSsl = mongoConfiguration.UseSsl,
-                SslSettings = mongoConfiguration.UseSsl ? new SslSettings
+                UseTls = mongoConfiguration.UseTls,
+                SslSettings = mongoConfiguration.UseTls ? new SslSettings
                 {
                     EnabledSslProtocols = SslProtocols.Tls12
                 } : null
@@ -128,7 +131,12 @@ namespace SOS.Search.Service
             }
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
+        /// <param name="loggerFactory"></param>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             // Add NLog support.
@@ -161,7 +169,10 @@ namespace SOS.Search.Service
             }
         }
 
-
+        /// <summary>
+        /// Get xml file path
+        /// </summary>
+        /// <returns></returns>
         private static string GetXmlCommentsPath()
         {
             var assemblyName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;

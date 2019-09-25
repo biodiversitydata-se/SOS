@@ -19,4 +19,6 @@
         <PackageReference Include="NLog.Web.AspNetCore" Version="4.8.5" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     </ItemGroup>
+
+    <ProjectExtensions><VisualStudio><UserProperties appsettings_1local_1json__JsonSchema="UseTls" /></VisualStudio></ProjectExtensions>
 </Project>

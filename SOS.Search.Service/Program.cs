@@ -4,6 +4,9 @@ using Microsoft.Extensions.Logging;
 
 namespace SOS.Search.Service
 {
+    /// <summary>
+    /// Program class
+    /// </summary>
     public class Program
     {
         /// <summary>
