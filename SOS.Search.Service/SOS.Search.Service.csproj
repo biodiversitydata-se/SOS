@@ -4,8 +4,12 @@
         <TargetFramework>netcoreapp2.2</TargetFramework>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <DocumentationFile>SOS.Search.Service.xml</DocumentationFile>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\netcoreapp2.0\SOS.Search.Service.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\netcoreapp2.0\SOS.Search.Service.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
