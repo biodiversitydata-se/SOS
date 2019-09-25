@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents diffrent metadata items
     /// </summary>
-    public class MetadataAggregate
+    public class Metadata
     {
         /// <summary>
         /// Id of item

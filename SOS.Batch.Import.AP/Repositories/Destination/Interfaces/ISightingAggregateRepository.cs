@@ -5,7 +5,7 @@ namespace SOS.Batch.Import.AP.Repositories.Destination.Interfaces
     /// <summary>
     /// 
     /// </summary>
-    public interface ISightingAggregateRepository : IAggregateRepository<SightingAggregate, int>
+    public interface ISightingAggregateRepository : IAggregateRepository<APSightingVerbatim, int>
     {
     }
 }

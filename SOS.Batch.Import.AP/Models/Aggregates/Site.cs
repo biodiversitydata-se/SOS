@@ -3,17 +3,17 @@
     /// <summary>
     /// Site object
     /// </summary>
-    public class SiteAggregate
+    public class Site
     {
         /// <summary>
         /// County of site
         /// </summary>
-        public MetadataAggregate County { get; set; }
+        public Metadata County { get; set; }
 
         /// <summary>
         /// Countyry part of site
         /// </summary>
-        public MetadataAggregate CountryPart { get; set; }
+        public Metadata CountryPart { get; set; }
 
         /// <summary>
         /// Id of site
@@ -23,12 +23,12 @@
         /// <summary>
         /// Name of site
         /// </summary>
-        public MetadataAggregate Municipality { get; set; }
+        public Metadata Municipality { get; set; }
 
         /// <summary>
         /// Province
         /// </summary>
-        public MetadataAggregate Province { get; set; }
+        public Metadata Province { get; set; }
 
         /// <summary>
         /// Name of site

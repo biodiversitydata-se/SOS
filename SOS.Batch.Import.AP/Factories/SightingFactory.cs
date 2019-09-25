@@ -87,13 +87,13 @@ namespace SOS.Batch.Import.AP.Factories
                 var sightingProjectIds = await _sightingRepository.GetProjectIdsAsync();
 
                 // Create a dictionary with sightings projects. 
-                var sightingProjects = new Dictionary<int, List<ProjectAggregate>>();
+                var sightingProjects = new Dictionary<int, List<Project>>();
                 foreach (var (sightingId, projectId) in sightingProjectIds)
                 {
                     // If no entry exists for sighting, add it
                     if (!sightingProjects.ContainsKey(sightingId))
                     {
-                        sightingProjects.Add(sightingId, new List<ProjectAggregate>());
+                        sightingProjects.Add(sightingId, new List<Project>());
                     }
 
                     // Add project to sighting

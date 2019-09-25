@@ -6,12 +6,12 @@ namespace SOS.Batch.Import.AP.Models.Aggregates
     /// <summary>
     /// Sighting object
     /// </summary>
-    public class SightingAggregate : Interfaces.IEntity<int>
+    public class APSightingVerbatim : Interfaces.IEntity<int>
     {
         /// <summary>
         /// Id of activity
         /// </summary>
-        public MetadataAggregate Activity { get; set; }
+        public Metadata Activity { get; set; }
 
         /// <summary>
         /// Sigthing end data
@@ -26,7 +26,7 @@ namespace SOS.Batch.Import.AP.Models.Aggregates
         /// <summary>
         /// Taxon gender id
         /// </summary>
-        public MetadataAggregate Gender { get; set; }
+        public Metadata Gender { get; set; }
 
         /// <summary>
         /// Hidden by provider date
@@ -61,7 +61,7 @@ namespace SOS.Batch.Import.AP.Models.Aggregates
         /// <summary>
         /// Projects
         /// </summary>
-        public IEnumerable<ProjectAggregate> Projects { get; set; }
+        public IEnumerable<Project> Projects { get; set; }
 
         /// <summary>
         /// Number of taxa found
@@ -71,12 +71,12 @@ namespace SOS.Batch.Import.AP.Models.Aggregates
         /// <summary>
         /// Id of site
         /// </summary>
-        public SiteAggregate Site { get; set; }
+        public Site Site { get; set; }
 
         /// <summary>
         /// Taxon stage id
         /// </summary>
-        public MetadataAggregate Stage { get; set; }
+        public Metadata Stage { get; set; }
 
         /// <summary>
         /// Sif´ghting start date
@@ -91,12 +91,12 @@ namespace SOS.Batch.Import.AP.Models.Aggregates
         /// <summary>
         /// Taxon
         /// </summary>
-        public TaxonAggregate Taxon { get; set; }
+        public Taxon Taxon { get; set; }
 
         /// <summary>
         /// Id of unit
         /// </summary>
-        public MetadataAggregate Unit { get; set; }
+        public Metadata Unit { get; set; }
 
         /// <summary>
         /// Un spontaneous flag
