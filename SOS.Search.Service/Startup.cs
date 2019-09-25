@@ -46,7 +46,7 @@ namespace SOS.Search.Service
             Configuration = configurationBuilder.Build();
 
             //Enable swagger for dev and local only
-            _enableSwagger = new [] { "dev", "local" }.Contains(env.EnvironmentName);
+            _enableSwagger = new [] { "dev", "local" }.Contains(env.EnvironmentName.ToLower());
         }
 
         /// <summary>
