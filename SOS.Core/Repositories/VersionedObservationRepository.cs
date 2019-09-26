@@ -213,6 +213,24 @@ namespace SOS.Core.Repositories
                 currentDocument);
         }
 
+        public async Task<IList<T>> RestoreDocumentsAsync(
+            IEnumerable<ObservationVersionIdentifier> observationVersionIdentifiers)
+        {
+            var filterDef = new FilterDefinitionBuilder<VersionedObservation<T>>();
+            var filter = filterDef.In(x => x.CompositeId, observationVersionIdentifiers.Select(x => $"{x.DataProviderId}_{x.CatalogNumber}"));
+            var foundObservations = await (await Collection.FindAsync(filter)).ToListAsync();
+            var observationVersionByCompositeId = observationVersionIdentifiers.ToDictionary(x => $"{x.DataProviderId}_{x.CatalogNumber}", x => x);
+            List<T> restoredObservations = new List<T>();
+
+            foreach (VersionedObservation<T> versionedObservation in foundObservations)
+            {
+                int version = observationVersionByCompositeId[versionedObservation.CompositeId].Version;
+                var restoredObs = RestoreDocument(versionedObservation, version);
+                restoredObservations.Add(restoredObs);
+            }
+
+            return restoredObservations;
+        }
 
         public async Task<T> RestoreDocumentAsync(
             int dataProviderId,
@@ -220,30 +238,39 @@ namespace SOS.Core.Repositories
             int version)
         {
             if (version < 1) throw new ArgumentException("Version must be >= 1");
-            var currentDocument = await (await Collection.FindAsync(x => x.DataProviderId == dataProviderId
-                                                                      && x.CatalogNumber == catalogNumber)).FirstOrDefaultAsync();
-            if (currentDocument == null) return null;
+            VersionedObservation<T> versionedObservation = await (await Collection.FindAsync(x => x.DataProviderId == dataProviderId
+                                                                                             && x.CatalogNumber == catalogNumber)).FirstOrDefaultAsync();
+            return RestoreDocument(versionedObservation, version);
+        }
 
-            if (version > currentDocument.Version) throw new ArgumentException($"version {version} doesn't exist");
-            if (version == currentDocument.Version) return currentDocument.Current;
 
-            int versionCounter = currentDocument.Version;
-            JToken jtokenCurrentDoc = currentDocument.Current == null
+        public T RestoreDocument(
+            VersionedObservation<T> versionedObservation,
+            int version)
+        {
+            if (version < 1) throw new ArgumentException("Version must be >= 1");
+            if (versionedObservation == null) return null;
+
+            if (version > versionedObservation.Version) throw new ArgumentException($"version {version} doesn't exist");
+            if (version == versionedObservation.Version) return versionedObservation.Current;
+
+            int versionCounter = versionedObservation.Version;
+            JToken jtokenCurrentDoc = versionedObservation.Current == null
                 ? JToken.Parse("{}")
-                : JToken.FromObject(currentDocument.Current);
+                : JToken.FromObject(versionedObservation.Current);
 
             JToken restoredDocument = _jdp.Unpatch(
                 jtokenCurrentDoc,
-                JToken.Parse(currentDocument.Prev[versionCounter - 2].Diff));
-            string strType = currentDocument.Prev[versionCounter - 2].Type;
+                JToken.Parse(versionedObservation.Prev[versionCounter - 2].Diff));
+            string strType = versionedObservation.Prev[versionCounter - 2].Type;
             versionCounter--;
 
             while (versionCounter > version)
             {
                 restoredDocument = _jdp.Unpatch(
                     restoredDocument,
-                    JToken.Parse(currentDocument.Prev[versionCounter - 2].Diff));
-                strType = currentDocument.Prev[versionCounter - 2].Type;
+                    JToken.Parse(versionedObservation.Prev[versionCounter - 2].Diff));
+                strType = versionedObservation.Prev[versionCounter - 2].Type;
                 versionCounter--;
             }
 
@@ -254,7 +281,7 @@ namespace SOS.Core.Repositories
             }
 
             // Or you can use this to know if a document is deleted.
-            //if (versionCounter >= 2 && currentDocument.Prev[versionCounter - 2].IsDeleted)
+            //if (versionCounter >= 2 && versionedObservation.Prev[versionCounter - 2].IsDeleted)
             //{
             //    return null;
             //}
@@ -266,6 +293,11 @@ namespace SOS.Core.Repositories
         public async Task<long> GetTotalNumberOfObservationsAsync()
         {
             return await Collection.CountDocumentsAsync(_ => true);
+        }
+
+        public async Task DropObservationCollectionAsync()
+        {
+            await _dbContext.Mongodb.DropCollectionAsync(Constants.ObservationCollectionName);
         }
     }
 }

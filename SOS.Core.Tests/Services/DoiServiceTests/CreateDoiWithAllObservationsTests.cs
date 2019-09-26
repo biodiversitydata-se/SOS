@@ -14,6 +14,7 @@ using Xunit;
 
 namespace SOS.Core.Tests.Services.DoiServiceTests
 {
+    [Collection("MongoDbIntegrationTests")]
     public class CreateDoiWithAllObservationsTests
     {
         private const string MongoUrl = "mongodb://localhost";
@@ -24,16 +25,22 @@ namespace SOS.Core.Tests.Services.DoiServiceTests
         public async Task TestCreateDoiWithAllProcessedObservations()
         {
             //-----------------------------------------------------------------------------------------------------------
-            // Arrange - Reset/Initiliaze MongoDb collections
+            // Arrange - Drop MongoDb collections
             //-----------------------------------------------------------------------------------------------------------
+            const int nrObservations = 10000;
             MongoDbContext observationsDbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.ObservationCollectionName);
             MongoDbContext doiDbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.DoiCollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(observationsDbContext);
             var doiRepository = new DoiRepository(doiDbContext);
+            await observationRepository.DropObservationCollectionAsync();  
             await doiRepository.DropDoiFileBucketAsync();
             await doiRepository.DropDoiCollectionAsync();
-            var nrObservations = await observationRepository.GetTotalNumberOfObservationsAsync();
-            if (nrObservations == 0) await InsertObservationsTestDataAsync(observationRepository);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange - Add observations
+            //-----------------------------------------------------------------------------------------------------------
+            var speciesObservations = ProcessedDwcObservationTestRepository.CreateRandomObservations(nrObservations);
+            await observationRepository.InsertDocumentsAsync(speciesObservations);
 
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - DOI data
@@ -47,21 +54,40 @@ namespace SOS.Core.Tests.Services.DoiServiceTests
             };
 
             //-----------------------------------------------------------------------------------------------------------
-            // Act
+            // Act - Create DOI for all current observations
             //-----------------------------------------------------------------------------------------------------------
-            var doiInfo = await doiService.CreateDoiWithAllObservationsAsync(doiMetadata);
+            var observationIdentifiers = observationRepository.GetAllObservationVersionIdentifiersEnumerable();
+            var doiInfo = await doiService.CreateDoiAsync(observationIdentifiers, doiMetadata);
+
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act - Change one observation
+            //-----------------------------------------------------------------------------------------------------------
+            var modifiedSpeciesObservation = speciesObservations[0];
+            var nameBeforeModified = modifiedSpeciesObservation.RecordedBy;
+            modifiedSpeciesObservation.RecordedBy = "Art Vandelay";
+            await observationRepository.InsertDocumentAsync(modifiedSpeciesObservation);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert - Check that the changed observations is changed in database
+            //-----------------------------------------------------------------------------------------------------------
+            var modifiedSpeciesObsFromDb = await observationRepository.GetDocumentAsync(modifiedSpeciesObservation.DataProviderId,
+                modifiedSpeciesObservation.CatalogNumber);
+            modifiedSpeciesObsFromDb.Version.Should().Be(2, "this observation is updated");
+            modifiedSpeciesObsFromDb.Current.RecordedBy.Should().Be("Art Vandelay");
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert - Get all observations for the DOI. Check that the changed observation is restored to version 1.
+            //-----------------------------------------------------------------------------------------------------------
             var doiObservations = await doiService.GetDoiObservationsAsync(doiInfo.FileName); // Get observations from DOI stored in MongoDb.
+            doiObservations.Count().Should().Be(nrObservations);
+            var restoredObservation = doiObservations.Single(x => x.RecordKey == modifiedSpeciesObservation.RecordKey);
+            restoredObservation.RecordedBy.Should().Be(nameBeforeModified, "this should be the restored version 1");
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             doiObservations.Count().Should().Be((int)nrObservations);
-        }
-
-        private async Task InsertObservationsTestDataAsync(VersionedObservationRepository<ProcessedDwcObservation> observationRepository)
-        {
-            var speciesObservations = ProcessedDwcObservationTestRepository.CreateRandomObservations(10000);
-            await observationRepository.InsertDocumentsAsync(speciesObservations);
         }
     }
 }

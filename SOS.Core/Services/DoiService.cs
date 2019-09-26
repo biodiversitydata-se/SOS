@@ -26,27 +26,29 @@ namespace SOS.Core.Services
             _doiRepository = doiRepository;
         }
 
-        public async Task<DoiInfo> CreateDoiWithAllObservationsAsync(DoiMetadata doiMetadata)
+        public async Task<DoiInfo> CreateDoiAsync(
+            IEnumerable<ObservationVersionIdentifier> observationIdentifiers,
+            DoiMetadata doiMetadata)
         {
-            byte[] file = CreateFileWithAllObservations();
+            byte[] serializedObservationIdentifiers = MessagePackSerializer.Serialize(observationIdentifiers);
             DoiInfo doiInfo = DoiInfo.Create(doiMetadata);
-            await _doiRepository.InsertDoiFileAsync(file, doiInfo.DoiId, doiInfo.FileName);
+            await _doiRepository.InsertDoiFileAsync(serializedObservationIdentifiers, doiInfo.DoiId, doiInfo.FileName);
             await _doiRepository.InsertDoiDocumentAsync(doiInfo);
             return doiInfo;
         }
 
-        public async Task<IEnumerable<ObservationVersionIdentifier>> GetDoiObservationsAsync(string filename)
+        public async Task<IList<ProcessedDwcObservation>> GetDoiObservationsAsync(string filename)
+        {
+            var observationVersionIdentifiers = await GetDoiObservationIdentifiersAsync(filename);
+            var observations = await _observationRepository.RestoreDocumentsAsync(observationVersionIdentifiers);
+            return observations;
+        }
+
+        public async Task<IEnumerable<ObservationVersionIdentifier>> GetDoiObservationIdentifiersAsync(string filename)
         {
             var messagePackFile = await _doiRepository.GetDoiFileByNameAsync(filename);
             var res = MessagePackSerializer.Deserialize<IEnumerable<ObservationVersionIdentifier>>(messagePackFile);
             return res;
-        }
-
-        private byte[] CreateFileWithAllObservations()
-        {
-            var observations = _observationRepository.GetAllObservationVersionIdentifiersEnumerable();
-            var bin = MessagePackSerializer.Serialize(observations);
-            return bin;
         }
     }
 }

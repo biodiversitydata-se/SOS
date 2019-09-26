@@ -9,11 +9,11 @@ using Xunit;
 
 namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
 {
+    [Collection("MongoDbIntegrationTests")]
     public class UpdateObservationsWithDifferentVersionsTests
     {
         private const string MongoUrl = "mongodb://localhost";
         private const string DatabaseName = "diff_sample";
-        private const string CollectionName = "observations";
 
         [Fact]
         [Trait("Category", "Integration")]
@@ -22,10 +22,9 @@ namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Database connection, etc.
             //-----------------------------------------------------------------------------------------------------------
-            MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, CollectionName);
-            await dbContext.Mongodb.DropCollectionAsync(CollectionName);
+            MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.ObservationCollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(dbContext);
-
+            await observationRepository.DropObservationCollectionAsync();
             
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Observation versions. One original version and 3 different updated versions.
@@ -85,10 +84,10 @@ namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Database connection, etc.
             //-----------------------------------------------------------------------------------------------------------
-            MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, CollectionName);
-            await dbContext.Mongodb.DropCollectionAsync(CollectionName);
+            MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.ObservationCollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(dbContext);
-            const int numberOfObservations = 100000;
+            await observationRepository.DropObservationCollectionAsync();
+            const int numberOfObservations = 10000;
 
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create <DataProviderId, CatalogNumber> index

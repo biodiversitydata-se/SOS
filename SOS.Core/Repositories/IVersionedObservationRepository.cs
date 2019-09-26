@@ -21,5 +21,12 @@ namespace SOS.Core.Repositories
             int dataProviderId,
             string catalogNumber,
             int version);
+
+        T RestoreDocument(
+            VersionedObservation<T> versionedObservation,
+            int version);
+
+        Task<IList<T>> RestoreDocumentsAsync(
+            IEnumerable<ObservationVersionIdentifier> observationVersionIdentifiers);
     }
 }
