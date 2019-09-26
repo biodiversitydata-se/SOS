@@ -165,7 +165,7 @@ namespace SOS.Batch.Import.AP.Test.Factories
                 .ReturnsAsync(true);
             _sightingAggregateRepositoryMock.Setup(tr => tr.AddCollectionAsync())
                 .ReturnsAsync(true);
-            _sightingAggregateRepositoryMock.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<SightingAggregate>>()))
+            _sightingAggregateRepositoryMock.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<APSightingVerbatim>>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------

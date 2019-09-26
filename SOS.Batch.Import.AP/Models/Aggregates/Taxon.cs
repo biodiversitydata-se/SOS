@@ -3,7 +3,7 @@
     /// <summary>
     /// Taxon object
     /// </summary>
-    public class TaxonAggregate
+    public class Taxon
     {
         /// <summary>
         /// Taxon category

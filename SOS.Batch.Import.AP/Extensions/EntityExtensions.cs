@@ -22,16 +22,16 @@ namespace SOS.Batch.Import.AP.Extensions
         /// <param name="sites"></param>
         /// <param name="projects"></param>
         /// <returns></returns>
-        public static SightingAggregate ToAggregate(this SightingEntity entity,
-            IDictionary<int, MetadataAggregate> activities,
-            IDictionary<int, MetadataAggregate> genders,
-            IDictionary<int, MetadataAggregate> stages,
-            IDictionary<int, MetadataAggregate> units,
-            IDictionary<int, TaxonAggregate> taxa,
-            IDictionary<int, SiteAggregate> sites,
-            IDictionary<int, List<ProjectAggregate>> projects)
+        public static APSightingVerbatim ToAggregate(this SightingEntity entity,
+            IDictionary<int, Metadata> activities,
+            IDictionary<int, Metadata> genders,
+            IDictionary<int, Metadata> stages,
+            IDictionary<int, Metadata> units,
+            IDictionary<int, Taxon> taxa,
+            IDictionary<int, Site> sites,
+            IDictionary<int, List<Project>> projects)
         {
-            return new SightingAggregate
+            return new APSightingVerbatim
             {
                 Activity = entity.ActivityId.HasValue && activities.ContainsKey(entity.ActivityId.Value) ? activities[entity.ActivityId.Value] : null,
                 EndDate = entity.EndDate,
@@ -69,14 +69,14 @@ namespace SOS.Batch.Import.AP.Extensions
         /// <param name="sites"></param>
         /// <param name="projects"></param>
         /// <returns></returns>
-        public static IEnumerable<SightingAggregate> ToAggregates(this IEnumerable<SightingEntity> entities,
-            IDictionary<int, MetadataAggregate> activities,
-            IDictionary<int, MetadataAggregate> genders,
-            IDictionary<int, MetadataAggregate> stages,
-            IDictionary<int, MetadataAggregate> units,
-            IDictionary<int, TaxonAggregate> taxa,
-            IDictionary<int, SiteAggregate> sites,
-            IDictionary<int, List<ProjectAggregate>> projects)
+        public static IEnumerable<APSightingVerbatim> ToAggregates(this IEnumerable<SightingEntity> entities,
+            IDictionary<int, Metadata> activities,
+            IDictionary<int, Metadata> genders,
+            IDictionary<int, Metadata> stages,
+            IDictionary<int, Metadata> units,
+            IDictionary<int, Taxon> taxa,
+            IDictionary<int, Site> sites,
+            IDictionary<int, List<Project>> projects)
         {
             return entities.Select(e => e.ToAggregate(activities, genders, stages, units, taxa, sites, projects));
         }
@@ -86,9 +86,9 @@ namespace SOS.Batch.Import.AP.Extensions
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static MetadataAggregate ToAggregate(this MetadataEntity entity)
+        public static Metadata ToAggregate(this MetadataEntity entity)
         {
-            return new MetadataAggregate
+            return new Metadata
             {
                 Id = entity.Id,
                 Name = entity.Name
@@ -100,14 +100,14 @@ namespace SOS.Batch.Import.AP.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<MetadataAggregate> ToAggregates(this IEnumerable<MetadataEntity> entities)
+        public static IEnumerable<Metadata> ToAggregates(this IEnumerable<MetadataEntity> entities)
         {
             return entities.Select(e => e.ToAggregate());
         }
 
-        public static ProjectAggregate ToAggregate(this ProjectEntity entity)
+        public static Project ToAggregate(this ProjectEntity entity)
         {
-            return new ProjectAggregate()
+            return new Project()
             {
                 Id = entity.Id,
                 Name = entity.Name
@@ -119,7 +119,7 @@ namespace SOS.Batch.Import.AP.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<ProjectAggregate> ToAggregates(this IEnumerable<ProjectEntity> entities)
+        public static IEnumerable<Project> ToAggregates(this IEnumerable<ProjectEntity> entities)
         {
             return entities.Select(e => e.ToAggregate());
         }
@@ -129,15 +129,15 @@ namespace SOS.Batch.Import.AP.Extensions
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static SiteAggregate ToAggregate(this SiteEntity entity)
+        public static Site ToAggregate(this SiteEntity entity)
         {
-            return new SiteAggregate
+            return new Site
             {
-                County = entity.CountyId.HasValue ? new MetadataAggregate{ Id = entity.CountyId.Value, Name = entity.CountyName } : null,
-                CountryPart = entity.CountryPartId.HasValue ? new MetadataAggregate { Id = entity.CountryPartId.Value, Name = entity.CountryPartName } : null,
+                County = entity.CountyId.HasValue ? new Metadata{ Id = entity.CountyId.Value, Name = entity.CountyName } : null,
+                CountryPart = entity.CountryPartId.HasValue ? new Metadata { Id = entity.CountryPartId.Value, Name = entity.CountryPartName } : null,
                 Id = entity.Id,
-                Municipality = entity.MunicipalityId.HasValue ? new MetadataAggregate { Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName } : null,
-                Province = entity.ProvinceId.HasValue ? new MetadataAggregate { Id = entity.ProvinceId.Value, Name = entity.ProvinceName } : null,
+                Municipality = entity.MunicipalityId.HasValue ? new Metadata { Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName } : null,
+                Province = entity.ProvinceId.HasValue ? new Metadata { Id = entity.ProvinceId.Value, Name = entity.ProvinceName } : null,
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord
@@ -149,14 +149,14 @@ namespace SOS.Batch.Import.AP.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<SiteAggregate> ToAggregates(this IEnumerable<SiteEntity> entities)
+        public static IEnumerable<Site> ToAggregates(this IEnumerable<SiteEntity> entities)
         {
             return entities.Select(e => e.ToAggregate());
         }
 
-        public static TaxonAggregate ToAggregate(this TaxonEntity entity)
+        public static Taxon ToAggregate(this TaxonEntity entity)
         {
-            return new TaxonAggregate
+            return new Taxon
             {
                 Category = entity.Category,
                 Id = entity.Id,
@@ -170,7 +170,7 @@ namespace SOS.Batch.Import.AP.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<TaxonAggregate> ToAggregates(this IEnumerable<TaxonEntity> entities)
+        public static IEnumerable<Taxon> ToAggregates(this IEnumerable<TaxonEntity> entities)
         {
             return entities.Select(e => e.ToAggregate());
         }

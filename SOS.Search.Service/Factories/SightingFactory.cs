@@ -20,6 +20,7 @@ namespace SOS.Search.Service.Factories
         /// Constructor
         /// </summary>
         /// <param name="sightingAggregateRepository"></param>
+        /// <param name="logger"></param>
         public SightingFactory(
             ISightingAggregateRepository sightingAggregateRepository,
             ILogger<SightingFactory> logger)

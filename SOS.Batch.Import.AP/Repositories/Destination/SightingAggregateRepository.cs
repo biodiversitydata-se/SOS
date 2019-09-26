@@ -10,12 +10,11 @@ namespace DataPopulateService.Repositories.DocumentDb
     /// <summary>
     /// Species data service
     /// </summary>
-    public class SightingAggregateRepository : AggregateRepository<SightingAggregate, int>, ISightingAggregateRepository
+    public class SightingAggregateRepository : AggregateRepository<APSightingVerbatim, int>, ISightingAggregateRepository
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="settingsService"></param>
         /// <param name="mongoClient"></param>
         /// <param name="mongoDbConfiguration"></param>
         /// <param name="logger"></param>

@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a person
     /// </summary>
-    public class PersonAggregate
+    public class Person
     {
         /// <summary>
         /// Id of person

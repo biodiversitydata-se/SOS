@@ -3,7 +3,7 @@
     /// <summary>
     /// Project class
     /// </summary>
-    public class ProjectAggregate
+    public class Project
     {
         /// <summary>
         /// Id of project

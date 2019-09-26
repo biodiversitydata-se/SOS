@@ -18,7 +18,6 @@ namespace SOS.Search.Service.Repositories
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="settingsService"></param>
         /// <param name="mongoClient"></param>
         /// <param name="mongoDbConfiguration"></param>
         /// <param name="logger"></param>
