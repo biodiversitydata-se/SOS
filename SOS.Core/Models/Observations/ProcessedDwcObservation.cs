@@ -98,12 +98,6 @@ namespace SOS.Core.Models.Observations
         /// </summary>        
         public string ValidationStatus { get; set; }
 
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Taxon id (not GUID) value in Dyntaxa.
-        /// </summary>
-        public int DyntaxaTaxonID { get; set; }
-
         public double CoordinateX_RT90 { get; set; }
 
         public double CoordinateY_RT90 { get; set; }

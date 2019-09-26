@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using SOS.Core.Tests.TestModels;
 
-namespace SOS.Core.Tests.TestRepositories
+namespace SOS.Core.Tests.TestDataFactories
 {
-    public static class PersonTestRepository
+    public static class PersonTestDataFactory
     {
         private static readonly Random Random = new Random();
 

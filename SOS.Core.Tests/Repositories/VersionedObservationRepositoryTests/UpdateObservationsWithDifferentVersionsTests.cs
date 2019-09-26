@@ -4,7 +4,7 @@ using MongoDB.Driver;
 using SOS.Core.Models.Observations;
 using SOS.Core.Models.Versioning;
 using SOS.Core.Repositories;
-using SOS.Core.Tests.TestRepositories;
+using SOS.Core.Tests.TestDataFactories;
 using Xunit;
 
 namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
@@ -29,7 +29,7 @@ namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Observation versions. One original version and 3 different updated versions.
             //-----------------------------------------------------------------------------------------------------------
-            ProcessedDwcObservation originalObservation = ProcessedDwcObservationTestRepository.CreateRandomObservation();
+            ProcessedDwcObservation originalObservation = ProcessedDwcObservationTestDataFactory.CreateRandomObservation();
             var observationVersion2 = (ProcessedDwcObservation)originalObservation.Clone();
             observationVersion2.RecordedBy = "Peter van Nostrand";
             var observationVersion3 = (ProcessedDwcObservation)observationVersion2.Clone();
@@ -106,7 +106,7 @@ namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create original observations
             //-----------------------------------------------------------------------------------------------------------
-            var speciesObservations = ProcessedDwcObservationTestRepository.CreateRandomObservations(numberOfObservations);
+            var speciesObservations = ProcessedDwcObservationTestDataFactory.CreateRandomObservations(numberOfObservations);
 
 
             //-----------------------------------------------------------------------------------------------------------

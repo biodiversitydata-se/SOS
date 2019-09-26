@@ -9,7 +9,7 @@ using SOS.Core.Models.DOI;
 using SOS.Core.Models.Observations;
 using SOS.Core.Repositories;
 using SOS.Core.Services;
-using SOS.Core.Tests.TestRepositories;
+using SOS.Core.Tests.TestDataFactories;
 using Xunit;
 
 namespace SOS.Core.Tests.Services.DoiServiceTests
@@ -39,7 +39,7 @@ namespace SOS.Core.Tests.Services.DoiServiceTests
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Add observations
             //-----------------------------------------------------------------------------------------------------------
-            var speciesObservations = ProcessedDwcObservationTestRepository.CreateRandomObservations(nrObservations);
+            var speciesObservations = ProcessedDwcObservationTestDataFactory.CreateRandomObservations(nrObservations);
             await observationRepository.InsertDocumentsAsync(speciesObservations);
 
             //-----------------------------------------------------------------------------------------------------------
