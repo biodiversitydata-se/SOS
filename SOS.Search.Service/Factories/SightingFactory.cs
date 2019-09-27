@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Search.Service.Extensions;
 using SOS.Search.Service.Models;
 using SOS.Search.Service.Repositories.Interfaces;
 
@@ -12,33 +13,32 @@ namespace SOS.Search.Service.Factories
     /// </summary>
     public class SightingFactory : Interfaces.ISightingFactory
     {
-        private ISightingAggregateRepository _sightingAggregateRepository;
+        private readonly IProcessedDarwinCoreRepository _ProcessedDarwinCoreRepository;
 
-        private ILogger<SightingFactory> _logger;
+        private readonly ILogger<SightingFactory> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="sightingAggregateRepository"></param>
+        /// <param name="ProcessedDarwinCoreRepository"></param>
         /// <param name="logger"></param>
         public SightingFactory(
-            ISightingAggregateRepository sightingAggregateRepository,
+            IProcessedDarwinCoreRepository ProcessedDarwinCoreRepository,
             ILogger<SightingFactory> logger)
         {
-
-            _sightingAggregateRepository = sightingAggregateRepository ??
-                                           throw new ArgumentNullException(nameof(sightingAggregateRepository));
+            _ProcessedDarwinCoreRepository = ProcessedDarwinCoreRepository ??
+                                           throw new ArgumentNullException(nameof(ProcessedDarwinCoreRepository));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<SightingAggregate>> GetChunkAsync(int taxonId, int skip, int take)
+        public async Task<IEnumerable<DarwinCore<string>>> GetChunkAsync(int taxonId, int skip, int take)
         {
             try
             {
-                // Make sure we have an empty collection
-                return await _sightingAggregateRepository.GetChunkAsync(taxonId, skip, take);
+                var processedDarwinCore = await _ProcessedDarwinCoreRepository.GetChunkAsync(taxonId, skip, take);
+                return processedDarwinCore?.ToDarwinCore();
             }
             catch (Exception e)
             {

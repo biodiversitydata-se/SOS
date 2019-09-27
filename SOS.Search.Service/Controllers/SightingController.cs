@@ -33,7 +33,7 @@ namespace SOS.Search.Service.Controllers
 
         /// <inheritdoc />
         [HttpGet("taxa/{taxonId}")]
-        [ProducesResponseType(typeof(IEnumerable<SightingAggregate>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<DarwinCore<string>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetChunkAsync([FromRoute] int taxonId, [FromQuery]int skip, [FromQuery]int take)
