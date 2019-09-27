@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using MongoDB.Driver;
 using SOS.Core.GIS;
 using SOS.Core.Models.Observations;
+using SOS.Core.Models.Versioning;
 using SOS.Core.ObservationProcessors;
 using SOS.Core.Repositories;
 
@@ -24,21 +28,21 @@ namespace SOS.Core.Jobs
             IEnumerable<VerbatimTestDataProviderObservation> verbatimObservations = repository.GetAllObservations();
 
             // 2. Process observations
-            List<ProcessedDwcObservation> processedObservations = new List<ProcessedDwcObservation>();
+            var processedObservationsBag = new ConcurrentBag<ProcessedDwcObservation>();
             TestDataProviderProcessor observationProcessor = new TestDataProviderProcessor();
-            foreach (VerbatimTestDataProviderObservation observation in verbatimObservations)
+            Parallel.ForEach(verbatimObservations, obs =>
             {
-                var processedObservation = observationProcessor.ProcessObservation(observation);
+                var processedObservation = observationProcessor.ProcessObservation(obs);
                 if (FileBasedGeographyService.IsObservationInSweden(processedObservation))
                 {
-                    processedObservations.Add(processedObservation);
+                    processedObservationsBag.Add(processedObservation);
                 }
-            }
+            });
 
             // 3. Save observations
             MongoDbContext observationsDbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.ObservationCollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(observationsDbContext);
-            observationRepository.InsertDocumentsAsync(processedObservations).Wait();
+            observationRepository.InsertDocumentsAsync(processedObservationsBag.ToList()).Wait();
 
             Console.WriteLine($"Finished processing VerbatimTestDataProvider observations: { DateTime.Now.ToLongTimeString() }");
         }
