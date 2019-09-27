@@ -9,6 +9,7 @@ namespace SOS.Core
         public const string ProcessedCollectionName = "ProcessedObservations";
         public const string GridFsDoiBucketName = "doi";
         public const string ObservationCollectionName = "observations";
+        public const string VerbatimTestDataProviderObservations = "verbatimTestDataProviderObservations";
         public const string DoiCollectionName = "doi";
     }
 }
