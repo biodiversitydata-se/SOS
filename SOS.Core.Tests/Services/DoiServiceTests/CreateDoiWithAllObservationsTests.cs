@@ -18,7 +18,7 @@ namespace SOS.Core.Tests.Services.DoiServiceTests
     public class CreateDoiWithAllObservationsTests
     {
         private const string MongoUrl = "mongodb://localhost";
-        private const string DatabaseName = "diff_sample";
+        private const string DatabaseName = "sos-local";
 
         [Fact]
         [Trait("Category", "Integration")]

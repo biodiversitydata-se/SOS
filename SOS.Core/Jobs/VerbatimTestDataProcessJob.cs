@@ -13,17 +13,33 @@ using SOS.Core.Repositories;
 
 namespace SOS.Core.Jobs
 {
-    public class VerbatimTestDataProcessJob
+    public interface IVerbatimTestDataProcessJob
     {
-        private const string MongoUrl = "mongodb://localhost";
-        private const string DatabaseName = "diff_sample";
+        void Run();
+    }
+
+    public class VerbatimTestDataProcessJob : IVerbatimTestDataProcessJob
+    {
+        private readonly IRepositorySettings _repositorySettings;
+
+        public VerbatimTestDataProcessJob() : this(SystemSettings.GetRepositorySettings())
+        {
+        }
+
+        public VerbatimTestDataProcessJob(IRepositorySettings repositorySettings)
+        {
+            _repositorySettings = repositorySettings;
+        }
 
         public void Run()
         {
             Console.WriteLine($"Start processing VerbatimTestDataProvider observations: { DateTime.Now.ToLongTimeString() }");
             
             // 1. Get all verbatim observations
-            MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.VerbatimTestDataProviderObservations);
+            MongoDbContext dbContext = new MongoDbContext(
+                _repositorySettings.MongoDbConnectionString, 
+                _repositorySettings.DatabaseName, 
+                Constants.VerbatimTestDataProviderObservations);
             var repository = new VerbatimObservationRepository<VerbatimTestDataProviderObservation>(dbContext);
             IEnumerable<VerbatimTestDataProviderObservation> verbatimObservations = repository.GetAllObservations();
 
@@ -40,7 +56,10 @@ namespace SOS.Core.Jobs
             });
 
             // 3. Save observations
-            MongoDbContext observationsDbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.ObservationCollectionName);
+            MongoDbContext observationsDbContext = new MongoDbContext(
+                _repositorySettings.MongoDbConnectionString, 
+                _repositorySettings.DatabaseName, 
+                Constants.ObservationCollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(observationsDbContext);
             observationRepository.InsertDocumentsAsync(processedObservationsBag.ToList()).Wait();
 

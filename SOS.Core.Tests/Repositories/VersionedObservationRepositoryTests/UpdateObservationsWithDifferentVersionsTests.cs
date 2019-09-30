@@ -13,7 +13,7 @@ namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
     public class UpdateObservationsWithDifferentVersionsTests
     {
         private const string MongoUrl = "mongodb://localhost";
-        private const string DatabaseName = "diff_sample";
+        private const string DatabaseName = "sos-local";
 
         [Fact]
         [Trait("Category", "Integration")]

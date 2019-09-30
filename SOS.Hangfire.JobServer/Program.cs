@@ -1,31 +1,64 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
+using Autofac;
+using Autofac.Core;
+using Autofac.Extensions.DependencyInjection;
 using Hangfire;
 using Hangfire.Mongo;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using SOS.Core;
+using SOS.Core.IoC;
+using SOS.Core.Jobs;
+using SOS.Core.Repositories;
+using SOS.Hangfire.JobServer.MyApplication.Common;
 
 namespace SOS.Hangfire.JobServer
 {
     class Program
     {
-        // SOS.Hangfire.UI
-        // SOS.Hangfire.Api
         static async Task Main(string[] args)
         {
-            GlobalConfiguration.Configuration.UseMongoStorage("mongodb://localhost", "sos-jobs-st", MongoStorageOptions);
+            IConfiguration configuration = ConfigurationFactory.CreateConfiguration();
+            var container = BootstrapContainer.Boostrap();
+            var configurationSection = configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository");
+            IContainer cont = null;
+            var repositorySettings = new RepositorySettings()
+            {
+                DatabaseName = configurationSection.GetValue<string>("DatabaseName"),
+                JobsDatabaseName = configurationSection.GetValue<string>("JobsDatabaseName"),
+                MongoDbConnectionString = configurationSection.GetValue<string>("InstanceUrl"),
+            };
+            SystemSettings.InitSettings(repositorySettings);
+            container.Register(r => repositorySettings).As<IRepositorySettings>().SingleInstance();
+            container.RegisterType<VerbatimTestDataHarvestJob>().As<IVerbatimTestDataHarvestJob>().InstancePerLifetimeScope();
+            container.RegisterType<VerbatimTestDataProcessJob>().As<IVerbatimTestDataProcessJob>().InstancePerLifetimeScope();
+            
+            GlobalConfiguration.Configuration.UseMongoStorage(
+                repositorySettings.MongoDbConnectionString, 
+                repositorySettings.JobsDatabaseName, 
+                MongoStorageOptions);
+
             var hostBuilder = new HostBuilder()
                 // Add configuration, logging, ...
                 .ConfigureServices((hostContext, services) =>
                 {
                     // Add your services for depedency injection.
+                    
                 });
+
+            // Add internal IoC
+            //container.Populate(services);
+            IContainer autofacContainer = container.Build();
+            GlobalConfiguration.Configuration.UseAutofacActivator(autofacContainer); // Hangfire
+
 
             using (var server = new BackgroundJobServer(new BackgroundJobServerOptions { WorkerCount = 5 }))
             {
                 await hostBuilder.RunConsoleAsync();
             }
         }
-
 
         private static MongoStorageOptions MongoStorageOptions
         {

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace SOS.Hangfire.UI
 {
+    // https://stackoverflow.com/questions/41829993/hangfire-dependency-injection-with-net-core
     public class Program
     {
         public static void Main(string[] args)

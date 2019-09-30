@@ -8,10 +8,23 @@ using SOS.Core.TestDataFactories;
 
 namespace SOS.Core.Jobs
 {
-    public class VerbatimTestDataHarvestJob
+    public interface IVerbatimTestDataHarvestJob
     {
-        private const string MongoUrl = "mongodb://localhost";
-        private const string DatabaseName = "diff_sample";
+        void Run(int nrObservations);
+    }
+
+    public class VerbatimTestDataHarvestJob : IVerbatimTestDataHarvestJob
+    {
+        private readonly IRepositorySettings _repositorySettings;
+
+        public VerbatimTestDataHarvestJob() : this(SystemSettings.GetRepositorySettings())
+        {
+        }
+
+        public VerbatimTestDataHarvestJob(IRepositorySettings repositorySettings)
+        {
+            _repositorySettings = repositorySettings;
+        }
 
         public void Run(int nrObservations)
         {
@@ -20,7 +33,7 @@ namespace SOS.Core.Jobs
             var verbatimObservations = VerbatimTestDataProviderObservationFactory.CreateRandomObservations(nrObservations);
 
             // 2. Drop verbatim collection to avoid duplicates. This should eventually be removed...
-            MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.VerbatimTestDataProviderObservations);
+            MongoDbContext dbContext = new MongoDbContext(_repositorySettings.MongoDbConnectionString, _repositorySettings.DatabaseName, Constants.VerbatimTestDataProviderObservations);
             var repository = new VerbatimObservationRepository<VerbatimTestDataProviderObservation>(dbContext);
             repository.DropVerbatimObservationCollectionAsync().Wait();
 
