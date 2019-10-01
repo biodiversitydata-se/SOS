@@ -12,7 +12,7 @@ namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
     [Collection("MongoDbIntegrationTests")]
     public class UpdateObservationsWithDifferentVersionsTests
     {
-        private const string MongoUrl = "mongodb://localhost";
+        private const string MongoDbConnectionString = "mongodb://localhost";
         private const string DatabaseName = "sos-local";
 
         [Fact]
@@ -22,7 +22,7 @@ namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Database connection, etc.
             //-----------------------------------------------------------------------------------------------------------
-            MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.ObservationCollectionName);
+            MongoDbContext dbContext = new MongoDbContext(MongoDbConnectionString, DatabaseName, Constants.ObservationCollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(dbContext);
             await observationRepository.DropObservationCollectionAsync();
             
@@ -84,7 +84,7 @@ namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Database connection, etc.
             //-----------------------------------------------------------------------------------------------------------
-            MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.ObservationCollectionName);
+            MongoDbContext dbContext = new MongoDbContext(MongoDbConnectionString, DatabaseName, Constants.ObservationCollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(dbContext);
             await observationRepository.DropObservationCollectionAsync();
             const int numberOfObservations = 10000;
