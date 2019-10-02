@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using MongoDB.Driver;
 using SOS.Core;
 using SOS.Core.Jobs;
@@ -18,26 +19,30 @@ namespace SOS.Hangfire.UI.Controllers
     [ApiController]
     public class JobTestController : ControllerBase
     {
-        private const string MongoUrl = "mongodb://localhost";
-        private const string DatabaseName = "diff_sample";
+        private readonly string _mongoDbJobsDatabaseName;
+        private readonly string _mongoDbConnectionString;
         private readonly IBackgroundJobClient _client;
 
-        public JobTestController(IBackgroundJobClient client)
+        public JobTestController(
+            IBackgroundJobClient client,
+            IRepositorySettings repositorySettings)
         {
             _client = client;
+            _mongoDbConnectionString = repositorySettings.MongoDbConnectionString;
+            _mongoDbJobsDatabaseName = repositorySettings.JobsDatabaseName;
         }
 
         [HttpPost("AddVerbatimTestDataProviderHarvestJob")]
         public ActionResult<IEnumerable<string>> AddVerbatimTestDataProviderHarvestJobRunOnce(int nrObservations)
         {
-            BackgroundJob.Enqueue<VerbatimTestDataHarvestJob>(job => job.Run(nrObservations));
+            BackgroundJob.Enqueue<IVerbatimTestDataHarvestJob>(job => job.Run(nrObservations));
             return Ok("VerbatimTestDataProvider observation harvest job added");
         }
 
         [HttpPost("AddVerbatimTestDataProviderProcessJob")]
         public ActionResult<IEnumerable<string>> AddVerbatimTestDataProviderProcessJob()
         {
-            BackgroundJob.Enqueue<VerbatimTestDataProcessJob>(job => job.Run());
+            BackgroundJob.Enqueue<IVerbatimTestDataProcessJob>(job => job.Run());
             return Ok("VerbatimTestDataProvider observation process job added");
         }
 
@@ -45,8 +50,8 @@ namespace SOS.Hangfire.UI.Controllers
         [HttpPost("AddVerbatimTestDataProviderHarvestJobAndContinueWithProcessing")]
         public ActionResult<IEnumerable<string>> AddVerbatimTestDataProviderHarvestJobAndContinueWithProcessing(int nrObservations)
         {
-            string jobId = BackgroundJob.Enqueue<VerbatimTestDataHarvestJob>(job => job.Run(nrObservations));
-            BackgroundJob.ContinueJobWith<VerbatimTestDataProcessJob>(
+            string jobId = BackgroundJob.Enqueue<IVerbatimTestDataHarvestJob>(job => job.Run(nrObservations));
+            BackgroundJob.ContinueJobWith<IVerbatimTestDataProcessJob>(
                 jobId,
                 job => job.Run());
 
@@ -56,7 +61,8 @@ namespace SOS.Hangfire.UI.Controllers
         [HttpPost("DropProcessedObservationCollection")]
         public ActionResult<string> DropProcessedObservationCollection()
         {
-            MongoDbContext observationsDbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.ObservationCollectionName);
+            MongoDbContext observationsDbContext = new MongoDbContext(_mongoDbConnectionString, _mongoDbJobsDatabaseName, Constants.ObservationCollectionName);
+            //MongoDbContext observationsDbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.ObservationCollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(observationsDbContext);
             observationRepository.DropObservationCollectionAsync().Wait();
             return Ok("Processed observation collection was deleted");

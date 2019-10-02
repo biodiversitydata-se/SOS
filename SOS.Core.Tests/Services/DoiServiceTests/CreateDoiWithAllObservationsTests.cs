@@ -17,8 +17,8 @@ namespace SOS.Core.Tests.Services.DoiServiceTests
     [Collection("MongoDbIntegrationTests")]
     public class CreateDoiWithAllObservationsTests
     {
-        private const string MongoUrl = "mongodb://localhost";
-        private const string DatabaseName = "diff_sample";
+        private const string MongoDbConnectionString = "mongodb://localhost";
+        private const string DatabaseName = "sos-local";
 
         [Fact]
         [Trait("Category", "Integration")]
@@ -28,8 +28,8 @@ namespace SOS.Core.Tests.Services.DoiServiceTests
             // Arrange - Drop MongoDb collections
             //-----------------------------------------------------------------------------------------------------------
             const int nrObservations = 10000;
-            MongoDbContext observationsDbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.ObservationCollectionName);
-            MongoDbContext doiDbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.DoiCollectionName);
+            MongoDbContext observationsDbContext = new MongoDbContext(MongoDbConnectionString, DatabaseName, Constants.ObservationCollectionName);
+            MongoDbContext doiDbContext = new MongoDbContext(MongoDbConnectionString, DatabaseName, Constants.DoiCollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(observationsDbContext);
             var doiRepository = new DoiRepository(doiDbContext);
             await observationRepository.DropObservationCollectionAsync();  
