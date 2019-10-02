@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Process.Factories.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Process.Services.Interfaces;
 
 
 namespace SOS.Process.Services
@@ -18,6 +19,8 @@ namespace SOS.Process.Services
 
         private readonly ISpeciesPortalProcessFactory _speciesPortalProcessFactory;
 
+        private readonly ITaxonService _taxonService;
+
         private readonly ILogger<ProcessService> _logger;
 
         /// <summary>
@@ -29,16 +32,20 @@ namespace SOS.Process.Services
         public ProcessService(
             IProcessedRepository processRepository,
             ISpeciesPortalProcessFactory speciesPortalProcessFactory,
+            ITaxonService taxonService,
             ILogger<ProcessService> logger)
         {
             _processRepository = processRepository ?? throw new ArgumentNullException(nameof(processRepository));
             _speciesPortalProcessFactory = speciesPortalProcessFactory ?? throw new ArgumentNullException(nameof(speciesPortalProcessFactory));
+            _taxonService = taxonService ?? throw new ArgumentNullException(nameof(taxonService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
         public async Task<bool> ImportAsync(int sources)
         {
+            var x = await _taxonService.GetTaxaAsync();
+
             _logger.LogDebug("Empty collection");
             // Make sure we have an empty collection
             await _processRepository.DeleteCollectionAsync();

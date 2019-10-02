@@ -122,6 +122,9 @@ namespace SOS.Process
 
             Configuration = builder.Build();
 
+            // Add app settings configuration
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+
             // Vebatim Mongo Db
             var verbatimDbConfiguration = Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
             var verbatimSettings = GetMongDbSettings(verbatimDbConfiguration);
@@ -153,6 +156,7 @@ namespace SOS.Process
 
             // Add Services
             services.AddScoped<IProcessService, ProcessService>();
+            services.AddScoped<ITaxonService, TaxonService>();
         }
 
         /// <summary>

@@ -15,17 +15,17 @@ namespace SOS.Import.Factories
     /// </summary>
     public class SpeciesPortalSightingFactory : Interfaces.ISpeciesPortalSightingFactory
     {
-        private IMetadataRepository _metadataRepository;
+        private readonly IMetadataRepository _metadataRepository;
 
-        private IProjectRepository _projectRepository;
+        private readonly IProjectRepository _projectRepository;
 
-        private ISightingRepository _sightingRepository;
+        private readonly ISightingRepository _sightingRepository;
 
-        private ISiteRepository _siteRepository;
+        private readonly ISiteRepository _siteRepository;
 
-        private ISightingVerbatimRepository _sightingAggregateRepository;
+        private readonly ISightingVerbatimRepository _sightingVerbatimRepository;
 
-        private ILogger<SpeciesPortalSightingFactory> _logger;
+        private readonly ILogger<SpeciesPortalSightingFactory> _logger;
 
         /// <summary>
         /// Constructor
@@ -34,21 +34,21 @@ namespace SOS.Import.Factories
         /// <param name="projectRepository"></param>
         /// <param name="sightingRepository"></param>
         /// <param name="siteRepository"></param>
-        /// <param name="sightingAggregateRepository"></param>
-        /// <param name="taxonRepository"></param>
+        /// <param name="sightingVerbatimRepository"></param>
+        /// <param name="logger"></param>
         public SpeciesPortalSightingFactory(IMetadataRepository metadataRepository, 
             IProjectRepository projectRepository, 
             ISightingRepository sightingRepository,
             ISiteRepository siteRepository,
-            ISightingVerbatimRepository sightingAggregateRepository,
+            ISightingVerbatimRepository sightingVerbatimRepository,
             ILogger<SpeciesPortalSightingFactory> logger)
         {
             _metadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
             _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
             _siteRepository = siteRepository ?? throw new ArgumentNullException(nameof(siteRepository));
-            _sightingAggregateRepository = sightingAggregateRepository ??
-                                           throw new ArgumentNullException(nameof(sightingAggregateRepository));
+            _sightingVerbatimRepository = sightingVerbatimRepository ??
+                                           throw new ArgumentNullException(nameof(sightingVerbatimRepository));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -98,8 +98,8 @@ namespace SOS.Import.Factories
 
                 _logger.LogDebug("Empty collection");
                 // Make sure we have an empty collection
-                await _sightingAggregateRepository.DeleteCollectionAsync();
-                await _sightingAggregateRepository.AddCollectionAsync();
+                await _sightingVerbatimRepository.DeleteCollectionAsync();
+                await _sightingVerbatimRepository.AddCollectionAsync();
 
                 var (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
                 const int chunkSize = 3000000;
@@ -117,7 +117,7 @@ namespace SOS.Import.Factories
                     var aggregates = sightings.ToAggregates(activities, genders, stages, units, sites, sightingProjects);
 
                     // Add sightings to mongodb
-                    await _sightingAggregateRepository.AddManyAsync(aggregates);
+                    await _sightingVerbatimRepository.AddManyAsync(aggregates);
 
                     // Calculate start of next chunk
                     minId += chunkSize;
