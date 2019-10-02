@@ -10,7 +10,7 @@ namespace SOS.Import.Repositories.Destination.Interfaces
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TKey"></typeparam>
-    public interface IAggregateRepository<TEntity, in TKey> : IDisposable where TEntity : IEntity<TKey>
+    public interface IVerbatimRepository<TEntity, in TKey> : IDisposable where TEntity : IEntity<TKey>
     {
         /// <summary>
         /// Add collection if not exists

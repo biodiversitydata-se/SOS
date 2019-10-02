@@ -82,7 +82,7 @@
 //        //}
 //        //}
 
-//        //public async Task<IEnumerable<ObservationVersionIdentifier>> GetDoiObservationsAsync(string filename)
+//        //public async Task<IEnumerable<ObservationVersionIdentifier>> GetDoiObservationIdentifiersAsync(string filename)
 //        //{
 //        //var messagePackFile = await GetDoiFileAsync(filename);
 //        //var res = MessagePack.MessagePackSerializer.Deserialize<IEnumerable<ObservationVersionIdentifier>>(messagePackFile);

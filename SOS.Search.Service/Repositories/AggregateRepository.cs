@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -53,7 +54,11 @@ namespace SOS.Search.Service.Repositories
 
             Database = mongoClient.GetDatabase($"{mongoDbConfiguration.Value.DatabaseName}");
 
-            _collectionName = typeof(TEntity).Name;
+            // Clean name from non alfa numeric chats
+            var regex = new Regex(@"\w+");
+            var match = regex.Match(typeof(TEntity).Name);
+
+            _collectionName = match.Value;
         }
 
         /// <summary>

@@ -19,6 +19,7 @@ namespace SOS.Search.Service.Controllers
     {
         private readonly ISightingFactory _sightingFactory;
         private readonly ILogger<SightingController> _logger;
+        private const int _maxBatchSize = 10000;
 
         /// <summary>
         /// Constructor
@@ -40,7 +41,7 @@ namespace SOS.Search.Service.Controllers
         {
             try
             {
-                if (skip <= 0 || take <= 0 || skip < take)
+                if (skip < 0 || take <= 0 || take > _maxBatchSize)
                 {
                     return new BadRequestResult();
                 }

@@ -10,6 +10,31 @@
     <PackageReference Include="MessagePack" Version="1.7.3.7" />
     <PackageReference Include="MongoDB.Driver" Version="2.9.1" />
     <PackageReference Include="MongoDB.Driver.GridFS" Version="2.9.1" />
+    <PackageReference Include="NetTopologySuite" Version="1.15.3" />
+    <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="1.15.5" />
+    <PackageReference Include="ProjNET4GeoAPI" Version="1.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Factories\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\GIS\Counties.geojson">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\GIS\CountryParts.geojson">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\GIS\Municipalities.geojson">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\GIS\Provinces.geojson">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\GIS\SimplifiedSwedenExtents.geojson">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -7,7 +7,10 @@ namespace SOS.Core.Services
 {
     public interface IDoiService
     {
-        Task<DoiInfo> CreateDoiWithAllObservationsAsync(DoiMetadata doiMetadata);
-        Task<IEnumerable<ObservationVersionIdentifier>> GetDoiObservationsAsync(string filename);
+        Task<DoiInfo> CreateDoiAsync(
+            IEnumerable<ObservationVersionIdentifier> observationIdentifiers,
+            DoiMetadata doiMetadata);
+        Task<IEnumerable<ObservationVersionIdentifier>> GetDoiObservationIdentifiersAsync(string filename);
+        Task<IList<ProcessedDwcObservation>> GetDoiObservationsAsync(string filename);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -33,8 +34,9 @@ namespace SOS.Search.Service.Repositories
         /// <param name="taxonIds"></param>
         /// <returns></returns>
         private FilterDefinition<DarwinCore<DynamicProperties>> CreateFilter(int[] taxonIds)
-        {   // NOT IMPLEMENTED, place holder code
-            var filter = Builders<DarwinCore<DynamicProperties>>.Filter.Where(m => taxonIds.IsReadOnly);
+        {
+            var ids = taxonIds?.Select(i => i.ToString()) ?? new string[0];
+            var filter = Builders<DarwinCore<DynamicProperties>>.Filter.Where(m => ids.Contains(m.Taxon.TaxonID));
 
            
             return filter;
@@ -47,7 +49,7 @@ namespace SOS.Search.Service.Repositories
 
             var res = await MongoCollection
                 .Find(filter)
-                .Sort(Builders<DarwinCore<DynamicProperties>>.Sort.Descending("id"))
+               // .Sort(Builders<DarwinCore<DynamicProperties>>.Sort.Descending("id"))
                 .Skip(skip)
                 .Limit(take)
                 .ToListAsync();

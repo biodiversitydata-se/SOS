@@ -4,16 +4,16 @@ using MongoDB.Driver;
 using SOS.Core.Models.Observations;
 using SOS.Core.Models.Versioning;
 using SOS.Core.Repositories;
-using SOS.Core.Tests.TestRepositories;
+using SOS.Core.Tests.TestDataFactories;
 using Xunit;
 
 namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
 {
+    [Collection("MongoDbIntegrationTests")]
     public class UpdateObservationsWithDifferentVersionsTests
     {
         private const string MongoUrl = "mongodb://localhost";
         private const string DatabaseName = "diff_sample";
-        private const string CollectionName = "observations";
 
         [Fact]
         [Trait("Category", "Integration")]
@@ -22,15 +22,14 @@ namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Database connection, etc.
             //-----------------------------------------------------------------------------------------------------------
-            MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, CollectionName);
-            await dbContext.Mongodb.DropCollectionAsync(CollectionName);
+            MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.ObservationCollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(dbContext);
-
+            await observationRepository.DropObservationCollectionAsync();
             
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Observation versions. One original version and 3 different updated versions.
             //-----------------------------------------------------------------------------------------------------------
-            ProcessedDwcObservation originalObservation = ProcessedDwcObservationTestRepository.CreateRandomObservation();
+            ProcessedDwcObservation originalObservation = ProcessedDwcObservationTestDataFactory.CreateRandomObservation();
             var observationVersion2 = (ProcessedDwcObservation)originalObservation.Clone();
             observationVersion2.RecordedBy = "Peter van Nostrand";
             var observationVersion3 = (ProcessedDwcObservation)observationVersion2.Clone();
@@ -85,10 +84,10 @@ namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Database connection, etc.
             //-----------------------------------------------------------------------------------------------------------
-            MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, CollectionName);
-            await dbContext.Mongodb.DropCollectionAsync(CollectionName);
+            MongoDbContext dbContext = new MongoDbContext(MongoUrl, DatabaseName, Constants.ObservationCollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(dbContext);
-            const int numberOfObservations = 100000;
+            await observationRepository.DropObservationCollectionAsync();
+            const int numberOfObservations = 10000;
 
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create <DataProviderId, CatalogNumber> index
@@ -107,7 +106,7 @@ namespace SOS.Core.Tests.Repositories.VersionedObservationRepositoryTests
             //-----------------------------------------------------------------------------------------------------------
             // Arrange - Create original observations
             //-----------------------------------------------------------------------------------------------------------
-            var speciesObservations = ProcessedDwcObservationTestRepository.CreateRandomObservations(numberOfObservations);
+            var speciesObservations = ProcessedDwcObservationTestDataFactory.CreateRandomObservations(numberOfObservations);
 
 
             //-----------------------------------------------------------------------------------------------------------

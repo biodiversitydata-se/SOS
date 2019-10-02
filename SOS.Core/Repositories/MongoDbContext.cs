@@ -18,6 +18,8 @@ namespace SOS.Core.Repositories
             _collectionName = collectionName;
         }
 
+        public string CollectionName => _collectionName;
+
         public IMongoCollection<T> MongoDbCollection<T>()
         {
             return Mongodb.GetCollection<T>(_collectionName);

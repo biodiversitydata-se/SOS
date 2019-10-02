@@ -167,7 +167,7 @@ namespace SOS.Import
             services.AddScoped<ITaxonRepository, TaxonRepository>();
 
             // Repositories destination
-            services.AddScoped<ISightingAggregateRepository, SightingAggregateRepository>();
+            services.AddScoped<ISightingVerbatimRepository, SightingVerbatimRepository>();
 
             // Add factories
             services.AddScoped<ISpeciesPortalSightingFactory, SpeciesPortalSightingFactory>();

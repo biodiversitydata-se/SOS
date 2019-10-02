@@ -38,6 +38,6 @@
         /// <summary>
         /// How many items to add in a time
         /// </summary>
-        public int AddBatchSize { get; set; }
+        public int BatchSize { get; set; }
     }
 }

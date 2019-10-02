@@ -8,12 +8,14 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using NLog.Extensions.Logging;
 using SOS.Process.Configuration;
+using SOS.Process.Database;
+using SOS.Process.Database.Interfaces;
 using SOS.Process.Factories;
 using SOS.Process.Factories.Interfaces;
-using SOS.Process.Repositories.Destination.SpeciesPortal;
-using SOS.Process.Repositories.Destination.SpeciesPortal.Interfaces;
-using SOS.Process.Repositories.Source.SpeciesPortal;
-using SOS.Process.Repositories.Source.SpeciesPortal.Interfaces;
+using SOS.Process.Repositories.Destination;
+using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Process.Repositories.Source;
+using SOS.Process.Repositories.Source.Interfaces;
 using SOS.Process.Services;
 using SOS.Process.Services.Interfaces;
 
@@ -78,7 +80,7 @@ namespace SOS.Process
                         NLog.LogManager.LoadConfiguration($"NLog.{env}.config");
 
                         // Get updateservice
-                        var importService = ServiceProvider.GetService<IImportService>();
+                        var importService = ServiceProvider.GetService<IProcessService>();
 
                         Console.WriteLine("Startar import");
 
@@ -97,8 +99,9 @@ namespace SOS.Process
                 });
                 app.Execute(args);
             }
-            catch
+            catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 app.ShowHelp();
             }
         }
@@ -119,35 +122,15 @@ namespace SOS.Process
 
             Configuration = builder.Build();
 
-            // Mongo Db
-            var mongoConfigSection = Configuration.GetSection("MongoDbConfiguration");
+            // Vebatim Mongo Db
+            var verbatimDbConfiguration = Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+            var verbatimSettings = GetMongDbSettings(verbatimDbConfiguration);
+            services.AddSingleton<IVerbatimClient, VerbatimClient>(x => new VerbatimClient(verbatimSettings, verbatimDbConfiguration.DatabaseName, verbatimDbConfiguration.BatchSize));
 
-            // Add configuration
-            services.Configure<MongoDbConfiguration>(mongoConfigSection);
-
-            var mongoConfiguration = mongoConfigSection.Get<MongoDbConfiguration>();
-            var settings = new MongoClientSettings
-            {
-                Servers = mongoConfiguration.Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)),
-                ReplicaSetName = mongoConfiguration.ReplicaSetName,
-                UseTls = mongoConfiguration.UseTls,
-                SslSettings = mongoConfiguration.UseTls ? new SslSettings
-                {
-                    EnabledSslProtocols = SslProtocols.Tls12
-                } : null
-            };
-
-            if (!string.IsNullOrEmpty(mongoConfiguration.DatabaseName) &&
-                !string.IsNullOrEmpty(mongoConfiguration.Password))
-            {
-                var identity = new MongoInternalIdentity(mongoConfiguration.DatabaseName, mongoConfiguration.UserName);
-                var evidence = new PasswordEvidence(mongoConfiguration.Password);
-
-                settings.Credential = new MongoCredential("SCRAM-SHA-1", identity, evidence);
-            }
-
-            // Setup Mongo Db
-            services.AddSingleton<IMongoClient, MongoClient>(x => new MongoClient(settings));
+            // Processed Mongo Db
+            var processedDbConfiguration = Configuration.GetSection("ProcessedDbConfiguration").Get<MongoDbConfiguration>();
+            var processedSettings = GetMongDbSettings(processedDbConfiguration);
+            services.AddSingleton<IProcessClient, ProcessClient>(x => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName, processedDbConfiguration.BatchSize));
 
             // Add options
             services.AddOptions();
@@ -160,21 +143,46 @@ namespace SOS.Process
             services.AddLogging(logger => logger.SetMinimumLevel(LogLevel.Trace));
 
             // Repositories source
-            services.AddScoped<IMetadataRepository, MetadataRepository>();
-            services.AddScoped<IProjectRepository, ProjectRepository>();
-            services.AddScoped<ISightingRepository, SightingRepository>();
-            services.AddScoped<ISiteRepository, SiteRepository>();
-            services.AddScoped<ITaxonRepository, TaxonRepository>();
+            services.AddScoped<ISpeciesPortalVerbatimRepository, SpeciesPortalVerbatimRepository>();
 
             // Repositories destination
-            services.AddScoped<ISightingAggregateRepository, SightingAggregateRepository>();
+            services.AddScoped<IProcessedRepository, ProcessedRepository>();
 
             // Add factories
-            services.AddScoped<ISpeciesPortalSightingFactory, SpeciesPortalSightingFactory>();
+            services.AddScoped<ISpeciesPortalProcessFactory, SpeciesPortalProcessFactory>();
 
             // Add Services
-            services.AddScoped<IImportService, ImportService>();
-            services.AddScoped<ISpeciesPortalDataService, SpeciesPortalDataService>();
+            services.AddScoped<IProcessService, ProcessService>();
+        }
+
+        /// <summary>
+        /// Get mongo db settings object
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        private static MongoClientSettings GetMongDbSettings(MongoDbConfiguration config)
+        {
+            MongoInternalIdentity identity = null;
+            PasswordEvidence evidence = null;
+            if (!(string.IsNullOrEmpty(config.DatabaseName) ||
+                string.IsNullOrEmpty(config.UserName) ||
+                string.IsNullOrEmpty(config.Password)))
+            {
+                identity = new MongoInternalIdentity(config.DatabaseName, config.UserName);
+                evidence = new PasswordEvidence(config.Password);
+            }
+
+            return new MongoClientSettings
+            {
+                Servers = config.Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)),
+                ReplicaSetName = config.ReplicaSetName,
+                UseTls = config.UseTls,
+                SslSettings = config.UseTls ? new SslSettings
+                {
+                    EnabledSslProtocols = SslProtocols.Tls12
+                } : null,
+                Credential = identity != null && evidence != null ? new MongoCredential("SCRAM-SHA-1", identity, evidence) : null
+            };
         }
     }
 }

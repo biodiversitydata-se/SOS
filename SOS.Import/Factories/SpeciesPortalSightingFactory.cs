@@ -25,7 +25,7 @@ namespace SOS.Import.Factories
 
         private ITaxonRepository _taxonRepository;
 
-        private ISightingAggregateRepository _sightingAggregateRepository;
+        private ISightingVerbatimRepository _sightingAggregateRepository;
 
         private ILogger<SpeciesPortalSightingFactory> _logger;
 
@@ -42,7 +42,7 @@ namespace SOS.Import.Factories
             IProjectRepository projectRepository, 
             ISightingRepository sightingRepository,
             ISiteRepository siteRepository,
-            ISightingAggregateRepository sightingAggregateRepository,
+            ISightingVerbatimRepository sightingAggregateRepository,
             ITaxonRepository taxonRepository,
             ILogger<SpeciesPortalSightingFactory> logger)
         {
