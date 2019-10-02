@@ -23,8 +23,6 @@ namespace SOS.Import.Factories
 
         private ISiteRepository _siteRepository;
 
-        private ITaxonRepository _taxonRepository;
-
         private ISightingVerbatimRepository _sightingAggregateRepository;
 
         private ILogger<SpeciesPortalSightingFactory> _logger;
@@ -43,7 +41,6 @@ namespace SOS.Import.Factories
             ISightingRepository sightingRepository,
             ISiteRepository siteRepository,
             ISightingVerbatimRepository sightingAggregateRepository,
-            ITaxonRepository taxonRepository,
             ILogger<SpeciesPortalSightingFactory> logger)
         {
             _metadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
@@ -52,7 +49,6 @@ namespace SOS.Import.Factories
             _siteRepository = siteRepository ?? throw new ArgumentNullException(nameof(siteRepository));
             _sightingAggregateRepository = sightingAggregateRepository ??
                                            throw new ArgumentNullException(nameof(sightingAggregateRepository));
-            _taxonRepository = taxonRepository ?? throw new ArgumentNullException(nameof(taxonRepository));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -76,9 +72,6 @@ namespace SOS.Import.Factories
                 var genders = metaDataTasks[1].Result.ToAggregates().ToDictionary(g => g.Id, g => g);
                 var stages = metaDataTasks[2].Result.ToAggregates().ToDictionary(s => s.Id, s => s);
                 var units = metaDataTasks[3].Result.ToAggregates().ToDictionary(u => u.Id, u => u);
-
-                _logger.LogDebug("Start getting taxa");
-                var taxa = (await _taxonRepository.GetAsync()).ToAggregates().ToDictionary(t => t.Id, t => t);
 
                 _logger.LogDebug("Start getting projects");
                 var projects = (await _projectRepository.GetAsync()).ToAggregates().ToDictionary(p => p.Id, p => p);
@@ -121,7 +114,7 @@ namespace SOS.Import.Factories
                     var sightings = await _sightingRepository.GetChunkAsync(minId, chunkSize);
 
                     // Cast sightings to aggregates
-                    var aggregates = sightings.ToAggregates(activities, genders, stages, units, taxa, sites, sightingProjects);
+                    var aggregates = sightings.ToAggregates(activities, genders, stages, units, sites, sightingProjects);
 
                     // Add sightings to mongodb
                     await _sightingAggregateRepository.AddManyAsync(aggregates);

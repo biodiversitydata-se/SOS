@@ -18,7 +18,6 @@ namespace SOS.Import.Extensions
         /// <param name="genders"></param>
         /// <param name="stages"></param>
         /// <param name="units"></param>
-        /// <param name="taxa"></param>
         /// <param name="sites"></param>
         /// <param name="projects"></param>
         /// <returns></returns>
@@ -27,7 +26,6 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> genders,
             IDictionary<int, Metadata> stages,
             IDictionary<int, Metadata> units,
-            IDictionary<int, Taxon> taxa,
             IDictionary<int, Site> sites,
             IDictionary<int, List<Project>> projects)
         {
@@ -49,7 +47,7 @@ namespace SOS.Import.Extensions
                 Stage = entity.StageId.HasValue && stages.ContainsKey(entity.StageId.Value) ? stages[entity.StageId.Value] : null,
                 StartDate = entity.StartDate,
                 StartTime = entity.StartTime,
-                Taxon = entity.TaxonId.HasValue && taxa.ContainsKey(entity.TaxonId.Value) ? taxa[entity.TaxonId.Value] : null,
+                TaxonId = entity.TaxonId,
                 Unit = entity.UnitId.HasValue && units.ContainsKey(entity.UnitId.Value) ? units[entity.UnitId.Value] : null,
                 Unspontaneous = entity.Unspontaneous,
                 UnsureDetermination = entity.UnsureDetermination,
@@ -65,7 +63,6 @@ namespace SOS.Import.Extensions
         /// <param name="genders"></param>
         /// <param name="stages"></param>
         /// <param name="units"></param>
-        /// <param name="taxa"></param>
         /// <param name="sites"></param>
         /// <param name="projects"></param>
         /// <returns></returns>
@@ -74,11 +71,10 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> genders,
             IDictionary<int, Metadata> stages,
             IDictionary<int, Metadata> units,
-            IDictionary<int, Taxon> taxa,
             IDictionary<int, Site> sites,
             IDictionary<int, List<Project>> projects)
         {
-            return entities.Select(e => e.ToAggregate(activities, genders, stages, units, taxa, sites, projects));
+            return entities.Select(e => e.ToAggregate(activities, genders, stages, units, sites, projects));
         }
 
         /// <summary>
@@ -150,27 +146,6 @@ namespace SOS.Import.Extensions
         /// <param name="entities"></param>
         /// <returns></returns>
         public static IEnumerable<Site> ToAggregates(this IEnumerable<SiteEntity> entities)
-        {
-            return entities.Select(e => e.ToAggregate());
-        }
-
-        public static Taxon ToAggregate(this TaxonEntity entity)
-        {
-            return new Taxon
-            {
-                Category = entity.Category,
-                Id = entity.Id,
-                ScientificName = entity.ScientificName,
-                SwedishName = entity.SwedishName
-            };
-        }
-
-        /// <summary>
-        /// Cast multiple taxa entities to aggregates 
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        public static IEnumerable<Taxon> ToAggregates(this IEnumerable<TaxonEntity> entities)
         {
             return entities.Select(e => e.ToAggregate());
         }

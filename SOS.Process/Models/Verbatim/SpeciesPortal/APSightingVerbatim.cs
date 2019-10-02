@@ -91,7 +91,7 @@ namespace SOS.Process.Models.Verbatim.SpeciesPortal
         /// <summary>
         /// Taxon
         /// </summary>
-        public Taxon Taxon { get; set; }
+        public int? TaxonId { get; set; }
 
         /// <summary>
         /// Id of unit

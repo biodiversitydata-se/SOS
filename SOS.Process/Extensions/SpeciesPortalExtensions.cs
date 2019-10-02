@@ -21,9 +21,9 @@ namespace SOS.Process.Extensions
             return new DarwinCore()
             {
                 DatasetID = $"{ (int)SightingProviders.SpeciesPortal }>{ verbatim.Id }",
-                Taxon = verbatim.Taxon != null ? new DarwinCoreTaxon
+                Taxon = verbatim.TaxonId != null ? new DarwinCoreTaxon
                 {
-                    TaxonID = verbatim.Taxon.Id.ToString()
+                    TaxonID = verbatim.TaxonId.ToString()
                 } : null
             };
         }

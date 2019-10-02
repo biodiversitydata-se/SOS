@@ -89,9 +89,9 @@ namespace SOS.Import.Models.Aggregates
         public TimeSpan? StartTime { get; set; }
         
         /// <summary>
-        /// Taxon
+        /// Taxon Id
         /// </summary>
-        public Taxon Taxon { get; set; }
+        public int? TaxonId { get; set; }
 
         /// <summary>
         /// Id of unit

@@ -164,7 +164,6 @@ namespace SOS.Import
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<ISightingRepository, SightingRepository>();
             services.AddScoped<ISiteRepository, SiteRepository>();
-            services.AddScoped<ITaxonRepository, TaxonRepository>();
 
             // Repositories destination
             services.AddScoped<ISightingVerbatimRepository, SightingVerbatimRepository>();
