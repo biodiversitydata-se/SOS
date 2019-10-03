@@ -44,7 +44,15 @@ namespace SOS.Process.Services
         /// <inheritdoc />
         public async Task<bool> ImportAsync(int sources)
         {
-            var x = await _taxonService.GetTaxaAsync();
+            _logger.LogDebug("Start getting taxa");
+            var taxa = (await _taxonService.GetTaxaAsync())?.ToDictionary(t => t.TaxonID, t => t);
+
+            if (!taxa?.Any() ?? true)
+            {
+                _logger.LogDebug("Failed to get taxa");
+
+                return false;
+            }
 
             _logger.LogDebug("Empty collection");
             // Make sure we have an empty collection
@@ -57,7 +65,7 @@ namespace SOS.Process.Services
             // Add species portal import if first bit is set
             if ((sources & 1) > 0)
             {
-                processTasks.Add(_speciesPortalProcessFactory.ProcessAsync());
+                processTasks.Add(_speciesPortalProcessFactory.ProcessAsync(taxa));
             }
 
             // Run all tasks async

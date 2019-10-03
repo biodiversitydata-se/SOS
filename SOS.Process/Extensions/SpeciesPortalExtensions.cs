@@ -15,34 +15,27 @@ namespace SOS.Process.Extensions
         /// Cast sighting verbatim to Darwin Core
         /// </summary>
         /// <param name="verbatim"></param>
+        /// <param name="taxa"></param>
         /// <returns></returns>
-        public static DarwinCore ToDarwinCore(this APSightingVerbatim verbatim)
+        public static DarwinCore ToDarwinCore(this APSightingVerbatim verbatim, IDictionary<string, DarwinCoreTaxon> taxa)
         {
+            var taxonId = verbatim.TaxonId.ToString();
             return new DarwinCore()
             {
-                DatasetID = $"{ (int)SightingProviders.SpeciesPortal }>{ verbatim.Id }",
-                Taxon = verbatim.TaxonId != null ? new DarwinCoreTaxon
-                {
-                    TaxonID = verbatim.TaxonId.ToString()
-                } : null
+                DatasetID = $"{ (int)SightingProviders.SpeciesPortal }-{ verbatim.Id }",
+                Taxon = taxa.ContainsKey(taxonId) ? taxa[taxonId] : null
             };
         }
 
         /// <summary>
-        ///  Cast multiple sightings entities to models 
+        /// Cast multiple sightings entities to models 
         /// </summary>
-        /// <param name="entities"></param>
-        /// <param name="activities"></param>
-        /// <param name="genders"></param>
-        /// <param name="stages"></param>
-        /// <param name="units"></param>
+        /// <param name="verbatims"></param>
         /// <param name="taxa"></param>
-        /// <param name="sites"></param>
-        /// <param name="projects"></param>
         /// <returns></returns>
-        public static IEnumerable<DarwinCore> ToDarwinCore(this IEnumerable<APSightingVerbatim> verbatims)
+        public static IEnumerable<DarwinCore> ToDarwinCore(this IEnumerable<APSightingVerbatim> verbatims, IDictionary<string, DarwinCoreTaxon> taxa)
         {
-            return verbatims.Select(v => v.ToDarwinCore());
+            return verbatims.Select(v => v.ToDarwinCore(taxa));
         }
     }
 }

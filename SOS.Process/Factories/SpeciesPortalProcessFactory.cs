@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Process.Extensions;
+using SOS.Process.Models.Processed;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
@@ -31,8 +33,9 @@ namespace SOS.Process.Factories
         /// <summary>
         /// Process verbatim data and store it in darwin core format
         /// </summary>
+        /// <param name="taxa"></param>
         /// <returns></returns>
-        public async Task<bool> ProcessAsync()
+        public async Task<bool> ProcessAsync(IDictionary<string, DarwinCoreTaxon> taxa)
         {
             try
             {
@@ -44,7 +47,7 @@ namespace SOS.Process.Factories
 
                 while (count > 0)
                 {
-                    await ProcessRepository.AddManyAsync(verbatim.ToDarwinCore());
+                    await ProcessRepository.AddManyAsync(verbatim.ToDarwinCore(taxa));
 
                     verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(totalCount + 1);
                     count = verbatim.Count();
