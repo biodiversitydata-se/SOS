@@ -19,10 +19,10 @@ namespace SOS.Process.Factories
         /// <param name="processRepository"></param>
         /// <param name="logger"></param>
         public ProcessBaseFactory(
-            IProcessedRepository processRepository,
+            IProcessedRepository processedRepository,
             ILogger<TEntity> logger)
         {
-            ProcessRepository = processRepository ?? throw new ArgumentNullException(nameof(processRepository));
+            ProcessRepository = processedRepository ?? throw new ArgumentNullException(nameof(processedRepository));
 
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }

@@ -21,11 +21,11 @@ namespace SOS.Process.Factories
         /// Constructor
         /// </summary>
         /// <param name="speciesPortalVerbatimRepository"></param>
-        /// <param name="processRepository"></param>
+        /// <param name="processedRepository"></param>
         /// <param name="logger"></param>
         public SpeciesPortalProcessFactory(ISpeciesPortalVerbatimRepository speciesPortalVerbatimRepository,
-            IProcessedRepository processRepository,
-            ILogger<SpeciesPortalProcessFactory> logger) : base(processRepository, logger)
+            IProcessedRepository processedRepository,
+            ILogger<SpeciesPortalProcessFactory> logger) : base(processedRepository, logger)
         {
             _speciesPortalVerbatimRepository = speciesPortalVerbatimRepository ?? throw new ArgumentNullException(nameof(speciesPortalVerbatimRepository));
         }
@@ -43,6 +43,13 @@ namespace SOS.Process.Factories
 
                 var verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(0);
                 var count = verbatim.Count();
+
+                if (count == 0)
+                {
+                    Logger.LogError("No verbatim data to process");
+                    return false;
+                }
+
                 var totalCount = count;
 
                 while (count > 0)

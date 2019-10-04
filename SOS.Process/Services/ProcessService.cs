@@ -7,13 +7,12 @@ using SOS.Process.Factories.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Services.Interfaces;
 
-
 namespace SOS.Process.Services
 {
     /// <summary>
     /// Main service
     /// </summary>
-    public class ProcessService : Interfaces.IProcessService
+    public class ProcessService : IProcessService
     {
         private readonly IProcessedRepository _processRepository;
 
