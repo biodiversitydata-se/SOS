@@ -1,4 +1,5 @@
 ﻿using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace SOS.Process.Models.Processed
@@ -9,7 +10,7 @@ namespace SOS.Process.Models.Processed
     /// Further information about the properties can
     /// be found at http://rs.tdwg.org/dwc/terms/.
     /// </summary>
-    public class DarwinCore : Interfaces.IEntity<string>
+    public class DarwinCore : Interfaces.IEntity<ObjectId>
     {
         /// <summary>
         /// Darwin Core term name: dcterms:accessRights.
@@ -79,7 +80,6 @@ namespace SOS.Process.Models.Processed
         /// May be a global unique identifier or an identifier
         /// specific to a collection or institution.
         /// </summary>
-        [BsonId]
         public string DatasetID { get; set; }
 
         /// <summary>
@@ -113,6 +113,11 @@ namespace SOS.Process.Models.Processed
         /// </summary>
         public DarwinCoreGeologicalContext GeologicalContext { get; set; }
 
+        /// <summary>
+        /// Mongodb id
+        /// </summary>
+        [BsonId]
+        public ObjectId Id { get; set; }
 
         /// <summary>
         /// Darwin Core term name: Identification.

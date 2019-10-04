@@ -10,7 +10,7 @@ namespace SOS.Process.Models.Processed.Interfaces
         /// <summary>
         /// Id
         /// </summary>
-        TKey DatasetID { get; set; }
+        TKey Id { get; set; }
     }
 
     /// <summary>

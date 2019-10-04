@@ -10,7 +10,7 @@ namespace SOS.Search.Service.Models.Interfaces
         /// <summary>
         /// Id
         /// </summary>
-        TKey DatasetID { get; set; }
+        TKey Id { get; set; }
     }
 
     /// <summary>

@@ -54,5 +54,28 @@ namespace SOS.Search.Service.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <inheritdoc />
+        [HttpPost("taxa/{taxonId}")]
+        [ProducesResponseType(typeof(IEnumerable<DarwinCore<string>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetChunkAsync([FromRoute]int taxonId, [FromBody]IEnumerable<string> fields, [FromQuery]int skip, [FromQuery]int take)
+        {
+            try
+            {
+                if (skip < 0 || take <= 0 || take > _maxBatchSize)
+                {
+                    return new BadRequestResult();
+                }
+
+                return new OkObjectResult(await _sightingFactory.GetChunkAsync(taxonId, fields, skip, take));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting batch of sightings");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

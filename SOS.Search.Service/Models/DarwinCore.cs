@@ -1,5 +1,7 @@
 ﻿using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace SOS.Search.Service.Models
 {
@@ -9,7 +11,7 @@ namespace SOS.Search.Service.Models
     /// Further information about the properties can
     /// be found at http://rs.tdwg.org/dwc/terms/.
     /// </summary>
-    public class DarwinCore<T> : Interfaces.IEntity<string>
+    public class DarwinCore<T> : Interfaces.IEntity<ObjectId>
     {
         /// <summary>
         /// Darwin Core term name: dcterms:accessRights.
@@ -113,6 +115,11 @@ namespace SOS.Search.Service.Models
         /// </summary>
         public DarwinCoreGeologicalContext GeologicalContext { get; set; }
 
+        /// <summary>
+        /// MongoDb id
+        /// </summary>
+        [BsonId, JsonIgnore]
+        public ObjectId Id { get; set; }
 
         /// <summary>
         /// Darwin Core term name: Identification.

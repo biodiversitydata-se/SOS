@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Search.Service.Configuration;
 using SOS.Search.Service.Models;
@@ -13,7 +15,7 @@ namespace SOS.Search.Service.Repositories
     /// <summary>
     /// Species data service
     /// </summary>
-    public class ProcessedDarwinCoreRepository : AggregateRepository<DarwinCore<DynamicProperties>, string>, IProcessedDarwinCoreRepository
+    public class ProcessedDarwinCoreRepository : AggregateRepository<DarwinCore<DynamicProperties>, ObjectId>, IProcessedDarwinCoreRepository
     {
         /// <summary>
         /// Constructor
@@ -33,13 +35,18 @@ namespace SOS.Search.Service.Repositories
         /// </summary>
         /// <param name="taxonIds"></param>
         /// <returns></returns>
-        private FilterDefinition<DarwinCore<DynamicProperties>> CreateFilter(int[] taxonIds)
+        private FilterDefinition<DarwinCore<DynamicProperties>> CreateFilter(IEnumerable<int> taxonIds)
         {
             var ids = taxonIds?.Select(i => i.ToString()) ?? new string[0];
             var filter = Builders<DarwinCore<DynamicProperties>>.Filter.Where(m => ids.Contains(m.Taxon.TaxonID));
 
-           
             return filter;
+        }
+
+        private string CreateProjection(IEnumerable<string> fields)
+        {
+            var projection = $"{{ _id: 0, { fields?.Where(f => !string.IsNullOrEmpty(f)).Select((f, i) => $"'{f}': {i+1}").Join(",") } }}";
+            return projection;
         }
 
         /// <inheritdoc />
@@ -55,6 +62,23 @@ namespace SOS.Search.Service.Repositories
                 .ToListAsync();
 
             return res;
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<dynamic>> GetChunkAsync(int taxonId, IEnumerable<string> fields, int skip, int take)
+        {
+            var filter = CreateFilter(new[] { taxonId });
+
+            var res = await MongoCollection
+                .Find(filter)
+                .Project(Builders<DarwinCore<DynamicProperties>>.Projection
+                    .Exclude("_id")) // _id is special and needs to be explicitly excluded if not needed
+                .Project(CreateProjection(fields))
+                .Skip(skip)
+                .Limit(take)
+                .ToListAsync();
+
+            return res.ConvertAll(BsonTypeMapper.MapToDotNetValue);
         }
     }
 }

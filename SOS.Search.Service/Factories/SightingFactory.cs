@@ -46,5 +46,20 @@ namespace SOS.Search.Service.Factories
                 return null;
             }
         }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<dynamic>> GetChunkAsync(int taxonId, IEnumerable<string> fields, int skip, int take)
+        {
+            try
+            {
+                var result = await _ProcessedDarwinCoreRepository.GetChunkAsync(taxonId, fields, skip, take);
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get chunk of sightings");
+                return null;
+            }
+        }
     }
 }
