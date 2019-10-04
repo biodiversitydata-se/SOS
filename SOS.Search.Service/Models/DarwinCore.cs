@@ -81,7 +81,6 @@ namespace SOS.Search.Service.Models
         /// May be a global unique identifier or an identifier
         /// specific to a collection or institution.
         /// </summary>
-        [BsonId]
         public string DatasetID { get; set; }
 
         /// <summary>
