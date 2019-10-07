@@ -43,6 +43,11 @@ namespace SOS.Search.Service.Repositories
             return filter;
         }
 
+        /// <summary>
+        /// Build a projection string
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <returns></returns>
         private string CreateProjection(IEnumerable<string> fields)
         {
             var projection = $"{{ _id: 0, { fields?.Where(f => !string.IsNullOrEmpty(f)).Select((f, i) => $"'{f}': {i+1}").Join(",") } }}";
@@ -71,8 +76,6 @@ namespace SOS.Search.Service.Repositories
 
             var res = await MongoCollection
                 .Find(filter)
-                .Project(Builders<DarwinCore<DynamicProperties>>.Projection
-                    .Exclude("_id")) // _id is special and needs to be explicitly excluded if not needed
                 .Project(CreateProjection(fields))
                 .Skip(skip)
                 .Limit(take)
