@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using JsonDiffPatchDotNet;
+using MessagePack;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -328,6 +331,36 @@ namespace SOS.Core.Repositories
         public async Task DropObservationCollectionAsync()
         {
             await _dbContext.Mongodb.DropCollectionAsync(Constants.ObservationCollectionName);
+        }
+
+        public async Task<string> CalculateHashForAllObservations()
+        {
+            List<VersionedObservation<T>> observations = await Collection.Find(new BsonDocument()).ToListAsync();
+            return CalculateHash(observations.Select(x => x.Current));
+        }
+
+        public async Task<ObservationVersionIdentifierSet> CalculateHashForAllObservationsAndReturnIdentifiers()
+        {
+            var identifiersSet = new ObservationVersionIdentifierSet();
+            List<VersionedObservation<T>> observations = await Collection.Find(new BsonDocument()).ToListAsync();
+            identifiersSet.Hash = CalculateHash(observations.Select(x => x.Current));
+            identifiersSet.ObservationVersionIdentifiers = observations.Select(s => new ObservationVersionIdentifier
+            {
+                Id = s.Id.ToString(),
+                CatalogNumber = s.CatalogNumber,
+                DataProviderId = s.DataProviderId,
+                Version = s.Version
+            }).ToList();
+
+            return identifiersSet;
+        }
+
+        public string CalculateHash(IEnumerable<T> observations)
+        {
+            var serializedBytes = MessagePackSerializer.Serialize(observations);
+            var sha = new SHA256Managed();
+            byte[] checksum = sha.ComputeHash(serializedBytes);
+            return BitConverter.ToString(checksum).Replace("-", String.Empty);
         }
     }
 }

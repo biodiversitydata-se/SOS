@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Globalization;
+using MessagePack;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace SOS.Core.Models.Observations
 {
     //[BsonIgnoreExtraElements]
+    [MessagePackObject(keyAsPropertyName: true)]
     public class ProcessedDwcObservation : IObservationKey, ICloneable
     {
         /// <summary>
