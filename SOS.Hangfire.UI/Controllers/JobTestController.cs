@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Hangfire;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using MongoDB.Driver;
 using SOS.Core;
 using SOS.Core.Jobs;
 using SOS.Core.Models.Observations;
@@ -15,8 +9,8 @@ using SOS.Core.Repositories;
 
 namespace SOS.Hangfire.UI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("[controller]")]
     public class JobTestController : ControllerBase
     {
         private readonly string _mongoDbJobsDatabaseName;
@@ -68,7 +62,7 @@ namespace SOS.Hangfire.UI.Controllers
             return Ok("Processed observation collection was deleted");
         }
 
-        
+
 
 
         [HttpPost("AddSharkRecurringJobOnceEveryNight")]

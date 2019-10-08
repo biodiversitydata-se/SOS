@@ -99,7 +99,37 @@ namespace SOS.Core.Repositories
             return observationVersionIdentifiers;
         }
 
-        
+        //public List<ObservationVersionIdentifier> GetAllObservationVersionIdentifiersEnumerableAsync()
+        //{
+        //    var observationVersionIdentifiers = Collection
+        //        .Find(new BsonDocument())
+        //        .Project(s => new ObservationVersionIdentifier
+        //        {
+        //            Id = s.Id.ToString(),
+        //            CatalogNumber = s.CatalogNumber,
+        //            DataProviderId = s.DataProviderId,
+        //            Version = s.Version
+        //        })
+        //        .ToList();
+
+        //    return observationVersionIdentifiers;
+        //}
+
+
+        //public List<ObservationVersionIdentifier> GetAllObservationVersionIdentifiersEnumerableWithoutProjection()
+        //{
+        //    var list = Collection.Find(x => true).ToList();
+        //    var versionIdentifiers = list.Select(s => new ObservationVersionIdentifier
+        //    {
+        //        Id = s.Id.ToString(),
+        //        CatalogNumber = s.CatalogNumber,
+        //        DataProviderId = s.DataProviderId,
+        //        Version = s.Version
+        //    }).ToList();
+
+        //    return versionIdentifiers;
+        //}
+
         private async Task<(T[] newObservations, T[] updatedObservations)> GetNewAndUpdatedObservationsAsync(
             List<T> speciesObservations)
         {

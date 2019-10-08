@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Hangfire;
@@ -11,63 +9,74 @@ using Hangfire.Dashboard;
 using Hangfire.Mongo;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using SOS.Core;
-using SOS.Core.IoC;
-using SOS.Core.Jobs;
+using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
+using SOS.Core.IoC.Modules;
 using SOS.Core.Repositories;
-using Swashbuckle.AspNetCore.Swagger;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace SOS.Hangfire.UI
 {
     public class Startup
     {
-        IHostingEnvironment _environment;
-        IConfigurationRoot _configuration;
+        public IHostingEnvironment Environment { get; }
 
-        public Startup(Microsoft.AspNetCore.Hosting.IHostingEnvironment environment)
+        public IConfiguration Configuration { get; }
+
+        public ILifetimeScope AutofacContainer { get; private set; }
+
+        public Startup(IHostingEnvironment env)
         {
-            _environment = environment;
-            SetConfiguration();
+            Environment = env;
+
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
+            
+            //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
+            if (env.IsDevelopment() ||
+                env.EnvironmentName == "DEV" ||
+                env.EnvironmentName == "LOCAL")
+            {
+                builder.AddUserSecrets<Startup>();
+            }
+
+            Configuration = builder.Build();
         }
 
+
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
-            var container = BootstrapContainer.Boostrap();
+            services.AddControllers();
             var repositorySettings = CreateRepositorySettings();
-            SystemSettings.InitSettings(repositorySettings);
-            container.Register(r => repositorySettings).As<IRepositorySettings>().SingleInstance();
-            container.RegisterType<VerbatimTestDataHarvestJob>().As<IVerbatimTestDataHarvestJob>().InstancePerLifetimeScope();
-            container.RegisterType<VerbatimTestDataProcessJob>().As<IVerbatimTestDataProcessJob>().InstancePerLifetimeScope();
 
             // Swagger
             services.AddSwaggerGen(
                 options =>
                 {
                     options.SwaggerDoc("v1",
-                        new Info
+                        new OpenApiInfo
                         {
                             Title = "SOS.Hangfire.UI",
                             Version = "v1",
-                            Description = "An API to handle various processing jobs",
-                            TermsOfService = "None"
+                            Description = "An API to handle various processing jobs" //,
+                            //TermsOfService = "None"
                         });
                     options.DescribeAllEnumsAsStrings();
                     // Set the comments path for the Swagger JSON and UI.
                     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                    Debug.WriteLine(xmlPath);
                     options.IncludeXmlComments(xmlPath);
                 });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Hangfire
             services.AddHangfire(configuration => configuration
@@ -76,59 +85,34 @@ namespace SOS.Hangfire.UI
                 .UseRecommendedSerializerSettings()
                 .UseMongoStorage(repositorySettings.MongoDbConnectionString, repositorySettings.JobsDatabaseName, MongoStorageOptions));
 
-            // Add internal IoC
-            container.Populate(services);
-
-            IContainer autofacContainer = container.Build();
-            GlobalConfiguration.Configuration.UseAutofacActivator(autofacContainer);
-
-            return new AutofacServiceProvider(autofacContainer);
         }
 
-        private IRepositorySettings CreateRepositorySettings()
+        
+        /// <summary>
+        /// Register Autofac services. This runs after ConfigureServices so the things
+        /// here will override registrations made in ConfigureServices.
+        /// </summary>
+        /// <param name="builder"></param>
+        public void ConfigureContainer(ContainerBuilder builder)
         {
-            var configuration = _configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository");
-
-            return new RepositorySettings
-            {
-                JobsDatabaseName = configuration.GetValue<string>("JobsDatabaseName"),
-                DatabaseName = configuration.GetValue<string>("DatabaseName"),
-                MongoDbConnectionString = configuration.GetValue<string>("InstanceUrl")
-            };
-        }
-
-        private void SetConfiguration()
-        {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(_environment.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{_environment.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-
-            //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\1309b7a2-a1d5-40a3-b1dc-1a3aa53d09dc\secrets.json)
-            if (_environment.IsDevelopment() ||
-                _environment.EnvironmentName == "DEV" ||
-                _environment.EnvironmentName == "LOCAL")
-            {
-                builder.AddUserSecrets<Startup>();
-            }
-
-            _configuration = builder.Build();
+            builder.RegisterModule<CoreModule>();
+            var repositorySettings = CreateRepositorySettings();
+            builder.Register(r => repositorySettings).As<IRepositorySettings>().SingleInstance();
         }
 
 
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline. 
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            this.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
             }
 
             app.UseHangfireDashboard("/hangfire", new DashboardOptions()
@@ -137,18 +121,39 @@ namespace SOS.Hangfire.UI
                 IgnoreAntiforgeryToken = true
             });
 
-            app.UseSwagger(c =>
-            {
-                c.PreSerializeFilters.Add((swagger, httpReq) => swagger.Host = httpReq.Host.Value);
-            });
 
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+            
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "ObservationProcessingJobs API, version 1");
             });
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+
+            app.UseRouting();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+        }
+
+        private IRepositorySettings CreateRepositorySettings()
+        {
+            var configuration = Configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository");
+
+            return new RepositorySettings
+            {
+                JobsDatabaseName = configuration.GetValue<string>("JobsDatabaseName"),
+                DatabaseName = configuration.GetValue<string>("DatabaseName"),
+                MongoDbConnectionString = configuration.GetValue<string>("InstanceUrl")
+            };
         }
 
         private static MongoStorageOptions MongoStorageOptions
@@ -165,6 +170,7 @@ namespace SOS.Hangfire.UI
                 return storageOptions;
             }
         }
+
     }
 
     public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
@@ -176,4 +182,5 @@ namespace SOS.Hangfire.UI
             return true;
         }
     }
+
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Autofac;
 using SOS.Core.GIS;
+using SOS.Core.Jobs;
 using SOS.Core.Repositories;
 using SOS.Core.Services;
 
@@ -12,12 +13,12 @@ namespace SOS.Core.IoC.Modules
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<DoiRepository>()
-                .As<IDoiRepository>();
-            builder.RegisterType<DoiService>()
-                .As<IDoiService>();
-            builder.RegisterType<FileBasedGeographyServiceEx>()
-                .As<IGeographyService>().SingleInstance();
+            builder.RegisterType<DoiRepository>().As<IDoiRepository>();
+            builder.RegisterType<DoiService>().As<IDoiService>();
+            builder.RegisterType<FileBasedGeographyServiceEx>().As<IGeographyService>().SingleInstance();
+            builder.RegisterType<VerbatimTestDataHarvestJob>().As<IVerbatimTestDataHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<VerbatimTestDataProcessJob>().As<IVerbatimTestDataProcessJob>().InstancePerLifetimeScope();
+
 
 
             //builder.RegisterType<SpeciesObservationService.Core.Implementation.Taxonomy.TaxonManager>()

@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Core", "SOS.Core\SOS.Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Hangfire.JobServer", "SOS.Hangfire.JobServer\SOS.Hangfire.JobServer.csproj", "{A0CC7353-2D06-4E8F-8265-73F3D01B004D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Hangfire.UI", "SOS.Hangfire.UI\SOS.Hangfire.UI.csproj", "{A9117471-3D2D-443C-B3AB-3FE8673C05A7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Hangfire.UI", "SOS.Hangfire.UI\SOS.Hangfire.UI.csproj", "{B39C0065-61EF-4A4B-B547-DFFBF59A5BBB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Core.Tests", "SOS.Core.Tests\SOS.Core.Tests.csproj", "{C3B3C42C-C94C-48EB-A2B3-4C09EEF97D48}"
 EndProject
@@ -57,6 +57,10 @@ Global
 		{390390E5-9BF7-4548-BDFC-8C640D74B42B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{390390E5-9BF7-4548-BDFC-8C640D74B42B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{390390E5-9BF7-4548-BDFC-8C640D74B42B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B39C0065-61EF-4A4B-B547-DFFBF59A5BBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B39C0065-61EF-4A4B-B547-DFFBF59A5BBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B39C0065-61EF-4A4B-B547-DFFBF59A5BBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B39C0065-61EF-4A4B-B547-DFFBF59A5BBB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
