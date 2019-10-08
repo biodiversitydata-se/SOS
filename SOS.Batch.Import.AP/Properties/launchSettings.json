@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "SOS.Batch.Import.AP": {
-      "commandName": "Project",
-      "commandLineArgs": "-e dev"
-    }
-  }
-}

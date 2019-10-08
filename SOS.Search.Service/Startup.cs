@@ -106,7 +106,7 @@ namespace SOS.Search.Service
             services.AddScoped<ISightingFactory, SightingFactory>();
           
             // Repositories mongo
-            services.AddScoped<ISightingAggregateRepository, SightingAggregateRepository>();
+            services.AddScoped<IProcessedDarwinCoreRepository, ProcessedDarwinCoreRepository>();
             
             // HttpContext
           //  services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

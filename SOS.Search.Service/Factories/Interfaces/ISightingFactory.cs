@@ -13,6 +13,12 @@ namespace SOS.Search.Service.Factories.Interfaces
         /// Get chunk of sightings
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<SightingAggregate>> GetChunkAsync(int taxonId, int skip, int take);
+        Task<IEnumerable<DarwinCore<string>>> GetChunkAsync(int taxonId, int skip, int take);
+
+        /// <summary>
+        /// Get chunk of sightings
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<dynamic>> GetChunkAsync(int taxonId, IEnumerable<string> fields, int skip, int take);
     }
 }

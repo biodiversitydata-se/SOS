@@ -15,9 +15,21 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.8.0" />
         <PackageReference Include="Microsoft.AspNetCore.App" />
-        <PackageReference Include="MongoDB.Driver" Version="2.9.1" />
-        <PackageReference Include="NLog.Web.AspNetCore" Version="4.8.5" />
+        <PackageReference Include="MongoDB.Driver" Version="2.9.2" />
+        <PackageReference Include="NLog.Web.AspNetCore" Version="4.8.6" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="appsettings.dev.json">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </Content>
+      <Content Update="appsettings.json">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </Content>
+      <Content Update="appsettings.local.json">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <ProjectExtensions><VisualStudio><UserProperties appsettings_1local_1json__JsonSchema="UseTls" /></VisualStudio></ProjectExtensions>

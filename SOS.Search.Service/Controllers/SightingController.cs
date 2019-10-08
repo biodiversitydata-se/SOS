@@ -19,6 +19,7 @@ namespace SOS.Search.Service.Controllers
     {
         private readonly ISightingFactory _sightingFactory;
         private readonly ILogger<SightingController> _logger;
+        private const int _maxBatchSize = 10000;
 
         /// <summary>
         /// Constructor
@@ -33,19 +34,42 @@ namespace SOS.Search.Service.Controllers
 
         /// <inheritdoc />
         [HttpGet("taxa/{taxonId}")]
-        [ProducesResponseType(typeof(IEnumerable<SightingAggregate>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<DarwinCore<string>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetChunkAsync([FromRoute] int taxonId, [FromQuery]int skip, [FromQuery]int take)
         {
             try
             {
-                if (skip <= 0 || take <= 0 || skip < take)
+                if (skip < 0 || take <= 0 || take > _maxBatchSize)
                 {
                     return new BadRequestResult();
                 }
 
                 return new OkObjectResult(await _sightingFactory.GetChunkAsync(taxonId, skip, take));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting batch of sightings");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("taxa/{taxonId}")]
+        [ProducesResponseType(typeof(IEnumerable<DarwinCore<string>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetChunkAsync([FromRoute]int taxonId, [FromBody]IEnumerable<string> fields, [FromQuery]int skip, [FromQuery]int take)
+        {
+            try
+            {
+                if (skip < 0 || take <= 0 || take > _maxBatchSize)
+                {
+                    return new BadRequestResult();
+                }
+
+                return new OkObjectResult(await _sightingFactory.GetChunkAsync(taxonId, fields, skip, take));
             }
             catch (Exception e)
             {
