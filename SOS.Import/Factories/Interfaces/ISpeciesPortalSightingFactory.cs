@@ -12,5 +12,11 @@ namespace SOS.Import.Factories.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<bool> AggregateAsync();
+
+        /// <summary>
+        /// Aggregate all areas
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> AggregateAreasAsync();
     }
 }

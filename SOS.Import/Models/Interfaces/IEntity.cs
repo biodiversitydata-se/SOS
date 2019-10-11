@@ -1,5 +1,5 @@
 ﻿
-namespace SOS.Import.Models.Aggregates.Interfaces
+namespace SOS.Import.Models.Interfaces
 {
     /// <summary>
     /// IEntity interface

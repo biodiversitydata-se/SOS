@@ -1,17 +1,17 @@
-﻿namespace SOS.Import.Models.Aggregates
+﻿namespace SOS.Import.Models.Aggregates.Artportalen
 {
     /// <summary>
-    /// Project class
+    /// Represents diffrent metadata items
     /// </summary>
-    public class Project
+    public class Metadata
     {
         /// <summary>
-        /// Id of project
+        /// Id of item
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Name of project
+        /// Name of item
         /// </summary>
         public string Name { get; set; }
     }

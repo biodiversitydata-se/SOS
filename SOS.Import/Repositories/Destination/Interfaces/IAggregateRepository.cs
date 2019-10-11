@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Import.Models.Aggregates.Interfaces;
+using SOS.Import.Models.Interfaces;
 
 namespace SOS.Import.Repositories.Destination.Interfaces
 {

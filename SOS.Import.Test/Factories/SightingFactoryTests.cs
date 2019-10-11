@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities;
 using SOS.Import.Factories;
-using SOS.Import.Models.Aggregates;
+using SOS.Import.Models.Aggregates.Artportalen;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using Xunit;

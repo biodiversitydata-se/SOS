@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SOS.Import.Configuration;
-using SOS.Import.Models.Aggregates.Interfaces;
+using SOS.Import.Models.Interfaces;
 
 namespace SOS.Import.Repositories.Destination
 {
@@ -53,6 +53,7 @@ namespace SOS.Import.Repositories.Destination
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Database = mongoClient.GetDatabase($"{mongoDbConfiguration.Value.DatabaseName}");
+            
             _batchSize = mongoDbConfiguration.Value.AddBatchSize;
             _collectionName = typeof(TEntity).Name;
         }

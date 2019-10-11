@@ -160,6 +160,7 @@ namespace SOS.Import
             services.AddLogging(logger => logger.SetMinimumLevel(LogLevel.Trace));
 
             // Repositories source
+            services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IMetadataRepository, MetadataRepository>();
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<ISightingRepository, SightingRepository>();
@@ -167,6 +168,7 @@ namespace SOS.Import
 
             // Repositories destination
             services.AddScoped<ISightingVerbatimRepository, SightingVerbatimRepository>();
+            services.AddScoped<IAreaVerbatimRepository, AreaVerbatimRepository>();
 
             // Add factories
             services.AddScoped<ISpeciesPortalSightingFactory, SpeciesPortalSightingFactory>();

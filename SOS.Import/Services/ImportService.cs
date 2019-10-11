@@ -27,7 +27,10 @@ namespace SOS.Import.Services
         public async Task<bool> ImportAsync(int sources)
         {
             // Create task list
-            var importTasks = new List<Task<bool>>();
+            var importTasks = new List<Task<bool>>
+            {
+                _speciesPortalSightingFactory.AggregateAreasAsync() // Make sure we have the latest areas
+            };
 
             // Add species portal import if first bit is set
             if ((sources & 1) > 0)

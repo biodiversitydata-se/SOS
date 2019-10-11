@@ -1,4 +1,4 @@
-﻿namespace SOS.Import.Models.Aggregates
+﻿namespace SOS.Import.Models.Aggregates.Artportalen
 {
     /// <summary>
     /// Site object

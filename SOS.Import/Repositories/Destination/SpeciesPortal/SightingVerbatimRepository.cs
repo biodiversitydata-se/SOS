@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SOS.Import.Configuration;
-using SOS.Import.Models.Aggregates;
+using SOS.Import.Models.Aggregates.Artportalen;
 
 namespace SOS.Import.Repositories.Destination.SpeciesPortal
 {
