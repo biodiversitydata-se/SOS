@@ -28,5 +28,9 @@ namespace SOS.Core.Repositories
 
         Task<IList<T>> RestoreDocumentsAsync(
             IEnumerable<ObservationVersionIdentifier> observationVersionIdentifiers);
+
+        Task<string> CalculateHashForAllObservations();
+        Task<ObservationVersionIdentifierSet> CalculateHashForAllObservationsAndReturnIdentifiers();
+        string CalculateHash(IEnumerable<T> observations);
     }
 }

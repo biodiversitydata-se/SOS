@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using SOS.Core;
 using SOS.Core.IoC;
+using SOS.Core.IoC.Modules;
 using SOS.Core.Jobs;
 using SOS.Core.Repositories;
 using SOS.Hangfire.JobServer.MyApplication.Common;
@@ -21,9 +22,10 @@ namespace SOS.Hangfire.JobServer
         static async Task Main(string[] args)
         {
             IConfiguration configuration = ConfigurationFactory.CreateConfiguration();
-            var container = BootstrapContainer.Boostrap();
+            var builder = new Autofac.ContainerBuilder();
+            builder.RegisterModule<CoreModule>();
+
             var configurationSection = configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository");
-            IContainer cont = null;
             var repositorySettings = new RepositorySettings()
             {
                 DatabaseName = configurationSection.GetValue<string>("DatabaseName"),
@@ -31,10 +33,8 @@ namespace SOS.Hangfire.JobServer
                 MongoDbConnectionString = configurationSection.GetValue<string>("InstanceUrl"),
             };
             SystemSettings.InitSettings(repositorySettings);
-            container.Register(r => repositorySettings).As<IRepositorySettings>().SingleInstance();
-            container.RegisterType<VerbatimTestDataHarvestJob>().As<IVerbatimTestDataHarvestJob>().InstancePerLifetimeScope();
-            container.RegisterType<VerbatimTestDataProcessJob>().As<IVerbatimTestDataProcessJob>().InstancePerLifetimeScope();
-            
+            builder.Register(r => repositorySettings).As<IRepositorySettings>().SingleInstance();
+
             GlobalConfiguration.Configuration.UseMongoStorage(
                 repositorySettings.MongoDbConnectionString, 
                 repositorySettings.JobsDatabaseName, 
@@ -48,11 +48,8 @@ namespace SOS.Hangfire.JobServer
                     
                 });
 
-            // Add internal IoC
-            //container.Populate(services);
-            IContainer autofacContainer = container.Build();
+            IContainer autofacContainer = builder.Build();
             GlobalConfiguration.Configuration.UseAutofacActivator(autofacContainer); // Hangfire
-
 
             using (var server = new BackgroundJobServer(new BackgroundJobServerOptions { WorkerCount = 5 }))
             {
