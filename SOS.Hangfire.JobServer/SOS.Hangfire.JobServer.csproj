@@ -33,6 +33,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SOS.Core\SOS.Core.csproj" />
+    <ProjectReference Include="..\SOS.Import\SOS.Import.csproj" />
+    <ProjectReference Include="..\SOS.Process\SOS.Process.csproj" />
   </ItemGroup>
 
 </Project>
