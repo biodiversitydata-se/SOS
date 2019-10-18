@@ -44,8 +44,8 @@ namespace SOS.Import.Factories
         /// <param name="logger"></param>
         public SpeciesPortalSightingFactory(
             IAreaRepository areaRepository,
-            IMetadataRepository metadataRepository, 
-            IProjectRepository projectRepository, 
+            IMetadataRepository metadataRepository,
+            IProjectRepository projectRepository,
             ISightingRepository sightingRepository,
             ISiteRepository siteRepository,
             IAreaVerbatimRepository areaVerbatimRepository,
@@ -58,9 +58,9 @@ namespace SOS.Import.Factories
             _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
             _siteRepository = siteRepository ?? throw new ArgumentNullException(nameof(siteRepository));
             _areaVerbatimRepository = areaVerbatimRepository ??
-                                          throw new ArgumentNullException(nameof(areaVerbatimRepository));
+                                           throw new ArgumentNullException(nameof(areaVerbatimRepository));
             _sightingVerbatimRepository = sightingVerbatimRepository ??
-                                           throw new ArgumentNullException(nameof(sightingVerbatimRepository));
+                                            throw new ArgumentNullException(nameof(sightingVerbatimRepository));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -122,7 +122,7 @@ namespace SOS.Import.Factories
                 // Loop until all sightings are fetched
                 while (minId <= maxId)
                 {
-                    _logger.LogDebug($"Getting sightings from { minId } to { minId + chunkSize -1 }");
+                    _logger.LogDebug($"Getting sightings from { minId } to { minId + chunkSize - 1 }");
                     // Get chunk of sightings
                     var sightings = await _sightingRepository.GetChunkAsync(minId, chunkSize);
 
@@ -151,7 +151,7 @@ namespace SOS.Import.Factories
             try
             {
                 _logger.LogDebug("Start getting areas");
-                
+
                 var areas = (await _areaRepository.GetAsync()).ToAggregates();
 
                 _logger.LogDebug("Empty collection");

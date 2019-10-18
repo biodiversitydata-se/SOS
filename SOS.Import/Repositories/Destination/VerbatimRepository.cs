@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SOS.Import.Configuration;
 using SOS.Import.Models.Interfaces;
@@ -41,20 +40,20 @@ namespace SOS.Import.Repositories.Destination
         /// <param name="logger"></param>
         protected VerbatimRepository(
             IMongoClient mongoClient,
-            IOptions<MongoDbConfiguration> mongoDbConfiguration,
+            MongoDbConfiguration mongoDbConfiguration,
             ILogger<VerbatimRepository<TEntity, TKey>> logger
         )
         {
-            if (mongoDbConfiguration?.Value == null)
+            if (mongoDbConfiguration == null)
             {
                 throw new ArgumentNullException(nameof(mongoDbConfiguration));
             }
 
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            Database = mongoClient.GetDatabase($"{mongoDbConfiguration.Value.DatabaseName}");
+            Database = mongoClient.GetDatabase($"{mongoDbConfiguration.DatabaseName}");
             
-            _batchSize = mongoDbConfiguration.Value.AddBatchSize;
+            _batchSize = mongoDbConfiguration.AddBatchSize;
             _collectionName = typeof(TEntity).Name;
         }
 

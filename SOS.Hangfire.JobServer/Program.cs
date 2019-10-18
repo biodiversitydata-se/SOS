@@ -1,36 +1,41 @@
-﻿using System;
-using System.IO;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
-using Autofac.Core;
-using Autofac.Extensions.DependencyInjection;
 using Hangfire;
 using Hangfire.Mongo;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NLog.Web;
 using SOS.Core;
-using SOS.Core.IoC;
 using SOS.Core.IoC.Modules;
-using SOS.Core.Jobs;
 using SOS.Core.Repositories;
+using SOS.Hangfire.JobServer.Configuration;
 using SOS.Hangfire.JobServer.MyApplication.Common;
+using SOS.Import.IoC.Modules;
+using SOS.Process.IoC.Modules;
 
 namespace SOS.Hangfire.JobServer
 {
-    class Program
+    public class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
             IConfiguration configuration = ConfigurationFactory.CreateConfiguration();
-            var builder = new Autofac.ContainerBuilder();
+            var builder = new ContainerBuilder();
             builder.RegisterModule<CoreModule>();
+            builder.RegisterModule<ImportModule>();
+            builder.RegisterModule<ProcessModule>();
 
-            var configurationSection = configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository");
+            builder.RegisterInstance(new LoggerFactory()).As<ILoggerFactory>();
+            builder.RegisterGeneric(typeof(Logger<>)).As(typeof(ILogger<>)).SingleInstance();
+
+            var mongoConfiguration = configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository").Get<MongoDbConfiguration>();
+            
             var repositorySettings = new RepositorySettings()
             {
-                DatabaseName = configurationSection.GetValue<string>("DatabaseName"),
-                JobsDatabaseName = configurationSection.GetValue<string>("JobsDatabaseName"),
-                MongoDbConnectionString = configurationSection.GetValue<string>("InstanceUrl"),
+                JobsDatabaseName = mongoConfiguration.DatabaseName,
+                MongoDbConnectionString = $"mongodb://{string.Join(",", mongoConfiguration.Hosts.Select(h => h.Name))}"
             };
             SystemSettings.InitSettings(repositorySettings);
             builder.Register(r => repositorySettings).As<IRepositorySettings>().SingleInstance();
@@ -42,12 +47,14 @@ namespace SOS.Hangfire.JobServer
 
             var hostBuilder = new HostBuilder()
                 // Add configuration, logging, ...
-                .ConfigureServices((hostContext, services) =>
+                .ConfigureServices((hostContext, services) => { })
+                .ConfigureLogging(logging =>
                 {
-                    // Add your services for depedency injection.
-                    
-                });
-
+                    logging.ClearProviders();
+                    logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);
+                })
+                .UseNLog();
+            
             IContainer autofacContainer = builder.Build();
             GlobalConfiguration.Configuration.UseAutofacActivator(autofacContainer); // Hangfire
 

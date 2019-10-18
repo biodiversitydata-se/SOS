@@ -8,13 +8,12 @@ namespace SOS.Core
     public static class SystemSettings
     {
         public static string MongoDbConnectionString { get; set; }
-        public static string DatabaseName { get; set; }
+
         public static string JobsDatabaseName { get; set; }
 
         public static void InitSettings(IRepositorySettings settings)
         {
             MongoDbConnectionString = settings.MongoDbConnectionString;
-            DatabaseName = settings.DatabaseName;
             JobsDatabaseName = settings.JobsDatabaseName;
         }
 
@@ -22,7 +21,6 @@ namespace SOS.Core
         {
             return new RepositorySettings
             {
-                DatabaseName = DatabaseName,
                 JobsDatabaseName = JobsDatabaseName,
                 MongoDbConnectionString = MongoDbConnectionString
             };

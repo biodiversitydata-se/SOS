@@ -4,15 +4,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Process.Factories.Interfaces;
+using SOS.Process.Jobs.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Services.Interfaces;
 
-namespace SOS.Process.Services
+namespace SOS.Process.Jobs
 {
     /// <summary>
-    /// Main service
+    /// Species portal harvest
     /// </summary>
-    public class ProcessService : IProcessService
+    public class ProcessJob : IProcessJob
     {
         private readonly IProcessedRepository _processRepository;
 
@@ -20,19 +21,16 @@ namespace SOS.Process.Services
 
         private readonly ITaxonService _taxonService;
 
-        private readonly ILogger<ProcessService> _logger;
+        private readonly ILogger<ProcessJob> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processRepository"></param>
-        /// <param name="speciesPortalProcessFactory"></param>
-        /// <param name="logger"></param>
-        public ProcessService(
-            IProcessedRepository processRepository,
+        /// <param name="speciesPortalSightingFactory"></param>
+        public ProcessJob(IProcessedRepository processRepository,
             ISpeciesPortalProcessFactory speciesPortalProcessFactory,
             ITaxonService taxonService,
-            ILogger<ProcessService> logger)
+            ILogger<ProcessJob> logger)
         {
             _processRepository = processRepository ?? throw new ArgumentNullException(nameof(processRepository));
             _speciesPortalProcessFactory = speciesPortalProcessFactory ?? throw new ArgumentNullException(nameof(speciesPortalProcessFactory));
@@ -41,8 +39,9 @@ namespace SOS.Process.Services
         }
 
         /// <inheritdoc />
-        public async Task<bool> ImportAsync(int sources)
+        public async Task<bool> Run(int sources)
         {
+            // Create task list
             _logger.LogDebug("Start getting taxa");
             var taxa = (await _taxonService.GetTaxaAsync())?.ToDictionary(t => t.TaxonID, t => t);
 
@@ -70,17 +69,17 @@ namespace SOS.Process.Services
             // Run all tasks async
             await Task.WhenAll(processTasks);
 
-            var result = processTasks.All(t => t.Result);
+            var success = processTasks.All(t => t.Result);
 
             // Create index if great success
-            if (result)
+            if (success)
             {
                 _logger.LogDebug("Create indexes");
                 await _processRepository.CreateIndexAsync();
             }
 
-            // return result of all imports
-            return result;
+            // return result of all processing
+            return success;
         }
     }
 }

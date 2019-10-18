@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using NLog.Web;
 
 namespace SOS.Hangfire.JobServer
 {
@@ -53,7 +51,7 @@ namespace SOS.Hangfire.JobServer
                 return config
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile($"appsettings.{environmentName}.json", optional: false, reloadOnChange: true)
                     .AddEnvironmentVariables();
             }
 
@@ -70,6 +68,9 @@ namespace SOS.Hangfire.JobServer
                     ContentRootPath = AppDomain.CurrentDomain.BaseDirectory,
                     ContentRootFileProvider = new PhysicalFileProvider(AppDomain.CurrentDomain.BaseDirectory)
                 };
+
+                var logger = NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config").GetCurrentClassLogger();
+                logger.Debug("Starting service");
 
                 var config = new ConfigurationBuilder();
                 var configured = Configure(config, env);

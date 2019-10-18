@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SOS.Import.Configuration;
 using SOS.Import.Models.Aggregates.Artportalen;
@@ -19,7 +18,7 @@ namespace SOS.Import.Repositories.Destination.SpeciesPortal
         /// <param name="logger"></param>
         public SightingVerbatimRepository(
             IMongoClient mongoClient,
-            IOptions<MongoDbConfiguration> mongoDbConfiguration, 
+            MongoDbConfiguration mongoDbConfiguration, 
             ILogger<SightingVerbatimRepository> logger) : base(mongoClient, mongoDbConfiguration, logger)
         {
         }

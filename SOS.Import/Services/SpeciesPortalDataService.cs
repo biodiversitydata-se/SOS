@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using SOS.Import.Configuration;
 using SOS.Import.Services.Interfaces;
 
 namespace SOS.Import.Services
@@ -20,10 +21,10 @@ namespace SOS.Import.Services
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="config"></param>
-        public SpeciesPortalDataService(IConfiguration config)
+        /// <param name="connectionStrings"></param>
+        public SpeciesPortalDataService(ConnectionStrings connectionStrings)
         {
-            _connectionString = config?.GetConnectionString("SpeciesPortal") ?? throw new ArgumentNullException(nameof(config));
+            _connectionString = connectionStrings?.SpeciesPortal ?? throw new ArgumentNullException(nameof(connectionStrings));
         }
 
         /// <summary>

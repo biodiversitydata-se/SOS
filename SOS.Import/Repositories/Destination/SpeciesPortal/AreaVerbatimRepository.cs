@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SOS.Import.Configuration;
 using SOS.Import.Models.Shared;
@@ -21,7 +20,7 @@ namespace SOS.Import.Repositories.Destination.SpeciesPortal
         /// <param name="logger"></param>
         public AreaVerbatimRepository(
             IMongoClient mongoClient,
-            IOptions<MongoDbConfiguration> mongoDbConfiguration, 
+            MongoDbConfiguration mongoDbConfiguration, 
             ILogger<AreaVerbatimRepository> logger) : base(mongoClient, mongoDbConfiguration, logger)
         {
         }
