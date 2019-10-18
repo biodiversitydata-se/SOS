@@ -34,26 +34,10 @@ namespace SOS.Hangfire.JobServer
         public static async Task Main(string[] args)
         {
             _env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            var logger = NLogBuilder.ConfigureNLog($"nlog.{_env}.config").GetCurrentClassLogger();
 
-            try
-            {
-                logger.Debug("Init main");
-                await CreateHostBuilder(args)
-                    .Build()
-                    .RunAsync();
-            }
-            catch (Exception exception)
-            {
-                //NLog: catch setup errors
-                logger.Error(exception, "Stopped program because of exception");
-                throw;
-            }
-            finally
-            {
-                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-                NLog.LogManager.Shutdown();
-            }
+            await CreateHostBuilder(args)
+                .Build()
+                .RunAsync();
         }
 
         /// <summary>
@@ -75,12 +59,13 @@ namespace SOS.Hangfire.JobServer
                 {
                     logging
                         .ClearProviders()
-                        .AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                        .AddConfiguration(hostingContext.Configuration.GetSection("Logging"))
+                        .AddNLog(configFileName: $"nlog.{_env}.config");
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
                     var mongoConfiguration = hostContext.Configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository").Get<MongoDbConfiguration>();
-                    
+
                     services.AddHangfire(configuration =>
                             configuration
                             .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
@@ -88,7 +73,9 @@ namespace SOS.Hangfire.JobServer
                             .UseRecommendedSerializerSettings()
                             .UseMongoStorage($"mongodb:// {(string.IsNullOrEmpty(mongoConfiguration.UserName) || string.IsNullOrEmpty(mongoConfiguration.Password) ? "" : $"{mongoConfiguration.UserName}:{mongoConfiguration.Password}@")} {string.Join(",", mongoConfiguration.Hosts.Select(h => $"{h.Name}:{h.Port}"))}?connect=replicaSet",
                                 mongoConfiguration.DatabaseName,
-                                new MongoStorageOptions { MigrationOptions = new MongoMigrationOptions
+                                new MongoStorageOptions
+                                {
+                                    MigrationOptions = new MongoMigrationOptions
                                     {
                                         Strategy = MongoMigrationStrategy.Migrate,
                                         BackupStrategy = MongoBackupStrategy.Collections
@@ -112,12 +99,6 @@ namespace SOS.Hangfire.JobServer
                         );
                     }
                 )
-               /* .UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>
-                    builder
-                        .RegisterModule<CoreModule>()
-                        .RegisterModule(new ImportModule{ Configuration = _importConfiguration })
-                        .RegisterModule(new ProcessModule { Configuration = _processConfiguration })
-                ))*/
                 .UseNLog();
     }
 }
