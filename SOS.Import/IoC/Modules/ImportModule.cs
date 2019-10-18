@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Authentication;
 using Autofac;
-using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using SOS.Import.Configuration;
 using SOS.Import.Factories;
@@ -20,24 +18,16 @@ namespace SOS.Import.IoC.Modules
 {
     public class ImportModule : Module
     {
+        public ImportConfiguration Configuration { get; set; }
+
         protected override void Load(ContainerBuilder builder)
         {
-            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-            var configurationBuilder = new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env}.json", optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables();
-            var configuration = configurationBuilder.Build();
-
             // Add configuration
-            var importConfiguration = configuration.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();
-            builder.RegisterInstance(importConfiguration.MongoDbConfiguration).As<MongoDbConfiguration>().SingleInstance();
-            builder.RegisterInstance(importConfiguration.ConnectionStrings).As<ConnectionStrings>().SingleInstance();
+            builder.RegisterInstance(Configuration.MongoDbConfiguration).As<MongoDbConfiguration>().SingleInstance();
+            builder.RegisterInstance(Configuration.ConnectionStrings).As<ConnectionStrings>().SingleInstance();
 
             // Init mongodb
-            SetUpMongoDb(builder, importConfiguration.MongoDbConfiguration);
+            SetUpMongoDb(builder, Configuration.MongoDbConfiguration);
 
             // Repositories source
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();

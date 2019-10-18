@@ -26,7 +26,6 @@ namespace SOS.Search.Service
                     logging.AddDebug();
                 })
                 .UseStartup<Startup>()
-               // .UseApplicationInsights()
                 .Build();
 
             webHostBuilder.Run();

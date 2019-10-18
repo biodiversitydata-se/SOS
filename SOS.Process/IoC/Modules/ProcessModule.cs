@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Authentication;
 using Autofac;
-using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using SOS.Process.Configuration;
 using SOS.Process.Database;
@@ -22,39 +20,21 @@ namespace SOS.Process.IoC.Modules
 {
     public class ProcessModule : Module
     {
-        private static IServiceProvider ServiceProvider;
+        public ProcessConfiguration Configuration { get; set; }
 
         protected override void Load(ContainerBuilder builder)
         {
-            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-            var configurationBuilder = new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env}.json", optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables();
-            var configuration = configurationBuilder.Build();
-
             // Add configuration
-           /* var serviceCollection = new ServiceCollection();
-            serviceCollection.AddOptions();
-            serviceCollection.Configure<AppSettings>(configuration.GetSection(nameof(ProcessConfiguration.AppSettings)));
-
-            ServiceProvider = serviceCollection.BuildServiceProvider();
-            builder.Register(context => ServiceProvider.GetService<IOptions<AppSettings>>());
-            */
-            var processConfiguration = configuration.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
-
-            builder.Register(r => processConfiguration.AppSettings).As<AppSettings>().SingleInstance();
+            builder.Register(r => Configuration.AppSettings).As<AppSettings>().SingleInstance();
 
             // Vebatim Mongo Db
-            var verbatimDbConfiguration = processConfiguration.VerbatimDbConfiguration;
+            var verbatimDbConfiguration = Configuration.VerbatimDbConfiguration;
             var verbatimSettings = GetMongDbSettings(verbatimDbConfiguration);
             var verbatimClient = new VerbatimClient(verbatimSettings, verbatimDbConfiguration.DatabaseName, verbatimDbConfiguration.BatchSize);
             builder.RegisterInstance(verbatimClient).As<IVerbatimClient>().SingleInstance();
 
             // Processed Mongo Db
-            var processedDbConfiguration = processConfiguration.ProcessedDbConfiguration;
+            var processedDbConfiguration = Configuration.ProcessedDbConfiguration;
             var processedSettings = GetMongDbSettings(processedDbConfiguration);
             var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName, processedDbConfiguration.BatchSize);
             builder.RegisterInstance(processClient).As<IProcessClient>().SingleInstance();
