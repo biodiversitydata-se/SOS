@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Search.Service.Models.Interfaces;
+using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Search.Service.Repositories.Interfaces
 {

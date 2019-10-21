@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using SOS.Lib.Models.Interfaces;
 using SOS.Process.Database.Interfaces;
-using SOS.Process.Models.Verbatim.Interfaces;
 
 namespace SOS.Process.Repositories.Source
 {

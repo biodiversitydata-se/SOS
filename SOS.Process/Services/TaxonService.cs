@@ -8,12 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using Microsoft.Extensions.Options;
 using CsvHelper;
 using Microsoft.Extensions.Logging;
-using SOS.Process.Configuration;
+using SOS.Lib.Configuration.Process;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Process.Mappings;
-using SOS.Process.Models.Processed;
 
 namespace SOS.Process.Services
 {

@@ -7,7 +7,7 @@ using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using NetTopologySuite.IO;
 using NetTopologySuite.Geometries;
-using SOS.Import.Enums;
+using SOS.Lib.Enums;
 
 namespace SOS.Import.Extensions
 {

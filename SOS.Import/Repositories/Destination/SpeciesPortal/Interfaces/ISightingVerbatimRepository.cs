@@ -1,5 +1,5 @@
-﻿using SOS.Import.Models.Aggregates.Artportalen;
-using SOS.Import.Repositories.Destination.Interfaces;
+﻿using SOS.Import.Repositories.Destination.Interfaces;
+using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces
 {

@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using SOS.Import.Configuration;
-using SOS.Import.Models.Shared;
+using SOS.Import.MongoDb.Interfaces;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Repositories.Destination.SpeciesPortal
 {
@@ -15,13 +15,11 @@ namespace SOS.Import.Repositories.Destination.SpeciesPortal
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="mongoClient"></param>
-        /// <param name="mongoDbConfiguration"></param>
+        /// <param name="importClient"></param>
         /// <param name="logger"></param>
         public AreaVerbatimRepository(
-            IMongoClient mongoClient,
-            MongoDbConfiguration mongoDbConfiguration, 
-            ILogger<AreaVerbatimRepository> logger) : base(mongoClient, mongoDbConfiguration, logger)
+            IImportClient importClient,
+            ILogger<AreaVerbatimRepository> logger) : base(importClient, logger)
         {
         }
 

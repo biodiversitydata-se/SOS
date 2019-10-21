@@ -1,15 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-      <TargetFramework>netcoreapp3.0</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.9.4" />
-    <PackageReference Include="CsvHelper" Version="12.1.2" />
-    <PackageReference Include="Dapper" Version="2.0.30" />
-    <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
-    <PackageReference Include="MongoDB.Driver" Version="2.9.2" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Autofac" Version="4.9.4" />
+        <PackageReference Include="CsvHelper" Version="12.1.2" />
+        <PackageReference Include="Dapper" Version="2.0.30" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0" />
+        <PackageReference Include="MongoDB.Driver" Version="2.9.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Properties\" />
+    </ItemGroup>
 </Project>

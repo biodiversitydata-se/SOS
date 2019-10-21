@@ -11,11 +11,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
 using SOS.Core.IoC.Modules;
-using SOS.Import.Configuration;
+using SOS.Export.IoC.Modules;
 using SOS.Import.IoC.Modules;
-using SOS.Process.Configuration;
+using SOS.Lib.Configuration.Export;
+using SOS.Lib.Configuration.Import;
+using SOS.Lib.Configuration.Process;
+using SOS.Lib.Configuration.Shared;
 using SOS.Process.IoC.Modules;
-using MongoDbConfiguration = SOS.Hangfire.JobServer.Configuration.MongoDbConfiguration;
 
 namespace SOS.Hangfire.JobServer
 {
@@ -47,7 +49,6 @@ namespace SOS.Hangfire.JobServer
         /// <returns></returns>
         private static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .UseEnvironment(_env)
                 .ConfigureAppConfiguration((hostingContext, configuration) =>
                 {
                     configuration.SetBasePath(Directory.GetCurrentDirectory())
@@ -90,12 +91,14 @@ namespace SOS.Hangfire.JobServer
                     {
                         var importConfiguration = hostContext.Configuration.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();
                         var processConfiguration = hostContext.Configuration.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
+                        var exportConfiguration  = hostContext.Configuration.GetSection(typeof(ExportConfiguration).Name).Get<ExportConfiguration>();
 
                         return new AutofacServiceProviderFactory(builder =>
                             builder
                                 .RegisterModule<CoreModule>()
                                 .RegisterModule(new ImportModule { Configuration = importConfiguration })
                                 .RegisterModule(new ProcessModule { Configuration = processConfiguration })
+                                .RegisterModule(new ExportModule { Configuration = exportConfiguration })
                         );
                     }
                 )

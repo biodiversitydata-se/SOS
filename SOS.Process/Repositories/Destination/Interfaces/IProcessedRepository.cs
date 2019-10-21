@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Process.Models.Processed;
+using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Process.Repositories.Destination.Interfaces
 {
@@ -21,14 +21,14 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<bool> AddAsync(DarwinCore entity);
+        Task<bool> AddAsync(DarwinCore<DynamicProperties> entity);
 
         /// <summary>
         /// Add many items
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        Task<bool> AddManyAsync(IEnumerable<DarwinCore> items);
+        Task<bool> AddManyAsync(IEnumerable<DarwinCore<DynamicProperties>> items);
 
         /// <summary>
         /// Create search index
@@ -62,6 +62,6 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// <param name="id"></param>
         /// <param name="entity"></param>
         /// <returns></returns>
-        Task<bool> UpdateAsync(string id, DarwinCore entity);
+        Task<bool> UpdateAsync(string id, DarwinCore<DynamicProperties> entity);
     }
 }

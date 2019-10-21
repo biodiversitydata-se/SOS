@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "SOS.Process": {
-      "commandName": "Project",
-      "commandLineArgs": "-e dev -s 1"
-    }
-  }
-}

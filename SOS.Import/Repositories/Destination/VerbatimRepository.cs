@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using SOS.Import.Configuration;
-using SOS.Import.Models.Interfaces;
+using SOS.Import.MongoDb.Interfaces;
+using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Import.Repositories.Destination
 {
@@ -35,25 +35,23 @@ namespace SOS.Import.Repositories.Destination
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="mongoClient"></param>
-        /// <param name="mongoDbConfiguration"></param>
+        /// <param name="importClient"></param>
         /// <param name="logger"></param>
         protected VerbatimRepository(
-            IMongoClient mongoClient,
-            MongoDbConfiguration mongoDbConfiguration,
+            IImportClient importClient,
             ILogger<VerbatimRepository<TEntity, TKey>> logger
         )
         {
-            if (mongoDbConfiguration == null)
+            if (importClient == null)
             {
-                throw new ArgumentNullException(nameof(mongoDbConfiguration));
+                throw new ArgumentNullException(nameof(importClient));
             }
 
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            Database = mongoClient.GetDatabase($"{mongoDbConfiguration.DatabaseName}");
+            Database = importClient.GetDatabase();
             
-            _batchSize = mongoDbConfiguration.AddBatchSize;
+            _batchSize = importClient.BatchSize;
             _collectionName = typeof(TEntity).Name;
         }
 

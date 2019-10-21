@@ -14,7 +14,7 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult AddDailyProcessJob(int sources, int hour, int minute);
+        IActionResult ScheduleDailyProcessJob(int sources, int hour, int minute);
 
         /// <summary>
         /// Run process job

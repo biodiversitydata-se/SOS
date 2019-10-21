@@ -5,8 +5,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Process.Factories;
-using SOS.Process.Models.Processed;
-using SOS.Process.Models.Verbatim.SpeciesPortal;
+using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Verbatim.SpeciesPortal;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
@@ -78,7 +78,7 @@ namespace SOS.Process.Test.Factories
                     Id = 1
                 } });
 
-            _processedRepository.Setup(r => r.AddManyAsync(It.IsAny<IEnumerable<DarwinCore>>()))
+            _processedRepository.Setup(r => r.AddManyAsync(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()))
                 .ReturnsAsync(true);
 
             var taxa = new Dictionary<string, DarwinCoreTaxon>

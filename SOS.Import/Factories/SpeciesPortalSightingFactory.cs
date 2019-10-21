@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
-using SOS.Import.Models.Aggregates.Artportalen;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
+using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Import.Factories
 {

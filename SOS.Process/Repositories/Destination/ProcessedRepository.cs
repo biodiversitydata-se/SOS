@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Process.Database.Interfaces;
-using SOS.Process.Models.Processed;
 
 namespace SOS.Process.Repositories.Destination
 {
@@ -51,17 +51,17 @@ namespace SOS.Process.Repositories.Destination
 
             Database = client.GetDatabase();
             _batchSize = client.BatchSize;
-            _collectionName = typeof(DarwinCore).Name;
+            _collectionName = typeof(DarwinCore<DynamicProperties>).Name;
         }
 
         /// <summary>
         /// Get client
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<DarwinCore> MongoCollection => Database.GetCollection<DarwinCore>(_collectionName);
+        protected IMongoCollection<DarwinCore<DynamicProperties>> MongoCollection => Database.GetCollection<DarwinCore<DynamicProperties>>(_collectionName);
 
         /// <inheritdoc />
-        public async Task<bool> AddAsync(DarwinCore item)
+        public async Task<bool> AddAsync(DarwinCore<DynamicProperties> item)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace SOS.Process.Repositories.Destination
         /// </summary>
         /// <param name="batch"></param>
         /// <returns></returns>
-        private async Task<bool> AddBatchAsync(IEnumerable<DarwinCore> batch)
+        private async Task<bool> AddBatchAsync(IEnumerable<DarwinCore<DynamicProperties>> batch)
         {
             var items = batch?.ToArray();
             try
@@ -130,7 +130,7 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddManyAsync(IEnumerable<DarwinCore> items)
+        public async Task<bool> AddManyAsync(IEnumerable<DarwinCore<DynamicProperties>> items)
         {
             var entities = items?.ToArray();
             if (!entities?.Any() ?? true)
@@ -172,9 +172,9 @@ namespace SOS.Process.Repositories.Destination
         /// <inheritdoc />
         public async Task CreateIndexAsync()
         {
-            var indexModels = new List<CreateIndexModel<DarwinCore>>();
+            var indexModels = new List<CreateIndexModel<DarwinCore<DynamicProperties>>>();
 
-            indexModels.Add(new CreateIndexModel<DarwinCore>(Builders<DarwinCore>.IndexKeys.Ascending(p => p.Taxon.TaxonID)));
+            indexModels.Add(new CreateIndexModel<DarwinCore<DynamicProperties>>(Builders<DarwinCore<DynamicProperties>>.IndexKeys.Ascending(p => p.Taxon.TaxonID)));
 
          /*   indexModels.Add(new CreateIndexModel<DarwinCore>(Builders<DarwinCore>.IndexKeys.Combine(
                 Builders<DarwinCore>.IndexKeys.Ascending(x => x.ParentIds),
@@ -188,7 +188,7 @@ namespace SOS.Process.Repositories.Destination
         {
             try
             {
-                var removeFilter = Builders<DarwinCore>.Filter.Eq("_id", id);
+                var removeFilter = Builders<DarwinCore<DynamicProperties>>.Filter.Eq("_id", id);
                 var deleteResult = await MongoCollection.DeleteOneAsync(removeFilter);
 
                 return deleteResult.IsAcknowledged && deleteResult.DeletedCount > 0;
@@ -226,8 +226,8 @@ namespace SOS.Process.Repositories.Destination
                 var res = await MongoCollection.Find(x => ids.Contains(x.DatasetID)).ToListAsync();
                 if (res != null && res.Any())
                 {
-                    var removeFilter = Builders<DarwinCore>.Filter.In("_id", res.Select(x=>x.DatasetID));
-                    var deleteResult = await Database.GetCollection<DarwinCore>(typeof(DarwinCore).Name)
+                    var removeFilter = Builders<DarwinCore<DynamicProperties>>.Filter.In("_id", res.Select(x=>x.DatasetID));
+                    var deleteResult = await Database.GetCollection<DarwinCore<DynamicProperties>>(typeof(DarwinCore<DynamicProperties>).Name)
                         .DeleteManyAsync(removeFilter);
                     return deleteResult.IsAcknowledged && deleteResult.DeletedCount > 0;
                 }
@@ -243,7 +243,7 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> UpdateAsync(string id, DarwinCore entity)
+        public async Task<bool> UpdateAsync(string id, DarwinCore<DynamicProperties> entity)
         {
             try
             {

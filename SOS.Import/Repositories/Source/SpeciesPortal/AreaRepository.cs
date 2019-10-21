@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities;
-using SOS.Import.Enums;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Enums;
 
 namespace SOS.Import.Repositories.Source.SpeciesPortal
 {

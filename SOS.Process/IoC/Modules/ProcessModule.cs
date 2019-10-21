@@ -2,7 +2,8 @@
 using System.Security.Authentication;
 using Autofac;
 using MongoDB.Driver;
-using SOS.Process.Configuration;
+using SOS.Lib.Configuration.Process;
+using SOS.Lib.Configuration.Shared;
 using SOS.Process.Database;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Factories;

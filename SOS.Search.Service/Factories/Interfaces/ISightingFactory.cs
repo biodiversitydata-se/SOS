@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Search.Service.Models;
+using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Search.Service.Factories.Interfaces
 {

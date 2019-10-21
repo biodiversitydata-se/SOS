@@ -30,7 +30,7 @@ namespace SOS.Hangfire.UI.Controllers
         [HttpPost("Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailyProcessJob([FromQuery]int sources, [FromQuery]int hour, [FromQuery]int minute)
+        public IActionResult ScheduleDailyProcessJob([FromQuery]int sources, [FromQuery]int hour, [FromQuery]int minute)
         {
             try
             {

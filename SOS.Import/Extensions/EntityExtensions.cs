@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SOS.Import.Entities;
-using SOS.Import.Enums;
-using SOS.Import.Models.Aggregates.Artportalen;
-using SOS.Import.Models.Shared;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.Verbatim.SpeciesPortal;
+using SOS.Lib.Models.Verbatim.Shared;
 
 
 namespace SOS.Import.Extensions

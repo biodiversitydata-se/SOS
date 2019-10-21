@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
-using SOS.Search.Service.Models;
+using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Search.Service.Repositories.Interfaces
 {

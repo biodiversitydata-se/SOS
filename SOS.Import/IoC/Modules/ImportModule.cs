@@ -2,11 +2,14 @@
 using System.Security.Authentication;
 using Autofac;
 using MongoDB.Driver;
-using SOS.Import.Configuration;
+using SOS.Lib.Configuration.Import;
+using SOS.Lib.Configuration.Shared;
 using SOS.Import.Factories;
 using SOS.Import.Factories.Interfaces;
 using SOS.Import.Jobs;
 using SOS.Import.Jobs.Interfaces;
+using SOS.Import.MongoDb;
+using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal;
@@ -23,12 +26,13 @@ namespace SOS.Import.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             // Add configuration
-            builder.RegisterInstance(Configuration.MongoDbConfiguration).As<MongoDbConfiguration>().SingleInstance();
             builder.RegisterInstance(Configuration.ConnectionStrings).As<ConnectionStrings>().SingleInstance();
 
             // Init mongodb
-            SetUpMongoDb(builder, Configuration.MongoDbConfiguration);
-
+            var importSettings = GetMongDbSettings(Configuration.MongoDbConfiguration);
+            var importClient = new ImportClient(importSettings, Configuration.MongoDbConfiguration.DatabaseName, Configuration.MongoDbConfiguration.BatchSize);
+            builder.RegisterInstance(importClient).As<IImportClient>().SingleInstance();
+            
             // Repositories source
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<MetadataRepository>().As<IMetadataRepository>().InstancePerLifetimeScope();
@@ -50,30 +54,34 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SpeciesPortalHarvestJob>().As<ISpeciesPortalHarvestJob>().InstancePerLifetimeScope();
         }
 
-        private void SetUpMongoDb(ContainerBuilder builder, MongoDbConfiguration mongoDBConfiguration)
+        /// <summary>
+        /// Get mongo db settings object
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        private static MongoClientSettings GetMongDbSettings(MongoDbConfiguration config)
         {
-            var settings = new MongoClientSettings
+            MongoInternalIdentity identity = null;
+            PasswordEvidence evidence = null;
+            if (!(string.IsNullOrEmpty(config.DatabaseName) ||
+                  string.IsNullOrEmpty(config.UserName) ||
+                  string.IsNullOrEmpty(config.Password)))
             {
-                Servers = mongoDBConfiguration.Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)),
-                ReplicaSetName = mongoDBConfiguration.ReplicaSetName,
-                UseTls = mongoDBConfiguration.UseTls,
-                SslSettings = mongoDBConfiguration.UseTls ? new SslSettings
+                identity = new MongoInternalIdentity(config.DatabaseName, config.UserName);
+                evidence = new PasswordEvidence(config.Password);
+            }
+
+            return new MongoClientSettings
+            {
+                Servers = config.Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)),
+                ReplicaSetName = config.ReplicaSetName,
+                UseTls = config.UseTls,
+                SslSettings = config.UseTls ? new SslSettings
                 {
                     EnabledSslProtocols = SslProtocols.Tls12
-                } : null
+                } : null,
+                Credential = identity != null && evidence != null ? new MongoCredential("SCRAM-SHA-1", identity, evidence) : null
             };
-
-            if (!string.IsNullOrEmpty(mongoDBConfiguration.DatabaseName) &&
-                !string.IsNullOrEmpty(mongoDBConfiguration.Password))
-            {
-                var identity = new MongoInternalIdentity(mongoDBConfiguration.DatabaseName, mongoDBConfiguration.UserName);
-                var evidence = new PasswordEvidence(mongoDBConfiguration.Password);
-
-                settings.Credential = new MongoCredential("SCRAM-SHA-1", identity, evidence);
-            }
-            // Setup Mongo Db
-            var mongoClient = new MongoClient(settings);
-            builder.RegisterInstance(mongoClient).As<IMongoClient>().SingleInstance();
         }
     }
 }

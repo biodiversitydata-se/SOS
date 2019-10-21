@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using SOS.Import.Models.Shared;
 using SOS.Import.Repositories.Destination.Interfaces;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces
 {

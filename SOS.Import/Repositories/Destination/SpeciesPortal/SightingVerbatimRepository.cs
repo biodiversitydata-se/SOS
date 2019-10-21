@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
-using SOS.Import.Configuration;
-using SOS.Import.Models.Aggregates.Artportalen;
+using SOS.Import.MongoDb.Interfaces;
+using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Import.Repositories.Destination.SpeciesPortal
 {
@@ -13,13 +12,11 @@ namespace SOS.Import.Repositories.Destination.SpeciesPortal
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="mongoClient"></param>
-        /// <param name="mongoDbConfiguration"></param>
+        /// <param name="importClient"></param>
         /// <param name="logger"></param>
         public SightingVerbatimRepository(
-            IMongoClient mongoClient,
-            MongoDbConfiguration mongoDbConfiguration, 
-            ILogger<SightingVerbatimRepository> logger) : base(mongoClient, mongoDbConfiguration, logger)
+            IImportClient importClient,
+            ILogger<SightingVerbatimRepository> logger) : base(importClient, logger)
         {
         }
     }

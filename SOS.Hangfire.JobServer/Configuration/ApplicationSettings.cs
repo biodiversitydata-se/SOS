@@ -1,4 +1,6 @@
-﻿namespace SOS.Hangfire.JobServer.Configuration
+﻿using SOS.Lib.Configuration.Shared;
+
+namespace SOS.Hangfire.JobServer.Configuration
 {
     /// <summary>
     /// Application settings

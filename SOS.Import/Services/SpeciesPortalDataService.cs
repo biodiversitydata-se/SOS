@@ -5,9 +5,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Configuration;
-using SOS.Import.Configuration;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Configuration.Import;
 
 namespace SOS.Import.Services
 {
@@ -35,21 +34,19 @@ namespace SOS.Import.Services
         /// <inheritdoc />
         public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null)
         {
-            using (var conn = Connection)
-            {
-                conn.Open();
+            using var conn = Connection;
+            conn.Open();
 
-                return (await conn.QueryAsync<T>(
-                    new CommandDefinition(
-                        query,
-                        parameters,
-                        null,
-                        null,
-                        CommandType.Text,
-                        CommandFlags.NoCache
-                    )
-                )).ToArray();
-            }
+            return (await conn.QueryAsync<T>(
+                new CommandDefinition(
+                    query,
+                    parameters,
+                    null,
+                    null,
+                    CommandType.Text,
+                    CommandFlags.NoCache
+                )
+            )).ToArray();
         }
     }
 }
