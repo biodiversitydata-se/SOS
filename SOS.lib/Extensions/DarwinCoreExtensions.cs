@@ -3,7 +3,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using SOS.Lib.Models.DarwinCore;
 
-namespace SOS.Export.Extensions
+namespace SOS.Lib.Extensions
 {
     /// <summary>
     /// Extensions for Darwin Core

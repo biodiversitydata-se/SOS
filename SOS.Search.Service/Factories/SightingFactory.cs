@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Search.Service.Extensions;
+using SOS.Lib.Extensions;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Factories
