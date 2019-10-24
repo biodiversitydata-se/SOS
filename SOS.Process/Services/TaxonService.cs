@@ -8,12 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using Microsoft.Extensions.Options;
 using CsvHelper;
 using Microsoft.Extensions.Logging;
-using SOS.Process.Configuration;
+using SOS.Lib.Configuration.Process;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Process.Mappings;
-using SOS.Process.Models.Processed;
 
 namespace SOS.Process.Services
 {
@@ -22,14 +21,14 @@ namespace SOS.Process.Services
         private readonly string _taxonDwcUrl;
         private readonly ILogger<TaxonService> _logger;
 
-        public TaxonService(IOptions<AppSettings> settings, ILogger<TaxonService> logger)
+        public TaxonService(AppSettings settings, ILogger<TaxonService> logger)
         {
-            if (settings?.Value == null)
+            if (settings == null)
             {
                 throw new ArgumentNullException(nameof(settings));
             }
 
-            _taxonDwcUrl = settings.Value.TaxonDwcUrl;
+            _taxonDwcUrl = settings.TaxonDwcUrl;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         }

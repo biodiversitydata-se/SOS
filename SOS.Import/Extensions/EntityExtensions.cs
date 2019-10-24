@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using SOS.Import.Entities;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.Verbatim.SpeciesPortal;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Import.Models;
 using SOS.Import.Models.Aggregates;
+
 
 namespace SOS.Import.Extensions
 {
@@ -12,6 +16,31 @@ namespace SOS.Import.Extensions
     /// </summary>
     public static class SightingExtensions
     {
+        /// <summary>
+        /// Cast area entity to model 
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public static Area ToAggregate(this AreaEntity entity)
+        {
+            return new Area((AreaType)entity.AreaDatasetId)
+            {
+                Id = entity.Id,
+                Geometry = entity.Polygon.ToGeometry().Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoJsonGeometry(),
+                Name = entity.Name
+            };
+        }
+
+        /// <summary>
+        /// Cast multiple area entities to models 
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public static IEnumerable<Area> ToAggregates(this IEnumerable<AreaEntity> entities)
+        {
+            return entities.Select(e => e.ToAggregate());
+        }
+
         /// <summary>
         /// Cast sighting itemEntity to model 
         /// </summary>

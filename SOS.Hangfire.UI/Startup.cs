@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -14,8 +15,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using SOS.Core.IoC.Modules;
 using SOS.Core.Repositories;
+using SOS.Hangfire.UI.Configuration;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace SOS.Hangfire.UI
@@ -56,6 +57,9 @@ namespace SOS.Hangfire.UI
             services.AddControllers();
             var repositorySettings = CreateRepositorySettings();
 
+       //     services.AddSingleton<ILoggerFactory, LoggerFactory>();
+       //     services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+
             // Swagger
             services.AddSwaggerGen(
                 options =>
@@ -95,7 +99,8 @@ namespace SOS.Hangfire.UI
         /// <param name="builder"></param>
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            builder.RegisterModule<CoreModule>();
+           
+
             var repositorySettings = CreateRepositorySettings();
             builder.Register(r => repositorySettings).As<IRepositorySettings>().SingleInstance();
         }
@@ -146,13 +151,12 @@ namespace SOS.Hangfire.UI
 
         private IRepositorySettings CreateRepositorySettings()
         {
-            var configuration = Configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository");
+            var mongoConfiguration = Configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository").Get<MongoDbConfiguration>();
 
             return new RepositorySettings
             {
-                JobsDatabaseName = configuration.GetValue<string>("JobsDatabaseName"),
-                DatabaseName = configuration.GetValue<string>("DatabaseName"),
-                MongoDbConnectionString = configuration.GetValue<string>("InstanceUrl")
+                JobsDatabaseName = mongoConfiguration.DatabaseName,
+                MongoDbConnectionString = $"mongodb://{string.Join(",", mongoConfiguration.Hosts.Select(h => h.Name))}" 
             };
         }
 

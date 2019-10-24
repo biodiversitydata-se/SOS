@@ -31,7 +31,7 @@ namespace SOS.Core.Jobs
             Console.WriteLine($"Start harvesting VerbatimTestDataProvider database: { DateTime.Now.ToLongTimeString() }");
             // 1. Get data from data source (in this case generate random observations)
             var verbatimObservations = VerbatimTestDataProviderObservationFactory.CreateRandomObservations(nrObservations);
-
+            /*
             // 2. Drop verbatim collection to avoid duplicates. This should eventually be removed...
             MongoDbContext dbContext = new MongoDbContext(_repositorySettings.MongoDbConnectionString, _repositorySettings.DatabaseName, Constants.VerbatimTestDataProviderObservations);
             var repository = new VerbatimObservationRepository<VerbatimTestDataProviderObservation>(dbContext);
@@ -39,7 +39,7 @@ namespace SOS.Core.Jobs
 
             // 3. Add observations to database
             repository.InsertObservationsAsync(verbatimObservations).Wait();
-
+            */
             Console.WriteLine($"Finished harvesting VerbatimTestDataProvider database: { DateTime.Now.ToLongTimeString() }");
         }
     }

@@ -3,7 +3,7 @@
     "SOS.Hangfire.JobServer": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "LOCAL"
+        "ASPNETCORE_ENVIRONMENT": "local"
       }
     }
   }

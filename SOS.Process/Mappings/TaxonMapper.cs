@@ -1,5 +1,5 @@
 ﻿using CsvHelper.Configuration;
-using SOS.Process.Models.Processed;
+using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Process.Mappings
 {

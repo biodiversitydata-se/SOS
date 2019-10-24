@@ -15,6 +15,12 @@ namespace SOS.Import.Factories.Interfaces
         Task<bool> AggregateAsync();
 
         /// <summary>
+        /// Aggregate all areas
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> AggregateAreasAsync();
+
+        /// <summary>
         /// Aggregate sightings.
         /// </summary>
         /// <param name="options">Options used in aggregation.</param>

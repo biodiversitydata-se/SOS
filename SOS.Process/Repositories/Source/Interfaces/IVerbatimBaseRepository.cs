@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Process.Models.Verbatim.Interfaces;
+using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Process.Repositories.Source.Interfaces
 {

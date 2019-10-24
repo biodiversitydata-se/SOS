@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Search.Service.Extensions;
-using SOS.Search.Service.Models;
+using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Extensions;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Factories
@@ -13,7 +13,7 @@ namespace SOS.Search.Service.Factories
     /// </summary>
     public class SightingFactory : Interfaces.ISightingFactory
     {
-        private readonly IProcessedDarwinCoreRepository _ProcessedDarwinCoreRepository;
+        private readonly IProcessedDarwinCoreRepository _processedDarwinCoreRepository;
 
         private readonly ILogger<SightingFactory> _logger;
 
@@ -26,7 +26,7 @@ namespace SOS.Search.Service.Factories
             IProcessedDarwinCoreRepository ProcessedDarwinCoreRepository,
             ILogger<SightingFactory> logger)
         {
-            _ProcessedDarwinCoreRepository = ProcessedDarwinCoreRepository ??
+            _processedDarwinCoreRepository = ProcessedDarwinCoreRepository ??
                                            throw new ArgumentNullException(nameof(ProcessedDarwinCoreRepository));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -37,7 +37,7 @@ namespace SOS.Search.Service.Factories
         {
             try
             {
-                var processedDarwinCore = await _ProcessedDarwinCoreRepository.GetChunkAsync(taxonId, skip, take);
+                var processedDarwinCore = await _processedDarwinCoreRepository.GetChunkAsync(taxonId, skip, take);
                 return processedDarwinCore?.ToDarwinCore();
             }
             catch (Exception e)
@@ -52,7 +52,7 @@ namespace SOS.Search.Service.Factories
         {
             try
             {
-                var result = await _ProcessedDarwinCoreRepository.GetChunkAsync(taxonId, fields, skip, take);
+                var result = await _processedDarwinCoreRepository.GetChunkAsync(taxonId, fields, skip, take);
                 return result;
             }
             catch (Exception e)

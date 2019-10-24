@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Models.Verbatim.SpeciesPortal;
 using SOS.Process.Database.Interfaces;
-using SOS.Process.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Process.Repositories.Source
 {

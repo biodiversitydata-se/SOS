@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "SOS.Import": {
-      "commandName": "Project",
-      "commandLineArgs": "-e dev -s 1"
-    }
-  }
-}

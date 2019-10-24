@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using SOS.Lib.Models.DarwinCore;
+
 using SOS.Search.Service.Configuration;
-using SOS.Search.Service.Models;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Repositories
@@ -50,7 +50,7 @@ namespace SOS.Search.Service.Repositories
         /// <returns></returns>
         private string CreateProjection(IEnumerable<string> fields)
         {
-            var projection = $"{{ _id: 0, { fields?.Where(f => !string.IsNullOrEmpty(f)).Select((f, i) => $"'{f}': {i+1}").Join(",") } }}";
+            var projection = $"{{ _id: 0, { string.Join(",", fields?.Where(f => !string.IsNullOrEmpty(f)).Select((f, i) => $"'{f}': {i+1}") ?? new string[0]) } }}";
             return projection;
         }
 

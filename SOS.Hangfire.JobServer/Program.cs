@@ -1,75 +1,107 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
-using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using Hangfire;
 using Hangfire.Mongo;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using SOS.Core;
-using SOS.Core.IoC;
+using Microsoft.Extensions.Logging;
+using NLog.Web;
 using SOS.Core.IoC.Modules;
-using SOS.Core.Jobs;
-using SOS.Core.Repositories;
-using SOS.Hangfire.JobServer.MyApplication.Common;
+using SOS.Export.IoC.Modules;
+using SOS.Import.IoC.Modules;
+using SOS.Lib.Configuration.Export;
+using SOS.Lib.Configuration.Import;
+using SOS.Lib.Configuration.Process;
+using SOS.Lib.Configuration.Shared;
+using SOS.Process.IoC.Modules;
 
 namespace SOS.Hangfire.JobServer
 {
-    class Program
+    /// <summary>
+    /// Program class
+    /// </summary>
+    public class Program
     {
-        static async Task Main(string[] args)
+        private static string _env;
+
+        /// <summary>
+        /// Application entry point
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public static async Task Main(string[] args)
         {
-            IConfiguration configuration = ConfigurationFactory.CreateConfiguration();
-            var builder = new Autofac.ContainerBuilder();
-            builder.RegisterModule<CoreModule>();
+            _env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-            var configurationSection = configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository");
-            var repositorySettings = new RepositorySettings()
-            {
-                DatabaseName = configurationSection.GetValue<string>("DatabaseName"),
-                JobsDatabaseName = configurationSection.GetValue<string>("JobsDatabaseName"),
-                MongoDbConnectionString = configurationSection.GetValue<string>("InstanceUrl"),
-            };
-            SystemSettings.InitSettings(repositorySettings);
-            builder.Register(r => repositorySettings).As<IRepositorySettings>().SingleInstance();
+            await CreateHostBuilder(args)
+                .Build()
+                .RunAsync();
+        }
 
-            GlobalConfiguration.Configuration.UseMongoStorage(
-                repositorySettings.MongoDbConnectionString, 
-                repositorySettings.JobsDatabaseName, 
-                MongoStorageOptions);
-
-            var hostBuilder = new HostBuilder()
-                // Add configuration, logging, ...
+        /// <summary>
+        /// Create a host
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        private static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, configuration) =>
+                {
+                    configuration.SetBasePath(Directory.GetCurrentDirectory())
+                        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                        .AddJsonFile($"appsettings.{_env}.json", optional: false, reloadOnChange: true)
+                        .AddEnvironmentVariables();
+                })
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    logging
+                        .ClearProviders()
+                        .AddConfiguration(hostingContext.Configuration.GetSection("Logging"))
+                        .AddNLog(configFileName: $"nlog.{_env}.config");
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    // Add your services for depedency injection.
-                    
-                });
+                    var mongoConfiguration = hostContext.Configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository").Get<MongoDbConfiguration>();
 
-            IContainer autofacContainer = builder.Build();
-            GlobalConfiguration.Configuration.UseAutofacActivator(autofacContainer); // Hangfire
+                    services.AddHangfire(configuration =>
+                            configuration
+                            .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                            .UseSimpleAssemblyNameTypeSerializer()
+                            .UseRecommendedSerializerSettings()
+                            .UseMongoStorage($"mongodb:// {(string.IsNullOrEmpty(mongoConfiguration.UserName) || string.IsNullOrEmpty(mongoConfiguration.Password) ? "" : $"{mongoConfiguration.UserName}:{mongoConfiguration.Password}@")} {string.Join(",", mongoConfiguration.Hosts.Select(h => $"{h.Name}:{h.Port}"))}?connect=replicaSet",
+                                mongoConfiguration.DatabaseName,
+                                new MongoStorageOptions
+                                {
+                                    MigrationOptions = new MongoMigrationOptions
+                                    {
+                                        Strategy = MongoMigrationStrategy.Migrate,
+                                        BackupStrategy = MongoBackupStrategy.Collections
+                                    }
+                                })
+                    );
 
-            using (var server = new BackgroundJobServer(new BackgroundJobServerOptions { WorkerCount = 5 }))
-            {
-                await hostBuilder.RunConsoleAsync();
-            }
-        }
+                    // Add the processing server as IHostedService
+                    services.AddHangfireServer();
+                })
+                .UseServiceProviderFactory(hostContext =>
+                    {
+                        var importConfiguration = hostContext.Configuration.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();
+                        var processConfiguration = hostContext.Configuration.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
+                        var exportConfiguration  = hostContext.Configuration.GetSection(typeof(ExportConfiguration).Name).Get<ExportConfiguration>();
 
-        private static MongoStorageOptions MongoStorageOptions
-        {
-            get
-            {
-                var migrationOptions = new MongoMigrationOptions
-                {
-                    Strategy = MongoMigrationStrategy.Migrate,
-                    BackupStrategy = MongoBackupStrategy.Collections
-                };
-
-                var storageOptions = new MongoStorageOptions { MigrationOptions = migrationOptions };
-                return storageOptions;
-            }
-        }
+                        return new AutofacServiceProviderFactory(builder =>
+                            builder
+                                .RegisterModule<CoreModule>()
+                                .RegisterModule(new ImportModule { Configuration = importConfiguration })
+                                .RegisterModule(new ProcessModule { Configuration = processConfiguration })
+                                .RegisterModule(new ExportModule { Configuration = exportConfiguration })
+                        );
+                    }
+                )
+                .UseNLog();
     }
 }

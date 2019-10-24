@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using SOS.Import.Configuration;
-using SOS.Import.Models.Aggregates.Interfaces;
+using SOS.Import.MongoDb.Interfaces;
+using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Import.Repositories.Destination
 {
@@ -36,24 +35,23 @@ namespace SOS.Import.Repositories.Destination
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="mongoClient"></param>
-        /// <param name="mongoDbConfiguration"></param>
+        /// <param name="importClient"></param>
         /// <param name="logger"></param>
         protected VerbatimRepository(
-            IMongoClient mongoClient,
-            IOptions<MongoDbConfiguration> mongoDbConfiguration,
+            IImportClient importClient,
             ILogger<VerbatimRepository<TEntity, TKey>> logger
         )
         {
-            if (mongoDbConfiguration?.Value == null)
+            if (importClient == null)
             {
-                throw new ArgumentNullException(nameof(mongoDbConfiguration));
+                throw new ArgumentNullException(nameof(importClient));
             }
 
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            Database = mongoClient.GetDatabase($"{mongoDbConfiguration.Value.DatabaseName}");
-            _batchSize = mongoDbConfiguration.Value.AddBatchSize;
+            Database = importClient.GetDatabase();
+            
+            _batchSize = importClient.BatchSize;
             _collectionName = typeof(TEntity).Name;
         }
 

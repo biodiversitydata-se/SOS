@@ -31,10 +31,11 @@ namespace SOS.Core.Jobs
             _repositorySettings = repositorySettings;
         }
 
+
         public void Run()
         {
             Console.WriteLine($"Start processing VerbatimTestDataProvider observations: { DateTime.Now.ToLongTimeString() }");
-            
+            /*
             // 1. Get all verbatim observations
             MongoDbContext dbContext = new MongoDbContext(
                 _repositorySettings.MongoDbConnectionString, 
@@ -62,7 +63,7 @@ namespace SOS.Core.Jobs
                 Constants.ObservationCollectionName);
             var observationRepository = new VersionedObservationRepository<ProcessedDwcObservation>(observationsDbContext);
             observationRepository.InsertDocumentsAsync(processedObservationsBag.ToList()).Wait();
-
+            */
             Console.WriteLine($"Finished processing VerbatimTestDataProvider observations: { DateTime.Now.ToLongTimeString() }");
         }
     }
