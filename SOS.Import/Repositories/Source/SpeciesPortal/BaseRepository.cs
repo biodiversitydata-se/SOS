@@ -11,16 +11,16 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
     /// </summary>
     public class BaseRepository<T> : Interfaces.IBaseRepository<T>
     {
-        private readonly ISpeciesPortalDataService _SpeciesPortalDataService;
+        private readonly ISpeciesPortalDataService _speciesPortalDataService;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="SpeciesPortalDataService"></param>
+        /// <param name="speciesPortalDataService"></param>
         /// <param name="logger"></param>
-        public BaseRepository(ISpeciesPortalDataService SpeciesPortalDataService, ILogger<T> logger)
+        public BaseRepository(ISpeciesPortalDataService speciesPortalDataService, ILogger<T> logger)
         {
-            _SpeciesPortalDataService = SpeciesPortalDataService ?? throw new ArgumentNullException(nameof(SpeciesPortalDataService));
+            _speciesPortalDataService = speciesPortalDataService ?? throw new ArgumentNullException(nameof(speciesPortalDataService));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -38,7 +38,7 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
         /// <returns></returns>
         public async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters = null)
         {
-            return await _SpeciesPortalDataService.QueryAsync<E>(query, parameters);
+            return await _speciesPortalDataService.QueryAsync<E>(query, parameters);
         }
     }
 }

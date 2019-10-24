@@ -112,5 +112,10 @@ namespace SOS.Import.Models.Aggregates
         /// Taxon weight
         /// </summary>
         public int? Weight { get; set; }
+
+        public string VerifiedBy { get; set; }
+        public string Observers { get; set; }
+        public string ReportedBy { get; set; }
+        public string SpeciesCollection { get; set; }
     }
 }

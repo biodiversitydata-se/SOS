@@ -8,6 +8,7 @@ using SOS.Import.Entities;
 using SOS.Import.Factories;
 using SOS.Import.Models.Aggregates;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
+using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using Xunit;
 
@@ -23,7 +24,10 @@ namespace SOS.Import.Test.Factories
         private readonly Mock<ISightingRepository> _sightingRepositoryMock;
         private readonly Mock<ISiteRepository> _siteRepositoryMockMock;
         private readonly Mock<SightingVerbatimRepository> _sightingVerbatimRepository;
-
+        private readonly Mock<PersonRepository> _personRepository;
+        private readonly Mock<OrganizationRepository> _organizationRepository;
+        private readonly Mock<SightingRelationRelationRepository> _personSightingRepository;
+        private readonly Mock<SpeciesCollectionItemRepository> _speciesCollectionItemRepository;
         private readonly Mock<ILogger<SpeciesPortalSightingFactory>> _loggerMock;
 
         /// <summary>
@@ -36,6 +40,10 @@ namespace SOS.Import.Test.Factories
             _sightingRepositoryMock = new Mock<ISightingRepository>();
             _siteRepositoryMockMock = new Mock<ISiteRepository>();
             _sightingVerbatimRepository = new Mock<SightingVerbatimRepository>();
+            _personRepository = new Mock<PersonRepository>();
+            _organizationRepository = new Mock<OrganizationRepository>();
+            _personSightingRepository = new Mock<SightingRelationRelationRepository>();
+            _speciesCollectionItemRepository = new Mock<SpeciesCollectionItemRepository>();
             _loggerMock = new Mock<ILogger<SpeciesPortalSightingFactory>>();
         }
 
@@ -51,6 +59,10 @@ namespace SOS.Import.Test.Factories
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
                 _sightingVerbatimRepository.Object,
+                _personRepository.Object,
+                _organizationRepository.Object, 
+                _personSightingRepository.Object, 
+                _speciesCollectionItemRepository.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new SpeciesPortalSightingFactory(
@@ -59,6 +71,10 @@ namespace SOS.Import.Test.Factories
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
                 _sightingVerbatimRepository.Object,
+                _personRepository.Object,
+                _organizationRepository.Object,
+                _personSightingRepository.Object,
+                _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("metadataRepository");
 
@@ -68,6 +84,10 @@ namespace SOS.Import.Test.Factories
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
                 _sightingVerbatimRepository.Object,
+                _personRepository.Object,
+                _organizationRepository.Object,
+                _personSightingRepository.Object,
+                _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("projectRepository");
 
@@ -77,6 +97,10 @@ namespace SOS.Import.Test.Factories
                 null,
                 _siteRepositoryMockMock.Object,
                 _sightingVerbatimRepository.Object,
+                _personRepository.Object,
+                _organizationRepository.Object,
+                _personSightingRepository.Object,
+                _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sightingRepository");
 
@@ -86,6 +110,10 @@ namespace SOS.Import.Test.Factories
                 _sightingRepositoryMock.Object,
                 null,
                 _sightingVerbatimRepository.Object,
+                _personRepository.Object,
+                _organizationRepository.Object,
+                _personSightingRepository.Object,
+                _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("siteRepository");
 
@@ -95,6 +123,10 @@ namespace SOS.Import.Test.Factories
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
                 null,
+                _personRepository.Object,
+                _organizationRepository.Object,
+                _personSightingRepository.Object,
+                _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sightingVerbatimRepository");
 
@@ -105,6 +137,10 @@ namespace SOS.Import.Test.Factories
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
                 _sightingVerbatimRepository.Object,
+                _personRepository.Object,
+                _organizationRepository.Object,
+                _personSightingRepository.Object,
+                _speciesCollectionItemRepository.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -159,6 +195,10 @@ namespace SOS.Import.Test.Factories
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
                 _sightingVerbatimRepository.Object,
+                _personRepository.Object, 
+                _organizationRepository.Object,
+                _personSightingRepository.Object,
+                _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
 
             var result = await sightingFactory.AggregateAsync();
@@ -190,6 +230,10 @@ namespace SOS.Import.Test.Factories
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
                 _sightingVerbatimRepository.Object,
+                _personRepository.Object, 
+                _organizationRepository.Object,
+                _personSightingRepository.Object,
+                _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
 
             var result = await sightingFactory.AggregateAsync();
