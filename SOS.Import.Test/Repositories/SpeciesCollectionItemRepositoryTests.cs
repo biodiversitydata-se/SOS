@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Services;
+using SOS.Lib.Configuration.Import;
 using Xunit;
 
 namespace SOS.Import.Test.Repositories
@@ -23,16 +24,11 @@ namespace SOS.Import.Test.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var configurationDictionary = new Dictionary<string, string>
+            SpeciesPortalDataService speciesPortalDataService = new SpeciesPortalDataService(new ConnectionStrings
             {
-                { "ConnectionStrings:SpeciesPortal", ArtportalenTestServerConnectionString }
-            };
+                SpeciesPortal = ArtportalenTestServerConnectionString
+            });
 
-            var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(configurationDictionary)
-                .Build();
-
-            SpeciesPortalDataService speciesPortalDataService = new SpeciesPortalDataService(configuration);
             SpeciesCollectionItemRepository speciesCollectionItemRepository = new SpeciesCollectionItemRepository(
                 speciesPortalDataService,
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);

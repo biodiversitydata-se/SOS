@@ -8,14 +8,17 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Moq;
-using SOS.Import.Configuration;
 using SOS.Import.Entities;
 using SOS.Import.Factories;
 using SOS.Import.Models;
+using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
+using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Import.Services;
+using SOS.Lib.Configuration.Import;
+using SOS.Lib.Configuration.Shared;
 using Xunit;
 
 namespace SOS.Import.Test.Factories
@@ -24,7 +27,9 @@ namespace SOS.Import.Test.Factories
     {
         private const string ArtportalenTestServerConnectionString = "Server=artsql2-4;Database=SpeciesObservationSwe_debugremote;Trusted_Connection=True;MultipleActiveResultSets=true";
         private const string MongoDbDatabaseName = "sos-verbatim";
-        private const string MongoDbConnectionString = "mongodb://localhost";
+        //private const string MongoDbConnectionString = "mongodb://localhost";
+        private const string MongoDbConnectionString = "localhost";
+        private const int MongoDbAddBatchSize = 1000;
 
         [Fact]
         [Trait("Category","Integration")]
@@ -33,23 +38,19 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var configurationDictionary = new Dictionary<string, string>
+            ConnectionStrings connectionStrings = new ConnectionStrings();
+            connectionStrings.SpeciesPortal = ArtportalenTestServerConnectionString;
+            SpeciesPortalDataService speciesPortalDataService = new SpeciesPortalDataService(new ConnectionStrings
             {
-                { "ConnectionStrings:SpeciesPortal", ArtportalenTestServerConnectionString }
+                SpeciesPortal = ArtportalenTestServerConnectionString
+            });
+            MongoClientSettings mongoClientSettings = new MongoClientSettings
+            {
+                Server = new MongoServerAddress(MongoDbConnectionString)
             };
 
-            var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(configurationDictionary)
-                .Build();
-
-            SpeciesPortalDataService speciesPortalDataService = new SpeciesPortalDataService(configuration);
-            MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration
-            {
-                DatabaseName = MongoDbDatabaseName, AddBatchSize = 1000
-            };
-            IOptions<MongoDbConfiguration> mongoDbOptions = Options.Create(mongoDbConfiguration);
-            IMongoClient mongoClient = new MongoClient(MongoDbConnectionString);
-            SightingVerbatimRepository sightingVerbatimRepository = new SightingVerbatimRepository(mongoClient, mongoDbOptions, new Mock<ILogger<SightingVerbatimRepository>>().Object);
+            var importClient = new ImportClient(mongoClientSettings, MongoDbDatabaseName, MongoDbAddBatchSize);
+            SightingVerbatimRepository sightingVerbatimRepository = new SightingVerbatimRepository(importClient, new Mock<ILogger<SightingVerbatimRepository>>().Object);
             IMetadataRepository metadataRepository = new MetadataRepository(speciesPortalDataService, new Mock<ILogger<MetadataRepository>>().Object);
             IProjectRepository projectRepository = new ProjectRepository(speciesPortalDataService, new Mock<ILogger<ProjectRepository>>().Object);
             ISightingRepository sightingRepository = new SightingRepository(speciesPortalDataService, new Mock<ILogger<SightingRepository>>().Object);
@@ -60,14 +61,18 @@ namespace SOS.Import.Test.Factories
             //ISiteRepository siteRepository = new SiteRepository(speciesPortalDataService, new Mock<ILogger<SiteRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
             siteRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<SiteEntity>());
-                
+            var areaRepositoryMock = new Mock<IAreaRepository>();
+            areaRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<AreaEntity>());
+            var areaVerbatimRepositoryMock = new Mock<IAreaVerbatimRepository>();
 
             SpeciesPortalSightingFactory sightingFactory = new SpeciesPortalSightingFactory(
+                areaRepositoryMock.Object,
                 metadataRepository,
                 projectRepository,
                 sightingRepository,
                 siteRepositoryMock.Object,
                 //siteRepository,
+                areaVerbatimRepositoryMock.Object,
                 sightingVerbatimRepository,
                 personRepository, 
                 organizationRepository,
