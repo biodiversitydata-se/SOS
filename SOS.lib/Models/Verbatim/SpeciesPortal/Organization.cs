@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SOS.Import.Entities
+namespace SOS.Lib.Models.Verbatim.SpeciesPortal
 {
-    public class OrganizationEntity
+    public class Organization
     {
         public int Id { get; set; }
         public int OrganizationId { get; set; }

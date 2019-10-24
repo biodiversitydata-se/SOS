@@ -60,7 +60,7 @@ namespace SOS.Import.Test.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var sightingRelationEntities = SightingRelationEntityTestData.CreateItems();
+            var sightingRelationEntities = SightingRelationEntityTestData.CreateItems().ToAggregates().ToList();
             var speciesCollectionItemEntities = SpeciesCollectionItemEntityTestData.CreateItems();
             var personByUserId = PersonTestData.CreatePersonDictionary();
             var sightingIds = new HashSet<int>(sightingRelationEntities

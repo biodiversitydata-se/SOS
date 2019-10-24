@@ -27,7 +27,6 @@ namespace SOS.Import.Test.Factories
     {
         private const string ArtportalenTestServerConnectionString = "Server=artsql2-4;Database=SpeciesObservationSwe_debugremote;Trusted_Connection=True;MultipleActiveResultSets=true";
         private const string MongoDbDatabaseName = "sos-verbatim";
-        //private const string MongoDbConnectionString = "mongodb://localhost";
         private const string MongoDbConnectionString = "localhost";
         private const int MongoDbAddBatchSize = 1000;
 

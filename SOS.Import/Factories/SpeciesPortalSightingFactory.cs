@@ -113,7 +113,7 @@ namespace SOS.Import.Factories
 
                 _logger.LogDebug("Start getting persons & organizations data");
                 var personByUserId = (await _personRepository.GetAsync()).ToAggregates().ToDictionary(p => p.UserId, p => p);
-                var organizationById = (await _organizationRepository.GetAsync()).ToDictionary(o => o.Id, o => o);
+                var organizationById = (await _organizationRepository.GetAsync()).ToAggregates().ToDictionary(o => o.Id, o => o);
 
                 _logger.LogDebug("Start getting species collection data");
                 var speciesCollections = (await _speciesCollectionRepository.GetAsync()).ToAggregates().ToList();
@@ -167,7 +167,8 @@ namespace SOS.Import.Factories
                     HashSet<int> sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
                     
                     // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
-                    var sightingRelations = (await _sightingRelationRepository.GetAsync(sightings.Select(x => x.Id))).ToList();
+                    var sightingRelations = (await _sightingRelationRepository
+                        .GetAsync(sightings.Select(x => x.Id))).ToAggregates().ToList();
                     var personSightingBySightingId = PersonSightingFactory.CalculatePersonSightingDictionary(
                         sightingIds,
                         personByUserId,

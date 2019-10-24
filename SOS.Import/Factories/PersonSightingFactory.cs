@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SOS.Import.Entities;
 using SOS.Import.Extensions;
 using SOS.Import.Repositories.Source.SpeciesPortal.Enums;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
@@ -14,9 +13,9 @@ namespace SOS.Import.Factories
         public static Dictionary<int, PersonSighting> CalculatePersonSightingDictionary(
            ISet<int> sightingIds,
            IDictionary<int, Person> personByUserId,
-           IDictionary<int, OrganizationEntity> organizationById,
+           IDictionary<int, Organization> organizationById,
            IList<SpeciesCollectionItem> speciesCollectionItems,
-           IList<SightingRelationEntity> sightingRelationEntities)
+           IList<SightingRelation> sightingRelations)
         {
             var personSightingBySightingId = new Dictionary<int, PersonSighting>();
             var filteredSpeciesCollectionItems = speciesCollectionItems.Where(x => sightingIds.Contains(x.SightingId)).ToList();
@@ -37,7 +36,7 @@ namespace SOS.Import.Factories
             // Add Observers values
             //------------------------------------------------------------------------------
             var observersBySightingId = CalculateObserversDictionary(
-                sightingRelationEntities,
+                sightingRelations,
                 personByUserId);
 
             foreach (var pair in observersBySightingId)
@@ -57,7 +56,7 @@ namespace SOS.Import.Factories
             //------------------------------------------------------------------------------
             var verifiedByStringBySightingId = CalculateVerifiedByStringDictionary(personByUserId,
                 filteredSpeciesCollectionItems,
-                sightingRelationEntities);
+                sightingRelations);
 
             foreach (var pair in verifiedByStringBySightingId)
             {
@@ -75,7 +74,7 @@ namespace SOS.Import.Factories
             // Add ReportedBy values
             //------------------------------------------------------------------------------
             var reportedByBySightingId = CalculateReportedByDictionary(
-                sightingRelationEntities,
+                sightingRelations,
                 personByUserId);
 
             foreach (var pair in reportedByBySightingId)
@@ -106,7 +105,7 @@ namespace SOS.Import.Factories
 
         private static Dictionary<int, string> CalculateSpeciesCollectionDictionary(
             IDictionary<int, Person> personById,
-            IDictionary<int, OrganizationEntity> organizationById,
+            IDictionary<int, Organization> organizationById,
             IList<SpeciesCollectionItem> speciesCollectionItems)
         {
             var speciesCollectionBySightingId = new Dictionary<int, string>();
@@ -120,7 +119,7 @@ namespace SOS.Import.Factories
                 }
 
                 // Collection is Organization
-                if (speciesCollectionItem.OrganizationId.HasValue && organizationById.TryGetValue(speciesCollectionItem.OrganizationId.Value, out OrganizationEntity organization))
+                if (speciesCollectionItem.OrganizationId.HasValue && organizationById.TryGetValue(speciesCollectionItem.OrganizationId.Value, out Organization organization))
                 {
                     speciesCollectionBySightingId[speciesCollectionItem.SightingId] = organization.Name;
                 }
@@ -130,7 +129,7 @@ namespace SOS.Import.Factories
         }
 
         private static IDictionary<int, string> CalculateObserversDictionary(
-            IEnumerable<SightingRelationEntity> sightingRelations,
+            IEnumerable<SightingRelation> sightingRelations,
             IDictionary<int, Person> personsByUserId)
         {
             Dictionary<int, string> observersBySightingId = new Dictionary<int, string>();
@@ -148,7 +147,7 @@ namespace SOS.Import.Factories
         }
 
         private static IDictionary<int, string> CalculateReportedByDictionary(
-            IEnumerable<SightingRelationEntity> sightingRelations,
+            IEnumerable<SightingRelation> sightingRelations,
             IDictionary<int, Person> personsByUserId)
         {
             Dictionary<int, string> reportedByBySightingId = new Dictionary<int, string>();
@@ -169,13 +168,13 @@ namespace SOS.Import.Factories
         private static Dictionary<int, string> CalculateVerifiedByStringDictionary(
             IDictionary<int, Person> personById,
             IList<SpeciesCollectionItem> speciesCollectionItems,
-            IList<SightingRelationEntity> sightingRelationEntities
+            IList<SightingRelation> sightingRelations
         )
         {
             var verifiedByDataBySightingId = CalculateVerifiedByDataDictionary(
                 personById,
                 speciesCollectionItems,
-                sightingRelationEntities);
+                sightingRelations);
 
             return verifiedByDataBySightingId.ToDictionary(x => x.Key, x => ConcatenateVerifiedByString(x.Value));
         }
@@ -183,10 +182,10 @@ namespace SOS.Import.Factories
         private static Dictionary<int, VerifiedByData> CalculateVerifiedByDataDictionary(
             IDictionary<int, Person> personById,
             IList<SpeciesCollectionItem> speciesCollectionItems,
-            IList<SightingRelationEntity> sightingRelationEntities)
+            IList<SightingRelation> sightingRelations)
         {
             var verifiedByDataBySightingId = new Dictionary<int, VerifiedByData>();
-            var determinerQuery = sightingRelationEntities.Where(x =>
+            var determinerQuery = sightingRelations.Where(x =>
                 x.SightingRelationTypeId == (int)SightingRelationTypeId.Determiner
                 && x.IsPublic
                 && x.Sort == 0);
@@ -204,7 +203,7 @@ namespace SOS.Import.Factories
                 vbd.SightingRelationDeterminationYear = determinerRelation.DeterminationYear;
             }
 
-            var confirmatorQuery = sightingRelationEntities.Where(x =>
+            var confirmatorQuery = sightingRelations.Where(x =>
                 x.SightingRelationTypeId == (int)SightingRelationTypeId.Confirmator
                 && x.IsPublic
                 && x.Sort == 0);

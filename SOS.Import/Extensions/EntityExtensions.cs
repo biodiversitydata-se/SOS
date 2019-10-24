@@ -154,6 +154,42 @@ namespace SOS.Import.Extensions
             };
         }
 
+        public static IEnumerable<Organization> ToAggregates(this IEnumerable<OrganizationEntity> entities)
+        {
+            return entities.Select(e => e.ToAggregate());
+        }
+
+        public static Organization ToAggregate(this OrganizationEntity entity)
+        {
+            return new Organization
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                OrganizationId = entity.OrganizationId
+            };
+        }
+
+        public static IEnumerable<SightingRelation> ToAggregates(this IEnumerable<SightingRelationEntity> entities)
+        {
+            return entities.Select(e => e.ToAggregate());
+        }
+
+        public static SightingRelation ToAggregate(this SightingRelationEntity entity)
+        {
+            return new SightingRelation
+            {
+                DeterminationYear = entity.DeterminationYear,
+                EditDate = entity.EditDate,
+                Id = entity.Id,
+                IsPublic = entity.IsPublic,
+                RegisterDate = entity.RegisterDate,
+                SightingId = entity.SightingId,
+                SightingRelationTypeId = entity.SightingRelationTypeId,
+                Sort = entity.Sort,
+                UserId = entity.UserId
+            };
+        }
+
         public static IEnumerable<Person> ToAggregates(this IEnumerable<PersonEntity> entities)
         {
             return entities.Select(e => e.ToAggregate());
