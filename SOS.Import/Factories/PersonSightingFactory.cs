@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using SOS.Import.Entities;
 using SOS.Import.Extensions;
-using SOS.Import.Models.Aggregates;
 using SOS.Import.Repositories.Source.SpeciesPortal.Enums;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 

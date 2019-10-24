@@ -1,4 +1,4 @@
-﻿namespace SOS.Import.Models.Aggregates
+﻿namespace SOS.Lib.Models.Verbatim.SpeciesPortal
 {
     public class PersonSighting
     {

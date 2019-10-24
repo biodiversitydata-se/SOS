@@ -1,4 +1,4 @@
-﻿namespace SOS.Import.Models.Aggregates
+﻿namespace SOS.Lib.Models.Verbatim.SpeciesPortal
 {
     /// <summary>
     /// Contains properties used to create a verified by string.

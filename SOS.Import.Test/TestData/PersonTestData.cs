@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SOS.Import.Models.Aggregates;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Import.Test.TestData

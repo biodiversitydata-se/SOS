@@ -11,7 +11,6 @@ using MongoDB.Driver;
 using SOS.Import.Entities;
 using SOS.Import.Extensions;
 using SOS.Import.Models;
-using SOS.Import.Models.Aggregates;
 using SOS.Import.Repositories.Source.SpeciesPortal.Enums;
 using SOS.Import.Services.Interfaces;
 

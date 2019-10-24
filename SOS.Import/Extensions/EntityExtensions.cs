@@ -6,7 +6,6 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Import.Models;
-using SOS.Import.Models.Aggregates;
 
 
 namespace SOS.Import.Extensions

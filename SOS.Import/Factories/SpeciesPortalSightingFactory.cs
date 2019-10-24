@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Import.Entities;
 using SOS.Import.Extensions;
 using SOS.Import.Models;
-using SOS.Import.Models.Aggregates;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;

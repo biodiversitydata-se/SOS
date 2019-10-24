@@ -4,7 +4,6 @@ using System.Text;
 using System.Threading.Tasks;
 using SOS.Import.Entities;
 using SOS.Import.Models;
-using SOS.Import.Models.Aggregates;
 
 namespace SOS.Import.Repositories.Source.SpeciesPortal.Interfaces
 {
