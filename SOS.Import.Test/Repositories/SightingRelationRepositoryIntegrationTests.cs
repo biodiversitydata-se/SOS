@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -8,19 +9,20 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities;
 using SOS.Import.Repositories.Source.SpeciesPortal;
+using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Import.Services;
 using SOS.Lib.Configuration.Import;
 using Xunit;
 
 namespace SOS.Import.Test.Repositories
 {
-    public class OrganizationRepositoryTests
+    public class SightingRelationRepositoryIntegrationTests
     {
         private const string ArtportalenTestServerConnectionString = "Server=artsql2-4;Database=SpeciesObservationSwe_debugremote;Trusted_Connection=True;MultipleActiveResultSets=true";
 
         [Fact]
-        [Trait("Category", "Integration")]
-        public async Task TestGetAllOrganizations()
+        [Trait("Category","Integration")]
+        public async Task TestGetSightingRelations()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -30,19 +32,19 @@ namespace SOS.Import.Test.Repositories
                 SpeciesPortal = ArtportalenTestServerConnectionString
             });
 
-            OrganizationRepository organizationRepository = new OrganizationRepository(
-                speciesPortalDataService, 
-                new Mock<ILogger<OrganizationRepository>>().Object);
+            SightingRelationRepository sightingRelationRepository = new SightingRelationRepository(
+                speciesPortalDataService,
+                new Mock<ILogger<SightingRelationRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var organizationEntities = await organizationRepository.GetAsync();
+            var sightingRelationEntities = await sightingRelationRepository.GetAsync(Enumerable.Range(1, 100));
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            organizationEntities.Should().NotBeEmpty();
+            sightingRelationEntities.Should().NotBeEmpty();
         }
     }
 }
