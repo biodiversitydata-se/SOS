@@ -17,11 +17,11 @@ using SOS.Import.Services.Interfaces;
 
 namespace SOS.Import.Repositories.Source.SpeciesPortal
 {
-    public class SightingRelationRelationRepository : BaseRepository<SightingRelationRelationRepository>, Interfaces.ISightingRelationRepository
+    public class SightingRelationRepository : BaseRepository<SightingRelationRepository>, Interfaces.ISightingRelationRepository
     {
-        public SightingRelationRelationRepository(
+        public SightingRelationRepository(
             ISpeciesPortalDataService speciesPortalDataService, 
-            ILogger<SightingRelationRelationRepository> logger) : base(speciesPortalDataService, logger)
+            ILogger<SightingRelationRepository> logger) : base(speciesPortalDataService, logger)
         {
         }
 

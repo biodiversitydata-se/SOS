@@ -56,7 +56,7 @@ namespace SOS.Import.Test.Factories
             ISightingRepository sightingRepository = new SightingRepository(speciesPortalDataService, new Mock<ILogger<SightingRepository>>().Object);
             PersonRepository personRepository = new PersonRepository(speciesPortalDataService, new Mock<ILogger<PersonRepository>>().Object);
             OrganizationRepository organizationRepository = new OrganizationRepository(speciesPortalDataService, new Mock<ILogger<OrganizationRepository>>().Object);
-            SightingRelationRelationRepository sightingRelationRelationRepository = new SightingRelationRelationRepository(speciesPortalDataService, new Mock<ILogger<SightingRelationRelationRepository>>().Object);
+            SightingRelationRepository sightingRelationRepository = new SightingRelationRepository(speciesPortalDataService, new Mock<ILogger<SightingRelationRepository>>().Object);
             SpeciesCollectionItemRepository speciesCollectionItemRepository = new SpeciesCollectionItemRepository(speciesPortalDataService, new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             //ISiteRepository siteRepository = new SiteRepository(speciesPortalDataService, new Mock<ILogger<SiteRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
@@ -76,7 +76,7 @@ namespace SOS.Import.Test.Factories
                 sightingVerbatimRepository,
                 personRepository, 
                 organizationRepository,
-                sightingRelationRelationRepository,
+                sightingRelationRepository,
                 speciesCollectionItemRepository,
                 new Mock<ILogger<SpeciesPortalSightingFactory>>().Object);
 

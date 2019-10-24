@@ -29,7 +29,7 @@ namespace SOS.Import.Test.Factories
         private readonly Mock<SightingVerbatimRepository> _sightingVerbatimRepository;
         private readonly Mock<PersonRepository> _personRepository;
         private readonly Mock<OrganizationRepository> _organizationRepository;
-        private readonly Mock<SightingRelationRelationRepository> _sightingRelationRepository;
+        private readonly Mock<SightingRelationRepository> _sightingRelationRepository;
         private readonly Mock<SpeciesCollectionItemRepository> _speciesCollectionItemRepository;
         private readonly Mock<ILogger<SpeciesPortalSightingFactory>> _loggerMock;
 
@@ -47,7 +47,7 @@ namespace SOS.Import.Test.Factories
             _sightingVerbatimRepository = new Mock<SightingVerbatimRepository>();
             _personRepository = new Mock<PersonRepository>();
             _organizationRepository = new Mock<OrganizationRepository>();
-            _sightingRelationRepository = new Mock<SightingRelationRelationRepository>();
+            _sightingRelationRepository = new Mock<SightingRelationRepository>();
             _speciesCollectionItemRepository = new Mock<SpeciesCollectionItemRepository>();
             _loggerMock = new Mock<ILogger<SpeciesPortalSightingFactory>>();
         }

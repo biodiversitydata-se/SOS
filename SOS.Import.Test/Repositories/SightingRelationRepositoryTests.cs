@@ -32,9 +32,9 @@ namespace SOS.Import.Test.Repositories
                 SpeciesPortal = ArtportalenTestServerConnectionString
             });
 
-            SightingRelationRelationRepository sightingRelationRepository = new SightingRelationRelationRepository(
+            SightingRelationRepository sightingRelationRepository = new SightingRelationRepository(
                 speciesPortalDataService,
-                new Mock<ILogger<SightingRelationRelationRepository>>().Object);
+                new Mock<ILogger<SightingRelationRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
