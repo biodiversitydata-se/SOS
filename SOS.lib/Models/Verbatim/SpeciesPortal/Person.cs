@@ -11,6 +11,11 @@
         public int Id { get; set; }
 
         /// <summary>
+        /// The user Id.
+        /// </summary>
+        public int UserId { get; set; }
+
+        /// <summary>
         /// First name of person
         /// </summary>
         public string FirstName { get; set; }
@@ -19,5 +24,10 @@
         /// Last name of person
         /// </summary>
         public string LastName { get; set; }
+
+        /// <summary>
+        /// The full name of the person.
+        /// </summary>
+        public string FullName => $"{FirstName} {LastName}";
     }
 }

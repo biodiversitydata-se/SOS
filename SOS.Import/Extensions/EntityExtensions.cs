@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SOS.Import.Entities;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Import.Models;
 
 
 namespace SOS.Import.Extensions
@@ -39,7 +41,7 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast sighting entity to model 
+        /// Cast sighting itemEntity to model 
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="activities"></param>
@@ -48,6 +50,7 @@ namespace SOS.Import.Extensions
         /// <param name="units"></param>
         /// <param name="sites"></param>
         /// <param name="projects"></param>
+        /// <param name="personSightings"></param>
         /// <returns></returns>
         public static APSightingVerbatim ToAggregate(this SightingEntity entity,
             IDictionary<int, Metadata> activities,
@@ -55,9 +58,10 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> stages,
             IDictionary<int, Metadata> units,
             IDictionary<int, Site> sites,
-            IDictionary<int, List<Project>> projects)
+            IDictionary<int, List<Project>> projects, 
+            IDictionary<int, PersonSighting> personSightings)
         {
-            return new APSightingVerbatim
+            var observation = new APSightingVerbatim
             {
                 Activity = entity.ActivityId.HasValue && activities.ContainsKey(entity.ActivityId.Value) ? activities[entity.ActivityId.Value] : null,
                 EndDate = entity.EndDate,
@@ -81,6 +85,16 @@ namespace SOS.Import.Extensions
                 UnsureDetermination = entity.UnsureDetermination,
                 Weight = entity.Weight
             };
+
+            if (personSightings.TryGetValue(entity.Id, out PersonSighting personSighting))
+            {
+                observation.VerifiedBy = personSighting.VerifiedBy;
+                observation.Observers = personSighting.Observers;
+                observation.ReportedBy = personSighting.ReportedBy;
+                observation.SpeciesCollection = personSighting.SpeciesCollection;
+            }
+
+            return observation;
         }
 
         /// <summary>
@@ -93,6 +107,7 @@ namespace SOS.Import.Extensions
         /// <param name="units"></param>
         /// <param name="sites"></param>
         /// <param name="projects"></param>
+        /// <param name="personSightings"></param>
         /// <returns></returns>
         public static IEnumerable<APSightingVerbatim> ToAggregates(this IEnumerable<SightingEntity> entities,
             IDictionary<int, Metadata> activities,
@@ -100,13 +115,14 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> stages,
             IDictionary<int, Metadata> units,
             IDictionary<int, Site> sites,
-            IDictionary<int, List<Project>> projects)
+            IDictionary<int, List<Project>> projects, 
+            IDictionary<int, PersonSighting> personSightings)
         {
-            return entities.Select(e => e.ToAggregate(activities, genders, stages, units, sites, projects));
+            return entities.Select(e => e.ToAggregate(activities, genders, stages, units, sites, projects, personSightings));
         }
 
         /// <summary>
-        /// Cast meta data entity to model 
+        /// Cast meta data itemEntity to model 
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
@@ -138,6 +154,78 @@ namespace SOS.Import.Extensions
             };
         }
 
+        public static IEnumerable<Organization> ToAggregates(this IEnumerable<OrganizationEntity> entities)
+        {
+            return entities.Select(e => e.ToAggregate());
+        }
+
+        public static Organization ToAggregate(this OrganizationEntity entity)
+        {
+            return new Organization
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                OrganizationId = entity.OrganizationId
+            };
+        }
+
+        public static IEnumerable<SightingRelation> ToAggregates(this IEnumerable<SightingRelationEntity> entities)
+        {
+            return entities.Select(e => e.ToAggregate());
+        }
+
+        public static SightingRelation ToAggregate(this SightingRelationEntity entity)
+        {
+            return new SightingRelation
+            {
+                DeterminationYear = entity.DeterminationYear,
+                EditDate = entity.EditDate,
+                Id = entity.Id,
+                IsPublic = entity.IsPublic,
+                RegisterDate = entity.RegisterDate,
+                SightingId = entity.SightingId,
+                SightingRelationTypeId = entity.SightingRelationTypeId,
+                Sort = entity.Sort,
+                UserId = entity.UserId
+            };
+        }
+
+        public static IEnumerable<Person> ToAggregates(this IEnumerable<PersonEntity> entities)
+        {
+            return entities.Select(e => e.ToAggregate());
+        }
+
+        public static Person ToAggregate(this PersonEntity entity)
+        {
+            return new Person()
+            {
+                Id = entity.Id,
+                UserId = entity.UserId,
+                FirstName = entity.FirstName,
+                LastName = entity.LastName
+            };
+        }
+
+        public static IEnumerable<SpeciesCollectionItem> ToAggregates(this IEnumerable<SpeciesCollectionItemEntity> entities)
+        {
+            return entities.Select(e => e.ToAggregate());
+        }
+
+        public static SpeciesCollectionItem ToAggregate(this SpeciesCollectionItemEntity itemEntity)
+        {
+            return new SpeciesCollectionItem()
+            {
+                SightingId = itemEntity.SightingId,
+                CollectorId = itemEntity.CollectorId,
+                OrganizationId = itemEntity.OrganizationId,
+                DeterminerText = itemEntity.DeterminerText,
+                DeterminerYear = itemEntity.DeterminerYear,
+                Description = itemEntity.Description,
+                ConfirmatorText = itemEntity.ConfirmatorText,
+                ConfirmatorYear = itemEntity.ConfirmatorYear
+            };
+        }
+
         /// <summary>
         /// Cast multiple projects entities to models 
         /// </summary>
@@ -149,7 +237,7 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast site entity to aggregate
+        /// Cast site itemEntity to aggregate
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
