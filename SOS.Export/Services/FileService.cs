@@ -63,6 +63,13 @@ namespace SOS.Export.Services
         }
 
         /// <inheritdoc />
+        public void SaveXmlDocument(XmlDocument xmlDocument, string path)
+        {
+            // Save document to disk
+            xmlDocument.Save(path);
+        }
+
+        /// <inheritdoc />
         public async Task WriteToCsvFileAsync<T>(string filePath, bool create, IEnumerable<T> records, ClassMap<T> map)
         {
             if (!records?.Any() ?? true)

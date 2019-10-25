@@ -182,7 +182,7 @@ namespace SOS.Export.Factories
             }
 
             // Save meta.xml to output directory
-            meta.Save($@"{path}\meta.xml");
+            _fileService.SaveXmlDocument(meta, $@"{path}\meta.xml");
         }
     }
 }

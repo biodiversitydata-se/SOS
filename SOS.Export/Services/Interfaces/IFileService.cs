@@ -52,6 +52,13 @@ namespace SOS.Export.Services.Interfaces
         XmlDocument GetXmlDocument(string path);
 
         /// <summary>
+        /// Save XML document
+        /// </summary>
+        /// <param name="xmlDocument"></param>
+        /// <param name="path"></param>
+        void SaveXmlDocument(XmlDocument xmlDocument, string path);
+
+        /// <summary>
         /// Create or append data to csv file
         /// </summary>
         /// <typeparam name="T"></typeparam>
