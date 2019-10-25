@@ -15,4 +15,13 @@
         <ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="DarwinCore\eml.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="DarwinCore\meta.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

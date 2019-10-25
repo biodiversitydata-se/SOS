@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -37,72 +38,102 @@ namespace SOS.Process.Services
         {
             try
             {
-                using (var client = new HttpClient())
+                using var client = new HttpClient();
+                using var result = await client.GetAsync(_taxonDwcUrl);
+
+                if (!result.IsSuccessStatusCode)
                 {
-                    using (var result = await client.GetAsync(_taxonDwcUrl))
+                    return null;
+                }
+
+                await using var zipFileContentStream = await result.Content.ReadAsStreamAsync();
+                using var zipArchive = new ZipArchive(zipFileContentStream, ZipArchiveMode.Read, false);
+
+                var delimiter = "\t";
+
+                // try to get meta data file
+                var metaFile = zipArchive.Entries.FirstOrDefault(f =>
+                    f.Name.Equals("meta.xml", StringComparison.CurrentCultureIgnoreCase));
+
+                // If we found the meta data file, try to get some settings from it
+                if (metaFile != null)
+                {
+                    using var reader = XmlReader.Create(metaFile.Open());
+                    var xmlDoc = XDocument.Load(reader);
+                    delimiter = xmlDoc.Root?.Element("archive")?.Element("core")?.Attribute("fieldsTerminatedBy")?.Value ?? delimiter;
+                }
+
+                // Try to get the taxon data file
+                var taxonFile = zipArchive.Entries.FirstOrDefault(f =>
+                    f.Name.Equals("Taxon.csv", StringComparison.CurrentCultureIgnoreCase));
+
+                // If no taxon data file found, we can't do anything more
+                if (taxonFile == null)
+                {
+                    return null;
+                }
+
+                // Read taxon data
+                using var taxonReader = new StreamReader(taxonFile.Open(), Encoding.UTF8);
+
+                using var taxonCsv = new CsvReader(taxonReader, new CsvHelper.Configuration.Configuration
+                {
+                    Delimiter = delimiter,
+                    Encoding = Encoding.UTF8,
+                    HasHeaderRecord = true
+                });
+
+                // Get all taxa from file
+                taxonCsv.Configuration.RegisterClassMap<TaxonMapper>();
+                var taxa = taxonCsv.GetRecords<DarwinCoreTaxon>().ToDictionary(t => t.TaxonID, t => t);
+
+                // Try to get the taxon data file
+                var vernacularNameFile = zipArchive.Entries.FirstOrDefault(f =>
+                    f.Name.Equals("VernacularName.csv", StringComparison.CurrentCultureIgnoreCase));
+
+                // If no vernacular name file found, we can't do anything more
+                if (vernacularNameFile == null)
+                {
+                    return taxa.Values;
+                }
+
+                // Read taxon data
+                using var vernacularNameReader = new StreamReader(vernacularNameFile.Open(), Encoding.UTF8);
+                using var vernacularNameCsv = new CsvReader(vernacularNameReader, new CsvHelper.Configuration.Configuration
+                {
+                    Delimiter = delimiter,
+                    Encoding = Encoding.UTF8,
+                    HasHeaderRecord = true
+                });
+
+                // Get all vernacular names from file
+                vernacularNameCsv.Configuration.RegisterClassMap<VernacularNameMapper>();
+                var vernacularNames = vernacularNameCsv.GetRecords<DarwinCoreVernacularName>().ToArray();
+
+                // Create a regex to map out taxon id
+               
+                foreach (var vernacularName in vernacularNames)
+                {
+                    // Try to get taxon
+                    if (!taxa.TryGetValue(vernacularName.TaxonID, out var taxon))
                     {
-                        if (!result.IsSuccessStatusCode)
-                        {
-                            return null;
-                        }
+                        continue;
+                    }
 
-                        using (var zipFileContentStream = await result.Content.ReadAsStreamAsync())
-                        {
-                            using (var zipArchive = new ZipArchive(zipFileContentStream, ZipArchiveMode.Read, false))
-                            {
-                                var delimiter = "\t";
-
-                                // try to get meta data file
-                                var metaFile = zipArchive.Entries.FirstOrDefault(f =>
-                                    f.Name.Equals("meta.xml", StringComparison.CurrentCultureIgnoreCase));
-
-                                // If we found the meta data file, try to get some settings from it
-                                if (metaFile != null)
-                                {
-                                    using (var reader = XmlReader.Create(metaFile.Open()))
-                                    {
-                                        var xmlDoc = XDocument.Load(reader);
-                                        delimiter = xmlDoc.Root?.Element("archive")?.Element("core")?.Attribute("fieldsTerminatedBy")?.Value ?? delimiter;
-                                    }
-                                }
-
-                                // Try to get the taxon data file
-                                var taxonFile = zipArchive.Entries.FirstOrDefault(f =>
-                                    f.Name.Equals("taxon.csv", StringComparison.CurrentCultureIgnoreCase));
-
-                                // If no taxon data file found, we can't do anything more
-                                if (taxonFile == null)
-                                {
-                                    return null;
-                                }
-
-                                // Read taxon data
-                                using (var reader = new StreamReader(taxonFile.Open(), Encoding.UTF8))
-                                {
-                                    using (var csv = new CsvReader(reader, new CsvHelper.Configuration.Configuration
-                                    {
-                                        Delimiter = delimiter,
-                                        Encoding = Encoding.UTF8,
-                                        HasHeaderRecord = true
-                                    }))
-                                    {
-                                        // Get all taxa from file
-                                        csv.Configuration.RegisterClassMap<TaxonMapper>();
-                                        var taxa = csv.GetRecords<DarwinCoreTaxon>();
-
-                                        return taxa.ToArray();
-                                    }
-                                }
-                            }
-                        }
+                    // If vernacular not is set or if this is the preferred name
+                    if (string.IsNullOrEmpty(taxon.VernacularName) || vernacularName.IsPreferredName)
+                    {
+                        taxon.VernacularName = vernacularName.VernacularName;
                     }
                 }
+
+                return taxa.Values;
             }
             catch (Exception e)
             {
                 _logger.LogError(e.Message);
             }
-           
+
             return null;
         }
     }

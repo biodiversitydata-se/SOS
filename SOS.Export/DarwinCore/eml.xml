@@ -1,0 +1,164 @@
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:dc="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd" packageId="de8934f4-a136-481c-a87a-b0b202b80a31/v1.2" system="http://gbif.org" scope="system" xml:lang="eng">
+  <dataset>
+    <alternateIdentifier>de8934f4-a136-481c-a87a-b0b202b80a31</alternateIdentifier>
+    <title xml:lang="eng">Dyntaxa. Svensk taxonomisk databas</title>
+    <creator>
+      <individualName>
+        <givenName>Johan</givenName>
+        <surName>Liljeblad</surName>
+      </individualName>
+      <organizationName>Swedish University of Agricultural Sciences</organizationName>
+      <positionName>Dyntaxa Manager</positionName>
+      <address>
+        <deliveryPoint>PO Box 7007</deliveryPoint>
+        <city>Uppsala</city>
+        <postalCode>SE-750 07</postalCode>
+        <country>SE</country>
+      </address>
+      <phone>+4618671434</phone>
+      <electronicMailAddress>johan.liljeblad@slu.se</electronicMailAddress>
+      <onlineUrl>http://www.slu.se/artdatabanken</onlineUrl>
+      <userId directory="http://orcid.org/">0000-0003-0442-8162</userId>
+    </creator>
+    <metadataProvider>
+      <individualName>
+        <givenName>Johan</givenName>
+        <surName>Liljeblad</surName>
+      </individualName>
+      <organizationName>Swedish University of Agricultural Sciences</organizationName>
+      <positionName>Dyntaxa Manager</positionName>
+      <address>
+        <deliveryPoint>PO Box 7007</deliveryPoint>
+        <city>Uppsala</city>
+        <postalCode>SE-750 07</postalCode>
+        <country>SE</country>
+      </address>
+      <phone>+4618671434</phone>
+      <electronicMailAddress>johan.liljeblad@slu.se</electronicMailAddress>
+      <onlineUrl>http://www.slu.se/artdatabanken</onlineUrl>
+      <userId directory="http://orcid.org/">0000-0003-0442-8162</userId>
+    </metadataProvider>
+    <associatedParty>
+      <individualName>
+        <givenName>Johan</givenName>
+        <surName>Liljeblad</surName>
+      </individualName>
+      <electronicMailAddress>johan.liljeblad@slu.se</electronicMailAddress>
+      <role>user</role>
+    </associatedParty>
+    <pubDate>2019-10-22</pubDate>
+    <language>eng</language>
+    <abstract>
+      <para>Dyntaxa is a Swedish taxonomic database of organisms occurring in Swedish nature. For other databases at the Swedish Species Information Centre, e.g. Artportalen, it has a normative function for taxonomic concepts, and is increasingly referenced by external Swedish users. To date (October 2018) Dyntaxa contains information about 61,500 species occurring in Sweden. This includes about 95% of known multicellular species – remaining gaps mainly found among the fungi. Our goal is to include in the database all species documented from Sweden – at least the multicellular ones and such unicellular species that are included in environmental monitoring by the Swedish EPA. In addition to these species there are many names at other taxonomic levels, scientific synonyms, Swedish vernaculars, etc. In all, the database includes more than 290,000 names (October 2018). Dyntaxa is continuously updated with new species, changes in taxonomy and added Swedish names and scientific synonyms.</para>
+    </abstract>
+    <keywordSet>
+      <keyword>Checklist</keyword>
+      <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+    </keywordSet>
+    <keywordSet>
+      <keyword>Taxonomicauthority</keyword>
+      <keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+    </keywordSet>
+    <intellectualRights>
+      <para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode"><citetitle>Public Domain (CC0 1.0)</citetitle></ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.</para>
+    </intellectualRights>
+    <distribution scope="document">
+      <online>
+        <url function="information">https://www.dyntaxa.se/</url>
+      </online>
+    </distribution>
+    <coverage>
+      <geographicCoverage>
+        <geographicDescription>The country of Sweden including territorial waters.</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>10.74</westBoundingCoordinate>
+          <eastBoundingCoordinate>24.37</eastBoundingCoordinate>
+          <northBoundingCoordinate>69.13</northBoundingCoordinate>
+          <southBoundingCoordinate>55.16</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <taxonomicCoverage>
+        <generalTaxonomicCoverage>All life with a focus on multicellular organisms.</generalTaxonomicCoverage>
+        <taxonomicClassification>
+          <taxonRankName>kingdom</taxonRankName>
+          <taxonRankValue>Viruses</taxonRankValue>
+          <commonName>Viruses</commonName>
+        </taxonomicClassification>
+        <taxonomicClassification>
+          <taxonRankName>kingdom</taxonRankName>
+          <taxonRankValue>Bacteria</taxonRankValue>
+          <commonName>Bacteria</commonName>
+        </taxonomicClassification>
+        <taxonomicClassification>
+          <taxonRankName>kingdom</taxonRankName>
+          <taxonRankValue>Archaea</taxonRankValue>
+          <commonName>Archaea</commonName>
+        </taxonomicClassification>
+        <taxonomicClassification>
+          <taxonRankName>kingdom</taxonRankName>
+          <taxonRankValue>Animalia</taxonRankValue>
+          <commonName>Animals</commonName>
+        </taxonomicClassification>
+        <taxonomicClassification>
+          <taxonRankName>kingdom</taxonRankName>
+          <taxonRankValue>Chromista</taxonRankValue>
+          <commonName>chromists</commonName>
+        </taxonomicClassification>
+        <taxonomicClassification>
+          <taxonRankName>kingdom</taxonRankName>
+          <taxonRankValue>Eukarya unassigned</taxonRankValue>
+          <commonName>Unassigned eukaryotes</commonName>
+        </taxonomicClassification>
+        <taxonomicClassification>
+          <taxonRankName>kingdom</taxonRankName>
+          <taxonRankValue>Fungi</taxonRankValue>
+          <commonName>Fungi</commonName>
+        </taxonomicClassification>
+        <taxonomicClassification>
+          <taxonRankName>kingdom</taxonRankName>
+          <taxonRankValue>Plantae</taxonRankValue>
+          <commonName>Plants</commonName>
+        </taxonomicClassification>
+        <taxonomicClassification>
+          <taxonRankName>kingdom</taxonRankName>
+          <taxonRankValue>Protozoa</taxonRankValue>
+          <commonName>Protozoans</commonName>
+        </taxonomicClassification>
+      </taxonomicCoverage>
+    </coverage>
+    <maintenance>
+      <description>
+        <para></para>
+      </description>
+      <maintenanceUpdateFrequency>weekly</maintenanceUpdateFrequency>
+    </maintenance>
+    <contact>
+      <individualName>
+        <givenName>Johan</givenName>
+        <surName>Liljeblad</surName>
+      </individualName>
+      <organizationName>Swedish University of Agricultural Sciences</organizationName>
+      <positionName>Dyntaxa Manager</positionName>
+      <address>
+        <deliveryPoint>PO Box 7007</deliveryPoint>
+        <city>Uppsala</city>
+        <postalCode>SE-750 07</postalCode>
+        <country>SE</country>
+      </address>
+      <phone>+4618671434</phone>
+      <electronicMailAddress>johan.liljeblad@slu.se</electronicMailAddress>
+      <onlineUrl>http://www.slu.se/artdatabanken</onlineUrl>
+      <userId directory="http://orcid.org/">0000-0003-0442-8162</userId>
+    </contact>
+  </dataset>
+  <additionalMetadata>
+    <metadata>
+      <gbif>
+        <dateStamp>2017-02-24T03:00:23.273+01:00</dateStamp>
+        <hierarchyLevel>dataset</hierarchyLevel>
+        <citation>Liljeblad J (2018): Dyntaxa. Svensk taxonomisk databas. v1.2. ArtDatabanken. Checklist dataset.</citation>
+        <dc:replaces>de8934f4-a136-481c-a87a-b0b202b80a31/v1.2.xml</dc:replaces>
+      </gbif>
+    </metadata>
+  </additionalMetadata>
+</eml:eml>

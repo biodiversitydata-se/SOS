@@ -10,6 +10,8 @@ using SOS.Export.MongoDb;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Export.Services;
+using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
 
@@ -31,6 +33,9 @@ namespace SOS.Export.IoC.Modules
         /// <param name="builder"></param>
         protected override void Load(ContainerBuilder builder)
         {
+            // Add configuration
+            builder.RegisterInstance(Configuration.FileDestination).As<FileDestination>().SingleInstance();
+
             // Init mongodb
             var exportSettings = GetMongDbSettings(Configuration.MongoDbConfiguration);
             var exportClient = new ExportClient(exportSettings, Configuration.MongoDbConfiguration.DatabaseName, Configuration.MongoDbConfiguration.BatchSize);
@@ -41,6 +46,9 @@ namespace SOS.Export.IoC.Modules
 
             // Repositories mongo
             builder.RegisterType<ProcessedDarwinCoreRepository>().As<IProcessedDarwinCoreRepository>().InstancePerLifetimeScope();
+
+            // Services
+            builder.RegisterType<FileService>().As<IFileService>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ExportDarwinCoreJob>().As<IExportDarwinCoreJob>().InstancePerLifetimeScope();

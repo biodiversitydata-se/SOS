@@ -1,9 +1,6 @@
 ﻿using System;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Lib.Models.DarwinCore
+namespace SOS.Export.Models.DarwinCore
 {
     /// <summary>
     /// This class contains information about a species
@@ -11,7 +8,7 @@ namespace SOS.Lib.Models.DarwinCore
     /// Further information about the properties can
     /// be found at http://rs.tdwg.org/dwc/terms/.
     /// </summary>
-    public class DarwinCore<T> : IEntity<ObjectId>
+    public class DwC
     {
         /// <summary>
         /// Darwin Core term name: dcterms:accessRights.
@@ -97,35 +94,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// about the record. Meant to provide a mechanism for
         /// structured content such as key-value pairs.
         /// </summary>
-        public T DynamicProperties { get; set; }
-
-        /// <summary>
-        /// Darwin Core term name: Event.
-        /// The category of information pertaining to an event (an 
-        /// action that occurs at a place and during a period of time).
-        /// </summary>
-        public DarwinCoreEvent Event { get; set; }
-
-        /// <summary>
-        /// Darwin Core term name: GeologicalContext.
-        /// The category of information pertaining to a location
-        /// within a geological context, such as stratigraphy.
-        /// This property is currently not used.
-        /// </summary>
-        public DarwinCoreGeologicalContext GeologicalContext { get; set; }
-
-        /// <summary>
-        /// Mongodb id
-        /// </summary>
-        [BsonId]
-        public ObjectId Id { get; set; }
-
-        /// <summary>
-        /// Darwin Core term name: Identification.
-        /// The category of information pertaining to taxonomic
-        /// determinations (the assignment of a scientific name).
-        /// </summary>
-        public DarwinCoreIdentification Identification { get; set; }
+        public string DynamicProperties { get; set; }
 
         /// <summary>
         /// Darwin Core term name: informationWithheld.
@@ -171,45 +140,12 @@ namespace SOS.Lib.Models.DarwinCore
         public string License { get; set; }
 
         /// <summary>
-        /// Darwin Core term name: dcterms:Location.
-        /// A spatial region or named place. For Darwin Core,
-        /// a set of terms describing a place, whether named or not.
-        /// </summary>
-        public DarwinCoreLocation Location { get; set; }
-
-        /// <summary>
-        /// A physical result of a sampling (or subsampling) event. In biological collections, the material sample is typically collected, and either preserved or destructively processed.
-        /// </summary>
-        /// <example>
-        /// A whole organism preserved in a collection. A part of an organism isolated for some purpose. A soil sample. A marine microbial sample.
-        /// </example>
-        public DarwinCoreMaterialSample MaterialSample { get; set; }
-
-        /// <summary>
-        /// Darwin Core term name: MeasurementOrFact.
-        /// The category of information pertaining to measurements,
-        /// facts, characteristics, or assertions about a resource
-        /// (instance of data record, such as Occurrence, Taxon,
-        /// Location, Event).
-        /// This property is currently not used.
-        /// </summary>
-        public DarwinCoreMeasurementOrFact MeasurementOrFact { get; set; }
-
-        /// <summary>
         /// Darwin Core term name: dcterms:modified.
         /// The most recent date-time on which the resource was changed.
         /// For Darwin Core, recommended best practice is to use an
         /// encoding scheme, such as ISO 8601:2004(E).
         /// </summary>
         public DateTime Modified { get; set; }
-
-        /// <summary>
-        /// Darwin Core term name: Occurrence.
-        /// The category of information pertaining to evidence of
-        /// an occurrence in nature, in a collection, or in a
-        /// dataset (specimen, observation, etc.).
-        /// </summary>
-        public DarwinCoreOccurrence Occurrence { get; set; }
 
         /// <summary>
         /// Darwin Core term name: ownerInstitutionCode.
@@ -229,15 +165,6 @@ namespace SOS.Lib.Models.DarwinCore
         public string References { get; set; }
 
         /// <summary>
-        /// Darwin Core term name: ResourceRelationship.
-        /// The category of information pertaining to relationships
-        /// between resources (instances of data records, such as
-        /// Occurrences, Taxa, Locations, Events).
-        /// This property is currently not used.
-        /// </summary>
-        public DarwinCoreResourceRelationship ResourceRelationship { get; set; }
-
-        /// <summary>
         /// Darwin Core term name: dcterms:rights.
         /// Information about rights held in and over the resource.
         /// Typically, rights information includes a statement
@@ -254,13 +181,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// This property is currently not used.
         /// </summary>
         public string RightsHolder { get; set; }
-
-        /// <summary>
-        /// Darwin Core term name: Taxon.
-        /// The category of information pertaining to taxonomic names,
-        /// taxon name usages, or taxon concepts.
-        /// </summary>
-        public DarwinCoreTaxon Taxon { get; set; }
 
         /// <summary>
         /// Darwin Core term name: dcterms:type.
