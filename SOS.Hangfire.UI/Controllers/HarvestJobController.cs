@@ -27,6 +27,42 @@ namespace SOS.Hangfire.UI.Controllers
         }
 
         /// <inheritdoc />
+        [HttpPost("ClamTreePortal/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailyClamTreePortalHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<ClamTreePortalHarvestJob>(nameof(ClamTreePortalHarvestJob), job => job.Run(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("Clam/tree Portal harvest job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding clam/tree Portal harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("ClamTreePortal/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunClamTreePortalHarvestJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IClamTreePortalHarvestJob>(job => job.Run());
+                return new OkObjectResult("Started clam/tree Portal harvest job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running clam/tree Portal harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
         [HttpPost("SpeciesPortal/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

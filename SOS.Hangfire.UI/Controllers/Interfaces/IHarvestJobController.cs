@@ -8,6 +8,20 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
     public interface IHarvestJobController
     {
         /// <summary>
+        /// Add daily harvest of sightings from clam/tree portal
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult AddDailyClamTreePortalHarvestJob(int hour, int minute);
+
+        /// <summary>
+        /// Run clam/tree portal sightings harvest
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunClamTreePortalHarvestJob();
+
+        /// <summary>
         /// Add daily harvest of sightings from species data portal
         /// </summary>
         /// <param name="hour"></param>

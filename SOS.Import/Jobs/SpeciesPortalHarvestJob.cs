@@ -33,8 +33,8 @@ namespace SOS.Import.Jobs
             // Create task list
             var harvestTasks = new List<Task<bool>>
             {
-                _speciesPortalSightingFactory.AggregateAreasAsync(), // Make sure we have the latest areas
-                _speciesPortalSightingFactory.AggregateAsync()
+                _speciesPortalSightingFactory.HarvestAreasAsync(), // Make sure we have the latest areas
+                _speciesPortalSightingFactory.HarvestSightingsAsync()
             };
 
             // Run all tasks async

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -86,12 +85,12 @@ namespace SOS.Import.Factories
         }
 
         /// <inheritdoc />
-        public async Task<bool> AggregateAsync()
+        public async Task<bool> HarvestSightingsAsync()
         {
-            return await AggregateAsync(new SpeciesPortalAggregationOptions());
+            return await HarvestSightingsAsync(new SpeciesPortalAggregationOptions());
         }
 
-        public async Task<bool> AggregateAsync(SpeciesPortalAggregationOptions options)
+        public async Task<bool> HarvestSightingsAsync(SpeciesPortalAggregationOptions options)
         {
             try
             {
@@ -203,7 +202,7 @@ namespace SOS.Import.Factories
         }
 
         /// <inheritdoc />
-        public async Task<bool> AggregateAreasAsync()
+        public async Task<bool> HarvestAreasAsync()
         {
             try
             {

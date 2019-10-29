@@ -178,6 +178,14 @@ namespace SOS.Lib.Models.DarwinCore
         public DarwinCoreLocation Location { get; set; }
 
         /// <summary>
+        /// A physical result of a sampling (or subsampling) event. In biological collections, the material sample is typically collected, and either preserved or destructively processed.
+        /// </summary>
+        /// <example>
+        /// A whole organism preserved in a collection. A part of an organism isolated for some purpose. A soil sample. A marine microbial sample.
+        /// </example>
+        public DarwinCoreMaterialSample MaterialSample { get; set; }
+
+        /// <summary>
         /// Darwin Core term name: MeasurementOrFact.
         /// The category of information pertaining to measurements,
         /// facts, characteristics, or assertions about a resource
