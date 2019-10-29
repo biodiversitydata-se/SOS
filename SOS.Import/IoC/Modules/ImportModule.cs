@@ -10,6 +10,8 @@ using SOS.Import.Jobs;
 using SOS.Import.Jobs.Interfaces;
 using SOS.Import.MongoDb;
 using SOS.Import.MongoDb.Interfaces;
+using SOS.Import.Repositories.Destination.ClamTreePortal;
+using SOS.Import.Repositories.Destination.ClamTreePortal.Interfaces;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal;
@@ -26,6 +28,7 @@ namespace SOS.Import.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             // Add configuration
+            builder.RegisterInstance(Configuration.ClamTreeServiceConfiguration).As<ClamTreeServiceConfiguration>().SingleInstance();
             builder.RegisterInstance(Configuration.ConnectionStrings).As<ConnectionStrings>().SingleInstance();
 
             // Init mongodb
@@ -48,13 +51,20 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingVerbatimRepository>().As<ISightingVerbatimRepository>().InstancePerLifetimeScope();
 
+            builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<TreeObservationVerbatimRepository>().As<ITreeObservationVerbatimRepository>().InstancePerLifetimeScope();
+
             // Add factories
+            builder.RegisterType<ClamTreePortalObservationFactory>().As<IClamTreePortalObservationFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalSightingFactory>().As<ISpeciesPortalSightingFactory>().InstancePerLifetimeScope();
 
             // Add Services
+            builder.RegisterType<ClamTreeObservationService>().As<IClamTreeObservationService>().InstancePerLifetimeScope();
+            builder.RegisterType<HttpClientService>().As<IHttpClientService>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalDataService>().As<ISpeciesPortalDataService>().InstancePerLifetimeScope();
 
             // Add jobs
+            builder.RegisterType<ClamTreePortalHarvestJob>().As<IClamTreePortalHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalHarvestJob>().As<ISpeciesPortalHarvestJob>().InstancePerLifetimeScope();
         }
 

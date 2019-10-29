@@ -12,19 +12,19 @@ namespace SOS.Import.Factories.Interfaces
         /// Aggregate sightings.
         /// </summary>
         /// <returns></returns>
-        Task<bool> AggregateAsync();
-
-        /// <summary>
-        /// Aggregate all areas
-        /// </summary>
-        /// <returns></returns>
-        Task<bool> AggregateAreasAsync();
+        Task<bool> HarvestSightingsAsync();
 
         /// <summary>
         /// Aggregate sightings.
         /// </summary>
         /// <param name="options">Options used in aggregation.</param>
         /// <returns></returns>
-        Task<bool> AggregateAsync(SpeciesPortalAggregationOptions options);
+        Task<bool> HarvestSightingsAsync(SpeciesPortalAggregationOptions options);
+
+        /// <summary>
+        /// Aggregate all areas
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> HarvestAreasAsync();
     }
 }

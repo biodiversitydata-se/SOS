@@ -8,6 +8,11 @@ namespace SOS.Lib.Configuration.Import
     public class ImportConfiguration
     {
         /// <summary>
+        /// Configuration for clam tree service
+        /// </summary>
+        public ClamTreeServiceConfiguration ClamTreeServiceConfiguration { get; set; }
+
+        /// <summary>
         /// Connection strings
         /// </summary>
         public ConnectionStrings ConnectionStrings { get; set; }

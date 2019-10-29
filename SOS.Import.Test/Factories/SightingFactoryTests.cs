@@ -260,7 +260,7 @@ namespace SOS.Import.Test.Factories
                 _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
 
-            var result = await sightingFactory.AggregateAsync();
+            var result = await sightingFactory.HarvestSightingsAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -297,7 +297,7 @@ namespace SOS.Import.Test.Factories
                 _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
 
-            var result = await sightingFactory.AggregateAsync();
+            var result = await sightingFactory.HarvestSightingsAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
