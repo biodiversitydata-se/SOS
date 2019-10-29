@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Services.Interfaces;
@@ -35,14 +34,14 @@ namespace SOS.Import.Services
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ClamObservationVerbatim>> GetClamObservations()
+        public async Task<IEnumerable<ClamObservationVerbatim>> GetClamObservationsAsync()
         {
             return await _httpClientService.GetDataAsync<IEnumerable<ClamObservationVerbatim>>(
                 new Uri($"{_clamTreeServiceConfiguration.BaseAddress}/Clams/Observations"));
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TreeObservationVerbatim>> GetTreeObservations(int pageNumber, int pageSize)
+        public async Task<IEnumerable<TreeObservationVerbatim>> GetTreeObservationsAsync(int pageNumber, int pageSize)
         {
             return await _httpClientService.GetDataAsync<IEnumerable<TreeObservationVerbatim>>(
                 new Uri($"{_clamTreeServiceConfiguration.BaseAddress}/Trees/Observations/Paged?pageNumber={pageNumber}&pageSize={pageSize}"));

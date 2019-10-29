@@ -13,12 +13,12 @@ namespace SOS.Import.Services.Interfaces
         /// Get clam observations
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<ClamObservationVerbatim>> GetClamObservations();
+        Task<IEnumerable<ClamObservationVerbatim>> GetClamObservationsAsync();
 
         /// <summary>
         /// Get tree observations
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<TreeObservationVerbatim>> GetTreeObservations(int pageNumber, int pageSize);
+        Task<IEnumerable<TreeObservationVerbatim>> GetTreeObservationsAsync(int pageNumber, int pageSize);
     }
 }

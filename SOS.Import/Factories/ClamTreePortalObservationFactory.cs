@@ -44,14 +44,14 @@ namespace SOS.Import.Factories
         {
             try
             {
-                _logger.LogDebug("Start getting clams observations");
-                var items = await _clamTreeObservationService.GetClamObservations();
-
                 _logger.LogDebug("Start storing clams verbatim");
+                var items = await _clamTreeObservationService.GetClamObservationsAsync();
+
                 await _clamObservationVerbatimRepository.DeleteCollectionAsync();
                 await _clamObservationVerbatimRepository.AddCollectionAsync();
                 await _clamObservationVerbatimRepository.AddManyAsync(items);
-
+                
+                _logger.LogDebug("Finish storing clams verbatim");
                 return true;
             }
             catch (Exception e)
@@ -69,23 +69,25 @@ namespace SOS.Import.Factories
         {
             try
             {
+                _logger.LogDebug("Start storing trees verbatim");
+
                 await _treeObservationVerbatimRepository.DeleteCollectionAsync();
                 await _treeObservationVerbatimRepository.AddCollectionAsync();
-
-                _logger.LogDebug("Start getting trees observations");
 
                 var pageNumber = 1;
                 const int pageSize = 500000;
 
-                var items = await _clamTreeObservationService.GetTreeObservations(pageNumber, pageSize);
+                var items = await _clamTreeObservationService.GetTreeObservationsAsync(pageNumber, pageSize);
 
                 while (items?.Any() ?? false)
                 {
                     await _treeObservationVerbatimRepository.AddManyAsync(items);
 
                     pageNumber++;
-                    items = await _clamTreeObservationService.GetTreeObservations(pageNumber, pageSize);
+                    items = await _clamTreeObservationService.GetTreeObservationsAsync(pageNumber, pageSize);
                 }
+
+                _logger.LogDebug("Finish storing tree verbatim");
 
                 return true;
             }
