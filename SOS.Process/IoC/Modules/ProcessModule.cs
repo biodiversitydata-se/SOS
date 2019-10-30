@@ -41,14 +41,17 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterInstance(processClient).As<IProcessClient>().SingleInstance();
             
             // Repositories source
+            builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalVerbatimRepository>().As<ISpeciesPortalVerbatimRepository>().InstancePerLifetimeScope();
-
+            builder.RegisterType<TreeObservationVerbatimRepository>().As<ITreeObservationVerbatimRepository>().InstancePerLifetimeScope();
+            
             // Repositories destination
             builder.RegisterType<ProcessedRepository>().As<IProcessedRepository>().InstancePerLifetimeScope();
           
             // Add factories
+            builder.RegisterType<ClamTreePortalProcessFactory>().As<IClamTreePortalProcessFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalProcessFactory>().As<ISpeciesPortalProcessFactory>().InstancePerLifetimeScope();
-           
+            
             // Add Services
             builder.RegisterType<TaxonService>().As<ITaxonService>().InstancePerLifetimeScope();
 

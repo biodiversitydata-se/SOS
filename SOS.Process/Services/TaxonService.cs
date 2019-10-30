@@ -85,8 +85,9 @@ namespace SOS.Process.Services
 
                 // Get all taxa from file
                 taxonCsv.Configuration.RegisterClassMap<TaxonMapper>();
-                var taxa = taxonCsv.GetRecords<DarwinCoreTaxon>().ToDictionary(t => t.TaxonID, t => t);
-
+                var matchRegex = new Regex(@"urn:lsid:dyntaxa.se:Taxon:\d+$");
+                var taxa = taxonCsv.GetRecords<DarwinCoreTaxon>().Where(t => matchRegex.IsMatch(t.TaxonID)).ToDictionary(t => t.TaxonID, t => t);
+                
                 // Try to get the taxon data file
                 var vernacularNameFile = zipArchive.Entries.FirstOrDefault(f =>
                     f.Name.Equals("VernacularName.csv", StringComparison.CurrentCultureIgnoreCase));
@@ -110,8 +111,6 @@ namespace SOS.Process.Services
                 vernacularNameCsv.Configuration.RegisterClassMap<VernacularNameMapper>();
                 var vernacularNames = vernacularNameCsv.GetRecords<DarwinCoreVernacularName>().ToArray();
 
-                // Create a regex to map out taxon id
-               
                 foreach (var vernacularName in vernacularNames)
                 {
                     // Try to get taxon
