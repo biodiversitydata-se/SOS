@@ -32,13 +32,11 @@ namespace SOS.Import.Test.Factories
 
         [Fact]
         [Trait("Category","Integration")]
-        public async Task TestGetAllData()
+        public async Task Test_GetOneHundredThousandSightingsFromArtportalen_And_SaveToMongoDb()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            ConnectionStrings connectionStrings = new ConnectionStrings();
-            connectionStrings.SpeciesPortal = ArtportalenTestServerConnectionString;
             SpeciesPortalDataService speciesPortalDataService = new SpeciesPortalDataService(new ConnectionStrings
             {
                 SpeciesPortal = ArtportalenTestServerConnectionString
@@ -84,8 +82,7 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             var res = await sightingFactory.HarvestSightingsAsync(new SpeciesPortalAggregationOptions
             {
-                AddSightingsToVerbatimDatabase = true,
-                ChunkSize = 100000,
+                ChunkSize = 125000,
                 MaxNumberOfSightingsHarvested = 100000
             });
 
@@ -94,5 +91,63 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             res.Should().BeTrue();
         }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public async Task Test_GetOneHundredThousandSightingsFromArtportalen_WithoutSaveToMongoDb()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            SpeciesPortalDataService speciesPortalDataService = new SpeciesPortalDataService(new ConnectionStrings
+            {
+                SpeciesPortal = ArtportalenTestServerConnectionString
+            });
+            
+            var sightingVerbatimRepositoryMock = new Mock<ISightingVerbatimRepository>();
+            IMetadataRepository metadataRepository = new MetadataRepository(speciesPortalDataService, new Mock<ILogger<MetadataRepository>>().Object);
+            IProjectRepository projectRepository = new ProjectRepository(speciesPortalDataService, new Mock<ILogger<ProjectRepository>>().Object);
+            ISightingRepository sightingRepository = new SightingRepository(speciesPortalDataService, new Mock<ILogger<SightingRepository>>().Object);
+            PersonRepository personRepository = new PersonRepository(speciesPortalDataService, new Mock<ILogger<PersonRepository>>().Object);
+            OrganizationRepository organizationRepository = new OrganizationRepository(speciesPortalDataService, new Mock<ILogger<OrganizationRepository>>().Object);
+            SightingRelationRepository sightingRelationRepository = new SightingRelationRepository(speciesPortalDataService, new Mock<ILogger<SightingRelationRepository>>().Object);
+            SpeciesCollectionItemRepository speciesCollectionItemRepository = new SpeciesCollectionItemRepository(speciesPortalDataService, new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
+            //ISiteRepository siteRepository = new SiteRepository(speciesPortalDataService, new Mock<ILogger<SiteRepository>>().Object);
+            var siteRepositoryMock = new Mock<ISiteRepository>();
+            siteRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<SiteEntity>());
+            var areaRepositoryMock = new Mock<IAreaRepository>();
+            areaRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<AreaEntity>());
+            var areaVerbatimRepositoryMock = new Mock<IAreaVerbatimRepository>();
+
+            SpeciesPortalSightingFactory sightingFactory = new SpeciesPortalSightingFactory(
+                areaRepositoryMock.Object,
+                metadataRepository,
+                projectRepository,
+                sightingRepository,
+                siteRepositoryMock.Object,
+                //siteRepository,
+                areaVerbatimRepositoryMock.Object,
+                sightingVerbatimRepositoryMock.Object,
+                personRepository,
+                organizationRepository,
+                sightingRelationRepository,
+                speciesCollectionItemRepository,
+                new Mock<ILogger<SpeciesPortalSightingFactory>>().Object);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var res = await sightingFactory.AggregateAsync(new SpeciesPortalAggregationOptions
+            {
+                ChunkSize = 125000,
+                MaxNumberOfSightingsHarvested = 100000
+            });
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            res.Should().BeTrue();
+        }
+
     }
 }

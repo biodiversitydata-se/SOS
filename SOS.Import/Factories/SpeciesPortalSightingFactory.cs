@@ -159,12 +159,12 @@ namespace SOS.Import.Factories
                     }
 
                     _logger.LogDebug($"Getting sightings from { minId } to { minId + options.ChunkSize -1 }");
-                    nrSightingsHarvested += options.ChunkSize;
 
                     // Get chunk of sightings
-                    IEnumerable<SightingEntity> sightings = (await _sightingRepository.GetChunkAsync(minId, options.ChunkSize)).ToArray();
+                    var sightings = (await _sightingRepository.GetChunkAsync(minId, options.ChunkSize)).ToArray();
                     HashSet<int> sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
-                    
+                    nrSightingsHarvested += sightings.Length;
+
                     // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
                     var sightingRelations = (await _sightingRelationRepository
                         .GetAsync(sightings.Select(x => x.Id))).ToAggregates().ToList();
@@ -186,10 +186,7 @@ namespace SOS.Import.Factories
                         personSightingBySightingId);
                     
                     // Add sightings to mongodb
-                    if (options.AddSightingsToVerbatimDatabase)
-                    {
-                        await _sightingVerbatimRepository.AddManyAsync(aggregates);
-                    }
+                    await _sightingVerbatimRepository.AddManyAsync(aggregates);
 
                     // Calculate start of next chunk
                     minId += options.ChunkSize;
