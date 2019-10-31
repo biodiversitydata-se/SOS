@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -29,7 +30,7 @@ namespace SOS.Import.Repositories.Destination.SpeciesPortal
             var indexModels = new List<CreateIndexModel<Area>>
             {
                 new CreateIndexModel<Area>(Builders<Area>.IndexKeys.Ascending(a => a.AreaType)),
-                new CreateIndexModel<Area>(Builders<Area>.IndexKeys.Geo2DSphere("Geometry.Coordinates"))
+                new CreateIndexModel<Area>(Builders<Area>.IndexKeys.Geo2DSphere(a => a.Geometry))
             };
 
             await MongoCollection.Indexes.CreateManyAsync(indexModels);

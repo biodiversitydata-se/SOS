@@ -7,6 +7,7 @@ using Moq;
 using SOS.Process.Factories;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Verbatim.ClamTreePortal;
+using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
@@ -20,6 +21,7 @@ namespace SOS.Process.Test.Factories
     {
         private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
         private readonly Mock<ITreeObservationVerbatimRepository> _treeObservationVerbatimRepositoryMock;
+        private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IProcessedRepository> _processedRepository;
         private readonly Mock<ILogger<ClamTreePortalProcessFactory>> _loggerMock;
 
@@ -30,6 +32,7 @@ namespace SOS.Process.Test.Factories
         {
             _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
             _treeObservationVerbatimRepositoryMock = new Mock<ITreeObservationVerbatimRepository>();
+            _areaHelper = new Mock<IAreaHelper>();
             _processedRepository = new Mock<IProcessedRepository>();
             _loggerMock = new Mock<ILogger<ClamTreePortalProcessFactory>>();
         }
@@ -43,12 +46,14 @@ namespace SOS.Process.Test.Factories
             new ClamTreePortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
+                _areaHelper.Object,
                 _processedRepository.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new ClamTreePortalProcessFactory(
                 null,
                 _treeObservationVerbatimRepositoryMock.Object,
+                _areaHelper.Object,
                 _processedRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
@@ -56,6 +61,7 @@ namespace SOS.Process.Test.Factories
             create = () => new ClamTreePortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 null,
+                _areaHelper.Object,
                 _processedRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("treeObservationVerbatimRepository");
@@ -64,12 +70,22 @@ namespace SOS.Process.Test.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
                 null,
+                _processedRepository.Object,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
+
+            create = () => new ClamTreePortalProcessFactory(
+                _clamObservationVerbatimRepositoryMock.Object,
+                _treeObservationVerbatimRepositoryMock.Object,
+                _areaHelper.Object,
+                null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedRepository");
 
             create = () => new ClamTreePortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
+                _areaHelper.Object,
                 _processedRepository.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
@@ -97,6 +113,8 @@ namespace SOS.Process.Test.Factories
                     DyntaxaTaxonId = 0
                 } });
 
+            _areaHelper.Setup(r => r.AddAreaDataToDarwinCoreAsync(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()));
+
             _processedRepository.Setup(r => r.AddManyAsync(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()))
                 .ReturnsAsync(true);
 
@@ -111,6 +129,7 @@ namespace SOS.Process.Test.Factories
             var clamTreePortalProcessFactory = new ClamTreePortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
+                _areaHelper.Object,
                 _processedRepository.Object,
                 _loggerMock.Object);
 
@@ -140,6 +159,7 @@ namespace SOS.Process.Test.Factories
             var clamTreePortalProcessFactory = new ClamTreePortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
+                _areaHelper.Object,
                 _processedRepository.Object,
                 _loggerMock.Object);
 
@@ -169,6 +189,7 @@ namespace SOS.Process.Test.Factories
             var clamTreePortalProcessFactory = new ClamTreePortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
+                _areaHelper.Object,
                 _processedRepository.Object,
                 _loggerMock.Object);
 

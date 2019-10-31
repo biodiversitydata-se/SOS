@@ -5,15 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="4.9.4" />
-    <PackageReference Include="CsvHelper" Version="12.1.2" />
-    <PackageReference Include="JsonDiffPatch.Net" Version="2.1.0" />
-    <PackageReference Include="MessagePack" Version="1.7.3.7" />
-    <PackageReference Include="MongoDB.Driver" Version="2.9.2" />
-    <PackageReference Include="MongoDB.Driver.GridFS" Version="2.9.2" />
-    <PackageReference Include="NetTopologySuite" Version="1.15.3" />
-    <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="1.15.5" />
-    <PackageReference Include="ProjNET4GeoAPI" Version="1.4.1" />
+      <PackageReference Include="Autofac" Version="4.9.4" />
+      <PackageReference Include="CsvHelper" Version="12.1.2" />
+      <PackageReference Include="JsonDiffPatch.Net" Version="2.1.0" />
+      <PackageReference Include="MessagePack" Version="1.7.3.7" />
+      <PackageReference Include="MongoDB.Driver" Version="2.9.2" />
+      <PackageReference Include="MongoDB.Driver.GridFS" Version="2.9.2" />
+      <PackageReference Include="NetTopologySuite" Version="1.15.3" />
+      <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="1.15.5" />
+      <PackageReference Include="ProjNET4GeoAPI" Version="1.4.1" />
   </ItemGroup>
 
   <ItemGroup>

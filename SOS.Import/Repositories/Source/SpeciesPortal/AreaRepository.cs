@@ -41,7 +41,6 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 WHERE
                     a.AreaDatasetId IN (" + string.Join(",", areaTypes) + ")";
 
-
                 return await QueryAsync<AreaEntity>(query);
             }
             catch (Exception e)

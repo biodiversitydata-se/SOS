@@ -76,29 +76,69 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Make sure polygon start end ends with same position
+        /// Create a linear ring out of coordinates
         /// </summary>
-        /// <param name="geometry"></param>
+        /// <param name="coordinates"></param>
         /// <returns></returns>
-        private static Geometry MakeValidLinearRing(this Geometry geometry)
+        private static LinearRing ToLineRing(this Coordinate[] coordinates)
         {
-            if (geometry.OgcGeometryType != OgcGeometryType.Polygon)
-            {
-                return geometry;
-            }
+            // Make sure we don't have any dublicates
+            coordinates = coordinates.Select(c => c).Distinct().ToArray();
 
-            var first = geometry.Coordinates.First();
-            var last = geometry.Coordinates.Last();
-            if (first.CompareTo(last) == 0)
-            {
-                return geometry;
-            }
+            // Make sure first and last coordinate is the same
+            var newCoordinates = coordinates.Append(coordinates.First());
 
-            // Can't find a way to add a point to existing polygon, soo we have to create a new one
-            var coordinates = geometry.Coordinates.Append(first);
+            // Create a new linear ring
             var geomFactory = new GeometryFactory();
-            return geomFactory.CreatePolygon(coordinates.ToArray());
+            return geomFactory.CreateLinearRing(newCoordinates.ToArray());
         }
+
+        /// <summary>
+        /// Make polygon valid
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        private static Polygon MakeValid(this Polygon polygon)
+        {
+            if (polygon.IsValid)
+            {
+                return polygon;
+            }
+
+            return (Polygon)polygon.Buffer(0);
+           /* if (polygon.IsValid)
+            {
+                return polygon;
+            }
+            var geomFactory = new GeometryFactory();
+
+            var exteriorRing = polygon.ExteriorRing.Coordinates.ToLineRing();
+            var holes = polygon.Holes.Select(h => h.Coordinates.ToLineRing()).ToArray();
+
+            polygon = geomFactory.CreatePolygon(exteriorRing, holes);
+            
+            if (!polygon.IsValid)
+            {
+                return (Polygon)polygon.Buffer(0);
+            }
+
+            return polygon;*/
+        }
+
+        /// <summary>
+        /// Cast polygon to coordinates
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        private static GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates> ToGeoJsonPolygonCoordinates(this Polygon polygon)
+        {
+            var exteriorRing = GeoJson.LinearRingCoordinates(polygon.ExteriorRing.Coordinates.Select(er => GeoJson.Geographic(er.X, er.Y)).ToArray());
+            var holes = polygon.Holes.Select(h => GeoJson.LinearRingCoordinates(h.Coordinates.Select(er => GeoJson.Geographic(er.X, er.Y)).ToArray())).ToArray();
+            var coordinates = GeoJson.PolygonCoordinates(exteriorRing, holes);
+
+            return coordinates;
+        }
+
 
         /// <summary>
         /// Transform coordinates
@@ -131,8 +171,12 @@ namespace SOS.Import.Extensions
                     return GeoJson.Point(GeoJson.Geographic(point.X, point.Y));
                 case OgcGeometryType.LineString:
                     var lineString = (LineString)geometry;
-
+                    
                     return GeoJson.LineString(lineString.Coordinates.Select(p => GeoJson.Geographic(p.X, p.Y)).ToArray());
+                case OgcGeometryType.MultiLineString:
+                    var multiLineString = (MultiLineString)geometry;
+                   
+                    return GeoJson.MultiLineString(multiLineString.Geometries.Select(mls => GeoJson.LineStringCoordinates(mls.Coordinates.Select(p => GeoJson.Geographic(p.X, p.Y)).ToArray())).ToArray());
                 case OgcGeometryType.MultiPoint:
                     var multiPoint = (MultiPoint)geometry;
 
@@ -140,18 +184,11 @@ namespace SOS.Import.Extensions
                 case OgcGeometryType.Polygon:
                     var polygon = (Polygon)geometry;
 
-                    return GeoJson.Polygon(polygon.MakeValidLinearRing().Coordinates.Select(p => GeoJson.Geographic(p.X, p.Y)).ToArray());
+                    return GeoJson.Polygon(polygon.MakeValid().ToGeoJsonPolygonCoordinates());
                 case OgcGeometryType.MultiPolygon:
                     var multiPolygon = (MultiPolygon)geometry;
 
-                    return GeoJson.MultiPolygon(
-                        multiPolygon.Geometries.Select(p =>
-                            GeoJson.PolygonCoordinates(
-                                GeoJson.LinearRingCoordinates(
-                                    p.MakeValidLinearRing().Coordinates.Select(c => GeoJson.Geographic(c.X, c.Y)
-                            ).ToArray())
-                        )).ToArray());
-
+                    return GeoJson.MultiPolygon(multiPolygon.Geometries.Select(p => ((Polygon) p).MakeValid().ToGeoJsonPolygonCoordinates()).ToArray());
                 default:
                     throw new ArgumentException($"Not handled geometry type: {geometry.GeometryType}");
             }

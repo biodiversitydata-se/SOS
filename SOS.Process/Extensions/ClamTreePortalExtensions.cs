@@ -58,6 +58,9 @@ namespace SOS.Process.Extensions
                 {
                     CoordinatePrecision = verbatim.CoordinateUncertaintyInMeters?.ToString(),
                     CountryCode = verbatim.CountryCode,
+                    DecimalLatitude = verbatim.DecimalLatitude,
+                    DecimalLongitude = verbatim.DecimalLongitude,
+                    GeodeticDatum = "EPSG:4326",
                     LocationID = verbatim.LocationId,
                     Locality = verbatim.Locality,
                     LocationRemarks = verbatim.LocationRemarks,
@@ -142,6 +145,9 @@ namespace SOS.Process.Extensions
                 {
                     CoordinatePrecision = verbatim.CoordinateUncertaintyInMeters?.ToString(),
                     CountryCode = verbatim.CountryCode,
+                    DecimalLatitude = verbatim.DecimalLatitude,
+                    DecimalLongitude = verbatim.DecimalLongitude,
+                    GeodeticDatum = "EPSG:4326",
                     LocationID = verbatim.LocationId,
                     Locality = verbatim.Locality,
                     VerbatimLatitude = verbatim.DecimalLatitude.ToString(),
