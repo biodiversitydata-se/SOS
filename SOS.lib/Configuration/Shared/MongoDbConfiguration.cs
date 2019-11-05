@@ -1,4 +1,8 @@
-﻿namespace SOS.Lib.Configuration.Shared
+﻿using System.Linq;
+using System.Security.Authentication;
+using MongoDB.Driver;
+
+namespace SOS.Lib.Configuration.Shared
 {
     /// <summary>
     /// Cosmos configuration properties
@@ -39,5 +43,34 @@
         /// How many items to add in a time
         /// </summary>
         public int BatchSize { get; set; }
+
+        /// <summary>
+        /// Get mongo db settings object.
+        /// </summary>
+        /// <returns></returns>
+        public MongoClientSettings GetMongoDbSettings()
+        {
+            MongoInternalIdentity identity = null;
+            PasswordEvidence evidence = null;
+            if (!(string.IsNullOrEmpty(DatabaseName) ||
+                  string.IsNullOrEmpty(UserName) ||
+                  string.IsNullOrEmpty(Password)))
+            {
+                identity = new MongoInternalIdentity(DatabaseName, UserName);
+                evidence = new PasswordEvidence(Password);
+            }
+
+            return new MongoClientSettings
+            {
+                Servers = Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)),
+                ReplicaSetName = ReplicaSetName,
+                UseTls = UseTls,
+                SslSettings = UseTls ? new SslSettings
+                {
+                    EnabledSslProtocols = SslProtocols.Tls12
+                } : null,
+                Credential = identity != null && evidence != null ? new MongoCredential("SCRAM-SHA-1", identity, evidence) : null
+            };
+        }
     }
 }

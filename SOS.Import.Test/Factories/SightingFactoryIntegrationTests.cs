@@ -137,7 +137,7 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await sightingFactory.AggregateAsync(new SpeciesPortalAggregationOptions
+            var res = await sightingFactory.HarvestSightingsAsync(new SpeciesPortalAggregationOptions
             {
                 ChunkSize = 125000,
                 MaxNumberOfSightingsHarvested = 100000
