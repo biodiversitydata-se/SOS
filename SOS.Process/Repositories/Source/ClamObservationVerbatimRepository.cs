@@ -5,15 +5,15 @@ using SOS.Process.Database.Interfaces;
 
 namespace SOS.Process.Repositories.Source
 {
-    public class TreeObservationVerbatimRepository : VerbatimBaseRepository<TreeObservationVerbatim, ObjectId>, Interfaces.ITreeObservationVerbatimRepository
+    public class ClamObservationVerbatimRepository : VerbatimBaseRepository<ClamObservationVerbatim, ObjectId>, Interfaces.IClamObservationVerbatimRepository
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
-        public TreeObservationVerbatimRepository(IVerbatimClient client,
-            ILogger<TreeObservationVerbatimRepository> logger) : base(client, logger)
+        public ClamObservationVerbatimRepository(IVerbatimClient client,
+            ILogger<ClamObservationVerbatimRepository> logger) : base(client, logger)
         {
 
         }

@@ -96,7 +96,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// Indicates if this species occurrence is natural or
         /// if it is a result of human activity.
         /// </summary>
-        public bool IsNaturalOccurrence { get; set; }
+        public bool? IsNaturalOccurrence { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
@@ -105,7 +105,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// that the specified species was not found in a location
         /// deemed appropriate for the species.
         /// </summary>
-        public bool IsNeverFoundObservation { get; set; }
+        public bool? IsNeverFoundObservation { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
@@ -115,7 +115,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// that the specified species was not found in a location
         /// where it has previously been observed.
         /// </summary>
-        public bool IsNotRediscoveredObservation { get; set; }
+        public bool? IsNotRediscoveredObservation { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
@@ -123,7 +123,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// "Positive observation" is a normal observation indicating
         /// that a species has been seen at a specified location.
         /// </summary>
-        public bool IsPositiveObservation { get; set; }
+        public bool? IsPositiveObservation { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.

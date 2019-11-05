@@ -8,6 +8,8 @@ using SOS.Process.Database;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Factories;
 using SOS.Process.Factories.Interfaces;
+using SOS.Process.Helpers;
+using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
 using SOS.Process.Jobs.Interfaces;
 using SOS.Process.Repositories.Destination;
@@ -39,16 +41,23 @@ namespace SOS.Process.IoC.Modules
             var processedSettings = GetMongDbSettings(processedDbConfiguration);
             var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName, processedDbConfiguration.BatchSize);
             builder.RegisterInstance(processClient).As<IProcessClient>().SingleInstance();
-            
-            // Repositories source
-            builder.RegisterType<SpeciesPortalVerbatimRepository>().As<ISpeciesPortalVerbatimRepository>().InstancePerLifetimeScope();
 
+            // Helpers
+            builder.RegisterType<AreaHelper>().As<IAreaHelper>().SingleInstance();
+
+            // Repositories source
+            builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<SpeciesPortalVerbatimRepository>().As<ISpeciesPortalVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<TreeObservationVerbatimRepository>().As<ITreeObservationVerbatimRepository>().InstancePerLifetimeScope();
+            
             // Repositories destination
             builder.RegisterType<ProcessedRepository>().As<IProcessedRepository>().InstancePerLifetimeScope();
           
             // Add factories
+            builder.RegisterType<ClamTreePortalProcessFactory>().As<IClamTreePortalProcessFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalProcessFactory>().As<ISpeciesPortalProcessFactory>().InstancePerLifetimeScope();
-           
+            
             // Add Services
             builder.RegisterType<TaxonService>().As<ITaxonService>().InstancePerLifetimeScope();
 
