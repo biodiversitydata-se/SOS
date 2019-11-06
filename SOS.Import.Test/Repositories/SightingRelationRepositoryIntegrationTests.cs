@@ -16,10 +16,8 @@ using Xunit;
 
 namespace SOS.Import.Test.Repositories
 {
-    public class SightingRelationRepositoryIntegrationTests
+    public class SightingRelationRepositoryIntegrationTests : TestBase
     {
-        private const string ArtportalenTestServerConnectionString = "Server=artsql2-4;Database=SpeciesObservationSwe_debugremote;Trusted_Connection=True;MultipleActiveResultSets=true";
-
         [Fact]
         [Trait("Category","Integration")]
         public async Task TestGetSightingRelations()
@@ -27,12 +25,9 @@ namespace SOS.Import.Test.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            SpeciesPortalDataService speciesPortalDataService = new SpeciesPortalDataService(new ConnectionStrings
-            {
-                SpeciesPortal = ArtportalenTestServerConnectionString
-            });
-
-            SightingRelationRepository sightingRelationRepository = new SightingRelationRepository(
+            var importConfiguration = GetImportConfiguration();
+            var speciesPortalDataService = new SpeciesPortalDataService(importConfiguration.SpeciesPortalConfiguration);
+            var sightingRelationRepository = new SightingRelationRepository(
                 speciesPortalDataService,
                 new Mock<ILogger<SightingRelationRepository>>().Object);
 

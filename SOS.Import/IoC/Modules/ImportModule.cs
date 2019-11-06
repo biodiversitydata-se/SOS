@@ -34,7 +34,7 @@ namespace SOS.Import.IoC.Modules
             // Add configuration
             builder.RegisterInstance(Configuration.ClamTreeServiceConfiguration).As<ClamTreeServiceConfiguration>().SingleInstance();
             builder.RegisterInstance(Configuration.KulServiceConfiguration).As<KulServiceConfiguration>().SingleInstance();
-            builder.RegisterInstance(Configuration.ConnectionStrings).As<ConnectionStrings>().SingleInstance();
+            builder.RegisterInstance(Configuration.SpeciesPortalConfiguration).As<SpeciesPortalConfiguration>().SingleInstance();
 
             // Init mongodb
             var importSettings = GetMongDbSettings(Configuration.MongoDbConfiguration);

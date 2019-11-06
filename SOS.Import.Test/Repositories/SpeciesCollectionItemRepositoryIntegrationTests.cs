@@ -13,10 +13,8 @@ using Xunit;
 
 namespace SOS.Import.Test.Repositories
 {
-    public class SpeciesCollectionItemRepositoryIntegrationTests
+    public class SpeciesCollectionItemRepositoryIntegrationTests : TestBase
     {
-        private const string ArtportalenTestServerConnectionString = "Server=artsql2-4;Database=SpeciesObservationSwe_debugremote;Trusted_Connection=True;MultipleActiveResultSets=true";
-
         [Fact]
         [Trait("Category", "Integration")]
         public async Task TestGetAllSightingSpeciesCollectionItems()
@@ -24,12 +22,9 @@ namespace SOS.Import.Test.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            SpeciesPortalDataService speciesPortalDataService = new SpeciesPortalDataService(new ConnectionStrings
-            {
-                SpeciesPortal = ArtportalenTestServerConnectionString
-            });
-
-            SpeciesCollectionItemRepository speciesCollectionItemRepository = new SpeciesCollectionItemRepository(
+            var importConfiguration = GetImportConfiguration();
+            var speciesPortalDataService = new SpeciesPortalDataService(importConfiguration.SpeciesPortalConfiguration);
+            var speciesCollectionItemRepository = new SpeciesCollectionItemRepository(
                 speciesPortalDataService,
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
 

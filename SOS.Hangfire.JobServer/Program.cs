@@ -35,7 +35,7 @@ namespace SOS.Hangfire.JobServer
         /// <returns></returns>
         public static async Task Main(string[] args)
         {
-            _env = args?.Any() ?? false ? args[0].ToUpper() : string.Empty;
+            _env = args?.Any() ?? false ? args[0].ToUpper() : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToUpper();
 
             if (new[] { "local", "dev", "st", "prod" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
             {
