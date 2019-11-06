@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
@@ -36,7 +37,7 @@ namespace SOS.Hangfire.JobServer
         {
             _env = args?.Any() ?? false ? args[0].ToUpper() : string.Empty;
 
-            if (new[] { "local", "dev", "st", "prod" }.Contains(_env))
+            if (new[] { "local", "dev", "st", "prod" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
             {
                 _env = args[0];
 
@@ -78,13 +79,16 @@ namespace SOS.Hangfire.JobServer
                 .ConfigureServices((hostContext, services) =>
                 {
                     var mongoConfiguration = hostContext.Configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository").Get<MongoDbConfiguration>();
-
+                    var connectionString = $"mongodb://{(string.IsNullOrEmpty(mongoConfiguration.UserName) || string.IsNullOrEmpty(mongoConfiguration.Password) ? "" : $"{mongoConfiguration.UserName}:{mongoConfiguration.Password}@")}" +
+                            $"{string.Join(",", mongoConfiguration.Hosts.Select(h => $"{h.Name}:{h.Port}"))}" +
+                            $"{(mongoConfiguration.Hosts.Length == 1 ? "" : "?connect=replicaSet")}";
+                    
                     services.AddHangfire(configuration =>
                             configuration
                             .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                             .UseSimpleAssemblyNameTypeSerializer()
                             .UseRecommendedSerializerSettings()
-                            .UseMongoStorage($"mongodb:// {(string.IsNullOrEmpty(mongoConfiguration.UserName) || string.IsNullOrEmpty(mongoConfiguration.Password) ? "" : $"{mongoConfiguration.UserName}:{mongoConfiguration.Password}@")} {string.Join(",", mongoConfiguration.Hosts.Select(h => $"{h.Name}:{h.Port}"))}?connect=replicaSet",
+                            .UseMongoStorage(connectionString,
                                 mongoConfiguration.DatabaseName,
                                 new MongoStorageOptions
                                 {
