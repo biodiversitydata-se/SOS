@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Moq;
 using SOS.Import.Entities;
@@ -18,7 +14,6 @@ using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Import.Services;
 using SOS.Lib.Configuration.Import;
-using SOS.Lib.Configuration.Shared;
 using Xunit;
 
 namespace SOS.Import.Test.Factories
@@ -58,18 +53,13 @@ namespace SOS.Import.Test.Factories
             //ISiteRepository siteRepository = new SiteRepository(speciesPortalDataService, new Mock<ILogger<SiteRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
             siteRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<SiteEntity>());
-            var areaRepositoryMock = new Mock<IAreaRepository>();
-            areaRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<AreaEntity>());
-            var areaVerbatimRepositoryMock = new Mock<IAreaVerbatimRepository>();
 
             SpeciesPortalSightingFactory sightingFactory = new SpeciesPortalSightingFactory(
-                areaRepositoryMock.Object,
                 metadataRepository,
                 projectRepository,
                 sightingRepository,
                 siteRepositoryMock.Object,
                 //siteRepository,
-                areaVerbatimRepositoryMock.Object,
                 sightingVerbatimRepository,
                 personRepository, 
                 organizationRepository,
@@ -115,18 +105,13 @@ namespace SOS.Import.Test.Factories
             //ISiteRepository siteRepository = new SiteRepository(speciesPortalDataService, new Mock<ILogger<SiteRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
             siteRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<SiteEntity>());
-            var areaRepositoryMock = new Mock<IAreaRepository>();
-            areaRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<AreaEntity>());
-            var areaVerbatimRepositoryMock = new Mock<IAreaVerbatimRepository>();
 
             SpeciesPortalSightingFactory sightingFactory = new SpeciesPortalSightingFactory(
-                areaRepositoryMock.Object,
                 metadataRepository,
                 projectRepository,
                 sightingRepository,
                 siteRepositoryMock.Object,
                 //siteRepository,
-                areaVerbatimRepositoryMock.Object,
                 sightingVerbatimRepositoryMock.Object,
                 personRepository,
                 organizationRepository,

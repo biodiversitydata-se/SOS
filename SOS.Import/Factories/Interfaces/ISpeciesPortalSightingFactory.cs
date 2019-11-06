@@ -20,11 +20,5 @@ namespace SOS.Import.Factories.Interfaces
         /// <param name="options">Options used in aggregation.</param>
         /// <returns></returns>
         Task<bool> HarvestSightingsAsync(SpeciesPortalAggregationOptions options);
-
-        /// <summary>
-        /// Aggregate all areas
-        /// </summary>
-        /// <returns></returns>
-        Task<bool> HarvestAreasAsync();
     }
 }
