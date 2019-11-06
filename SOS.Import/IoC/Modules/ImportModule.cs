@@ -1,9 +1,5 @@
-﻿using System.Linq;
-using System.Security.Authentication;
-using Autofac;
-using MongoDB.Driver;
+﻿using Autofac;
 using SOS.Lib.Configuration.Import;
-using SOS.Lib.Configuration.Shared;
 using SOS.Import.Factories;
 using SOS.Import.Factories.Interfaces;
 using SOS.Import.Jobs;
@@ -37,7 +33,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterInstance(Configuration.SpeciesPortalConfiguration).As<SpeciesPortalConfiguration>().SingleInstance();
 
             // Init mongodb
-            var importSettings = GetMongDbSettings(Configuration.MongoDbConfiguration);
+            var importSettings = Configuration.MongoDbConfiguration.GetMongoDbSettings();
             var importClient = new ImportClient(importSettings, Configuration.MongoDbConfiguration.DatabaseName, Configuration.MongoDbConfiguration.BatchSize);
             builder.RegisterInstance(importClient).As<IImportClient>().SingleInstance();
             
@@ -75,36 +71,6 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ClamTreePortalHarvestJob>().As<IClamTreePortalHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalHarvestJob>().As<ISpeciesPortalHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<KulHarvestJob>().As<IKulHarvestJob>().InstancePerLifetimeScope();
-        }
-
-        /// <summary>
-        /// Get mongo db settings object
-        /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        private static MongoClientSettings GetMongDbSettings(MongoDbConfiguration config)
-        {
-            MongoInternalIdentity identity = null;
-            PasswordEvidence evidence = null;
-            if (!(string.IsNullOrEmpty(config.DatabaseName) ||
-                  string.IsNullOrEmpty(config.UserName) ||
-                  string.IsNullOrEmpty(config.Password)))
-            {
-                identity = new MongoInternalIdentity(config.DatabaseName, config.UserName);
-                evidence = new PasswordEvidence(config.Password);
-            }
-
-            return new MongoClientSettings
-            {
-                Servers = config.Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)),
-                ReplicaSetName = config.ReplicaSetName,
-                UseTls = config.UseTls,
-                SslSettings = config.UseTls ? new SslSettings
-                {
-                    EnabledSslProtocols = SslProtocols.Tls12
-                } : null,
-                Credential = identity != null && evidence != null ? new MongoCredential("SCRAM-SHA-1", identity, evidence) : null
-            };
         }
     }
 }
