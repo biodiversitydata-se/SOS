@@ -6,7 +6,7 @@ using KulService;
 
 namespace SOS.Import.Repositories.Source.Kul.Interfaces
 {
-    public interface IKulSightingRepository
+    public interface IKulObservationRepository
     {
         Task<IEnumerable<KulService.WebSpeciesObservation>> GetAsync(DateTime changedFrom, DateTime changedTo);
     }

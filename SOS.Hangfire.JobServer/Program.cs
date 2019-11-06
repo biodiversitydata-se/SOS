@@ -36,7 +36,7 @@ namespace SOS.Hangfire.JobServer
         public static async Task Main(string[] args)
         {
             _env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToUpper();
-
+            
             await CreateHostBuilder(args)
                 .Build()
                 .RunAsync();
@@ -74,13 +74,13 @@ namespace SOS.Hangfire.JobServer
                 .ConfigureServices((hostContext, services) =>
                 {
                     var mongoConfiguration = hostContext.Configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository").Get<MongoDbConfiguration>();
-
+                    
                     services.AddHangfire(configuration =>
                             configuration
                             .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                             .UseSimpleAssemblyNameTypeSerializer()
                             .UseRecommendedSerializerSettings()
-                            .UseMongoStorage($"mongodb:// {(string.IsNullOrEmpty(mongoConfiguration.UserName) || string.IsNullOrEmpty(mongoConfiguration.Password) ? "" : $"{mongoConfiguration.UserName}:{mongoConfiguration.Password}@")} {string.Join(",", mongoConfiguration.Hosts.Select(h => $"{h.Name}:{h.Port}"))}?connect=replicaSet",
+                            .UseMongoStorage(mongoConfiguration.GetMongoDbSettings(),
                                 mongoConfiguration.DatabaseName,
                                 new MongoStorageOptions
                                 {

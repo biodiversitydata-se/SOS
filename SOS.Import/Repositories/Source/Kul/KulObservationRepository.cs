@@ -10,12 +10,12 @@ using SOS.Lib.Configuration.Import;
 
 namespace SOS.Import.Repositories.Source.Kul
 {
-    public class KulSightingRepository : IKulSightingRepository
+    public class KulObservationRepository : IKulObservationRepository
     {
         private readonly KulServiceConfiguration _kulServiceConfiguration;
-        private readonly ILogger<KulSightingRepository> _logger;
+        private readonly ILogger<KulObservationRepository> _logger;
 
-        public KulSightingRepository(ILogger<KulSightingRepository> logger, KulServiceConfiguration kulServiceConfiguration)
+        public KulObservationRepository(ILogger<KulObservationRepository> logger, KulServiceConfiguration kulServiceConfiguration)
         {
             _logger = logger;
             _kulServiceConfiguration = kulServiceConfiguration;

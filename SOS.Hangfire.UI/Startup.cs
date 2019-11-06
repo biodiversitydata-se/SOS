@@ -17,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SOS.Core.Repositories;
 using SOS.Hangfire.UI.Configuration;
+using SOS.Lib.Configuration.Shared;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace SOS.Hangfire.UI
@@ -55,10 +56,6 @@ namespace SOS.Hangfire.UI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            var repositorySettings = CreateRepositorySettings();
-
-       //     services.AddSingleton<ILoggerFactory, LoggerFactory>();
-       //     services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
             // Swagger
             services.AddSwaggerGen(
@@ -83,11 +80,24 @@ namespace SOS.Hangfire.UI
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Hangfire
-            services.AddHangfire(configuration => configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseMongoStorage(repositorySettings.MongoDbConnectionString, repositorySettings.JobsDatabaseName, MongoStorageOptions));
+            var mongoConfiguration = Configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository").Get<MongoDbConfiguration>();
+
+            services.AddHangfire(configuration =>
+                configuration
+                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings()
+                    .UseMongoStorage(mongoConfiguration.GetMongoDbSettings(),
+                        mongoConfiguration.DatabaseName,
+                        new MongoStorageOptions
+                        {
+                            MigrationOptions = new MongoMigrationOptions
+                            {
+                                Strategy = MongoMigrationStrategy.Migrate,
+                                BackupStrategy = MongoBackupStrategy.Collections
+                            }
+                        })
+            );
 
         }
 
@@ -99,8 +109,6 @@ namespace SOS.Hangfire.UI
         /// <param name="builder"></param>
         public void ConfigureContainer(ContainerBuilder builder)
         {
-           
-
             var repositorySettings = CreateRepositorySettings();
             builder.Register(r => repositorySettings).As<IRepositorySettings>().SingleInstance();
         }

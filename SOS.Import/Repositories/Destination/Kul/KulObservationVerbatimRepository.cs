@@ -7,11 +7,11 @@ using SOS.Lib.Models.Verbatim.Kul;
 
 namespace SOS.Import.Repositories.Destination.Kul
 {
-    public class KulSightingVerbatimRepository : VerbatimRepository<KulSightingVerbatim, string>, Interfaces.IKulSightingVerbatimRepository
+    public class KulObservationVerbatimRepository : VerbatimRepository<KulObservationVerbatim, string>, Interfaces.IKulObservationVerbatimRepository
     {
-        public KulSightingVerbatimRepository(
+        public KulObservationVerbatimRepository(
             IImportClient importClient,
-            ILogger<KulSightingVerbatimRepository> logger) : base(importClient, logger)
+            ILogger<KulObservationVerbatimRepository> logger) : base(importClient, logger)
         {
         }
     }

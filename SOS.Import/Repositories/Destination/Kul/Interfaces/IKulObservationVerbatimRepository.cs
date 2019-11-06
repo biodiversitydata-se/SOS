@@ -6,7 +6,7 @@ using SOS.Lib.Models.Verbatim.Kul;
 
 namespace SOS.Import.Repositories.Destination.Kul.Interfaces
 {
-    public interface IKulSightingVerbatimRepository : IVerbatimRepository<KulSightingVerbatim, string>
+    public interface IKulObservationVerbatimRepository : IVerbatimRepository<KulObservationVerbatim, string>
     {
     }
 }

@@ -5,7 +5,7 @@ using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.Kul
 {
-    public class KulSightingVerbatim : IEntity<string>
+    public class KulObservationVerbatim : IEntity<string>
     {
         public string Id
         {
