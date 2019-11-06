@@ -34,6 +34,7 @@ namespace SOS.Export.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             // Add configuration
+            builder.RegisterInstance(Configuration.BlobStorageConfiguration).As<BlobStorageConfiguration>().SingleInstance();
             builder.RegisterInstance(Configuration.FileDestination).As<FileDestination>().SingleInstance();
 
             // Init mongodb
@@ -48,6 +49,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<ProcessedDarwinCoreRepository>().As<IProcessedDarwinCoreRepository>().InstancePerLifetimeScope();
 
             // Services
+            builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().InstancePerLifetimeScope();
             builder.RegisterType<FileService>().As<IFileService>().InstancePerLifetimeScope();
 
             // Add jobs

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Process.Helpers.Interfaces
@@ -11,6 +10,6 @@ namespace SOS.Process.Helpers.Interfaces
         /// </summary>
         /// <param name="darwinCoreModels"></param>
         /// <returns></returns>
-        Task AddAreaDataToDarwinCoreAsync(IEnumerable<DarwinCore<DynamicProperties>> darwinCoreModels);
+        void AddAreaDataToDarwinCore(IEnumerable<DarwinCore<DynamicProperties>> darwinCoreModels);
     }
 }
