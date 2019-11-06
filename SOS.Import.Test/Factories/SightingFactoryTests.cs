@@ -11,6 +11,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
+using SOS.Lib.Configuration.Import;
 using Xunit;
 
 namespace SOS.Import.Test.Factories
@@ -20,6 +21,7 @@ namespace SOS.Import.Test.Factories
     /// </summary>
     public class SightingFactoryTests
     {
+        private readonly SpeciesPortalConfiguration _speciesPortalConfiguration;
         private readonly Mock<IMetadataRepository> _metadataRepositoryMock;
         private readonly Mock<IProjectRepository> _projectRepositoryMock;
         private readonly Mock<ISightingRepository> _sightingRepositoryMock;
@@ -36,6 +38,7 @@ namespace SOS.Import.Test.Factories
         /// </summary>
         public SightingFactoryTests()
         {
+            _speciesPortalConfiguration = new SpeciesPortalConfiguration();
             _metadataRepositoryMock = new Mock<IMetadataRepository>();
             _projectRepositoryMock = new Mock<IProjectRepository>();
             _sightingRepositoryMock = new Mock<ISightingRepository>();
@@ -55,6 +58,7 @@ namespace SOS.Import.Test.Factories
         public void ConstructorTest()
         {
             new SpeciesPortalSightingFactory(
+                _speciesPortalConfiguration,
                 _metadataRepositoryMock.Object,
                 _projectRepositoryMock.Object,
                 _sightingRepositoryMock.Object,
@@ -68,6 +72,7 @@ namespace SOS.Import.Test.Factories
 
             Action create = () => new SpeciesPortalSightingFactory(
                 null,
+                _metadataRepositoryMock.Object,
                 _projectRepositoryMock.Object,
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
@@ -77,9 +82,10 @@ namespace SOS.Import.Test.Factories
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("metadataRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesPortalConfiguration");
 
             create = () => new SpeciesPortalSightingFactory(
+                _speciesPortalConfiguration,
                 _metadataRepositoryMock.Object,
                 null,
                 _sightingRepositoryMock.Object,
@@ -93,6 +99,7 @@ namespace SOS.Import.Test.Factories
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("projectRepository");
 
             create = () => new SpeciesPortalSightingFactory(
+                _speciesPortalConfiguration,
                 _metadataRepositoryMock.Object,
                 _projectRepositoryMock.Object,
                 null,
@@ -106,6 +113,7 @@ namespace SOS.Import.Test.Factories
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sightingRepository");
 
             create = () => new SpeciesPortalSightingFactory(
+                _speciesPortalConfiguration,
                 _metadataRepositoryMock.Object,
                 _projectRepositoryMock.Object,
                 _sightingRepositoryMock.Object,
@@ -119,6 +127,7 @@ namespace SOS.Import.Test.Factories
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("siteRepository");
 
             create = () => new SpeciesPortalSightingFactory(
+                _speciesPortalConfiguration,
                 _metadataRepositoryMock.Object,
                 _projectRepositoryMock.Object,
                 _sightingRepositoryMock.Object,
@@ -132,6 +141,7 @@ namespace SOS.Import.Test.Factories
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sightingVerbatimRepository");
 
             create = () => new SpeciesPortalSightingFactory(
+                _speciesPortalConfiguration,
                 _metadataRepositoryMock.Object,
                 _projectRepositoryMock.Object,
                 _sightingRepositoryMock.Object,
@@ -188,6 +198,7 @@ namespace SOS.Import.Test.Factories
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var sightingFactory = new SpeciesPortalSightingFactory(
+                _speciesPortalConfiguration,
                 _metadataRepositoryMock.Object,
                 _projectRepositoryMock.Object,
                 _sightingRepositoryMock.Object,
@@ -223,6 +234,7 @@ namespace SOS.Import.Test.Factories
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var sightingFactory = new SpeciesPortalSightingFactory(
+                _speciesPortalConfiguration,
                 _metadataRepositoryMock.Object,
                 _projectRepositoryMock.Object,
                 _sightingRepositoryMock.Object,

@@ -14,10 +14,8 @@ using Xunit;
 
 namespace SOS.Import.Test.Repositories
 {
-    public class OrganizationRepositoryIntegrationTests
+    public class OrganizationRepositoryIntegrationTests : TestBase
     {
-        private const string ArtportalenTestServerConnectionString = "Server=artsql2-4;Database=SpeciesObservationSwe_debugremote;Trusted_Connection=True;MultipleActiveResultSets=true";
-
         [Fact]
         [Trait("Category", "Integration")]
         public async Task TestGetAllOrganizations()
@@ -25,12 +23,9 @@ namespace SOS.Import.Test.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            SpeciesPortalDataService speciesPortalDataService = new SpeciesPortalDataService(new ConnectionStrings
-            {
-                SpeciesPortal = ArtportalenTestServerConnectionString
-            });
-
-            OrganizationRepository organizationRepository = new OrganizationRepository(
+            var importConfiguration = GetImportConfiguration();
+            var speciesPortalDataService = new SpeciesPortalDataService(importConfiguration.SpeciesPortalConfiguration);
+            var organizationRepository = new OrganizationRepository(
                 speciesPortalDataService, 
                 new Mock<ILogger<OrganizationRepository>>().Object);
 

@@ -8,6 +8,7 @@ using SOS.Import.Extensions;
 using SOS.Import.Models;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Import.Factories
@@ -17,6 +18,7 @@ namespace SOS.Import.Factories
     /// </summary>
     public class SpeciesPortalSightingFactory : Interfaces.ISpeciesPortalSightingFactory
     {
+        private readonly SpeciesPortalConfiguration _speciesPortalConfiguration;
         private readonly IMetadataRepository _metadataRepository;
 
         private readonly IProjectRepository _projectRepository;
@@ -39,7 +41,7 @@ namespace SOS.Import.Factories
 
         /// <summary>
         /// Constructor
-        /// </summary>
+        /// </summary>/// <param name="speciesPortalConfiguration"></param>
         /// <param name="metadataRepository"></param>
         /// <param name="projectRepository"></param>
         /// <param name="sightingRepository"></param>
@@ -51,7 +53,8 @@ namespace SOS.Import.Factories
         /// <param name="speciesCollectionItemRepository"></param>
         /// <param name="logger"></param>
         public SpeciesPortalSightingFactory(
-           
+
+            SpeciesPortalConfiguration speciesPortalConfiguration,
             IMetadataRepository metadataRepository,
             IProjectRepository projectRepository,
             ISightingRepository sightingRepository,
@@ -63,6 +66,7 @@ namespace SOS.Import.Factories
             ISpeciesCollectionItemRepository speciesCollectionItemRepository,
             ILogger<SpeciesPortalSightingFactory> logger)
         {
+            _speciesPortalConfiguration = speciesPortalConfiguration ?? throw new ArgumentNullException(nameof(speciesPortalConfiguration));
             _metadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
             _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
@@ -77,11 +81,6 @@ namespace SOS.Import.Factories
 
         /// <inheritdoc />
         public async Task<bool> HarvestSightingsAsync()
-        {
-            return await HarvestSightingsAsync(new SpeciesPortalAggregationOptions());
-        }
-
-        public async Task<bool> HarvestSightingsAsync(SpeciesPortalAggregationOptions options)
         {
             try
             {
@@ -143,16 +142,16 @@ namespace SOS.Import.Factories
                 // Loop until all sightings are fetched
                 while (minId <= maxId)
                 {
-                    if (options.MaxNumberOfSightingsHarvested.HasValue &&
-                        nrSightingsHarvested >= options.MaxNumberOfSightingsHarvested)
+                    if (_speciesPortalConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        nrSightingsHarvested >= _speciesPortalConfiguration.MaxNumberOfSightingsHarvested)
                     {
                         break;
                     }
 
-                    _logger.LogDebug($"Getting sightings from { minId } to { minId + options.ChunkSize -1 }");
+                    _logger.LogDebug($"Getting sightings from { minId } to { minId + _speciesPortalConfiguration.ChunkSize -1 }");
 
                     // Get chunk of sightings
-                    var sightings = (await _sightingRepository.GetChunkAsync(minId, options.ChunkSize)).ToArray();
+                    var sightings = (await _sightingRepository.GetChunkAsync(minId, _speciesPortalConfiguration.ChunkSize)).ToArray();
                     HashSet<int> sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
                     nrSightingsHarvested += sightings.Length;
 
@@ -180,7 +179,7 @@ namespace SOS.Import.Factories
                     await _sightingVerbatimRepository.AddManyAsync(aggregates);
 
                     // Calculate start of next chunk
-                    minId += options.ChunkSize;
+                    minId += _speciesPortalConfiguration.ChunkSize;
                 }
 
                 return true;

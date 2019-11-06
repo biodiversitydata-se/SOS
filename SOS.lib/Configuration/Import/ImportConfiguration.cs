@@ -13,9 +13,9 @@ namespace SOS.Lib.Configuration.Import
         public ClamTreeServiceConfiguration ClamTreeServiceConfiguration { get; set; }
 
         /// <summary>
-        /// Connection strings
+        /// Configuration for Species Portal
         /// </summary>
-        public ConnectionStrings ConnectionStrings { get; set; }
+        public SpeciesPortalConfiguration SpeciesPortalConfiguration { get; set; }
 
         /// <summary>
         /// Host

@@ -20,10 +20,9 @@ namespace SOS.Import.Services
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="connectionStrings"></param>
-        public SpeciesPortalDataService(ConnectionStrings connectionStrings)
+        public SpeciesPortalDataService(SpeciesPortalConfiguration speciesPortalConfiguration)
         {
-            _connectionString = connectionStrings?.SpeciesPortal ?? throw new ArgumentNullException(nameof(connectionStrings));
+            _connectionString = speciesPortalConfiguration?.ConnectionString ?? throw new ArgumentNullException(nameof(speciesPortalConfiguration));
         }
 
         /// <summary>
