@@ -15,7 +15,7 @@ using Xunit.Abstractions;
 
 namespace SOS.Import.Test.Repositories
 {
-    public class KulRepositoryIntegrationTests
+    public class KulObservationRepositoryIntegrationTests
     {
         [Fact]
         [Trait("Category","Integration")]
@@ -25,8 +25,8 @@ namespace SOS.Import.Test.Repositories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var importConfiguration = GetImportConfiguration();
-            var kulRepository = new KulSightingRepository(
-                new Mock<ILogger<KulSightingRepository>>().Object, 
+            var kulRepository = new KulObservationRepository(
+                new Mock<ILogger<KulObservationRepository>>().Object, 
                 importConfiguration.KulServiceConfiguration);
             var changedFrom = new DateTime(2015,1,1);
             var changedTo = changedFrom.AddYears(1);
@@ -48,7 +48,7 @@ namespace SOS.Import.Test.Repositories
             IConfigurationRoot config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
-                .AddUserSecrets<KulRepositoryIntegrationTests>()
+                .AddUserSecrets<KulObservationRepositoryIntegrationTests>()
                 .Build();
 
             ImportConfiguration importConfiguration = config.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();

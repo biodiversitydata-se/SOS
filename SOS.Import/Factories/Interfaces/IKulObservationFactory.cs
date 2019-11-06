@@ -6,19 +6,19 @@ using SOS.Import.Models;
 
 namespace SOS.Import.Factories.Interfaces
 {
-    public interface IKulSightingFactory
+    public interface IKulObservationFactory
     {
         /// <summary>
         /// Aggregate sightings.
         /// </summary>
         /// <returns></returns>
-        Task<bool> AggregateAsync();
+        Task<bool> HarvestObservationsAsync();
 
         /// <summary>
         /// Aggregate sightings.
         /// </summary>
         /// <param name="options">Options used in aggregation.</param>
         /// <returns></returns>
-        Task<bool> AggregateAsync(KulAggregationOptions options);
+        Task<bool> HarvestObservationsAsync(KulAggregationOptions options);
     }
 }

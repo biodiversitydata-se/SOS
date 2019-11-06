@@ -63,6 +63,42 @@ namespace SOS.Hangfire.UI.Controllers
         }
 
         /// <inheritdoc />
+        [HttpPost("KUL/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailyKulHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<IKulHarvestJob>(nameof(KulHarvestJob), job => job.Run(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("KUL harvest job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding KUL harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("KUL/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunKulHarvestJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IKulHarvestJob>(job => job.Run());
+                return new OkObjectResult("Started KUL harvest job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running KUL harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
         [HttpPost("SpeciesPortal/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

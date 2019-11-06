@@ -23,7 +23,7 @@ using Xunit;
 
 namespace SOS.Import.Test.Factories
 {
-    public class KulSightingFactoryIntegrationTests
+    public class KulObservationFactoryIntegrationTests
     {
         [Fact]
         [Trait("Category", "Integration")]
@@ -34,26 +34,26 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             ImportConfiguration importConfiguration = GetImportConfiguration();
 
-            var kulSightingRepository = new KulSightingRepository(
-                new Mock<ILogger<KulSightingRepository>>().Object, 
+            var kulObservationRepository = new KulObservationRepository(
+                new Mock<ILogger<KulObservationRepository>>().Object, 
                 importConfiguration.KulServiceConfiguration);
             
-            var kulSightingVerbatimRepository = new KulSightingVerbatimRepository(
+            var kulObservationVerbatimRepository = new KulObservationVerbatimRepository(
                 new ImportClient(
                     importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
                     importConfiguration.MongoDbConfiguration.DatabaseName,
                     importConfiguration.MongoDbConfiguration.BatchSize), 
-                new Mock<ILogger<KulSightingVerbatimRepository>>().Object);
+                new Mock<ILogger<KulObservationVerbatimRepository>>().Object);
             
-            var kulSightingFactory = new KulSightingFactory(
-                kulSightingRepository,
-                kulSightingVerbatimRepository,
-                new Mock<ILogger<KulSightingFactory>>().Object);
+            var kulObservationFactory = new KulObservationFactory(
+                kulObservationRepository,
+                kulObservationVerbatimRepository,
+                new Mock<ILogger<KulObservationFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulSightingFactory.AggregateAsync(
+            var result = await kulObservationFactory.HarvestObservationsAsync(
                 new KulAggregationOptions
                 {
                     StartHarvestYear = 2015,
@@ -74,17 +74,17 @@ namespace SOS.Import.Test.Factories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             ImportConfiguration importConfiguration = GetImportConfiguration();
-            var kulSightingFactory = new KulSightingFactory(
-                new KulSightingRepository(
-                    new Mock<ILogger<KulSightingRepository>>().Object,
+            var kulObservationFactory = new KulObservationFactory(
+                new KulObservationRepository(
+                    new Mock<ILogger<KulObservationRepository>>().Object,
                     importConfiguration.KulServiceConfiguration),
-                new Mock<IKulSightingVerbatimRepository>().Object,
-                new Mock<ILogger<KulSightingFactory>>().Object);
+                new Mock<IKulObservationVerbatimRepository>().Object,
+                new Mock<ILogger<KulObservationFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulSightingFactory.AggregateAsync(
+            var result = await kulObservationFactory.HarvestObservationsAsync(
                 new KulAggregationOptions
                 {
                     StartHarvestYear = 2015,
@@ -102,7 +102,7 @@ namespace SOS.Import.Test.Factories
             IConfigurationRoot config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
-                .AddUserSecrets<KulRepositoryIntegrationTests>()
+                .AddUserSecrets<KulObservationRepositoryIntegrationTests>()
                 .Build();
 
             ImportConfiguration importConfiguration = config.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();

@@ -11,35 +11,35 @@ using SOS.Import.Repositories.Source.Kul.Interfaces;
 
 namespace SOS.Import.Factories
 {
-    public class KulSightingFactory : Interfaces.IKulSightingFactory
+    public class KulObservationFactory : Interfaces.IKulObservationFactory
     {
-        private readonly IKulSightingRepository _kulSightingRepository;
-        private readonly IKulSightingVerbatimRepository _kulSightingVerbatimRepository;
-        private readonly ILogger<KulSightingFactory> _logger;
+        private readonly IKulObservationRepository _kulObservationRepository;
+        private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
+        private readonly ILogger<KulObservationFactory> _logger;
 
-        public KulSightingFactory(
-            IKulSightingRepository kulSightingRepository,
-            IKulSightingVerbatimRepository kulSightingVerbatimRepository,
-            ILogger<KulSightingFactory> logger)
+        public KulObservationFactory(
+            IKulObservationRepository kulObservationRepository,
+            IKulObservationVerbatimRepository kulObservationVerbatimRepository,
+            ILogger<KulObservationFactory> logger)
         {
-            _kulSightingRepository = kulSightingRepository;
-            _kulSightingVerbatimRepository = kulSightingVerbatimRepository;
+            _kulObservationRepository = kulObservationRepository;
+            _kulObservationVerbatimRepository = kulObservationVerbatimRepository;
             _logger = logger;
         }
 
-        public async Task<bool> AggregateAsync()
+        public async Task<bool> HarvestObservationsAsync()
         {
-            return await AggregateAsync(new KulAggregationOptions());
+            return await HarvestObservationsAsync(new KulAggregationOptions());
         }
 
-        public async Task<bool> AggregateAsync(KulAggregationOptions options)
+        public async Task<bool> HarvestObservationsAsync(KulAggregationOptions options)
         {
             _logger.LogDebug("Start harvesting sightings for KUL data provider");
             
             // Make sure we have an empty collection.
             _logger.LogDebug("Empty collection for KUL verbatim collection");
-            await _kulSightingVerbatimRepository.DeleteCollectionAsync();
-            await _kulSightingVerbatimRepository.AddCollectionAsync();
+            await _kulObservationVerbatimRepository.DeleteCollectionAsync();
+            await _kulObservationVerbatimRepository.AddCollectionAsync();
 
             DateTime changedFrom = new DateTime(options.StartHarvestYear, 1, 1);
             DateTime changedToEnd = DateTime.Now;
@@ -55,12 +55,12 @@ namespace SOS.Import.Factories
                 }
 
                 // Get sightings for one year
-                var sightings = await _kulSightingRepository.GetAsync(changedFrom, changedFrom.AddYears(1));
+                var sightings = await _kulObservationRepository.GetAsync(changedFrom, changedFrom.AddYears(1));
                 var aggregates = sightings.ToAggregates().ToArray();
                 nrSightingsHarvested += aggregates.Length;
 
                 // Add sightings to MongoDb
-                await _kulSightingVerbatimRepository.AddManyAsync(aggregates);
+                await _kulObservationVerbatimRepository.AddManyAsync(aggregates);
 
                 changedFrom = changedFrom.AddYears(1);
             }

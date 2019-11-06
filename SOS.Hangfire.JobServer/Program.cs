@@ -79,16 +79,13 @@ namespace SOS.Hangfire.JobServer
                 .ConfigureServices((hostContext, services) =>
                 {
                     var mongoConfiguration = hostContext.Configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository").Get<MongoDbConfiguration>();
-                    var connectionString = $"mongodb://{(string.IsNullOrEmpty(mongoConfiguration.UserName) || string.IsNullOrEmpty(mongoConfiguration.Password) ? "" : $"{mongoConfiguration.UserName}:{mongoConfiguration.Password}@")}" +
-                            $"{string.Join(",", mongoConfiguration.Hosts.Select(h => $"{h.Name}:{h.Port}"))}" +
-                            $"{(mongoConfiguration.Hosts.Length == 1 ? "" : "?connect=replicaSet")}";
                     
                     services.AddHangfire(configuration =>
                             configuration
                             .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                             .UseSimpleAssemblyNameTypeSerializer()
                             .UseRecommendedSerializerSettings()
-                            .UseMongoStorage(connectionString,
+                            .UseMongoStorage(mongoConfiguration.GetMongoDbSettings(),
                                 mongoConfiguration.DatabaseName,
                                 new MongoStorageOptions
                                 {

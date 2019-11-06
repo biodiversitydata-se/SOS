@@ -12,6 +12,8 @@ using SOS.Import.Repositories.Destination.Kul;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
+using SOS.Import.Repositories.Source.Kul;
+using SOS.Import.Repositories.Source.Kul.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Import.Services;
@@ -45,6 +47,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<PersonRepository>().As<IPersonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingRelationRepository>().As<ISightingRelationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesCollectionItemRepository>().As<ISpeciesCollectionItemRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<KulObservationRepository>().As<IKulObservationRepository>().InstancePerLifetimeScope();
 
             // Repositories destination
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
@@ -52,12 +55,12 @@ namespace SOS.Import.IoC.Modules
 
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TreeObservationVerbatimRepository>().As<ITreeObservationVerbatimRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<KulSightingVerbatimRepository>().As<IKulSightingVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<KulObservationVerbatimRepository>().As<IKulObservationVerbatimRepository>().InstancePerLifetimeScope();
 
             // Add factories
             builder.RegisterType<ClamTreePortalObservationFactory>().As<IClamTreePortalObservationFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalSightingFactory>().As<ISpeciesPortalSightingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<KulSightingFactory>().As<IKulSightingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<KulObservationFactory>().As<IKulObservationFactory>().InstancePerLifetimeScope();
 
             // Add Services
             builder.RegisterType<ClamTreeObservationService>().As<IClamTreeObservationService>().InstancePerLifetimeScope();
@@ -67,6 +70,7 @@ namespace SOS.Import.IoC.Modules
             // Add jobs
             builder.RegisterType<ClamTreePortalHarvestJob>().As<IClamTreePortalHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalHarvestJob>().As<ISpeciesPortalHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<KulHarvestJob>().As<IKulHarvestJob>().InstancePerLifetimeScope();
         }
     }
 }
