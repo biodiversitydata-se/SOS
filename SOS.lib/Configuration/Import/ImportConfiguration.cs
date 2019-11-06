@@ -21,5 +21,10 @@ namespace SOS.Lib.Configuration.Import
         /// Host
         /// </summary>
         public MongoDbConfiguration MongoDbConfiguration { get; set; }
+
+        /// <summary>
+        /// KUL Service/repository configuration.
+        /// </summary>
+        public KulServiceConfiguration KulServiceConfiguration { get; set; }
     }
 }

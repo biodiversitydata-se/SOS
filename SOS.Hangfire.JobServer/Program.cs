@@ -34,7 +34,7 @@ namespace SOS.Hangfire.JobServer
         /// <returns></returns>
         public static async Task Main(string[] args)
         {
-            _env = args?.Any() ?? false ? args[0] : string.Empty;
+            _env = args?.Any() ?? false ? args[0].ToUpper() : string.Empty;
 
             if (new[] { "local", "dev", "st", "prod" }.Contains(_env))
             {
@@ -59,6 +59,14 @@ namespace SOS.Hangfire.JobServer
                         .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                         .AddJsonFile($"appsettings.{_env}.json", optional: false, reloadOnChange: true)
                         .AddEnvironmentVariables();
+                   
+                    // If Development mode, add secrets stored on developer machine 
+                    // (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
+                    // In production you should store the secret values as environment variables.
+                    if (_env == "DEV" || _env == "LOCAL")
+                    {
+                        configuration.AddUserSecrets<Program>();
+                    }
                 })
                 .ConfigureLogging((hostingContext, logging) =>
                 {

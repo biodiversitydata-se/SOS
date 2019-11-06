@@ -12,6 +12,8 @@ using SOS.Import.MongoDb;
 using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.ClamTreePortal;
 using SOS.Import.Repositories.Destination.ClamTreePortal.Interfaces;
+using SOS.Import.Repositories.Destination.Kul;
+using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal;
@@ -29,6 +31,7 @@ namespace SOS.Import.IoC.Modules
         {
             // Add configuration
             builder.RegisterInstance(Configuration.ClamTreeServiceConfiguration).As<ClamTreeServiceConfiguration>().SingleInstance();
+            builder.RegisterInstance(Configuration.KulServiceConfiguration).As<KulServiceConfiguration>().SingleInstance();
             builder.RegisterInstance(Configuration.ConnectionStrings).As<ConnectionStrings>().SingleInstance();
 
             // Init mongodb
@@ -53,10 +56,12 @@ namespace SOS.Import.IoC.Modules
 
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TreeObservationVerbatimRepository>().As<ITreeObservationVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<KulSightingVerbatimRepository>().As<IKulSightingVerbatimRepository>().InstancePerLifetimeScope();
 
             // Add factories
             builder.RegisterType<ClamTreePortalObservationFactory>().As<IClamTreePortalObservationFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalSightingFactory>().As<ISpeciesPortalSightingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<KulSightingFactory>().As<IKulSightingFactory>().InstancePerLifetimeScope();
 
             // Add Services
             builder.RegisterType<ClamTreeObservationService>().As<IClamTreeObservationService>().InstancePerLifetimeScope();
