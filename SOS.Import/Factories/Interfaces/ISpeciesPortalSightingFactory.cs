@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using SOS.Import.Models;
 
 namespace SOS.Import.Factories.Interfaces
 {
@@ -13,12 +12,5 @@ namespace SOS.Import.Factories.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<bool> HarvestSightingsAsync();
-
-        /// <summary>
-        /// Aggregate sightings.
-        /// </summary>
-        /// <param name="options">Options used in aggregation.</param>
-        /// <returns></returns>
-        Task<bool> HarvestSightingsAsync(SpeciesPortalAggregationOptions options);
     }
 }
