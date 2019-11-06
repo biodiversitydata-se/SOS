@@ -3,7 +3,7 @@
     public enum AreaType
     {
         Municipality = 1,
-        Community = 11,
+     //   Community = 11,
         CountryRegion = 13,
         Province = 16,
         Parish = 19,

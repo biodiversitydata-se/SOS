@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
@@ -35,11 +34,16 @@ namespace SOS.Hangfire.JobServer
         /// <returns></returns>
         public static async Task Main(string[] args)
         {
-            _env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            _env = args?.Any() ?? false ? args[0] : string.Empty;
 
-            await CreateHostBuilder(args)
-                .Build()
-                .RunAsync();
+            if (new[] { "local", "dev", "st", "prod" }.Contains(_env))
+            {
+                _env = args[0];
+
+                await CreateHostBuilder(args)
+                    .Build()
+                    .RunAsync();
+            }
         }
 
         /// <summary>

@@ -5,15 +5,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Process.Extensions;
 using SOS.Process.Repositories.Source.Interfaces;
+using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Index.Strtree;
 
 namespace SOS.Process.Helpers
 {
     public class AreaHelper : Interfaces.IAreaHelper
     {
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
-        private readonly IDictionary<string, IEnumerable<Area>> _areaCache;
+
+        private readonly STRtree<IFeature> _strTree;
+        private readonly IDictionary<string, IEnumerable<IFeature>> _featureCache;
 
         /// <summary>
         /// Constructor
@@ -22,10 +27,66 @@ namespace SOS.Process.Helpers
         public AreaHelper(IAreaVerbatimRepository areaVerbatimRepository)
         {
             _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
-            _areaCache = new ConcurrentDictionary<string, IEnumerable<Area>>();
+
+            _strTree = new STRtree<IFeature>();
+            _featureCache = new ConcurrentDictionary<string, IEnumerable<IFeature>>();
+
+            Task.Run(() => InitilaizeAsync()).Wait();
         }
 
-        public async Task AddAreaDataToDarwinCoreAsync(IEnumerable<DarwinCore<DynamicProperties>> darwinCoreModels)
+        private async Task InitilaizeAsync()
+        {
+            if (_strTree.Count != 0)
+            {
+                return;
+            }
+
+            var areas = await _areaVerbatimRepository.GetBatchAsync(0);
+            var count = areas.Count();
+            var totalCount = count;
+
+            while (count != 0)
+            {
+                foreach (var area in areas)
+                {
+                    var feature = area.ToFeature();
+                    _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
+                }
+                
+                areas = await _areaVerbatimRepository.GetBatchAsync(totalCount + 1);
+                count = areas.Count();
+                totalCount += count;
+            }
+
+            _strTree.Build();
+        }
+
+        /// <summary>
+        /// Get all features where position is inside area
+        /// </summary>
+        /// <param name="longitude"></param>
+        /// <param name="latitude"></param>
+        /// <returns></returns>
+        private IEnumerable<IFeature> GetPointFeatures(double longitude, double latitude)
+        {
+            var factory = new GeometryFactory();
+            var point = factory.CreatePoint(new Coordinate(longitude, latitude));
+
+            var featuresContainingPoint = new List<IFeature>();
+            var possibleFeatures = _strTree.Query(point.EnvelopeInternal);
+            foreach (var feature in possibleFeatures)
+            {
+                if (feature.Geometry.Contains(point))
+                {
+                    featuresContainingPoint.Add(feature);
+                }
+            }
+
+            return featuresContainingPoint;
+        }
+
+        /// <inheritdoc />
+        public void AddAreaDataToDarwinCore(IEnumerable<DarwinCore<DynamicProperties>> darwinCoreModels)
         {
             if (!darwinCoreModels?.Any() ?? true)
             {
@@ -43,42 +104,40 @@ namespace SOS.Process.Helpers
                 var key = $"{Math.Round(dwcModel.Location.DecimalLongitude, 5)}-{Math.Round(dwcModel.Location.DecimalLatitude, 5)}";
 
                 // Try to get areas from cache
-                _areaCache.TryGetValue(key, out var areas);
+                _featureCache.TryGetValue(key, out var features);
 
                 // If areas not found for that position, try to get from repository
-                if (areas == null)
+                if (features == null)
                 {
-                    areas = await _areaVerbatimRepository.GetAreasByCoordinatesAsync(
-                        dwcModel.Location.DecimalLongitude, 
-                        dwcModel.Location.DecimalLatitude);
+                    features = GetPointFeatures(dwcModel.Location.DecimalLongitude, dwcModel.Location.DecimalLatitude);
 
-                    _areaCache.Add(key, areas);
+                    _featureCache.Add(key, features);
                 }
 
-                if (areas == null)
+                if (features == null)
                 {
                     continue;
                 }
 
-                foreach (var area in areas)
+                foreach (var feature in features)
                 {
-                    switch (area.AreaType)
+                    switch ((AreaType)feature.Attributes.GetOptionalValue("areaType"))
                     {
                         case AreaType.County:
-                            dwcModel.Location.County = area.Name;
+                            dwcModel.Location.County = (string)feature.Attributes.GetOptionalValue("name");
                             break;
                         case AreaType.Municipality:
-                            dwcModel.Location.Municipality = area.Name;
+                            dwcModel.Location.Municipality = (string)feature.Attributes.GetOptionalValue("name");
                             break;
                         case AreaType.Parish:
                             if (dwcModel.DynamicProperties == null)
                             {
                                 dwcModel.DynamicProperties = new DynamicProperties();
                             }
-                            dwcModel.DynamicProperties.Parish = area.Name;
+                            dwcModel.DynamicProperties.Parish = (string)feature.Attributes.GetOptionalValue("name");
                             break;
                         case AreaType.Province:
-                            dwcModel.Location.StateProvince = area.Name;
+                            dwcModel.Location.StateProvince = (string)feature.Attributes.GetOptionalValue("name");
                             break;
                     }
                 }

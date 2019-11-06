@@ -12,7 +12,7 @@ namespace SOS.Export.Services.Interfaces
         /// </summary>
         /// <param name="path"></param>
         /// <param name="folder"></param>
-        void CompressFolder(string path, string folder);
+        string CompressFolder(string path, string folder);
 
         /// <summary>
         /// Copy files to destination
@@ -29,6 +29,13 @@ namespace SOS.Export.Services.Interfaces
         /// <param name="folder"></param>
         /// <returns></returns>
         void CreateFolder(string path, string folder);
+
+        /// <summary>
+        /// Delete a file
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        void DeleteFile(string path);
 
         /// <summary>
         /// Delete a folder

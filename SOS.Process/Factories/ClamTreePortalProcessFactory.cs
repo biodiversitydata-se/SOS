@@ -91,7 +91,7 @@ namespace SOS.Process.Factories
                     var dwcModels = verbatim.ToDarwinCore(taxa)?.ToArray() ?? new DarwinCore<DynamicProperties>[0];
 
                     // Add area related data to models
-                    await _areaHelper.AddAreaDataToDarwinCoreAsync(dwcModels);
+                    _areaHelper.AddAreaDataToDarwinCore(dwcModels);
 
                     await ProcessRepository.AddManyAsync(dwcModels);
 
@@ -136,7 +136,7 @@ namespace SOS.Process.Factories
                     var dwcModels = verbatim.ToDarwinCore(taxa)?.ToArray() ?? new DarwinCore<DynamicProperties>[0];
 
                     // Add area related data to models
-                    await _areaHelper.AddAreaDataToDarwinCoreAsync(dwcModels);
+                    _areaHelper.AddAreaDataToDarwinCore(dwcModels);
 
                     await ProcessRepository.AddManyAsync(dwcModels);
 

@@ -16,9 +16,12 @@ namespace SOS.Export.Services
     public class FileService : IFileService
     {
         /// <inheritdoc />
-        public void CompressFolder(string path, string folder)
+        public string CompressFolder(string path, string folder)
         {
-            ZipFile.CreateFromDirectory($"{path}/{folder}", $"{path}/{folder}.zip");
+            var zipFilePath = $"{path}/{folder}.zip";
+            ZipFile.CreateFromDirectory($"{path}/{folder}", zipFilePath);
+
+            return zipFilePath;
         }
 
         /// <inheritdoc />
@@ -39,6 +42,12 @@ namespace SOS.Export.Services
         public void CreateFolder(string path, string folder)
         {
             Directory.CreateDirectory($"{path}/{folder}");
+        }
+
+        /// <inheritdoc />
+        public void DeleteFile(string path)
+        {
+            File.Delete(path);
         }
 
         /// <inheritdoc />

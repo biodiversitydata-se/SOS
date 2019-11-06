@@ -23,6 +23,7 @@ namespace SOS.Export.Test.Factories
     {
         private readonly Mock<IProcessedDarwinCoreRepository> _processedDarwinCoreRepositoryMock;
         private readonly Mock<IFileService> _fileServiceMock;
+        private readonly Mock<IBlobStorageService> _blobStorageServiceMock;
         private readonly Mock<ILogger<SightingFactory>> _loggerMock;
 
         /// <summary>
@@ -32,6 +33,7 @@ namespace SOS.Export.Test.Factories
         {
             _processedDarwinCoreRepositoryMock = new Mock<IProcessedDarwinCoreRepository>();
             _fileServiceMock = new Mock<IFileService>();
+            _blobStorageServiceMock = new Mock<IBlobStorageService>();
             _loggerMock = new Mock<ILogger<SightingFactory>>();
         }
 
@@ -44,12 +46,14 @@ namespace SOS.Export.Test.Factories
             new SightingFactory(
                 _processedDarwinCoreRepositoryMock.Object,
                 _fileServiceMock.Object,
+                _blobStorageServiceMock.Object,
                 new FileDestination{Path = "test"},
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new SightingFactory(
                 null,
                 _fileServiceMock.Object,
+                _blobStorageServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedDarwinCoreRepository");
@@ -57,6 +61,7 @@ namespace SOS.Export.Test.Factories
             create = () => new SightingFactory(
                 _processedDarwinCoreRepositoryMock.Object,
                 null,
+                _blobStorageServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("fileService");
@@ -65,12 +70,22 @@ namespace SOS.Export.Test.Factories
                 _processedDarwinCoreRepositoryMock.Object,
                 _fileServiceMock.Object,
                 null,
+                new FileDestination { Path = "test" },
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("blobStorageService");
+
+            create = () => new SightingFactory(
+                _processedDarwinCoreRepositoryMock.Object,
+                _fileServiceMock.Object,
+                _blobStorageServiceMock.Object,
+                null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("fileDestination");
 
             create = () => new SightingFactory(
                 _processedDarwinCoreRepositoryMock.Object,
                 _fileServiceMock.Object,
+                _blobStorageServiceMock.Object,
                 new FileDestination { Path = "test" },
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
@@ -115,6 +130,10 @@ namespace SOS.Export.Test.Factories
             _fileServiceMock.Setup(mdr => mdr.CopyFiles(It.IsAny<string>(), It.IsAny<IEnumerable<string>>(), It.IsAny<string>()));
             _fileServiceMock.Setup(mdr => mdr.CompressFolder(It.IsAny<string>(), It.IsAny<string>()));
             _fileServiceMock.Setup(mdr => mdr.DeleteFolder(It.IsAny<string>()));
+            _fileServiceMock.Setup(mdr => mdr.DeleteFile(It.IsAny<string>()));
+
+            _blobStorageServiceMock.Setup(mdr => mdr.CreateContainerAsync(It.IsAny<string>())).ReturnsAsync(true);
+            _blobStorageServiceMock.Setup(mdr => mdr.UploadBlobAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -122,6 +141,7 @@ namespace SOS.Export.Test.Factories
             var sightingFactory = new SightingFactory(
                 _processedDarwinCoreRepositoryMock.Object,
                 _fileServiceMock.Object,
+                _blobStorageServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
 
@@ -151,6 +171,7 @@ namespace SOS.Export.Test.Factories
             var sightingFactory = new SightingFactory(
                 _processedDarwinCoreRepositoryMock.Object,
                 _fileServiceMock.Object,
+                _blobStorageServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
 

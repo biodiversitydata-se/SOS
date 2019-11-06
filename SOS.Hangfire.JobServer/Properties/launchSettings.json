@@ -2,9 +2,7 @@
   "profiles": {
     "SOS.Hangfire.JobServer": {
       "commandName": "Project",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "local"
-      }
+      "commandLineArgs": "dev"
     }
   }
 }

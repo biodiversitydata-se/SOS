@@ -21,6 +21,7 @@ namespace SOS.Export.Factories
     {
         private readonly IProcessedDarwinCoreRepository _processedDarwinCoreRepository;
         private readonly IFileService _fileService;
+        private readonly IBlobStorageService _blobStorageService;
         private readonly string _exportPath;
         private readonly ILogger<SightingFactory> _logger;
 
@@ -34,11 +35,14 @@ namespace SOS.Export.Factories
         public SightingFactory(
             IProcessedDarwinCoreRepository processedDarwinCoreRepository,
             IFileService fileService,
+            IBlobStorageService blobStorageService,
             FileDestination fileDestination,
+
             ILogger<SightingFactory> logger)
         {
             _processedDarwinCoreRepository = processedDarwinCoreRepository ?? throw new ArgumentNullException(nameof(processedDarwinCoreRepository));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
             _exportPath = fileDestination?.Path ?? throw new ArgumentNullException(nameof(fileDestination));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -143,8 +147,19 @@ namespace SOS.Export.Factories
                 // Add metadata, compress files and remove temp directory
                 AddMeta($@"{_exportPath}\{folder}");
                 _fileService.CopyFiles(@".\DarwinCore", new []{ "eml.xml"}, $@"{_exportPath}\{folder}");
-                _fileService.CompressFolder(_exportPath, folder);
+                var zipFile = _fileService.CompressFolder(_exportPath, folder);
                 _fileService.DeleteFolder($@"{_exportPath}\{folder}");
+
+                // Make sure container exists
+                var container = $"sos-{DateTime.Now.Year}";
+                await _blobStorageService.CreateContainerAsync(container);
+
+                // Upload file to blob storage
+                if (await _blobStorageService.UploadBlobAsync(zipFile, container))
+                {
+                    // Remove local file
+                    _fileService.DeleteFile(zipFile);
+                }
 
                 return true;
             }
