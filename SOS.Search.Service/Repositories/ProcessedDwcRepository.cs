@@ -5,9 +5,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.DarwinCore;
-
-using SOS.Search.Service.Configuration;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Repositories

@@ -60,10 +60,8 @@ namespace SOS.Lib.Configuration.Shared
                 evidence = new PasswordEvidence(Password);
             }
 
-            return new MongoClientSettings
+            var mongoSettings = new MongoClientSettings
             {
-                Servers = Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)),
-                ReplicaSetName = ReplicaSetName,
                 UseTls = UseTls,
                 SslSettings = UseTls ? new SslSettings
                 {
@@ -71,6 +69,18 @@ namespace SOS.Lib.Configuration.Shared
                 } : null,
                 Credential = identity != null && evidence != null ? new MongoCredential("SCRAM-SHA-1", identity, evidence) : null
             };
+
+            if (Hosts.Length == 1)
+            {
+                mongoSettings.Server =
+                    Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)).FirstOrDefault();
+            }
+            else
+            {
+                mongoSettings.Servers = Hosts.Select(h => new MongoServerAddress(h.Name, h.Port));
+            }
+
+            return mongoSettings;
         }
     }
 }

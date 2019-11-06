@@ -113,7 +113,7 @@ namespace SOS.Process.Test.Factories
                     DyntaxaTaxonId = 0
                 } });
 
-            _areaHelper.Setup(r => r.AddAreaDataToDarwinCoreAsync(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()));
+            _areaHelper.Setup(r => r.AddAreaDataToDarwinCore(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()));
 
             _processedRepository.Setup(r => r.AddManyAsync(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()))
                 .ReturnsAsync(true);

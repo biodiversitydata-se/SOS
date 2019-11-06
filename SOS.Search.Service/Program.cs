@@ -2,7 +2,6 @@
 using System.Linq;
 using System.IO;
 using System.Reflection;
-using System.Security.Authentication;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -13,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using NLog.Web;
-using SOS.Search.Service.Configuration;
+using SOS.Lib.Configuration.Shared;
 using SOS.Search.Service.Factories;
 using SOS.Search.Service.Factories.Interfaces;
 using SOS.Search.Service.Repositories;
@@ -94,34 +93,11 @@ namespace SOS.Search.Service
                     services.AddOptions();
 
                     // Mongo Db
-                    var mongoConfiguration =
+                    var config =
                         hostContext.Configuration.GetSection("MongoDbConfiguration").Get<MongoDbConfiguration>();
 
-                    var settings = new MongoClientSettings
-                    {
-                        Servers = mongoConfiguration.Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)),
-                        ReplicaSetName = mongoConfiguration.ReplicaSetName,
-                        UseTls = mongoConfiguration.UseTls,
-                        SslSettings = mongoConfiguration.UseTls
-                            ? new SslSettings
-                            {
-                                EnabledSslProtocols = SslProtocols.Tls12
-                            }
-                            : null
-                    };
-
-                    if (!string.IsNullOrEmpty(mongoConfiguration.DatabaseName) &&
-                        !string.IsNullOrEmpty(mongoConfiguration.Password))
-                    {
-                        var identity = new MongoInternalIdentity(mongoConfiguration.DatabaseName,
-                            mongoConfiguration.UserName);
-                        var evidence = new PasswordEvidence(mongoConfiguration.Password);
-
-                        settings.Credential = new MongoCredential("SCRAM-SHA-1", identity, evidence);
-                    }
-
                     // Setup db
-                    services.AddSingleton<IMongoClient, MongoClient>(x => new MongoClient(settings));
+                    services.AddSingleton<IMongoClient, MongoClient>(x => new MongoClient(config.GetMongoDbSettings()));
 
                     // Add factories
                     services.AddScoped<ISightingFactory, SightingFactory>();
