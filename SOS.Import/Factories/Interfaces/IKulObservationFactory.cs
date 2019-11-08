@@ -13,12 +13,5 @@ namespace SOS.Import.Factories.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<bool> HarvestObservationsAsync();
-
-        /// <summary>
-        /// Aggregate sightings.
-        /// </summary>
-        /// <param name="options">Options used in aggregation.</param>
-        /// <returns></returns>
-        Task<bool> HarvestObservationsAsync(KulAggregationOptions options);
     }
 }

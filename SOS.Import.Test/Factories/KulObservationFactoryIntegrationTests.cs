@@ -33,6 +33,8 @@ namespace SOS.Import.Test.Factories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             ImportConfiguration importConfiguration = GetImportConfiguration();
+            importConfiguration.KulServiceConfiguration.StartHarvestYear = 2015;
+            importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
 
             var kulObservationRepository = new KulObservationRepository(
                 new Mock<ILogger<KulObservationRepository>>().Object, 
@@ -47,18 +49,14 @@ namespace SOS.Import.Test.Factories
             
             var kulObservationFactory = new KulObservationFactory(
                 kulObservationRepository,
-                kulObservationVerbatimRepository,
+                kulObservationVerbatimRepository, 
+                importConfiguration.KulServiceConfiguration, 
                 new Mock<ILogger<KulObservationFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulObservationFactory.HarvestObservationsAsync(
-                new KulAggregationOptions
-                {
-                    StartHarvestYear = 2015,
-                    MaxNumberOfSightingsHarvested = 10000
-                });
+            var result = await kulObservationFactory.HarvestObservationsAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -74,22 +72,21 @@ namespace SOS.Import.Test.Factories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             ImportConfiguration importConfiguration = GetImportConfiguration();
+            importConfiguration.KulServiceConfiguration.StartHarvestYear = 2015;
+            importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
+
             var kulObservationFactory = new KulObservationFactory(
                 new KulObservationRepository(
                     new Mock<ILogger<KulObservationRepository>>().Object,
                     importConfiguration.KulServiceConfiguration),
                 new Mock<IKulObservationVerbatimRepository>().Object,
+                importConfiguration.KulServiceConfiguration,
                 new Mock<ILogger<KulObservationFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulObservationFactory.HarvestObservationsAsync(
-                new KulAggregationOptions
-                {
-                    StartHarvestYear = 2015,
-                    MaxNumberOfSightingsHarvested = 10000
-                });
+            var result = await kulObservationFactory.HarvestObservationsAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

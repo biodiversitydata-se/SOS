@@ -6,6 +6,7 @@
     public enum SightingProviders
     {
         SpeciesPortal = 1,
-        ClamAndTreePortal = 2
+        ClamAndTreePortal = 2,
+        KUL = 4
     }
 }

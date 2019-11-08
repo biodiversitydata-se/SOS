@@ -32,7 +32,7 @@ namespace SOS.Import.Repositories.Source.Kul
                 true,
                 0,
                 false,
-                _kulServiceConfiguration.MaxReturnedChanges);
+                _kulServiceConfiguration.MaxReturnedChangesInOnePage);
 
             _logger.LogDebug($"Getting observations from KUL Service: ChangedFrom: {changedFrom.ToShortDateString()}, ChangedTo: {changedTo.ToShortDateString()}, Created: {result.CreatedSpeciesObservations.Length}, Updated: {result.UpdatedSpeciesObservations.Length}, Deleted: {result.DeletedSpeciesObservationGuids.Length}");
 

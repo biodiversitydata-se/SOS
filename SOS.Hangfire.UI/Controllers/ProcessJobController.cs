@@ -3,6 +3,7 @@ using System.Net;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Enums;
 using SOS.Process.Jobs;
 using SOS.Process.Jobs.Interfaces;
 
@@ -58,6 +59,24 @@ namespace SOS.Hangfire.UI.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Starting process job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost("Kul/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunKulProcessJob()
+        {
+            try
+            {
+                int sources = (int) SightingProviders.KUL;
+                BackgroundJob.Enqueue<IProcessJob>(job => job.Run(sources));
+                return new OkObjectResult("Started process KUL job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Starting process KUL job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

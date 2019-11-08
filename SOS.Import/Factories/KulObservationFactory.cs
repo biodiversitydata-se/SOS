@@ -8,6 +8,7 @@ using SOS.Import.Extensions;
 using SOS.Import.Models;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Repositories.Source.Kul.Interfaces;
+using SOS.Lib.Configuration.Import;
 
 namespace SOS.Import.Factories
 {
@@ -16,23 +17,22 @@ namespace SOS.Import.Factories
         private readonly IKulObservationRepository _kulObservationRepository;
         private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
         private readonly ILogger<KulObservationFactory> _logger;
+        private readonly KulServiceConfiguration _kulServiceConfiguration;
 
         public KulObservationFactory(
             IKulObservationRepository kulObservationRepository,
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
+            KulServiceConfiguration kulServiceConfiguration,
             ILogger<KulObservationFactory> logger)
         {
             _kulObservationRepository = kulObservationRepository;
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository;
+            _kulServiceConfiguration = kulServiceConfiguration;
             _logger = logger;
         }
 
+        
         public async Task<bool> HarvestObservationsAsync()
-        {
-            return await HarvestObservationsAsync(new KulAggregationOptions());
-        }
-
-        public async Task<bool> HarvestObservationsAsync(KulAggregationOptions options)
         {
             _logger.LogDebug("Start harvesting sightings for KUL data provider");
             
@@ -41,15 +41,15 @@ namespace SOS.Import.Factories
             await _kulObservationVerbatimRepository.DeleteCollectionAsync();
             await _kulObservationVerbatimRepository.AddCollectionAsync();
 
-            DateTime changedFrom = new DateTime(options.StartHarvestYear, 1, 1);
+            DateTime changedFrom = new DateTime(_kulServiceConfiguration.StartHarvestYear, 1, 1);
             DateTime changedToEnd = DateTime.Now;
             int nrSightingsHarvested = 0;
 
             // Loop until all sightings are fetched.
             while (changedFrom < changedToEnd)
             {
-                if (options.MaxNumberOfSightingsHarvested.HasValue &&
-                    nrSightingsHarvested >= options.MaxNumberOfSightingsHarvested)
+                if (_kulServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                    nrSightingsHarvested >= _kulServiceConfiguration.MaxNumberOfSightingsHarvested)
                 {
                     break;
                 }

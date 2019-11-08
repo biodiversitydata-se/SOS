@@ -21,6 +21,7 @@ namespace SOS.Process.Jobs
 
         private readonly ISpeciesPortalProcessFactory _speciesPortalProcessFactory;
         private readonly IClamTreePortalProcessFactory _clamTreePortalProcessFactory;
+        private readonly IKulProcessFactory _kulProcessFactory;
 
         private readonly ITaxonService _taxonService;
 
@@ -31,16 +32,20 @@ namespace SOS.Process.Jobs
         /// </summary>
         /// <param name="processRepository"></param>
         /// <param name="clamTreePortalProcessFactory"></param>
+        /// <param name="kulProcessFactory"></param>
         /// <param name="speciesPortalProcessFactory"></param>
         /// <param name="taxonService"></param>
         /// <param name="logger"></param>
-        public ProcessJob(IProcessedRepository processRepository,
+        public ProcessJob(
+            IProcessedRepository processRepository,
             IClamTreePortalProcessFactory clamTreePortalProcessFactory,
+            IKulProcessFactory kulProcessFactory,
             ISpeciesPortalProcessFactory speciesPortalProcessFactory,
             ITaxonService taxonService,
             ILogger<ProcessJob> logger)
         {
             _processRepository = processRepository ?? throw new ArgumentNullException(nameof(processRepository));
+            _kulProcessFactory = kulProcessFactory;
             _clamTreePortalProcessFactory = clamTreePortalProcessFactory ?? throw new ArgumentNullException(nameof(clamTreePortalProcessFactory));
             _speciesPortalProcessFactory = speciesPortalProcessFactory ?? throw new ArgumentNullException(nameof(speciesPortalProcessFactory));
             _taxonService = taxonService ?? throw new ArgumentNullException(nameof(taxonService));
@@ -83,6 +88,11 @@ namespace SOS.Process.Jobs
                 if ((sources & (int)SightingProviders.ClamAndTreePortal) > 0)
                 {
                     processTasks.Add(_clamTreePortalProcessFactory.ProcessAsync(taxa));
+                }
+
+                if ((sources & (int)SightingProviders.KUL) > 0)
+                {
+                    processTasks.Add(_kulProcessFactory.ProcessAsync(taxa));
                 }
 
                 // Run all tasks async
