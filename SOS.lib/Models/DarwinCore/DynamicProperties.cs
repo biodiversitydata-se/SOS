@@ -8,6 +8,26 @@ namespace SOS.Lib.Models.DarwinCore
     public class DynamicProperties
     {
         /// <summary>
+        /// Not defined in Darwin Core.
+        /// The Data provider Id.
+        /// </summary>
+        public int DataProviderId { get; set; }
+
+        /// <summary>
+        /// Not defined in Darwin Core.
+        /// Information about date and time when the
+        /// species observation started.
+        /// </summary>
+        public DateTime ObservationDateStart { get; set; }
+
+        /// <summary>
+        /// Not defined in Darwin Core.
+        /// Information about date and time when the
+        /// species observation ended.
+        /// </summary>
+        public DateTime? ObservationDateEnd { get; set; }
+
+        /// <summary>
         ///
         /// Conservation related information about the taxon that
         /// the species observation is attached to.
@@ -263,5 +283,20 @@ namespace SOS.Lib.Models.DarwinCore
         /// This property is currently not used.
         /// </summary>
         public string VerbatimScientificName { get; set; }
+        
+        public int? ActivityId { get; set; }
+        public int? BirdNestActivityId { get; set; }
+        public int DisturbanceRadius { get; set; }
+        public int MaxAccuracyOrDisturbanceRadius { get; set; }
+        public int? CountyIdByName { get; set; }
+        public int? CountyPartIdByName { get; set; }
+        public int? ProvinceIdByName { get; set; }
+        public int? MunicipalityIdByName { get; set; }
+        public int? ProvincePartIdByName { get; set; }
+        public int? CountyIdByCoordinate { get; set; }
+        public int? CountyPartIdByCoordinate { get; set; }
+        public int? ProvinceIdByCoordinate { get; set; }
+        public int? ProvincePartIdByCoordinate { get; set; }
+        public int? MunicipalityIdByCoordinate { get; set; }
     }
 }

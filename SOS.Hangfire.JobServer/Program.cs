@@ -39,8 +39,6 @@ namespace SOS.Hangfire.JobServer
 
             if (new[] { "local", "dev", "st", "prod" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
             {
-                _env = args[0];
-
                 await CreateHostBuilder(args)
                     .Build()
                     .RunAsync();

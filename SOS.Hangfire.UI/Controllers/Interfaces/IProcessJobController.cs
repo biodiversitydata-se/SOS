@@ -22,5 +22,7 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// <param name="sources">Bit flag. 1-Species Portal</param>
         /// <returns></returns>
         IActionResult RunProcessJob(int sources);
+
+        IActionResult RunKulProcessJob();
     }
 }
