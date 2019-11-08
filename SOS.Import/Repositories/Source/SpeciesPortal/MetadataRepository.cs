@@ -20,20 +20,25 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity>> GetActivitiesAsync()
+        public async Task<IEnumerable<MetadataWithCategoryEntity>> GetActivitiesAsync()
         {
             try
             {
                 const string query = @"
                 SELECT 
 	                a.Id, 
-	                t.Value AS Name
+	                t.Value AS Name,
+                    ac.Id AS CategoryId,
+	                ct.Value AS CategoryName
                 FROM 
 	                Activity a 
 	                INNER JOIN [Resource] r ON a.ResourceLabel = r.Label
-	                INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
+	                INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49
+	                INNER JOIN ActivityCategory ac ON a.ActivityCategoryId = ac.Id
+	                INNER JOIN [Resource] cr ON ac.ResourceLabel = cr.Label
+	                INNER JOIN Translation ct ON cr.Id = ct.ResourceId AND ct.GlobalizationCultureId = 49";
 
-                return await QueryAsync<MetadataEntity>(query);
+                return await QueryAsync<MetadataWithCategoryEntity>(query);
             }
             catch (Exception e)
             {
@@ -110,7 +115,29 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 Logger.LogError(e, "Error getting unite");
                 return null;
             }
-            
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<MetadataEntity>> GetValidationStatusAsync()
+        {
+            try
+            {
+                const string query = @"
+                    SELECT 
+	                    vs.Id, 
+	                    t.Value AS Name
+                    FROM 
+	                    ValidationStatus vs 
+	                    INNER JOIN [Resource] r ON vs.ResourceLabel = r.Label
+	                    INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
+
+                return await QueryAsync<MetadataEntity>(query);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting validation status");
+                return null;
+            }
         }
     }
 }

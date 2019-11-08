@@ -201,7 +201,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// For Darwin Core, recommended best practice is to use an
         /// encoding scheme, such as ISO 8601:2004(E).
         /// </summary>
-        public DateTime Modified { get; set; }
+        public DateTime? Modified { get; set; }
 
         /// <summary>
         /// Darwin Core term name: Occurrence.

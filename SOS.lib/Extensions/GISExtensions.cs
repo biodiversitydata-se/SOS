@@ -9,7 +9,7 @@ using NetTopologySuite.IO;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 
-namespace SOS.Import.Extensions
+namespace SOS.Lib.Extensions
 {
     /// <summary>
     /// NetTopologySuite extensions

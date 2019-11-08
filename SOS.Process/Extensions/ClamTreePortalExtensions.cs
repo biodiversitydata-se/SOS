@@ -33,7 +33,6 @@ namespace SOS.Process.Extensions
                     IsNeverFoundObservation = verbatim.IsNeverFoundObservation,
                     IsNotRediscoveredObservation = verbatim.IsNotRediscoveredObservation,
                     IsPositiveObservation = verbatim.IsPositiveObservation,
-                    Owner = verbatim.Owner,
                     Project = string.IsNullOrEmpty(verbatim.ProjectName) ? null : new DarwinCoreProject
                     {
                         ProjectName = verbatim.ProjectName
@@ -56,6 +55,7 @@ namespace SOS.Process.Extensions
                 Language = verbatim.Language,
                 Location = new DarwinCoreLocation
                 {
+                    Continent = "Europa",
                     CoordinatePrecision = verbatim.CoordinateUncertaintyInMeters?.ToString(),
                     CountryCode = verbatim.CountryCode,
                     DecimalLatitude = verbatim.DecimalLatitude,
@@ -121,7 +121,6 @@ namespace SOS.Process.Extensions
                     IsNeverFoundObservation = verbatim.IsNeverFoundObservation,
                     IsNotRediscoveredObservation = verbatim.IsNotRediscoveredObservation,
                     IsPositiveObservation = verbatim.IsPositiveObservation,
-                    Owner = verbatim.Owner,
                     Project = string.IsNullOrEmpty(verbatim.ProjectName) ? null : new DarwinCoreProject
                     {
                         ProjectName = verbatim.ProjectName

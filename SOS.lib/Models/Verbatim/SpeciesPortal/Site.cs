@@ -6,6 +6,11 @@
     public class Site
     {
         /// <summary>
+        /// Accuracy in meters
+        /// </summary>
+        public int Accuracy { get; set; }
+
+        /// <summary>
         /// County of site
         /// </summary>
         public Metadata County { get; set; }
@@ -24,6 +29,11 @@
         /// Name of site
         /// </summary>
         public Metadata Municipality { get; set; }
+
+        /// <summary>
+        /// Parish
+        /// </summary>
+        public Metadata Parish { get; set; }
 
         /// <summary>
         /// Province

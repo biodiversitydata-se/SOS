@@ -13,7 +13,7 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal.Interfaces
         /// Get all activities
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<MetadataEntity>> GetActivitiesAsync();
+        Task<IEnumerable<MetadataWithCategoryEntity>> GetActivitiesAsync();
 
         /// <summary>
         /// Get all genders
@@ -32,5 +32,11 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<MetadataEntity>> GetUnitsAsync();
+
+        /// <summary>
+        /// Get all validation status items
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<MetadataEntity>> GetValidationStatusAsync();
     }
 }

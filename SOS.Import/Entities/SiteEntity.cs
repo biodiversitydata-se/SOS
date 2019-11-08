@@ -5,6 +5,14 @@
     /// </summary>
     public class SiteEntity
     {
+        /// <summary>
+        /// Accuracy in meters
+        /// </summary>
+        public int Accuracy { get; set; }
+
+        /// <summary>
+        /// Id of county
+        /// </summary>
         public int? CountyId { get; set; }
 
         /// <summary>
@@ -36,6 +44,16 @@
         /// Name of municipality
         /// </summary>
         public string MunicipalityName { get; set; }
+
+        /// <summary>
+        /// Id of Parish
+        /// </summary>
+        public int? ParishId { get; set; }
+
+        /// <summary>
+        /// Name of Parish
+        /// </summary>
+        public string ParishName { get; set; }
 
         /// <summary>
         /// Id of province
