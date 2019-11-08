@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Entities;
 using SOS.Import.Extensions;
-using SOS.Import.Models;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Lib.Configuration.Import;
@@ -19,9 +17,6 @@ namespace SOS.Import.Factories
     public class SpeciesPortalSightingFactory : Interfaces.ISpeciesPortalSightingFactory
     {
         private readonly SpeciesPortalConfiguration _speciesPortalConfiguration;
-
-        private readonly IAreaRepository _areaRepository;
-
         private readonly IMetadataRepository _metadataRepository;
 
         private readonly IProjectRepository _projectRepository;
@@ -29,8 +24,6 @@ namespace SOS.Import.Factories
         private readonly ISightingRepository _sightingRepository;
 
         private readonly ISiteRepository _siteRepository;
-
-        private readonly IAreaVerbatimRepository _areaVerbatimRepository;
 
         private readonly ISightingVerbatimRepository _sightingVerbatimRepository;
 
@@ -46,14 +39,11 @@ namespace SOS.Import.Factories
 
         /// <summary>
         /// Constructor
-        /// </summary>
-        /// <param name="speciesPortalConfiguration"></param>
-        /// <param name="areaRepository"></param>
+        /// </summary>/// <param name="speciesPortalConfiguration"></param>
         /// <param name="metadataRepository"></param>
         /// <param name="projectRepository"></param>
         /// <param name="sightingRepository"></param>
         /// <param name="siteRepository"></param>
-        /// <param name="areaVerbatimRepository"></param>
         /// <param name="sightingVerbatimRepository"></param>
         /// <param name="personRepository"></param>
         /// <param name="organizationRepository"></param>
@@ -61,13 +51,12 @@ namespace SOS.Import.Factories
         /// <param name="speciesCollectionItemRepository"></param>
         /// <param name="logger"></param>
         public SpeciesPortalSightingFactory(
+
             SpeciesPortalConfiguration speciesPortalConfiguration,
-            IAreaRepository areaRepository,
             IMetadataRepository metadataRepository,
             IProjectRepository projectRepository,
             ISightingRepository sightingRepository,
             ISiteRepository siteRepository,
-            IAreaVerbatimRepository areaVerbatimRepository,
             ISightingVerbatimRepository sightingVerbatimRepository,
             IPersonRepository personRepository,
             IOrganizationRepository organizationRepository,
@@ -76,12 +65,10 @@ namespace SOS.Import.Factories
             ILogger<SpeciesPortalSightingFactory> logger)
         {
             _speciesPortalConfiguration = speciesPortalConfiguration ?? throw new ArgumentNullException(nameof(speciesPortalConfiguration));
-            _areaRepository = areaRepository ?? throw new ArgumentNullException(nameof(areaRepository));
             _metadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
             _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
             _siteRepository = siteRepository ?? throw new ArgumentNullException(nameof(siteRepository));
-            _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
             _sightingVerbatimRepository = sightingVerbatimRepository ?? throw new ArgumentNullException(nameof(sightingVerbatimRepository));
             _personRepository = personRepository ?? throw new ArgumentNullException(nameof(personRepository));
             _organizationRepository = organizationRepository ?? throw new ArgumentNullException(nameof(organizationRepository));
@@ -198,38 +185,6 @@ namespace SOS.Import.Factories
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed aggregation of sightings");
-                return false;
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> HarvestAreasAsync()
-        {
-            try
-            {
-                _logger.LogDebug("Start getting areas");
-
-                var areas = (await _areaRepository.GetAsync()).ToAggregates();
-
-                _logger.LogDebug("Empty collection");
-                // Make sure we have an empty collection
-                if (await _areaVerbatimRepository.DeleteCollectionAsync())
-                {
-                    if (await _areaVerbatimRepository.AddCollectionAsync())
-                    {
-                        if (await _areaVerbatimRepository.AddManyAsync(areas))
-                        {
-                            await _areaVerbatimRepository.CreateIndexAsync();
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed aggregation of areas");
                 return false;
             }
         }

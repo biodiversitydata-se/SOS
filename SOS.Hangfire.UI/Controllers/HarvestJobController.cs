@@ -26,6 +26,7 @@ namespace SOS.Hangfire.UI.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        #region Clam Tree Portal
         /// <inheritdoc />
         [HttpPost("ClamTreePortal/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -61,7 +62,47 @@ namespace SOS.Hangfire.UI.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+        #endregion Clam Tree Portal
 
+        #region Geo
+        /// <inheritdoc />
+        [HttpPost("Geo/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailyGeoHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<GeoHarvestJob>(nameof(GeoHarvestJob), job => job.Run(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("Geo harvest job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding geo harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Geo/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunGeoHarvestJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IGeoHarvestJob>(job => job.Run());
+                return new OkObjectResult("Started geo harvest job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running geo harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        #endregion Geo
+
+        #region KUL
         /// <inheritdoc />
         [HttpPost("KUL/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -97,7 +138,9 @@ namespace SOS.Hangfire.UI.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+        #endregion KUL
 
+        #region Species Portal
         /// <inheritdoc />
         [HttpPost("SpeciesPortal/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -133,5 +176,6 @@ namespace SOS.Hangfire.UI.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+        #endregion Species Portal
     }
 }

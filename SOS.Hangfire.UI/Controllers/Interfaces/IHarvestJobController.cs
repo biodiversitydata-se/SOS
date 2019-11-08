@@ -22,6 +22,20 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         IActionResult RunClamTreePortalHarvestJob();
 
         /// <summary>
+        /// Add daily harvest of geo data
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult AddDailyGeoHarvestJob(int hour, int minute);
+
+        /// <summary>
+        /// Run geo data harvest
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunGeoHarvestJob();
+
+        /// <summary>
         /// Add daily harvest of sightings from KUL
         /// </summary>
         /// <param name="hour"></param>

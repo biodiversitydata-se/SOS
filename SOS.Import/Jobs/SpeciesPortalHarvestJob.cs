@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Factories.Interfaces;
@@ -30,16 +28,8 @@ namespace SOS.Import.Jobs
         public async Task<bool> Run()
         {
             _logger.LogDebug("Start Species Portal Harvest Job");
-            // Create task list
-            var harvestTasks = new List<Task<bool>>
-            {
-                _speciesPortalSightingFactory.HarvestAreasAsync(), // Make sure we have the latest areas
-                _speciesPortalSightingFactory.HarvestSightingsAsync()
-            };
-
-            // Run all tasks async
-            await Task.WhenAll(harvestTasks);
-            var success = harvestTasks.All(t => t.Result);
+           
+            var success = await _speciesPortalSightingFactory.HarvestSightingsAsync();
 
             _logger.LogDebug($"End Species Portal Harvest Job. Success: {success}");
 

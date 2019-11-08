@@ -3,14 +3,14 @@
 namespace SOS.Import.Factories.Interfaces
 {
     /// <summary>
-    /// Sighting factory repository
+    /// Geo related factory
     /// </summary>
-    public interface ISpeciesPortalSightingFactory
+    public interface IGeoFactory
     {
         /// <summary>
-        /// Aggregate sightings.
+        /// Aggregate all areas
         /// </summary>
         /// <returns></returns>
-        Task<bool> HarvestSightingsAsync();
+        Task<bool> HarvestAreasAsync();
     }
 }
