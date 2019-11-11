@@ -130,20 +130,20 @@ namespace SOS.Process.Helpers
                     {
                         case AreaType.County:
                             dwcModel.Location.County = (string)feature.Attributes.GetOptionalValue("name");
-                            dwcModel.DynamicProperties.CountyIdByCoordinate = (int)feature.Attributes.GetOptionalValue("id");
+                            dwcModel.DynamicProperties.CountyIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
                             //dwcModel.DynamicProperties.CountyPartIdByCoordinate = ; // todo
                             break;
                         case AreaType.Municipality:
                             dwcModel.Location.Municipality = (string)feature.Attributes.GetOptionalValue("name");
-                            dwcModel.DynamicProperties.MunicipalityIdByCoordinate = (int)feature.Attributes.GetOptionalValue("id");
+                            dwcModel.DynamicProperties.MunicipalityIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
                             break;
                         case AreaType.Parish:
                             dwcModel.DynamicProperties.Parish = (string)feature.Attributes.GetOptionalValue("name");
-                            dwcModel.DynamicProperties.ParishIdByCoordinate = (int)feature.Attributes.GetOptionalValue("id");
+                            dwcModel.DynamicProperties.ParishIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
                             break;
                         case AreaType.Province:
                             dwcModel.Location.StateProvince = (string)feature.Attributes.GetOptionalValue("name");
-                            dwcModel.DynamicProperties.ProvinceIdByCoordinate = (int)feature.Attributes.GetOptionalValue("id");
+                            dwcModel.DynamicProperties.ProvinceIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
                             //dwcModel.DynamicProperties.ProvincePartIdByCoordinate = ; // todo
                             break;
                     }

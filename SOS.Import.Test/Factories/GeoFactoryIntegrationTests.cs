@@ -1,61 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Authentication;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using Moq;
 using SOS.Import.Factories;
-using SOS.Import.Models;
 using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Kul;
-using SOS.Import.Repositories.Destination.Kul.Interfaces;
+using SOS.Import.Repositories.Destination.SpeciesPortal;
+using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
+using SOS.Import.Repositories.Source.SpeciesPortal;
+using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Import.Services;
-using SOS.Import.Test.Repositories;
 using SOS.Lib.Configuration.Import;
-using SOS.Lib.Configuration.Shared;
 using Xunit;
 
 namespace SOS.Import.Test.Factories
 {
-    public class KulObservationFactoryIntegrationTests : TestBase
+    public class GeoFactoryIntegrationTests : TestBase
     {
         [Fact]
         [Trait("Category", "Integration")]
-        public async Task HarvestTenThousandObservations_FromKulProvider_And_SaveToMongoDb()
+        public async Task HarvestAllAreas_And_SaveToMongoDb()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             ImportConfiguration importConfiguration = GetImportConfiguration();
-            importConfiguration.KulServiceConfiguration.StartHarvestYear = 2015;
-            importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
-
-            var kulObservationService = new KulObservationService(
-                new Mock<ILogger<KulObservationService>>().Object, 
-                importConfiguration.KulServiceConfiguration);
-            
-            var kulObservationVerbatimRepository = new KulObservationVerbatimRepository(
+            var speciesPortalDataService = new SpeciesPortalDataService(importConfiguration.SpeciesPortalConfiguration);
+            var areaVerbatimRepository = new AreaVerbatimRepository(
                 new ImportClient(
                     importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
                     importConfiguration.MongoDbConfiguration.DatabaseName,
-                    importConfiguration.MongoDbConfiguration.BatchSize), 
-                new Mock<ILogger<KulObservationVerbatimRepository>>().Object);
-            
-            var kulObservationFactory = new KulObservationFactory(
-                kulObservationService,
-                kulObservationVerbatimRepository, 
-                importConfiguration.KulServiceConfiguration, 
-                new Mock<ILogger<KulObservationFactory>>().Object);
+                    importConfiguration.MongoDbConfiguration.BatchSize),
+                new Mock<ILogger<AreaVerbatimRepository>>().Object);
+
+            var geoFactory = new GeoFactory(
+                new AreaRepository(speciesPortalDataService, new Mock<ILogger<AreaRepository>>().Object),
+                areaVerbatimRepository,
+                new Mock<ILogger<GeoFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulObservationFactory.HarvestObservationsAsync();
+            var result = await geoFactory.HarvestAreasAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -65,27 +55,29 @@ namespace SOS.Import.Test.Factories
 
         [Fact]
         [Trait("Category", "Integration")]
-        public async Task HarvestTenThousandObservations_FromKulProvider_WithoutSavingToMongoDb()
+        public async Task HarvestAllAreas_WithoutSavingToMongoDb()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             ImportConfiguration importConfiguration = GetImportConfiguration();
-            importConfiguration.KulServiceConfiguration.StartHarvestYear = 2015;
-            importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
+            var speciesPortalDataService = new SpeciesPortalDataService(importConfiguration.SpeciesPortalConfiguration);
+            var areaVerbatimRepository = new AreaVerbatimRepository(
+                new ImportClient(
+                    importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
+                    importConfiguration.MongoDbConfiguration.DatabaseName,
+                    importConfiguration.MongoDbConfiguration.BatchSize),
+                new Mock<ILogger<AreaVerbatimRepository>>().Object);
 
-            var kulObservationFactory = new KulObservationFactory(
-                new KulObservationService(
-                    new Mock<ILogger<KulObservationService>>().Object,
-                    importConfiguration.KulServiceConfiguration),
-                new Mock<IKulObservationVerbatimRepository>().Object,
-                importConfiguration.KulServiceConfiguration,
-                new Mock<ILogger<KulObservationFactory>>().Object);
+            var geoFactory = new GeoFactory(
+                new AreaRepository(speciesPortalDataService, new Mock<ILogger<AreaRepository>>().Object),
+                areaVerbatimRepository,
+                new Mock<ILogger<GeoFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulObservationFactory.HarvestObservationsAsync();
+            var result = await geoFactory.HarvestAreasAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

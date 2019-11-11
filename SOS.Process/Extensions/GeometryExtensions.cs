@@ -17,7 +17,8 @@ namespace SOS.Process.Extensions
             attributes.Add("id", area.Id);
             attributes.Add("name", area.Name);
             attributes.Add("areaType", area.AreaType);
-            
+            attributes.Add("featureId", area.FeatureId);
+
             return new Feature { Geometry = reader.Read<Geometry>(area.Geometry.ToJson()), Attributes = attributes };
         }
     }

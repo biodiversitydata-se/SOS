@@ -35,5 +35,15 @@ namespace SOS.Lib.Models.Verbatim.Shared
         /// Type of area
         /// </summary>
         public AreaType AreaType { get; private set; }
+        
+        /// <summary>
+        /// Feature Id.
+        /// </summary>
+        public int FeatureId { get; set; }
+        
+        /// <summary>
+        /// Parent Id.
+        /// </summary>
+        public int? ParentId { get; set; }
     }
 }
