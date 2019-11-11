@@ -89,7 +89,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// Taxon id (not GUID) value in Dyntaxa.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public int DyntaxaTaxonID { get; set; }
+        public int? DyntaxaTaxonID { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
@@ -111,6 +111,11 @@ namespace SOS.Lib.Models.DarwinCore
         /// </summary>
         public long Id { get; set; }
 
+        /// <summary>
+        /// Id of individual
+        /// </summary>
+        public string IndividualID { get; set; }
+        
         /// <summary>
         /// Not defined in Darwin Core.
         /// Indicates if this species occurrence is natural or
@@ -173,13 +178,6 @@ namespace SOS.Lib.Models.DarwinCore
 
         /// <summary>
         /// Not defined in Darwin Core.
-        /// Name of the organization or person that
-        /// owns the species observation.
-        /// </summary>
-        public string Owner { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
         /// Parish where the species observation where made.
         /// 'Socken/församling' in swedish.
         /// </summary>
@@ -215,7 +213,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// Not defined in Darwin Core.
         /// Date and time when the species observation was reported.
         /// </summary>
-        public DateTime ReportedDate { get; set; }
+        public DateTime? ReportedDate { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.

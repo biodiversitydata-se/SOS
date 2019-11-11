@@ -12,7 +12,22 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         /// <summary>
         /// Id of activity
         /// </summary>
-        public Metadata Activity { get; set; }
+        public MetadataWithCategory Activity { get; set; }
+
+        /// <summary>
+        /// Id of collection
+        /// </summary>
+        public string CollectionID { get; set; }
+
+        /// <summary>
+        /// SightingCommentPublic comment
+        /// </summary>
+        public string Comment { get; set; }
+
+        /// <summary>
+        /// Id of controlling organisation
+        /// </summary>
+        public int? ControlingOrganisationId { get; set; }
 
         /// <summary>
         /// Sigthing end data
@@ -30,6 +45,11 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         public Metadata Gender { get; set; }
 
         /// <summary>
+        /// Has sighting images
+        /// </summary>
+        public bool HasImages { get; set; }
+
+        /// <summary>
         /// Hidden by provider date
         /// </summary>
         public DateTime? HiddenByProvider { get; set; }
@@ -40,9 +60,49 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         public int Id { get; set; }
 
         /// <summary>
+        /// Owner organization
+        /// </summary>
+        public string InstitutionCode { get; set; }
+
+        /// <summary>
+        /// SightingSpeciesCollectionItem label
+        /// </summary>
+        public string Label { get; set; }
+
+        /// <summary>
         /// Taxon length
         /// </summary>
         public int? Length { get; set; }
+
+        /// <summary>
+        /// Max depth
+        /// </summary>
+        public int? MaxDepth { get; set; }
+
+        /// <summary>
+        /// Max height
+        /// </summary>
+        public int? MaxHeight { get; set; }
+
+        /// <summary>
+        /// Migrate obs id
+        /// </summary>
+        public int? MigrateSightingObsId { get; set; }
+
+        /// <summary>
+        /// Migrate Portal id
+        /// </summary>
+        public int? MigrateSightingPortalId { get; set; }
+
+        /// <summary>
+        /// Min depth
+        /// </summary>
+        public int? MinDepth { get; set; }
+
+        /// <summary>
+        /// Min height
+        /// </summary>
+        public int? MinHeight { get; set; }
 
         /// <summary>
         /// Not present flag
@@ -68,7 +128,17 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         /// Number of taxa found
         /// </summary>
         public int? Quantity { get; set; }
-        
+
+        /// <summary>
+        /// Date sighting was added
+        /// </summary>
+        public DateTime? ReportedDate { get; set; }
+
+        /// <summary>
+        /// Rights holder
+        /// </summary>
+        public string RightsHolder { get; set; }
+
         /// <summary>
         /// Id of site
         /// </summary>
@@ -113,6 +183,16 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         /// Taxon weight
         /// </summary>
         public int? Weight { get; set; }
+
+        /// <summary>
+        /// SightingBarcode url
+        /// </summary>
+        public string URL { get; set; }
+
+        /// <summary>
+        /// Validation status 
+        /// </summary>
+        public Metadata ValidationStatus { get; set; }
 
         public string VerifiedBy { get; set; }
         public string Observers { get; set; }

@@ -27,39 +27,63 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
             {
                 var query = @"
                 SELECT DISTINCT
-                    s.Id, 
-                    s.TaxonId,
-                    s.StartDate,
-                    s.StartTime,
-                    s.EndDate,
-                    s.EndTime,
-                    s.SiteId,
-                    s.Quantity,
-                    s.[Length],
-                    s.[Weight],
-                    s.UnitId,
-                    s.StageId,
                     s.ActivityId,
-                    s.GenderId,
-                    s.UnsureDetermination,
-                    s.Unspontaneous,
-                    s.NotRecovered,
-                    s.NotPresent,
-                    s.ProtectedBySystem,
-                    s.HiddenByProvider
+                    ssci.Label AS CollectionID,
+	                scp.Comment,
+                    s.ControlingOrganisationId,
+	                s.EndDate,
+	                s.EndTime,
+	                s.GenderId,
+                    s.HasImages,
+	                s.HiddenByProvider,
+	                s.Id, 
+                    o.Name AS InstitutionCode,
+	                ssc.Label,
+	                s.[Length],
+                    s.MaxDepth,
+					s.MaxHeight,
+					s.MinDepth,
+					s.MinHeight,
+	                s.NotPresent,
+	                s.NotRecovered,
+                    msi.PortalId AS MigrateSightingPortalId,
+                    msi.obsid AS MigrateSightingObsId,
+	                s.ProtectedBySystem,
+	                s.Quantity,
+                    s.RegisterDate,
+	                p.FirstName + ' ' + p.LastName AS RightsHolder,
+	                s.SiteId,
+	                s.StageId,
+	                s.StartDate,
+	                s.StartTime,
+	                s.TaxonId,
+	                s.UnsureDetermination,
+	                s.Unspontaneous,
+	                s.UnitId,
+	                sb.URL,
+                    s.ValidationStatusId,
+	                s.[Weight]
                 FROM
-                    SearchableSightings s WITH(NOLOCK)
-                    INNER JOIN SightingState ss ON s.SightingId = ss.SightingId
+	                SearchableSightings s WITH(NOLOCK)
+	                INNER JOIN SightingState ss ON s.SightingId = ss.SightingId
+	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId
+	                LEFT JOIN SightingSpeciesCollectionItem ssc ON s.SightingId = ssc.SightingId
+	                LEFT JOIN SightingBarcode sb ON s.SightingId = sb.SightingId
+                    LEFT JOIN Organization o ON s.OwnerOrganizationId = o.Id
+                    LEFT JOIN [User] u ON s.OwnerUserId = u.Id 
+	                LEFT JOIN Person p ON u.PersonId = p.Id
+                    LEFT JOIN SightingSpeciesCollectionItem ssci ON s.SightingId = ssci.SightingId
+                    LEFT JOIN MigrateSightingid msi ON s.SightingId = msi.Id
                 WHERE
-                    s.Id BETWEEN @StartId AND @EndId
-                    AND s.TaxonId IS NOT NULL
-                    AND s.SightingTypeId IN(0, 3) 
-                    AND s.HiddenByProvider IS NULL
-                    AND s.ValidationStatusId NOT IN(50)
-                    AND s.SightingTypeSearchGroupId & 33 > 0
-                    AND ss.IsActive = 1
-                    AND ss.SightingStateTypeId = 30--Published
-                    AND(ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
+	                s.Id BETWEEN @StartId AND @EndId
+	                AND s.TaxonId IS NOT NULL
+	                AND s.SightingTypeId IN(0, 3) 
+	                AND s.HiddenByProvider IS NULL
+	                AND s.ValidationStatusId NOT IN(50)
+	                AND s.SightingTypeSearchGroupId & 33 > 0
+	                AND ss.IsActive = 1
+	                AND ss.SightingStateTypeId = 30--Published
+	                AND(ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
 
                 return await QueryAsync<SightingEntity>(query, new { StartId = startId, EndId = startId + maxRows -1 });
             }

@@ -166,7 +166,7 @@ namespace SOS.Import.Test.Factories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _metadataRepositoryMock.Setup(mdr => mdr.GetActivitiesAsync())
-                .ReturnsAsync(new [] { new MetadataEntity { Id = 1, Name = "Activity" } });
+                .ReturnsAsync(new [] { new MetadataWithCategoryEntity { Id = 1, Name = "Activity" } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetGendersAsync())
                 .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "Gender" } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetStagesAsync())

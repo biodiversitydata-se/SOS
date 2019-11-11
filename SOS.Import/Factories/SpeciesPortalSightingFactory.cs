@@ -82,21 +82,23 @@ namespace SOS.Import.Factories
         {
             try
             {
+                var activities = (await _metadataRepository.GetActivitiesAsync()).ToAggregates().ToDictionary(a => a.Id, a => a);
+
                 var metaDataTasks = new[]
                 {
-                    _metadataRepository.GetActivitiesAsync(),
                     _metadataRepository.GetGendersAsync(),
                     _metadataRepository.GetStagesAsync(),
-                    _metadataRepository.GetUnitsAsync()
+                    _metadataRepository.GetUnitsAsync(),
+                    _metadataRepository.GetValidationStatusAsync()
                 };
 
                 _logger.LogDebug("Start getting meta data");
                 await Task.WhenAll(metaDataTasks);
 
-                var activities = metaDataTasks[0].Result.ToAggregates().ToDictionary(a => a.Id, a => a);
-                var genders = metaDataTasks[1].Result.ToAggregates().ToDictionary(g => g.Id, g => g);
-                var stages = metaDataTasks[2].Result.ToAggregates().ToDictionary(s => s.Id, s => s);
-                var units = metaDataTasks[3].Result.ToAggregates().ToDictionary(u => u.Id, u => u);
+                var genders = metaDataTasks[0].Result.ToAggregates().ToDictionary(g => g.Id, g => g);
+                var stages = metaDataTasks[1].Result.ToAggregates().ToDictionary(s => s.Id, s => s);
+                var units = metaDataTasks[2].Result.ToAggregates().ToDictionary(u => u.Id, u => u);
+                var validationStatus = metaDataTasks[3].Result.ToAggregates().ToDictionary(u => u.Id, u => u);
 
                 _logger.LogDebug("Start getting persons & organizations data");
                 var personByUserId = (await _personRepository.GetAsync()).ToAggregates().ToDictionary(p => p.UserId, p => p);
@@ -164,14 +166,15 @@ namespace SOS.Import.Factories
                         sightingRelations);
 
                     // Cast sightings to aggregates
-                    IEnumerable <APSightingVerbatim> aggregates = sightings.ToAggregates(
+                    IEnumerable<APSightingVerbatim> aggregates = sightings.ToAggregates(
                         activities, 
                         genders, 
                         stages, 
                         units, 
                         sites, 
                         sightingProjects,
-                        personSightingBySightingId);
+                        personSightingBySightingId,
+                        validationStatus);
                     
                     // Add sightings to mongodb
                     await _sightingVerbatimRepository.AddManyAsync(aggregates);

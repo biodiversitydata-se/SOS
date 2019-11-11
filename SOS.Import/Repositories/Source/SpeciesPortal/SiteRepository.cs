@@ -34,6 +34,7 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
 	                s.Name,
 	                s.XCoord,
 	                s.YCoord,
+                    s.Accuracy,
 	                am.Id AS MunicipalityId,
 	                am.Name AS MunicipalityName,
 	                am.ParentId AS CountyId,
@@ -41,7 +42,9 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
 	                ap.Id AS ProvinceId,
 	                ap.Name AS ProvinceName,
 	                acp.Id AS CountryPartId,
-	                acp.Name AS CountryPartName
+	                acp.Name AS CountryPartName,
+	                apa.Id AS ParishId,
+	                apa.Name AS ParishName
                 FROM 
 	                Site s 
 	                LEFT JOIN -- Bad data exists, some sites are connected to more than one Municipality
@@ -79,7 +82,19 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
 		                GROUP BY 
 			                sa.SiteId
 	                ) AS sacp ON s.Id = sacp.SiteId  
-	                LEFT JOIN Area acp ON sacp.AreasId = acp.Id";
+	                LEFT JOIN Area acp ON sacp.AreasId = acp.Id
+	                LEFT JOIN -- Bad data exists, some sites are connected to more than one parish
+	                (
+		                SELECT
+			                sa.SiteId,
+			                MAX(sa.AreasId) AS AreasId
+		                FROM
+			                SiteAreas sa
+			                INNER JOIN Area a ON sa.AreasId = a.Id AND a.AreaDatasetId = 19 
+		                GROUP BY 
+			                sa.SiteId
+	                ) AS sapa ON s.Id = sapa.SiteId  
+	                LEFT JOIN Area apa ON sapa.AreasId = apa.Id";
 
                 return await QueryAsync<SiteEntity>(query);
             }
