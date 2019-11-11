@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using KulService;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Repositories.Source.Kul.Interfaces;
 using SOS.Lib.Configuration.Import;
 
-namespace SOS.Import.Repositories.Source.Kul
+namespace SOS.Import.Services
 {
-    public class KulObservationRepository : IKulObservationRepository
+    public class KulObservationService : Interfaces.IKulObservationService
     {
         private readonly KulServiceConfiguration _kulServiceConfiguration;
-        private readonly ILogger<KulObservationRepository> _logger;
+        private readonly ILogger<KulObservationService> _logger;
 
-        public KulObservationRepository(ILogger<KulObservationRepository> logger, KulServiceConfiguration kulServiceConfiguration)
+        public KulObservationService(ILogger<KulObservationService> logger, KulServiceConfiguration kulServiceConfiguration)
         {
             _logger = logger;
             _kulServiceConfiguration = kulServiceConfiguration;

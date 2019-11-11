@@ -298,5 +298,6 @@ namespace SOS.Lib.Models.DarwinCore
         public int? ProvinceIdByCoordinate { get; set; }
         public int? ProvincePartIdByCoordinate { get; set; }
         public int? MunicipalityIdByCoordinate { get; set; }
+        public int? ParishIdByCoordinate { get; set; }
     }
 }

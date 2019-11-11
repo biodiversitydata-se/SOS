@@ -8,14 +8,14 @@ using KulService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Repositories.Source.Kul;
+using SOS.Import.Services;
 using SOS.Lib.Configuration.Import;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace SOS.Import.Test.Repositories
+namespace SOS.Import.Test.Services
 {
-    public class KulObservationRepositoryIntegrationTests
+    public class KulObservationServiceIntegrationTests : TestBase
     {
         [Fact]
         [Trait("Category","Integration")]
@@ -25,8 +25,8 @@ namespace SOS.Import.Test.Repositories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var importConfiguration = GetImportConfiguration();
-            var kulRepository = new KulObservationRepository(
-                new Mock<ILogger<KulObservationRepository>>().Object, 
+            var kulObservationService = new KulObservationService(
+                new Mock<ILogger<KulObservationService>>().Object, 
                 importConfiguration.KulServiceConfiguration);
             var changedFrom = new DateTime(2015,1,1);
             var changedTo = changedFrom.AddYears(1);
@@ -34,25 +34,13 @@ namespace SOS.Import.Test.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = (await kulRepository.GetAsync(changedFrom, changedTo)).ToArray();
+            var result = (await kulObservationService.GetAsync(changedFrom, changedTo)).ToArray();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             result.Should().NotBeNull();
-            result.Count().Should().BeGreaterThan(10000, "because 2019-11-04 there were 12200 sightings");
-        }
-
-        private ImportConfiguration GetImportConfiguration()
-        {
-            IConfigurationRoot config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .AddUserSecrets<KulObservationRepositoryIntegrationTests>()
-                .Build();
-
-            ImportConfiguration importConfiguration = config.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();
-            return importConfiguration;
+            result.Count().Should().BeGreaterThan(10000, "because 2019-11-04 there were 12200 sightings from 2015-01-01 to 2016-01-01");
         }
     }
 }

@@ -121,23 +121,30 @@ namespace SOS.Process.Helpers
 
                 foreach (var feature in features)
                 {
+                    if (dwcModel.DynamicProperties == null)
+                    {
+                        dwcModel.DynamicProperties = new DynamicProperties();
+                    }
+
                     switch ((AreaType)feature.Attributes.GetOptionalValue("areaType"))
                     {
                         case AreaType.County:
                             dwcModel.Location.County = (string)feature.Attributes.GetOptionalValue("name");
+                            dwcModel.DynamicProperties.CountyIdByCoordinate = (int)feature.Attributes.GetOptionalValue("id");
+                            //dwcModel.DynamicProperties.CountyPartIdByCoordinate = ; // todo
                             break;
                         case AreaType.Municipality:
                             dwcModel.Location.Municipality = (string)feature.Attributes.GetOptionalValue("name");
+                            dwcModel.DynamicProperties.MunicipalityIdByCoordinate = (int)feature.Attributes.GetOptionalValue("id");
                             break;
                         case AreaType.Parish:
-                            if (dwcModel.DynamicProperties == null)
-                            {
-                                dwcModel.DynamicProperties = new DynamicProperties();
-                            }
                             dwcModel.DynamicProperties.Parish = (string)feature.Attributes.GetOptionalValue("name");
+                            dwcModel.DynamicProperties.ParishIdByCoordinate = (int)feature.Attributes.GetOptionalValue("id");
                             break;
                         case AreaType.Province:
                             dwcModel.Location.StateProvince = (string)feature.Attributes.GetOptionalValue("name");
+                            dwcModel.DynamicProperties.ProvinceIdByCoordinate = (int)feature.Attributes.GetOptionalValue("id");
+                            //dwcModel.DynamicProperties.ProvincePartIdByCoordinate = ; // todo
                             break;
                     }
                 }
@@ -145,3 +152,27 @@ namespace SOS.Process.Helpers
         }
     }
 }
+/*
+  
+--Update CountyIdByCoordinate and CountyPartIdByCoordinate
+UPDATE DarwinCoreObservation SET CountyIdByCoordinate = A.FeatureId, CountyPartIdByCoordinate = A.FeatureId
+FROM [SwedishSpeciesObservationResources].[dbo].[Area] A INNER JOIN DarwinCoreObservation D ON A.Polygon.STContains(D.point_GoogleMercator) = 1 AND A.AreaDatasetId = 21
+INNER JOIN @SpeciesObservationIdTable S ON S.Id = D.Id
+
+--Update ProvinceIdByCoordinate and ProvincePartIdByCoordinate
+UPDATE DarwinCoreObservation SET ProvincePartIdByCoordinate = A.FeatureId, ProvinceIdByCoordinate = A.FeatureId
+FROM [SwedishSpeciesObservationResources].[dbo].[Area] A INNER JOIN DarwinCoreObservation D ON A.Polygon.STContains(D.point_GoogleMercator)  = 1 AND A.AreaDatasetId = 16
+INNER JOIN @SpeciesObservationIdTable S ON S.Id = D.Id
+
+--Update ProvincePartIdByCoordinate for Lappland
+UPDATE DarwinCoreObservation SET ProvinceIdByCoordinate = 100
+FROM DarwinCoreObservation D INNER JOIN @SpeciesObservationIdTable S ON  D.Id = S.Id
+WHERE ProvincePartIdByCoordinate IN (25,26,27,28,29)
+
+--Update ProvinceIdByCoordinate's for Kalmar
+UPDATE DarwinCoreObservation SET CountyPartIdByCoordinate = 
+CASE WHEN ProvincePartIdByCoordinate = 4 THEN 101 ELSE 100 END
+FROM DarwinCoreObservation D INNER JOIN @SpeciesObservationIdTable S ON  D.Id = S.Id
+WHERE D.CountyIdByCoordinate = 8
+  
+ */

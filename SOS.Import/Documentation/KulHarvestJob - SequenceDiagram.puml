@@ -1,0 +1,38 @@
+﻿@startuml
+''autonumber
+!theme blue
+''!theme napkin
+''!theme trans
+title KUL harvest job - harvest all observations
+legend bottom center
+  This sequence diagram describes how the KulHarvestJob works.
+  The job takes approximately 45 minutes to run.
+  95% of the time comes from waiting for the external KUL service to deliver its result
+endlegend
+participant KulHarvestJob
+participant KulObservationFactory
+participant KulObservationVerbatimRepository
+participant KulObservationService
+database "sos-verbatim\n(MongoDb)" as VerbatimMongoDb
+[-> KulHarvestJob: Activate from\nHangfire schedule\n(1 time/week, 3pm)
+''note left: this is a first note
+KulHarvestJob -> KulObservationFactory: HarvestObservations()
+''note left of KulHarvestJob 
+''	this is a second 
+''	note
+''end note
+KulObservationFactory -> KulObservationVerbatimRepository: EmptyCollection()
+note over KulObservationVerbatimRepository: **Delete** all verbatim KUL observations for\nMongoDb collection: <i>KulObservationVerbatim</i>
+KulObservationVerbatimRepository -> VerbatimMongoDb: Empty MongoDb collection: <i>KulObservationVerbatim</i>
+''note over KulObservationVerbatimRepository: This is displayed over\nKulObservationVerbatimRepository.
+loop Iterate all years from 1987 until DateTime.Now.
+	note over KulObservationFactory: <i><init></i>\nfromYear = 1987
+	KulObservationFactory -> KulObservationService: GetObservationsFromKulService(fromYear, fromYear + 1)
+	KulObservationFactory <-- KulObservationService: KUL verbatim observations (<i>for one year</i>)
+	KulObservationFactory -> KulObservationVerbatimRepository: AddManyObservations(verbatims)
+	note over KulObservationVerbatimRepository: **Add** verbatim KUL observations to\nMongoDb collection: <i>KulObservationVerbatim</i>
+	KulObservationVerbatimRepository -> VerbatimMongoDb: Add verbatim observations to MongoDb collection: <i>KulObservationVerbatim</i>
+	note over KulObservationFactory: fromYear++
+end
+KulHarvestJob <-- KulObservationFactory: return success
+@enduml

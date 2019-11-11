@@ -12,8 +12,6 @@ using SOS.Import.Repositories.Destination.Kul;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
-using SOS.Import.Repositories.Source.Kul;
-using SOS.Import.Repositories.Source.Kul.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Import.Services;
@@ -47,7 +45,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<PersonRepository>().As<IPersonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingRelationRepository>().As<ISightingRelationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesCollectionItemRepository>().As<ISpeciesCollectionItemRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<KulObservationRepository>().As<IKulObservationRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<KulObservationService>().As<IKulObservationService>().InstancePerLifetimeScope();
 
             // Repositories destination
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();

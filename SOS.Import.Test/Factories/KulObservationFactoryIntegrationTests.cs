@@ -14,8 +14,7 @@ using SOS.Import.Models;
 using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Kul;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
-using SOS.Import.Repositories.Source.Kul;
-using SOS.Import.Repositories.Source.Kul.Interfaces;
+using SOS.Import.Services;
 using SOS.Import.Test.Repositories;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Shared;
@@ -23,7 +22,7 @@ using Xunit;
 
 namespace SOS.Import.Test.Factories
 {
-    public class KulObservationFactoryIntegrationTests
+    public class KulObservationFactoryIntegrationTests : TestBase
     {
         [Fact]
         [Trait("Category", "Integration")]
@@ -36,8 +35,8 @@ namespace SOS.Import.Test.Factories
             importConfiguration.KulServiceConfiguration.StartHarvestYear = 2015;
             importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
 
-            var kulObservationRepository = new KulObservationRepository(
-                new Mock<ILogger<KulObservationRepository>>().Object, 
+            var kulObservationService = new KulObservationService(
+                new Mock<ILogger<KulObservationService>>().Object, 
                 importConfiguration.KulServiceConfiguration);
             
             var kulObservationVerbatimRepository = new KulObservationVerbatimRepository(
@@ -48,7 +47,7 @@ namespace SOS.Import.Test.Factories
                 new Mock<ILogger<KulObservationVerbatimRepository>>().Object);
             
             var kulObservationFactory = new KulObservationFactory(
-                kulObservationRepository,
+                kulObservationService,
                 kulObservationVerbatimRepository, 
                 importConfiguration.KulServiceConfiguration, 
                 new Mock<ILogger<KulObservationFactory>>().Object);
@@ -76,8 +75,8 @@ namespace SOS.Import.Test.Factories
             importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
 
             var kulObservationFactory = new KulObservationFactory(
-                new KulObservationRepository(
-                    new Mock<ILogger<KulObservationRepository>>().Object,
+                new KulObservationService(
+                    new Mock<ILogger<KulObservationService>>().Object,
                     importConfiguration.KulServiceConfiguration),
                 new Mock<IKulObservationVerbatimRepository>().Object,
                 importConfiguration.KulServiceConfiguration,
@@ -92,18 +91,6 @@ namespace SOS.Import.Test.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             result.Should().BeTrue();
-        }
-
-        private ImportConfiguration GetImportConfiguration()
-        {
-            IConfigurationRoot config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .AddUserSecrets<KulObservationRepositoryIntegrationTests>()
-                .Build();
-
-            ImportConfiguration importConfiguration = config.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();
-            return importConfiguration;
         }
     }
 }
