@@ -34,8 +34,10 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 SELECT 
 	                a.AreaDatasetId,
                     a.Id,
+                    a.FeatureId,
                     a.Polygon,
-	                a.Name
+	                a.Name,
+                    a.ParentId
                 FROM 
 	                Area a
                 WHERE
