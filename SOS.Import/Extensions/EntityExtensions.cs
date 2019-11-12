@@ -23,6 +23,8 @@ namespace SOS.Import.Extensions
             return new Area((AreaType)entity.AreaDatasetId)
             {
                 Id = entity.Id,
+                FeatureId = entity.FeatureId,
+                ParentId = entity.ParentId,
                 Geometry = entity.Polygon.ToGeometry().Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoJsonGeometry(),
                 Name = entity.Name
             };

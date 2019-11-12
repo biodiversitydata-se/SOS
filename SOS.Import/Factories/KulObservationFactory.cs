@@ -7,25 +7,25 @@ using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
 using SOS.Import.Models;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
-using SOS.Import.Repositories.Source.Kul.Interfaces;
+using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 
 namespace SOS.Import.Factories
 {
     public class KulObservationFactory : Interfaces.IKulObservationFactory
     {
-        private readonly IKulObservationRepository _kulObservationRepository;
+        private readonly IKulObservationService _kulObservationService;
         private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
         private readonly ILogger<KulObservationFactory> _logger;
         private readonly KulServiceConfiguration _kulServiceConfiguration;
 
         public KulObservationFactory(
-            IKulObservationRepository kulObservationRepository,
+            IKulObservationService kulObservationService,
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             KulServiceConfiguration kulServiceConfiguration,
             ILogger<KulObservationFactory> logger)
         {
-            _kulObservationRepository = kulObservationRepository;
+            _kulObservationService = kulObservationService;
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository;
             _kulServiceConfiguration = kulServiceConfiguration;
             _logger = logger;
@@ -55,7 +55,7 @@ namespace SOS.Import.Factories
                 }
 
                 // Get sightings for one year
-                var sightings = await _kulObservationRepository.GetAsync(changedFrom, changedFrom.AddYears(1));
+                var sightings = await _kulObservationService.GetAsync(changedFrom, changedFrom.AddYears(1));
                 var aggregates = sightings.ToAggregates().ToArray();
                 nrSightingsHarvested += aggregates.Length;
 

@@ -23,6 +23,16 @@ namespace SOS.Import.Entities
         /// Name of area
         /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Feature Id.
+        /// </summary>
+        public int FeatureId { get; set; }
+
+        /// <summary>
+        /// Parent Id.
+        /// </summary>
+        public int? ParentId { get; set; } 
     }
 }
         

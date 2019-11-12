@@ -51,7 +51,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<PersonRepository>().As<IPersonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingRelationRepository>().As<ISightingRelationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesCollectionItemRepository>().As<ISpeciesCollectionItemRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<KulObservationRepository>().As<IKulObservationRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<KulObservationService>().As<IKulObservationService>().InstancePerLifetimeScope();
 
             // Repositories destination
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();

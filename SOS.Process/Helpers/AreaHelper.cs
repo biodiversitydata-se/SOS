@@ -119,27 +119,57 @@ namespace SOS.Process.Helpers
                     continue;
                 }
 
+                if (dwcModel.DynamicProperties == null)
+                {
+                    dwcModel.DynamicProperties = new DynamicProperties();
+                }
+
                 foreach (var feature in features)
                 {
                     switch ((AreaType)feature.Attributes.GetOptionalValue("areaType"))
                     {
                         case AreaType.County:
                             dwcModel.Location.County = (string)feature.Attributes.GetOptionalValue("name");
+                            dwcModel.DynamicProperties.CountyIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
                             break;
                         case AreaType.Municipality:
                             dwcModel.Location.Municipality = (string)feature.Attributes.GetOptionalValue("name");
+                            dwcModel.DynamicProperties.MunicipalityIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
                             break;
                         case AreaType.Parish:
-                            if (dwcModel.DynamicProperties == null)
-                            {
-                                dwcModel.DynamicProperties = new DynamicProperties();
-                            }
                             dwcModel.DynamicProperties.Parish = (string)feature.Attributes.GetOptionalValue("name");
+                            dwcModel.DynamicProperties.ParishIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
                             break;
                         case AreaType.Province:
                             dwcModel.Location.StateProvince = (string)feature.Attributes.GetOptionalValue("name");
+                            dwcModel.DynamicProperties.ProvinceIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
                             break;
                     }
+                }
+
+                // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
+                dwcModel.DynamicProperties.CountyPartIdByCoordinate = dwcModel.DynamicProperties.CountyIdByCoordinate;
+                if (dwcModel.DynamicProperties.CountyIdByCoordinate == (int)CountyFeatureId.Kalmar)
+                {
+                    if (dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int) ProvinceFeatureId.Oland)
+                    {
+                        dwcModel.DynamicProperties.CountyPartIdByCoordinate = (int) CountyFeatureId.Oland;
+                    }
+                    else
+                    {
+                        dwcModel.DynamicProperties.CountyPartIdByCoordinate = (int)CountyFeatureId.KalmarFastland;
+                    }
+                }
+
+                // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
+                dwcModel.DynamicProperties.ProvincePartIdByCoordinate = dwcModel.DynamicProperties.ProvinceIdByCoordinate;
+                if (dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.LuleLappmark ||
+                    dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.LyckseleLappmark ||
+                    dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.PiteLappmark ||
+                    dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.TorneLappmark ||
+                    dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.AseleLappmark)
+                {
+                    dwcModel.DynamicProperties.ProvincePartIdByCoordinate = (int) ProvinceFeatureId.Lappland;
                 }
             }
         }

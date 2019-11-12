@@ -114,7 +114,7 @@ namespace SOS.Process.Extensions
         /// </summary>
         private static string GetOccurrenceStatus(int dyntaxaTaxonId)
         {
-            return dyntaxaTaxonId == 0 ? "Absent" : "Present";
+            return dyntaxaTaxonId == 0 ? OccurrenceStatus.Absent : OccurrenceStatus.Present;
         }
 
         /// <summary>

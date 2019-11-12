@@ -22,7 +22,7 @@ namespace SOS.Import.Test.Factories
     {
         [Fact]
         [Trait("Category","Integration")]
-        public async Task Test_GetOneHundredThousandSightingsFromArtportalen_And_SaveToMongoDb()
+        public async Task HarvestOneHundredThousandSightingsFromArtportalen_And_SaveToMongoDb()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -75,7 +75,7 @@ namespace SOS.Import.Test.Factories
 
         [Fact]
         [Trait("Category", "Integration")]
-        public async Task Test_GetOneHundredThousandSightingsFromArtportalen_WithoutSavingToMongoDb()
+        public async Task HarvestOneHundredThousandSightingsFromArtportalen_WithoutSavingToMongoDb()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
