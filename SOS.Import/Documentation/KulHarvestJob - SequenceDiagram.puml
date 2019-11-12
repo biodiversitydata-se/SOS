@@ -1,8 +1,8 @@
 ﻿@startuml
-''autonumber
-!theme blue
-''!theme napkin
-''!theme trans
+'autonumber
+'!theme blue
+'!theme napkin
+'!theme trans
 title KUL harvest job - harvest all observations
 legend bottom center
   This sequence diagram describes how the KulHarvestJob works.

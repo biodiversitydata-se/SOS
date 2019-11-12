@@ -8,6 +8,7 @@ using SOS.Lib.Models.DarwinCore;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Repositories.Source;
+using SOS.Process.Test.TestRepositories;
 using Xunit;
 
 namespace SOS.Process.Test.Helpers
@@ -16,7 +17,7 @@ namespace SOS.Process.Test.Helpers
     {
         [Fact]
         [Trait("Category", "Integration")]
-        public void TestGetAreas()
+        public void GetAreasFromMongoDb_And_GetRegionBelongingsForTranasMunicipality()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -31,12 +32,13 @@ namespace SOS.Process.Test.Helpers
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
             AreaHelper areaHelper = new AreaHelper(areaVerbatimRepository);
             List<DarwinCore<DynamicProperties>> observations = new List<DarwinCore<DynamicProperties>>();
-
-            var tranaasMunicipalityCoord = (Longitude: 14.98996, Latitude: 58.01539);
-
             DarwinCore<DynamicProperties> observation = new DarwinCore<DynamicProperties>
             {
-                Location = new DarwinCoreLocation { DecimalLongitude = tranaasMunicipalityCoord.Longitude, DecimalLatitude = tranaasMunicipalityCoord.Latitude }
+                Location = new DarwinCoreLocation
+                {
+                    DecimalLatitude = Coordinates.TranasMunicipality.Latitude,
+                    DecimalLongitude = Coordinates.TranasMunicipality.Longitude 
+                }
             };
             observations.Add(observation);
 
@@ -53,10 +55,16 @@ namespace SOS.Process.Test.Helpers
             observation.Location.StateProvince.Should().Be("Småland");
             observation.DynamicProperties.Parish.Should().Be("Tranås");
 
-            observation.DynamicProperties.CountyIdByCoordinate.Should().Be(7);
-            observation.DynamicProperties.MunicipalityIdByCoordinate.Should().Be(283);
-            observation.DynamicProperties.ParishIdByCoordinate.Should().Be(42769);
-            observation.DynamicProperties.ProvinceIdByCoordinate.Should().Be(8060);
+            observation.DynamicProperties.CountyIdByCoordinate.Should().Be(6); // FeatureId
+            observation.DynamicProperties.MunicipalityIdByCoordinate.Should().Be(687); // FeatureId
+            observation.DynamicProperties.ParishIdByCoordinate.Should().Be(671); // FeatureId
+            observation.DynamicProperties.ProvinceIdByCoordinate.Should().Be(3); // FeatureId
+            observation.DynamicProperties.CountyPartIdByCoordinate.Should().Be(6); // FeatureId
+            observation.DynamicProperties.ProvincePartIdByCoordinate.Should().Be(3); // FeatureId
+            //observation.DynamicProperties.CountyIdByCoordinate.Should().Be(7); // Id
+            //observation.DynamicProperties.MunicipalityIdByCoordinate.Should().Be(283); // Id
+            //observation.DynamicProperties.ParishIdByCoordinate.Should().Be(42769); // Id
+            //observation.DynamicProperties.ProvinceIdByCoordinate.Should().Be(8060); // Id
         }
     }
 }

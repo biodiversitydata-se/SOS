@@ -119,19 +119,18 @@ namespace SOS.Process.Helpers
                     continue;
                 }
 
+                if (dwcModel.DynamicProperties == null)
+                {
+                    dwcModel.DynamicProperties = new DynamicProperties();
+                }
+
                 foreach (var feature in features)
                 {
-                    if (dwcModel.DynamicProperties == null)
-                    {
-                        dwcModel.DynamicProperties = new DynamicProperties();
-                    }
-
                     switch ((AreaType)feature.Attributes.GetOptionalValue("areaType"))
                     {
                         case AreaType.County:
                             dwcModel.Location.County = (string)feature.Attributes.GetOptionalValue("name");
                             dwcModel.DynamicProperties.CountyIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
-                            //dwcModel.DynamicProperties.CountyPartIdByCoordinate = ; // todo
                             break;
                         case AreaType.Municipality:
                             dwcModel.Location.Municipality = (string)feature.Attributes.GetOptionalValue("name");
@@ -144,35 +143,35 @@ namespace SOS.Process.Helpers
                         case AreaType.Province:
                             dwcModel.Location.StateProvince = (string)feature.Attributes.GetOptionalValue("name");
                             dwcModel.DynamicProperties.ProvinceIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
-                            //dwcModel.DynamicProperties.ProvincePartIdByCoordinate = ; // todo
                             break;
                     }
+                }
+
+                // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
+                dwcModel.DynamicProperties.CountyPartIdByCoordinate = dwcModel.DynamicProperties.CountyIdByCoordinate;
+                if (dwcModel.DynamicProperties.CountyIdByCoordinate == (int)CountyFeatureId.Kalmar)
+                {
+                    if (dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int) ProvinceFeatureId.Oland)
+                    {
+                        dwcModel.DynamicProperties.CountyPartIdByCoordinate = (int) CountyFeatureId.Oland;
+                    }
+                    else
+                    {
+                        dwcModel.DynamicProperties.CountyPartIdByCoordinate = (int)CountyFeatureId.KalmarFastland;
+                    }
+                }
+
+                // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
+                dwcModel.DynamicProperties.ProvincePartIdByCoordinate = dwcModel.DynamicProperties.ProvinceIdByCoordinate;
+                if (dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.LuleLappmark ||
+                    dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.LyckseleLappmark ||
+                    dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.PiteLappmark ||
+                    dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.TorneLappmark ||
+                    dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.AseleLappmark)
+                {
+                    dwcModel.DynamicProperties.ProvincePartIdByCoordinate = (int) ProvinceFeatureId.Lappland;
                 }
             }
         }
     }
 }
-/*
-  
---Update CountyIdByCoordinate and CountyPartIdByCoordinate
-UPDATE DarwinCoreObservation SET CountyIdByCoordinate = A.FeatureId, CountyPartIdByCoordinate = A.FeatureId
-FROM [SwedishSpeciesObservationResources].[dbo].[Area] A INNER JOIN DarwinCoreObservation D ON A.Polygon.STContains(D.point_GoogleMercator) = 1 AND A.AreaDatasetId = 21
-INNER JOIN @SpeciesObservationIdTable S ON S.Id = D.Id
-
---Update ProvinceIdByCoordinate and ProvincePartIdByCoordinate
-UPDATE DarwinCoreObservation SET ProvincePartIdByCoordinate = A.FeatureId, ProvinceIdByCoordinate = A.FeatureId
-FROM [SwedishSpeciesObservationResources].[dbo].[Area] A INNER JOIN DarwinCoreObservation D ON A.Polygon.STContains(D.point_GoogleMercator)  = 1 AND A.AreaDatasetId = 16
-INNER JOIN @SpeciesObservationIdTable S ON S.Id = D.Id
-
---Update ProvincePartIdByCoordinate for Lappland
-UPDATE DarwinCoreObservation SET ProvinceIdByCoordinate = 100
-FROM DarwinCoreObservation D INNER JOIN @SpeciesObservationIdTable S ON  D.Id = S.Id
-WHERE ProvincePartIdByCoordinate IN (25,26,27,28,29)
-
---Update ProvinceIdByCoordinate's for Kalmar
-UPDATE DarwinCoreObservation SET CountyPartIdByCoordinate = 
-CASE WHEN ProvincePartIdByCoordinate = 4 THEN 101 ELSE 100 END
-FROM DarwinCoreObservation D INNER JOIN @SpeciesObservationIdTable S ON  D.Id = S.Id
-WHERE D.CountyIdByCoordinate = 8
-  
- */
