@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -25,34 +27,11 @@ namespace SOS.Import.Services
         /// <inheritdoc />
         public async Task<T> GetDataAsync<T>(Uri requestUri)
         {
-            var attempts = 0;
-            while (attempts < 3)
-            {
-                try
-                {
-                    using var httpClient = new HttpClient
-                    {
-                        Timeout = TimeSpan.FromMinutes(30)
-                    };
-                    
-                    var httpResponseMessage = await httpClient.GetAsync(requestUri);
-                    var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<T>(jsonString);
-
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"{requestUri.PathAndQuery} \n{ex.Message}");
-
-                    Thread.Sleep(1000);
-                    attempts++;                   
-                }
-            }
-            return default(T);
+            return await GetDataAsync<T>(requestUri, null);
         }
 
         /// <inheritdoc />
-        public async Task<T> PostDataAsync<T>(Uri requestUri, object model)
+        public async Task<T> GetDataAsync<T>(Uri requestUri, Dictionary<string, string> headerData)
         {
             var attempts = 0;
             while (attempts < 3)
@@ -64,7 +43,57 @@ namespace SOS.Import.Services
                         Timeout = TimeSpan.FromMinutes(30)
                     };
 
-                    httpClient.DefaultRequestHeaders.Add("Culture", "sv-SE");
+                    if (headerData?.Any() ?? false)
+                    {
+                        foreach (var data in headerData)
+                        {
+                            httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
+                        }
+                    }
+
+                    var httpResponseMessage = await httpClient.GetAsync(requestUri);
+                    var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<T>(jsonString);
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"{requestUri.PathAndQuery} \n{ex.Message}");
+
+                    Thread.Sleep(1000);
+                    attempts++;
+                }
+            }
+            return default(T);
+        }
+
+        /// <inheritdoc />
+        public async Task<T> PostDataAsync<T>(Uri requestUri, object model)
+        {
+            return await PostDataAsync<T>(requestUri, model, null);
+        }
+
+        /// <inheritdoc />
+        public async Task<T> PostDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData)
+        {
+            var attempts = 0;
+            while (attempts < 3)
+            {
+                try
+                {
+                    using var httpClient = new HttpClient
+                    {
+                        Timeout = TimeSpan.FromMinutes(30)
+                    };
+
+                    if (headerData?.Any() ?? false)
+                    {
+                        foreach (var data in headerData)
+                        {
+                            httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
+                        }
+                    }
+
                     var httpResponseMessage = await httpClient.PostAsync(requestUri, new JsonContent(model));
                     var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
 

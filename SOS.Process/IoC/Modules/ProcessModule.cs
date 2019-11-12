@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Extensions;
 using SOS.Process.Database;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Factories;
@@ -13,8 +12,6 @@ using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
 using SOS.Process.Repositories.Source.Interfaces;
-using SOS.Process.Services;
-using SOS.Process.Services.Interfaces;
 
 namespace SOS.Process.IoC.Modules
 {
@@ -24,8 +21,6 @@ namespace SOS.Process.IoC.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            // Add configuration
-            builder.Register(r => Configuration.AppSettings).As<AppSettings>().SingleInstance();
 
             // Vebatim Mongo Db
             var verbatimDbConfiguration = Configuration.VerbatimDbConfiguration;
@@ -47,6 +42,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationVerbatimRepository>().As<IKulObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalVerbatimRepository>().As<ISpeciesPortalVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonVerbatimRepository>().As<ITaxonVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TreeObservationVerbatimRepository>().As<ITreeObservationVerbatimRepository>().InstancePerLifetimeScope();
             
             // Repositories destination
@@ -56,9 +52,6 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ClamTreePortalProcessFactory>().As<IClamTreePortalProcessFactory>().InstancePerLifetimeScope();
             builder.RegisterType<KulProcessFactory>().As<IKulProcessFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalProcessFactory>().As<ISpeciesPortalProcessFactory>().InstancePerLifetimeScope();
-            
-            // Add Services
-            builder.RegisterType<TaxonService>().As<ITaxonService>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ProcessJob>().As<IProcessJob>().InstancePerLifetimeScope();

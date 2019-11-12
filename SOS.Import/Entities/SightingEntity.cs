@@ -58,11 +58,6 @@ namespace SOS.Import.Entities
         public int Id { get; set; }
 
         /// <summary>
-        /// Owner organization
-        /// </summary>
-        public string InstitutionCode { get; set; }
-
-        /// <summary>
         /// SightingSpeciesCollectionItem label
         /// </summary>
         public string Label { get; set; }
@@ -111,6 +106,11 @@ namespace SOS.Import.Entities
         /// Migrate Portal id
         /// </summary>
         public int? MigrateSightingPortalId { get; set; }
+
+        /// <summary>
+        /// Owner organization
+        /// </summary>
+        public int? OwnerOrganizationId { get; set; }
 
         /// <summary>
         /// Protected by system flag

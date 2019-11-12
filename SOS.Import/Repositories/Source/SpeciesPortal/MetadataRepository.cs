@@ -52,8 +52,7 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
         {
             try
             {
-                
-                    const string query = @"
+                const string query = @"
                     SELECT 
 	                    g.Id, 
 	                    t.Value AS Name
@@ -67,6 +66,27 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting genders");
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<MetadataEntity>> GetOrganizationsAsync()
+        {
+            try
+            {
+                const string query = @"
+                    SELECT 
+	                    Id,
+	                    Name
+                    FROM 
+                      Organization";
+
+                return await QueryAsync<MetadataEntity>(query);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting organizations");
                 return null;
             }
         }

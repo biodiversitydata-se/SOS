@@ -18,9 +18,9 @@ namespace SOS.Process.Extensions
         /// <param name="verbatim"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static DarwinCore<DynamicProperties> ToDarwinCore(this ClamObservationVerbatim verbatim, IDictionary<string, DarwinCoreTaxon> taxa)
+        public static DarwinCore<DynamicProperties> ToDarwinCore(this ClamObservationVerbatim verbatim, IDictionary<int, DarwinCoreTaxon> taxa)
         {
-            taxa.TryGetValue(verbatim.DyntaxaTaxonId?.ToString() ?? string.Empty, out var taxon);
+            taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
 
             return new DarwinCore<DynamicProperties>()
             {
@@ -95,7 +95,7 @@ namespace SOS.Process.Extensions
         /// <param name="verbatims"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static IEnumerable<DarwinCore<DynamicProperties>> ToDarwinCore(this IEnumerable<ClamObservationVerbatim> verbatims, IDictionary<string, DarwinCoreTaxon> taxa)
+        public static IEnumerable<DarwinCore<DynamicProperties>> ToDarwinCore(this IEnumerable<ClamObservationVerbatim> verbatims, IDictionary<int, DarwinCoreTaxon> taxa)
         {
             return verbatims.Select(v => v.ToDarwinCore(taxa));
         }
@@ -106,9 +106,9 @@ namespace SOS.Process.Extensions
         /// <param name="verbatim"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static DarwinCore<DynamicProperties> ToDarwinCore(this TreeObservationVerbatim verbatim, IDictionary<string, DarwinCoreTaxon> taxa)
+        public static DarwinCore<DynamicProperties> ToDarwinCore(this TreeObservationVerbatim verbatim, IDictionary<int, DarwinCoreTaxon> taxa)
         {
-            taxa.TryGetValue(verbatim.DyntaxaTaxonId?.ToString() ?? string.Empty, out var taxon);
+            taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
 
             return new DarwinCore<DynamicProperties>()
             {
@@ -179,7 +179,7 @@ namespace SOS.Process.Extensions
         /// <param name="verbatims"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static IEnumerable<DarwinCore<DynamicProperties>> ToDarwinCore(this IEnumerable<TreeObservationVerbatim> verbatims, IDictionary<string, DarwinCoreTaxon> taxa)
+        public static IEnumerable<DarwinCore<DynamicProperties>> ToDarwinCore(this IEnumerable<TreeObservationVerbatim> verbatims, IDictionary<int, DarwinCoreTaxon> taxa)
         {
             return verbatims.Select(v => v.ToDarwinCore(taxa));
         }

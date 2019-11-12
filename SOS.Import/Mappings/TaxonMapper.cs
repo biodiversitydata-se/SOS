@@ -1,7 +1,7 @@
 ﻿using CsvHelper.Configuration;
 using SOS.Lib.Models.DarwinCore;
 
-namespace SOS.Process.Mappings
+namespace SOS.Import.Mappings
 {
     public sealed class TaxonMapper : ClassMap<DarwinCoreTaxon>
     {
@@ -22,6 +22,7 @@ namespace SOS.Process.Mappings
             Map(x => x.Order).Name("order").Index(12);
             Map(x => x.Family).Name("family").Index(13);
             Map(x => x.Genus).Name("genus").Index(14);
+            Map(x => x.DynamicProperties).Ignore(true);
         }
     }
 }

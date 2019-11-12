@@ -26,5 +26,15 @@ namespace SOS.Lib.Configuration.Import
         /// KUL Service/repository configuration.
         /// </summary>
         public KulServiceConfiguration KulServiceConfiguration { get; set; }
+
+        /// <summary>
+        /// taxon attribute service configuration
+        /// </summary>
+        public TaxonAttributeServiceConfiguration TaxonAttributeServiceConfiguration { get; set; }
+
+        /// <summary>
+        /// Taxon service configuration
+        /// </summary>
+        public TaxonServiceConfiguration TaxonServiceConfiguration { get; set; }
     }
 }

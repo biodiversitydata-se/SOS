@@ -60,11 +60,6 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         public int Id { get; set; }
 
         /// <summary>
-        /// Owner organization
-        /// </summary>
-        public string InstitutionCode { get; set; }
-
-        /// <summary>
         /// SightingSpeciesCollectionItem label
         /// </summary>
         public string Label { get; set; }
@@ -115,6 +110,11 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         public bool NotRecovered { get; set; }
 
         /// <summary>
+        /// Owner organization
+        /// </summary>
+        public Metadata OwnerOrganization { get; set; }
+
+        /// <summary>
         /// Protected by system flag
         /// </summary>
         public bool ProtectedBySystem { get; set; }
@@ -122,7 +122,7 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         /// <summary>
         /// Projects
         /// </summary>
-        public IEnumerable<Project> Projects { get; set; }
+        public Project Project { get; set; }
 
         /// <summary>
         /// Number of taxa found

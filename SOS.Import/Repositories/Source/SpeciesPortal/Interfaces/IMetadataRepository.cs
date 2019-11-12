@@ -22,6 +22,12 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal.Interfaces
         Task<IEnumerable<MetadataEntity>> GetGendersAsync();
 
         /// <summary>
+        /// Get all organizations
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<MetadataEntity>> GetOrganizationsAsync();
+
+        /// <summary>
         /// Get all stages
         /// </summary>
         /// <returns></returns>

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using SOS.Lib.Models.DarwinCore;
 
-namespace SOS.Process.Services.Interfaces
+namespace SOS.Import.Services.Interfaces
 {
     /// <summary>
     /// Interface for taxon service

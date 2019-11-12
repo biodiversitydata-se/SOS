@@ -14,6 +14,6 @@ namespace SOS.Process.Factories.Interfaces
         /// </summary>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        Task<bool> ProcessAsync(IDictionary<string, DarwinCoreTaxon> taxa);
+        Task<bool> ProcessAsync(IDictionary<int, DarwinCoreTaxon> taxa);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SOS.Import.Services.Interfaces
@@ -17,6 +18,15 @@ namespace SOS.Import.Services.Interfaces
         Task<T> GetDataAsync<T>(Uri requestUri);
 
         /// <summary>
+        /// Get request with header data
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="requestUri"></param>
+        /// <param name="headerData"></param>
+        /// <returns></returns>
+        Task<T> GetDataAsync<T>(Uri requestUri, Dictionary<string, string> headerData);
+        
+        /// <summary>
         /// Post request
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -24,6 +34,16 @@ namespace SOS.Import.Services.Interfaces
         /// <param name="model"></param>
         /// <returns></returns>
         Task<T> PostDataAsync<T>(Uri requestUri, object model);
+
+        /// <summary>
+        /// Post request with header data
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="requestUri"></param>
+        /// <param name="model"></param>
+        /// <param name="headerData"></param>
+        /// <returns></returns>
+        Task<T> PostDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData);
 
         /// <summary>
         /// Put requests

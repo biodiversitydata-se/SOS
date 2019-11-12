@@ -177,5 +177,43 @@ namespace SOS.Hangfire.UI.Controllers
             }
         }
         #endregion Species Portal
+
+        #region Taxon
+        /// <inheritdoc />
+        [HttpPost("Taxon/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailyTaxonHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<TaxonHarvestJob>(nameof(TaxonHarvestJob), job => job.Run(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("Taxon harvest job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding taxon harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Taxon/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunTaxonHarvestJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<ITaxonHarvestJob>(job => job.Run());
+                return new OkObjectResult("Started taxon harvest job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running taxon harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        #endregion Taxon
     }
 }

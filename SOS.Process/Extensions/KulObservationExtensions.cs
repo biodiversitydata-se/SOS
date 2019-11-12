@@ -23,9 +23,9 @@ namespace SOS.Process.Extensions
         /// <param name="verbatim"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static DarwinCore<DynamicProperties> ToDarwinCore(this KulObservationVerbatim verbatim, IDictionary<string, DarwinCoreTaxon> taxa)
+        public static DarwinCore<DynamicProperties> ToDarwinCore(this KulObservationVerbatim verbatim, IDictionary<int, DarwinCoreTaxon> taxa)
         {
-            taxa.TryGetValue(verbatim.DyntaxaTaxonId.ToString(), out var taxon);
+            taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
             // todo - ProtectionLevel, CoordinateX_RT90, CoordinateY_RT90, CoordinateX_SWEREF99, CoordinateY_SWEREF99, CoordinateX, CoordinateY
             var obs = new DarwinCore<DynamicProperties>()
             {
@@ -93,7 +93,7 @@ namespace SOS.Process.Extensions
         /// <returns></returns>
         public static IEnumerable<DarwinCore<DynamicProperties>> ToDarwinCore(
             this IEnumerable<KulObservationVerbatim> verbatims, 
-            IDictionary<string, DarwinCoreTaxon> taxa)
+            IDictionary<int, DarwinCoreTaxon> taxa)
         {
             return verbatims.Select(v => v.ToDarwinCore(taxa));
         }
