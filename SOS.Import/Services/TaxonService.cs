@@ -11,25 +11,25 @@ using System.Xml;
 using System.Xml.Linq;
 using CsvHelper;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.Process;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Process.Mappings;
+using SOS.Import.Mappings;
 
-namespace SOS.Process.Services
+namespace SOS.Import.Services
 {
     public class TaxonService : Interfaces.ITaxonService
     {
         private readonly string _taxonDwcUrl;
         private readonly ILogger<TaxonService> _logger;
 
-        public TaxonService(AppSettings settings, ILogger<TaxonService> logger)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="taxonServiceConfiguration"></param>
+        /// <param name="logger"></param>
+        public TaxonService(TaxonServiceConfiguration taxonServiceConfiguration, ILogger<TaxonService> logger)
         {
-            if (settings == null)
-            {
-                throw new ArgumentNullException(nameof(settings));
-            }
-
-            _taxonDwcUrl = settings.TaxonDwcUrl;
+            _taxonDwcUrl = taxonServiceConfiguration?.BaseAddress ?? throw new ArgumentNullException(nameof(taxonServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         }
@@ -87,7 +87,7 @@ namespace SOS.Process.Services
                 taxonCsv.Configuration.RegisterClassMap<TaxonMapper>();
                 var matchRegex = new Regex(@"urn:lsid:dyntaxa.se:Taxon:\d+$");
                 var taxa = taxonCsv.GetRecords<DarwinCoreTaxon>().Where(t => matchRegex.IsMatch(t.TaxonID)).ToDictionary(t => t.TaxonID, t => t);
-                
+
                 // Try to get the taxon data file
                 var vernacularNameFile = zipArchive.Entries.FirstOrDefault(f =>
                     f.Name.Equals("VernacularName.csv", StringComparison.CurrentCultureIgnoreCase));

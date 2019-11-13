@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.4" />
+    <PackageReference Include="CsvHelper" Version="12.2.1" />
     <PackageReference Include="Dapper" Version="2.0.30" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0" />
     <PackageReference Include="Microsoft.SqlServer.Types" Version="14.0.1016.290" />
@@ -23,7 +24,6 @@
 
   <ItemGroup>
     <Folder Include="Entities\Kul\" />
-    <Folder Include="Enums\" />
   </ItemGroup>
 
   <ItemGroup>

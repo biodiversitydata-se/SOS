@@ -46,22 +46,25 @@ namespace SOS.Import.Extensions
         /// <param name="entity"></param>
         /// <param name="activities"></param>
         /// <param name="genders"></param>
-        /// <param name="stages"></param>
-        /// <param name="units"></param>
-        /// <param name="sites"></param>
-        /// <param name="projects"></param>
+        /// <param name="organizations"></param>
         /// <param name="personSightings"></param>
+        /// <param name="projects"></param>
+        /// <param name="sites"></param>
+        /// <param name="stages"></param>
         /// <param name="validationStatus"></param>
+        /// <param name="units"></param>
         /// <returns></returns>
         public static APSightingVerbatim ToAggregate(this SightingEntity entity,
             IDictionary<int, MetadataWithCategory> activities,
             IDictionary<int, Metadata> genders,
-            IDictionary<int, Metadata> stages,
-            IDictionary<int, Metadata> units,
-            IDictionary<int, Site> sites,
-            IDictionary<int, List<Project>> projects, 
+            IDictionary<int, Metadata> organizations,
             IDictionary<int, PersonSighting> personSightings,
-            IDictionary<int, Metadata> validationStatus)
+            IDictionary<int, Project> projects,
+            IDictionary<int, Site> sites,
+            IDictionary<int, Metadata> stages,
+            IDictionary<int, Metadata> validationStatus,
+            IDictionary<int, Metadata> units 
+        )
         {
             var observation = new APSightingVerbatim
             {
@@ -75,7 +78,7 @@ namespace SOS.Import.Extensions
                 HasImages = entity.HasImages,
                 HiddenByProvider = entity.HiddenByProvider,
                 Id = entity.Id,
-                InstitutionCode = entity.InstitutionCode,
+                OwnerOrganization = entity.OwnerOrganizationId.HasValue && organizations.ContainsKey(entity.OwnerOrganizationId.Value) ? organizations[entity.OwnerOrganizationId.Value] : null,
                 Label = entity.Label,
                 Length = entity.Length,
                 MaxDepth = entity.MaxDepth,
@@ -86,7 +89,7 @@ namespace SOS.Import.Extensions
                 MinHeight = entity.MinHeight,
                 NotPresent = entity.NotPresent,
                 NotRecovered = entity.NotRecovered,
-                Projects = projects.ContainsKey(entity.Id) ? projects[entity.Id] : null,
+                Project = projects.ContainsKey(entity.Id) ? projects[entity.Id] : null,
                 ProtectedBySystem = entity.ProtectedBySystem,
                 Quantity = entity.Quantity,
                 ReportedDate = entity.RegisterDate,
@@ -131,14 +134,15 @@ namespace SOS.Import.Extensions
         public static IEnumerable<APSightingVerbatim> ToAggregates(this IEnumerable<SightingEntity> entities,
             IDictionary<int, MetadataWithCategory> activities,
             IDictionary<int, Metadata> genders,
-            IDictionary<int, Metadata> stages,
-            IDictionary<int, Metadata> units,
-            IDictionary<int, Site> sites,
-            IDictionary<int, List<Project>> projects, 
+            IDictionary<int, Metadata> organizations,
             IDictionary<int, PersonSighting> personSightings,
-            IDictionary<int, Metadata> validationStatus)
+            IDictionary<int, Project> projects,
+            IDictionary<int, Site> sites,
+            IDictionary<int, Metadata> stages,
+            IDictionary<int, Metadata> validationStatus,
+            IDictionary<int, Metadata> units)
         {
-            return entities.Select(e => e.ToAggregate(activities, genders, stages, units, sites, projects, personSightings, validationStatus));
+            return entities.Select(e => e.ToAggregate(activities, genders, organizations, personSightings, projects, sites, stages, validationStatus, units ));
         }
 
         /// <summary>
@@ -203,9 +207,26 @@ namespace SOS.Import.Extensions
         {
             return new Project()
             {
+                Category = entity.Category,
+                Description = entity.Description,
+                EndDate = entity.EndDate,
                 Id = entity.Id,
-                Name = entity.Name
+                IsPublic = entity.IsPublic,
+                Name = entity.Name,
+                Owner = entity.Owner,
+                StartDate = entity.StartDate,
+                SurveyMethod = entity.SurveyMethod
             };
+        }
+
+        /// <summary>
+        /// Cast multiple projects entities to models 
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public static IEnumerable<Project> ToAggregates(this IEnumerable<ProjectEntity> entities)
+        {
+            return entities.Select(e => e.ToAggregate());
         }
 
         /// <summary>
@@ -283,16 +304,6 @@ namespace SOS.Import.Extensions
                 ConfirmatorText = itemEntity.ConfirmatorText,
                 ConfirmatorYear = itemEntity.ConfirmatorYear
             };
-        }
-
-        /// <summary>
-        /// Cast multiple projects entities to models 
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        public static IEnumerable<Project> ToAggregates(this IEnumerable<ProjectEntity> entities)
-        {
-            return entities.Select(e => e.ToAggregate());
         }
 
         /// <summary>

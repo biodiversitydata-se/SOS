@@ -87,6 +87,7 @@ namespace SOS.Import.Factories
                 var metaDataTasks = new[]
                 {
                     _metadataRepository.GetGendersAsync(),
+                    _metadataRepository.GetOrganizationsAsync(),
                     _metadataRepository.GetStagesAsync(),
                     _metadataRepository.GetUnitsAsync(),
                     _metadataRepository.GetValidationStatusAsync()
@@ -96,9 +97,10 @@ namespace SOS.Import.Factories
                 await Task.WhenAll(metaDataTasks);
 
                 var genders = metaDataTasks[0].Result.ToAggregates().ToDictionary(g => g.Id, g => g);
-                var stages = metaDataTasks[1].Result.ToAggregates().ToDictionary(s => s.Id, s => s);
-                var units = metaDataTasks[2].Result.ToAggregates().ToDictionary(u => u.Id, u => u);
-                var validationStatus = metaDataTasks[3].Result.ToAggregates().ToDictionary(u => u.Id, u => u);
+                var organizations = metaDataTasks[1].Result.ToAggregates().ToDictionary(o => o.Id, o => o);
+                var stages = metaDataTasks[2].Result.ToAggregates().ToDictionary(s => s.Id, s => s);
+                var units = metaDataTasks[3].Result.ToAggregates().ToDictionary(u => u.Id, u => u);
+                var validationStatus = metaDataTasks[4].Result.ToAggregates().ToDictionary(v => v.Id, v => v);
 
                 _logger.LogDebug("Start getting persons & organizations data");
                 var personByUserId = (await _personRepository.GetAsync()).ToAggregates().ToDictionary(p => p.UserId, p => p);
@@ -114,17 +116,10 @@ namespace SOS.Import.Factories
                 var sightingProjectIds = await _sightingRepository.GetProjectIdsAsync();
 
                 // Create a dictionary with sightings projects. 
-                var sightingProjects = new Dictionary<int, List<Project>>();
+                var sightingProjects = new Dictionary<int, Project>();
                 foreach (var (sightingId, projectId) in sightingProjectIds)
                 {
-                    // If no entry exists for sighting, add it
-                    if (!sightingProjects.ContainsKey(sightingId))
-                    {
-                        sightingProjects.Add(sightingId, new List<Project>());
-                    }
-
-                    // Add project to sighting
-                    sightingProjects[sightingId].Add(projects[projectId]);
+                    sightingProjects.Add(sightingId, projects[projectId]);
                 }
 
                 _logger.LogDebug("Start getting sites");
@@ -168,12 +163,13 @@ namespace SOS.Import.Factories
                     // Cast sightings to aggregates
                     IEnumerable<APSightingVerbatim> aggregates = sightings.ToAggregates(
                         activities, 
-                        genders, 
-                        stages, 
-                        units, 
-                        sites, 
-                        sightingProjects,
+                        genders,
+                        organizations,
                         personSightingBySightingId,
+                        sightingProjects,
+                        sites,
+                        stages,
+                        units,
                         validationStatus);
                     
                     // Add sightings to mongodb

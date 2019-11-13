@@ -81,9 +81,9 @@ namespace SOS.Process.Test.Factories
             _processedRepository.Setup(r => r.AddManyAsync(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()))
                 .ReturnsAsync(true);
 
-            var taxa = new Dictionary<string, DarwinCoreTaxon>
+            var taxa = new Dictionary<int, DarwinCoreTaxon>
             {
-                { "0", new DarwinCoreTaxon { TaxonID = "0", ScientificName = "Biota" } }
+                { 0, new DarwinCoreTaxon { TaxonID = "0", ScientificName = "Biota" } }
             };
 
             //-----------------------------------------------------------------------------------------------------------

@@ -20,13 +20,16 @@ namespace SOS.Process.Extensions
         /// <param name="verbatim"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static DarwinCore<DynamicProperties> ToDarwinCore(this APSightingVerbatim verbatim, IDictionary<string, DarwinCoreTaxon> taxa)
+        public static DarwinCore<DynamicProperties> ToDarwinCore(this APSightingVerbatim verbatim, IDictionary<int, DarwinCoreTaxon> taxa)
         {
             
-            var taxonId = verbatim.TaxonId.ToString();
+            var taxonId = verbatim.TaxonId ?? -1;
 
             var googleMercatorPoint = new Point(verbatim.Site?.XCoord ?? 0, verbatim.Site?.YCoord ?? 0);
             var wgs84Point = googleMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+
+            taxa.TryGetValue(taxonId, out var taxon);
+
 
             string associatedReferences = null;
             switch (verbatim.MigrateSightingPortalId.HasValue ? verbatim.MigrateSightingPortalId.Value : 0)
@@ -59,6 +62,7 @@ namespace SOS.Process.Extensions
                 DatasetName = "Artportalen",
                 DynamicProperties = new DynamicProperties
                 {
+                    ActivityId = verbatim.Activity?.Id,
                     CoordinateX = googleMercatorPoint.Coordinate?.X ?? 0,
                     CoordinateY = googleMercatorPoint.Coordinate?.Y ?? 0,
                     DyntaxaTaxonID = verbatim.TaxonId,
@@ -69,6 +73,18 @@ namespace SOS.Process.Extensions
                     IsPositiveObservation = !(verbatim.NotPresent || verbatim.NotRecovered),
                     OccurrenceURL = $"http://www.artportalen.se/sighting/{verbatim.Id}",
                     Parish = verbatim.Site?.Parish?.Name ?? string.Empty,
+                    Project = verbatim.Project == null ? null : new DarwinCoreProject
+                    {
+                        IsPublic = verbatim.Project?.IsPublic ?? false,
+                        ProjectCategory = verbatim.Project?.Category,
+                        ProjectDescription = verbatim.Project?.Description,
+                        ProjectEndDate = verbatim.Project?.EndDate.HasValue ?? false ? verbatim.Project.EndDate.Value.ToString("yyyy-MM-dd hh:mm") : null,
+                        ProjectID = verbatim.Project?.Id.ToString(),
+                        ProjectName = verbatim.Project?.Name,
+                        ProjectOwner = verbatim.Project ?.Owner,
+                        ProjectStartDate = verbatim.Project?.StartDate.HasValue ?? false ? verbatim.Project.StartDate.Value.ToString("yyyy-MM-dd hh:mm") : null,
+                        SurveyMethod = verbatim.Project?.SurveyMethod,
+                    },
                     ReportedDate = verbatim.ReportedDate,
                     UncertainDetermination = verbatim.UnsureDetermination
                 },
@@ -88,7 +104,7 @@ namespace SOS.Process.Extensions
                     IdentificationVerificationStatus = verbatim.ValidationStatus?.Name 
                 },
                 InformationWithheld = "More information can be obtained from the Data Provider",
-                InstitutionCode = verbatim.InstitutionCode ?? "ArtDatabanken",
+                InstitutionCode = verbatim.OwnerOrganization?.Name ?? "ArtDatabanken",
                 InstitutionID = verbatim.ControlingOrganisationId.HasValue ? $"urn:lsid:artdata.slu.se:organization:{verbatim.ControlingOrganisationId}" : null,
                 Language = "Swedish",
                 Location = new DarwinCoreLocation
@@ -129,7 +145,8 @@ namespace SOS.Process.Extensions
                     ReproductiveCondition = verbatim.Activity?.Category?.Name,
                     Sex = verbatim.Gender?.Name
                 },
-                OwnerInstitutionCode = verbatim.InstitutionCode ?? "ArtDatabanken",
+                OwnerInstitutionCode = verbatim.OwnerOrganization?.Name ?? "ArtDatabanken",
+                RightsHolder = verbatim.RightsHolder ?? verbatim.OwnerOrganization?.Name ?? "Data saknas",
                 Taxon = taxa.ContainsKey(taxonId) ? taxa[taxonId] : null,
                 Type = "Occurrence"
             };
@@ -141,7 +158,7 @@ namespace SOS.Process.Extensions
         /// <param name="verbatims"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static IEnumerable<DarwinCore<DynamicProperties>> ToDarwinCore(this IEnumerable<APSightingVerbatim> verbatims, IDictionary<string, DarwinCoreTaxon> taxa)
+        public static IEnumerable<DarwinCore<DynamicProperties>> ToDarwinCore(this IEnumerable<APSightingVerbatim> verbatims, IDictionary<int, DarwinCoreTaxon> taxa)
         {
             return verbatims.Select(v => v.ToDarwinCore(taxa));
         }

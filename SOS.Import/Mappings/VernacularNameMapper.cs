@@ -1,7 +1,7 @@
 ﻿using CsvHelper.Configuration;
 using SOS.Lib.Models.DarwinCore;
 
-namespace SOS.Process.Mappings
+namespace SOS.Import.Mappings
 {
     public sealed class VernacularNameMapper : ClassMap<DarwinCoreVernacularName>
     {

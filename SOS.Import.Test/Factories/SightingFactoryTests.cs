@@ -173,6 +173,9 @@ namespace SOS.Import.Test.Factories
                 .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "Stage" } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetUnitsAsync())
                 .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "Unit" } });
+            _metadataRepositoryMock.Setup(mdr => mdr.GetValidationStatusAsync())
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "ValidationStatus" } });
+            
 
             _projectRepositoryMock.Setup(pr => pr.GetAsync())
                 .ReturnsAsync(new[] { new ProjectEntity { Id = 1, Name = "Project" } });

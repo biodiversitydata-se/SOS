@@ -30,9 +30,24 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 const string query = @"
                 SELECT 
 	                p.Id,
-	                p.ProjectName AS Name
+                    p.IsPublic,
+	                p.ProjectName AS Name,
+                    p.ProjectDescription AS Description,
+                    p.StartDate,
+                    p.EndDate,
+	                pc.Name AS Category,
+	                sm.Name AS SurveyMethod,
+	                CASE 
+		                WHEN o.Id IS NOT NULL THEN o.Name
+		                WHEN pn.Id IS NOT NULL THEN pn.FirstName + ' ' + pn.LastName 
+	                END AS Owner
                 FROM 
-	                Project p";
+	                Project p 
+	                INNER JOIN ProjectCategory pc ON p.ProjectCategoryId = pc.Id
+	                LEFT JOIN SurveyMethod sm ON p.SurveyMethodId = sm.Id 
+	                LEFT JOIN Organization o ON p.ControlingOrganisationId = o.Id
+	                LEFT JOIN [User] u ON p.ControlingUserId = u.Id
+	                LEFT JOIN Person pn ON u.PersonId = pn.Id";
 
 
                 return await QueryAsync<ProjectEntity>(query);

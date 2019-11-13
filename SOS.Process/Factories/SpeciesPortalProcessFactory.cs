@@ -35,7 +35,7 @@ namespace SOS.Process.Factories
         /// </summary>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public async Task<bool> ProcessAsync(IDictionary<string, DarwinCoreTaxon> taxa)
+        public async Task<bool> ProcessAsync(IDictionary<int, DarwinCoreTaxon> taxa)
         {
             try
             {

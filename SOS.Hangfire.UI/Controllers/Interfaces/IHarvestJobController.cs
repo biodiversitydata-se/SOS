@@ -62,5 +62,19 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         IActionResult RunSpeciesPortalHarvestJob();
+
+        /// <summary>
+        /// Schedule daily taxon harvest job
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult AddDailyTaxonHarvestJob(int hour, int minute);
+
+        /// <summary>
+        /// Run taxon harvest
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunTaxonHarvestJob();
     }
 }

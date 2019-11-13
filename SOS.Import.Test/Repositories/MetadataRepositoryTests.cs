@@ -279,6 +279,64 @@ namespace SOS.Import.Test.Repositories
 
             result.Should().BeNull();
         }
-        #endregion Activities
+        #endregion Units
+
+        #region ValidationStatus
+        /// <summary>
+        /// Test get units success
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetValidationStatusAsyncSuccess()
+        {
+            IEnumerable<MetadataEntity> validationStatus = new[]
+            {
+                    new MetadataEntity { Id = 1, Name = "ValidationStatus 1" },
+                    new MetadataEntity { Id = 2, Name = "ValidationStatus 2" }
+            };
+
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+                .ReturnsAsync(validationStatus);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var metadataRepository = new MetadataRepository(
+                _speciesPortalDataServiceMock.Object,
+                _loggerMock.Object);
+
+            var result = await metadataRepository.GetValidationStatusAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().HaveCount(2);
+        }
+
+        /// <summary>
+        /// Test get units exception
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetValidationStatusAsyncException()
+        {
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+                .Throws<Exception>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var metadataRepository = new MetadataRepository(
+                _speciesPortalDataServiceMock.Object,
+                _loggerMock.Object);
+
+            var result = await metadataRepository.GetValidationStatusAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeNull();
+        }
+        #endregion ValidationStatus
     }
 }

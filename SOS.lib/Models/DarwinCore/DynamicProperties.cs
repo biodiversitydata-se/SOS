@@ -177,6 +177,11 @@ namespace SOS.Lib.Models.DarwinCore
         public string OrganismGroup { get; set; }
 
         /// <summary>
+        /// Owner of the sighting
+        /// </summary>
+        public string Owner { get; set; }
+
+        /// <summary>
         /// Not defined in Darwin Core.
         /// Parish where the species observation where made.
         /// 'Socken/församling' in swedish.

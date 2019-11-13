@@ -1,4 +1,7 @@
-﻿namespace SOS.Lib.Models.DarwinCore
+﻿using Newtonsoft.Json;
+using SOS.Lib.Models.Interfaces;
+
+namespace SOS.Lib.Models.DarwinCore
 {
     /// <summary>
     /// This class contains taxon information about a species
@@ -6,7 +9,7 @@
     /// Further information about the properties can
     /// be found at http://rs.tdwg.org/dwc/terms/
     /// </summary>
-    public class DarwinCoreTaxon
+    public class DarwinCoreTaxon: IEntity<int>
     {
         /// <summary>
         /// Darwin Core term name: acceptedNameUsage.
@@ -36,6 +39,12 @@
         public string Class { get; set; }
 
         /// <summary>
+        /// Dynamic properties used for search, not part of Darwin Core
+        /// </summary>
+        [JsonIgnore]
+        public TaxonDynamicProperties DynamicProperties { get; set; }
+
+        /// <summary>
         /// Darwin Core term name: family.
         /// The full scientific name of the family in which
         /// the taxon is classified.
@@ -62,6 +71,12 @@
         /// This property is currently not used.
         /// </summary>
         public string HigherClassification { get; set; }
+
+        /// <summary>
+        /// Object id
+        /// </summary>
+        [JsonIgnore]
+        public int Id { get; set; }
 
         /// <summary>
         /// Darwin Core term name: infraspecificEpithet.

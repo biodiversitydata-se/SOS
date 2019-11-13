@@ -43,7 +43,7 @@ namespace SOS.Process.Factories
         /// </summary>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public async Task<bool> ProcessAsync(IDictionary<string, DarwinCoreTaxon> taxa)
+        public async Task<bool> ProcessAsync(IDictionary<int, DarwinCoreTaxon> taxa)
         {
             Logger.LogDebug("Start clam and tree portal process job");
 
@@ -69,7 +69,7 @@ namespace SOS.Process.Factories
         /// </summary>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        private async Task<bool> ProcessClamsAsync(IDictionary<string, DarwinCoreTaxon> taxa)
+        private async Task<bool> ProcessClamsAsync(IDictionary<int, DarwinCoreTaxon> taxa)
         {
             try
             {
@@ -114,7 +114,7 @@ namespace SOS.Process.Factories
         /// </summary>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        private async Task<bool> ProcessTreesAsync(IDictionary<string, DarwinCoreTaxon> taxa)
+        private async Task<bool> ProcessTreesAsync(IDictionary<int, DarwinCoreTaxon> taxa)
         {
             try
             {
