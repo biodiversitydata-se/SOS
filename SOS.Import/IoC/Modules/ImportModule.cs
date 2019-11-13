@@ -14,8 +14,6 @@ using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Destination.Taxon;
 using SOS.Import.Repositories.Destination.Taxon.Interfaces;
-using SOS.Import.Repositories.Source.Kul;
-using SOS.Import.Repositories.Source.Kul.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Import.Services;
