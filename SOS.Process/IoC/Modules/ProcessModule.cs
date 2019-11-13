@@ -9,6 +9,8 @@ using SOS.Process.Helpers;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
 using SOS.Process.Jobs.Interfaces;
+using SOS.Process.Mappings;
+using SOS.Process.Mappings.Interfaces;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
@@ -40,6 +42,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterInstance(processClient).As<IProcessClient>().SingleInstance();
 
             // Helpers
+            builder.RegisterType<AreaNameMapper>().As<IAreaNameMapper>().SingleInstance();
             builder.RegisterType<AreaHelper>().As<IAreaHelper>().SingleInstance();
 
             // Repositories source

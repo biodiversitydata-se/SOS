@@ -1,0 +1,238 @@
+[
+  {
+    "DcoCountyName": "Blekinge",
+    "CountyName": "Blekinge"
+  },
+  {
+    "DcoCountyName": "Blekinge Län",
+    "CountyName": "Blekinge"
+  },
+  {
+    "DcoCountyName": "Dalarnas",
+    "CountyName": "Dalarna"
+  },
+  {
+    "DcoCountyName": "Dalarnas Län",
+    "CountyName": "Dalarna"
+  },
+  {
+    "DcoCountyName": "Gotland",
+    "CountyName": "Gotland"
+  },
+  {
+    "DcoCountyName": "Gotlands",
+    "CountyName": "Gotland"
+  },
+  {
+    "DcoCountyName": "Gotlands Län",
+    "CountyName": "Gotland"
+  },
+  {
+    "DcoCountyName": "Gävleborg",
+    "CountyName": "Gävleborg"
+  },
+  {
+    "DcoCountyName": "Gävleborgs",
+    "CountyName": "Gävleborg"
+  },
+  {
+    "DcoCountyName": "Gävleborgs Län",
+    "CountyName": "Gävleborg"
+  },
+  {
+    "DcoCountyName": "Halland",
+    "CountyName": "Halland"
+  },
+  {
+    "DcoCountyName": "Hallands",
+    "CountyName": "Halland"
+  },
+  {
+    "DcoCountyName": "Hallands Län",
+    "CountyName": "Halland"
+  },
+  {
+    "DcoCountyName": "Hallnad",
+    "CountyName": "Halland"
+  },
+  {
+    "DcoCountyName": "Jämtland",
+    "CountyName": "Jämtland"
+  },
+  {
+    "DcoCountyName": "Jämtlands",
+    "CountyName": "Jämtland"
+  },
+  {
+    "DcoCountyName": "Jämtlands Län",
+    "CountyName": "Jämtland"
+  },
+  {
+    "DcoCountyName": "Jönköping",
+    "CountyName": "Jönköping"
+  },
+  {
+    "DcoCountyName": "Jönköpings",
+    "CountyName": "Jönköping"
+  },
+  {
+    "DcoCountyName": "Jönköpings Län",
+    "CountyName": "Jönköping"
+  },
+  {
+    "DcoCountyName": "Kalmar",
+    "CountyName": "Kalmar"
+  },
+  {
+    "DcoCountyName": "Kalmar Län",
+    "CountyName": "Kalmar"
+  },
+  {
+    "DcoCountyName": "Kronoberg",
+    "CountyName": "Kronoberg"
+  },
+  {
+    "DcoCountyName": "Kronobergs",
+    "CountyName": "Kronoberg"
+  },
+  {
+    "DcoCountyName": "Kronobergs Län",
+    "CountyName": "Kronoberg"
+  },
+  {
+    "DcoCountyName": "Norrbotten",
+    "CountyName": "Norrbotten"
+  },
+  {
+    "DcoCountyName": "Norrbottens",
+    "CountyName": "Norrbotten"
+  },
+  {
+    "DcoCountyName": "Norrbottens Län",
+    "CountyName": "Norrbotten"
+  },
+  {
+    "DcoCountyName": "Skåne",
+    "CountyName": "Skåne"
+  },
+  {
+    "DcoCountyName": "Skåne Län",
+    "CountyName": "Skåne"
+  },
+  {
+    "DcoCountyName": "Stockholm",
+    "CountyName": "Stockholm"
+  },
+  {
+    "DcoCountyName": "Stockholms",
+    "CountyName": "Stockholm"
+  },
+  {
+    "DcoCountyName": "Stockholms Län",
+    "CountyName": "Stockholm"
+  },
+  {
+    "DcoCountyName": "Södermanland",
+    "CountyName": "Södermanland"
+  },
+  {
+    "DcoCountyName": "Södermanlands",
+    "CountyName": "Södermanland"
+  },
+  {
+    "DcoCountyName": "Södermanlands Län",
+    "CountyName": "Södermanland"
+  },
+  {
+    "DcoCountyName": "Uppsala",
+    "CountyName": "Uppsala"
+  },
+  {
+    "DcoCountyName": "Uppsala Län",
+    "CountyName": "Uppsala"
+  },
+  {
+    "DcoCountyName": "Värmland",
+    "CountyName": "Värmland"
+  },
+  {
+    "DcoCountyName": "Värmlands",
+    "CountyName": "Värmland"
+  },
+  {
+    "DcoCountyName": "Värmlands Län",
+    "CountyName": "Värmland"
+  },
+  {
+    "DcoCountyName": "Västerbotten",
+    "CountyName": "Västerbotten"
+  },
+  {
+    "DcoCountyName": "Västerbottens",
+    "CountyName": "Västerbotten"
+  },
+  {
+    "DcoCountyName": "Västerbottens Län",
+    "CountyName": "Västerbotten"
+  },
+  {
+    "DcoCountyName": "Västernorrland",
+    "CountyName": "Västernorrland"
+  },
+  {
+    "DcoCountyName": "Västernorrlands",
+    "CountyName": "Västernorrland"
+  },
+  {
+    "DcoCountyName": "Västernorrlands Län",
+    "CountyName": "Västernorrland"
+  },
+  {
+    "DcoCountyName": "Västmanland",
+    "CountyName": "Västmanland"
+  },
+  {
+    "DcoCountyName": "Västmanlands",
+    "CountyName": "Västmanland"
+  },
+  {
+    "DcoCountyName": "Västmanlands Län",
+    "CountyName": "Västmanland"
+  },
+  {
+    "DcoCountyName": "Västra Götaland",
+    "CountyName": "Västra Götaland"
+  },
+  {
+    "DcoCountyName": "Västra Götalands",
+    "CountyName": "Västra Götaland"
+  },
+  {
+    "DcoCountyName": "Västra Götalands Län",
+    "CountyName": "Västra Götaland"
+  },
+  {
+    "DcoCountyName": "Västragötaland",
+    "CountyName": "Västra Götaland"
+  },
+  {
+    "DcoCountyName": "Örebro",
+    "CountyName": "Örebro"
+  },
+  {
+    "DcoCountyName": "Örebro Län",
+    "CountyName": "Örebro"
+  },
+  {
+    "DcoCountyName": "Östergötland",
+    "CountyName": "Östergötland"
+  },
+  {
+    "DcoCountyName": "Östergötlands",
+    "CountyName": "Östergötland"
+  },
+  {
+    "DcoCountyName": "Östergötlands Län",
+    "CountyName": "Östergötland"
+  }
+]

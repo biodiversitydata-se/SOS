@@ -289,7 +289,6 @@ namespace SOS.Lib.Models.DarwinCore
         public int? CountyIdByName { get; set; }
         public int? CountyPartIdByName { get; set; }
         public int? ProvinceIdByName { get; set; }
-        public int? MunicipalityIdByName { get; set; }
         public int? ProvincePartIdByName { get; set; }
         public int? CountyIdByCoordinate { get; set; }
         public int? CountyPartIdByCoordinate { get; set; }
