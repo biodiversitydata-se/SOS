@@ -31,9 +31,8 @@ namespace SOS.Process.Test.Helpers
             AreaVerbatimRepository areaVerbatimRepository = new AreaVerbatimRepository(
                 verbatimClient,
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
-            AreaHelper areaHelper = new AreaHelper(
-                areaVerbatimRepository,
-                new AreaNameMapper());
+            var areaHelper = new AreaHelper(
+                areaVerbatimRepository);
             List<DarwinCore<DynamicProperties>> observations = new List<DarwinCore<DynamicProperties>>();
             DarwinCore<DynamicProperties> observation = new DarwinCore<DynamicProperties>
             {

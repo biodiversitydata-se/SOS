@@ -16,10 +16,14 @@ using SOS.Process.Mappings.Interfaces;
 
 namespace SOS.Process.Helpers
 {
-    public class AreaHelper : Interfaces.IAreaHelper
+    public class AreaHelperWithNameMapping : Interfaces.IAreaHelper
     {
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
+        private readonly IAreaNameMapper _areaNameMapper;
+
         private readonly STRtree<IFeature> _strTree;
+        private Dictionary<string, int> _countyFeatureIdByNameMapper;
+        private Dictionary<string, int> _provinceFeatureIdByNameMapper;
         private readonly IDictionary<string, IEnumerable<IFeature>> _featureCache;
 
         /// <summary>
@@ -27,9 +31,12 @@ namespace SOS.Process.Helpers
         /// </summary>
         /// <param name="areaVerbatimRepository"></param>
         /// <param name="areaNameMapper"></param>
-        public AreaHelper(IAreaVerbatimRepository areaVerbatimRepository)
+        public AreaHelperWithNameMapping(
+            IAreaVerbatimRepository areaVerbatimRepository,
+            IAreaNameMapper areaNameMapper)
         {
             _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
+            _areaNameMapper = areaNameMapper ?? throw new ArgumentNullException(nameof(areaNameMapper));
             _strTree = new STRtree<IFeature>();
             _featureCache = new ConcurrentDictionary<string, IEnumerable<IFeature>>();
 
@@ -73,6 +80,8 @@ namespace SOS.Process.Helpers
             }
 
             _strTree.Build();
+            _countyFeatureIdByNameMapper = _areaNameMapper.BuildCountyFeatureIdByNameMapper(counties);
+            _provinceFeatureIdByNameMapper = _areaNameMapper.BuildProvinceFeatureIdByNameMapper(provinces);
         }
 
         /// <summary>
@@ -138,24 +147,38 @@ namespace SOS.Process.Helpers
                     dwcModel.DynamicProperties = new DynamicProperties();
                 }
 
+                string originalCountyName = dwcModel.Location.County;
+                string originalStateProvinceName = dwcModel.Location.StateProvince;
                 foreach (var feature in features)
                 {
                     switch ((AreaType)feature.Attributes.GetOptionalValue("areaType"))
                     {
                         case AreaType.County:
-                            dwcModel.Location.County = (string) feature.Attributes.GetOptionalValue("name");
+                            if (string.IsNullOrEmpty(dwcModel.Location.County))
+                            {
+                                dwcModel.Location.County = (string) feature.Attributes.GetOptionalValue("name");
+                            }
                             dwcModel.DynamicProperties.CountyIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
                             break;
                         case AreaType.Municipality:
-                            dwcModel.Location.Municipality = (string) feature.Attributes.GetOptionalValue("name");
+                            if (string.IsNullOrEmpty(dwcModel.Location.Municipality))
+                            {
+                                dwcModel.Location.Municipality = (string) feature.Attributes.GetOptionalValue("name");
+                            }
                             dwcModel.DynamicProperties.MunicipalityIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
                             break;
                         case AreaType.Parish:
-                            dwcModel.DynamicProperties.Parish = (string) feature.Attributes.GetOptionalValue("name");
+                            if (string.IsNullOrEmpty(dwcModel.DynamicProperties.Parish))
+                            {
+                                dwcModel.DynamicProperties.Parish = (string) feature.Attributes.GetOptionalValue("name");
+                            }
                             dwcModel.DynamicProperties.ParishIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
                             break;
                         case AreaType.Province:
-                            dwcModel.Location.StateProvince = (string) feature.Attributes.GetOptionalValue("name");
+                            if (string.IsNullOrEmpty(dwcModel.Location.StateProvince))
+                            {
+                                dwcModel.Location.StateProvince = (string) feature.Attributes.GetOptionalValue("name");
+                            }
                             dwcModel.DynamicProperties.ProvinceIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
                             break;
                     }
@@ -184,6 +207,53 @@ namespace SOS.Process.Helpers
                     dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.AseleLappmark)
                 {
                     dwcModel.DynamicProperties.ProvincePartIdByCoordinate = (int) ProvinceFeatureId.Lappland;
+                }
+
+                // County name mapping
+                if (!string.IsNullOrEmpty(originalCountyName) && _countyFeatureIdByNameMapper.TryGetValue(originalCountyName, out int countyFeatureId))
+                {
+                    dwcModel.DynamicProperties.CountyIdByName = countyFeatureId;
+                    dwcModel.DynamicProperties.CountyPartIdByName = countyFeatureId;
+                }
+                else
+                {
+                    dwcModel.DynamicProperties.CountyIdByName = dwcModel.DynamicProperties.CountyIdByCoordinate;
+                    dwcModel.DynamicProperties.CountyPartIdByName = dwcModel.DynamicProperties.CountyPartIdByCoordinate;
+                }
+
+                // Province name mapping
+                if (!string.IsNullOrEmpty(originalStateProvinceName) && _provinceFeatureIdByNameMapper.TryGetValue(originalStateProvinceName, out int provinceFeatureId))
+                {
+                    dwcModel.DynamicProperties.ProvinceIdByName = provinceFeatureId;
+                    dwcModel.DynamicProperties.ProvincePartIdByName = provinceFeatureId;
+                }
+                else
+                {
+                    dwcModel.DynamicProperties.ProvinceIdByName = dwcModel.DynamicProperties.ProvinceIdByCoordinate;
+                    dwcModel.DynamicProperties.ProvincePartIdByName = dwcModel.DynamicProperties.ProvincePartIdByCoordinate;
+                }
+
+                // Set ProvincePartIdByName. Merge Lappmarker into Lappland.
+                if (dwcModel.DynamicProperties.ProvincePartIdByName == (int)ProvinceFeatureId.LuleLappmark ||
+                    dwcModel.DynamicProperties.ProvincePartIdByName == (int)ProvinceFeatureId.LyckseleLappmark ||
+                    dwcModel.DynamicProperties.ProvincePartIdByName == (int)ProvinceFeatureId.PiteLappmark ||
+                    dwcModel.DynamicProperties.ProvincePartIdByName == (int)ProvinceFeatureId.TorneLappmark ||
+                    dwcModel.DynamicProperties.ProvincePartIdByName == (int)ProvinceFeatureId.AseleLappmark)
+                {
+                    dwcModel.DynamicProperties.ProvincePartIdByName = (int)ProvinceFeatureId.Lappland;
+                }
+
+                // Set CountyPartIdByName. Split Kalmar into Öland and Kalmar fastland.
+                if (dwcModel.DynamicProperties.CountyIdByName == (int)CountyFeatureId.Kalmar)
+                {
+                    if (dwcModel.DynamicProperties.ProvincePartIdByName == (int)ProvinceFeatureId.Oland)
+                    {
+                        dwcModel.DynamicProperties.CountyPartIdByName = (int)CountyFeatureId.Oland;
+                    }
+                    else
+                    {
+                        dwcModel.DynamicProperties.CountyPartIdByName = (int)CountyFeatureId.KalmarFastland;
+                    }
                 }
             }
         }
