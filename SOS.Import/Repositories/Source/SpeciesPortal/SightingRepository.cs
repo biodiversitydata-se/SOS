@@ -28,9 +28,11 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 var query = @"
                 SELECT DISTINCT
                     s.ActivityId,
+					s.BiotopeId,
+					sdb.[Description] AS BiotopeDescription,
                     ssci.Label AS CollectionID,
 	                scp.Comment,
-                    s.ControlingOrganisationId,
+					si.ControlingOrganisationId,
 	                s.EndDate,
 	                s.EndTime,
 	                s.GenderId,
@@ -50,6 +52,7 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                     msi.obsid AS MigrateSightingObsId,
 	                s.ProtectedBySystem,
 	                s.Quantity,
+					s.QuantityOfSubstrate,
                     s.RegisterDate,
 	                CASE 
 						WHEN p.Id IS NULL THEN null
@@ -59,6 +62,10 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
 	                s.StageId,
 	                s.StartDate,
 	                s.StartTime,
+					s.SubstrateId,
+					sds.[Description] AS SubstrateDescription,
+					sdss.[Description] AS SubstrateSpeciesDescription,
+					s.SubstrateSpeciesId,
 	                s.TaxonId,
 	                s.UnsureDetermination,
 	                s.Unspontaneous,
@@ -68,6 +75,7 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
 	                s.[Weight]
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
+					INNER JOIN Sighting si ON s.SightingId = si.Id
 	                INNER JOIN SightingState ss ON s.SightingId = ss.SightingId
 	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId
 	                LEFT JOIN SightingSpeciesCollectionItem ssc ON s.SightingId = ssc.SightingId
@@ -76,6 +84,9 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
 	                LEFT JOIN Person p ON u.PersonId = p.Id
                     LEFT JOIN SightingSpeciesCollectionItem ssci ON s.SightingId = ssci.SightingId
                     LEFT JOIN MigrateSightingid msi ON s.SightingId = msi.Id
+					LEFT JOIN SightingDescription sdb ON si.SightingBiotopeDescriptionId = sdb.Id 
+					LEFT JOIN SightingDescription sds ON si.SightingSubstrateDescriptionId = sds.Id 
+					LEFT JOIN SightingDescription sdss ON si.SightingSubstrateSpeciesDescriptionId = sdss.Id
                 WHERE
 	                s.Id BETWEEN @StartId AND @EndId
 	                AND s.TaxonId IS NOT NULL

@@ -45,23 +45,27 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="activities"></param>
+        /// <param name="biotopes"></param>
         /// <param name="genders"></param>
         /// <param name="organizations"></param>
         /// <param name="personSightings"></param>
         /// <param name="projects"></param>
         /// <param name="sites"></param>
         /// <param name="stages"></param>
+        /// <param name="substrates"></param>
         /// <param name="validationStatus"></param>
         /// <param name="units"></param>
         /// <returns></returns>
         public static APSightingVerbatim ToAggregate(this SightingEntity entity,
             IDictionary<int, MetadataWithCategory> activities,
+            IDictionary<int, Metadata> biotopes,
             IDictionary<int, Metadata> genders,
             IDictionary<int, Metadata> organizations,
             IDictionary<int, PersonSighting> personSightings,
             IDictionary<int, Project> projects,
             IDictionary<int, Site> sites,
             IDictionary<int, Metadata> stages,
+            IDictionary<int, Metadata> substrates,
             IDictionary<int, Metadata> validationStatus,
             IDictionary<int, Metadata> units 
         )
@@ -69,6 +73,8 @@ namespace SOS.Import.Extensions
             var observation = new APSightingVerbatim
             {
                 Activity = entity.ActivityId.HasValue && activities.ContainsKey(entity.ActivityId.Value) ? activities[entity.ActivityId.Value] : null,
+                Bioptope = entity.BiptopeId.HasValue && biotopes.ContainsKey(entity.BiptopeId.Value) ? biotopes[entity.BiptopeId.Value] : null,
+                BiotopeDescription = entity.BiptopeDescription,
                 CollectionID = entity.CollectionID,
                 Comment = entity.Comment,
                 ControlingOrganisationId = entity.ControlingOrganisationId,
@@ -92,12 +98,17 @@ namespace SOS.Import.Extensions
                 Project = projects.ContainsKey(entity.Id) ? projects[entity.Id] : null,
                 ProtectedBySystem = entity.ProtectedBySystem,
                 Quantity = entity.Quantity,
+                QuantityOfSubstrate = entity.QuantityOfSubstrate,
                 ReportedDate = entity.RegisterDate,
                 RightsHolder = entity.RightsHolder,
                 Site = entity.SiteId.HasValue && sites.ContainsKey(entity.SiteId.Value) ? sites[entity.SiteId.Value] : null,
                 Stage = entity.StageId.HasValue && stages.ContainsKey(entity.StageId.Value) ? stages[entity.StageId.Value] : null,
                 StartDate = entity.StartDate,
                 StartTime = entity.StartTime,
+                Substrate= entity.SubstrateId.HasValue && substrates.ContainsKey(entity.SubstrateId.Value) ? substrates[entity.SubstrateId.Value] : null,
+                SubstrateDescription = entity.SubstrateDescription,
+                SubstrateSpeciesDescription = entity.SubstrateSpeciesDescription,
+                SubstrateSpeciesId = entity.SubstrateSpeciesId,
                 TaxonId = entity.TaxonId,
                 Unit = entity.UnitId.HasValue && units.ContainsKey(entity.UnitId.Value) ? units[entity.UnitId.Value] : null,
                 Unspontaneous = entity.Unspontaneous,
@@ -123,26 +134,31 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <param name="activities"></param>
+        /// <param name="biotopes"></param>
         /// <param name="genders"></param>
-        /// <param name="stages"></param>
-        /// <param name="units"></param>
-        /// <param name="sites"></param>
-        /// <param name="projects"></param>
+        /// <param name="organizations"></param>
         /// <param name="personSightings"></param>
+        /// <param name="projects"></param>
+        /// <param name="sites"></param>
+        /// <param name="stages"></param>
+        /// <param name="substrates"></param>
         /// <param name="validationStatus"></param>
+        /// <param name="units"></param>
         /// <returns></returns>
         public static IEnumerable<APSightingVerbatim> ToAggregates(this IEnumerable<SightingEntity> entities,
             IDictionary<int, MetadataWithCategory> activities,
+            IDictionary<int, Metadata> biotopes,
             IDictionary<int, Metadata> genders,
             IDictionary<int, Metadata> organizations,
             IDictionary<int, PersonSighting> personSightings,
             IDictionary<int, Project> projects,
             IDictionary<int, Site> sites,
             IDictionary<int, Metadata> stages,
+            IDictionary<int, Metadata> substrates,
             IDictionary<int, Metadata> validationStatus,
             IDictionary<int, Metadata> units)
         {
-            return entities.Select(e => e.ToAggregate(activities, genders, organizations, personSightings, projects, sites, stages, validationStatus, units ));
+            return entities.Select(e => e.ToAggregate(activities, biotopes, genders, organizations, personSightings, projects, sites, stages, substrates, validationStatus, units ));
         }
 
         /// <summary>
@@ -215,7 +231,8 @@ namespace SOS.Import.Extensions
                 Name = entity.Name,
                 Owner = entity.Owner,
                 StartDate = entity.StartDate,
-                SurveyMethod = entity.SurveyMethod
+                SurveyMethod = entity.SurveyMethod,
+                SurveyMethodUrl = entity.SurveyMethodUrl
             };
         }
 

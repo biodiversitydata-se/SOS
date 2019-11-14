@@ -51,5 +51,10 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         /// Survey method used
         /// </summary>
         public string SurveyMethod { get; set; }
+
+        /// <summary>
+        /// Survey method url 
+        /// </summary>
+        public string SurveyMethodUrl { get; set; }
     }
 }

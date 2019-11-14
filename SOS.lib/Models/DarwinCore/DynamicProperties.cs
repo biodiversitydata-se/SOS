@@ -196,6 +196,11 @@ namespace SOS.Lib.Models.DarwinCore
         public DarwinCoreProject Project { get; set; }
 
         /// <summary>
+        /// Protection level
+        /// </summary>
+        public int ProtectionLevel { get; set; }
+
+        /// <summary>
         /// Not defined in Darwin Core.
         /// Quantity of observed species, for example distribution area.
         /// Unit is specified in property QuantityUnit.
@@ -302,12 +307,5 @@ namespace SOS.Lib.Models.DarwinCore
         public int? ProvincePartIdByCoordinate { get; set; }
         public int? MunicipalityIdByCoordinate { get; set; }
         public int? ParishIdByCoordinate { get; set; }
-        
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Name of the organization or person that
-        /// owns the species observation.
-        /// </summary>
-        public string Owner { get; set; }
     }
 }

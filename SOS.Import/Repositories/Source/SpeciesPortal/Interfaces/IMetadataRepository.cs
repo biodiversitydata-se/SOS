@@ -16,6 +16,12 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal.Interfaces
         Task<IEnumerable<MetadataWithCategoryEntity>> GetActivitiesAsync();
 
         /// <summary>
+        /// Get all bioptopes
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<MetadataEntity>> GetBiotopesAsync();
+
+        /// <summary>
         /// Get all genders
         /// </summary>
         /// <returns></returns>
@@ -32,6 +38,12 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<MetadataEntity>> GetStagesAsync();
+
+        /// <summary>
+        /// Get all substrates
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<MetadataEntity>> GetSubstratesAsync();
 
         /// <summary>
         /// Get all units
