@@ -16,6 +16,14 @@ using SOS.Process.Mappings.Interfaces;
 
 namespace SOS.Process.Helpers
 {
+    /// <summary>
+    /// This class is currently not used. It is unclear if this functionality is needed.
+    ///
+    /// The difference compared to the AreaHelper class is that this class also handles
+    /// name mappings of counties and provinces. The name mappings that occur e.g.
+    /// for a county is that if there is a value "Hallnad" from verbatimObs.County
+    /// then it is mapped first to "Halland" and then to a FeatureId (13) to speed up searches.
+    /// </summary>
     public class AreaHelperWithNameMapping : Interfaces.IAreaHelper
     {
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
