@@ -153,28 +153,11 @@ namespace SOS.Lib.Models.DarwinCore
         /// <summary>
         /// Not defined in Darwin Core.
         /// Web address that leads to more information about the
-        /// location. The information should be accessible
-        /// from the most commonly used web browsers.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        public string LocationURL { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Web address that leads to more information about the
         /// occurrence. The information should be accessible
         /// from the most commonly used web browsers.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string OccurrenceURL { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Common name of the organism group that observed species
-        /// belongs to. Classification of species groups is the same as
-        /// used in latest 'Red List of Swedish Species'.
-        /// </summary>
-        public string OrganismGroup { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
@@ -204,19 +187,6 @@ namespace SOS.Lib.Models.DarwinCore
 
         /// <summary>
         /// Not defined in Darwin Core.
-        /// Quantity of observed species, for example distribution area.
-        /// Unit is specified in property QuantityUnit.
-        /// </summary>
-        public string Quantity { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Unit for quantity value of observed species.
-        /// </summary>
-        public string QuantityUnit { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
         /// Name of the person that reported the species observation.
         /// </summary>
         public string ReportedBy { get; set; }
@@ -226,14 +196,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Date and time when the species observation was reported.
         /// </summary>
         public DateTime? ReportedDate { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Web address that leads to more information about the
-        /// species observation. The information should be accessible
-        /// from the most commonly used web browsers.
-        /// </summary>
-        public string SpeciesObservationURL { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
@@ -250,50 +212,11 @@ namespace SOS.Lib.Models.DarwinCore
 
         /// <summary>
         /// Not defined in Darwin Core.
-        /// Status of the taxon concept.
-        /// Examples of possible values are InvalidDueToSplit,
-        /// InvalidDueToLump, InvalidDueToDelete, Unchanged,
-        /// ValidAfterLump or ValidAfterSplit.
-        /// </summary>
-        public string TaxonConceptStatus { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Sort order of taxon according to Dyntaxa.
-        /// This property is currently not used.
-        /// </summary>
-        public int TaxonSortOrder { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Web address that leads to more information about the
-        /// taxon. The information should be accessible
-        /// from the most commonly used web browsers.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        public string TaxonURL { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
         /// Indicates if the species observer himself is
         /// uncertain about the taxon determination.
         /// </summary>
         public bool UncertainDetermination { get; set; }
 
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Information about current validation status
-        /// for the species observation.
-        /// </summary>
-        public string ValidationStatus { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// ScientificName as it appears in the original record.
-        /// This property is currently not used.
-        /// </summary>
-        public string VerbatimScientificName { get; set; }
-        
         public int? ActivityId { get; set; }
         public int? BirdNestActivityId { get; set; }
         public int DisturbanceRadius { get; set; }

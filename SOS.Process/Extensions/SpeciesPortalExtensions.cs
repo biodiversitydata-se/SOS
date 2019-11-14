@@ -36,29 +36,6 @@ namespace SOS.Process.Extensions
 
             taxa.TryGetValue(taxonId, out var taxon);
 
-            string associatedReferences = null;
-            switch (verbatim.MigrateSightingPortalId ?? 0)
-            {
-                case 1:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bird.{verbatim.MigrateSightingObsId.Value}";
-                    break;
-                case 2:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:PlantAndMushroom.{verbatim.MigrateSightingObsId.Value}";
-                    break;
-                case 6:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Vertebrate.{verbatim.MigrateSightingObsId.Value}";
-                    break;
-                case 7:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bugs.{verbatim.MigrateSightingObsId.Value}";
-                    break;
-                case 8:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Fish.{verbatim.MigrateSightingObsId.Value}";
-                    break;
-                case 9:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:MarineInvertebrates.{verbatim.MigrateSightingObsId.Value}";
-                    break;
-            }
-            
             return new DarwinCore<DynamicProperties>()
             {
                 AccessRights = !verbatim.ProtectedBySystem && verbatim.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now ? "Free usage" : "Not for public usage",
@@ -71,8 +48,8 @@ namespace SOS.Process.Extensions
                 {
                     ActivityId = verbatim.Activity?.Id,
                     BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon),
-                    CoordinateX = googleMercatorPoint.Coordinate?.X ?? 0,
-                    CoordinateY = googleMercatorPoint.Coordinate?.Y ?? 0,
+                    CoordinateX = googleMercatorPoint.Coordinate.X,
+                    CoordinateY = googleMercatorPoint.Coordinate.Y,
                     DyntaxaTaxonID = verbatim.TaxonId,
                     IndividualID = verbatim.URL,
                     IsNaturalOccurrence = !verbatim.Unspontaneous,
@@ -144,7 +121,7 @@ namespace SOS.Process.Extensions
                 Occurrence = new DarwinCoreOccurrence
                 {
                     AssociatedMedia = verbatim.HasImages ? $"http://www.artportalen.se/sighting/{verbatim.Id}#SightingDetailImages" : "",
-                    AssociatedReferences = associatedReferences,
+                    AssociatedReferences = GetAssociatedReferences(verbatim),
                     Behavior = verbatim.Activity?.Name, 
                     CatalogNumber = verbatim.Id.ToString(),
                     EstablishmentMeans = verbatim.Unspontaneous ? "Unspontaneous" : "Natural",
@@ -266,6 +243,39 @@ namespace SOS.Process.Extensions
             }
 
             return 0;
+        }
+
+        /// <summary>
+        /// Get associated references
+        /// </summary>
+        /// <param name="verbatim"></param>
+        /// <returns></returns>
+        public static string GetAssociatedReferences(APSightingVerbatim verbatim)
+        {
+            string associatedReferences = null;
+            switch (verbatim.MigrateSightingPortalId ?? 0)
+            {
+                case 1:
+                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bird.{verbatim.MigrateSightingObsId.Value}";
+                    break;
+                case 2:
+                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:PlantAndMushroom.{verbatim.MigrateSightingObsId.Value}";
+                    break;
+                case 6:
+                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Vertebrate.{verbatim.MigrateSightingObsId.Value}";
+                    break;
+                case 7:
+                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bugs.{verbatim.MigrateSightingObsId.Value}";
+                    break;
+                case 8:
+                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Fish.{verbatim.MigrateSightingObsId.Value}";
+                    break;
+                case 9:
+                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:MarineInvertebrates.{verbatim.MigrateSightingObsId.Value}";
+                    break;
+            }
+
+            return associatedReferences;
         }
     }
 }
