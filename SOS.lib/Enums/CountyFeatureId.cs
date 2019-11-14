@@ -15,6 +15,11 @@ namespace SOS.Lib.Enums
         Kalmar = 8,
 
         /// <summary>
+        /// Halland county.
+        /// </summary>
+        Halland = 13,
+
+        /// <summary>
         /// Kalmar fastland
         /// Special county that represents a part of the County Kalmar
         /// </summary>

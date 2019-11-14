@@ -1,12 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Hangfire;
 using Hangfire.Mongo;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
@@ -27,6 +29,9 @@ namespace SOS.Hangfire.JobServer
     public class Program
     {
         private static string _env;
+        private static ImportConfiguration _importConfiguration;
+        private static ProcessConfiguration _processConfiguration;
+        private static ExportConfiguration _exportConfiguration;
 
         /// <summary>
         /// Application entry point
@@ -39,9 +44,9 @@ namespace SOS.Hangfire.JobServer
 
             if (new[] { "local", "dev", "st", "prod" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
             {
-                await CreateHostBuilder(args)
-                    .Build()
-                    .RunAsync();
+                IHost host = CreateHostBuilder(args).Build();
+                LogStartupSettings(host.Services.GetService<ILogger<Program>>());
+                await host.RunAsync();
             }
         }
 
@@ -100,19 +105,55 @@ namespace SOS.Hangfire.JobServer
                 })
                 .UseServiceProviderFactory(hostContext =>
                     {
-                        var importConfiguration = hostContext.Configuration.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();
-                        var processConfiguration = hostContext.Configuration.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
-                        var exportConfiguration  = hostContext.Configuration.GetSection(typeof(ExportConfiguration).Name).Get<ExportConfiguration>();
+                        _importConfiguration = hostContext.Configuration.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();
+                        _processConfiguration = hostContext.Configuration.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
+                        _exportConfiguration  = hostContext.Configuration.GetSection(typeof(ExportConfiguration).Name).Get<ExportConfiguration>();
 
                         return new AutofacServiceProviderFactory(builder =>
                             builder
                                 .RegisterModule<CoreModule>()
-                                .RegisterModule(new ImportModule { Configuration = importConfiguration })
-                                .RegisterModule(new ProcessModule { Configuration = processConfiguration })
-                                .RegisterModule(new ExportModule { Configuration = exportConfiguration })
+                                .RegisterModule(new ImportModule { Configuration = _importConfiguration })
+                                .RegisterModule(new ProcessModule { Configuration = _processConfiguration })
+                                .RegisterModule(new ExportModule { Configuration = _exportConfiguration })
                         );
                     }
                 )
                 .UseNLog();
+
+        private static void LogStartupSettings(ILogger<Program> logger)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("Hangfire JobServer Started with the following settings:");
+            sb.AppendLine("Import settings:");
+            sb.AppendLine("================");
+            sb.AppendLine($"[KULSettings].[StartHarvestYear]: { _importConfiguration.KulServiceConfiguration.StartHarvestYear}");
+            sb.AppendLine($"[KULSettings].[MaxNumberOfSightingsHarvested]: { _importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            sb.AppendLine($"[SpeciesPortalSettings].[MaxNumberOfSightingsHarvested]: {_importConfiguration.SpeciesPortalConfiguration.MaxNumberOfSightingsHarvested}");
+            sb.AppendLine($"[SpeciesPortalSettings].[ChunkSize]: {_importConfiguration.SpeciesPortalConfiguration.ChunkSize}");
+            sb.AppendLine($"[SpeciesPortalSettings].[ConnectionString]: {_importConfiguration.SpeciesPortalConfiguration.ConnectionString}");
+            sb.AppendLine($"[ClamTreeService].[Address]: {_importConfiguration.ClamTreeServiceConfiguration.BaseAddress}");
+            sb.AppendLine($"[TaxonAttributeService].[Address]: {_importConfiguration.TaxonAttributeServiceConfiguration.BaseAddress}");
+            sb.AppendLine($"[TaxonService].[Address]: {_importConfiguration.TaxonServiceConfiguration.BaseAddress}");
+            sb.AppendLine($"[MongoDb].[Servers]: { string.Join(", ", _importConfiguration.MongoDbConfiguration.Hosts.Select(x => x.Name))}");
+            sb.AppendLine($"[MongoDb].[DatabaseName]: {_importConfiguration.MongoDbConfiguration.DatabaseName}");
+            sb.AppendLine("");
+
+            sb.AppendLine("Process settings:");
+            sb.AppendLine("================");
+            sb.AppendLine($"[ProcessedDb].[Servers]: { string.Join(", ", _processConfiguration.ProcessedDbConfiguration.Hosts.Select(x => x.Name))}");
+            sb.AppendLine($"[ProcessedDb].[DatabaseName]: { _processConfiguration.ProcessedDbConfiguration.DatabaseName}");
+            sb.AppendLine($"[VerbatimDb].[Servers]: { string.Join(", ", _processConfiguration.VerbatimDbConfiguration.Hosts.Select(x => x.Name))}");
+            sb.AppendLine($"[VerbatimDb].[DatabaseName]: { _processConfiguration.VerbatimDbConfiguration.DatabaseName}");
+            sb.AppendLine("");
+
+            sb.AppendLine("Export settings:");
+            sb.AppendLine("================");
+            sb.AppendLine($"[BlobStorage].[ConnectionString]: { _exportConfiguration.BlobStorageConfiguration.ConnectionString}");
+            sb.AppendLine($"[MongoDb].[Servers]: { string.Join(", ", _exportConfiguration.MongoDbConfiguration.Hosts.Select(x => x.Name))}");
+            sb.AppendLine($"[MongoDb].[DatabaseName]: { _exportConfiguration.MongoDbConfiguration.DatabaseName}");
+            sb.AppendLine($"[FileDestination].[Path]: { _exportConfiguration.FileDestination.Path}");
+
+            logger.LogInformation(sb.ToString());
+        }
     }
 }

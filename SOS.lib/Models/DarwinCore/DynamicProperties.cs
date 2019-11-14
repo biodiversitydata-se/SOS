@@ -177,7 +177,9 @@ namespace SOS.Lib.Models.DarwinCore
         public string OrganismGroup { get; set; }
 
         /// <summary>
-        /// Owner of the sighting
+        /// Not defined in Darwin Core.
+        /// Name of the organization or person that
+        /// owns the species observation.
         /// </summary>
         public string Owner { get; set; }
 
@@ -299,7 +301,6 @@ namespace SOS.Lib.Models.DarwinCore
         public int? CountyIdByName { get; set; }
         public int? CountyPartIdByName { get; set; }
         public int? ProvinceIdByName { get; set; }
-        public int? MunicipalityIdByName { get; set; }
         public int? ProvincePartIdByName { get; set; }
         public int? CountyIdByCoordinate { get; set; }
         public int? CountyPartIdByCoordinate { get; set; }

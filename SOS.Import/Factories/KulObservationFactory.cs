@@ -31,13 +31,22 @@ namespace SOS.Import.Factories
             _logger = logger;
         }
 
+        private string GetKulHarvestSettingsInfoString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("KUL Harvest settings:");
+            sb.AppendLine($"  Start Harvest Year: {_kulServiceConfiguration.StartHarvestYear}");
+            sb.AppendLine($"  Max Number Of Sightings Harvested: {_kulServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            return sb.ToString();
+        }
         
         public async Task<bool> HarvestObservationsAsync()
         {
-            _logger.LogDebug("Start harvesting sightings for KUL data provider");
-            
+            _logger.LogInformation("Start harvesting sightings for KUL data provider");
+            _logger.LogInformation(GetKulHarvestSettingsInfoString());
+
             // Make sure we have an empty collection.
-            _logger.LogDebug("Empty collection for KUL verbatim collection");
+            _logger.LogInformation("Empty collection for KUL verbatim collection");
             await _kulObservationVerbatimRepository.DeleteCollectionAsync();
             await _kulObservationVerbatimRepository.AddCollectionAsync();
 
@@ -65,7 +74,7 @@ namespace SOS.Import.Factories
                 changedFrom = changedFrom.AddYears(1);
             }
 
-            _logger.LogDebug("Finished harvesting sightings for KUL data provider");
+            _logger.LogInformation("Finished harvesting sightings for KUL data provider");
             return true;
         }
     }

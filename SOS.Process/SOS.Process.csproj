@@ -19,4 +19,13 @@
     <ItemGroup>
       <Folder Include="Properties\" />
     </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Resources\CountyNameMapper.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\ProvinceNameMapper.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 </Project>
