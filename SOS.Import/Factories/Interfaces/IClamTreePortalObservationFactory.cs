@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Hangfire;
 
 namespace SOS.Import.Factories.Interfaces
 {
@@ -17,6 +18,6 @@ namespace SOS.Import.Factories.Interfaces
         /// Harvest trees.
         /// </summary>
         /// <returns></returns>
-        Task<bool> HarvestTreesAsync();
+        Task<bool> HarvestTreesAsync(IJobCancellationToken cancellationToken);
     }
 }

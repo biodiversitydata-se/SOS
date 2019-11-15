@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Repositories.Destination.ClamTreePortal.Interfaces;
 using SOS.Import.Services.Interfaces;
@@ -65,7 +67,7 @@ namespace SOS.Import.Factories
         /// Aggregate trees
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> HarvestTreesAsync()
+        public async Task<bool> HarvestTreesAsync(IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -81,6 +83,7 @@ namespace SOS.Import.Factories
 
                 while (items?.Any() ?? false)
                 {
+                    cancellationToken?.ThrowIfCancellationRequested();
                     await _treeObservationVerbatimRepository.AddManyAsync(items);
 
                     pageNumber++;
@@ -90,6 +93,11 @@ namespace SOS.Import.Factories
                 _logger.LogDebug("Finish storing tree verbatim");
 
                 return true;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Tree harvest was cancelled.");
+                return false;
             }
             catch (Exception e)
             {

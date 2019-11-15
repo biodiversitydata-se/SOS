@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
@@ -78,7 +80,7 @@ namespace SOS.Import.Factories
         }
 
         /// <inheritdoc />
-        public async Task<bool> HarvestSightingsAsync()
+        public async Task<bool> HarvestSightingsAsync(IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -97,7 +99,7 @@ namespace SOS.Import.Factories
 
                 _logger.LogDebug("Start getting meta data");
                 await Task.WhenAll(metaDataTasks);
-
+                cancellationToken?.ThrowIfCancellationRequested();
                 var biotopes = metaDataTasks[0].Result.ToAggregates().ToDictionary(b => b.Id, b => b);
                 var genders = metaDataTasks[1].Result.ToAggregates().ToDictionary(g => g.Id, g => g);
                 var organizations = metaDataTasks[2].Result.ToAggregates().ToDictionary(o => o.Id, o => o);
@@ -118,6 +120,7 @@ namespace SOS.Import.Factories
 
                 _logger.LogDebug("Start getting sighting project id's");
                 var sightingProjectIds = await _sightingRepository.GetProjectIdsAsync();
+                cancellationToken?.ThrowIfCancellationRequested();
 
                 // Create a dictionary with sightings projects. 
                 var sightingProjects = new Dictionary<int, Project>();
@@ -141,6 +144,7 @@ namespace SOS.Import.Factories
                 // Loop until all sightings are fetched
                 while (minId <= maxId)
                 {
+                    cancellationToken?.ThrowIfCancellationRequested();
                     if (_speciesPortalConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         nrSightingsHarvested >= _speciesPortalConfiguration.MaxNumberOfSightingsHarvested)
                     {
@@ -186,6 +190,11 @@ namespace SOS.Import.Factories
                 }
 
                 return true;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Species Portal harvest was cancelled.");
+                return false;
             }
             catch (Exception e)
             {

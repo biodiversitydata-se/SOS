@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Factories.Interfaces;
 using SOS.Import.Jobs.Interfaces;
@@ -25,11 +26,11 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> Run()
+        public async Task<bool> Run(IJobCancellationToken cancellationToken)
         {
             _logger.LogDebug("Start Species Portal Harvest Job");
            
-            var success = await _speciesPortalSightingFactory.HarvestSightingsAsync();
+            var success = await _speciesPortalSightingFactory.HarvestSightingsAsync(cancellationToken);
 
             _logger.LogDebug($"End Species Portal Harvest Job. Success: {success}");
 

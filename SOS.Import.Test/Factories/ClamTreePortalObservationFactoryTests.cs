@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using FluentAssertions;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Factories;
@@ -177,7 +178,7 @@ namespace SOS.Import.Test.Factories
                 _clamTreeObservationServiceMock.Object,
                 _loggerMock.Object);
 
-            var result = await sightingFactory.HarvestTreesAsync();
+            var result = await sightingFactory.HarvestTreesAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -207,7 +208,7 @@ namespace SOS.Import.Test.Factories
                 _clamTreeObservationServiceMock.Object,
                 _loggerMock.Object);
 
-            var result = await sightingFactory.HarvestTreesAsync();
+            var result = await sightingFactory.HarvestTreesAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

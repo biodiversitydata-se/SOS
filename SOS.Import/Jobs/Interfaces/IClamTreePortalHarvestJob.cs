@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Hangfire;
 
 namespace SOS.Import.Jobs.Interfaces
 {
@@ -8,6 +9,6 @@ namespace SOS.Import.Jobs.Interfaces
         /// Run species portal harvest
         /// </summary>
         /// <returns></returns>
-        Task<bool> Run();
+        Task<bool> Run(IJobCancellationToken cancellationToken);
     }
 }

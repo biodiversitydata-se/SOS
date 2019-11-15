@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Hangfire;
 
 namespace SOS.Import.Factories.Interfaces
 {
@@ -11,6 +12,6 @@ namespace SOS.Import.Factories.Interfaces
         /// Aggregate sightings.
         /// </summary>
         /// <returns></returns>
-        Task<bool> HarvestSightingsAsync();
+        Task<bool> HarvestSightingsAsync(IJobCancellationToken cancellationToken);
     }
 }

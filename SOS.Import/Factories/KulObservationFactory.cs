@@ -82,9 +82,9 @@ namespace SOS.Import.Factories
                 _logger.LogInformation("Finished harvesting sightings for KUL data provider");
                 return true;
             }
-            catch (JobAbortedException e)
+            catch (JobAbortedException)
             {
-                _logger.LogInformation("KUL harvest job was cancelled.");
+                _logger.LogInformation("KUL harvest was cancelled.");
                 return false;
             }
             catch (Exception e)

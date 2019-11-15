@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Factories.Interfaces;
 using SOS.Import.Jobs.Interfaces;
@@ -28,14 +29,14 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> Run()
+        public async Task<bool> Run(IJobCancellationToken cancellationToken)
         {
             _logger.LogDebug("Start Clam Tree Portal Harvest Job");
             // Create task list
             var harvestTasks = new List<Task<bool>>
             {
                 _clamTreePortalObservationFactory.HarvestClamsAsync(),
-                _clamTreePortalObservationFactory.HarvestTreesAsync()
+                _clamTreePortalObservationFactory.HarvestTreesAsync(cancellationToken)
             };
 
             // Run all tasks async

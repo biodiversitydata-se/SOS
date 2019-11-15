@@ -35,7 +35,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<ClamTreePortalHarvestJob>(nameof(ClamTreePortalHarvestJob), job => job.Run(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<ClamTreePortalHarvestJob>(nameof(ClamTreePortalHarvestJob), job => job.Run(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Clam/tree Portal harvest job added");
             }
             catch (Exception e)
@@ -53,7 +53,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                BackgroundJob.Enqueue<IClamTreePortalHarvestJob>(job => job.Run());
+                BackgroundJob.Enqueue<IClamTreePortalHarvestJob>(job => job.Run(JobCancellationToken.Null));
                 return new OkObjectResult("Started clam/tree Portal harvest job");
             }
             catch (Exception e)
@@ -149,7 +149,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<SpeciesPortalHarvestJob>(nameof(SpeciesPortalHarvestJob), job => job.Run(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<SpeciesPortalHarvestJob>(nameof(SpeciesPortalHarvestJob), job => job.Run(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Species Portal harvest job added");
             }
             catch (Exception e)
@@ -167,7 +167,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                BackgroundJob.Enqueue<ISpeciesPortalHarvestJob>(job => job.Run());
+                BackgroundJob.Enqueue<ISpeciesPortalHarvestJob>(job => job.Run(JobCancellationToken.Null));
                 return new OkObjectResult("Started Species Portal harvest job");
             }
             catch (Exception e)
