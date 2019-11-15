@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using FluentAssertions;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Export.Factories;
@@ -145,7 +146,7 @@ namespace SOS.Export.Test.Factories
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
 
-            var result = await sightingFactory.ExportAllAsync();
+            var result = await sightingFactory.ExportAllAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -175,7 +176,7 @@ namespace SOS.Export.Test.Factories
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
 
-            var result = await sightingFactory.ExportAllAsync();
+            var result = await sightingFactory.ExportAllAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

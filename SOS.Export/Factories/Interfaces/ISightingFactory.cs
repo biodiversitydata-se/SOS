@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Hangfire;
 
 namespace SOS.Export.Factories.Interfaces
 {
@@ -11,7 +12,7 @@ namespace SOS.Export.Factories.Interfaces
         /// Export all sightings
         /// </summary>
         /// <returns></returns>
-        Task<bool> ExportAllAsync();
+        Task<bool> ExportAllAsync(IJobCancellationToken cancellationToken);
 
     }
 }

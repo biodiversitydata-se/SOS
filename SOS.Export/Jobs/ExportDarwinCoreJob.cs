@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Factories.Interfaces;
 using SOS.Export.Jobs.Interfaces;
@@ -30,7 +31,7 @@ namespace SOS.Export.Jobs
         {
             _logger.LogDebug("Start Export Darwin Core job");
            
-            var success = await _sightingFactory.ExportAllAsync();
+            var success = await _sightingFactory.ExportAllAsync(JobCancellationToken.Null);
 
             _logger.LogDebug($"End Export Darwin Core job. Success: {success}");
 

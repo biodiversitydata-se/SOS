@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml;
+using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Extensions;
 using SOS.Export.Mappings;
@@ -48,7 +50,7 @@ namespace SOS.Export.Factories
         }
 
         /// <inheritdoc />
-        public async Task<bool> ExportAllAsync()
+        public async Task<bool> ExportAllAsync(IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -62,6 +64,7 @@ namespace SOS.Export.Factories
 
                 while (processedDarwinCore.Any())
                 {
+                    cancellationToken?.ThrowIfCancellationRequested();
                     var dwC = new List<DwC>();
                     var dwCOccurrence = new List<DwCOccurrence>();
                     var dwCMaterialSample = new List<DwCMaterialSample>();
@@ -149,6 +152,7 @@ namespace SOS.Export.Factories
                 _fileService.CopyFiles(@".\DarwinCore", new []{ "eml.xml"}, $@"{_exportPath}\{folder}");
                 var zipFile = _fileService.CompressFolder(_exportPath, folder);
                 _fileService.DeleteFolder($@"{_exportPath}\{folder}");
+                cancellationToken?.ThrowIfCancellationRequested();
 
                 // Make sure container exists
                 var container = $"sos-{DateTime.Now.Year}";
@@ -162,6 +166,11 @@ namespace SOS.Export.Factories
                 }
 
                 return true;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Export all sightings was canceled.");
+                return false;
             }
             catch (Exception e)
             {
