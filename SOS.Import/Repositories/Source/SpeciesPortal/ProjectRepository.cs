@@ -37,6 +37,7 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                     p.EndDate,
 	                pc.Name AS Category,
 	                sm.Name AS SurveyMethod,
+                    sm.Url AS SurveyMethodUrl,
 	                CASE 
 		                WHEN o.Id IS NOT NULL THEN o.Name
 		                WHEN pn.Id IS NOT NULL THEN pn.FirstName + ' ' + pn.LastName 

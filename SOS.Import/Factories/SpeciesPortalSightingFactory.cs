@@ -86,9 +86,11 @@ namespace SOS.Import.Factories
 
                 var metaDataTasks = new[]
                 {
+                    _metadataRepository.GetBiotopesAsync(),
                     _metadataRepository.GetGendersAsync(),
                     _metadataRepository.GetOrganizationsAsync(),
                     _metadataRepository.GetStagesAsync(),
+                    _metadataRepository.GetSubstratesAsync(),
                     _metadataRepository.GetUnitsAsync(),
                     _metadataRepository.GetValidationStatusAsync()
                 };
@@ -96,11 +98,13 @@ namespace SOS.Import.Factories
                 _logger.LogDebug("Start getting meta data");
                 await Task.WhenAll(metaDataTasks);
 
-                var genders = metaDataTasks[0].Result.ToAggregates().ToDictionary(g => g.Id, g => g);
-                var organizations = metaDataTasks[1].Result.ToAggregates().ToDictionary(o => o.Id, o => o);
-                var stages = metaDataTasks[2].Result.ToAggregates().ToDictionary(s => s.Id, s => s);
-                var units = metaDataTasks[3].Result.ToAggregates().ToDictionary(u => u.Id, u => u);
-                var validationStatus = metaDataTasks[4].Result.ToAggregates().ToDictionary(v => v.Id, v => v);
+                var biotopes = metaDataTasks[0].Result.ToAggregates().ToDictionary(b => b.Id, b => b);
+                var genders = metaDataTasks[1].Result.ToAggregates().ToDictionary(g => g.Id, g => g);
+                var organizations = metaDataTasks[2].Result.ToAggregates().ToDictionary(o => o.Id, o => o);
+                var stages = metaDataTasks[3].Result.ToAggregates().ToDictionary(s => s.Id, s => s);
+                var substrates = metaDataTasks[4].Result.ToAggregates().ToDictionary(s => s.Id, s => s);
+                var units = metaDataTasks[5].Result.ToAggregates().ToDictionary(u => u.Id, u => u);
+                var validationStatus = metaDataTasks[6].Result.ToAggregates().ToDictionary(v => v.Id, v => v);
 
                 _logger.LogDebug("Start getting persons & organizations data");
                 var personByUserId = (await _personRepository.GetAsync()).ToAggregates().ToDictionary(p => p.UserId, p => p);
@@ -163,12 +167,14 @@ namespace SOS.Import.Factories
                     // Cast sightings to aggregates
                     IEnumerable<APSightingVerbatim> aggregates = sightings.ToAggregates(
                         activities, 
+                        biotopes,
                         genders,
                         organizations,
                         personSightingBySightingId,
                         sightingProjects,
                         sites,
                         stages,
+                        substrates,
                         units,
                         validationStatus);
                     

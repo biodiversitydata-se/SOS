@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.SpeciesPortal
@@ -13,6 +12,16 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         /// Id of activity
         /// </summary>
         public MetadataWithCategory Activity { get; set; }
+
+        /// <summary>
+        /// Biotope
+        /// </summary>
+        public Metadata Bioptope { get; set; }
+
+        /// <summary>
+        /// Description of bioptpe
+        /// </summary>
+        public string BiotopeDescription { get; set; }
 
         /// <summary>
         /// Id of collection
@@ -130,6 +139,11 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         public int? Quantity { get; set; }
 
         /// <summary>
+        /// Quality of substrate
+        /// </summary>
+        public int? QuantityOfSubstrate { get; set; }
+
+        /// <summary>
         /// Date sighting was added
         /// </summary>
         public DateTime? ReportedDate { get; set; }
@@ -158,7 +172,27 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         /// Sighting start time
         /// </summary>
         public TimeSpan? StartTime { get; set; }
-        
+
+        /// <summary>
+        /// Substrate
+        /// </summary>
+        public Metadata Substrate { get; set; }
+
+        /// <summary>
+        /// Description of substrate
+        /// </summary>
+        public string SubstrateDescription { get; set; }
+
+        /// <summary>
+        /// Description of substrate species
+        /// </summary>
+        public string SubstrateSpeciesDescription { get; set; }
+
+        /// <summary>
+        /// Substrate taxon id
+        /// </summary>
+        public int? SubstrateSpeciesId { get; set; }
+
         /// <summary>
         /// Taxon Id
         /// </summary>

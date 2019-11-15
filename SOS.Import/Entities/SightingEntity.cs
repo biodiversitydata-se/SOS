@@ -13,6 +13,16 @@ namespace SOS.Import.Entities
         public int? ActivityId { get; set; }
 
         /// <summary>
+        /// Id of biotope
+        /// </summary>
+        public int? BiptopeId { get; set; }
+
+        /// <summary>
+        /// Description of biotope
+        /// </summary>
+        public string BiptopeDescription { get; set; }
+
+        /// <summary>
         /// Id of collection
         /// </summary>
         public string CollectionID { get; set; }
@@ -121,6 +131,11 @@ namespace SOS.Import.Entities
         /// Number of taxa found
         /// </summary>
         public int? Quantity { get; set; }
+
+        /// <summary>
+        /// Quality of substrate
+        /// </summary>
+        public int? QuantityOfSubstrate { get; set; }
         
         /// <summary>
         /// Date sighting was reported
@@ -151,7 +166,27 @@ namespace SOS.Import.Entities
         /// Sighting start time
         /// </summary>
         public TimeSpan? StartTime { get; set; }
-        
+
+        /// <summary>
+        /// Id of substrate
+        /// </summary>
+        public int? SubstrateId { get; set; }
+
+        /// <summary>
+        /// Description of substrate
+        /// </summary>
+        public string SubstrateDescription { get; set; }
+
+        /// <summary>
+        /// Description of substrate species
+        /// </summary>
+        public string SubstrateSpeciesDescription { get; set; }
+
+        /// <summary>
+        /// Substrate taxon id
+        /// </summary>
+        public int? SubstrateSpeciesId { get; set; }
+
         /// <summary>
         /// Id of taxon
         /// </summary>

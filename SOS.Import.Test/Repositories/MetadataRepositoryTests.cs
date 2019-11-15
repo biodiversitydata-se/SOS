@@ -57,13 +57,13 @@ namespace SOS.Import.Test.Repositories
         [Fact]
         public async Task GetActivitiesAsyncSuccess()
         {
-            IEnumerable<MetadataEntity> activities = new []
+            IEnumerable<MetadataWithCategoryEntity> activities = new []
             {
-                    new MetadataEntity { Id = 1, Name = "Activity 1" },
-                    new MetadataEntity { Id = 2, Name = "Activity 2" }
+                    new MetadataWithCategoryEntity { Id = 1, Name = "Activity 1", CategoryId = 1, CategoryName = "Category" },
+                    new MetadataWithCategoryEntity { Id = 2, Name = "Activity 2", CategoryId = 1, CategoryName = "Category" }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataWithCategoryEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -106,6 +106,64 @@ namespace SOS.Import.Test.Repositories
             result.Should().BeNull();
         }
         #endregion Activities
+
+        #region Biotopes
+        /// <summary>
+        /// Test get activities success
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetBiotopessAsyncSuccess()
+        {
+            IEnumerable<MetadataEntity> biotopes = new[]
+            {
+                    new MetadataEntity { Id = 1, Name = "Biotope 1" },
+                    new MetadataEntity { Id = 2, Name = "Biotope 2" }
+            };
+
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+                .ReturnsAsync(biotopes);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var metadataRepository = new MetadataRepository(
+                _speciesPortalDataServiceMock.Object,
+                _loggerMock.Object);
+
+            var result = await metadataRepository.GetBiotopesAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().HaveCount(2);
+        }
+
+        /// <summary>
+        /// Test get activities exception
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetBiotopesAsyncException()
+        {
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+                .Throws<Exception>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var metadataRepository = new MetadataRepository(
+                _speciesPortalDataServiceMock.Object,
+                _loggerMock.Object);
+
+            var result = await metadataRepository.GetBiotopesAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeNull();
+        }
+        #endregion Biotopes
 
         #region Genders
         /// <summary>
@@ -222,6 +280,64 @@ namespace SOS.Import.Test.Repositories
             result.Should().BeNull();
         }
         #endregion Activities
+
+        #region Substrates
+        /// <summary>
+        /// Test get activities success
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetSubstratesAsyncSuccess()
+        {
+            IEnumerable<MetadataEntity> substrates = new[]
+            {
+                    new MetadataEntity { Id = 1, Name = "Substrate 1" },
+                    new MetadataEntity { Id = 2, Name = "Substrate 2" }
+            };
+
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+                .ReturnsAsync(substrates);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var metadataRepository = new MetadataRepository(
+                _speciesPortalDataServiceMock.Object,
+                _loggerMock.Object);
+
+            var result = await metadataRepository.GetSubstratesAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().HaveCount(2);
+        }
+
+        /// <summary>
+        /// Test get activities exception
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetSubstratesAsyncException()
+        {
+            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+                .Throws<Exception>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var metadataRepository = new MetadataRepository(
+                _speciesPortalDataServiceMock.Object,
+                _loggerMock.Object);
+
+            var result = await metadataRepository.GetSubstratesAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeNull();
+        }
+        #endregion Substrates
 
         #region Units
         /// <summary>

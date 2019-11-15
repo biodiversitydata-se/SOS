@@ -48,6 +48,29 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<MetadataEntity>> GetBiotopesAsync()
+        {
+            try
+            {
+                const string query = @"
+                    SELECT 
+	                    b.Id, 
+	                    t.Value AS Name
+                    FROM 
+	                    Biotope b 
+	                    INNER JOIN [Resource] r ON b.ResourceLabel = r.Label
+	                    INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
+
+                return await QueryAsync<MetadataEntity>(query);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting biotopes");
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<IEnumerable<MetadataEntity>> GetGendersAsync()
         {
             try
@@ -110,6 +133,29 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting stages");
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<MetadataEntity>> GetSubstratesAsync()
+        {
+            try
+            {
+                const string query = @"
+                    SELECT 
+	                    s.Id, 
+	                    t.Value AS Name
+                    FROM 
+	                    Substrate s 
+	                    INNER JOIN [Resource] r ON s.ResourceLabel = r.Label
+	                    INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
+
+                return await QueryAsync<MetadataEntity>(query);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting substrates");
                 return null;
             }
         }

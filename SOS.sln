@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Export.Test", "SOS.Expo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Lib", "SOS.lib\SOS.Lib.csproj", "{ACA596A8-10BA-41AA-B215-D593E518475A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Export", "SOS.Export\SOS.Export.csproj", "{78037770-6CCB-4D5A-84DC-250D77276F7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Export", "SOS.Export\SOS.Export.csproj", "{78037770-6CCB-4D5A-84DC-250D77276F7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
