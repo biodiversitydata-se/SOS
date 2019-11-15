@@ -41,8 +41,8 @@ namespace SOS.Process.Extensions
                 AccessRights =
                     !verbatim.ProtectedBySystem &&
                     verbatim.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now
-                        ? "Free usage"
-                        : "Not for public usage",
+                        ? AccessRights.FreeUsage
+                        : AccessRights.NotForPublicUsage,
                 BasisOfRecord = string.IsNullOrEmpty(verbatim.SpeciesCollection)
                     ? BasisOfRecord.HumanObservation
                     : BasisOfRecord.PreservedSpecimen,
@@ -108,13 +108,13 @@ namespace SOS.Process.Extensions
                 InstitutionID = verbatim.ControlingOrganisationId.HasValue
                     ? $"urn:lsid:artdata.slu.se:organization:{verbatim.ControlingOrganisationId}"
                     : null,
-                Language = "Swedish",
+                Language = Language.Swedish,
                 Location = new DarwinCoreLocation
                 {
                     Continent = Continent.Europe,
                     CoordinateUncertaintyInMeters = verbatim.Site?.Accuracy.ToString(),
                     Country = Country.Sweden,
-                    CountryCode = "SE",
+                    CountryCode = CountryCode.Sweden,
                     County = verbatim.Site?.County?.Name ?? string.Empty,
                     DecimalLatitude = wgs84Point.Coordinate?.X ?? 0,
                     DecimalLongitude = wgs84Point.Coordinate?.Y ?? 0,
@@ -137,7 +137,7 @@ namespace SOS.Process.Extensions
                     AssociatedReferences = GetAssociatedReferences(verbatim),
                     Behavior = verbatim.Activity?.Name,
                     CatalogNumber = verbatim.Id.ToString(),
-                    EstablishmentMeans = verbatim.Unspontaneous ? "Unspontaneous" : "Natural",
+                    EstablishmentMeans = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
                     IndividualCount = verbatim.Quantity.HasValue ? verbatim.Quantity.Value.ToString() : "",
                     LifeStage = verbatim.Stage?.Name,
                     OccurrenceID = $"urn:lsid:artportalen.se:Sighting:{verbatim.Id}",
