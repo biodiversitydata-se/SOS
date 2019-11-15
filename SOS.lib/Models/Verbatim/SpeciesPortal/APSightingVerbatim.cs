@@ -164,7 +164,7 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         public Metadata Stage { get; set; }
 
         /// <summary>
-        /// Sif´ghting start date
+        /// Sighting start date
         /// </summary>
         public DateTime? StartDate { get; set; }
 
