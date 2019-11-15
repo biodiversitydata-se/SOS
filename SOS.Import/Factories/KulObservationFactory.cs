@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
 using SOS.Import.Models;
@@ -40,42 +42,56 @@ namespace SOS.Import.Factories
             return sb.ToString();
         }
         
-        public async Task<bool> HarvestObservationsAsync()
+        public async Task<bool> HarvestObservationsAsync(IJobCancellationToken  cancellationToken)
         {
-            _logger.LogInformation("Start harvesting sightings for KUL data provider");
-            _logger.LogInformation(GetKulHarvestSettingsInfoString());
-
-            // Make sure we have an empty collection.
-            _logger.LogInformation("Empty collection for KUL verbatim collection");
-            await _kulObservationVerbatimRepository.DeleteCollectionAsync();
-            await _kulObservationVerbatimRepository.AddCollectionAsync();
-
-            DateTime changedFrom = new DateTime(_kulServiceConfiguration.StartHarvestYear, 1, 1);
-            DateTime changedToEnd = DateTime.Now;
-            int nrSightingsHarvested = 0;
-
-            // Loop until all sightings are fetched.
-            while (changedFrom < changedToEnd)
+            try
             {
-                if (_kulServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                    nrSightingsHarvested >= _kulServiceConfiguration.MaxNumberOfSightingsHarvested)
+                _logger.LogInformation("Start harvesting sightings for KUL data provider");
+                _logger.LogInformation(GetKulHarvestSettingsInfoString());
+
+                // Make sure we have an empty collection.
+                _logger.LogInformation("Empty collection for KUL verbatim collection");
+                await _kulObservationVerbatimRepository.DeleteCollectionAsync();
+                await _kulObservationVerbatimRepository.AddCollectionAsync();
+
+                DateTime changedFrom = new DateTime(_kulServiceConfiguration.StartHarvestYear, 1, 1);
+                DateTime changedToEnd = DateTime.Now;
+                int nrSightingsHarvested = 0;
+
+                // Loop until all sightings are fetched.
+                while (changedFrom < changedToEnd)
                 {
-                    break;
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    if (_kulServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        nrSightingsHarvested >= _kulServiceConfiguration.MaxNumberOfSightingsHarvested)
+                    {
+                        break;
+                    }
+
+                    // Get sightings for one year
+                    var sightings = await _kulObservationService.GetAsync(changedFrom, changedFrom.AddYears(1));
+                    var aggregates = sightings.ToAggregates().ToArray();
+                    nrSightingsHarvested += aggregates.Length;
+
+                    // Add sightings to MongoDb
+                    await _kulObservationVerbatimRepository.AddManyAsync(aggregates);
+
+                    changedFrom = changedFrom.AddYears(1);
                 }
 
-                // Get sightings for one year
-                var sightings = await _kulObservationService.GetAsync(changedFrom, changedFrom.AddYears(1));
-                var aggregates = sightings.ToAggregates().ToArray();
-                nrSightingsHarvested += aggregates.Length;
-
-                // Add sightings to MongoDb
-                await _kulObservationVerbatimRepository.AddManyAsync(aggregates);
-
-                changedFrom = changedFrom.AddYears(1);
+                _logger.LogInformation("Finished harvesting sightings for KUL data provider");
+                return true;
             }
-
-            _logger.LogInformation("Finished harvesting sightings for KUL data provider");
-            return true;
+            catch (JobAbortedException e)
+            {
+                _logger.LogInformation("KUL harvest job was cancelled.");
+                return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to harvest KUL");
+                throw;
+            }
         }
     }
 }

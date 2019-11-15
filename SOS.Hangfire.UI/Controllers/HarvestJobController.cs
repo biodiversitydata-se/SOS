@@ -111,7 +111,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<IKulHarvestJob>(nameof(KulHarvestJob), job => job.Run(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IKulHarvestJob>(nameof(KulHarvestJob), job => job.Run(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("KUL harvest job added");
             }
             catch (Exception e)
@@ -129,7 +129,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                BackgroundJob.Enqueue<IKulHarvestJob>(job => job.Run());
+                BackgroundJob.Enqueue<IKulHarvestJob>(job => job.Run(JobCancellationToken.Null));
                 return new OkObjectResult("Started KUL harvest job");
             }
             catch (Exception e)
