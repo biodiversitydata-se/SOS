@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities;
@@ -217,7 +218,7 @@ namespace SOS.Import.Test.Factories
                 _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
 
-            var result = await sightingFactory.HarvestSightingsAsync();
+            var result = await sightingFactory.HarvestSightingsAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -253,7 +254,7 @@ namespace SOS.Import.Test.Factories
                 _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
 
-            var result = await sightingFactory.HarvestSightingsAsync();
+            var result = await sightingFactory.HarvestSightingsAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Process.Extensions;
@@ -42,16 +44,19 @@ namespace SOS.Process.Factories
         /// Process verbatim data and store it in darwin core format
         /// </summary>
         /// <param name="taxa"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<bool> ProcessAsync(IDictionary<int, DarwinCoreTaxon> taxa)
+        public async Task<bool> ProcessAsync(
+            IDictionary<int, DarwinCoreTaxon> taxa,
+            IJobCancellationToken cancellationToken)
         {
             Logger.LogDebug("Start clam and tree portal process job");
 
             // Create task list
             var processTasks = new List<Task<bool>>
             {
-                ProcessClamsAsync(taxa),
-                ProcessTreesAsync(taxa)
+                ProcessClamsAsync(taxa, cancellationToken),
+                ProcessTreesAsync(taxa, cancellationToken)
             };
 
             // Run all tasks async
@@ -68,8 +73,11 @@ namespace SOS.Process.Factories
         /// Process clams
         /// </summary>
         /// <param name="taxa"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ProcessClamsAsync(IDictionary<int, DarwinCoreTaxon> taxa)
+        private async Task<bool> ProcessClamsAsync(
+            IDictionary<int, DarwinCoreTaxon> taxa,
+            IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -88,6 +96,7 @@ namespace SOS.Process.Factories
 
                 while (count > 0)
                 {
+                    cancellationToken?.ThrowIfCancellationRequested();
                     var dwcModels = verbatim.ToDarwinCore(taxa)?.ToArray() ?? new DarwinCore<DynamicProperties>[0];
 
                     // Add area related data to models
@@ -98,9 +107,15 @@ namespace SOS.Process.Factories
                     verbatim = await _clamObservationVerbatimRepository.GetBatchAsync(totalCount + 1);
                     count = verbatim.Count();
                     totalCount += count;
+                    Logger.LogInformation($"Clam observations being processed, totalCount={totalCount:N}");
                 }
 
                 return true;
+            }
+            catch (JobAbortedException)
+            {
+                Logger.LogInformation("Clam observation processing was canceled.");
+                throw;
             }
             catch (Exception e)
             {
@@ -113,8 +128,11 @@ namespace SOS.Process.Factories
         /// Process clams
         /// </summary>
         /// <param name="taxa"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ProcessTreesAsync(IDictionary<int, DarwinCoreTaxon> taxa)
+        private async Task<bool> ProcessTreesAsync(
+            IDictionary<int, DarwinCoreTaxon> taxa,
+            IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -133,6 +151,7 @@ namespace SOS.Process.Factories
 
                 while (count > 0)
                 {
+                    cancellationToken?.ThrowIfCancellationRequested();
                     var dwcModels = verbatim.ToDarwinCore(taxa)?.ToArray() ?? new DarwinCore<DynamicProperties>[0];
 
                     // Add area related data to models
@@ -143,9 +162,15 @@ namespace SOS.Process.Factories
                     verbatim = await _treeObservationVerbatimRepository.GetBatchAsync(totalCount + 1);
                     count = verbatim.Count();
                     totalCount += count;
+                    Logger.LogInformation($"Tree observations being processed, totalCount={totalCount:N}");
                 }
 
                 return true;
+            }
+            catch (JobAbortedException)
+            {
+                Logger.LogInformation("Tree observation processing was canceled.");
+                throw;
             }
             catch (Exception e)
             {

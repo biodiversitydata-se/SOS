@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore;
@@ -53,7 +55,7 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> Run(int sources)
+        public async Task<bool> Run(int sources, IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -83,10 +85,12 @@ namespace SOS.Process.Jobs
                     return false;
                 }
 
+                cancellationToken?.ThrowIfCancellationRequested();
                 _logger.LogDebug("Empty collection");
                 // Make sure we have an empty collection
                 await _processRepository.DeleteCollectionAsync();
                 await _processRepository.AddCollectionAsync();
+                cancellationToken?.ThrowIfCancellationRequested();
 
                 // Create task list
                 var processTasks = new List<Task<bool>>();
@@ -94,17 +98,17 @@ namespace SOS.Process.Jobs
                 // Add species portal import if first bit is set
                 if ((sources & (int)SightingProviders.SpeciesPortal) > 0)
                 {
-                    processTasks.Add(_speciesPortalProcessFactory.ProcessAsync(taxa));
+                    processTasks.Add(_speciesPortalProcessFactory.ProcessAsync(taxa, cancellationToken));
                 }
 
                 if ((sources & (int)SightingProviders.ClamAndTreePortal) > 0)
                 {
-                    processTasks.Add(_clamTreePortalProcessFactory.ProcessAsync(taxa));
+                    processTasks.Add(_clamTreePortalProcessFactory.ProcessAsync(taxa, cancellationToken));
                 }
 
                 if ((sources & (int)SightingProviders.KUL) > 0)
                 {
-                    processTasks.Add(_kulProcessFactory.ProcessAsync(taxa));
+                    processTasks.Add(_kulProcessFactory.ProcessAsync(taxa, cancellationToken));
                 }
 
                 // Run all tasks async
@@ -122,12 +126,16 @@ namespace SOS.Process.Jobs
                 // return result of all processing
                 return success;
             }
-            catch(Exception e)
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Process job was cancelled.");
+                return false;
+            }
+            catch (Exception e)
             {
                 _logger.LogError(e, "Process job failed");
                 return false;
-            }
-            
+            }            
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using Moq;
@@ -65,7 +66,7 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await sightingFactory.HarvestSightingsAsync();
+            var res = await sightingFactory.HarvestSightingsAsync(JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -113,7 +114,7 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await sightingFactory.HarvestSightingsAsync();
+            var res = await sightingFactory.HarvestSightingsAsync(JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

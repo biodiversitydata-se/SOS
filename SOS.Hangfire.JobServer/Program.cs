@@ -136,6 +136,7 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine($"[TaxonService].[Address]: {_importConfiguration.TaxonServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[MongoDb].[Servers]: { string.Join(", ", _importConfiguration.MongoDbConfiguration.Hosts.Select(x => x.Name))}");
             sb.AppendLine($"[MongoDb].[DatabaseName]: {_importConfiguration.MongoDbConfiguration.DatabaseName}");
+            sb.AppendLine($"[MongoDb].[BatchSize]: {_importConfiguration.MongoDbConfiguration.BatchSize}");
             sb.AppendLine("");
 
             sb.AppendLine("Process settings:");
@@ -144,6 +145,7 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine($"[ProcessedDb].[DatabaseName]: { _processConfiguration.ProcessedDbConfiguration.DatabaseName}");
             sb.AppendLine($"[VerbatimDb].[Servers]: { string.Join(", ", _processConfiguration.VerbatimDbConfiguration.Hosts.Select(x => x.Name))}");
             sb.AppendLine($"[VerbatimDb].[DatabaseName]: { _processConfiguration.VerbatimDbConfiguration.DatabaseName}");
+            sb.AppendLine($"[VerbatimDb].[BatchSize]: { _processConfiguration.VerbatimDbConfiguration.BatchSize}");
             sb.AppendLine("");
 
             sb.AppendLine("Export settings:");

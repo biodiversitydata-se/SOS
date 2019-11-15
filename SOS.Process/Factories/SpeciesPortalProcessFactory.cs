@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Process.Extensions;
@@ -34,8 +36,11 @@ namespace SOS.Process.Factories
         /// Process verbatim data and store it in darwin core format
         /// </summary>
         /// <param name="taxa"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<bool> ProcessAsync(IDictionary<int, DarwinCoreTaxon> taxa)
+        public async Task<bool> ProcessAsync(
+            IDictionary<int, DarwinCoreTaxon> taxa,
+            IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -54,14 +59,21 @@ namespace SOS.Process.Factories
 
                 while (count > 0)
                 {
+                    cancellationToken?.ThrowIfCancellationRequested();
                     await ProcessRepository.AddManyAsync(verbatim.ToDarwinCore(taxa));
 
                     verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(totalCount + 1);
                     count = verbatim.Count();
                     totalCount += count;
+                    Logger.LogInformation($"Species Portal observations being processed, totalCount={totalCount:N}");
                 }
 
                 return true;
+            }
+            catch (JobAbortedException)
+            {
+                Logger.LogInformation("Species Portal observation processing was canceled.");
+                throw;
             }
             catch (Exception e)
             {

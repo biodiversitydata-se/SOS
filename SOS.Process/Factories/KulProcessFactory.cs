@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Process.Extensions;
@@ -40,8 +43,11 @@ namespace SOS.Process.Factories
         /// Process verbatim data and store it in darwin core format
         /// </summary>
         /// <param name="taxa"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<bool> ProcessAsync(IDictionary<int, DarwinCoreTaxon> taxa)
+        public async Task<bool> ProcessAsync(
+            IDictionary<int, DarwinCoreTaxon> taxa,
+            IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -60,6 +66,7 @@ namespace SOS.Process.Factories
 
                 while (count > 0)
                 {
+                    cancellationToken?.ThrowIfCancellationRequested();
                     var dwcModels = verbatim.ToDarwinCore(taxa)?.ToArray() ?? new DarwinCore<DynamicProperties>[0];
 
                     // Add area related data to models
@@ -70,10 +77,16 @@ namespace SOS.Process.Factories
                     verbatim = await _kulObservationVerbatimRepository.GetBatchAsync(totalCount + 1);
                     count = verbatim.Count();
                     totalCount += count;
+                    Logger.LogInformation($"KUL observations being processed, totalCount={totalCount:N}");
                 }
 
                 Logger.LogDebug($"End KUL Verbatim observations process job. Success: true");
                 return true;
+            }
+            catch (JobAbortedException)
+            {
+                Logger.LogInformation("KUL observation processing was canceled.");
+                throw;
             }
             catch (Exception e)
             {

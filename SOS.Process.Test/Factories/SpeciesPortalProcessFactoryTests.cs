@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Process.Factories;
@@ -94,7 +95,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(taxa);
+            var result = await speciesPortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -122,7 +123,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -150,7 +151,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
