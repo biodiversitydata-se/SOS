@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Hangfire;
 
 namespace SOS.Export.Jobs.Interfaces
 {
@@ -11,6 +12,6 @@ namespace SOS.Export.Jobs.Interfaces
         /// Run export Darwin core job
         /// </summary>
         /// <returns></returns>
-        Task<bool> Run();
+        Task<bool> Run(IJobCancellationToken cancellationToken);
     }
 }

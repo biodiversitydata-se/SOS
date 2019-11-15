@@ -27,11 +27,11 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> Run()
+        public async Task<bool> Run(IJobCancellationToken cancellationToken)
         {
             _logger.LogDebug("Start Export Darwin Core job");
            
-            var success = await _sightingFactory.ExportAllAsync(JobCancellationToken.Null);
+            var success = await _sightingFactory.ExportAllAsync(cancellationToken);
 
             _logger.LogDebug($"End Export Darwin Core job. Success: {success}");
 
