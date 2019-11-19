@@ -9,6 +9,7 @@ using SOS.Lib.Models.DarwinCore;
 using SOS.Process.Extensions;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
+using SOS.Process.Services.Interfaces;
 
 namespace SOS.Process.Factories
 {
@@ -25,27 +26,26 @@ namespace SOS.Process.Factories
         /// <param name="speciesPortalVerbatimRepository"></param>
         /// <param name="processedRepository"></param>
         /// <param name="logger"></param>
-        public SpeciesPortalProcessFactory(ISpeciesPortalVerbatimRepository speciesPortalVerbatimRepository,
+        public SpeciesPortalProcessFactory(
+            ISpeciesPortalVerbatimRepository speciesPortalVerbatimRepository,
             IProcessedRepository processedRepository,
             ILogger<SpeciesPortalProcessFactory> logger) : base(processedRepository, logger)
         {
             _speciesPortalVerbatimRepository = speciesPortalVerbatimRepository ?? throw new ArgumentNullException(nameof(speciesPortalVerbatimRepository));
         }
 
-        /// <summary>
-        /// Process verbatim data and store it in darwin core format
-        /// </summary>
-        /// <param name="taxa"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public async Task<bool> ProcessAsync(
+            string databaseName,
             IDictionary<int, DarwinCoreTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
             try
             {
-                Logger.LogDebug("Start Processing Species Portal Verbatim");
+                Initialize(databaseName);
 
+                Logger.LogDebug("Start Processing Species Portal Verbatim");
+               
                 var verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(0);
                 var count = verbatim.Count();
 

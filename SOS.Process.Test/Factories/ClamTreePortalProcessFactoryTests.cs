@@ -51,7 +51,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new ClamTreePortalProcessFactory(
+            Action create = () =>  new ClamTreePortalProcessFactory(
                 null,
                 _treeObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
@@ -76,7 +76,7 @@ namespace SOS.Process.Test.Factories
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
 
             create = () => new ClamTreePortalProcessFactory(
-                _clamObservationVerbatimRepositoryMock.Object,
+                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 null,
@@ -134,7 +134,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await clamTreePortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
+            var result = await clamTreePortalProcessFactory.ProcessAsync(It.IsAny<string>(), taxa, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await clamTreePortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await clamTreePortalProcessFactory.ProcessAsync(It.IsAny<string>(), null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await clamTreePortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await clamTreePortalProcessFactory.ProcessAsync(It.IsAny<string>(), null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

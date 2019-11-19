@@ -13,9 +13,16 @@ namespace SOS.Process.Factories.Interfaces
         /// <summary>
         /// Process sightings
         /// </summary>
+        /// <param name="databaseName"></param>
         /// <param name="taxa"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> ProcessAsync(IDictionary<int, DarwinCoreTaxon> taxa, IJobCancellationToken cancellationToken);
+        Task<bool> ProcessAsync(string databaseName, IDictionary<int, DarwinCoreTaxon> taxa, IJobCancellationToken cancellationToken);
+
+        /// <summary>
+        /// Initialize
+        /// </summary>
+        /// <param name="databaseName"></param>
+        void Initialize(string databaseName);
     }
 }

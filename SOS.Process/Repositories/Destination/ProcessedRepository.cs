@@ -19,10 +19,12 @@ namespace SOS.Process.Repositories.Destination
         /// </summary>
         protected readonly ILogger<ProcessedRepository> Logger;
 
+        private readonly IProcessClient _client;
+
         /// <summary>
         /// Mongo db
         /// </summary>
-        protected readonly IMongoDatabase Database;
+        protected  IMongoDatabase Database;
 
         /// <summary>
         /// Disposed
@@ -42,16 +44,18 @@ namespace SOS.Process.Repositories.Destination
             ILogger<ProcessedRepository> logger
         )
         {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-
+            _client = client ?? throw new ArgumentNullException(nameof(client));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            Database = client.GetDatabase();
             _batchSize = client.BatchSize;
             _collectionName = typeof(DarwinCore<DynamicProperties>).Name;
+        }
+
+        /// <inheritdoc />
+        public void Initialize(string databaseName)
+        {
+            _client.Initialize(databaseName);
+            Database = _client.GetDatabase();
         }
 
         /// <summary>

@@ -57,6 +57,12 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         Task<bool> DeleteManyAsync(IEnumerable<string> ids);
 
         /// <summary>
+        /// Initialize repository
+        /// </summary>
+        /// <param name="databaseName"></param>
+        void Initialize(string databaseName);
+
+        /// <summary>
         /// Update entity
         /// </summary>
         /// <param name="id"></param>

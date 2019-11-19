@@ -73,6 +73,7 @@ namespace SOS.Process.Test.Factories
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+
             _speciesPortalVerbatimRepository.Setup(r => r.GetBatchAsync(0))
                 .ReturnsAsync(new [] { new APSightingVerbatim
                 {
@@ -95,7 +96,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(It.IsAny<string>(), taxa, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -113,8 +114,7 @@ namespace SOS.Process.Test.Factories
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-
-
+           
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(It.IsAny<string>(), null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -141,6 +141,7 @@ namespace SOS.Process.Test.Factories
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+
             _speciesPortalVerbatimRepository.Setup(r => r.GetBatchAsync(0))
                 .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
@@ -151,7 +152,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(It.IsAny<string>(), null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

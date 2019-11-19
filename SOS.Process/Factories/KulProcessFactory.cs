@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -11,6 +10,7 @@ using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
+using SOS.Process.Services.Interfaces;
 
 namespace SOS.Process.Factories
 {
@@ -25,10 +25,10 @@ namespace SOS.Process.Factories
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="kulObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processedRepository"></param>
         /// <param name="logger"></param>
-        /// <param name="kulObservationVerbatimRepository"></param>
         public KulProcessFactory(
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
@@ -39,18 +39,16 @@ namespace SOS.Process.Factories
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
-        /// <summary>
-        /// Process verbatim data and store it in darwin core format
-        /// </summary>
-        /// <param name="taxa"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public async Task<bool> ProcessAsync(
+            string databaseName,
             IDictionary<int, DarwinCoreTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
             try
             {
+                Initialize(databaseName);
+
                 Logger.LogDebug("Start Processing KUL Verbatim observations");
 
                 var verbatim = await _kulObservationVerbatimRepository.GetBatchAsync(0);

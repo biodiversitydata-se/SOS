@@ -11,5 +11,11 @@ namespace SOS.Process.Database.Interfaces
         /// </summary>
         /// <returns></returns>
         IMongoDatabase GetDatabase();
+
+        /// <summary>
+        /// Initialize client
+        /// </summary>
+        /// <param name="databaseName"></param>
+        void Initialize(string databaseName);
     }
 }

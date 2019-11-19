@@ -21,15 +21,17 @@ namespace SOS.Process.Factories
         private readonly IClamObservationVerbatimRepository _clamObservationVerbatimRepository;
         private readonly ITreeObservationVerbatimRepository _treeObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="clamObservationVerbatimRepository"></param>
         /// <param name="treeObservationVerbatimRepository"></param>
+        /// <param name="areaHelper"></param>
         /// <param name="processedRepository"></param>
         /// <param name="logger"></param>
-        public ClamTreePortalProcessFactory(IClamObservationVerbatimRepository clamObservationVerbatimRepository,
+        public ClamTreePortalProcessFactory(
+            IClamObservationVerbatimRepository clamObservationVerbatimRepository,
             ITreeObservationVerbatimRepository treeObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedRepository processedRepository,
@@ -40,16 +42,14 @@ namespace SOS.Process.Factories
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
-        /// <summary>
-        /// Process verbatim data and store it in darwin core format
-        /// </summary>
-        /// <param name="taxa"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public async Task<bool> ProcessAsync(
+            string databaseName,
             IDictionary<int, DarwinCoreTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
+            Initialize(databaseName);
+
             Logger.LogDebug("Start clam and tree portal process job");
 
             // Create task list

@@ -10,23 +10,27 @@ namespace SOS.Process.Database
         /// <summary>
         /// Name of database
         /// </summary>
-        private readonly string _dataBaseName;
+        private string _databaseName;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="settings"></param>
-        /// <param name="dataBaseName"></param>
         /// <param name="batchSize"></param>
-        public ProcessClient(MongoClientSettings settings, string dataBaseName, int batchSize) : base(settings)
+        public ProcessClient(MongoClientSettings settings, int batchSize) : base(settings)
         {
-            _dataBaseName = dataBaseName;
             BatchSize = batchSize;
         }
 
         public IMongoDatabase GetDatabase()
         {
-            return base.GetDatabase(_dataBaseName);
+            return base.GetDatabase(_databaseName);
+        }
+
+        /// <inheritdoc />
+        public void Initialize(string databaseName)
+        {
+            _databaseName = databaseName;
         }
     }
 }
