@@ -7,7 +7,9 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Factories;
 using SOS.Import.Repositories.Destination.ClamTreePortal.Interfaces;
+using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.ClamTreePortal;
 using Xunit;
 
@@ -18,6 +20,7 @@ namespace SOS.Import.Test.Factories
         private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
         private readonly Mock<ITreeObservationVerbatimRepository> _treeObservationVerbatimRepositoryMock;
         private readonly Mock<IClamTreeObservationService> _clamTreeObservationServiceMock;
+        private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
         private readonly Mock<ILogger<ClamTreePortalObservationFactory>> _loggerMock;
 
         /// <summary>
@@ -28,6 +31,7 @@ namespace SOS.Import.Test.Factories
             _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
             _treeObservationVerbatimRepositoryMock = new Mock<ITreeObservationVerbatimRepository>();
             _clamTreeObservationServiceMock = new Mock<IClamTreeObservationService>();
+            _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
             _loggerMock = new Mock<ILogger<ClamTreePortalObservationFactory>>();
         }
 
@@ -41,12 +45,14 @@ namespace SOS.Import.Test.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
                 _clamTreeObservationServiceMock.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new ClamTreePortalObservationFactory(
                 null,
                 _treeObservationVerbatimRepositoryMock.Object,
                 _clamTreeObservationServiceMock.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
 
@@ -54,6 +60,7 @@ namespace SOS.Import.Test.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 null,
                 _clamTreeObservationServiceMock.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("treeObservationVerbatimRepository");
 
@@ -61,6 +68,7 @@ namespace SOS.Import.Test.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
                 null,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamTreeObservationService");
 
@@ -68,10 +76,17 @@ namespace SOS.Import.Test.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
                 _clamTreeObservationServiceMock.Object,
+                null,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
+
+            create = () => new ClamTreePortalObservationFactory(
+                _clamObservationVerbatimRepositoryMock.Object,
+                _treeObservationVerbatimRepositoryMock.Object,
+                _clamTreeObservationServiceMock.Object,
+                _harvestInfoRepositoryMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-
-           
         }
 
         /// <summary>
@@ -97,7 +112,9 @@ namespace SOS.Import.Test.Factories
             _clamObservationVerbatimRepositoryMock.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<ClamObservationVerbatim>>()))
                 .ReturnsAsync(true);
 
-
+            _harvestInfoRepositoryMock.Setup(hir =>
+                hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProviderId.ClamAndTreePortal, It.IsAny<int>()))
+                .ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -105,6 +122,7 @@ namespace SOS.Import.Test.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
                 _clamTreeObservationServiceMock.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
             var result = await sightingFactory.HarvestClamsAsync();
@@ -135,6 +153,7 @@ namespace SOS.Import.Test.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
                 _clamTreeObservationServiceMock.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
             var result = await sightingFactory.HarvestClamsAsync();
@@ -167,7 +186,9 @@ namespace SOS.Import.Test.Factories
                 .ReturnsAsync(true);
             _treeObservationVerbatimRepositoryMock.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<TreeObservationVerbatim>>()))
                 .ReturnsAsync(true);
-
+            _harvestInfoRepositoryMock.Setup(hir =>
+                    hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProviderId.ClamAndTreePortal, It.IsAny<int>()))
+                .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -176,6 +197,7 @@ namespace SOS.Import.Test.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
                 _clamTreeObservationServiceMock.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
             var result = await sightingFactory.HarvestTreesAsync(JobCancellationToken.Null);
@@ -206,6 +228,7 @@ namespace SOS.Import.Test.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _treeObservationVerbatimRepositoryMock.Object,
                 _clamTreeObservationServiceMock.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
             var result = await sightingFactory.HarvestTreesAsync(JobCancellationToken.Null);

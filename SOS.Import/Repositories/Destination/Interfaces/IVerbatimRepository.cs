@@ -33,6 +33,13 @@ namespace SOS.Import.Repositories.Destination.Interfaces
         Task<bool> AddManyAsync(IEnumerable<TEntity> items);
 
         /// <summary>
+        /// Add or update existing entity
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        Task<bool> AddOrUpdateAsync(TEntity item);
+
+        /// <summary>
         /// Remove
         /// </summary>
         /// <param name="id"></param>

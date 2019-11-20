@@ -7,12 +7,13 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities;
 using SOS.Import.Factories;
+using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Enums;
 using Xunit;
 
 namespace SOS.Import.Test.Factories
@@ -32,6 +33,7 @@ namespace SOS.Import.Test.Factories
         private readonly Mock<OrganizationRepository> _organizationRepository;
         private readonly Mock<SightingRelationRepository> _sightingRelationRepository;
         private readonly Mock<SpeciesCollectionItemRepository> _speciesCollectionItemRepository;
+        private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
         private readonly Mock<ILogger<SpeciesPortalSightingFactory>> _loggerMock;
 
         /// <summary>
@@ -49,6 +51,7 @@ namespace SOS.Import.Test.Factories
             _organizationRepository = new Mock<OrganizationRepository>();
             _sightingRelationRepository = new Mock<SightingRelationRepository>();
             _speciesCollectionItemRepository = new Mock<SpeciesCollectionItemRepository>();
+            _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
             _loggerMock = new Mock<ILogger<SpeciesPortalSightingFactory>>();
         }
 
@@ -69,6 +72,7 @@ namespace SOS.Import.Test.Factories
                 _organizationRepository.Object, 
                 _sightingRelationRepository.Object, 
                 _speciesCollectionItemRepository.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new SpeciesPortalSightingFactory(
@@ -82,6 +86,7 @@ namespace SOS.Import.Test.Factories
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesPortalConfiguration");
 
@@ -96,6 +101,7 @@ namespace SOS.Import.Test.Factories
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("projectRepository");
 
@@ -110,6 +116,7 @@ namespace SOS.Import.Test.Factories
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sightingRepository");
 
@@ -124,6 +131,7 @@ namespace SOS.Import.Test.Factories
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("siteRepository");
 
@@ -138,6 +146,7 @@ namespace SOS.Import.Test.Factories
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sightingVerbatimRepository");
 
@@ -152,6 +161,22 @@ namespace SOS.Import.Test.Factories
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                null,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
+
+            create = () => new SpeciesPortalSightingFactory(
+                _speciesPortalConfiguration,
+                _metadataRepositoryMock.Object,
+                _projectRepositoryMock.Object,
+                _sightingRepositoryMock.Object,
+                _siteRepositoryMockMock.Object,
+                _sightingVerbatimRepository.Object,
+                _personRepository.Object,
+                _organizationRepository.Object,
+                _sightingRelationRepository.Object,
+                _speciesCollectionItemRepository.Object,
+                _harvestInfoRepositoryMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -201,7 +226,9 @@ namespace SOS.Import.Test.Factories
                 .ReturnsAsync(true);
             _sightingVerbatimRepository.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<APSightingVerbatim>>()))
                 .ReturnsAsync(true);
-
+            _harvestInfoRepositoryMock.Setup(hir =>
+                    hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProviderId.ClamAndTreePortal, It.IsAny<int>()))
+                .ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -216,6 +243,7 @@ namespace SOS.Import.Test.Factories
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
             var result = await sightingFactory.HarvestSightingsAsync(JobCancellationToken.Null);
@@ -252,6 +280,7 @@ namespace SOS.Import.Test.Factories
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
             var result = await sightingFactory.HarvestSightingsAsync(JobCancellationToken.Null);

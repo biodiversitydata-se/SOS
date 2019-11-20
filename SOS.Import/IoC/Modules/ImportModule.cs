@@ -6,8 +6,10 @@ using SOS.Import.Jobs;
 using SOS.Import.Jobs.Interfaces;
 using SOS.Import.MongoDb;
 using SOS.Import.MongoDb.Interfaces;
+using SOS.Import.Repositories.Destination;
 using SOS.Import.Repositories.Destination.ClamTreePortal;
 using SOS.Import.Repositories.Destination.ClamTreePortal.Interfaces;
+using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.Kul;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
@@ -54,6 +56,7 @@ namespace SOS.Import.IoC.Modules
             // Repositories destination
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationVerbatimRepository>().As<IKulObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingVerbatimRepository>().As<ISightingVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonVerbatimRepository>().As<ITaxonVerbatimRepository>().InstancePerLifetimeScope();

@@ -154,6 +154,20 @@ namespace SOS.Import.Repositories.Destination
         }
 
         /// <inheritdoc />
+        public async Task<bool> AddOrUpdateAsync(TEntity item)
+        {
+            var filter = Builders<TEntity>.Filter.Eq("_id", item.Id);
+
+            var entity = await MongoCollection.FindAsync(filter);
+            if (entity.Current == null)
+            {
+                return await AddAsync(item);
+            }
+
+            return await UpdateAsync(item.Id, item);
+        }
+
+        /// <inheritdoc />
         public async Task<bool> AddCollectionAsync()
         {
             try
