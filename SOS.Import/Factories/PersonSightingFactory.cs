@@ -18,7 +18,7 @@ namespace SOS.Import.Factories
            IList<SightingRelation> sightingRelations)
         {
             var personSightingBySightingId = new Dictionary<int, PersonSighting>();
-            var filteredSpeciesCollectionItems = speciesCollectionItems.Where(x => sightingIds.Contains(x.SightingId)).ToList();
+            var filteredSpeciesCollectionItems = speciesCollectionItems.Where(x => sightingIds.Contains(x.SightingId)).ToArray();
 
             //------------------------------------------------------------------------------
             // Add SpeciesCollection values
@@ -73,11 +73,11 @@ namespace SOS.Import.Factories
             //------------------------------------------------------------------------------
             // Add ReportedBy values
             //------------------------------------------------------------------------------
-            var reportedByBySightingId = CalculateReportedByDictionary(
+            var reportedBySightingId = CalculateReportedByDictionary(
                 sightingRelations,
                 personByUserId);
 
-            foreach (var pair in reportedByBySightingId)
+            foreach (var pair in reportedBySightingId)
             {
                 if (personSightingBySightingId.TryGetValue(pair.Key, out PersonSighting personSighting))
                 {
@@ -115,13 +115,27 @@ namespace SOS.Import.Factories
                 // Collection is collector
                 if (speciesCollectionItem.CollectorId.HasValue && personById.TryGetValue(speciesCollectionItem.CollectorId.Value, out Person person))
                 {
-                    speciesCollectionBySightingId.Add(speciesCollectionItem.SightingId, person.FullName);
+                    if (speciesCollectionBySightingId.ContainsKey(speciesCollectionItem.SightingId))
+                    {
+                        speciesCollectionBySightingId[speciesCollectionItem.SightingId] = person.FullName;
+                    }
+                    else
+                    {
+                        speciesCollectionBySightingId.Add(speciesCollectionItem.SightingId, person.FullName);
+                    }
                 }
 
                 // Collection is Organization
                 if (speciesCollectionItem.OrganizationId.HasValue && organizationById.TryGetValue(speciesCollectionItem.OrganizationId.Value, out Organization organization))
                 {
-                    speciesCollectionBySightingId[speciesCollectionItem.SightingId] = organization.Name;
+                    if (speciesCollectionBySightingId.ContainsKey(speciesCollectionItem.SightingId))
+                    {
+                        speciesCollectionBySightingId[speciesCollectionItem.SightingId] = organization.Name;
+                    }
+                    else
+                    {
+                        speciesCollectionBySightingId.Add(speciesCollectionItem.SightingId, organization.Name);
+                    }
                 }
             }
 
@@ -138,7 +152,7 @@ namespace SOS.Import.Factories
                 .GroupBy(y => y.SightingId);
             foreach (var grouping in query)
             {
-                IEnumerable<Person> persons = grouping.Select(v => personsByUserId[v.UserId]);
+                IEnumerable<Person> persons = grouping.Where(p => personsByUserId.ContainsKey(p.UserId)).Select(v => personsByUserId[v.UserId]);
                 string observers = string.Join(", ", persons.Select(n => n.FullName)).WithMaxLength(256);
                 observersBySightingId.Add(grouping.Key, observers);
             }
@@ -150,18 +164,21 @@ namespace SOS.Import.Factories
             IEnumerable<SightingRelation> sightingRelations,
             IDictionary<int, Person> personsByUserId)
         {
-            Dictionary<int, string> reportedByBySightingId = new Dictionary<int, string>();
+            Dictionary<int, string> reportedBySightingId = new Dictionary<int, string>();
             var query = sightingRelations
                 .Where(y => y.SightingRelationTypeId == (int)SightingRelationTypeId.Reporter && y.IsPublic);
             foreach (var sightingRelation in query)
             {
                 if (personsByUserId.TryGetValue(sightingRelation.UserId, out Person person))
                 {
-                    reportedByBySightingId.Add(sightingRelation.SightingId, person.FullName);
+                    if (!reportedBySightingId.ContainsKey(sightingRelation.SightingId))
+                    {
+                        reportedBySightingId.Add(sightingRelation.SightingId, person.FullName);
+                    }
                 }
             }
 
-            return reportedByBySightingId;
+            return reportedBySightingId;
         }
 
 
@@ -171,12 +188,12 @@ namespace SOS.Import.Factories
             IList<SightingRelation> sightingRelations
         )
         {
-            var verifiedByDataBySightingId = CalculateVerifiedByDataDictionary(
+            var verifiedByDataSightingId = CalculateVerifiedByDataDictionary(
                 personById,
                 speciesCollectionItems,
                 sightingRelations);
 
-            return verifiedByDataBySightingId.ToDictionary(x => x.Key, x => ConcatenateVerifiedByString(x.Value));
+            return verifiedByDataSightingId.ToDictionary(x => x.Key, x => ConcatenateVerifiedByString(x.Value));
         }
 
         private static Dictionary<int, VerifiedByData> CalculateVerifiedByDataDictionary(
@@ -184,7 +201,7 @@ namespace SOS.Import.Factories
             IList<SpeciesCollectionItem> speciesCollectionItems,
             IList<SightingRelation> sightingRelations)
         {
-            var verifiedByDataBySightingId = new Dictionary<int, VerifiedByData>();
+            var verifiedByDataSightingId = new Dictionary<int, VerifiedByData>();
             var determinerQuery = sightingRelations.Where(x =>
                 x.SightingRelationTypeId == (int)SightingRelationTypeId.Determiner
                 && x.IsPublic
@@ -193,7 +210,11 @@ namespace SOS.Import.Factories
             foreach (var determinerRelation in determinerQuery)
             {
                 var vbd = new VerifiedByData { SightingId = determinerRelation.SightingId };
-                verifiedByDataBySightingId.Add(determinerRelation.SightingId, vbd);
+
+                if (!verifiedByDataSightingId.ContainsKey(determinerRelation.SightingId))
+                {
+                    verifiedByDataSightingId.Add(determinerRelation.SightingId, vbd);
+                }
 
                 if (personById.TryGetValue(determinerRelation.UserId, out Person person))
                 {
@@ -210,10 +231,10 @@ namespace SOS.Import.Factories
 
             foreach (var confirmatorRelation in confirmatorQuery)
             {
-                if (!verifiedByDataBySightingId.TryGetValue(confirmatorRelation.SightingId, out var vbd))
+                if (!verifiedByDataSightingId.TryGetValue(confirmatorRelation.SightingId, out var vbd))
                 {
                     vbd = new VerifiedByData { SightingId = confirmatorRelation.SightingId };
-                    verifiedByDataBySightingId.Add(confirmatorRelation.SightingId, vbd);
+                    verifiedByDataSightingId.Add(confirmatorRelation.SightingId, vbd);
                 }
 
                 if (personById.TryGetValue(confirmatorRelation.UserId, out Person person))
@@ -226,10 +247,10 @@ namespace SOS.Import.Factories
 
             foreach (var speciesCollectionItem in speciesCollectionItems)
             {
-                if (!verifiedByDataBySightingId.TryGetValue(speciesCollectionItem.SightingId, out var vbd))
+                if (!verifiedByDataSightingId.TryGetValue(speciesCollectionItem.SightingId, out var vbd))
                 {
                     vbd = new VerifiedByData { SightingId = speciesCollectionItem.SightingId };
-                    verifiedByDataBySightingId.Add(speciesCollectionItem.SightingId, vbd);
+                    verifiedByDataSightingId.Add(speciesCollectionItem.SightingId, vbd);
                 }
 
                 vbd.DeterminerText = speciesCollectionItem.DeterminerText;
@@ -239,7 +260,7 @@ namespace SOS.Import.Factories
                 vbd.SpeciesCollectionItemConfirmatorYear = speciesCollectionItem.ConfirmatorYear;
             }
 
-            return verifiedByDataBySightingId;
+            return verifiedByDataSightingId;
         }
 
         public static string ConcatenateVerifiedByString(VerifiedByData vbd)

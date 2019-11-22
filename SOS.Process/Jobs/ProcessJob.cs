@@ -64,76 +64,82 @@ namespace SOS.Process.Jobs
         {
             try
             {
-                _runtimeService.Initialize();
-                var databaseName = _runtimeService.DatabaseName;
-
-                // Create task list
-                _logger.LogDebug("Start getting taxa");
-
-                // Map out taxon id
-                var taxa = new Dictionary<int, DarwinCoreTaxon>();
-                var skip = 0;
-                var tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
-
-                while (tmpTaxa?.Any() ?? false)
+                if (_runtimeService.Initialize())
                 {
-                    foreach (var taxon in tmpTaxa)
+                    var databaseName = _runtimeService.DatabaseName;
+                    _processRepository.Initialize(databaseName);
+
+                    // Create task list
+                    _logger.LogDebug("Start getting taxa");
+
+                    // Map out taxon id
+                    var taxa = new Dictionary<int, DarwinCoreTaxon>();
+                    var skip = 0;
+                    var tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
+
+                    while (tmpTaxa?.Any() ?? false)
                     {
-                        taxa.Add(taxon.Id, taxon);
+                        foreach (var taxon in tmpTaxa)
+                        {
+                            taxa.Add(taxon.Id, taxon);
+                        }
+
+                        skip += tmpTaxa.Count();
+                        tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
                     }
 
-                    skip += tmpTaxa.Count();
-                    tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
+                    if (!taxa?.Any() ?? true)
+                    {
+                        _logger.LogDebug("Failed to get taxa");
+
+                        return false;
+                    }
+
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    _logger.LogDebug("Empty collection");
+                    // Make sure we have an empty collection
+
+                    await _processRepository.DeleteCollectionAsync();
+                    await _processRepository.AddCollectionAsync();
+                    cancellationToken?.ThrowIfCancellationRequested();
+
+                    // Create task list
+                    var processTasks = new List<Task<bool>>();
+
+                    // Add species portal import if first bit is set
+                    if ((sources & (int)SightingProviders.SpeciesPortal) > 0)
+                    {
+                        processTasks.Add(_speciesPortalProcessFactory.ProcessAsync(taxa, cancellationToken));
+                    }
+
+                    if ((sources & (int)SightingProviders.ClamAndTreePortal) > 0)
+                    {
+                        processTasks.Add(_clamTreePortalProcessFactory.ProcessAsync(taxa, cancellationToken));
+                    }
+
+                    if ((sources & (int)SightingProviders.KUL) > 0)
+                    {
+                        processTasks.Add(_kulProcessFactory.ProcessAsync(taxa, cancellationToken));
+                    }
+
+                    // Run all tasks async
+                    await Task.WhenAll(processTasks);
+
+                    var success = processTasks.All(t => t.Result);
+
+                    // Create index if great success
+                    if (success)
+                    {
+                        _logger.LogDebug("Create indexes");
+                        await _processRepository.CreateIndexAsync();
+                        await _runtimeService.ToggleInstanceAsync();
+                    }
+
+                    // return result of all processing
+                    return success;
                 }
 
-                if (!taxa?.Any() ?? true)
-                {
-                    _logger.LogDebug("Failed to get taxa");
-
-                    return false;
-                }
-
-                cancellationToken?.ThrowIfCancellationRequested();
-                _logger.LogDebug("Empty collection");
-                // Make sure we have an empty collection
-                await _processRepository.DeleteCollectionAsync();
-                await _processRepository.AddCollectionAsync();
-                cancellationToken?.ThrowIfCancellationRequested();
-
-                // Create task list
-                var processTasks = new List<Task<bool>>();
-
-                // Add species portal import if first bit is set
-                if ((sources & (int)SightingProviders.SpeciesPortal) > 0)
-                {
-                    processTasks.Add(_speciesPortalProcessFactory.ProcessAsync(databaseName, taxa, cancellationToken));
-                }
-
-                if ((sources & (int)SightingProviders.ClamAndTreePortal) > 0)
-                {
-                    processTasks.Add(_clamTreePortalProcessFactory.ProcessAsync(databaseName, taxa, cancellationToken));
-                }
-
-                if ((sources & (int)SightingProviders.KUL) > 0)
-                {
-                    processTasks.Add(_kulProcessFactory.ProcessAsync(databaseName, taxa, cancellationToken));
-                }
-
-                // Run all tasks async
-                await Task.WhenAll(processTasks);
-
-                var success = processTasks.All(t => t.Result);
-
-                // Create index if great success
-                if (success)
-                {
-                    _logger.LogDebug("Create indexes");
-                    await _processRepository.CreateIndexAsync();
-                    await _runtimeService.ToggleInstanceAsync();
-                }
-
-                // return result of all processing
-                return success;
+                return false;
             }
             catch (JobAbortedException)
             {

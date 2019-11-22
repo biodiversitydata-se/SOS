@@ -24,11 +24,5 @@ namespace SOS.Process.Factories
             ProcessRepository = processedRepository ?? throw new ArgumentNullException(nameof(processedRepository));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
-        /// <inheritdoc />
-        public void Initialize(string databaseName)
-        {
-            ProcessRepository.Initialize(databaseName);
-        }
     }
 }

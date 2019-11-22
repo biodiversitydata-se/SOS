@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Lib.Configuration.Process;
-
+using SOS.Lib.Extensions;
 
 namespace SOS.Process.Services
 {
@@ -32,7 +33,8 @@ namespace SOS.Process.Services
             // Use first application as master to read current environment
             var application = _applications.First();
             var appSettings = ReadAppsettings(application.UniqueSettingsFile);
-            var currentDatabaseName = (string)appSettings.MongoDbConfiguration.DatabaseName;
+            var currentDatabaseName = appSettings.GetValue<string>(application.DatabaseNameProperty);
+
             var regex = new Regex(@"(?<=-)\d$");
             if (regex.IsMatch(currentDatabaseName))
             {
@@ -66,14 +68,12 @@ namespace SOS.Process.Services
                     }
                     else
                     {
-                        var commands = new List<string>
-                        {
-                            $"$s = New-PSSession -computerName '{ application.ServerName }' ",
-                            $"Copy-Item -FromSession $s -path '{ application.Folder }\\{ application.SettingsFile }' -destination '.\\{ application.UniqueSettingsFile }' -Recurse ",
-                            "Remove-PSSession $s"
-                        };
+                        var commands = new StringBuilder();
+                        commands.Append($"$s = New-PSSession -computerName '{ application.ServerName }' \n");
+                        commands.Append($"Copy-Item -FromSession $s -path '{ application.Folder }\\{ application.SettingsFile }' -destination '.\\{ application.UniqueSettingsFile }' -Recurse \n");
+                        commands.Append("Remove-PSSession $s");
 
-                        success = success && ExecuteProcess(commands);
+                        success = success && ExecuteProcess(commands.ToString());
                     }
                 }
 
@@ -90,12 +90,12 @@ namespace SOS.Process.Services
         /// Read app settings file
         /// </summary>
         /// <returns></returns>
-        private dynamic ReadAppsettings(string fileName)
+        private object ReadAppsettings(string fileName)
         {
             using var fileStream = new FileStream($".\\{fileName}", FileMode.Open);
 
             using var reader = new StreamReader(fileStream);
-            var settings = JsonConvert.DeserializeObject<dynamic>(reader.ReadToEnd());
+            var settings = JsonConvert.DeserializeObject<object>(reader.ReadToEnd());
             reader.Close();
 
             return settings;
@@ -132,7 +132,7 @@ namespace SOS.Process.Services
                 {
                     // Read current app settings and switch instance
                     var appSettings = ReadAppsettings(application.UniqueSettingsFile);
-                    appSettings.MongoDbConfiguration.DatabaseName = DatabaseName;
+                    appSettings.SetValue(application.DatabaseNameProperty, DatabaseName); 
 
                     // Save configuration change
                     WriteAppSettings(appSettings, application.UniqueSettingsFile);
@@ -144,18 +144,34 @@ namespace SOS.Process.Services
                     else
                     {
                         // Copy updated settings to server
-                        var commands = new List<string>
-                        {
-                            $"$s = New-PSSession -computerName '{ application.ServerName }' ",
-                            $"Copy-Item -ToSession $s -Path '.\\{ application.UniqueSettingsFile }' -destination '{ application.Folder }\\{ application.SettingsFile }' -Recurse ",
-                            $"Invoke-Command -Session $s -Scriptblock {{ Restart-WebAppPool { application.ApplicationPool } }} ",
-                            "Remove-PSSession $s"
-                        };
+                        var commands = new StringBuilder("");
+                        commands.Append($"$s = New-PSSession -computerName '{application.ServerName}' \n");
+                        commands.Append($"Copy-Item -ToSession $s -Path '.\\{ application.UniqueSettingsFile }' -destination '{ application.Folder }\\{ application.SettingsFile }' -Recurse \n");
+                        commands.Append($"Invoke-Command -Session $s -Scriptblock {{ \n");
 
-                        success = success && ExecuteProcess(commands);
+                        // Check if web application
+                        if (application.IsWebApplication)
+                        {
+                            // Restart application pole 
+                            commands.Append($"Restart-WebAppPool { application.ProcessName } \n");
+                        }
+                        else if(!string.IsNullOrEmpty(application.ProcessName))
+                        {
+                            // Restart process
+                            commands.Append($"processes = Get-Process '{ application.ProcessName }' \n");
+                            commands.Append("foreach (process in processes){ \n");
+                            commands.Append("$cmdPath, $cmdArguments = (Get-WMIObject Win32_Process -Filter \"Handle=$(process.Id)\").CommandLine.Split('', [System.StringSplitOptions]::RemoveEmptyEntries) \n");
+                            commands.Append("process.Kill() \n");
+                            commands.Append("process.WaitForExit() \n");
+                            commands.Append($@"Start-Process -WorkingDirectory '{ application.Folder }' -FilePath '{ application.Folder }\{ application.ProcessName }' -ArgumentList $cmdArguments -WindowStyle hidden");
+                        }
+                        commands.Append($"}} \n");
+                        commands.Append("Remove-PSSession $s \n");
+
+                        success = success && ExecuteProcess(commands.ToString());
                     }
 
-                    _logger.LogInformation($"Aktiverat miljö { appSettings.MongoDbConfiguration.DatabaseName } på { application.ServerName }: { success } ");
+                    _logger.LogInformation($"Aktiverat miljö { DatabaseName } på { application.ServerName }: { success } ");
                 }
 
                 if (success)
@@ -171,12 +187,12 @@ namespace SOS.Process.Services
             return success;
         }
 
-        private bool ExecuteProcess(IEnumerable<string> commands)
+        private bool ExecuteProcess(string commands)
         {
             using var process = new System.Diagnostics.Process
             {
                 StartInfo = new ProcessStartInfo(@"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe",
-                    string.Join("\n", commands))
+                    commands)
                 {
                     RedirectStandardOutput = true,
                     CreateNoWindow = true

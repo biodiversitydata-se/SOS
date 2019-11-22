@@ -44,12 +44,9 @@ namespace SOS.Process.Factories
 
         /// <inheritdoc />
         public async Task<bool> ProcessAsync(
-            string databaseName,
             IDictionary<int, DarwinCoreTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
-            Initialize(databaseName);
-
             Logger.LogDebug("Start clam and tree portal process job");
 
             // Create task list

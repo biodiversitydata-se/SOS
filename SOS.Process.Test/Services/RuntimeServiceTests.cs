@@ -29,7 +29,7 @@ namespace SOS.Process.Test.Services
                     new ApplicationConfiguration
                     {
                         ServerName = "localhost",
-                        ApplicationPool = "N/A",
+                        ProcessName = "",
                         SettingsFile = "appsettings.local.json",
                         Folder = @"C:\Users\msli0005\Source\repos\SOS\SOS.Search.Service\bin\Debug\netcoreapp3.0"
                     }

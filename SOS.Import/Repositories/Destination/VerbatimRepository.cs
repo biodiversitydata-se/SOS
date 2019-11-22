@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -52,7 +53,10 @@ namespace SOS.Import.Repositories.Destination
             Database = importClient.GetDatabase();
             
             _batchSize = importClient.BatchSize;
-            _collectionName = typeof(TEntity).Name;
+
+            // Clean name from non alfa numeric chats
+            var regex = new Regex(@"\w+");
+            _collectionName = regex.Match(typeof(TEntity).Name).Value;
         }
 
         /// <summary>
@@ -158,8 +162,8 @@ namespace SOS.Import.Repositories.Destination
         {
             var filter = Builders<TEntity>.Filter.Eq("_id", item.Id);
 
-            var entity = await MongoCollection.FindAsync(filter);
-            if (entity.Current == null)
+            var entity = await MongoCollection.Find(filter).FirstOrDefaultAsync();
+            if (entity == null)
             {
                 return await AddAsync(item);
             }

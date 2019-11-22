@@ -80,7 +80,7 @@ namespace SOS.Process.Test.Factories
                     Id = 1
                 } });
 
-            _processedRepository.Setup(r => r.AddManyAsync(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()))
+            _processedRepository.Setup(r => r.AddManyAsync(It.IsAny<ICollection<DarwinCore<DynamicProperties>>>()))
                 .ReturnsAsync(true);
 
             var taxa = new Dictionary<int, DarwinCoreTaxon>
@@ -96,7 +96,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(It.IsAny<string>(), taxa, JobCancellationToken.Null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(It.IsAny<string>(), null, JobCancellationToken.Null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(It.IsAny<string>(), null, JobCancellationToken.Null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

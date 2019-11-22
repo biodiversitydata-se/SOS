@@ -1,6 +1,7 @@
 ﻿using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.DarwinCore
@@ -151,6 +152,12 @@ namespace SOS.Lib.Models.DarwinCore
         /// This property is currently not used.
         /// </summary>
         public string InstitutionID { get; set; }
+
+        /// <summary>
+        /// Internal flag used in validation. must be true to be stored in processed data
+        /// </summary>
+        [JsonIgnore]
+        public bool IsInEconomicZoneOfSweden { get; set; }
 
         /// <summary>
         /// Darwin Core term name: dcterms:language.

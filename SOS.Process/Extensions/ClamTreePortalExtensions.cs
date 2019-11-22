@@ -26,7 +26,8 @@ namespace SOS.Process.Extensions
             {
                 AccessRights = verbatim.AccessRights,
                 BasisOfRecord = verbatim.BasisOfRecord,
-                DatasetID = $"{ (int)SightingProviders.ClamAndTreePortal }-{ verbatim.CatalogNumber }",
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProviderId.ClamAndTreePortal}",
+                DatasetName = "Träd och musselportalen",
                 DynamicProperties = new DynamicProperties
                 {
                     IsNaturalOccurrence = verbatim.IsNaturalOccurrence,
@@ -114,7 +115,8 @@ namespace SOS.Process.Extensions
             {
                 AccessRights = verbatim.AccessRights,
                 BasisOfRecord = verbatim.BasisOfRecord,
-                DatasetID = $"{ (int)SightingProviders.ClamAndTreePortal }-{ verbatim.CatalogNumber }",
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProviderId.ClamAndTreePortal}",
+                DatasetName = "Träd och musselportalen",
                 DynamicProperties = new DynamicProperties
                 {
                     IsNaturalOccurrence = verbatim.IsNaturalOccurrence,
@@ -156,7 +158,6 @@ namespace SOS.Process.Extensions
                 Modified = verbatim.Modified ?? DateTime.MinValue,
                 Occurrence = new DarwinCoreOccurrence
                 {
-
                     CatalogNumber = verbatim.CatalogNumber.ToString(),
                     EstablishmentMeans = verbatim.EstablishmentMeans,
                     IndividualCount = verbatim.IndividualCount,

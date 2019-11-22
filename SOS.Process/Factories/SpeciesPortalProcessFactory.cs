@@ -9,7 +9,6 @@ using SOS.Lib.Models.DarwinCore;
 using SOS.Process.Extensions;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
-using SOS.Process.Services.Interfaces;
 
 namespace SOS.Process.Factories
 {
@@ -36,14 +35,11 @@ namespace SOS.Process.Factories
 
         /// <inheritdoc />
         public async Task<bool> ProcessAsync(
-            string databaseName,
             IDictionary<int, DarwinCoreTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
             try
             {
-                Initialize(databaseName);
-
                 Logger.LogDebug("Start Processing Species Portal Verbatim");
                
                 var verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(0);

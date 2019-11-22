@@ -54,9 +54,7 @@ namespace SOS.Export.Repositories
 
             // Clean name from non alfa numeric chats
             var regex = new Regex(@"\w+");
-            var match = regex.Match(typeof(TEntity).Name);
-
-            _collectionName = match.Value;
+            _collectionName = regex.Match(typeof(TEntity).Name).Value;
         }
 
         /// <summary>
@@ -76,7 +74,7 @@ namespace SOS.Export.Repositories
             catch (Exception e)
             {
                 Logger.LogError(e.ToString());
-                return default(TEntity);
+                return default;
             }
         }
 

@@ -116,7 +116,7 @@ namespace SOS.Process.Test.Factories
 
             _areaHelper.Setup(r => r.AddAreaDataToDarwinCore(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()));
 
-            _processedRepository.Setup(r => r.AddManyAsync(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()))
+            _processedRepository.Setup(r => r.AddManyAsync(It.IsAny<ICollection<DarwinCore<DynamicProperties>>>()))
                 .ReturnsAsync(true);
 
             var taxa = new Dictionary<int, DarwinCoreTaxon>
@@ -134,7 +134,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await clamTreePortalProcessFactory.ProcessAsync(It.IsAny<string>(), taxa, JobCancellationToken.Null);
+            var result = await clamTreePortalProcessFactory.ProcessAsync( taxa, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await clamTreePortalProcessFactory.ProcessAsync(It.IsAny<string>(), null, JobCancellationToken.Null);
+            var result = await clamTreePortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ namespace SOS.Process.Test.Factories
                 _processedRepository.Object,
                 _loggerMock.Object);
 
-            var result = await clamTreePortalProcessFactory.ProcessAsync(It.IsAny<string>(), null, JobCancellationToken.Null);
+            var result = await clamTreePortalProcessFactory.ProcessAsync( null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

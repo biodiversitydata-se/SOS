@@ -17,13 +17,6 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         Task<bool> AddCollectionAsync();
 
         /// <summary>
-        /// Add entity
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        Task<bool> AddAsync(DarwinCore<DynamicProperties> entity);
-
-        /// <summary>
         /// Add many items
         /// </summary>
         /// <param name="items"></param>

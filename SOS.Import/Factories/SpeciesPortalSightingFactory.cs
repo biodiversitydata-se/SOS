@@ -151,12 +151,12 @@ namespace SOS.Import.Factories
 
                     // Get chunk of sightings
                     var sightings = (await _sightingRepository.GetChunkAsync(minId, _speciesPortalConfiguration.ChunkSize)).ToArray();
-                    HashSet<int> sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
+                    var sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
                     nrSightingsHarvested += sightings.Length;
 
                     // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
                     var sightingRelations = (await _sightingRelationRepository
-                        .GetAsync(sightings.Select(x => x.Id))).ToAggregates().ToList();
+                        .GetAsync(sightingIds)).ToAggregates().ToArray();
                     var personSightingBySightingId = PersonSightingFactory.CalculatePersonSightingDictionary(
                         sightingIds,
                         personByUserId,

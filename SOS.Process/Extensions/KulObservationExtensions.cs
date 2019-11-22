@@ -30,6 +30,8 @@ namespace SOS.Process.Extensions
             var obs = new DarwinCore<DynamicProperties>()
             {
                 BasisOfRecord = BasisOfRecord.HumanObservation,
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProviderId.KUL}",
+                DatasetName = "KUL",
                 DynamicProperties = new DynamicProperties
                 {
                     DataProviderId = (int)DataProviderId.KUL,

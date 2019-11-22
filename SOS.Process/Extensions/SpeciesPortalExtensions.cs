@@ -50,7 +50,7 @@ namespace SOS.Process.Extensions
                     ? "Artportalen"
                     : verbatim.SpeciesCollection,
                 CollectionID = verbatim.CollectionID,
-                DatasetID = "urn:lsid:swedishlifewatch.se:dataprovider:1",
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProviderId.SpeciesPortal}",
                 DatasetName = "Artportalen",
                 DynamicProperties = new DynamicProperties
                 {
@@ -108,6 +108,7 @@ namespace SOS.Process.Extensions
                 InstitutionID = verbatim.ControlingOrganisationId.HasValue
                     ? $"urn:lsid:artdata.slu.se:organization:{verbatim.ControlingOrganisationId}"
                     : null,
+                IsInEconomicZoneOfSweden = true, // Species portal validate all sightings, we rely on that validation
                 Language = Language.Swedish,
                 Location = new DarwinCoreLocation
                 {
@@ -168,9 +169,9 @@ namespace SOS.Process.Extensions
         /// <param name="verbatims"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static IEnumerable<DarwinCore<DynamicProperties>> ToDarwinCore(this IEnumerable<APSightingVerbatim> verbatims, IDictionary<int, DarwinCoreTaxon> taxa)
+        public static ICollection<DarwinCore<DynamicProperties>> ToDarwinCore(this IEnumerable<APSightingVerbatim> verbatims, IDictionary<int, DarwinCoreTaxon> taxa)
         {
-            return verbatims.Select(v => v.ToDarwinCore(taxa));
+            return verbatims.Select(v => v.ToDarwinCore(taxa)).ToArray();
         }
 
         /// <summary>
