@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Import.MongoDb.Interfaces;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Import.Repositories.Destination
@@ -55,8 +55,7 @@ namespace SOS.Import.Repositories.Destination
             _batchSize = importClient.BatchSize;
 
             // Clean name from non alfa numeric chats
-            var regex = new Regex(@"\w+");
-            _collectionName = regex.Match(typeof(TEntity).Name).Value;
+            _collectionName = typeof(TEntity).Name.UntilNonAlfanumeric();
         }
 
         /// <summary>

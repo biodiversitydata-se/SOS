@@ -8,7 +8,7 @@ using MongoDB.Driver.GeoJsonObjectModel;
 using Moq;
 using NetTopologySuite.Features;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers;
 using SOS.Process.Mappings;

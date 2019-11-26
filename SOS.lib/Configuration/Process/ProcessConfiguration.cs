@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using SOS.Lib.Configuration.Shared;
+﻿using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Lib.Configuration.Process
 {
@@ -17,10 +16,5 @@ namespace SOS.Lib.Configuration.Process
         /// Host
         /// </summary>
         public MongoDbConfiguration ProcessedDbConfiguration { get; set; }
-
-        /// <summary>
-        /// Configuration for run time 
-        /// </summary>
-        public RunTimeConfiguration Runtime { get; set; } 
     }
 }

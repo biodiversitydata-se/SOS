@@ -14,8 +14,6 @@ using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
 using SOS.Process.Repositories.Source.Interfaces;
-using SOS.Process.Services;
-using SOS.Process.Services.Interfaces;
 
 namespace SOS.Process.IoC.Modules
 {
@@ -25,9 +23,6 @@ namespace SOS.Process.IoC.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            // Configuration
-            builder.RegisterInstance(Configuration.Runtime).As<RunTimeConfiguration>().SingleInstance();
-
             // Vebatim Mongo Db
             var verbatimDbConfiguration = Configuration.VerbatimDbConfiguration;
             var verbatimSettings = verbatimDbConfiguration.GetMongoDbSettings();
@@ -37,7 +32,7 @@ namespace SOS.Process.IoC.Modules
             // Processed Mongo Db
             var processedDbConfiguration = Configuration.ProcessedDbConfiguration;
             var processedSettings = processedDbConfiguration.GetMongoDbSettings();
-            var processClient = new ProcessClient(processedSettings, processedDbConfiguration.BatchSize);
+            var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName, processedDbConfiguration.BatchSize);
             builder.RegisterInstance(processClient).As<IProcessClient>().SingleInstance();
 
             // Helpers
@@ -53,15 +48,13 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<TreeObservationVerbatimRepository>().As<ITreeObservationVerbatimRepository>().InstancePerLifetimeScope();
             
             // Repositories destination
-            builder.RegisterType<ProcessedRepository>().As<IProcessedRepository>().InstancePerLifetimeScope();
-          
+            builder.RegisterType<InadequateItemRepository>().As<IInadequateItemRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<DarwinCoreRepository>().As<IDarwinCoreRepository>().InstancePerLifetimeScope();
+
             // Add factories
             builder.RegisterType<ClamTreePortalProcessFactory>().As<IClamTreePortalProcessFactory>().InstancePerLifetimeScope();
             builder.RegisterType<KulProcessFactory>().As<IKulProcessFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalProcessFactory>().As<ISpeciesPortalProcessFactory>().InstancePerLifetimeScope();
-
-            // Services
-            builder.RegisterType<RuntimeService>().As<IRuntimeService>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ProcessJob>().As<IProcessJob>().InstancePerLifetimeScope();

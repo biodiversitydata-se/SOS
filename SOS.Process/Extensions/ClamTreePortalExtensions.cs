@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Verbatim.ClamTreePortal;
 
 namespace SOS.Process.Extensions

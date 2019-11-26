@@ -6,8 +6,8 @@ using System.Text.RegularExpressions;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.DarwinCore.Vocabulary;
+using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.Processed.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Process.Extensions

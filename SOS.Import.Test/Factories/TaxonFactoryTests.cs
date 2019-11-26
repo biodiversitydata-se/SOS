@@ -8,7 +8,7 @@ using SOS.Import.Factories;
 using SOS.Import.Models.TaxonAttributeService;
 using SOS.Import.Repositories.Destination.Taxon.Interfaces;
 using SOS.Import.Services.Interfaces;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using Xunit;
 
 namespace SOS.Import.Test.Factories

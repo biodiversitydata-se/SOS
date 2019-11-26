@@ -4,7 +4,7 @@ using System.Text;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Mappings;

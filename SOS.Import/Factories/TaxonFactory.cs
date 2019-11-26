@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Import.Enums;
 using SOS.Import.Repositories.Destination.Taxon.Interfaces;
 using SOS.Import.Services.Interfaces;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Import.Factories
 {

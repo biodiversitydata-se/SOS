@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Export.Repositories.Interfaces
 {
     /// <summary>
     /// 
     /// </summary>
-    public interface IProcessedDarwinCoreRepository : IAggregateRepository<DarwinCore<DynamicProperties>, ObjectId>
+    public interface IProcessedDarwinCoreRepository : IBaseRepository<DarwinCore<DynamicProperties>, ObjectId>
     {
         /// <summary>
         /// Get chunk of objects from repository

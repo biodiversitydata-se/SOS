@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -26,13 +26,13 @@ namespace SOS.Process.Factories
         /// </summary>
         /// <param name="kulObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="processedRepository"></param>
+        /// <param name="DarwinCoreRepository"></param>
         /// <param name="logger"></param>
         public KulProcessFactory(
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedRepository processedRepository,
-            ILogger<KulProcessFactory> logger) : base(processedRepository, logger)
+            IDarwinCoreRepository DarwinCoreRepository,
+            ILogger<KulProcessFactory> logger) : base(DarwinCoreRepository, logger)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));

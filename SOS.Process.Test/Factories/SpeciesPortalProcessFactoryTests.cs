@@ -6,7 +6,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Process.Factories;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -20,7 +20,7 @@ namespace SOS.Process.Test.Factories
     public class SpeciesPortalProcessFactoryTests
     {
         private readonly Mock<ISpeciesPortalVerbatimRepository> _speciesPortalVerbatimRepository;
-        private readonly Mock<IProcessedRepository> _processedRepository;
+        private readonly Mock<IDarwinCoreRepository> _DarwinCoreRepository;
         private readonly Mock<ILogger<SpeciesPortalProcessFactory>> _loggerMock;
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace SOS.Process.Test.Factories
         public SpeciesPortalProcessFactoryTests()
         {
             _speciesPortalVerbatimRepository = new Mock<ISpeciesPortalVerbatimRepository>();
-            _processedRepository = new Mock<IProcessedRepository>();
+            _DarwinCoreRepository = new Mock<IDarwinCoreRepository>();
             _loggerMock = new Mock<ILogger<SpeciesPortalProcessFactory>>();
         }
 
@@ -41,12 +41,12 @@ namespace SOS.Process.Test.Factories
         {
             new SpeciesPortalProcessFactory(
                 _speciesPortalVerbatimRepository.Object,
-                _processedRepository.Object,
+                _DarwinCoreRepository.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new SpeciesPortalProcessFactory(
                 null,
-                _processedRepository.Object,
+                _DarwinCoreRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesPortalVerbatimRepository");
 
@@ -54,11 +54,11 @@ namespace SOS.Process.Test.Factories
                 _speciesPortalVerbatimRepository.Object,
                 null,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("DarwinCoreRepository");
 
             create = () => new SpeciesPortalProcessFactory(
                 _speciesPortalVerbatimRepository.Object,
-                _processedRepository.Object,
+                _DarwinCoreRepository.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -80,7 +80,7 @@ namespace SOS.Process.Test.Factories
                     Id = 1
                 } });
 
-            _processedRepository.Setup(r => r.AddManyAsync(It.IsAny<ICollection<DarwinCore<DynamicProperties>>>()))
+            _DarwinCoreRepository.Setup(r => r.AddManyAsync(It.IsAny<ICollection<DarwinCore<DynamicProperties>>>()))
                 .ReturnsAsync(true);
 
             var taxa = new Dictionary<int, DarwinCoreTaxon>
@@ -93,7 +93,7 @@ namespace SOS.Process.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
                 _speciesPortalVerbatimRepository.Object,
-                _processedRepository.Object,
+                _DarwinCoreRepository.Object,
                 _loggerMock.Object);
 
             var result = await speciesPortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
@@ -120,7 +120,7 @@ namespace SOS.Process.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
                 _speciesPortalVerbatimRepository.Object,
-                _processedRepository.Object,
+                _DarwinCoreRepository.Object,
                 _loggerMock.Object);
 
             var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
@@ -149,7 +149,7 @@ namespace SOS.Process.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
                 _speciesPortalVerbatimRepository.Object,
-                _processedRepository.Object,
+                _DarwinCoreRepository.Object,
                 _loggerMock.Object);
 
             var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);

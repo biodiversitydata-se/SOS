@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.DarwinCore.Vocabulary;
+using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.Processed.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Verbatim.ClamTreePortal;
 using SOS.Lib.Models.Verbatim.Kul;
 

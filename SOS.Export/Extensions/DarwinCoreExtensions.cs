@@ -2,7 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json;
 using SOS.Export.Models.DarwinCore;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Export.Extensions
 {

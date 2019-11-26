@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Extensions;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -23,12 +23,12 @@ namespace SOS.Process.Factories
         /// Constructor
         /// </summary>
         /// <param name="speciesPortalVerbatimRepository"></param>
-        /// <param name="processedRepository"></param>
+        /// <param name="DarwinCoreRepository"></param>
         /// <param name="logger"></param>
         public SpeciesPortalProcessFactory(
             ISpeciesPortalVerbatimRepository speciesPortalVerbatimRepository,
-            IProcessedRepository processedRepository,
-            ILogger<SpeciesPortalProcessFactory> logger) : base(processedRepository, logger)
+            IDarwinCoreRepository DarwinCoreRepository,
+            ILogger<SpeciesPortalProcessFactory> logger) : base(DarwinCoreRepository, logger)
         {
             _speciesPortalVerbatimRepository = speciesPortalVerbatimRepository ?? throw new ArgumentNullException(nameof(speciesPortalVerbatimRepository));
         }

@@ -5,14 +5,14 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Export.Repositories
 {
     /// <summary>
     /// Species data service
     /// </summary>
-    public class ProcessedDarwinCoreRepository : AggregateRepository<DarwinCore<DynamicProperties>, ObjectId>, IProcessedDarwinCoreRepository
+    public class ProcessedDarwinCoreRepository : BaseRepository<DarwinCore<DynamicProperties>, ObjectId>, IProcessedDarwinCoreRepository
     {
         /// <summary>
         /// Constructor

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -28,14 +28,14 @@ namespace SOS.Process.Factories
         /// <param name="clamObservationVerbatimRepository"></param>
         /// <param name="treeObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="processedRepository"></param>
+        /// <param name="DarwinCoreRepository"></param>
         /// <param name="logger"></param>
         public ClamTreePortalProcessFactory(
             IClamObservationVerbatimRepository clamObservationVerbatimRepository,
             ITreeObservationVerbatimRepository treeObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedRepository processedRepository,
-            ILogger<ClamTreePortalProcessFactory> logger) : base(processedRepository, logger)
+            IDarwinCoreRepository DarwinCoreRepository,
+            ILogger<ClamTreePortalProcessFactory> logger) : base(DarwinCoreRepository, logger)
         {
             _clamObservationVerbatimRepository = clamObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(clamObservationVerbatimRepository));
             _treeObservationVerbatimRepository = treeObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(treeObservationVerbatimRepository));
