@@ -47,8 +47,8 @@ namespace SOS.Process.Repositories.Destination
 
             foreach (var item in items)
             {
-                var inadequateItem = new InadequateItem(item.DatasetID, item.DatasetName);
- 
+                var inadequateItem = new InadequateItem(item.DatasetID, item.DatasetName, item.Occurrence.OccurrenceID);
+
                 if (item.Taxon == null)
                 {
                     inadequateItem.Defects.Add("Taxon not found");

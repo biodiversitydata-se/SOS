@@ -14,11 +14,13 @@ namespace SOS.Lib.Models.Processed.Validation
         /// </summary>
         /// <param name="datasetID"></param>
         /// <param name="datasetName"></param>
-        public InadequateItem(string datasetID, string datasetName)
+        /// <param name="occurrenceID"></param>
+        public InadequateItem(string datasetID, string datasetName, string occurrenceID)
         {
             DatasetID = datasetID;
             DatasetName = datasetName;
             Defects = new List<string>();
+            OccurrenceID = occurrenceID;
         }
 
         /// <summary>
@@ -40,5 +42,7 @@ namespace SOS.Lib.Models.Processed.Validation
         /// Object id
         /// </summary>
         public ObjectId Id { get; set; }
+
+        public string OccurrenceID { get; set; }
     }
 }
