@@ -55,7 +55,7 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> Run(int sources, IJobCancellationToken cancellationToken)
+        public async Task<bool> Run(int sources, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -86,11 +86,10 @@ namespace SOS.Process.Jobs
                 }
 
                 cancellationToken?.ThrowIfCancellationRequested();
-                _logger.LogDebug("Empty collection");
+                _logger.LogDebug("Verify collection");
+               
                 // Make sure we have an empty collection
-
-                await _processRepository.DeleteCollectionAsync();
-                await _processRepository.AddCollectionAsync();
+                await _processRepository.VerifyCollectionAsync();
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 // Create task list
@@ -122,7 +121,11 @@ namespace SOS.Process.Jobs
                 {
                     _logger.LogDebug("Create indexes");
                     await _processRepository.CreateIndexAsync();
-                    await _processRepository.ToggleInstanceAsync();
+
+                    if (toggleInstanceOnSuccess)
+                    {
+                        await _processRepository.ToggleInstanceAsync();
+                    }
                 }
 
                 // return result of all processing

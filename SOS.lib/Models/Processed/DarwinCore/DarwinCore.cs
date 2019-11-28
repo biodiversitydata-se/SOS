@@ -2,6 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Processed.DarwinCore
@@ -14,6 +15,14 @@ namespace SOS.Lib.Models.Processed.DarwinCore
     /// </summary>
     public class DarwinCore<T> : IEntity<ObjectId>
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="provider"></param>
+        public DarwinCore(DataProviderId provider)
+        {
+            Provider = provider;
+        }
         /// <summary>
         /// Darwin Core term name: dcterms:accessRights.
         /// Information about who can access the resource or
@@ -226,6 +235,12 @@ namespace SOS.Lib.Models.Processed.DarwinCore
         /// This property is currently not used.
         /// </summary>
         public string OwnerInstitutionCode { get; set; }
+
+        /// <summary>
+        /// Internal use. Provider of the data
+        /// </summary>
+        [JsonIgnore]
+        public DataProviderId Provider { get; set; }
 
         /// <summary>
         /// Darwin Core term name: dcterms:references.

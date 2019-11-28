@@ -31,7 +31,7 @@ namespace SOS.Process.Test.Helpers
             var provinceAreas = AreasTestRepository.LoadAreas(new[] { AreaType.County, AreaType.Province});
             var areaHelper = new AreaHelper(CreateAreaVerbatimRepositoryMock(provinceAreas).Object);
             var observations = new List<DarwinCore<DynamicProperties>>();
-            var observation = new DarwinCore<DynamicProperties>
+            var observation = new DarwinCore<DynamicProperties>(DataProviderId.SpeciesPortal)
             {
                 Location = new DarwinCoreLocation
                 {
@@ -63,7 +63,7 @@ namespace SOS.Process.Test.Helpers
             var provinceAreas = AreasTestRepository.LoadAreas(new[] { AreaType.County, AreaType.Province });
             var areaHelper = new AreaHelper(CreateAreaVerbatimRepositoryMock(provinceAreas).Object);
             var observations = new List<DarwinCore<DynamicProperties>>();
-            var observation = new DarwinCore<DynamicProperties>
+            var observation = new DarwinCore<DynamicProperties>(DataProviderId.SpeciesPortal)
             {
                 Location = new DarwinCoreLocation
                 {
@@ -95,7 +95,7 @@ namespace SOS.Process.Test.Helpers
             var provinceAreas = AreasTestRepository.LoadAreas(new[] { AreaType.County, AreaType.Province });
             var areaHelper = new AreaHelper(CreateAreaVerbatimRepositoryMock(provinceAreas).Object);
             var observations = new List<DarwinCore<DynamicProperties>>();
-            var observation = new DarwinCore<DynamicProperties>
+            var observation = new DarwinCore<DynamicProperties>(DataProviderId.SpeciesPortal)
             {
                 Location = new DarwinCoreLocation
                 {

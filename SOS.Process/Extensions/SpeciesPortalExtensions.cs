@@ -36,7 +36,7 @@ namespace SOS.Process.Extensions
             var wgs84Point = googleMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
 
             taxa.TryGetValue(taxonId, out var taxon);
-            var obs = new DarwinCore<DynamicProperties>
+            var obs = new DarwinCore<DynamicProperties>(DataProviderId.SpeciesPortal)
             {
                 AccessRights =
                     !verbatim.ProtectedBySystem &&
@@ -70,19 +70,15 @@ namespace SOS.Process.Extensions
                         ? null
                         : new DarwinCoreProject
                         {
-                            IsPublic = verbatim.Project?.IsPublic ?? false,
-                            ProjectCategory = verbatim.Project?.Category,
-                            ProjectDescription = verbatim.Project?.Description,
-                            ProjectEndDate = verbatim.Project?.EndDate.HasValue ?? false
-                                ? verbatim.Project.EndDate.Value.ToString("yyyy-MM-dd hh:mm")
-                                : null,
-                            ProjectID = verbatim.Project?.Id.ToString(),
-                            ProjectName = verbatim.Project?.Name,
-                            ProjectOwner = verbatim.Project?.Owner,
-                            ProjectStartDate = verbatim.Project?.StartDate.HasValue ?? false
-                                ? verbatim.Project.StartDate.Value.ToString("yyyy-MM-dd hh:mm")
-                                : null,
-                            SurveyMethod = verbatim.Project?.SurveyMethod,
+                            IsPublic = verbatim.Project.IsPublic,
+                            ProjectCategory = verbatim.Project.Category,
+                            ProjectDescription = verbatim.Project.Description,
+                            ProjectEndDate =  verbatim.Project.EndDate?.ToString("yyyy-MM-dd hh:mm"),
+                            ProjectID = verbatim.Project.Id.ToString(),
+                            ProjectName = verbatim.Project.Name,
+                            ProjectOwner = verbatim.Project.Owner,
+                            ProjectStartDate = verbatim.Project.StartDate?.ToString("yyyy-MM-dd hh:mm"),
+                            SurveyMethod = verbatim.Project.SurveyMethod,
                         },
                     ProtectionLevel = CalculateProtectionLevel(taxon, verbatim.HiddenByProvider, verbatim.ProtectedBySystem),
                     ReportedBy = verbatim.ReportedBy,
@@ -96,7 +92,7 @@ namespace SOS.Process.Extensions
                         ? $"{verbatim.Bioptope.Name}{(string.IsNullOrEmpty(verbatim.BiotopeDescription) ? "" : " # ")}{verbatim.BiotopeDescription}"
                         : verbatim.BiotopeDescription).WithMaxLength(255),
                     SamplingProtocol = verbatim.Project?.SurveyMethod ?? verbatim.Project?.SurveyMethodUrl,
-                    VerbatimEventDate = $"{(verbatim.StartDate.HasValue ? verbatim.StartDate.Value.ToString("yyyy-MM-dd hh:mm") : "")}{(verbatim.StartDate.HasValue && verbatim.EndDate.HasValue ? "-" : "")}{(verbatim.EndDate.HasValue ? verbatim.EndDate.Value.ToString("yyyy-MM-dd hh:mm") : "")}"
+                    VerbatimEventDate = $"{(verbatim.StartDate?.ToString("yyyy-MM-dd hh:mm") ?? "")}{(verbatim.StartDate.HasValue && verbatim.EndDate.HasValue ? "-" : "")}{(verbatim.EndDate?.ToString("yyyy-MM-dd hh:mm") ?? "")}"
                 },
                 Identification = new DarwinCoreIdentification
                 {
@@ -108,7 +104,7 @@ namespace SOS.Process.Extensions
                 InstitutionID = verbatim.ControlingOrganisationId.HasValue
                     ? $"urn:lsid:artdata.slu.se:organization:{verbatim.ControlingOrganisationId}"
                     : null,
-                IsInEconomicZoneOfSweden = true, // Species portal validate all sightings, we rely on that validation
+                IsInEconomicZoneOfSweden = verbatim.Site?.XCoord != 0 && verbatim.Site?.YCoord != 0, // Species portal validate all sightings, we rely on that validation as long it has coordinates
                 Language = Language.Swedish,
                 Location = new DarwinCoreLocation
                 {
@@ -139,14 +135,14 @@ namespace SOS.Process.Extensions
                     Behavior = verbatim.Activity?.Name,
                     CatalogNumber = verbatim.Id.ToString(),
                     EstablishmentMeans = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
-                    IndividualCount = verbatim.Quantity.HasValue ? verbatim.Quantity.Value.ToString() : "",
+                    IndividualCount = verbatim.Quantity?.ToString() ?? "",
                     LifeStage = verbatim.Stage?.Name,
                     OccurrenceID = $"urn:lsid:artportalen.se:Sighting:{verbatim.Id}",
                     OccurrenceRemarks = verbatim.Comment,
                     OccurrenceStatus = verbatim.NotPresent || verbatim.NotRecovered
                         ? OccurrenceStatus.Absent
                         : OccurrenceStatus.Present,
-                    OrganismQuantity = verbatim.Quantity.HasValue ? verbatim.Quantity.Value.ToString() : "",
+                    OrganismQuantity = verbatim.Quantity?.ToString() ?? "",
                     OrganismQuantityType = verbatim.Quantity.HasValue ? verbatim.Unit?.Name ?? "Individuals" : null,
                     RecordedBy = verbatim.Observers,
                     RecordNumber = verbatim.Label,
@@ -183,21 +179,23 @@ namespace SOS.Process.Extensions
         /// <returns></returns>
         private static int CalculateProtectionLevel(DarwinCoreTaxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
         {
-            if (taxon == null || string.IsNullOrEmpty(taxon.DynamicProperties.ProtectionLevel))
+            if (taxon == null || string.IsNullOrEmpty(taxon.DynamicProperties?.ProtectionLevel))
             {
                 return 1;
             }
 
             var regex = new Regex(@"^\d");
-            var protectionLevel = int.Parse(regex.Match(taxon.DynamicProperties.ProtectionLevel).Value);
 
-            if (protectionLevel <= 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now)
+            if (int.TryParse(regex.Match(taxon.DynamicProperties.ProtectionLevel).Value, out var protectionLevel))
             {
-                return 3;
-            }
-            if ((protectionLevel > 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now) || protectedBySystem)
-            {
-                return protectionLevel;
+                if (protectionLevel <= 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now)
+                {
+                    return 3;
+                }
+                if ((protectionLevel > 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now) || protectedBySystem)
+                {
+                    return protectionLevel;
+                }
             }
 
             return 1;
@@ -228,7 +226,7 @@ namespace SOS.Process.Extensions
                 substrateDescription.Append($"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatim.SubstrateDescription}");
             }
             
-            if (verbatim.SubstrateSpeciesId != null &&
+            if (verbatim.SubstrateSpeciesId.HasValue &&
                 taxa != null &&
                 taxa.TryGetValue(verbatim.SubstrateSpeciesId.Value, out var taxon))
             {
@@ -292,22 +290,40 @@ namespace SOS.Process.Extensions
             switch (verbatim.MigrateSightingPortalId ?? 0)
             {
                 case 1:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bird.{verbatim.MigrateSightingObsId.Value}";
+                    if (verbatim.MigrateSightingObsId.HasValue)
+                    {
+                        associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bird.{verbatim.MigrateSightingObsId.Value}";
+                    }
                     break;
                 case 2:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:PlantAndMushroom.{verbatim.MigrateSightingObsId.Value}";
+                    if (verbatim.MigrateSightingObsId.HasValue)
+                    {
+                        associatedReferences = $"urn:lsid:artportalen.se:Sighting:PlantAndMushroom.{verbatim.MigrateSightingObsId.Value}";
+                    }
                     break;
                 case 6:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Vertebrate.{verbatim.MigrateSightingObsId.Value}";
+                    if (verbatim.MigrateSightingObsId.HasValue)
+                    {
+                        associatedReferences = $"urn:lsid:artportalen.se:Sighting:Vertebrate.{verbatim.MigrateSightingObsId.Value}";
+                    }
                     break;
                 case 7:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bugs.{verbatim.MigrateSightingObsId.Value}";
+                    if (verbatim.MigrateSightingObsId.HasValue)
+                    {
+                        associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bugs.{verbatim.MigrateSightingObsId.Value}";
+                    }
                     break;
                 case 8:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Fish.{verbatim.MigrateSightingObsId.Value}";
+                    if (verbatim.MigrateSightingObsId.HasValue)
+                    {
+                        associatedReferences = $"urn:lsid:artportalen.se:Sighting:Fish.{verbatim.MigrateSightingObsId.Value}";
+                    }
                     break;
                 case 9:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:MarineInvertebrates.{verbatim.MigrateSightingObsId.Value}";
+                    if (verbatim.MigrateSightingObsId.HasValue)
+                    {
+                        associatedReferences = $"urn:lsid:artportalen.se:Sighting:MarineInvertebrates.{verbatim.MigrateSightingObsId.Value}";
+                    }
                     break;
             }
 

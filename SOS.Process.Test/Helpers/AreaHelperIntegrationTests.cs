@@ -4,6 +4,7 @@ using System.Text;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
@@ -34,7 +35,7 @@ namespace SOS.Process.Test.Helpers
             var areaHelper = new AreaHelper(
                 areaVerbatimRepository);
             List<DarwinCore<DynamicProperties>> observations = new List<DarwinCore<DynamicProperties>>();
-            DarwinCore<DynamicProperties> observation = new DarwinCore<DynamicProperties>
+            DarwinCore<DynamicProperties> observation = new DarwinCore<DynamicProperties>(DataProviderId.SpeciesPortal)
             {
                 Location = new DarwinCoreLocation
                 {

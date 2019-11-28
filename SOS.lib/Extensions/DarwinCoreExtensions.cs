@@ -22,7 +22,7 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
-            return new DarwinCore<string>
+            return new DarwinCore<string>(processedDarwinCore.Provider)
             {
                 AccessRights = processedDarwinCore.AccessRights,
                 BasisOfRecord = processedDarwinCore.BasisOfRecord,

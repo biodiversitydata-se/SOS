@@ -22,7 +22,7 @@ namespace SOS.Process.Extensions
         {
             taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
 
-            return new DarwinCore<DynamicProperties>()
+            return new DarwinCore<DynamicProperties>(DataProviderId.ClamAndTreePortal)
             {
                 AccessRights = verbatim.AccessRights,
                 BasisOfRecord = verbatim.BasisOfRecord,
@@ -111,7 +111,7 @@ namespace SOS.Process.Extensions
         {
             taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
 
-            return new DarwinCore<DynamicProperties>()
+            return new DarwinCore<DynamicProperties>(DataProviderId.ClamAndTreePortal)
             {
                 AccessRights = verbatim.AccessRights,
                 BasisOfRecord = verbatim.BasisOfRecord,

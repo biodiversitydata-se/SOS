@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Processed.Validation;
@@ -108,7 +109,9 @@ namespace SOS.Process.Repositories.Destination
             var indexModels = new List<CreateIndexModel<DarwinCore<DynamicProperties>>>()
             {
                 new CreateIndexModel<DarwinCore<DynamicProperties>>(
-                    Builders<DarwinCore<DynamicProperties>>.IndexKeys.Ascending(p => p.Taxon.TaxonID))
+                    Builders<DarwinCore<DynamicProperties>>.IndexKeys.Ascending(p => p.Taxon.TaxonID)),
+                new CreateIndexModel<DarwinCore<DynamicProperties>>(
+                    Builders<DarwinCore<DynamicProperties>>.IndexKeys.Ascending(p => p.Provider))
             };
 
             /*   indexModels.Add(new CreateIndexModel<DarwinCore>(Builders<DarwinCore>.IndexKeys.Combine(
@@ -116,6 +119,23 @@ namespace SOS.Process.Repositories.Destination
                    Builders<ImageADarwinCoreggregate>.IndexKeys.Ascending(x => x.Class))));
                    */
             await MongoCollection.Indexes.CreateManyAsync(indexModels);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DeleteProviderDataAsync(DataProviderId provider)
+        {
+            try
+            {
+                // Create the collection
+                var res = await MongoCollection.DeleteManyAsync(Builders<DarwinCore<DynamicProperties>>.Filter.Eq(dwc => dwc.Provider, provider));
+
+                return res.IsAcknowledged;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
         }
 
         /// <inheritdoc />

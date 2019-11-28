@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Extensions;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -41,27 +42,40 @@ namespace SOS.Process.Factories
             try
             {
                 Logger.LogDebug("Start Processing Species Portal Verbatim");
-               
-                var verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(0);
-                var count = verbatim.Count();
 
-                if (count == 0)
+                if (!await ProcessRepository.DeleteProviderDataAsync(DataProviderId.SpeciesPortal))
+                {
+                    Logger.LogError("Failed to delete Species Portal data");
+
+                    return false;
+                }
+
+                Logger.LogDebug("Previous processed Species Portal data deleted");
+
+                var verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(0);
+                
+                if (!verbatim.Any())
                 {
                     Logger.LogError("No verbatim data to process");
                     return false;
                 }
 
-                var totalCount = count;
+                var totalCount = 0;
 
-                while (count > 0)
+                while (verbatim.Any())
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    await ProcessRepository.AddManyAsync(verbatim.ToDarwinCore(taxa));
+                   
+                    var darwinCore = verbatim.ToDarwinCore(taxa).ToArray();
+                   
+                    await ProcessRepository.AddManyAsync(darwinCore);
 
+                    totalCount += verbatim.Count();
+
+                    // Fetch next batch
                     verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(totalCount + 1);
-                    count = verbatim.Count();
-                    totalCount += count;
-                    Logger.LogInformation($"Species Portal observations being processed, totalCount={totalCount:N}");
+
+                    Logger.LogInformation($"Species Portal observations being processed, totalCount: {totalCount}");
                 }
 
                 return true;

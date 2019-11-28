@@ -27,5 +27,10 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<bool> DeleteCollectionAsync();
+
+        /// <summary>
+        /// Make sure collection exists
+        /// </summary>
+        Task VerifyCollectionAsync();
     }
 }

@@ -173,7 +173,34 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
-        
+        /// <summary>
+        /// Dispose
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+
+            }
+
+            _disposed = true;
+        }
+
+        /// <summary>
+        /// Dispose
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         /// <inheritdoc />
         public virtual async Task<bool> AddManyAsync(IEnumerable<T> items)
         {
@@ -225,32 +252,23 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
-        /// <summary>
-        /// Dispose
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
+        /// <inheritdoc />
+        public async Task VerifyCollectionAsync()
         {
-            if (_disposed)
+            //filter by collection name
+            var exists = (await Database
+                .ListCollectionNamesAsync(new ListCollectionNamesOptions
+                {
+                    Filter = new BsonDocument("name", _collectionName)
+                }))
+                .Any();
+
+            //check for existence
+            if (!exists)
             {
-                return;
+                // Create the collection
+                await Database.CreateCollectionAsync(_collectionName);
             }
-
-            if (disposing)
-            {
-
-            }
-
-            _disposed = true;
-        }
-
-        /// <summary>
-        /// Dispose
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

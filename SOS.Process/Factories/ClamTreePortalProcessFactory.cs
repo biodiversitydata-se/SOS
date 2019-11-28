@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
@@ -49,6 +50,15 @@ namespace SOS.Process.Factories
         {
             Logger.LogDebug("Start clam and tree portal process job");
 
+            if (!await ProcessRepository.DeleteProviderDataAsync(DataProviderId.ClamAndTreePortal))
+            {
+                Logger.LogError("Failed to delete Clam and Tree portal data");
+                
+                return false;
+            }
+
+            Logger.LogDebug("Previous processed clam and tree portal data deleted");
+
             // Create task list
             var processTasks = new List<Task<bool>>
             {
@@ -81,30 +91,32 @@ namespace SOS.Process.Factories
                 Logger.LogDebug("Start processing clams verbatim");
 
                 var verbatim = await _clamObservationVerbatimRepository.GetBatchAsync(0);
-                var count = verbatim.Count();
-
-                if (count == 0)
+                
+                if (!verbatim.Any())
                 {
                     Logger.LogError("No clams verbatim data to process");
                     return false;
                 }
 
-                var totalCount = count;
+                var totalCount = 0;
 
-                while (count > 0)
+                while (verbatim.Any())
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var dwcModels = verbatim.ToDarwinCore(taxa)?.ToArray() ?? new DarwinCore<DynamicProperties>[0];
+                    
+                    var darwinCore = verbatim.ToDarwinCore(taxa).ToArray();
 
                     // Add area related data to models
-                    _areaHelper.AddAreaDataToDarwinCore(dwcModels);
+                    _areaHelper.AddAreaDataToDarwinCore(darwinCore);
 
-                    await ProcessRepository.AddManyAsync(dwcModels);
+                    await ProcessRepository.AddManyAsync(darwinCore);
 
+                    totalCount += verbatim.Count();
+
+                    // Fetch next batch
                     verbatim = await _clamObservationVerbatimRepository.GetBatchAsync(totalCount + 1);
-                    count = verbatim.Count();
-                    totalCount += count;
-                    Logger.LogInformation($"Clam observations being processed, totalCount={totalCount:N}");
+                    
+                    Logger.LogInformation($"Clam observations being processed, totalCount: {totalCount}");
                 }
 
                 return true;
@@ -136,30 +148,32 @@ namespace SOS.Process.Factories
                 Logger.LogDebug("Start processing trees verbatim");
 
                 var verbatim = await _treeObservationVerbatimRepository.GetBatchAsync(0);
-                var count = verbatim.Count();
-
-                if (count == 0)
+                
+                if (!verbatim.Any())
                 {
                     Logger.LogError("No tree verbatim data to process");
                     return false;
                 }
 
-                var totalCount = count;
+                var totalCount = 0;
 
-                while (count > 0)
+                while (verbatim.Any())
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var dwcModels = verbatim.ToDarwinCore(taxa)?.ToArray() ?? new DarwinCore<DynamicProperties>[0];
-
+                    
+                    var darwinCore = verbatim.ToDarwinCore(taxa).ToArray();
+                    
                     // Add area related data to models
-                    _areaHelper.AddAreaDataToDarwinCore(dwcModels);
+                    _areaHelper.AddAreaDataToDarwinCore(darwinCore);
 
-                    await ProcessRepository.AddManyAsync(dwcModels);
+                    await ProcessRepository.AddManyAsync(darwinCore);
 
+                    totalCount += verbatim.Count();
+
+                    // Fetch next batch
                     verbatim = await _treeObservationVerbatimRepository.GetBatchAsync(totalCount + 1);
-                    count = verbatim.Count();
-                    totalCount += count;
-                    Logger.LogInformation($"Tree observations being processed, totalCount={totalCount:N}");
+                    
+                    Logger.LogInformation($"Tree observations being processed, totalCount: {totalCount}");
                 }
 
                 return true;

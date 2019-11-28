@@ -12,6 +12,7 @@ using SOS.Export.Models.DarwinCore;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
 using Xunit;
 
@@ -103,7 +104,7 @@ namespace SOS.Export.Test.Factories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _processedDarwinCoreRepositoryMock.Setup(dwcr => dwcr.GetChunkAsync(0, It.IsAny<int>()))
-                .ReturnsAsync(new[] { new DarwinCore<DynamicProperties> { 
+                .ReturnsAsync(new[] { new DarwinCore<DynamicProperties>(DataProviderId.SpeciesPortal) { 
                     DatasetID = "test", Taxon = new DarwinCoreTaxon
                     {
                         ScientificName = "Biota",

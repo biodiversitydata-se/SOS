@@ -33,7 +33,7 @@ namespace SOS.Process.Test.Helpers
                 CreateAreaVerbatimRepositoryMock(provinceAreas).Object,
                 new AreaNameMapper());
             var observations = new List<DarwinCore<DynamicProperties>>();
-            var observation = new DarwinCore<DynamicProperties>
+            var observation = new DarwinCore<DynamicProperties>(DataProviderId.SpeciesPortal)
             {
                 Location = new DarwinCoreLocation
                 {
@@ -67,7 +67,7 @@ namespace SOS.Process.Test.Helpers
                 CreateAreaVerbatimRepositoryMock(provinceAreas).Object,
                 new AreaNameMapper());
             var observations = new List<DarwinCore<DynamicProperties>>();
-            var observation = new DarwinCore<DynamicProperties>
+            var observation = new DarwinCore<DynamicProperties>(DataProviderId.SpeciesPortal)
             {
                 Location = new DarwinCoreLocation
                 {
@@ -102,7 +102,7 @@ namespace SOS.Process.Test.Helpers
                 CreateAreaVerbatimRepositoryMock(provinceAreas).Object,
                 new AreaNameMapper());
             var observations = new List<DarwinCore<DynamicProperties>>();
-            var observation = new DarwinCore<DynamicProperties>
+            var observation = new DarwinCore<DynamicProperties>(DataProviderId.SpeciesPortal)
             {
                 Location = new DarwinCoreLocation
                 {

@@ -27,7 +27,7 @@ namespace SOS.Process.Extensions
         {
             taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
             // todo - ProtectionLevel, CoordinateX_RT90, CoordinateY_RT90, CoordinateX_SWEREF99, CoordinateY_SWEREF99, CoordinateX, CoordinateY
-            var obs = new DarwinCore<DynamicProperties>()
+            var obs = new DarwinCore<DynamicProperties>(DataProviderId.KUL)
             {
                 BasisOfRecord = BasisOfRecord.HumanObservation,
                 DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProviderId.KUL}",
