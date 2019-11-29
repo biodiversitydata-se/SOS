@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
@@ -10,6 +12,10 @@ using SOS.Process.Repositories.Source.Interfaces;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
+using Newtonsoft.Json;
+using SOS.Process.Models.Cache;
+
+using Location = SOS.Process.Models.Cache.Location;
 
 namespace SOS.Process.Helpers
 {
@@ -17,24 +23,30 @@ namespace SOS.Process.Helpers
     {
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
         private readonly STRtree<IFeature> _strTree;
-        private readonly IDictionary<string, IEnumerable<IFeature>> _featureCache;
+        private readonly IDictionary<string, PositionLocation> _featureCache;
+        private const string _cacheFileName = "positionAreas.json";
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="areaVerbatimRepository"></param>
-        /// <param name="areaNameMapper"></param>
+        /// <param name="cacheRepository"></param>
         public AreaHelper(IAreaVerbatimRepository areaVerbatimRepository)
         {
             _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
             _strTree = new STRtree<IFeature>();
-            _featureCache = new ConcurrentDictionary<string, IEnumerable<IFeature>>();
+
+            // Try to get saved cache
+            _featureCache = File.Exists(_cacheFileName) ?
+                JsonConvert.DeserializeObject<IDictionary<string, PositionLocation>>(
+                    File.ReadAllText(_cacheFileName, Encoding.UTF8)) : new ConcurrentDictionary<string, PositionLocation>();
 
             Task.Run(() => InitializeAsync()).Wait();
         }
 
         private async Task InitializeAsync()
         {
+            // If tree already initialized, return
             if (_strTree.Count != 0)
             {
                 return;
@@ -98,56 +110,63 @@ namespace SOS.Process.Helpers
                 {
                     continue;
                 }
-
-                // Round coordinates to 5 decimals (roughly 1m)
-                var key = $"{Math.Round(dwcModel.Location.DecimalLongitude, 5)}-{Math.Round(dwcModel.Location.DecimalLatitude, 5)}";
-
-                // Try to get areas from cache
-                _featureCache.TryGetValue(key, out var features);
-
-                // If areas not found for that position, try to get from repository
-                if (features == null)
-                {
-                    features = GetPointFeatures(dwcModel.Location.DecimalLongitude, dwcModel.Location.DecimalLatitude);
-
-                    _featureCache.Add(key, features);
-                }
-
-                if (features == null)
-                {
-                    continue;
-                }
-
+                
                 if (dwcModel.DynamicProperties == null)
                 {
                     dwcModel.DynamicProperties = new DynamicProperties();
                 }
 
-                foreach (var feature in features)
+                // Round coordinates to 5 decimals (roughly 1m)
+                var key = $"{Math.Round(dwcModel.Location.DecimalLongitude, 5)}-{Math.Round(dwcModel.Location.DecimalLatitude, 5)}";
+
+                // Try to get areas from cache. If areas not found for that position, try to get from repository
+                if (!_featureCache.TryGetValue(key, out var positionLocation))
                 {
-                    switch ((AreaType)feature.Attributes.GetOptionalValue("areaType"))
+                    var features = GetPointFeatures(dwcModel.Location.DecimalLongitude, dwcModel.Location.DecimalLatitude);
+                    positionLocation = new PositionLocation();
+
+                    if (features != null)
                     {
-                        case AreaType.County:
-                            dwcModel.Location.County = (string) feature.Attributes.GetOptionalValue("name");
-                            dwcModel.DynamicProperties.CountyIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
-                            break;
-                        case AreaType.Municipality:
-                            dwcModel.Location.Municipality = (string) feature.Attributes.GetOptionalValue("name");
-                            dwcModel.DynamicProperties.MunicipalityIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
-                            break;
-                        case AreaType.Parish:
-                            dwcModel.DynamicProperties.Parish = (string) feature.Attributes.GetOptionalValue("name");
-                            dwcModel.DynamicProperties.ParishIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
-                            break;
-                        case AreaType.Province:
-                            dwcModel.Location.StateProvince = (string) feature.Attributes.GetOptionalValue("name");
-                            dwcModel.DynamicProperties.ProvinceIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
-                            break;
-                        case AreaType.EconomicZoneOfSweden:
-                            dwcModel.IsInEconomicZoneOfSweden = true;
-                            break;
+                        foreach (var feature in features)
+                        {
+                            var location = new Location
+                            {
+                                Id = (int)feature.Attributes.GetOptionalValue("featureId"),
+                                Name = (string)feature.Attributes.GetOptionalValue("name")
+                            };
+                            switch ((AreaType)feature.Attributes.GetOptionalValue("areaType"))
+                            {
+                                case AreaType.County:
+                                    positionLocation.County = location;
+                                    break;
+                                case AreaType.Municipality:
+                                    positionLocation.Municipality = location;
+                                    break;
+                                case AreaType.Parish:
+                                    positionLocation.Parish = location;
+                                    break;
+                                case AreaType.Province:
+                                    positionLocation.Province = location;
+                                    break;
+                                case AreaType.EconomicZoneOfSweden:
+                                    positionLocation.EconomicZoneOfSweden = true;
+                                    break;
+                            }
+                        }
                     }
+
+                    _featureCache.Add(key, positionLocation);
                 }
+
+                dwcModel.Location.County = positionLocation.County?.Name;
+                dwcModel.DynamicProperties.CountyIdByCoordinate = positionLocation.County?.Id;
+                dwcModel.Location.Municipality = positionLocation.Municipality?.Name;
+                dwcModel.DynamicProperties.MunicipalityIdByCoordinate = positionLocation.Municipality?.Id;
+                dwcModel.DynamicProperties.Parish = positionLocation.Parish?.Name;
+                dwcModel.DynamicProperties.ParishIdByCoordinate = positionLocation.Parish?.Id;
+                dwcModel.Location.StateProvince = positionLocation.Province?.Name;
+                dwcModel.DynamicProperties.ProvinceIdByCoordinate = positionLocation.Province?.Id;
+                dwcModel.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
 
                 // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
                 dwcModel.DynamicProperties.CountyPartIdByCoordinate = dwcModel.DynamicProperties.CountyIdByCoordinate;
@@ -174,6 +193,10 @@ namespace SOS.Process.Helpers
                     dwcModel.DynamicProperties.ProvincePartIdByCoordinate = (int) ProvinceFeatureId.Lappland;
                 }
             }
+
+            // Persist cache
+            using var file = new StreamWriter(File.Create(_cacheFileName), Encoding.UTF8);
+            file.Write(JsonConvert.SerializeObject(_featureCache));
         }
     }
 }

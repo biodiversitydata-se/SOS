@@ -77,6 +77,11 @@ namespace SOS.Process.Repositories.Destination
             {
                 // Create the collection
                 Database.CreateCollection(_collectionNameConfiguration);
+
+                MongoCollectionConfiguration.InsertOne(new ProcessedConfiguration
+                {
+                    ActiveInstance = 1
+                });
             }
         } 
 

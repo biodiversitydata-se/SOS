@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Factories.Interfaces;
+using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -126,6 +127,8 @@ namespace SOS.Process.Jobs
                     {
                         await _processRepository.ToggleInstanceAsync();
                     }
+
+                    _logger.LogDebug("Persist area cache");
                 }
 
                 // return result of all processing
