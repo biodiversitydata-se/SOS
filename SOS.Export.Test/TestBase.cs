@@ -5,11 +5,13 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Newtonsoft.Json;
+using SOS.Export.IO.Csv.Converters;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Test.TestHelpers.JsonConverters;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Export.Test
 {

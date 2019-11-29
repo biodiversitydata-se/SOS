@@ -52,7 +52,7 @@ namespace SOS.Export.Repositories
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Database = exportClient.GetDatabase();
-
+            
             _collectionName = $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ ActiveInstance }";
         }
 

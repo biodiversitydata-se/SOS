@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Processed.DarwinCore

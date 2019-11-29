@@ -12,6 +12,7 @@ using SOS.Export.IO.Csv.Converters;
 using SOS.Export.Models;
 using SOS.Export.Models.DarwinCore;
 using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Export.Mappings
 {
