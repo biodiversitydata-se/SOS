@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
 using CsvHelper.Configuration;
@@ -11,16 +12,8 @@ namespace SOS.Export.Services.Interfaces
         /// Compress folder content
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="folder"></param>
-        string CompressFolder(string path, string folder);
-
-        /// <summary>
-        /// Copy files to destination
-        /// </summary>
-        /// <param name="sourcePath"></param>
-        /// <param name="files"></param>
-        /// <param name="destinationPath"></param>
-        void CopyFiles(string sourcePath, IEnumerable<string> files, string destinationPath);
+        /// <param name="folderName"></param>
+        string CompressFolder(string path, string folderName);
 
         /// <summary>
         /// Create a new folder
@@ -29,6 +22,12 @@ namespace SOS.Export.Services.Interfaces
         /// <param name="folder"></param>
         /// <returns></returns>
         void CreateFolder(string path, string folder);
+
+        /// <summary>
+        /// Creates a new folder.
+        /// </summary>
+        /// <param name="folderPath">The folder path.</param>
+        void CreateFolder(string folderPath);
 
         /// <summary>
         /// Delete a file
@@ -43,39 +42,5 @@ namespace SOS.Export.Services.Interfaces
         /// <param name="path"></param>
         /// <returns></returns>
         void DeleteFolder(string path);
-
-        /// <summary>
-        /// Get name of all files in a folder
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        IEnumerable<string> GetFolderFiles(string path);
-
-        /// <summary>
-        /// Get a xml document from disk
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        XmlDocument GetXmlDocument(string path);
-
-        /// <summary>
-        /// Save XML document
-        /// </summary>
-        /// <param name="xmlDocument"></param>
-        /// <param name="path"></param>
-        void SaveXmlDocument(XmlDocument xmlDocument, string path);
-
-        /// <summary>
-        /// Create or append data to csv file
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="filePath"></param>
-        /// <param name="create"></param>
-        /// <param name="records"></param>
-        /// <param name="map"></param>
-        /// <returns></returns>
-        Task WriteToCsvFileAsync<T>(string filePath, bool create, IEnumerable<T> records, ClassMap<T> map);
-
-        
     }
 }

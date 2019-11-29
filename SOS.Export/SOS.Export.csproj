@@ -18,10 +18,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="DarwinCore\eml.xml">
+      <None Update="Resources\DarwinCore\eml.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="DarwinCore\meta.xml">
+      <None Update="Resources\DarwinCore\meta.xml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\FieldDescriptions.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

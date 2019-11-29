@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -16,26 +17,11 @@ namespace SOS.Export.Services
     public class FileService : IFileService
     {
         /// <inheritdoc />
-        public string CompressFolder(string path, string folder)
+        public string CompressFolder(string path, string folderName)
         {
-            var zipFilePath = $"{path}/{folder}.zip";
-            ZipFile.CreateFromDirectory($"{path}/{folder}", zipFilePath);
-
+            var zipFilePath = Path.Join(path, $"{folderName}.zip");
+            ZipFile.CreateFromDirectory($"{path}/{folderName}", zipFilePath);
             return zipFilePath;
-        }
-
-        /// <inheritdoc />
-        public void CopyFiles(string sourcePath, IEnumerable<string> files, string destinationPath)
-        {
-            if (!files?.Any() == true)
-            {
-                return;
-            }
-
-            foreach (var file in files)
-            {
-                File.Copy($"{sourcePath}/{file}", $"{destinationPath}/{file}");
-            }
         }
 
         /// <inheritdoc />
@@ -45,53 +31,27 @@ namespace SOS.Export.Services
         }
 
         /// <inheritdoc />
+        public void CreateFolder(string folderPath)
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+
+        /// <inheritdoc />
         public void DeleteFile(string path)
         {
-            File.Delete(path);
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
         }
 
         /// <inheritdoc />
         public void DeleteFolder(string path)
         {
-            Directory.Delete($"{path}", true);
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<string> GetFolderFiles(string path)
-        {
-            return Directory.EnumerateFiles(path);
-        }
-
-        /// <inheritdoc />
-        public XmlDocument GetXmlDocument(string path)
-        {
-            var document = new XmlDocument();
-            document.Load(path);
-
-            return document;
-        }
-
-        /// <inheritdoc />
-        public void SaveXmlDocument(XmlDocument xmlDocument, string path)
-        {
-            // Save document to disk
-            xmlDocument.Save(path);
-        }
-
-        /// <inheritdoc />
-        public async Task WriteToCsvFileAsync<T>(string filePath, bool create, IEnumerable<T> records, ClassMap<T> map)
-        {
-            if (!records?.Any() ?? true)
+            if (Directory.Exists(path))
             {
-                return;
+                Directory.Delete(path, true);
             }
-
-            await using var fileStream = new FileStream($"{filePath}", create ? FileMode.Create : FileMode.Append);
-            await using var streamWriter = new StreamWriter(fileStream);
-            using var csv = new CsvWriter(streamWriter, new Configuration { HasHeaderRecord = create });
-
-            csv.Configuration.RegisterClassMap(map);
-            csv.WriteRecords(records);
         }
     }
 }

@@ -26,6 +26,7 @@ namespace SOS.Export.Test.Repositories.Destination
         /// Test constructor
         /// </summary>
         [Fact]
+        [Trait("Category","Unit")]
         public void ConstructorTest()
         {
             new ProcessedDarwinCoreRepository(

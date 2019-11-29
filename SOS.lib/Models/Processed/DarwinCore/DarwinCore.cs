@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Processed.DarwinCore
@@ -226,6 +227,12 @@ namespace SOS.Lib.Models.Processed.DarwinCore
         /// dataset (specimen, observation, etc.).
         /// </summary>
         public DarwinCoreOccurrence Occurrence { get; set; }
+
+        /// <summary>
+        /// Instances of the dwc:Organism class are intended to facilitate linking one or more
+        /// dwc:Identification instances to one or more dwc:Occurrence instances.
+        /// </summary>
+        public DarwinCoreOrganism Organism { get; set; }
 
         /// <summary>
         /// Darwin Core term name: ownerInstitutionCode.

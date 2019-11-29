@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Lib.Extensions
@@ -256,6 +257,24 @@ namespace SOS.Lib.Extensions
                 string.IsNullOrEmpty(occurrence.ReproductiveCondition) &&
                 string.IsNullOrEmpty(occurrence.Sex));
         }
+
+        /// <summary>
+        /// Check if organism has data
+        /// </summary>
+        /// <param name="organism"></param>
+        /// <returns></returns>
+        public static bool HasData(this DarwinCoreOrganism organism)
+        {
+            return !(
+                string.IsNullOrEmpty(organism.AssociatedOccurrences) &&
+                string.IsNullOrEmpty(organism.AssociatedOrganisms) &&
+                string.IsNullOrEmpty(organism.OrganismID) &&
+                string.IsNullOrEmpty(organism.OrganismName) &&
+                string.IsNullOrEmpty(organism.OrganismRemarks) &&
+                string.IsNullOrEmpty(organism.OrganismScope) &&
+                string.IsNullOrEmpty(organism.PreviousIdentifications));
+        }
+
 
         /// <summary>
         /// Check if resourceRelationship has data
