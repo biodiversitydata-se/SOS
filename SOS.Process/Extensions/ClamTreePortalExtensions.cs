@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Verbatim.ClamTreePortal;
 
 namespace SOS.Process.Extensions
@@ -22,11 +22,12 @@ namespace SOS.Process.Extensions
         {
             taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
 
-            return new DarwinCore<DynamicProperties>()
+            return new DarwinCore<DynamicProperties>(DataProviderId.ClamAndTreePortal)
             {
                 AccessRights = verbatim.AccessRights,
                 BasisOfRecord = verbatim.BasisOfRecord,
-                DatasetID = $"{ (int)SightingProviders.ClamAndTreePortal }-{ verbatim.CatalogNumber }",
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProviderId.ClamAndTreePortal}",
+                DatasetName = "Träd och musselportalen",
                 DynamicProperties = new DynamicProperties
                 {
                     IsNaturalOccurrence = verbatim.IsNaturalOccurrence,
@@ -114,11 +115,12 @@ namespace SOS.Process.Extensions
         {
             taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
 
-            return new DarwinCore<DynamicProperties>()
+            return new DarwinCore<DynamicProperties>(DataProviderId.ClamAndTreePortal)
             {
                 AccessRights = verbatim.AccessRights,
                 BasisOfRecord = verbatim.BasisOfRecord,
-                DatasetID = $"{ (int)SightingProviders.ClamAndTreePortal }-{ verbatim.CatalogNumber }",
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProviderId.ClamAndTreePortal}",
+                DatasetName = "Träd och musselportalen",
                 DynamicProperties = new DynamicProperties
                 {
                     IsNaturalOccurrence = verbatim.IsNaturalOccurrence,
@@ -164,7 +166,6 @@ namespace SOS.Process.Extensions
                 Modified = verbatim.Modified ?? DateTime.MinValue,
                 Occurrence = new DarwinCoreOccurrence
                 {
-
                     CatalogNumber = verbatim.CatalogNumber.ToString(),
                     EstablishmentMeans = verbatim.EstablishmentMeans,
                     IndividualCount = verbatim.IndividualCount,

@@ -6,7 +6,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Factories.Interfaces;
 using SOS.Process.Jobs.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -19,7 +19,7 @@ namespace SOS.Process.Jobs
     /// </summary>
     public class ProcessJob : IProcessJob
     {
-        private readonly IProcessedRepository _processRepository;
+        private readonly IDarwinCoreRepository _processRepository;
 
         private readonly ISpeciesPortalProcessFactory _speciesPortalProcessFactory;
         private readonly IClamTreePortalProcessFactory _clamTreePortalProcessFactory;
@@ -39,7 +39,7 @@ namespace SOS.Process.Jobs
         /// <param name="taxonVerbatimRepository"></param>
         /// <param name="logger"></param>
         public ProcessJob(
-            IProcessedRepository processRepository,
+            IDarwinCoreRepository processRepository,
             IClamTreePortalProcessFactory clamTreePortalProcessFactory,
             IKulProcessFactory kulProcessFactory,
             ISpeciesPortalProcessFactory speciesPortalProcessFactory,
@@ -55,7 +55,7 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> Run(int sources, IJobCancellationToken cancellationToken)
+        public async Task<bool> Run(int sources, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -86,10 +86,10 @@ namespace SOS.Process.Jobs
                 }
 
                 cancellationToken?.ThrowIfCancellationRequested();
-                _logger.LogDebug("Empty collection");
+                _logger.LogDebug("Verify collection");
+               
                 // Make sure we have an empty collection
-                await _processRepository.DeleteCollectionAsync();
-                await _processRepository.AddCollectionAsync();
+                await _processRepository.VerifyCollectionAsync();
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 // Create task list
@@ -121,6 +121,11 @@ namespace SOS.Process.Jobs
                 {
                     _logger.LogDebug("Create indexes");
                     await _processRepository.CreateIndexAsync();
+
+                    if (toggleInstanceOnSuccess)
+                    {
+                        await _processRepository.ToggleInstanceAsync();
+                    }
                 }
 
                 // return result of all processing
@@ -135,7 +140,7 @@ namespace SOS.Process.Jobs
             {
                 _logger.LogError(e, "Process job failed");
                 return false;
-            }            
+            }
         }
     }
 }

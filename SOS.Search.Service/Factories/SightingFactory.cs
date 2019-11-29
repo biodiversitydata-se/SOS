@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Extensions;
 using SOS.Search.Service.Repositories.Interfaces;
 

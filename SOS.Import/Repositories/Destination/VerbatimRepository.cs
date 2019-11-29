@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Import.MongoDb.Interfaces;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Import.Repositories.Destination
@@ -52,7 +53,9 @@ namespace SOS.Import.Repositories.Destination
             Database = importClient.GetDatabase();
             
             _batchSize = importClient.BatchSize;
-            _collectionName = typeof(TEntity).Name;
+
+            // Clean name from non alfa numeric chats
+            _collectionName = typeof(TEntity).Name.UntilNonAlfanumeric();
         }
 
         /// <summary>
@@ -151,6 +154,20 @@ namespace SOS.Import.Repositories.Destination
             }
 
             return success;
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> AddOrUpdateAsync(TEntity item)
+        {
+            var filter = Builders<TEntity>.Filter.Eq("_id", item.Id);
+
+            var entity = await MongoCollection.Find(filter).FirstOrDefaultAsync();
+            if (entity == null)
+            {
+                return await AddAsync(item);
+            }
+
+            return await UpdateAsync(item.Id, item);
         }
 
         /// <inheritdoc />

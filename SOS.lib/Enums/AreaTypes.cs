@@ -6,6 +6,7 @@
      //   Community = 11,
         CountryRegion = 13,
         Province = 16,
+        EconomicZoneOfSweden = 18,
         Parish = 19,
         County = 21
     }

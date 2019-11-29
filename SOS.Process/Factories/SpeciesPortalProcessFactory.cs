@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Extensions;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -23,21 +24,17 @@ namespace SOS.Process.Factories
         /// Constructor
         /// </summary>
         /// <param name="speciesPortalVerbatimRepository"></param>
-        /// <param name="processedRepository"></param>
+        /// <param name="DarwinCoreRepository"></param>
         /// <param name="logger"></param>
-        public SpeciesPortalProcessFactory(ISpeciesPortalVerbatimRepository speciesPortalVerbatimRepository,
-            IProcessedRepository processedRepository,
-            ILogger<SpeciesPortalProcessFactory> logger) : base(processedRepository, logger)
+        public SpeciesPortalProcessFactory(
+            ISpeciesPortalVerbatimRepository speciesPortalVerbatimRepository,
+            IDarwinCoreRepository DarwinCoreRepository,
+            ILogger<SpeciesPortalProcessFactory> logger) : base(DarwinCoreRepository, logger)
         {
             _speciesPortalVerbatimRepository = speciesPortalVerbatimRepository ?? throw new ArgumentNullException(nameof(speciesPortalVerbatimRepository));
         }
 
-        /// <summary>
-        /// Process verbatim data and store it in darwin core format
-        /// </summary>
-        /// <param name="taxa"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public async Task<bool> ProcessAsync(
             IDictionary<int, DarwinCoreTaxon> taxa,
             IJobCancellationToken cancellationToken)
@@ -46,26 +43,39 @@ namespace SOS.Process.Factories
             {
                 Logger.LogDebug("Start Processing Species Portal Verbatim");
 
-                var verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(0);
-                var count = verbatim.Count();
+                if (!await ProcessRepository.DeleteProviderDataAsync(DataProviderId.SpeciesPortal))
+                {
+                    Logger.LogError("Failed to delete Species Portal data");
 
-                if (count == 0)
+                    return false;
+                }
+
+                Logger.LogDebug("Previous processed Species Portal data deleted");
+
+                var verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(0);
+                
+                if (!verbatim.Any())
                 {
                     Logger.LogError("No verbatim data to process");
                     return false;
                 }
 
-                var totalCount = count;
+                var totalCount = 0;
 
-                while (count > 0)
+                while (verbatim.Any())
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    await ProcessRepository.AddManyAsync(verbatim.ToDarwinCore(taxa));
+                   
+                    var darwinCore = verbatim.ToDarwinCore(taxa).ToArray();
+                   
+                    await ProcessRepository.AddManyAsync(darwinCore);
 
+                    totalCount += verbatim.Count();
+
+                    // Fetch next batch
                     verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(totalCount + 1);
-                    count = verbatim.Count();
-                    totalCount += count;
-                    Logger.LogInformation($"Species Portal observations being processed, totalCount={totalCount:N}");
+
+                    Logger.LogInformation($"Species Portal observations being processed, totalCount: {totalCount}");
                 }
 
                 return true;

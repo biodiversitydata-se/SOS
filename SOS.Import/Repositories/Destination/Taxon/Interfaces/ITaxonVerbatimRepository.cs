@@ -1,5 +1,5 @@
 ﻿using SOS.Import.Repositories.Destination.Interfaces;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Import.Repositories.Destination.Taxon.Interfaces
 {

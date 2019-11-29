@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Process.Helpers.Interfaces
 {

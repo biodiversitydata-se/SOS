@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Repositories
@@ -14,7 +14,7 @@ namespace SOS.Search.Service.Repositories
     /// <summary>
     /// Species data service
     /// </summary>
-    public class ProcessedDarwinCoreRepository : AggregateRepository<DarwinCore<DynamicProperties>, ObjectId>, IProcessedDarwinCoreRepository
+    public class ProcessedDarwinCoreRepository : BaseRepository<DarwinCore<DynamicProperties>, ObjectId>, IProcessedDarwinCoreRepository
     {
         /// <summary>
         /// Constructor
@@ -36,9 +36,8 @@ namespace SOS.Search.Service.Repositories
         /// <returns></returns>
         private FilterDefinition<DarwinCore<DynamicProperties>> CreateFilter(IEnumerable<int> taxonIds)
         {
-            var ids = taxonIds?.Select(i => i.ToString()) ?? new string[0];
-            var filter = Builders<DarwinCore<DynamicProperties>>.Filter.Where(m => ids.Contains(m.Taxon.TaxonID));
-
+            var filter = Builders<DarwinCore<DynamicProperties>>.Filter.Where(m => taxonIds.Contains(m.Taxon.Id));
+          
             return filter;
         }
 

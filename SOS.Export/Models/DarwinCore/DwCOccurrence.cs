@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Models.DarwinCore;
+﻿using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Export.Models.DarwinCore
 {

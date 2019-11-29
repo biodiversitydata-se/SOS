@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Lib.Extensions
 {
@@ -22,7 +22,7 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
-            return new DarwinCore<string>
+            return new DarwinCore<string>(processedDarwinCore.Provider)
             {
                 AccessRights = processedDarwinCore.AccessRights,
                 BasisOfRecord = processedDarwinCore.BasisOfRecord,

@@ -4,15 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Extensions;
 using SOS.Process.Repositories.Source.Interfaces;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
-using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Process.Mappings;
-using SOS.Process.Mappings.Interfaces;
 
 namespace SOS.Process.Helpers
 {
@@ -43,8 +40,6 @@ namespace SOS.Process.Helpers
                 return;
             }
 
-            var counties = new List<Area>();
-            var provinces = new List<Area>();
             var areas = await _areaVerbatimRepository.GetBatchAsync(0);
             var count = areas.Count();
             var totalCount = count;
@@ -53,16 +48,6 @@ namespace SOS.Process.Helpers
             {
                 foreach (var area in areas)
                 {
-                    switch (area.AreaType)
-                    {
-                        case AreaType.County:
-                            counties.Add(area);
-                            break;
-                        case AreaType.Province:
-                            provinces.Add(area);
-                            break;
-                    }
-
                     var feature = area.ToFeature();
                     _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
                 }
@@ -157,6 +142,9 @@ namespace SOS.Process.Helpers
                         case AreaType.Province:
                             dwcModel.Location.StateProvince = (string) feature.Attributes.GetOptionalValue("name");
                             dwcModel.DynamicProperties.ProvinceIdByCoordinate = (int)feature.Attributes.GetOptionalValue("featureId");
+                            break;
+                        case AreaType.EconomicZoneOfSweden:
+                            dwcModel.IsInEconomicZoneOfSweden = true;
                             break;
                     }
                 }

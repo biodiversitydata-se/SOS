@@ -23,7 +23,6 @@ namespace SOS.Process.IoC.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-
             // Vebatim Mongo Db
             var verbatimDbConfiguration = Configuration.VerbatimDbConfiguration;
             var verbatimSettings = verbatimDbConfiguration.GetMongoDbSettings();
@@ -49,8 +48,9 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<TreeObservationVerbatimRepository>().As<ITreeObservationVerbatimRepository>().InstancePerLifetimeScope();
             
             // Repositories destination
-            builder.RegisterType<ProcessedRepository>().As<IProcessedRepository>().InstancePerLifetimeScope();
-          
+            builder.RegisterType<InadequateItemRepository>().As<IInadequateItemRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<DarwinCoreRepository>().As<IDarwinCoreRepository>().InstancePerLifetimeScope();
+
             // Add factories
             builder.RegisterType<ClamTreePortalProcessFactory>().As<IClamTreePortalProcessFactory>().InstancePerLifetimeScope();
             builder.RegisterType<KulProcessFactory>().As<IKulProcessFactory>().InstancePerLifetimeScope();

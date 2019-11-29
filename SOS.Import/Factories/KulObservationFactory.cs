@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,9 +7,13 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
 using SOS.Import.Models;
+using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.Verbatim.ClamTreePortal;
+using SOS.Lib.Models.Verbatim.Kul;
 
 namespace SOS.Import.Factories
 {
@@ -18,18 +21,29 @@ namespace SOS.Import.Factories
     {
         private readonly IKulObservationService _kulObservationService;
         private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
+        private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<KulObservationFactory> _logger;
         private readonly KulServiceConfiguration _kulServiceConfiguration;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="kulObservationService"></param>
+        /// <param name="kulObservationVerbatimRepository"></param>
+        /// <param name="kulServiceConfiguration"></param>
+        /// <param name="harvestInfoRepository"></param>
+        /// <param name="logger"></param>
         public KulObservationFactory(
             IKulObservationService kulObservationService,
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             KulServiceConfiguration kulServiceConfiguration,
+            IHarvestInfoRepository harvestInfoRepository,
             ILogger<KulObservationFactory> logger)
         {
             _kulObservationService = kulObservationService;
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository;
             _kulServiceConfiguration = kulServiceConfiguration;
+            _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger;
         }
 
@@ -80,7 +94,12 @@ namespace SOS.Import.Factories
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for KUL data provider");
-                return true;
+                
+                // Update harvest info
+                return await _harvestInfoRepository.UpdateHarvestInfoAsync(
+                    nameof(KulObservationVerbatim),
+                    DataProviderId.KUL,
+                    nrSightingsHarvested);
             }
             catch (JobAbortedException)
             {

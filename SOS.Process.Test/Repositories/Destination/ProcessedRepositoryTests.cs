@@ -4,22 +4,25 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination;
+using SOS.Process.Repositories.Destination.Interfaces;
 using Xunit;
 
 namespace SOS.Process.Test.Repositories.Destination
 {
-    public class ProcessedRepositoryTests
+    public class DarwinCoreRepositoryTests
     {
         private readonly Mock<IProcessClient> _processClient;
-        private readonly Mock<ILogger<ProcessedRepository>> _loggerMock;
+        private readonly Mock<IInadequateItemRepository> _inadequateItemRepositoryMock;
+        private readonly Mock<ILogger<DarwinCoreRepository>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ProcessedRepositoryTests()
+        public DarwinCoreRepositoryTests()
         {
             _processClient = new Mock<IProcessClient>();
-            _loggerMock = new Mock<ILogger<ProcessedRepository>>();
+            _inadequateItemRepositoryMock = new Mock<IInadequateItemRepository>();
+            _loggerMock = new Mock<ILogger<DarwinCoreRepository>>();
         }
 
         /// <summary>
@@ -28,17 +31,26 @@ namespace SOS.Process.Test.Repositories.Destination
         [Fact]
         public void ConstructorTest()
         {
-            new ProcessedRepository(
+            new DarwinCoreRepository(
                 _processClient.Object,
+                _inadequateItemRepositoryMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new ProcessedRepository(
+            Action create = () => new DarwinCoreRepository(
                 null,
+                _inadequateItemRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
 
-            create = () => new ProcessedRepository(
+            create = () => new DarwinCoreRepository(
                 _processClient.Object,
+               null,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("darwinCoreInadequateRepository");
+
+            create = () => new DarwinCoreRepository(
+                _processClient.Object,
+                _inadequateItemRepositoryMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }

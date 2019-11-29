@@ -3,24 +3,33 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using Moq;
 using SOS.Import.Entities;
 using SOS.Import.Factories;
-using SOS.Import.Models;
 using SOS.Import.MongoDb;
+using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Import.Services;
-using SOS.Lib.Configuration.Import;
+using SOS.Lib.Enums;
 using Xunit;
 
 namespace SOS.Import.Test.Factories
 {
     public class SightingFactoryIntegrationTests : TestBase
     {
+        private IHarvestInfoRepository GetHarvestInfoRepository()
+        {
+            var harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
+            harvestInfoRepositoryMock.Setup(hir =>
+                    hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProviderId.ClamAndTreePortal, It.IsAny<int>()))
+                .ReturnsAsync(true);
+
+            return harvestInfoRepositoryMock.Object;
+        }
+
         [Fact]
         [Trait("Category","Integration")]
         public async Task HarvestOneHundredThousandSightingsFromArtportalen_And_SaveToMongoDb()
@@ -61,6 +70,7 @@ namespace SOS.Import.Test.Factories
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
+                GetHarvestInfoRepository(),
                 new Mock<ILogger<SpeciesPortalSightingFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -109,6 +119,7 @@ namespace SOS.Import.Test.Factories
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
+                GetHarvestInfoRepository(),
                 new Mock<ILogger<SpeciesPortalSightingFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

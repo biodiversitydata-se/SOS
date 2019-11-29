@@ -6,9 +6,11 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
+using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Import.Factories
@@ -20,23 +22,15 @@ namespace SOS.Import.Factories
     {
         private readonly SpeciesPortalConfiguration _speciesPortalConfiguration;
         private readonly IMetadataRepository _metadataRepository;
-
         private readonly IProjectRepository _projectRepository;
-
         private readonly ISightingRepository _sightingRepository;
-
         private readonly ISiteRepository _siteRepository;
-
         private readonly ISightingVerbatimRepository _sightingVerbatimRepository;
-
         private readonly IPersonRepository _personRepository;
-        
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
-
         private readonly ISightingRelationRepository _sightingRelationRepository;
-
         private readonly IOrganizationRepository _organizationRepository;
-
+        private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<SpeciesPortalSightingFactory> _logger;
 
         /// <summary>
@@ -64,6 +58,7 @@ namespace SOS.Import.Factories
             IOrganizationRepository organizationRepository,
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionItemRepository,
+            IHarvestInfoRepository harvestInfoRepository,
             ILogger<SpeciesPortalSightingFactory> logger)
         {
             _speciesPortalConfiguration = speciesPortalConfiguration ?? throw new ArgumentNullException(nameof(speciesPortalConfiguration));
@@ -76,6 +71,7 @@ namespace SOS.Import.Factories
             _organizationRepository = organizationRepository ?? throw new ArgumentNullException(nameof(organizationRepository));
             _sightingRelationRepository = sightingRelationRepository ?? throw new ArgumentNullException(nameof(sightingRelationRepository));
             _speciesCollectionRepository = speciesCollectionItemRepository ?? throw new ArgumentNullException(nameof(speciesCollectionItemRepository));
+            _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -155,12 +151,12 @@ namespace SOS.Import.Factories
 
                     // Get chunk of sightings
                     var sightings = (await _sightingRepository.GetChunkAsync(minId, _speciesPortalConfiguration.ChunkSize)).ToArray();
-                    HashSet<int> sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
+                    var sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
                     nrSightingsHarvested += sightings.Length;
 
                     // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
                     var sightingRelations = (await _sightingRelationRepository
-                        .GetAsync(sightings.Select(x => x.Id))).ToAggregates().ToList();
+                        .GetAsync(sightingIds)).ToAggregates().ToArray();
                     var personSightingBySightingId = PersonSightingFactory.CalculatePersonSightingDictionary(
                         sightingIds,
                         personByUserId,
@@ -189,7 +185,11 @@ namespace SOS.Import.Factories
                     minId += _speciesPortalConfiguration.ChunkSize;
                 }
 
-                return true;
+                // Update harvest info
+                return await _harvestInfoRepository.UpdateHarvestInfoAsync(
+                    nameof(APSightingVerbatim),
+                    DataProviderId.SpeciesPortal,
+                    nrSightingsHarvested);
             }
             catch (JobAbortedException)
             {

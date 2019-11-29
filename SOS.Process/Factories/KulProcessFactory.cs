@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -25,26 +25,21 @@ namespace SOS.Process.Factories
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="areaHelper"></param>
-        /// <param name="processedRepository"></param>
-        /// <param name="logger"></param>
         /// <param name="kulObservationVerbatimRepository"></param>
+        /// <param name="areaHelper"></param>
+        /// <param name="DarwinCoreRepository"></param>
+        /// <param name="logger"></param>
         public KulProcessFactory(
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedRepository processedRepository,
-            ILogger<KulProcessFactory> logger) : base(processedRepository, logger)
+            IDarwinCoreRepository DarwinCoreRepository,
+            ILogger<KulProcessFactory> logger) : base(DarwinCoreRepository, logger)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
-        /// <summary>
-        /// Process verbatim data and store it in darwin core format
-        /// </summary>
-        /// <param name="taxa"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public async Task<bool> ProcessAsync(
             IDictionary<int, DarwinCoreTaxon> taxa,
             IJobCancellationToken cancellationToken)
@@ -53,31 +48,42 @@ namespace SOS.Process.Factories
             {
                 Logger.LogDebug("Start Processing KUL Verbatim observations");
 
-                var verbatim = await _kulObservationVerbatimRepository.GetBatchAsync(0);
-                var count = verbatim.Count();
+                if (!await ProcessRepository.DeleteProviderDataAsync(DataProviderId.KUL))
+                {
+                    Logger.LogError("Failed to delete KUL data");
 
-                if (count == 0)
+                    return false;
+                }
+
+                Logger.LogDebug("Previous processed KUL data deleted");
+
+                var verbatim = await _kulObservationVerbatimRepository.GetBatchAsync(0);
+                
+                if (!verbatim.Any())
                 {
                     Logger.LogError("No verbatim data to process");
                     return false;
                 }
 
-                var totalCount = count;
+                var totalCount = 0;
 
-                while (count > 0)
+                while (verbatim.Any())
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var dwcModels = verbatim.ToDarwinCore(taxa)?.ToArray() ?? new DarwinCore<DynamicProperties>[0];
+
+                    var darwinCore = verbatim.ToDarwinCore(taxa).ToArray();
 
                     // Add area related data to models
-                    _areaHelper.AddAreaDataToDarwinCore(dwcModels);
+                    _areaHelper.AddAreaDataToDarwinCore(darwinCore);
+                    
+                    await ProcessRepository.AddManyAsync(darwinCore);
 
-                    await ProcessRepository.AddManyAsync(dwcModels);
+                    totalCount += verbatim.Count();
 
+                    // Fetch next batch
                     verbatim = await _kulObservationVerbatimRepository.GetBatchAsync(totalCount + 1);
-                    count = verbatim.Count();
-                    totalCount += count;
-                    Logger.LogInformation($"KUL observations being processed, totalCount={totalCount:N}");
+                    
+                    Logger.LogInformation($"KUL observations being processed, totalCount: {totalCount}");
                 }
 
                 Logger.LogDebug($"End KUL Verbatim observations process job. Success: true");
