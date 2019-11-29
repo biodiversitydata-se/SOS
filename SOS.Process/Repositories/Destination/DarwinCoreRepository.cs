@@ -145,18 +145,6 @@ namespace SOS.Process.Repositories.Destination
             {
                 var config = GetConfiguration();
 
-                if (config == null)
-                {
-                    config = new ProcessedConfiguration
-                    {
-                        ActiveInstance = InstanceToUpdate
-                    };
-
-                    await MongoCollectionConfiguration.InsertOneAsync(config);
-
-                    return true;
-                }
-                
                 config.ActiveInstance = InstanceToUpdate;
 
                 var updateResult = await MongoCollectionConfiguration.ReplaceOneAsync(
@@ -168,7 +156,7 @@ namespace SOS.Process.Repositories.Destination
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Faild to toggle instance");
+                Logger.LogError(e, "Failed to toggle instance");
                 return false;
             }
            

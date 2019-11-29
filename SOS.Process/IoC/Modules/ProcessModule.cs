@@ -1,4 +1,6 @@
-﻿using Autofac;
+﻿using System.Collections.Generic;
+using Autofac;
+using NetTopologySuite.Features;
 using SOS.Lib.Configuration.Process;
 using SOS.Process.Database;
 using SOS.Process.Database.Interfaces;
@@ -46,10 +48,10 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<SpeciesPortalVerbatimRepository>().As<ISpeciesPortalVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonVerbatimRepository>().As<ITaxonVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TreeObservationVerbatimRepository>().As<ITreeObservationVerbatimRepository>().InstancePerLifetimeScope();
-            
-            // Repositories destination
-            builder.RegisterType<InadequateItemRepository>().As<IInadequateItemRepository>().InstancePerLifetimeScope();
+
+            // Repositories destination 
             builder.RegisterType<DarwinCoreRepository>().As<IDarwinCoreRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<InadequateItemRepository>().As<IInadequateItemRepository>().InstancePerLifetimeScope();
 
             // Add factories
             builder.RegisterType<ClamTreePortalProcessFactory>().As<IClamTreePortalProcessFactory>().InstancePerLifetimeScope();
