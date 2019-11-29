@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -49,7 +50,7 @@ namespace SOS.Export.Services
         {
             if (Directory.Exists(path))
             {
-                Directory.Delete($"{path}", true);
+                Directory.Delete(path, true);
             }
         }
     }

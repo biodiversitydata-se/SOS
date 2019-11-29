@@ -105,10 +105,7 @@ namespace SOS.Export.IO.DwcArchive
             }
             finally
             {
-                if (Directory.Exists(temporaryZipExportFolderPath))
-                {
-                    Directory.Delete(temporaryZipExportFolderPath);
-                }
+                _fileService.DeleteFolder(temporaryZipExportFolderPath);
             }
         }
     }
