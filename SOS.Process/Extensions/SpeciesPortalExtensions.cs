@@ -103,6 +103,10 @@ namespace SOS.Process.Extensions
                     IdentificationVerificationStatus = verbatim.ValidationStatus?.Name,
                     IdentifiedBy = verbatim.VerifiedBy
                 },
+                Organism = new DarwinCoreOrganism()
+                {
+
+                },
                 InformationWithheld = "More information can be obtained from the Data Provider",
                 InstitutionCode = verbatim.OwnerOrganization?.Name ?? "ArtDatabanken",
                 InstitutionID = verbatim.ControlingOrganisationId.HasValue

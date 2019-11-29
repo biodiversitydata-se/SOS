@@ -58,6 +58,10 @@ namespace SOS.Process.Extensions
                 {
                     
                 },
+                Organism = new DarwinCoreOrganism()
+                {
+
+                },
                 Location = new DarwinCoreLocation
                 {
                     CoordinateUncertaintyInMeters = verbatim.CoordinateUncertaintyInMeters.HasValue ? verbatim.CoordinateUncertaintyInMeters.Value.ToString() : DefaultCoordinateUncertaintyInMeters.ToString(),

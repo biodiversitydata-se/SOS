@@ -212,6 +212,12 @@ namespace SOS.Lib.Models.DarwinCore
         public DarwinCoreOccurrence Occurrence { get; set; }
 
         /// <summary>
+        /// Instances of the dwc:Organism class are intended to facilitate linking one or more
+        /// dwc:Identification instances to one or more dwc:Occurrence instances.
+        /// </summary>
+        public DarwinCoreOrganism Organism { get; set; }
+
+        /// <summary>
         /// Darwin Core term name: ownerInstitutionCode.
         /// The name (or acronym) in use by the institution having
         /// ownership of the object(s) or information referred

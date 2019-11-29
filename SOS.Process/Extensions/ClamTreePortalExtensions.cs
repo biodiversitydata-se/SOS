@@ -51,6 +51,10 @@ namespace SOS.Process.Extensions
                 {
                     IdentificationVerificationStatus = verbatim.IdentificationVerificationStatus
                 },
+                Organism = new DarwinCoreOrganism()
+                {
+
+                },
                 InstitutionCode = verbatim.InstitutionCode,
                 Language = verbatim.Language,
                 Location = new DarwinCoreLocation
@@ -137,6 +141,10 @@ namespace SOS.Process.Extensions
                 Identification = new DarwinCoreIdentification
                 {
                     IdentificationVerificationStatus = verbatim.IdentificationVerificationStatus
+                },
+                Organism = new DarwinCoreOrganism()
+                {
+
                 },
                 InstitutionCode = verbatim.InstitutionCode,
                 Language = verbatim.Language,

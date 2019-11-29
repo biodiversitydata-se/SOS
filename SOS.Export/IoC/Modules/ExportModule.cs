@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using SOS.Export.Factories;
 using SOS.Export.Factories.Interfaces;
+using SOS.Export.IO.DwcArchive;
+using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Jobs;
 using SOS.Export.Jobs.Interfaces;
 using SOS.Export.MongoDb;
@@ -51,6 +53,10 @@ namespace SOS.Export.IoC.Modules
 
             // Add jobs
             builder.RegisterType<ExportDarwinCoreJob>().As<IExportDarwinCoreJob>().InstancePerLifetimeScope();
+
+            // DwC Archive
+            builder.RegisterType<DwcArchiveFileWriter>().As<IDwcArchiveFileWriter>().SingleInstance();
+            builder.RegisterType<DwcArchiveOccurrenceCsvWriter>().As<IDwcArchiveOccurrenceCsvWriter>().SingleInstance();
         }
     }
 }
