@@ -125,11 +125,12 @@ namespace SOS.Process.Jobs
 
                     if (toggleInstanceOnSuccess)
                     {
+                        _logger.LogDebug("Toggle instance");
                         await _processRepository.ToggleInstanceAsync();
                     }
-
-                    _logger.LogDebug("Persist area cache");
                 }
+
+                _logger.LogDebug($"Processing done: {success}");
 
                 // return result of all processing
                 return success;
