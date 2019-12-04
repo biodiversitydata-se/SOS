@@ -40,11 +40,11 @@ namespace SOS.Hangfire.JobServer
         /// <returns></returns>
         public static async Task Main(string[] args)
         {
-            _env = args?.Any() ?? false ? args[0].ToUpper() : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToUpper();
+            _env = args?.Any() ?? false ? args[0].ToLower() : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
 
             if (new[] { "local", "dev", "st", "prod" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
             {
-                IHost host = CreateHostBuilder(args).Build();
+                var host = CreateHostBuilder(args).Build();
                 LogStartupSettings(host.Services.GetService<ILogger<Program>>());
                 await host.RunAsync();
             }
