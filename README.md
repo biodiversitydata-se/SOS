@@ -1,4 +1,4 @@
-## How to harvest
+﻿## How to harvest
 Navigate to the handle job page. You can run or schedule any of the following  **HarvestJobs**:
 
 Job       						| Description           					| Parameters
@@ -28,7 +28,7 @@ Job       						| Description           					| Parameters
 | Run      | Export the processed file to Darwin Core. The file will be uploaded to Microsoft Azure.| |
 | Daily      | Schedule export file. | **hour**: Start hour, **minute**: Start minute |
 
-## Monitoration
+## Monitoring
 Navigate to the monitor page in Hangfire.
 
 Click the tab Jobs to see running, scheduled, completed, failed jobs etc.
