@@ -6,13 +6,11 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
-using SOS.Import.Models;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Verbatim.ClamTreePortal;
 using SOS.Lib.Models.Verbatim.Kul;
 
 namespace SOS.Import.Factories
@@ -60,6 +58,7 @@ namespace SOS.Import.Factories
         {
             try
             {
+                var start = DateTime.Now;
                 _logger.LogInformation("Start harvesting sightings for KUL data provider");
                 _logger.LogInformation(GetKulHarvestSettingsInfoString());
 
@@ -99,6 +98,8 @@ namespace SOS.Import.Factories
                 return await _harvestInfoRepository.UpdateHarvestInfoAsync(
                     nameof(KulObservationVerbatim),
                     DataProviderId.KUL,
+                    start,
+                    DateTime.Now, 
                     nrSightingsHarvested);
             }
             catch (JobAbortedException)

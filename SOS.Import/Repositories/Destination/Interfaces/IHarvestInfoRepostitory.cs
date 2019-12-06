@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Shared;
 
@@ -11,8 +12,10 @@ namespace SOS.Import.Repositories.Destination.Interfaces
         /// </summary>
         /// <param name="id"></param>
         /// <param name="provider"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
         /// <param name="sightingCount"></param>
         /// <returns></returns>
-        Task<bool> UpdateHarvestInfoAsync(string id, DataProviderId provider, int sightingCount);
+        Task<bool> UpdateHarvestInfoAsync(string id, DataProviderId provider, DateTime start, DateTime end, int sightingCount);
     }
 }

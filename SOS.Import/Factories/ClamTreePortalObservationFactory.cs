@@ -53,6 +53,7 @@ namespace SOS.Import.Factories
         {
             try
             {
+                var start = DateTime.Now;
                 _logger.LogDebug("Start storing clams verbatim");
                 var items = await _clamTreeObservationService.GetClamObservationsAsync();
 
@@ -66,6 +67,8 @@ namespace SOS.Import.Factories
                 return await _harvestInfoRepository.UpdateHarvestInfoAsync(
                     nameof(ClamObservationVerbatim),
                     DataProviderId.ClamAndTreePortal,
+                    start,
+                    DateTime.Now, 
                     items?.Count() ?? 0);
             }
             catch (Exception e)
@@ -83,6 +86,7 @@ namespace SOS.Import.Factories
         {
             try
             {
+                var start = DateTime.Now;
                 _logger.LogDebug("Start storing trees verbatim");
 
                 await _treeObservationVerbatimRepository.DeleteCollectionAsync();
@@ -110,6 +114,8 @@ namespace SOS.Import.Factories
                 return await _harvestInfoRepository.UpdateHarvestInfoAsync(
                     nameof(TreeObservationVerbatim),
                     DataProviderId.ClamAndTreePortal,
+                    start,
+                    DateTime.Now, 
                     totalCount);
             }
             catch (JobAbortedException)

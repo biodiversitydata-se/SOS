@@ -16,12 +16,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SOS.Core.Repositories;
-using SOS.Hangfire.UI.Configuration;
 using SOS.Lib.Configuration.Shared;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace SOS.Hangfire.UI
 {
+    /// <summary>
+    /// Start up class
+    /// </summary>
     public class Startup
     {
         public IHostingEnvironment Environment { get; }

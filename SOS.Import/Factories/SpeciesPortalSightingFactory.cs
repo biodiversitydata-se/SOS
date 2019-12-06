@@ -80,6 +80,7 @@ namespace SOS.Import.Factories
         {
             try
             {
+                var start = DateTime.Now;
                 var activities = (await _metadataRepository.GetActivitiesAsync()).ToAggregates().ToDictionary(a => a.Id, a => a);
 
                 var metaDataTasks = new[]
@@ -189,6 +190,8 @@ namespace SOS.Import.Factories
                 return await _harvestInfoRepository.UpdateHarvestInfoAsync(
                     nameof(APSightingVerbatim),
                     DataProviderId.SpeciesPortal,
+                    start, 
+                    DateTime.Now, 
                     nrSightingsHarvested);
             }
             catch (JobAbortedException)

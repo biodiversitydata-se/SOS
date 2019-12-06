@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -92,7 +93,7 @@ namespace SOS.Import.Test.Factories
         {
             var harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
             harvestInfoRepositoryMock.Setup(hir =>
-                    hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProviderId.ClamAndTreePortal, It.IsAny<int>()))
+                    hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProviderId.ClamAndTreePortal, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()))
                 .ReturnsAsync(true);
 
             return harvestInfoRepositoryMock.Object;
