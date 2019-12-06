@@ -11,5 +11,10 @@ namespace SOS.Process.Helpers.Interfaces
         /// <param name="darwinCoreModels"></param>
         /// <returns></returns>
         void AddAreaDataToDarwinCore(IEnumerable<DarwinCore<DynamicProperties>> darwinCoreModels);
+
+        /// <summary>
+        /// Save cache so we can use it after restart
+        /// </summary>
+        void PersistCache();
     }
 }

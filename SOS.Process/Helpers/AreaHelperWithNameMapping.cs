@@ -266,7 +266,7 @@ namespace SOS.Process.Helpers
             }
         }
 
-        public async Task PersistCacheAsync()
+        public void PersistCache()
         {
             throw new NotImplementedException();
         }

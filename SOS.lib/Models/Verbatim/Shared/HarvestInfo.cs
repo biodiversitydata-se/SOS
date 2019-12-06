@@ -12,14 +12,19 @@ namespace SOS.Lib.Models.Verbatim.Shared
         public DataProviderId DataProvider { get; set; }
 
         /// <summary>
+        /// Harvest end date and time
+        /// </summary>
+        public DateTime End { get; set; }
+
+        /// <summary>
         /// Id of data set
         /// </summary>
         public string Id { get; set; }
 
         /// <summary>
-        /// Harvest date and time
+        /// Harvest start date and time
         /// </summary>
-        public DateTime IssueDate { get; set; }
+        public DateTime Start { get; set; }
 
         /// <summary>
         /// Number of sightings

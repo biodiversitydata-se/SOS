@@ -113,7 +113,7 @@ namespace SOS.Import.Test.Factories
                 .ReturnsAsync(true);
 
             _harvestInfoRepositoryMock.Setup(hir =>
-                hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProviderId.ClamAndTreePortal, It.IsAny<int>()))
+                hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProviderId.ClamAndTreePortal, It.IsAny<DateTime>(), It.IsAny<DateTime>(),It.IsAny<int>()))
                 .ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -187,7 +187,7 @@ namespace SOS.Import.Test.Factories
             _treeObservationVerbatimRepositoryMock.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<TreeObservationVerbatim>>()))
                 .ReturnsAsync(true);
             _harvestInfoRepositoryMock.Setup(hir =>
-                    hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProviderId.ClamAndTreePortal, It.IsAny<int>()))
+                    hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProviderId.ClamAndTreePortal, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------

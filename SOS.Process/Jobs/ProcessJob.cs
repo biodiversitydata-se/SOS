@@ -27,7 +27,7 @@ namespace SOS.Process.Jobs
         private readonly IKulProcessFactory _kulProcessFactory;
 
         private readonly ITaxonVerbatimRepository _taxonVerbatimRepository;
-
+        private readonly IAreaHelper _areaHelper;
         private readonly ILogger<ProcessJob> _logger;
 
         /// <summary>
@@ -38,6 +38,7 @@ namespace SOS.Process.Jobs
         /// <param name="kulProcessFactory"></param>
         /// <param name="speciesPortalProcessFactory"></param>
         /// <param name="taxonVerbatimRepository"></param>
+        /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
         public ProcessJob(
             IDarwinCoreRepository processRepository,
@@ -45,6 +46,7 @@ namespace SOS.Process.Jobs
             IKulProcessFactory kulProcessFactory,
             ISpeciesPortalProcessFactory speciesPortalProcessFactory,
             ITaxonVerbatimRepository taxonVerbatimRepository,
+            IAreaHelper areaHelper,
             ILogger<ProcessJob> logger)
         {
             _processRepository = processRepository ?? throw new ArgumentNullException(nameof(processRepository));
@@ -52,6 +54,7 @@ namespace SOS.Process.Jobs
             _clamTreePortalProcessFactory = clamTreePortalProcessFactory ?? throw new ArgumentNullException(nameof(clamTreePortalProcessFactory));
             _speciesPortalProcessFactory = speciesPortalProcessFactory ?? throw new ArgumentNullException(nameof(speciesPortalProcessFactory));
             _taxonVerbatimRepository = taxonVerbatimRepository ?? throw new ArgumentNullException(nameof(taxonVerbatimRepository));
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -131,6 +134,9 @@ namespace SOS.Process.Jobs
                 }
 
                 _logger.LogDebug($"Processing done: {success}");
+
+                _logger.LogDebug("Persist area cache");
+                _areaHelper.PersistCache();
 
                 // return result of all processing
                 return success;

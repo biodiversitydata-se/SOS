@@ -37,11 +37,21 @@ namespace SOS.Process.Helpers
             _strTree = new STRtree<IFeature>();
 
             // Try to get saved cache
-            _featureCache = File.Exists(_cacheFileName) ?
-                JsonConvert.DeserializeObject<IDictionary<string, PositionLocation>>(
-                    File.ReadAllText(_cacheFileName, Encoding.UTF8)) : new ConcurrentDictionary<string, PositionLocation>();
+            _featureCache = InitializeCache();
 
             Task.Run(() => InitializeAsync()).Wait();
+        }
+
+        /// <summary>
+        /// Get save cache if it exists
+        /// </summary>
+        /// <returns></returns>
+        private static IDictionary<string, PositionLocation> InitializeCache()
+        {
+            // Try to get saved cache
+           return File.Exists(_cacheFileName) ?
+                JsonConvert.DeserializeObject<IDictionary<string, PositionLocation>>(
+                    File.ReadAllText(_cacheFileName, Encoding.UTF8)) : new ConcurrentDictionary<string, PositionLocation>();
         }
 
         private async Task InitializeAsync()
@@ -193,8 +203,12 @@ namespace SOS.Process.Helpers
                     dwcModel.DynamicProperties.ProvincePartIdByCoordinate = (int) ProvinceFeatureId.Lappland;
                 }
             }
+        }
 
-            // Persist cache
+        /// <inheritdoc />
+        public void PersistCache()
+        {
+            // Update saved cache
             using var file = new StreamWriter(File.Create(_cacheFileName), Encoding.UTF8);
             file.Write(JsonConvert.SerializeObject(_featureCache));
         }

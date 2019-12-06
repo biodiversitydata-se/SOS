@@ -22,14 +22,15 @@ namespace SOS.Import.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> UpdateHarvestInfoAsync(string id, DataProviderId provider, int sightingCount)
+        public async Task<bool> UpdateHarvestInfoAsync(string id, DataProviderId provider, DateTime start, DateTime end, int sightingCount)
         {
             return await AddOrUpdateAsync(new HarvestInfo
             {
                 Id = id,
                 DataProvider = DataProviderId.ClamAndTreePortal,
-                IssueDate = DateTime.Now,
-                SightingCount = sightingCount
+                End = end,
+                SightingCount = sightingCount,
+                Start = start
             });
         }
     }
