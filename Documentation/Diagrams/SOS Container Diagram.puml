@@ -1,0 +1,59 @@
+@startuml "SOS (Species Observation System)"
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
+title Container diagram for Species Observation System
+
+System_Ext(artfakta, "Artfakta.se")
+System_Ext(artsok, "Artsök\nGIS plugin")
+System_Ext(gbif_ala, "GBIF/ALA")
+System_Ext(other_users, "Other systems ...")
+
+System_Boundary(sos, "SOS (Species Observation System)"){    
+    Container(sos_api, "API Application", "C#, .Net Core 3.x", "Provides species observation data via a REST JSON/HTTPS API.")
+    ContainerDb(mongodb_sos_processed, "sos-processed", "MongoDB 4.x", "Stores processed species observations in DwC format")
+    ContainerDb(mongodb_sos_verbatim, "sos-verbatim", "MongoDB 4.x", "Stores verbatim harvested species observations")    
+    Container(doi_file_storage, "DOI File Storage", "Azure BLOB storage", "Stores DOI DwC-A files.\nStored indefinitely.")
+    Container(file_storage, "File Storage", "NTFS", "Stores DwC-A files.\nStored 1 week.")
+    Container(sos_job_server, "Job Server", "C#, .Net Core 3.x, Hangfire", "Harvest observations on a scheduled basis, processes observations & creates DwC-A files.")    
+
+    Rel(sos_api, mongodb_sos_processed, "Reads from")
+    Rel(sos_api, file_storage, "Reads from")
+    Rel(sos_api, doi_file_storage, "Reads from")
+    Rel_U(sos_job_server, file_storage, "Reads from and writes to")
+    Rel_U(sos_job_server, doi_file_storage, "Reads from and writes to")
+    Rel_U(sos_job_server, mongodb_sos_verbatim, "Reads from and writes to")
+    Rel_U(sos_job_server, mongodb_sos_processed, "Reads from and writes to")
+}
+
+' Processing data
+System_Boundary(c3, "Processing data") {
+    System(taxon_service, "Taxon Service\n(Dyntaxa)")
+    System(taxon_attribute_service, "Taxon Attribute Service")
+    System(georeference_service, "GeoReference Service")
+}
+
+' Data providers
+System_Boundary(c2, "Species oservation data providers") {
+    SystemDb(artportalen_db, "Artportalen")
+    System(wram, "WRAM")
+    System_Ext(dwca_external_source, "DwC-A")
+    System_Ext(other_external_sources, "Other data providers ...")
+}
+
+' External systems Relations
+Rel(artfakta, sos_api, "Uses", "HTTPS")
+Rel(artsok, sos_api, "Uses", "HTTPS")
+Rel(gbif_ala, sos_api, "Harvest DwC-A", "HTTPS")
+Rel(other_users, sos_api, "Uses", "HTTPS")
+
+' Species observation providers relations
+Rel(sos_job_server, wram, "Gets observations from", "HTTPS")
+Rel(sos_job_server, artportalen_db, "Gets observations from", "SQL native")
+Rel(sos_job_server, dwca_external_source, "Gets observations from", "HTTPS")
+Rel(sos_job_server, other_external_sources, "Gets observations from", "HTTPS")
+
+'Processing data providers relations
+Rel(sos_job_server, taxon_service, "Gets Dyntaxa checklist DwC-A from", "HTTPS")
+Rel(sos_job_server, taxon_attribute_service, "Gets taxon attributes from", "HTTPS")
+Rel(sos_job_server, georeference_service, "Gets geographical regions from", "HTTPS")
+
+@enduml

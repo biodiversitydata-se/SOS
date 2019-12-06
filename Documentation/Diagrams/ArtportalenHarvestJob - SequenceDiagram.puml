@@ -1,0 +1,30 @@
+﻿@startuml
+'autonumber
+'!theme blue
+'!theme napkin
+'!theme trans
+title Artportalen verbatim harvest job - harvest all observations from Artportalen
+legend bottom center
+  This sequence diagram describes how the Artportalen verbatim observation harvest job works.  
+endlegend
+participant "SpeciesPortalHarvestJob" as ArtportalenHarvestJob
+participant "SpeciesPortalSightingFactory" as ArtportalenObservationFactory 
+participant "SpeciesPortalVerbatimRepository" as ArtportalenObservationVerbatimRepository
+database "Artportalen\n(SQL Server)" as ArtportalenDb
+database "sos-verbatim\n(MongoDb)" as VerbatimMongoDb
+[-> ArtportalenHarvestJob: Activate from\nHangfire schedule\n(1 time/day, 3pm)
+ArtportalenHarvestJob -> ArtportalenObservationFactory: HarvestObservations()
+note over ArtportalenObservationVerbatimRepository: **Delete** all verbatim Artportalen observations for\nMongoDb collection: <i>ApSightingVerbatim</i>
+ArtportalenObservationFactory -> ArtportalenObservationVerbatimRepository: EmptyCollection()
+ArtportalenObservationVerbatimRepository -> VerbatimMongoDb: Empty MongoDb collection: <i>ApSightingVerbatim</i>
+loop Iterate all observation ids while minId <= maxId
+	note over ArtportalenObservationFactory: <i><init></i>\nminId, maxId = GetArtportalenDbMinMaxIndex()\nchunkSize = 1 000 000
+	ArtportalenObservationFactory -> ArtportalenDb: GetObservations(minId, minId + chunkSize)	
+	ArtportalenObservationFactory <- ArtportalenDb: Artportalen verbatim observations	
+	note over ArtportalenObservationVerbatimRepository: **Add** verbatim Artportalen observations to\nMongoDb collection: <i>ApSightingVerbatim</i>
+	ArtportalenObservationFactory -> ArtportalenObservationVerbatimRepository: AddManyObservations(verbatims)	
+	ArtportalenObservationVerbatimRepository -> VerbatimMongoDb: Add verbatim observations to <i>ApSightingVerbatim</i>
+	note over ArtportalenObservationFactory: minId += chunkSize
+end
+ArtportalenHarvestJob <-- ArtportalenObservationFactory: return success
+@enduml

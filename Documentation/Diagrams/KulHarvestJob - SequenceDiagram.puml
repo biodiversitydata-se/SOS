@@ -5,9 +5,7 @@
 '!theme trans
 title KUL harvest job - harvest all observations
 legend bottom center
-  This sequence diagram describes how the KulHarvestJob works.
-  The job takes approximately 45 minutes to run.
-  95% of the time comes from waiting for the external KUL service to deliver its result
+  This sequence diagram describes how the KulHarvestJob works.  
 endlegend
 participant KulHarvestJob
 participant KulObservationFactory
