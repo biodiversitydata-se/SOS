@@ -189,7 +189,7 @@ namespace SOS.Import.Factories
                 // Update harvest info
                 return await _harvestInfoRepository.UpdateHarvestInfoAsync(
                     nameof(APSightingVerbatim),
-                    DataProviderId.SpeciesPortal,
+                    DataProvider.Artdatabanken,
                     start, 
                     DateTime.Now, 
                     nrSightingsHarvested);

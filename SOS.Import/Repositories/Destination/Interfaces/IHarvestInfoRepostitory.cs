@@ -14,8 +14,8 @@ namespace SOS.Import.Repositories.Destination.Interfaces
         /// <param name="provider"></param>
         /// <param name="start"></param>
         /// <param name="end"></param>
-        /// <param name="sightingCount"></param>
+        /// <param name="count"></param>
         /// <returns></returns>
-        Task<bool> UpdateHarvestInfoAsync(string id, DataProviderId provider, DateTime start, DateTime end, int sightingCount);
+        Task<bool> UpdateHarvestInfoAsync(string id, DataProvider provider, DateTime start, DateTime end, int count);
     }
 }

@@ -1,26 +1,25 @@
 ﻿using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
-using SOS.Lib.Models.Processed.Validation;
+using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Process.Database.Interfaces;
+using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Repositories.Destination
 {
     /// <summary>
     /// Base class for cosmos db repositories
     /// </summary>
-    public class InadequateItemRepository : ProcessBaseRepository<InadequateItem, ObjectId>, Interfaces.IInadequateItemRepository
+    public class ProcessInfoRepository : ProcessBaseRepository<ProcessInfo, byte>, IProcessInfoRepository
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
-        public InadequateItemRepository(
+        public ProcessInfoRepository(
             IProcessClient client,
-            ILogger<InadequateItemRepository> logger
-        ) : base(client, true, logger)
+            ILogger<ProcessInfoRepository> logger
+        ):base(client, false, logger)
         {
-            
         }
     }
 }

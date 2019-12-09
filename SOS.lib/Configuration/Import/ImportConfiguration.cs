@@ -10,7 +10,7 @@ namespace SOS.Lib.Configuration.Import
         /// <summary>
         /// Configuration for clam tree service
         /// </summary>
-        public ClamTreeServiceConfiguration ClamTreeServiceConfiguration { get; set; }
+        public ClamServiceConfiguration ClamServiceConfiguration { get; set; }
 
         /// <summary>
         /// Configuration for Species Portal

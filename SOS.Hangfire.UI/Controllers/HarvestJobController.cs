@@ -26,39 +26,39 @@ namespace SOS.Hangfire.UI.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        #region Clam Tree Portal
+        #region Clam Portal
         /// <inheritdoc />
-        [HttpPost("ClamTreePortal/Schedule/Daily")]
+        [HttpPost("ClamPortal/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailyClamTreePortalHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        public IActionResult AddDailyClamPortalHarvestJob([FromQuery]int hour, [FromQuery]int minute)
         {
             try
             {
-                RecurringJob.AddOrUpdate<ClamTreePortalHarvestJob>(nameof(ClamTreePortalHarvestJob), job => job.Run(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
-                return new OkObjectResult("Clam/tree Portal harvest job added");
+                RecurringJob.AddOrUpdate<ClamPortalHarvestJob>(nameof(ClamPortalHarvestJob), job => job.Run(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("Clam Portal harvest job added");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Adding clam/tree Portal harvest job failed");
+                _logger.LogError(e, "Adding clam Portal harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
-        [HttpPost("ClamTreePortal/Run")]
+        [HttpPost("ClamPortal/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunClamTreePortalHarvestJob()
+        public IActionResult RunClamPortalHarvestJob()
         {
             try
             {
-                BackgroundJob.Enqueue<IClamTreePortalHarvestJob>(job => job.Run(JobCancellationToken.Null));
-                return new OkObjectResult("Started clam/tree Portal harvest job");
+                BackgroundJob.Enqueue<IClamPortalHarvestJob>(job => job.Run(JobCancellationToken.Null));
+                return new OkObjectResult("Started clam Portal harvest job");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running clam/tree Portal harvest job failed");
+                _logger.LogError(e, "Running clam Portal harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

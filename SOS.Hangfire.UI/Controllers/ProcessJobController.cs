@@ -70,7 +70,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                int sources = (int) SightingProviders.KUL;
+                int sources = (int)DataProvider.KUL;
                 BackgroundJob.Enqueue<IProcessJob>(job => job.Run(sources, true, JobCancellationToken.Null));
                 return new OkObjectResult("Started process KUL job");
             }

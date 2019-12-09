@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -15,12 +16,12 @@ namespace SOS.Process.Repositories.Destination
     /// <summary>
     /// Base class for cosmos db repositories
     /// </summary>
-    public class ProcessBaseRepository<T> : IProcessBaseRepository<T>
-    {
+    public class ProcessBaseRepository<TEntity, TKey> : IProcessBaseRepository<TEntity, TKey> where TEntity : IEntity<TKey>
+    { 
         /// <summary>
         /// Logger 
         /// </summary>
-        protected readonly ILogger<ProcessBaseRepository<T>> Logger;
+        protected readonly ILogger<ProcessBaseRepository<TEntity, TKey>> Logger;
 
         private readonly IProcessClient _client;
 
@@ -34,17 +35,19 @@ namespace SOS.Process.Repositories.Destination
         /// </summary>
         private bool _disposed;
 
-        private readonly string _collectionName;
+        protected readonly string _collectionName;
         private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
+        /// <param name="toggleable"></param>
         /// <param name="logger"></param>
         public ProcessBaseRepository(
             IProcessClient client,
-            ILogger<ProcessBaseRepository<T>> logger
+            bool toggleable,
+            ILogger<ProcessBaseRepository<TEntity, TKey>> logger
         )
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
@@ -55,8 +58,23 @@ namespace SOS.Process.Repositories.Destination
 
             // Init config
             InitializeConfiguration();
+            
+            _collectionName = toggleable ? $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ InstanceToUpdate }" : $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }";
+        }
 
-            _collectionName = $"{ typeof(T).Name.UntilNonAlfanumeric() }-{ InstanceToUpdate }" ;
+        private async Task<bool> AddAsync(TEntity item)
+        {
+            try
+            {
+                await MongoCollection.InsertOneAsync(item);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
         }
 
         /// <summary>
@@ -83,7 +101,30 @@ namespace SOS.Process.Repositories.Destination
                     ActiveInstance = 1
                 });
             }
-        } 
+        }
+
+        /// <summary>
+        /// Update one item
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        private async Task<bool> UpdateAsync(TKey id, TEntity entity)
+        {
+            try
+            {
+                var updateResult = await MongoCollection.ReplaceOneAsync(
+                    x => x.Id.Equals(id),
+                    entity,
+                    new UpdateOptions { IsUpsert = true });
+                return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
+        }
 
         /// <summary>
         /// Get configuration object
@@ -109,7 +150,7 @@ namespace SOS.Process.Repositories.Destination
         /// Check config for instance to update
         /// </summary>
         /// <returns></returns>
-        protected byte InstanceToUpdate => (byte)((GetConfiguration()?.ActiveInstance ?? 1) == 0 ? 1 : 0);
+        public byte InstanceToUpdate => (byte)((GetConfiguration()?.ActiveInstance ?? 1) == 0 ? 1 : 0);
         
         protected int BatchSize { get; }
 
@@ -117,7 +158,7 @@ namespace SOS.Process.Repositories.Destination
         /// Get collection
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<T> MongoCollection => Database.GetCollection<T>(_collectionName);
+        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName);
 
         /// <summary>
         /// Configuration collection
@@ -129,7 +170,7 @@ namespace SOS.Process.Repositories.Destination
         /// </summary>
         /// <param name="batch"></param>
         /// <returns></returns>
-        protected async Task<bool> AddBatchAsync(IEnumerable<T> batch)
+        protected async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
         {
             if (!batch?.Any() ?? true)
             {
@@ -207,23 +248,6 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public virtual async Task<bool> AddManyAsync(IEnumerable<T> items)
-        {
-            var success = true;
-            var count = 0;
-            var batch = items.Skip(0).Take(BatchSize).ToArray();
-
-            while (batch?.Any() ?? false)
-            {
-                success = success && await AddBatchAsync(batch);
-                count++;
-                batch = items.Skip(BatchSize * count).Take(BatchSize).ToArray();
-            }
-
-            return success;
-        }
-
-        /// <inheritdoc />
         public async Task<bool> AddCollectionAsync()
         {
             try
@@ -241,6 +265,36 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
+        public virtual async Task<bool> AddManyAsync(IEnumerable<TEntity> items)
+        {
+            var success = true;
+            var count = 0;
+            var batch = items.Skip(0).Take(BatchSize).ToArray();
+
+            while (batch?.Any() ?? false)
+            {
+                success = success && await AddBatchAsync(batch);
+                count++;
+                batch = items.Skip(BatchSize * count).Take(BatchSize).ToArray();
+            }
+
+            return success;
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> AddOrUpdateAsync(TEntity item)
+        {
+            var entity = await GetAsync(item.Id);
+            if (entity == null)
+            {
+                return await AddAsync(item);
+            }
+
+            return await UpdateAsync(item.Id, item);
+        }
+
+
+        /// <inheritdoc />
         public async Task<bool> DeleteCollectionAsync()
         {
             try
@@ -254,6 +308,23 @@ namespace SOS.Process.Repositories.Destination
             {
                 Logger.LogError(e.ToString());
                 return false;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<TEntity> GetAsync(TKey id)
+        {
+            try
+            {
+                var filter = Builders<TEntity>.Filter.Eq("_id", id);
+
+                return await MongoCollection.Find(filter).FirstOrDefaultAsync();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+
+                return default;
             }
         }
 

@@ -3,7 +3,7 @@ using Hangfire;
 
 namespace SOS.Import.Jobs.Interfaces
 {
-    public interface IClamTreePortalHarvestJob
+    public interface IClamPortalHarvestJob
     {
         /// <summary>
         /// Run species portal harvest

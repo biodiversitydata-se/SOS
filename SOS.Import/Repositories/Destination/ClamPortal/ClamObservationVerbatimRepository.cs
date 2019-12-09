@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using SOS.Import.MongoDb.Interfaces;
-using SOS.Lib.Models.Verbatim.ClamTreePortal;
+using SOS.Lib.Models.Verbatim.ClamPortal;
 
-namespace SOS.Import.Repositories.Destination.ClamTreePortal
+namespace SOS.Import.Repositories.Destination.ClamPortal
 {
     /// <summary>
     /// Clam verbatim repository

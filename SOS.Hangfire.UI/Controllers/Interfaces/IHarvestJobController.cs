@@ -13,13 +13,13 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult AddDailyClamTreePortalHarvestJob(int hour, int minute);
+        IActionResult AddDailyClamPortalHarvestJob(int hour, int minute);
 
         /// <summary>
         /// Run clam/tree portal sightings harvest
         /// </summary>
         /// <returns></returns>
-        IActionResult RunClamTreePortalHarvestJob();
+        IActionResult RunClamPortalHarvestJob();
 
         /// <summary>
         /// Add daily harvest of geo data

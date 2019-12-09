@@ -3,7 +3,7 @@
     /// <summary>
     /// Sighting process factory
     /// </summary>
-    public interface IClamTreePortalProcessFactory : IProcessFactory
+    public interface IClamPortalProcessFactory : IProcessFactory
     {
         
     }

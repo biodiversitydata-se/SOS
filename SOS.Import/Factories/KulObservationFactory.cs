@@ -97,7 +97,7 @@ namespace SOS.Import.Factories
                 // Update harvest info
                 return await _harvestInfoRepository.UpdateHarvestInfoAsync(
                     nameof(KulObservationVerbatim),
-                    DataProviderId.KUL,
+                    DataProvider.KUL,
                     start,
                     DateTime.Now, 
                     nrSightingsHarvested);

@@ -5,8 +5,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Enums;
+using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.Taxon.Interfaces;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Import.Factories
@@ -19,6 +21,7 @@ namespace SOS.Import.Factories
         private readonly ITaxonVerbatimRepository _taxonVerbatimRepository;
         private readonly ITaxonService _taxonService;
         private readonly ITaxonAttributeService _taxonAttributeService;
+        private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<TaxonFactory> _logger;
 
         /// <summary>
@@ -27,16 +30,19 @@ namespace SOS.Import.Factories
         /// <param name="taxonVerbatimRepository"></param>
         /// <param name="taxonService"></param>
         /// <param name="taxonAttributeService"></param>
+        /// <param name="harvestInfoRepository"></param>
         /// <param name="logger"></param>
         public TaxonFactory(
             ITaxonVerbatimRepository taxonVerbatimRepository,
             ITaxonService taxonService,
             ITaxonAttributeService taxonAttributeService,
+            IHarvestInfoRepository harvestInfoRepository,
             ILogger<TaxonFactory> logger)
         {
             _taxonVerbatimRepository = taxonVerbatimRepository ?? throw new ArgumentNullException(nameof(taxonVerbatimRepository));
             _taxonService = taxonService ?? throw new ArgumentNullException(nameof(taxonService));
             _taxonAttributeService = taxonAttributeService ?? throw new ArgumentNullException(nameof(taxonAttributeService));
+            _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -48,6 +54,7 @@ namespace SOS.Import.Factories
         {
             try
             {
+                var start = DateTime.Now;
                 _logger.LogDebug("Start storing taxa verbatim");
                 var taxa = await _taxonService.GetTaxaAsync();
 
@@ -66,7 +73,14 @@ namespace SOS.Import.Factories
                 await _taxonVerbatimRepository.AddManyAsync(taxa);
                 
                 _logger.LogDebug("Finish storing taxa verbatim");
-                return true;
+
+                // Update harvest info
+                return await _harvestInfoRepository.UpdateHarvestInfoAsync(
+                    nameof(DarwinCoreTaxon),
+                    DataProvider.Artdatabanken,
+                    start,
+                    DateTime.Now,
+                    taxa.Count());
             }
             catch (Exception e)
             {

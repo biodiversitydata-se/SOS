@@ -1,5 +1,5 @@
 ﻿using MongoDB.Bson;
-using SOS.Lib.Models.Verbatim.ClamTreePortal;
+using SOS.Lib.Models.Verbatim.ClamPortal;
 
 namespace SOS.Process.Repositories.Source.Interfaces
 {

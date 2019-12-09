@@ -2,7 +2,7 @@
 
 namespace SOS.Lib.Configuration.Import
 {
-    public class ClamTreeServiceConfiguration : RestServiceConfiguration
+    public class ClamServiceConfiguration : RestServiceConfiguration
     {
     }
 }

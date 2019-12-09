@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Process.Factories;
 using SOS.Lib.Models.Processed.DarwinCore;
-using SOS.Lib.Models.Verbatim.ClamTreePortal;
+using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -18,24 +18,22 @@ namespace SOS.Process.Test.Factories
     /// <summary>
     /// Tests for sighting factory
     /// </summary>
-    public class ClamTreePortalProcessFactoryTests
+    public class ClamPortalProcessFactoryTests
     {
         private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
-        private readonly Mock<ITreeObservationVerbatimRepository> _treeObservationVerbatimRepositoryMock;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IDarwinCoreRepository> _DarwinCoreRepository;
-        private readonly Mock<ILogger<ClamTreePortalProcessFactory>> _loggerMock;
+        private readonly Mock<ILogger<ClamPortalProcessFactory>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ClamTreePortalProcessFactoryTests()
+        public ClamPortalProcessFactoryTests()
         {
             _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
-            _treeObservationVerbatimRepositoryMock = new Mock<ITreeObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
             _DarwinCoreRepository = new Mock<IDarwinCoreRepository>();
-            _loggerMock = new Mock<ILogger<ClamTreePortalProcessFactory>>();
+            _loggerMock = new Mock<ILogger<ClamPortalProcessFactory>>();
         }
 
         /// <summary>
@@ -44,48 +42,36 @@ namespace SOS.Process.Test.Factories
         [Fact]
         public void ConstructorTest()
         {
-            new ClamTreePortalProcessFactory(
+            new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
-                _treeObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _DarwinCoreRepository.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () =>  new ClamTreePortalProcessFactory(
+            Action create = () =>  new ClamPortalProcessFactory(
                 null,
-                _treeObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _DarwinCoreRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
 
-            create = () => new ClamTreePortalProcessFactory(
+            
+            create = () => new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
-                null,
-                _areaHelper.Object,
-                _DarwinCoreRepository.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("treeObservationVerbatimRepository");
-
-            create = () => new ClamTreePortalProcessFactory(
-                _clamObservationVerbatimRepositoryMock.Object,
-                _treeObservationVerbatimRepositoryMock.Object,
                 null,
                 _DarwinCoreRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
 
-            create = () => new ClamTreePortalProcessFactory(
+            create = () => new ClamPortalProcessFactory(
                  _clamObservationVerbatimRepositoryMock.Object,
-                _treeObservationVerbatimRepositoryMock.Object,
-                _areaHelper.Object,
+                 _areaHelper.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("DarwinCoreRepository");
 
-            create = () => new ClamTreePortalProcessFactory(
+            create = () => new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
-                _treeObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _DarwinCoreRepository.Object,
                 null);
@@ -108,12 +94,6 @@ namespace SOS.Process.Test.Factories
                     DyntaxaTaxonId = 0
                 } });
 
-            _treeObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(0))
-                .ReturnsAsync(new[] { new TreeObservationVerbatim
-                {
-                    DyntaxaTaxonId = 0
-                } });
-
             _areaHelper.Setup(r => r.AddAreaDataToDarwinCore(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()));
 
             _DarwinCoreRepository.Setup(r => r.AddManyAsync(It.IsAny<ICollection<DarwinCore<DynamicProperties>>>()))
@@ -127,14 +107,13 @@ namespace SOS.Process.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamTreePortalProcessFactory = new ClamTreePortalProcessFactory(
+            var clamPortalProcessFactory = new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
-                _treeObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _DarwinCoreRepository.Object,
                 _loggerMock.Object);
 
-            var result = await clamTreePortalProcessFactory.ProcessAsync( taxa, JobCancellationToken.Null);
+            var result = await clamPortalProcessFactory.ProcessAsync( taxa, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -157,14 +136,13 @@ namespace SOS.Process.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamTreePortalProcessFactory = new ClamTreePortalProcessFactory(
+            var clamPortalProcessFactory = new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
-                _treeObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _DarwinCoreRepository.Object,
                 _loggerMock.Object);
 
-            var result = await clamTreePortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await clamPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -187,14 +165,13 @@ namespace SOS.Process.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamTreePortalProcessFactory = new ClamTreePortalProcessFactory(
+            var clamPortalProcessFactory = new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
-                _treeObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _DarwinCoreRepository.Object,
                 _loggerMock.Object);
 
-            var result = await clamTreePortalProcessFactory.ProcessAsync( null, JobCancellationToken.Null);
+            var result = await clamPortalProcessFactory.ProcessAsync( null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

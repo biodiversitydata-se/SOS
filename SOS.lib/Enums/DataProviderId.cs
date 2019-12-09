@@ -3,10 +3,11 @@
     /// <summary>
     /// Id of data providers, must be binary unique
     /// </summary>
-    public enum DataProviderId
+    public enum DataProvider
     {
-        SpeciesPortal = 1,
-        ClamAndTreePortal = 2,
-        KUL = 4
+        Artdatabanken = 1,
+        ClamPortal = 2,
+        KUL = 4,
+        TaxonService = 8
     }
 }

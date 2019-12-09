@@ -37,7 +37,7 @@ namespace SOS.Process.Extensions
             var wgs84Point = googleMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
 
             taxa.TryGetValue(taxonId, out var taxon);
-            var obs = new DarwinCore<DynamicProperties>(DataProviderId.SpeciesPortal)
+            var obs = new DarwinCore<DynamicProperties>(DataProvider.Artdatabanken)
             {
                 AccessRights =
                     !verbatim.ProtectedBySystem &&
@@ -51,7 +51,7 @@ namespace SOS.Process.Extensions
                     ? "Artportalen"
                     : verbatim.SpeciesCollection,
                 CollectionID = verbatim.CollectionID,
-                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProviderId.SpeciesPortal}",
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProvider.Artdatabanken}",
                 DatasetName = "Artportalen",
                 DynamicProperties = new DynamicProperties
                 {

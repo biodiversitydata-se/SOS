@@ -20,7 +20,7 @@ namespace SOS.Lib.Models.Processed.DarwinCore
         /// Constructor
         /// </summary>
         /// <param name="provider"></param>
-        public DarwinCore(DataProviderId provider)
+        public DarwinCore(DataProvider provider)
         {
             Provider = provider;
         }
@@ -247,7 +247,7 @@ namespace SOS.Lib.Models.Processed.DarwinCore
         /// Internal use. Provider of the data
         /// </summary>
         [JsonIgnore]
-        public DataProviderId Provider { get; set; }
+        public DataProvider Provider { get; set; }
 
         /// <summary>
         /// Darwin Core term name: dcterms:references.

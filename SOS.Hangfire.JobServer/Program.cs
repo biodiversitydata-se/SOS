@@ -131,7 +131,7 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine($"[SpeciesPortalSettings].[MaxNumberOfSightingsHarvested]: {_importConfiguration.SpeciesPortalConfiguration.MaxNumberOfSightingsHarvested}");
             sb.AppendLine($"[SpeciesPortalSettings].[ChunkSize]: {_importConfiguration.SpeciesPortalConfiguration.ChunkSize}");
             sb.AppendLine($"[SpeciesPortalSettings].[ConnectionString]: {_importConfiguration.SpeciesPortalConfiguration.ConnectionString}");
-            sb.AppendLine($"[ClamTreeService].[Address]: {_importConfiguration.ClamTreeServiceConfiguration.BaseAddress}");
+            sb.AppendLine($"[ClamService].[Address]: {_importConfiguration.ClamServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[TaxonAttributeService].[Address]: {_importConfiguration.TaxonAttributeServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[TaxonService].[Address]: {_importConfiguration.TaxonServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[MongoDb].[Servers]: { string.Join(", ", _importConfiguration.MongoDbConfiguration.Hosts.Select(x => x.Name))}");

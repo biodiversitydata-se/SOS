@@ -1,38 +1,36 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using FluentAssertions;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Entities;
 using SOS.Import.Factories;
+using SOS.Import.Repositories.Destination.ClamPortal.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
-using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Import.Repositories.Destination.SpeciesPortal;
-using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
+using SOS.Import.Services.Interfaces;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.Verbatim.ClamPortal;
 using Xunit;
 
 namespace SOS.Import.Test.Factories
 {
-    /// <summary>
-    /// Tests for sighting factory
-    /// </summary>
-    public class GeoFactoryTests
+    public class ClamPortalObservationFactoryTests
     {
-        private readonly Mock<IAreaRepository> _areaRepositoryMock;
-        private readonly Mock<AreaVerbatimRepository> _areaVerbatimRepository;
+        private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
+        private readonly Mock<IClamObservationService> _clamObservationServiceMock;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
-        private readonly Mock<ILogger<GeoFactory>> _loggerMock;
+        private readonly Mock<ILogger<ClamPortalObservationFactory>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public GeoFactoryTests()
+        public ClamPortalObservationFactoryTests()
         {
-            _areaRepositoryMock = new Mock<IAreaRepository>();
-            _areaVerbatimRepository = new Mock<AreaVerbatimRepository>();
+            _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
+            _clamObservationServiceMock = new Mock<IClamObservationService>();
             _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
-            _loggerMock = new Mock<ILogger<GeoFactory>>();
+            _loggerMock = new Mock<ILogger<ClamPortalObservationFactory>>();
         }
 
         /// <summary>
@@ -41,72 +39,77 @@ namespace SOS.Import.Test.Factories
         [Fact]
         public void ConstructorTest()
         {
-            new GeoFactory(
-                _areaRepositoryMock.Object,
-                _areaVerbatimRepository.Object,
+            new ClamPortalObservationFactory(
+                _clamObservationVerbatimRepositoryMock.Object,
+                _clamObservationServiceMock.Object,
                 _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new GeoFactory(
+            Action create = () => new ClamPortalObservationFactory(
                 null,
-                _areaVerbatimRepository.Object,
+                _clamObservationServiceMock.Object,
                 _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
 
-            create = () => new GeoFactory(
-                _areaRepositoryMock.Object,
-                null,
+            create = () => new ClamPortalObservationFactory(
+                _clamObservationVerbatimRepositoryMock.Object,
+              null,
                 _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaVerbatimRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationService");
 
-            create = () => new GeoFactory(
-                _areaRepositoryMock.Object,
-                _areaVerbatimRepository.Object,
+            create = () => new ClamPortalObservationFactory(
+                _clamObservationVerbatimRepositoryMock.Object,
+                _clamObservationServiceMock.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
 
-            create = () => new GeoFactory(
-                _areaRepositoryMock.Object,
-                _areaVerbatimRepository.Object,
+            create = () => new ClamPortalObservationFactory(
+                _clamObservationVerbatimRepositoryMock.Object,
+                _clamObservationServiceMock.Object,
                 _harvestInfoRepositoryMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-
         }
 
         /// <summary>
-        /// Make a successful test of aggregation
+        /// Make a successful clams harvest
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task HarvestAreasAsyncSuccess()
+        public async Task HarvestClamsAsyncSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _areaRepositoryMock.Setup(mdr => mdr.GetAsync())
-                .ReturnsAsync(new[] { new AreaEntity() { Id = 1, Name = "Sverige" } });
+            _clamObservationServiceMock.Setup(cts => cts.GetClamObservationsAsync())
+                .ReturnsAsync(new[] { new ClamObservationVerbatim
+                {
+                    DyntaxaTaxonId = 100024
+                }  });
 
-            _areaVerbatimRepository.Setup(tr => tr.DeleteCollectionAsync())
+            _clamObservationVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())
                 .ReturnsAsync(true);
-            _areaVerbatimRepository.Setup(tr => tr.AddCollectionAsync())
+            _clamObservationVerbatimRepositoryMock.Setup(tr => tr.AddCollectionAsync())
                 .ReturnsAsync(true);
-            _areaVerbatimRepository.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<Area>>()))
+            _clamObservationVerbatimRepositoryMock.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<ClamObservationVerbatim>>()))
                 .ReturnsAsync(true);
 
+            _harvestInfoRepositoryMock.Setup(hir =>
+                hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProvider.ClamPortal, It.IsAny<DateTime>(), It.IsAny<DateTime>(),It.IsAny<int>()))
+                .ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var geoFactory = new GeoFactory(
-                _areaRepositoryMock.Object,
-                _areaVerbatimRepository.Object,
+            var sightingFactory = new ClamPortalObservationFactory(
+                _clamObservationVerbatimRepositoryMock.Object,
+                _clamObservationServiceMock.Object,
                 _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await geoFactory.HarvestAreasAsync();
+            var result = await sightingFactory.HarvestClamsAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -119,23 +122,24 @@ namespace SOS.Import.Test.Factories
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task HarvestAreasAsyncFail()
+        public async Task HarvestClamsAsyncFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-
-
+            _clamObservationServiceMock.Setup(cts => cts.GetClamObservationsAsync())
+                .ThrowsAsync(new Exception("Fail"));
+            
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var geoFactory = new GeoFactory(
-                _areaRepositoryMock.Object,
-                _areaVerbatimRepository.Object,
+            var sightingFactory = new ClamPortalObservationFactory(
+                _clamObservationVerbatimRepositoryMock.Object,
+                _clamObservationServiceMock.Object,
                 _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await geoFactory.HarvestAreasAsync();
+            var result = await sightingFactory.HarvestClamsAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

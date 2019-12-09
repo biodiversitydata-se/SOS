@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Events;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Processed.Validation;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
@@ -16,7 +18,7 @@ namespace SOS.Process.Repositories.Destination
     /// <summary>
     /// Base class for cosmos db repositories
     /// </summary>
-    public class DarwinCoreRepository : ProcessBaseRepository<DarwinCore<DynamicProperties>>, IDarwinCoreRepository
+    public class DarwinCoreRepository : ProcessBaseRepository<DarwinCore<DynamicProperties>, ObjectId>, IDarwinCoreRepository
     {
         private readonly IInadequateItemRepository _inadequateItemRepository;
 
@@ -30,7 +32,7 @@ namespace SOS.Process.Repositories.Destination
             IProcessClient client,
             IInadequateItemRepository darwinCoreInadequateRepository,
             ILogger<DarwinCoreRepository> logger
-        ):base(client, logger)
+        ):base(client, true, logger)
         {
             _inadequateItemRepository = darwinCoreInadequateRepository ?? throw new ArgumentNullException(nameof(darwinCoreInadequateRepository));
         }
@@ -122,7 +124,7 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteProviderDataAsync(DataProviderId provider)
+        public async Task<bool> DeleteProviderDataAsync(DataProvider provider)
         {
             try
             {
@@ -139,15 +141,18 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> ToggleInstanceAsync()
+        public async Task<bool> ToggleInstanceAsync(DateTime start, IEnumerable<HarvestInfo> harvestInfo)
         {
             try
             {
                 var config = GetConfiguration();
 
                 config.ActiveInstance = InstanceToUpdate;
+                config.End = DateTime.Now;
+                config.HarvestInfo = harvestInfo;
+                config.Start = start;
 
-                var updateResult = await MongoCollectionConfiguration.ReplaceOneAsync(
+               var updateResult = await MongoCollectionConfiguration.ReplaceOneAsync(
                     x => x.Id.Equals(config.Id),
                     config,
                     new UpdateOptions { IsUpsert = true });

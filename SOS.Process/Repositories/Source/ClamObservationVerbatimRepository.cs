@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
-using SOS.Lib.Models.Verbatim.ClamTreePortal;
+using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Process.Database.Interfaces;
 
 namespace SOS.Process.Repositories.Source

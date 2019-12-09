@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Factories;
 using SOS.Import.MongoDb;
+using SOS.Import.Repositories.Destination;
 using SOS.Import.Repositories.Destination.Kul;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
@@ -36,10 +37,14 @@ namespace SOS.Import.Test.Factories
                     importConfiguration.MongoDbConfiguration.DatabaseName,
                     importConfiguration.MongoDbConfiguration.BatchSize),
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
-
+            var processConfig = GetProcessConfiguration().ProcessedDbConfiguration;
+            var harvestInfoRepository = new HarvestInfoRepository(
+                new ImportClient(processConfig.GetMongoDbSettings(), processConfig.DatabaseName, processConfig.BatchSize), new Mock<ILogger<HarvestInfoRepository>>().Object
+            );
             var geoFactory = new GeoFactory(
                 new AreaRepository(speciesPortalDataService, new Mock<ILogger<AreaRepository>>().Object),
                 areaVerbatimRepository,
+                harvestInfoRepository,
                 new Mock<ILogger<GeoFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -69,9 +74,15 @@ namespace SOS.Import.Test.Factories
                     importConfiguration.MongoDbConfiguration.BatchSize),
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
 
+            var processConfig = GetProcessConfiguration().ProcessedDbConfiguration;
+            var harvestInfoRepository = new HarvestInfoRepository(
+                new ImportClient(processConfig.GetMongoDbSettings(), processConfig.DatabaseName, processConfig.BatchSize), new Mock<ILogger<HarvestInfoRepository>>().Object
+            );
+
             var geoFactory = new GeoFactory(
                 new AreaRepository(speciesPortalDataService, new Mock<ILogger<AreaRepository>>().Object),
                 areaVerbatimRepository,
+                harvestInfoRepository,
                 new Mock<ILogger<GeoFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

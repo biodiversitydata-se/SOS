@@ -7,9 +7,20 @@ namespace SOS.Lib.Models.Verbatim.Shared
     public class HarvestInfo : IEntity<string>
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="provider"></param>
+        public HarvestInfo(string id, DataProvider provider)
+        {
+            Id = id;
+            DataProvider = provider;
+        }
+
+        /// <summary>
         /// Id of data provider
         /// </summary>
-        public DataProviderId DataProvider { get; set; }
+        public DataProvider DataProvider { get; set; }
 
         /// <summary>
         /// Harvest end date and time
@@ -27,8 +38,8 @@ namespace SOS.Lib.Models.Verbatim.Shared
         public DateTime Start { get; set; }
 
         /// <summary>
-        /// Number of sightings
+        /// Number of items
         /// </summary>
-        public int SightingCount { get; set; }
+        public int Count { get; set; }
     }
 }

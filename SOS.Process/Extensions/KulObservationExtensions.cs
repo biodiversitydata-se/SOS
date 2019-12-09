@@ -6,7 +6,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.DarwinCore;
 using  SOS.Lib.Models.Processed.DarwinCore.Vocabulary;
-using SOS.Lib.Models.Verbatim.ClamTreePortal;
+using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 
 namespace SOS.Process.Extensions
@@ -28,14 +28,14 @@ namespace SOS.Process.Extensions
         {
             taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
             // todo - ProtectionLevel, CoordinateX_RT90, CoordinateY_RT90, CoordinateX_SWEREF99, CoordinateY_SWEREF99, CoordinateX, CoordinateY
-            var obs = new DarwinCore<DynamicProperties>(DataProviderId.KUL)
+            var obs = new DarwinCore<DynamicProperties>(DataProvider.KUL)
             {
                 BasisOfRecord = BasisOfRecord.HumanObservation,
-                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProviderId.KUL}",
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProvider.KUL}",
                 DatasetName = "KUL",
                 DynamicProperties = new DynamicProperties
                 {
-                    DataProviderId = (int)DataProviderId.KUL,
+                    DataProviderId = (int)DataProvider.KUL,
                     CoordinateX = verbatim.DecimalLongitude, // todo - convert to WebMercator?
                     CoordinateY = verbatim.DecimalLatitude, // todo - convert to WebMercator?
                     ObservationDateStart = verbatim.Start,

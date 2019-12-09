@@ -2,7 +2,7 @@
 using MongoDB.Bson;
 using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Lib.Models.Verbatim.ClamTreePortal
+namespace SOS.Lib.Models.Verbatim.ClamPortal
 {
     /// <summary>
     /// Clams verbatim model

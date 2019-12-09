@@ -43,7 +43,7 @@ namespace SOS.Process.Factories
             {
                 Logger.LogDebug("Start Processing Species Portal Verbatim");
 
-                if (!await ProcessRepository.DeleteProviderDataAsync(DataProviderId.SpeciesPortal))
+                if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider.Artdatabanken))
                 {
                     Logger.LogError("Failed to delete Species Portal data");
 

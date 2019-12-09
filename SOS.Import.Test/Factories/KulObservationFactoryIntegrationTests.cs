@@ -93,7 +93,7 @@ namespace SOS.Import.Test.Factories
         {
             var harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
             harvestInfoRepositoryMock.Setup(hir =>
-                    hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProviderId.ClamAndTreePortal, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()))
+                    hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProvider.KUL, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()))
                 .ReturnsAsync(true);
 
             return harvestInfoRepositoryMock.Object;

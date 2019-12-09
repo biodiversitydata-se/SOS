@@ -48,7 +48,7 @@ namespace SOS.Process.Factories
             {
                 Logger.LogDebug("Start Processing KUL Verbatim observations");
 
-                if (!await ProcessRepository.DeleteProviderDataAsync(DataProviderId.KUL))
+                if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider.KUL))
                 {
                     Logger.LogError("Failed to delete KUL data");
 

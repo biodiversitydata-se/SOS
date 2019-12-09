@@ -35,7 +35,7 @@ namespace SOS.Process.Test.Helpers
             var areaHelper = new AreaHelper(
                 areaVerbatimRepository);
             List<DarwinCore<DynamicProperties>> observations = new List<DarwinCore<DynamicProperties>>();
-            DarwinCore<DynamicProperties> observation = new DarwinCore<DynamicProperties>(DataProviderId.SpeciesPortal)
+            DarwinCore<DynamicProperties> observation = new DarwinCore<DynamicProperties>(DataProvider.Artdatabanken)
             {
                 Location = new DarwinCoreLocation
                 {

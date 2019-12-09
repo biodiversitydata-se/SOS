@@ -1,19 +1,18 @@
 ﻿using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
-using SOS.Lib.Models.Verbatim.ClamTreePortal;
+using SOS.Lib.Models.Verbatim.SpeciesPortal;
 using SOS.Process.Database.Interfaces;
 
 namespace SOS.Process.Repositories.Source
 {
-    public class TreeObservationVerbatimRepository : VerbatimBaseRepository<TreeObservationVerbatim, ObjectId>, Interfaces.ITreeObservationVerbatimRepository
+    public class SpeciesPortalVerbatimRepository : VerbatimBaseRepository<APSightingVerbatim, int>, Interfaces.ISpeciesPortalVerbatimRepository
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
-        public TreeObservationVerbatimRepository(IVerbatimClient client,
-            ILogger<TreeObservationVerbatimRepository> logger) : base(client, logger)
+        public SpeciesPortalVerbatimRepository(IVerbatimClient client,
+            ILogger<SpeciesPortalVerbatimRepository> logger) : base(client, logger)
         {
 
         }

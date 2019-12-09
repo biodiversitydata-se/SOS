@@ -83,7 +83,6 @@ namespace SOS.Import.Repositories.Destination
                 Logger.LogError(e.ToString());
                 return false;
             }
-            
         }
 
         /// <summary>
