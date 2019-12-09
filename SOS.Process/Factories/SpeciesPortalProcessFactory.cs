@@ -24,12 +24,12 @@ namespace SOS.Process.Factories
         /// Constructor
         /// </summary>
         /// <param name="speciesPortalVerbatimRepository"></param>
-        /// <param name="DarwinCoreRepository"></param>
+        /// <param name="darwinCoreRepository"></param>
         /// <param name="logger"></param>
         public SpeciesPortalProcessFactory(
             ISpeciesPortalVerbatimRepository speciesPortalVerbatimRepository,
-            IDarwinCoreRepository DarwinCoreRepository,
-            ILogger<SpeciesPortalProcessFactory> logger) : base(DarwinCoreRepository, logger)
+            IDarwinCoreRepository darwinCoreRepository,
+            ILogger<SpeciesPortalProcessFactory> logger) : base(darwinCoreRepository, logger)
         {
             _speciesPortalVerbatimRepository = speciesPortalVerbatimRepository ?? throw new ArgumentNullException(nameof(speciesPortalVerbatimRepository));
         }

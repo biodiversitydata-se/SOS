@@ -1,0 +1,27 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+title Component diagram for SOS Observation API
+
+' Users
+System_Ext(artfakta, "Artfakta.se")
+System_Ext(artsok, "Artsök\nGIS plugin")
+System_Ext(gbif_ala, "GBIF/ALA")
+System_Ext(other_users, "Other systems ...")
+
+Container_Boundary(api, "Observation API") {
+    Component(observation_api, "SOS.ObservationApi", ".Net Core Web API application", "Provides a REST API to search for species observations & retrieve DwC-A files.")        
+    ContainerDb(mongodb_sos_processed, "sos-processed", "MongoDB 4.x", "Stores processed species observations in DwC format")    
+    Container(doi_file_storage, "DOI File Storage", "Azure BLOB storage", "Stores DOI DwC-A files.\nStored indefinitely.")
+    Container(file_storage, "File Storage", "NTFS", "Stores DwC-A files.\nStored 1 week.")
+    
+    Rel(observation_api, mongodb_sos_processed, "Read from")
+    Rel(observation_api, doi_file_storage, "Read from")
+    Rel(observation_api, file_storage, "Read from")
+}
+
+' Relations
+Rel(artfakta, observation_api, "Makes API calls to", "HTTPS")
+Rel(artsok, observation_api, "Makes API calls to", "HTTPS")
+Rel(gbif_ala, observation_api, "Makes API calls to", "HTTPS")
+Rel(other_users, observation_api, "Makes API calls to", "HTTPS")
+@enduml
