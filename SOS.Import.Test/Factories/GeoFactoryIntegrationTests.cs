@@ -16,6 +16,7 @@ using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Import.Services;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Enums;
 using Xunit;
 
 namespace SOS.Import.Test.Factories
@@ -38,13 +39,10 @@ namespace SOS.Import.Test.Factories
                     importConfiguration.MongoDbConfiguration.BatchSize),
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
             var processConfig = GetProcessConfiguration().ProcessedDbConfiguration;
-            var harvestInfoRepository = new HarvestInfoRepository(
-                new ImportClient(processConfig.GetMongoDbSettings(), processConfig.DatabaseName, processConfig.BatchSize), new Mock<ILogger<HarvestInfoRepository>>().Object
-            );
+           
             var geoFactory = new GeoFactory(
                 new AreaRepository(speciesPortalDataService, new Mock<ILogger<AreaRepository>>().Object),
                 areaVerbatimRepository,
-                harvestInfoRepository,
                 new Mock<ILogger<GeoFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -55,7 +53,7 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
+            result.Status.Should().Be(HarvestStatus.Succeded);
         }
 
         [Fact]
@@ -75,14 +73,10 @@ namespace SOS.Import.Test.Factories
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
 
             var processConfig = GetProcessConfiguration().ProcessedDbConfiguration;
-            var harvestInfoRepository = new HarvestInfoRepository(
-                new ImportClient(processConfig.GetMongoDbSettings(), processConfig.DatabaseName, processConfig.BatchSize), new Mock<ILogger<HarvestInfoRepository>>().Object
-            );
 
             var geoFactory = new GeoFactory(
                 new AreaRepository(speciesPortalDataService, new Mock<ILogger<AreaRepository>>().Object),
                 areaVerbatimRepository,
-                harvestInfoRepository,
                 new Mock<ILogger<GeoFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -93,7 +87,7 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
+            result.Status.Should().Be(HarvestStatus.Succeded);
         }
     }
 }

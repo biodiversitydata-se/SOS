@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Factories.Interfaces
 {
@@ -12,6 +13,6 @@ namespace SOS.Import.Factories.Interfaces
         /// Harvest clams.
         /// </summary>
         /// <returns></returns>
-        Task<bool> HarvestClamsAsync(IJobCancellationToken cancellationToken);
+        Task<HarvestInfo> HarvestClamsAsync(IJobCancellationToken cancellationToken);
     }
 }

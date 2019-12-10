@@ -12,6 +12,7 @@ using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Kul;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Factories
 {
@@ -19,7 +20,6 @@ namespace SOS.Import.Factories
     {
         private readonly IKulObservationService _kulObservationService;
         private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
-        private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<KulObservationFactory> _logger;
         private readonly KulServiceConfiguration _kulServiceConfiguration;
 
@@ -29,19 +29,16 @@ namespace SOS.Import.Factories
         /// <param name="kulObservationService"></param>
         /// <param name="kulObservationVerbatimRepository"></param>
         /// <param name="kulServiceConfiguration"></param>
-        /// <param name="harvestInfoRepository"></param>
         /// <param name="logger"></param>
         public KulObservationFactory(
             IKulObservationService kulObservationService,
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             KulServiceConfiguration kulServiceConfiguration,
-            IHarvestInfoRepository harvestInfoRepository,
             ILogger<KulObservationFactory> logger)
         {
             _kulObservationService = kulObservationService;
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository;
             _kulServiceConfiguration = kulServiceConfiguration;
-            _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger;
         }
 
@@ -54,8 +51,10 @@ namespace SOS.Import.Factories
             return sb.ToString();
         }
         
-        public async Task<bool> HarvestObservationsAsync(IJobCancellationToken  cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken  cancellationToken)
         {
+            var harvestInfo = new HarvestInfo(nameof(KulObservationVerbatim), DataProvider.KUL, DateTime.Now);
+
             try
             {
                 var start = DateTime.Now;
@@ -93,25 +92,24 @@ namespace SOS.Import.Factories
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for KUL data provider");
-                
+
                 // Update harvest info
-                return await _harvestInfoRepository.UpdateHarvestInfoAsync(
-                    nameof(KulObservationVerbatim),
-                    DataProvider.KUL,
-                    start,
-                    DateTime.Now, 
-                    nrSightingsHarvested);
+                harvestInfo.End = DateTime.Now;
+                harvestInfo.Status = HarvestStatus.Succeded;
+                harvestInfo.Count = nrSightingsHarvested;
             }
             catch (JobAbortedException)
             {
                 _logger.LogInformation("KUL harvest was cancelled.");
-                return false;
+                harvestInfo.Status = HarvestStatus.Canceled;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to harvest KUL");
-                throw;
+                harvestInfo.Status = HarvestStatus.Failed;
             }
+
+            return harvestInfo;
         }
     }
 }

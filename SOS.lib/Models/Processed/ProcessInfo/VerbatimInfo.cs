@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Shared;
 
@@ -14,7 +15,8 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// </summary>
         /// <param name="id"></param>
         /// <param name="provider"></param>
-        public VerbatimInfo(string id, DataProvider provider): base(id, provider)
+        /// <param name="start"></param>
+        public VerbatimInfo(string id, DataProvider provider, DateTime start): base(id, provider, start)
         {
             
         }
