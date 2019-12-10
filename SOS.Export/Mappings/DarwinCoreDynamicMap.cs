@@ -471,7 +471,8 @@ namespace SOS.Export.Mappings
             Map(m => m.Location.CoordinateUncertaintyInMeters)
                 .Name(mappingbyId[FieldDescriptionId.CoordinateUncertaintyInMeters].Name)
                 .Index(mappingbyId[FieldDescriptionId.CoordinateUncertaintyInMeters].Index)
-                .Ignore(mappingbyId[FieldDescriptionId.CoordinateUncertaintyInMeters].Ignore);
+                .Ignore(mappingbyId[FieldDescriptionId.CoordinateUncertaintyInMeters].Ignore)
+                .TypeConverter<CoordinateUncertaintyConverter<int?>>();
 
             Map(m => m.Location.CoordinatePrecision)
                 .Name(mappingbyId[FieldDescriptionId.CoordinatePrecision].Name)

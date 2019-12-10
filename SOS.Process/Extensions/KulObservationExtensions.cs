@@ -67,7 +67,7 @@ namespace SOS.Process.Extensions
                 },
                 Location = new DarwinCoreLocation
                 {
-                    CoordinateUncertaintyInMeters = verbatim.CoordinateUncertaintyInMeters.HasValue ? verbatim.CoordinateUncertaintyInMeters.Value.ToString() : DefaultCoordinateUncertaintyInMeters.ToString(),
+                    CoordinateUncertaintyInMeters = verbatim.CoordinateUncertaintyInMeters ?? DefaultCoordinateUncertaintyInMeters,
                     CountryCode = verbatim.CountryCode,
                     DecimalLatitude = verbatim.DecimalLatitude,
                     DecimalLongitude = verbatim.DecimalLongitude,
