@@ -114,7 +114,7 @@ namespace SOS.Process.Extensions
                 Location = new DarwinCoreLocation
                 {
                     Continent = Continent.Europe,
-                    CoordinateUncertaintyInMeters = verbatim.Site?.Accuracy.ToString(),
+                    CoordinateUncertaintyInMeters = verbatim.Site?.Accuracy,
                     Country = Country.Sweden,
                     CountryCode = CountryCode.Sweden,
                     County = verbatim.Site?.County?.Name ?? string.Empty,

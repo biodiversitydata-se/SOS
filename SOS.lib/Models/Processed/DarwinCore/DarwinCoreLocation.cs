@@ -35,7 +35,7 @@
         /// be estimated, or is not applicable (because there are
         /// no coordinates). Zero is not a valid value for this term.
         /// </summary>
-        public string CoordinateUncertaintyInMeters { get; set; }
+        public int? CoordinateUncertaintyInMeters { get; set; }
 
         /// <summary>
         /// Darwin Core term name: country.

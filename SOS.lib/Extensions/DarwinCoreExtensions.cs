@@ -150,7 +150,7 @@ namespace SOS.Lib.Extensions
             return !(
             string.IsNullOrEmpty(location.Continent) &&
             string.IsNullOrEmpty(location.CoordinatePrecision) &&
-            string.IsNullOrEmpty(location.CoordinateUncertaintyInMeters) &&
+            !location.CoordinateUncertaintyInMeters.HasValue &&
             string.IsNullOrEmpty(location.County) &&
             string.IsNullOrEmpty(location.Country) &&
             string.IsNullOrEmpty(location.CountryCode) &&
