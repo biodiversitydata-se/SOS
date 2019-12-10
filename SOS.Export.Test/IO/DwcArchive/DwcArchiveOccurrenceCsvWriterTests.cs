@@ -9,8 +9,10 @@ using CsvHelper;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Moq;
 using Newtonsoft.Json;
+using SOS.Export.Enums;
 using SOS.Export.Factories;
 using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive;
@@ -156,6 +158,44 @@ namespace SOS.Export.Test.IO.DwcArchive
             ((string)record.occurrenceRemarks).Should().Be("Sighting found in Uppsala");
         }
 
+        [Fact]
+        [Trait("Category", "Unit")]
+        [Trait("Category", "DwcArchiveUnit")]
+        public async Task CreateDwcOccurrenceCsvFile_WithSubsetOfFieldDescriptions_OnlySpecifiedFieldDescriptionsShouldBeUsed()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var memoryStream = new MemoryStream();
+            var observation = GetDefaultObservation();
+            var processedDarwinCoreRepositoryMock = CreateProcessedDarwinCoreRepositoryMock(observation);
+            List<FieldDescriptionId> fieldDescriptionIds = new List<FieldDescriptionId>
+            {
+                FieldDescriptionId.OccurrenceID,
+                FieldDescriptionId.ScientificName,
+                FieldDescriptionId.DecimalLongitude,
+                FieldDescriptionId.DecimalLatitude
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                memoryStream,
+                FieldDescriptionHelper.GetFieldDescriptions(fieldDescriptionIds),
+                processedDarwinCoreRepositoryMock.Object,
+                JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            dynamic record = ReadCsvFile(memoryStream).First();
+            var recordDictionary = (IDictionary<string, object>) record;
+            recordDictionary.Should().ContainKey("occurrenceID", "because this field was provided as field description");
+            recordDictionary.Should().NotContainKey("basisOfRecord", "because this field was not provided as field description");
+        }
+
+
         private static List<dynamic> ReadCsvFile(MemoryStream memoryStream)
         {
             using var readMemoryStream = new MemoryStream(memoryStream.ToArray());
@@ -165,7 +205,6 @@ namespace SOS.Export.Test.IO.DwcArchive
             var records = csvReader.GetRecords<dynamic>().ToList();
             return records;
         }
-
 
         private static void SetCsvConfigurations(CsvReader csv)
         {
