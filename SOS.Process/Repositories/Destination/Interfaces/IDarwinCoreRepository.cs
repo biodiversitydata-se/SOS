@@ -25,7 +25,7 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// <param name="start"></param>
         /// <param name="harvestInfo"></param>
         /// <returns></returns>
-        Task<bool> ToggleInstanceAsync(DateTime start, IEnumerable<HarvestInfo> harvestInfo);
+        Task<bool> ToggleInstanceAsync(DateTime start);
 
         /// <summary>
         /// Delete provider data

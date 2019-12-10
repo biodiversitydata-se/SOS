@@ -101,10 +101,12 @@ namespace SOS.Search.Service
 
                     // Add factories
                     services.AddScoped<ISightingFactory, SightingFactory>();
+                    services.AddScoped<IProcessInfoFactory, ProcessInfoFactory>();
 
                     // Repositories mongo
                     services.AddScoped<IProcessedDarwinCoreRepository, ProcessedDarwinCoreRepository>();
-
+                    services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
+                    
                     // Configure swagger
                     services.AddSwaggerGen(
                         options =>

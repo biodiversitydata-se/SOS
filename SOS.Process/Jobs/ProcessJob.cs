@@ -186,7 +186,7 @@ namespace SOS.Process.Jobs
                     if (toggleInstanceOnSuccess)
                     {
                         _logger.LogDebug("Toggle instance");
-                        await _processRepository.ToggleInstanceAsync(start, await _harvestInfoRepository.GetAllAsync());
+                        await _processRepository.ToggleInstanceAsync(start);
                     }
                 }
 

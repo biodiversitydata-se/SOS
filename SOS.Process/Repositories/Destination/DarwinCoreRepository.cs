@@ -141,18 +141,15 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> ToggleInstanceAsync(DateTime start, IEnumerable<HarvestInfo> harvestInfo)
+        public async Task<bool> ToggleInstanceAsync(DateTime start)
         {
             try
             {
                 var config = GetConfiguration();
 
                 config.ActiveInstance = InstanceToUpdate;
-                config.End = DateTime.Now;
-                config.HarvestInfo = harvestInfo;
-                config.Start = start;
 
-               var updateResult = await MongoCollectionConfiguration.ReplaceOneAsync(
+                var updateResult = await MongoCollectionConfiguration.ReplaceOneAsync(
                     x => x.Id.Equals(config.Id),
                     config,
                     new UpdateOptions { IsUpsert = true });

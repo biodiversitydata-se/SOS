@@ -21,6 +21,11 @@ namespace SOS.Lib.Models.Verbatim.Shared
         }
 
         /// <summary>
+        /// Number of items
+        /// </summary>
+        public int Count { get; set; }
+
+        /// <summary>
         /// Id of data provider
         /// </summary>
         public DataProvider DataProvider { get; set; }
@@ -44,10 +49,5 @@ namespace SOS.Lib.Models.Verbatim.Shared
         /// Status of harvest
         /// </summary>
         public HarvestStatus Status { get; set; }
-
-        /// <summary>
-        /// Number of items
-        /// </summary>
-        public int Count { get; set; }
     }
 }
