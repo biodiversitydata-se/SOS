@@ -35,7 +35,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<IProcessJob>(nameof(ProcessJob), job => job.Run(sources, toggleInstanceOnSuccess, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IProcessJob>(nameof(ProcessJob), job => job.RunAsync(sources, toggleInstanceOnSuccess, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Process job added");
             }
             catch (Exception e)
@@ -53,7 +53,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                BackgroundJob.Enqueue<IProcessJob>(job => job.Run(sources, toggleInstanceOnSuccess, JobCancellationToken.Null));
+                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(sources, toggleInstanceOnSuccess, JobCancellationToken.Null));
                 return new OkObjectResult("Started process job");
             }
             catch (Exception e)
@@ -71,7 +71,7 @@ namespace SOS.Hangfire.UI.Controllers
             try
             {
                 int sources = (int)DataProvider.KUL;
-                BackgroundJob.Enqueue<IProcessJob>(job => job.Run(sources, true, JobCancellationToken.Null));
+                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(sources, true, JobCancellationToken.Null));
                 return new OkObjectResult("Started process KUL job");
             }
             catch (Exception e)

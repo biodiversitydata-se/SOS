@@ -9,6 +9,6 @@ namespace SOS.Import.Jobs.Interfaces
         /// Run species portal harvest
         /// </summary>
         /// <returns></returns>
-        Task<bool> Run(IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(IJobCancellationToken cancellationToken);
     }
 }

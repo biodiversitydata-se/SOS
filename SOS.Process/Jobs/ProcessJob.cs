@@ -70,7 +70,7 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> Run(int sources, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(int sources, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -177,8 +177,8 @@ namespace SOS.Process.Jobs
 
                     // Update process info
                     processInfo.End = DateTime.Now;
-                    processInfo.Start = start;        // Merge current verbatim info with our new data
-                    processInfo.VerbatimInfo = verbatimInfo.Union(processInfo.VerbatimInfo.Where(vi => !verbatimInfo.Select(v => v.DataProvider).Contains(vi.DataProvider)));
+                    processInfo.Start = start;                      // Merge current verbatim info with our new data
+                    processInfo.VerbatimInfo = verbatimInfo.Union(processInfo.VerbatimInfo.Where(vi => !verbatimInfo.Select(v => v.Id).Contains(vi.Id)));
                     
                     // Save process info
                     await _processInfoRepository.AddOrUpdateAsync(processInfo);
@@ -186,7 +186,7 @@ namespace SOS.Process.Jobs
                     if (toggleInstanceOnSuccess)
                     {
                         _logger.LogDebug("Toggle instance");
-                        await _processRepository.ToggleInstanceAsync(start);
+                        await _processRepository.SetActiveInstanceAsync(_processRepository.InstanceToUpdate);
                     }
                 }
 

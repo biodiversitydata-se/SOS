@@ -163,7 +163,7 @@ namespace SOS.Process.Repositories.Destination
         /// <summary>
         /// Configuration collection
         /// </summary>
-        protected IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration => Database.GetCollection<ProcessedConfiguration>(_collectionNameConfiguration);
+        private IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration => Database.GetCollection<ProcessedConfiguration>(_collectionNameConfiguration);
 
         /// <summary>
         /// 
@@ -319,6 +319,30 @@ namespace SOS.Process.Repositories.Destination
                 var filter = Builders<TEntity>.Filter.Eq("_id", id);
 
                 return await MongoCollection.Find(filter).FirstOrDefaultAsync();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+
+                return default;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> SetActiveInstanceAsync(byte instance)
+        {
+            try
+            {
+                var config = GetConfiguration();
+
+                config.ActiveInstance = instance;
+
+                var updateResult = await MongoCollectionConfiguration.ReplaceOneAsync(
+                    x => x.Id.Equals(config.Id),
+                    config,
+                    new UpdateOptions { IsUpsert = true });
+
+                return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
             }
             catch (Exception e)
             {

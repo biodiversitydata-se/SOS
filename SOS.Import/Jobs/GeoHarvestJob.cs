@@ -33,7 +33,7 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> Run()
+        public async Task<bool> RunAsync()
         {
             _logger.LogDebug("Start Geo Harvest Job");
            

@@ -34,7 +34,7 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> Run(IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
             _logger.LogDebug("Start Species Portal Harvest Job");
            

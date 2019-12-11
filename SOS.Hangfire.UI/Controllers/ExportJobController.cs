@@ -34,7 +34,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                BackgroundJob.Enqueue<IExportDarwinCoreJob>(job => job.Run(JobCancellationToken.Null));
+                BackgroundJob.Enqueue<IExportDarwinCoreJob>(job => job.RunAsync(JobCancellationToken.Null));
 
                 return new OkObjectResult("Running Darwin Core export");
             }
@@ -53,7 +53,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<IExportDarwinCoreJob>(nameof(ExportDarwinCoreJob), job => job.Run(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IExportDarwinCoreJob>(nameof(ExportDarwinCoreJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Export Darwin Core Job Scheduled");
             }
             catch (Exception e)

@@ -58,6 +58,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<SpeciesPortalProcessFactory>().As<ISpeciesPortalProcessFactory>().InstancePerLifetimeScope();
 
             // Add jobs
+            builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessJob>().As<IProcessJob>().InstancePerLifetimeScope();
         }
     }

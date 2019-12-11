@@ -12,6 +12,6 @@ namespace SOS.Export.Jobs.Interfaces
         /// Run export Darwin core job
         /// </summary>
         /// <returns></returns>
-        Task<bool> Run(IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(IJobCancellationToken cancellationToken);
     }
 }
