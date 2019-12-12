@@ -9,9 +9,10 @@ namespace SOS.Search.Service.Controllers.Interfaces
     public interface ISystemController
     {
         /// <summary>
-        /// Get process information of active instance
+        ///  Get process information 
         /// </summary>
+        /// <param name="active"></param>
         /// <returns></returns>
-        Task<IActionResult> GetCurrentProcessInfoAsync();
+        Task<IActionResult> GetProcessInfoAsync(bool active);
     }
 }

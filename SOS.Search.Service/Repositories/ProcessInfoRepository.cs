@@ -27,9 +27,10 @@ namespace SOS.Search.Service.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<ProcessInfo> GetCurrentProcessInfoAsync()
+        public async Task<ProcessInfo> GetProcessInfoAsync(bool current)
         {
-            return await GetAsync(ActiveInstance);
+            var instance = (byte)(current ? ActiveInstance : ActiveInstance == 0 ? 1 : 0);
+            return await GetAsync(instance);
         }
     }
 }

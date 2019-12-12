@@ -31,11 +31,11 @@ namespace SOS.Search.Service.Factories
         }
 
         /// <inheritdoc />
-        public async Task<ProcessInfo> GetCurrentProcessInfoAsync()
+        public async Task<ProcessInfo> GetProcessInfoAsync(bool active)
         {
             try
             {
-                var processInfo = await _processInfoRepository.GetCurrentProcessInfoAsync();
+                var processInfo = await _processInfoRepository.GetProcessInfoAsync(active);
                 return processInfo;
             }
             catch (Exception e)

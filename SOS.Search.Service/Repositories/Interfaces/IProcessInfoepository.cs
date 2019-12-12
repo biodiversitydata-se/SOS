@@ -9,9 +9,10 @@ namespace SOS.Search.Service.Repositories.Interfaces
     public interface IProcessInfoRepository : IBaseRepository<ProcessInfo, byte>
     {
         /// <summary>
-        /// Get process information of active instance
+        /// Get process information
         /// </summary>
+        /// <param name="current"></param>
         /// <returns></returns>
-        Task<ProcessInfo> GetCurrentProcessInfoAsync();
+        Task<ProcessInfo> GetProcessInfoAsync(bool current);
     }
 }

@@ -31,18 +31,18 @@ namespace SOS.Search.Service.Controllers
         }
 
         /// <inheritdoc />
-        [HttpGet("ProcessInformation/Current")]
+        [HttpGet("ProcessInformation")]
         [ProducesResponseType(typeof(ProcessInfo), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetCurrentProcessInfoAsync()
+        public async Task<IActionResult> GetProcessInfoAsync([FromQuery]bool active)
         {
             try
             {
-                return new OkObjectResult(await _processInfoFactory.GetCurrentProcessInfoAsync());
+                return new OkObjectResult(await _processInfoFactory.GetProcessInfoAsync(active));
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error getting current process information");
+                _logger.LogError(e, "Error getting process information");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

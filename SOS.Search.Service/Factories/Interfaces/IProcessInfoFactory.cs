@@ -9,9 +9,9 @@ namespace SOS.Search.Service.Factories.Interfaces
     public interface IProcessInfoFactory
     {
         /// <summary>
-        /// Get process information of active instance
+        /// Get process information 
         /// </summary>
         /// <returns></returns>
-        Task<ProcessInfo> GetCurrentProcessInfoAsync();
+        Task<ProcessInfo> GetProcessInfoAsync(bool active);
     }
 }
