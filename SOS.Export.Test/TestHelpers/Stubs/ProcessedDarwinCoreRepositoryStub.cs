@@ -11,6 +11,8 @@ namespace SOS.Export.Test.TestHelpers.Stubs
 {
     public class ProcessedDarwinCoreRepositoryStub : IProcessedDarwinCoreRepository
     {
+        public byte ActiveInstance => throw new NotImplementedException();
+
         public void Dispose()
         {
             throw new NotImplementedException();

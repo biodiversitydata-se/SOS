@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -20,6 +19,7 @@ namespace SOS.Export.Factories
     public class SightingFactory : Interfaces.ISightingFactory
     {
         private readonly IProcessedDarwinCoreRepository _processedDarwinCoreRepository;
+        private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IFileService _fileService;
         private readonly IBlobStorageService _blobStorageService;
         private readonly string _exportPath;
@@ -31,6 +31,7 @@ namespace SOS.Export.Factories
         /// </summary>
         /// <param name="dwcArchiveFileWriter"></param>
         /// <param name="processedDarwinCoreRepository"></param>
+        /// <param name="processInfoRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="blobStorageService"></param>
         /// <param name="fileDestination"></param>
@@ -38,6 +39,7 @@ namespace SOS.Export.Factories
         public SightingFactory(
             IDwcArchiveFileWriter dwcArchiveFileWriter,
             IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            IProcessInfoRepository processInfoRepository,
             IFileService fileService,
             IBlobStorageService blobStorageService,
             FileDestination fileDestination,
@@ -45,6 +47,7 @@ namespace SOS.Export.Factories
             ILogger<SightingFactory> logger)
         {
             _processedDarwinCoreRepository = processedDarwinCoreRepository ?? throw new ArgumentNullException(nameof(processedDarwinCoreRepository));
+            _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
             _exportPath = fileDestination?.Path ?? throw new ArgumentNullException(nameof(fileDestination));
@@ -69,9 +72,12 @@ namespace SOS.Export.Factories
 
             try
             {
+                var processInfo = await _processInfoRepository.GetAsync(_processInfoRepository.ActiveInstance);
+
                 zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     _processedDarwinCoreRepository,
                     fieldDescriptions,
+                    processInfo,
                     _exportPath,
                     cancellationToken);
                 cancellationToken?.ThrowIfCancellationRequested();

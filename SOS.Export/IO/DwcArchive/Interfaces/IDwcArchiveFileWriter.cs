@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Models.Processed.ProcessInfo;
 
 namespace SOS.Export.IO.DwcArchive.Interfaces
 {
@@ -14,11 +15,13 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// The full path is returned by this function.
         /// </summary>
         /// <param name="processedDarwinCoreRepository">The repository to read observation data from.</param>
+        /// <param name="processInfo"></param>
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
         Task<string> CreateDwcArchiveFileAsync(
             IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken);
 
@@ -29,12 +32,14 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// </summary>
         /// <param name="processedDarwinCoreRepository">The repository to read observation data from.</param>
         /// <param name="fieldDescriptions"></param>
+        /// <param name="processInfo"></param>
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
         Task<string> CreateDwcArchiveFileAsync(
             IProcessedDarwinCoreRepository processedDarwinCoreRepository,
             IEnumerable<FieldDescription> fieldDescriptions,
+            ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken);
     }

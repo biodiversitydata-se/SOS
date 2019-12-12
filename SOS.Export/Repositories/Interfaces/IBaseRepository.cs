@@ -13,6 +13,11 @@ namespace SOS.Export.Repositories.Interfaces
     public interface IBaseRepository<TEntity, in TKey> : IDisposable where TEntity : IEntity<TKey>
     {
         /// <summary>
+        /// Get active database instance
+        /// </summary>
+        byte ActiveInstance { get; }
+        
+        /// <summary>
         /// Get entity
         /// </summary>
         /// <returns></returns>

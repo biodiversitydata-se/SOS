@@ -11,6 +11,7 @@ using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
+using SOS.Lib.Models.Processed.ProcessInfo;
 
 namespace SOS.Export.IO.DwcArchive
 {
@@ -39,12 +40,14 @@ namespace SOS.Export.IO.DwcArchive
         /// <inheritdoc />
         public async Task<string> CreateDwcArchiveFileAsync(
             IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken)
         {
             return await CreateDwcArchiveFileAsync(
                 processedDarwinCoreRepository,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
+                processInfo,
                 exportFolderPath,
                 cancellationToken);
         }
@@ -53,6 +56,7 @@ namespace SOS.Export.IO.DwcArchive
         public async Task<string> CreateDwcArchiveFileAsync(
             IProcessedDarwinCoreRepository processedDarwinCoreRepository,
             IEnumerable<FieldDescription> fieldDescriptions,
+            ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken)
         {
@@ -66,6 +70,7 @@ namespace SOS.Export.IO.DwcArchive
                 string occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.csv");
                 string metaXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "meta.xml");
                 string emlXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "eml.xml");
+                string processInfoXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "processinfo.xml");
 
                 // Create Occurrence.csv
                 using (FileStream fileStream = File.Create(occurrenceCsvFilePath))
@@ -89,6 +94,11 @@ namespace SOS.Export.IO.DwcArchive
                     await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(fileStream);
                 }
 
+                // Create processinfo.xml
+                
+                await using var processInfoFileStream = File.Create(processInfoXmlFilePath);
+                DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileStream, processInfo);
+                processInfoFileStream.Close();
                 var zipFilePath = _fileService.CompressFolder(exportFolderPath, zipFolderName);
                 _fileService.DeleteFolder(temporaryZipExportFolderPath);
                 return zipFilePath;

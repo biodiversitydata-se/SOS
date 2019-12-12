@@ -12,7 +12,6 @@ using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
-using SOS.Lib.Extensions;
 
 namespace SOS.Export.IoC.Modules
 {
@@ -46,6 +45,7 @@ namespace SOS.Export.IoC.Modules
 
             // Repositories mongo
             builder.RegisterType<ProcessedDarwinCoreRepository>().As<IProcessedDarwinCoreRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
 
             // Services
             builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().InstancePerLifetimeScope();
