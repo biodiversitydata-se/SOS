@@ -37,10 +37,11 @@ namespace SOS.Export.Repositories
         /// Constructor
         /// </summary>
         /// <param name="exportClient"></param>
+        /// <param name="toggleable"></param>
         /// <param name="logger"></param>
         protected BaseRepository(
             IExportClient exportClient,
-           
+            bool toggleable,
             ILogger<BaseRepository<TEntity, TKey>> logger
         )
         {
@@ -52,8 +53,8 @@ namespace SOS.Export.Repositories
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Database = exportClient.GetDatabase();
-            
-            _collectionName = $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ ActiveInstance }";
+
+            _collectionName = toggleable ? $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ ActiveInstance }" : $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }";
         }
 
         /// <summary>
@@ -80,7 +81,7 @@ namespace SOS.Export.Repositories
         /// Get active instance
         /// </summary>
         /// <returns></returns>
-        protected byte ActiveInstance => GetConfiguration().ActiveInstance;
+        public byte ActiveInstance => GetConfiguration().ActiveInstance;
 
         /// <summary>
         /// Get client

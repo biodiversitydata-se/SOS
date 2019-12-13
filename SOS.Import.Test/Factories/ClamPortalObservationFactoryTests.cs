@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Factories;
 using SOS.Import.Repositories.Destination.ClamPortal.Interfaces;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.ClamPortal;
@@ -19,7 +18,6 @@ namespace SOS.Import.Test.Factories
     {
         private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
         private readonly Mock<IClamObservationService> _clamObservationServiceMock;
-        private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
         private readonly Mock<ILogger<ClamPortalObservationFactory>> _loggerMock;
 
         /// <summary>
@@ -29,7 +27,6 @@ namespace SOS.Import.Test.Factories
         {
             _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
             _clamObservationServiceMock = new Mock<IClamObservationService>();
-            _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
             _loggerMock = new Mock<ILogger<ClamPortalObservationFactory>>();
         }
 
@@ -42,34 +39,23 @@ namespace SOS.Import.Test.Factories
             new ClamPortalObservationFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _clamObservationServiceMock.Object,
-                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new ClamPortalObservationFactory(
                 null,
                 _clamObservationServiceMock.Object,
-                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
 
             create = () => new ClamPortalObservationFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
               null,
-                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationService");
 
             create = () => new ClamPortalObservationFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _clamObservationServiceMock.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
-
-            create = () => new ClamPortalObservationFactory(
-                _clamObservationVerbatimRepositoryMock.Object,
-                _clamObservationServiceMock.Object,
-                _harvestInfoRepositoryMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -97,16 +83,12 @@ namespace SOS.Import.Test.Factories
             _clamObservationVerbatimRepositoryMock.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<ClamObservationVerbatim>>()))
                 .ReturnsAsync(true);
 
-            _harvestInfoRepositoryMock.Setup(hir =>
-                hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProvider.ClamPortal, It.IsAny<DateTime>(), It.IsAny<DateTime>(),It.IsAny<int>()))
-                .ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var sightingFactory = new ClamPortalObservationFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _clamObservationServiceMock.Object,
-                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
             var result = await sightingFactory.HarvestClamsAsync(JobCancellationToken.Null);
@@ -114,7 +96,7 @@ namespace SOS.Import.Test.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeTrue();
+            result.Status.Should().Be(HarvestStatus.Succeded);
         }
 
         /// <summary>
@@ -136,7 +118,6 @@ namespace SOS.Import.Test.Factories
             var sightingFactory = new ClamPortalObservationFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _clamObservationServiceMock.Object,
-                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
             var result = await sightingFactory.HarvestClamsAsync(JobCancellationToken.Null);
@@ -144,7 +125,7 @@ namespace SOS.Import.Test.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeFalse();
+            result.Status.Should().Be(HarvestStatus.Failed);
         }
     }
 }

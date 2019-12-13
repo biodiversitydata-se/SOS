@@ -20,16 +20,5 @@ namespace SOS.Import.Repositories.Destination
         {
             
         }
-
-        /// <inheritdoc />
-        public async Task<bool> UpdateHarvestInfoAsync(string id, DataProvider provider, DateTime start, DateTime end, int count)
-        {
-            return await AddOrUpdateAsync(new HarvestInfo(id, provider)
-            {
-                End = end,
-                Count = count,
-                Start = start
-            });
-        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Factories.Interfaces
 {
@@ -11,6 +12,6 @@ namespace SOS.Import.Factories.Interfaces
         /// Aggregate all areas
         /// </summary>
         /// <returns></returns>
-        Task<bool> HarvestAreasAsync();
+        Task<HarvestInfo> HarvestAreasAsync();
     }
 }

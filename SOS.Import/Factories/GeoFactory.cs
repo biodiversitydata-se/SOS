@@ -18,7 +18,6 @@ namespace SOS.Import.Factories
     {
         private readonly IAreaRepository _areaRepository;
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
-        private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<GeoFactory> _logger;
 
         /// <summary>
@@ -26,24 +25,22 @@ namespace SOS.Import.Factories
         /// </summary>
         /// <param name="areaRepository"></param>
         /// <param name="areaVerbatimRepository"></param>
-        /// <param name="harvestInfoRepository"></param>
         /// <param name="logger"></param>
         public GeoFactory(
             IAreaRepository areaRepository,
             IAreaVerbatimRepository areaVerbatimRepository,
-            IHarvestInfoRepository harvestInfoRepository,
             ILogger<GeoFactory> logger)
         {
             _areaRepository = areaRepository ?? throw new ArgumentNullException(nameof(areaRepository));
             _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
             _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
-            _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<bool> HarvestAreasAsync()
+        public async Task<HarvestInfo> HarvestAreasAsync()
         {
+            var harvestInfo = new HarvestInfo(nameof(Area), DataProvider.Artdatabanken, DateTime.Now);
             try
             {
                 var start = DateTime.Now;
@@ -64,24 +61,23 @@ namespace SOS.Import.Factories
                             _logger.LogDebug("Succeeded adding areas");
 
                             // Update harvest info
-                            return await _harvestInfoRepository.UpdateHarvestInfoAsync(
-                                nameof(Area),
-                                DataProvider.Artdatabanken,
-                                start,
-                                DateTime.Now,
-                                areas.Count());
+                            harvestInfo.End = DateTime.Now;
+                            harvestInfo.Status = HarvestStatus.Succeded;
+                            harvestInfo.Count = areas?.Count() ?? 0;
+
+                            return harvestInfo;
                         }
                     }
                 }
-
-                _logger.LogDebug("Failed adding areas");
-                return false;
+                harvestInfo.Status = HarvestStatus.Failed;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed aggregation of areas");
-                return false;
+                harvestInfo.Status = HarvestStatus.Failed;
             }
+
+            return harvestInfo;
         }
     }
 }

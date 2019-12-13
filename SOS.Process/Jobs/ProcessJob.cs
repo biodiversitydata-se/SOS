@@ -70,7 +70,7 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> Run(int sources, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(int sources, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -120,14 +120,13 @@ namespace SOS.Process.Jobs
                 {
                     processTasks.Add(DataProvider.Artdatabanken, _speciesPortalProcessFactory.ProcessAsync(taxa, cancellationToken));
 
-                    var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(APSightingVerbatim))) ?? new HarvestInfo(nameof(APSightingVerbatim), DataProvider.Artdatabanken);
+                    var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(APSightingVerbatim))) ?? new HarvestInfo(nameof(APSightingVerbatim), DataProvider.Artdatabanken, DateTime.MinValue);
                     //Add information about harvest
-                    verbatimInfo.Add(new VerbatimInfo(nameof(APSightingVerbatim), DataProvider.Artdatabanken)
+                    verbatimInfo.Add(new VerbatimInfo(nameof(APSightingVerbatim), DataProvider.Artdatabanken, harvestInfo.Start)
                     {
-                        End = harvestInfo?.End ?? DateTime.MinValue,
-                        Count = harvestInfo?.Count ?? 0,
-                        Metadata = currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon))).ToArray(),
-                        Start = harvestInfo?.Start ?? DateTime.MinValue
+                        End = harvestInfo.End,
+                        Count = harvestInfo.Count,
+                        Metadata = currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon))).ToArray()
                     });
                 }
 
@@ -135,14 +134,13 @@ namespace SOS.Process.Jobs
                 {
                     processTasks.Add(DataProvider.ClamPortal, _clamPortalProcessFactory.ProcessAsync(taxa, cancellationToken));
 
-                    var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(ClamObservationVerbatim))) ?? new HarvestInfo(nameof(ClamObservationVerbatim), DataProvider.ClamPortal);
+                    var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(ClamObservationVerbatim))) ?? new HarvestInfo(nameof(ClamObservationVerbatim), DataProvider.ClamPortal, DateTime.MinValue);
                     //Add information about harvest
-                    verbatimInfo.Add(new VerbatimInfo(nameof(ClamObservationVerbatim), DataProvider.ClamPortal)
+                    verbatimInfo.Add(new VerbatimInfo(nameof(ClamObservationVerbatim), DataProvider.ClamPortal, harvestInfo.Start)
                     {
-                        End = harvestInfo?.End ?? DateTime.MinValue,
-                        Count = harvestInfo?.Count ?? 0,
+                        End = harvestInfo.End,
+                        Count = harvestInfo.Count,
                         Metadata = currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon)) || hi.Id.Equals(nameof(Area))).ToArray(),
-                        Start = harvestInfo?.Start ?? DateTime.MinValue
                     });
                 }
 
@@ -150,14 +148,13 @@ namespace SOS.Process.Jobs
                 {
                     processTasks.Add(DataProvider.KUL, _kulProcessFactory.ProcessAsync(taxa, cancellationToken));
 
-                    var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(KulObservationVerbatim))) ?? new HarvestInfo(nameof(KulObservationVerbatim), DataProvider.KUL);
+                    var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(KulObservationVerbatim))) ?? new HarvestInfo(nameof(KulObservationVerbatim), DataProvider.KUL, DateTime.MinValue);
                     //Add information about harvest
-                    verbatimInfo.Add(new VerbatimInfo(nameof(KulObservationVerbatim), DataProvider.KUL)
+                    verbatimInfo.Add(new VerbatimInfo(nameof(KulObservationVerbatim), DataProvider.KUL, harvestInfo.Start)
                     {
-                        End = harvestInfo?.End ?? DateTime.MinValue,
-                        Count = harvestInfo?.Count ?? 0,
+                        End = harvestInfo.End,
+                        Count = harvestInfo.Count,
                         Metadata = currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon)) || hi.Id.Equals(nameof(Area))).ToArray(),
-                        Start = harvestInfo?.Start ?? DateTime.MinValue
                     });
                 }
 
@@ -180,8 +177,8 @@ namespace SOS.Process.Jobs
 
                     // Update process info
                     processInfo.End = DateTime.Now;
-                    processInfo.Start = start;        // Merge current verbatim info with our new data
-                    processInfo.VerbatimInfo = verbatimInfo.Union(processInfo.VerbatimInfo.Where(vi => !verbatimInfo.Select(v => v.DataProvider).Contains(vi.DataProvider)));
+                    processInfo.Start = start;                      // Merge current verbatim info with our new data
+                    processInfo.VerbatimInfo = verbatimInfo.Union(processInfo.VerbatimInfo.Where(vi => !verbatimInfo.Select(v => v.Id).Contains(vi.Id)));
                     
                     // Save process info
                     await _processInfoRepository.AddOrUpdateAsync(processInfo);
@@ -189,7 +186,7 @@ namespace SOS.Process.Jobs
                     if (toggleInstanceOnSuccess)
                     {
                         _logger.LogDebug("Toggle instance");
-                        await _processRepository.ToggleInstanceAsync(start, await _harvestInfoRepository.GetAllAsync());
+                        await _processRepository.SetActiveInstanceAsync(_processRepository.InstanceToUpdate);
                     }
                 }
 
@@ -197,7 +194,6 @@ namespace SOS.Process.Jobs
 
                 _logger.LogDebug("Persist area cache");
                 _areaHelper.PersistCache();
-
 
                 // return result of all processing
                 return success;

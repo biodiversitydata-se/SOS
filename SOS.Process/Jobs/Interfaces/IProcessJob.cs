@@ -12,6 +12,6 @@ namespace SOS.Process.Jobs.Interfaces
         /// <param name="toggleInstanceOnSuccess"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> Run(int sources, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(int sources, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken);
     }
 }

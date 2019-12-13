@@ -28,7 +28,7 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> Run(IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
             try
             {

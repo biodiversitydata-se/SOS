@@ -12,6 +12,7 @@ using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Import.Factories
@@ -31,7 +32,6 @@ namespace SOS.Import.Factories
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly IOrganizationRepository _organizationRepository;
-        private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<SpeciesPortalSightingFactory> _logger;
 
         /// <summary>
@@ -60,7 +60,6 @@ namespace SOS.Import.Factories
             IOrganizationRepository organizationRepository,
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionItemRepository,
-            IHarvestInfoRepository harvestInfoRepository,
             ILogger<SpeciesPortalSightingFactory> logger)
         {
             _speciesPortalConfiguration = speciesPortalConfiguration ?? throw new ArgumentNullException(nameof(speciesPortalConfiguration));
@@ -73,13 +72,14 @@ namespace SOS.Import.Factories
             _organizationRepository = organizationRepository ?? throw new ArgumentNullException(nameof(organizationRepository));
             _sightingRelationRepository = sightingRelationRepository ?? throw new ArgumentNullException(nameof(sightingRelationRepository));
             _speciesCollectionRepository = speciesCollectionItemRepository ?? throw new ArgumentNullException(nameof(speciesCollectionItemRepository));
-            _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<bool> HarvestSightingsAsync(IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestSightingsAsync(IJobCancellationToken cancellationToken)
         {
+            var harvestInfo = new HarvestInfo(nameof(APSightingVerbatim), DataProvider.ClamPortal, DateTime.Now);
+
             try
             {
                 var start = DateTime.Now;
@@ -183,23 +183,22 @@ namespace SOS.Import.Factories
                 }
 
                 // Update harvest info
-                return await _harvestInfoRepository.UpdateHarvestInfoAsync(
-                    nameof(APSightingVerbatim),
-                    DataProvider.Artdatabanken,
-                    start, 
-                    DateTime.Now, 
-                    nrSightingsHarvested);
+                harvestInfo.End = DateTime.Now;
+                harvestInfo.Status = HarvestStatus.Succeded;
+                harvestInfo.Count = nrSightingsHarvested;
             }
             catch (JobAbortedException)
             {
                 _logger.LogInformation("Species Portal harvest was cancelled.");
-                return false;
+                harvestInfo.Status = HarvestStatus.Canceled;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed aggregation of sightings");
-                return false;
+                harvestInfo.Status = HarvestStatus.Failed;
             }
+
+            return harvestInfo;
         }
 
         private static ProjectEntityDictionaries GetProjectEntityDictionaries(

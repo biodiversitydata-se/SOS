@@ -40,10 +40,12 @@ namespace SOS.Search.Service.Repositories
         /// </summary>
         /// <param name="mongoClient"></param>
         /// <param name="mongoDbConfiguration"></param>
+        /// <param name="multipleInstances"></param>
         /// <param name="logger"></param>
         protected BaseRepository(
             IMongoClient mongoClient,
             IOptions<MongoDbConfiguration> mongoDbConfiguration,
+            bool multipleInstances,
             ILogger<BaseRepository<TEntity, TKey>> logger
         )
         {
@@ -56,7 +58,7 @@ namespace SOS.Search.Service.Repositories
 
             Database = mongoClient.GetDatabase($"{mongoDbConfiguration.Value.DatabaseName}");
 
-            _collectionName = $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ ActiveInstance }";
+            _collectionName = multipleInstances ? $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ ActiveInstance }" : typeof(TEntity).Name.UntilNonAlfanumeric();
         }
 
         /// <summary>

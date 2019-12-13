@@ -11,11 +11,19 @@ namespace SOS.Lib.Models.Verbatim.Shared
         /// </summary>
         /// <param name="id"></param>
         /// <param name="provider"></param>
-        public HarvestInfo(string id, DataProvider provider)
+        /// <param name="status"></param>
+        /// <param name="start"></param>
+        public HarvestInfo(string id, DataProvider provider, DateTime start)
         {
             Id = id;
             DataProvider = provider;
+            Start = start;
         }
+
+        /// <summary>
+        /// Number of items
+        /// </summary>
+        public int Count { get; set; }
 
         /// <summary>
         /// Id of data provider
@@ -38,8 +46,8 @@ namespace SOS.Lib.Models.Verbatim.Shared
         public DateTime Start { get; set; }
 
         /// <summary>
-        /// Number of items
+        /// Status of harvest
         /// </summary>
-        public int Count { get; set; }
+        public HarvestStatus Status { get; set; }
     }
 }

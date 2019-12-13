@@ -25,7 +25,7 @@ namespace SOS.Search.Service.Repositories
         public ProcessedDarwinCoreRepository(
             IMongoClient mongoClient,
             IOptions<MongoDbConfiguration> mongoDbConfiguration, 
-            ILogger<ProcessedDarwinCoreRepository> logger) : base(mongoClient, mongoDbConfiguration, logger)
+            ILogger<ProcessedDarwinCoreRepository> logger) : base(mongoClient, mongoDbConfiguration, true, logger)
         {
         }
 

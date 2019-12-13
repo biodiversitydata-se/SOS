@@ -20,14 +20,6 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         Task CreateIndexAsync();
 
         /// <summary>
-        /// Toggle active instance
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="harvestInfo"></param>
-        /// <returns></returns>
-        Task<bool> ToggleInstanceAsync(DateTime start, IEnumerable<HarvestInfo> harvestInfo);
-
-        /// <summary>
         /// Delete provider data
         /// </summary>
         /// <param name="provider"></param>

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Factories.Interfaces
 {
@@ -11,6 +12,6 @@ namespace SOS.Import.Factories.Interfaces
         /// Harvest taxa.
         /// </summary>
         /// <returns></returns>
-        Task<bool> HarvestAsync();
+        Task<HarvestInfo> HarvestAsync();
     }
 }

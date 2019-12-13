@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Factories.Interfaces
 {
@@ -12,6 +13,6 @@ namespace SOS.Import.Factories.Interfaces
         /// Aggregate sightings.
         /// </summary>
         /// <returns></returns>
-        Task<bool> HarvestSightingsAsync(IJobCancellationToken cancellationToken);
+        Task<HarvestInfo> HarvestSightingsAsync(IJobCancellationToken cancellationToken);
     }
 }

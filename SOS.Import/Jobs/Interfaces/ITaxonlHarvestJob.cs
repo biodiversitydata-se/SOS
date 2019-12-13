@@ -8,6 +8,6 @@ namespace SOS.Import.Jobs.Interfaces
         /// Run taxon harvest
         /// </summary>
         /// <returns></returns>
-        Task<bool> Run();
+        Task<bool> RunAsync();
     }
 }

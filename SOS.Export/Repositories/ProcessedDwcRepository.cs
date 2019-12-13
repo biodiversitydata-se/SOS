@@ -21,7 +21,7 @@ namespace SOS.Export.Repositories
         /// <param name="logger"></param>
         public ProcessedDarwinCoreRepository(
             IExportClient exportClient,
-            ILogger<ProcessedDarwinCoreRepository> logger) : base(exportClient, logger)
+            ILogger<ProcessedDarwinCoreRepository> logger) : base(exportClient, true, logger)
         {
         }
 

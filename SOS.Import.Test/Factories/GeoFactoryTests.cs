@@ -6,10 +6,10 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities;
 using SOS.Import.Factories;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
+using SOS.Lib.Enums;
 using Xunit;
 
 namespace SOS.Import.Test.Factories
@@ -21,7 +21,6 @@ namespace SOS.Import.Test.Factories
     {
         private readonly Mock<IAreaRepository> _areaRepositoryMock;
         private readonly Mock<AreaVerbatimRepository> _areaVerbatimRepository;
-        private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
         private readonly Mock<ILogger<GeoFactory>> _loggerMock;
 
         /// <summary>
@@ -31,7 +30,6 @@ namespace SOS.Import.Test.Factories
         {
             _areaRepositoryMock = new Mock<IAreaRepository>();
             _areaVerbatimRepository = new Mock<AreaVerbatimRepository>();
-            _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
             _loggerMock = new Mock<ILogger<GeoFactory>>();
         }
 
@@ -44,34 +42,23 @@ namespace SOS.Import.Test.Factories
             new GeoFactory(
                 _areaRepositoryMock.Object,
                 _areaVerbatimRepository.Object,
-                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new GeoFactory(
                 null,
                 _areaVerbatimRepository.Object,
-                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaRepository");
 
             create = () => new GeoFactory(
                 _areaRepositoryMock.Object,
                 null,
-                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaVerbatimRepository");
 
             create = () => new GeoFactory(
                 _areaRepositoryMock.Object,
                 _areaVerbatimRepository.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
-
-            create = () => new GeoFactory(
-                _areaRepositoryMock.Object,
-                _areaVerbatimRepository.Object,
-                _harvestInfoRepositoryMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
 
@@ -103,15 +90,13 @@ namespace SOS.Import.Test.Factories
             var geoFactory = new GeoFactory(
                 _areaRepositoryMock.Object,
                 _areaVerbatimRepository.Object,
-                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
             var result = await geoFactory.HarvestAreasAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeTrue();
+            result.Status.Should().Be(HarvestStatus.Succeded);
         }
 
         /// <summary>
@@ -132,7 +117,6 @@ namespace SOS.Import.Test.Factories
             var geoFactory = new GeoFactory(
                 _areaRepositoryMock.Object,
                 _areaVerbatimRepository.Object,
-                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
             var result = await geoFactory.HarvestAreasAsync();
@@ -140,7 +124,7 @@ namespace SOS.Import.Test.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeFalse();
+            result.Status.Should().Be(HarvestStatus.Failed);
         }
     }
 }

@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Factories;
 using SOS.Import.MongoDb;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.Kul;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Services;
@@ -44,7 +43,6 @@ namespace SOS.Import.Test.Factories
                 kulObservationService,
                 kulObservationVerbatimRepository, 
                 importConfiguration.KulServiceConfiguration,
-                GetHarvestInfoRepository(),
                 new Mock<ILogger<KulObservationFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -55,7 +53,7 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
+            result.Status.Should().Be(HarvestStatus.Succeded);
         }
 
         [Fact]
@@ -75,7 +73,6 @@ namespace SOS.Import.Test.Factories
                     importConfiguration.KulServiceConfiguration),
                 new Mock<IKulObservationVerbatimRepository>().Object,
                 importConfiguration.KulServiceConfiguration,
-                GetHarvestInfoRepository(),
                 new Mock<ILogger<KulObservationFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -86,17 +83,7 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
-        }
-
-        private IHarvestInfoRepository GetHarvestInfoRepository()
-        {
-            var harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
-            harvestInfoRepositoryMock.Setup(hir =>
-                    hir.UpdateHarvestInfoAsync(It.IsAny<string>(), DataProvider.KUL, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>()))
-                .ReturnsAsync(true);
-
-            return harvestInfoRepositoryMock.Object;
+            result.Status.Should().Be(HarvestStatus.Succeded);
         }
     }
 }

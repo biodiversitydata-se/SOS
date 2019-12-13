@@ -49,6 +49,13 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         byte InstanceToUpdate { get; }
 
         /// <summary>
+        /// Set active instance
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <returns></returns>
+        Task<bool> SetActiveInstanceAsync(byte instance);
+
+        /// <summary>
         /// Make sure collection exists
         /// </summary>
         Task VerifyCollectionAsync();

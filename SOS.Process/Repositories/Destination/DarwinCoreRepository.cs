@@ -5,11 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Events;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Processed.Validation;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
@@ -138,33 +136,6 @@ namespace SOS.Process.Repositories.Destination
                 Logger.LogError(e.ToString());
                 return false;
             }
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> ToggleInstanceAsync(DateTime start, IEnumerable<HarvestInfo> harvestInfo)
-        {
-            try
-            {
-                var config = GetConfiguration();
-
-                config.ActiveInstance = InstanceToUpdate;
-                config.End = DateTime.Now;
-                config.HarvestInfo = harvestInfo;
-                config.Start = start;
-
-               var updateResult = await MongoCollectionConfiguration.ReplaceOneAsync(
-                    x => x.Id.Equals(config.Id),
-                    config,
-                    new UpdateOptions { IsUpsert = true });
-
-                return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to toggle instance");
-                return false;
-            }
-           
         }
     }
 }
