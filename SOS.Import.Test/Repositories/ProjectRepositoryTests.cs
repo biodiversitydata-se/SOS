@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -73,7 +74,7 @@ namespace SOS.Import.Test.Repositories
                 _speciesPortalDataServiceMock.Object,
                 _loggerMock.Object);
 
-            var result = await ProjectRepository.GetAsync();
+            var result = await ProjectRepository.GetProjectsAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -98,12 +99,15 @@ namespace SOS.Import.Test.Repositories
                 _speciesPortalDataServiceMock.Object,
                 _loggerMock.Object);
 
-            var result = await ProjectRepository.GetAsync();
+            var result = await ProjectRepository.GetProjectsAsync();
+            
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
             result.Should().BeNull();
         }
+
+
     }
 }

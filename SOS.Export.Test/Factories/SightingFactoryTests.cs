@@ -73,6 +73,7 @@ namespace SOS.Export.Test.Factories
             create = () => new SightingFactory(
                 _dwcArchiveFileWriterMock.Object,
                 _processedDarwinCoreRepositoryMock.Object,
+                _processInfoRepositoryMock.Object,
                 null,
                 _fileServiceMock.Object,
                 _blobStorageServiceMock.Object,

@@ -31,25 +31,27 @@ namespace SOS.Export.Test.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var exportConfiguration = GetExportConfiguration();
             string exportFolderPath = exportConfiguration.FileDestination.Path;
+            var exportClient = new ExportClient(
+                exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
+                exportConfiguration.MongoDbConfiguration.DatabaseName,
+                exportConfiguration.MongoDbConfiguration.BatchSize);
             var processedDarwinCoreRepository = new ProcessedDarwinCoreRepository(
-                new ExportClient(
-                    exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                    exportConfiguration.MongoDbConfiguration.DatabaseName,
-                    exportConfiguration.MongoDbConfiguration.BatchSize),
+                exportClient,
                 new Mock<ILogger<ProcessedDarwinCoreRepository>>().Object);
             DwcArchiveFileWriter dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object), 
                     new FileService(), 
                     new Mock<ILogger<DwcArchiveFileWriter>>().Object);
+            var processInfoRepository = new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
+            var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
 
-            
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                 processedDarwinCoreRepository,
-                new ProcessInfo(1),
+                processInfo,
                 exportFolderPath,
                 JobCancellationToken.Null);
 
@@ -76,13 +78,20 @@ namespace SOS.Export.Test.IO.DwcArchive
                     new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object),
                     new FileService(),
                     new Mock<ILogger<DwcArchiveFileWriter>>().Object);
+            
+            var exportClient = new ExportClient(
+                exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
+                exportConfiguration.MongoDbConfiguration.DatabaseName,
+                exportConfiguration.MongoDbConfiguration.BatchSize);
+            var processInfoRepository = new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
+            var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                 processedDarwinCoreRepositoryMock.Object,
-                new ProcessInfo(1), 
+                processInfo,
                 exportFolderPath,
                 JobCancellationToken.Null);
 

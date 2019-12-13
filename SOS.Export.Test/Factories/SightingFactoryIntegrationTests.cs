@@ -36,15 +36,16 @@ namespace SOS.Export.Test.Factories
                     new FileService(), 
                     new NullLogger<DwcArchiveFileWriter>());
 
+            var exportClient = new ExportClient(
+                exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
+                exportConfiguration.MongoDbConfiguration.DatabaseName,
+                exportConfiguration.MongoDbConfiguration.BatchSize);
             SightingFactory sightingFactory = new SightingFactory(
                 dwcArchiveFileWriter,
                 new ProcessedDarwinCoreRepository(
-                    new ExportClient(
-                        exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                        exportConfiguration.MongoDbConfiguration.DatabaseName,
-                        exportConfiguration.MongoDbConfiguration.BatchSize),
+                    exportClient,
                     new Mock<ILogger<ProcessedDarwinCoreRepository>>().Object),
-                new Mock<IProcessInfoRepository>().Object,
+                new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object), 
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,
                 new FileDestination { Path = exportConfiguration.FileDestination.Path },
