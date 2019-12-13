@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.SpeciesPortal
@@ -129,9 +130,14 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         public bool ProtectedBySystem { get; set; }
 
         /// <summary>
-        /// Projects
+        /// Project
         /// </summary>
         public Project Project { get; set; }
+
+        /// <summary>
+        /// Projects
+        /// </summary>
+        public List<Project> Projects { get; set; }
 
         /// <summary>
         /// Number of taxa found

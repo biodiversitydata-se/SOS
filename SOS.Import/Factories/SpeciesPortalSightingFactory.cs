@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Import.Entities;
 using SOS.Import.Extensions;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
@@ -35,7 +36,8 @@ namespace SOS.Import.Factories
 
         /// <summary>
         /// Constructor
-        /// </summary>/// <param name="speciesPortalConfiguration"></param>
+        /// </summary>///
+        /// <param name="speciesPortalConfiguration"></param>
         /// <param name="metadataRepository"></param>
         /// <param name="projectRepository"></param>
         /// <param name="sightingRepository"></param>
@@ -45,9 +47,9 @@ namespace SOS.Import.Factories
         /// <param name="organizationRepository"></param>
         /// <param name="sightingRelationRepository"></param>
         /// <param name="speciesCollectionItemRepository"></param>
+        /// <param name="harvestInfoRepository"></param>
         /// <param name="logger"></param>
         public SpeciesPortalSightingFactory(
-
             SpeciesPortalConfiguration speciesPortalConfiguration,
             IMetadataRepository metadataRepository,
             IProjectRepository projectRepository,
@@ -112,25 +114,17 @@ namespace SOS.Import.Factories
                 _logger.LogDebug("Start getting species collection data");
                 var speciesCollections = (await _speciesCollectionRepository.GetAsync()).ToAggregates().ToList();
 
-                _logger.LogDebug("Start getting projects");
-                var projects = (await _projectRepository.GetAsync()).ToAggregates().ToDictionary(p => p.Id, p => p);
-
-                _logger.LogDebug("Start getting sighting project id's");
+                _logger.LogDebug("Start getting projects & project parameters");
+                var projectEntityById = (await _projectRepository.GetProjectsAsync()).ToDictionary(p => p.Id, p => p);
+                var projectParameterEntities = await _projectRepository.GetProjectParametersAsync();
                 var sightingProjectIds = await _sightingRepository.GetProjectIdsAsync();
                 cancellationToken?.ThrowIfCancellationRequested();
-
-                // Create a dictionary with sightings projects. 
-                var sightingProjects = new Dictionary<int, Project>();
-                foreach (var (sightingId, projectId) in sightingProjectIds)
-                {
-                    sightingProjects.Add(sightingId, projects[projectId]);
-                }
-
+   
                 _logger.LogDebug("Start getting sites");
                 var sites = (await _siteRepository.GetAsync()).ToAggregates().ToDictionary(s => s.Id, s => s);
 
-                _logger.LogDebug("Empty collection");
                 // Make sure we have an empty collection
+                _logger.LogDebug("Empty collection");
                 await _sightingVerbatimRepository.DeleteCollectionAsync();
                 await _sightingVerbatimRepository.AddCollectionAsync();
 
@@ -149,21 +143,23 @@ namespace SOS.Import.Factories
                     }
 
                     _logger.LogDebug($"Getting sightings from { minId } to { minId + _speciesPortalConfiguration.ChunkSize -1 }");
-
+                    
                     // Get chunk of sightings
                     var sightings = (await _sightingRepository.GetChunkAsync(minId, _speciesPortalConfiguration.ChunkSize)).ToArray();
                     var sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
                     nrSightingsHarvested += sightings.Length;
 
                     // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
-                    var sightingRelations = (await _sightingRelationRepository
-                        .GetAsync(sightingIds)).ToAggregates().ToArray();
+                    var sightingRelations = (await _sightingRelationRepository.GetAsync(sightingIds)).ToAggregates().ToArray();
                     var personSightingBySightingId = PersonSightingFactory.CalculatePersonSightingDictionary(
                         sightingIds,
                         personByUserId,
                         organizationById,
                         speciesCollections,
                         sightingRelations);
+
+                    // Get projects & project parameters
+                    var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, sightingProjectIds, projectEntityById, projectParameterEntities);
 
                     // Cast sightings to aggregates
                     IEnumerable<APSightingVerbatim> aggregates = sightings.ToAggregates(
@@ -172,12 +168,12 @@ namespace SOS.Import.Factories
                         genders,
                         organizations,
                         personSightingBySightingId,
-                        sightingProjects,
                         sites,
                         stages,
                         substrates,
+                        validationStatus,
                         units,
-                        validationStatus);
+                        projectEntityDictionaries);
                     
                     // Add sightings to mongodb
                     await _sightingVerbatimRepository.AddManyAsync(aggregates);
@@ -204,6 +200,30 @@ namespace SOS.Import.Factories
                 _logger.LogError(e, "Failed aggregation of sightings");
                 return false;
             }
+        }
+
+        private static ProjectEntityDictionaries GetProjectEntityDictionaries(
+            HashSet<int> sightingIds,
+            IEnumerable<(int SightingId, int ProjectId)> sightingProjectIds,
+            Dictionary<int, ProjectEntity> projectEntityById,
+            IEnumerable<ProjectParameterEntity> projectParameterEntities)
+        {
+            Dictionary<int, IEnumerable<ProjectEntity>> projectEntitiesBySightingId = sightingProjectIds
+                .Where(p => sightingIds.Contains(p.SightingId))
+                .GroupBy(p => p.SightingId)
+                .ToDictionary(g => g.Key, g => g.Select(p => projectEntityById[p.ProjectId]));
+
+            Dictionary<int, IEnumerable<ProjectParameterEntity>> projectParameterEntitiesBySightingId = projectParameterEntities
+                .Where(p => sightingIds.Contains(p.SightingId))
+                .GroupBy(p => p.SightingId)
+                .ToDictionary(g => g.Key, g => g.AsEnumerable());
+
+            return new ProjectEntityDictionaries
+            {
+                ProjectEntityById = projectEntityById,
+                ProjectEntitiesBySightingId = projectEntitiesBySightingId,
+                ProjectParameterEntitiesBySightingId = projectParameterEntitiesBySightingId
+            };
         }
     }
 }

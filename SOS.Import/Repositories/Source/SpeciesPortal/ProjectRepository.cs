@@ -15,15 +15,15 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="SpeciesPortalDataService"></param>
+        /// <param name="speciesPortalDataService"></param>
         /// <param name="logger"></param>
-        public ProjectRepository(ISpeciesPortalDataService SpeciesPortalDataService, ILogger<ProjectRepository> logger) : base(SpeciesPortalDataService, logger)
+        public ProjectRepository(ISpeciesPortalDataService speciesPortalDataService, ILogger<ProjectRepository> logger) : base(speciesPortalDataService, logger)
         {
            
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ProjectEntity>> GetAsync()
+        public async Task<IEnumerable<ProjectEntity>> GetProjectsAsync()
         {
             try
             {
@@ -59,5 +59,56 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 return null;
             }
         }
-    }
+
+        /// <inheritdoc />
+		public async Task<IEnumerable<ProjectParameterEntity>> GetProjectParametersAsync()
+		{
+			try
+			{
+				const string query = @"
+                SELECT
+                    SearchableSightings.SightingId							AS SightingId,
+	                Project.Id												AS ProjectId,	                	                
+	                ProjectParameter.Id										AS ProjectParameterId,
+	                ProjectParameter.Name									AS Name,
+	                ProjectParameter.Description							AS Description,
+	                ProjectParameter.Unit									AS Unit,
+	                ProjectParameterValue.Value								AS Value,
+	                CASE
+		                WHEN ProjectParameter.ProjectParameterTypeId = 3
+		                THEN 'double'
+		                ELSE 'string' END									AS DataType	                
+	                FROM SearchableSightings SearchableSightings WITH (NOLOCK)	                
+	                INNER JOIN SightingState AS SightingState ON SightingState.SightingId = SearchableSightings.SightingId
+		                AND SightingState.SightingStateTypeId = 30  -- A sighting that has been made public.
+		                AND SightingState.IsActive = 1				-- if edited several records w/ IsActive = 0
+	                INNER JOIN Taxon AS Taxon ON Taxon.Id = SearchableSightings.TaxonId
+	                INNER JOIN ProjectParameterValue AS ProjectParameterValue ON SearchableSightings.SightingId = ProjectParameterValue.SightingId
+	                INNER JOIN ProjectParameter AS ProjectParameter ON ProjectParameterValue.ProjectParameterId = ProjectParameter.Id
+	                INNER JOIN Project AS Project ON Project.Id = ProjectParameter.ProjectId
+	                WHERE
+		                 (SearchableSightings.HiddenByProvider IS NULL OR SearchableSightings.HiddenByProvider < getDate())
+		                AND
+		                (SearchableSightings.SightingTypeId = 0 OR SearchableSightings.SightingTypeId = 3)  
+		                AND
+		                SearchableSightings.ValidationStatusId != 50		                
+		                AND
+		                (Taxon.ProtectionLevelId = 1)		                
+		                AND
+		                ISNULL(ProjectParameterValue.Value, '') <> ''
+		                AND
+		                ProjectParameter.IsDeleted = 0
+		                AND
+		                Project.IsHideAll = 0";
+
+				return await QueryAsync<ProjectParameterEntity>(query);
+			}
+			catch (Exception e)
+			{
+				Logger.LogError(e, "Error getting project parameters");
+				return null;
+			}
+		}
+
+	}
 }

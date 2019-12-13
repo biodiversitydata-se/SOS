@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Verbatim.SpeciesPortal
 {
@@ -56,5 +57,10 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         /// Survey method url 
         /// </summary>
         public string SurveyMethodUrl { get; set; }
+
+        /// <summary>
+        /// Project parameters
+        /// </summary>
+        public List<ProjectParameter> ProjectParameters { get; set; }
     }
 }

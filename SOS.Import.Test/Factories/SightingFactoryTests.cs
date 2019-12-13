@@ -207,7 +207,7 @@ namespace SOS.Import.Test.Factories
                 .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "ValidationStatus" } });
             
 
-            _projectRepositoryMock.Setup(pr => pr.GetAsync())
+            _projectRepositoryMock.Setup(pr => pr.GetProjectsAsync())
                 .ReturnsAsync(new[] { new ProjectEntity { Id = 1, Name = "Project" } });
 
             _sightingRepositoryMock.Setup(sr => sr.GetIdSpanAsync())
@@ -215,7 +215,7 @@ namespace SOS.Import.Test.Factories
             _sightingRepositoryMock.Setup(sr => sr.GetChunkAsync(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(new[] { new SightingEntity { Id = 1, ActivityId = 1, GenderId = 1, SiteId = 1, StageId = 1 } });
             _sightingRepositoryMock.Setup(sr => sr.GetProjectIdsAsync())
-                .ReturnsAsync(new [] { new Tuple<int, int>(1, 1) });
+                .ReturnsAsync(new[] { (SightingId : 1, ProjectId : 1) });
 
             _siteRepositoryMockMock.Setup(sr => sr.GetAsync())
                 .ReturnsAsync(new[] { new SiteEntity() { Id = 1, Name = "Site"} });
@@ -239,7 +239,7 @@ namespace SOS.Import.Test.Factories
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
                 _sightingVerbatimRepository.Object,
-                _personRepository.Object, 
+                _personRepository.Object,
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
@@ -276,7 +276,7 @@ namespace SOS.Import.Test.Factories
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
                 _sightingVerbatimRepository.Object,
-                _personRepository.Object, 
+                _personRepository.Object,
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,

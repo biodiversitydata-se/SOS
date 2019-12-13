@@ -28,6 +28,6 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal.Interfaces
         /// Get all connections between project and sighting
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<Tuple<int, int>>> GetProjectIdsAsync();
+        Task<IEnumerable<(int SightingId, int ProjectId)>> GetProjectIdsAsync();
     }
 }

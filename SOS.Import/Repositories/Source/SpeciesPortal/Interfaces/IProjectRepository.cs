@@ -13,6 +13,12 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal.Interfaces
         /// Get all projects
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<ProjectEntity>> GetAsync();
+        Task<IEnumerable<ProjectEntity>> GetProjectsAsync();
+
+        /// <summary>
+        /// Get all project parameters.
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<ProjectParameterEntity>> GetProjectParametersAsync();
     }
 }

@@ -131,25 +131,23 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Tuple<int, int>>> GetProjectIdsAsync()
+        public async Task<IEnumerable<(int SightingId, int ProjectId)>> GetProjectIdsAsync()
         {
             try
             {
                 const string query = @"
                 SELECT 
-                    ps.SightingId AS Item1,
-	                MAX(ps.ProjectId) AS Item2
+                    ps.SightingId AS SightingId,
+	                ps.ProjectId AS ProjectId
                 FROM 
-	                ProjectSighting ps WITH(NOLOCK)
-                GROUP BY 
-	                ps.SightingId";
+	                ProjectSighting ps
+                ORDER BY ps.ProjectId DESC";
 
-                return await QueryAsync<Tuple<int, int>>(query);
+                return await QueryAsync<(int SightingId, int ProjectId)>(query);
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting sighting/project connections");
-
                 return null;
             }
         }

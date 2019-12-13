@@ -67,7 +67,7 @@ namespace SOS.Import.Test.Factories
                 siteRepositoryMock.Object,
                 //siteRepository,
                 sightingVerbatimRepository,
-                personRepository, 
+                personRepository,
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
