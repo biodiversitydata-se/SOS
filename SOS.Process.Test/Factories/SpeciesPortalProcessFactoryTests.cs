@@ -5,6 +5,7 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SOS.Lib.Enums;
 using SOS.Process.Factories;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
@@ -81,7 +82,7 @@ namespace SOS.Process.Test.Factories
                 } });
 
             _DarwinCoreRepository.Setup(r => r.AddManyAsync(It.IsAny<ICollection<DarwinCore<DynamicProperties>>>()))
-                .ReturnsAsync(true);
+                .ReturnsAsync(1);
 
             var taxa = new Dictionary<int, DarwinCoreTaxon>
             {
@@ -101,7 +102,7 @@ namespace SOS.Process.Test.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeTrue();
+            result.Status.Should().Be(RunStatus.Success);
         }
 
         /// <summary>
@@ -128,7 +129,7 @@ namespace SOS.Process.Test.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeFalse();
+            result.Status.Should().Be(RunStatus.Failed);
         }
 
         /// <summary>
@@ -157,7 +158,7 @@ namespace SOS.Process.Test.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeFalse();
+            result.Status.Should().Be(RunStatus.Failed);
         }
     }
 }

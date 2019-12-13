@@ -40,7 +40,7 @@ namespace SOS.Import.Jobs
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(result);
 
-            return result.Status.Equals(HarvestStatus.Succeded);
+            return result.Status.Equals(RunStatus.Success);
         }
     }
 }

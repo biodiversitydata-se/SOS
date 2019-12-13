@@ -95,18 +95,18 @@ namespace SOS.Import.Factories
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;
-                harvestInfo.Status = HarvestStatus.Succeded;
+                harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
             }
             catch (JobAbortedException)
             {
                 _logger.LogInformation("KUL harvest was cancelled.");
-                harvestInfo.Status = HarvestStatus.Canceled;
+                harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to harvest KUL");
-                harvestInfo.Status = HarvestStatus.Failed;
+                harvestInfo.Status = RunStatus.Failed;
             }
 
             return harvestInfo;

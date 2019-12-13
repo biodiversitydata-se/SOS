@@ -7,6 +7,7 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Shared.Shared;
 using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -27,50 +28,58 @@ namespace SOS.Process.Factories
         /// </summary>
         /// <param name="clamObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="DarwinCoreRepository"></param>
+        /// <param name="darwinCoreRepository"></param>
         /// <param name="logger"></param>
         public ClamPortalProcessFactory(
             IClamObservationVerbatimRepository clamObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IDarwinCoreRepository DarwinCoreRepository,
-            ILogger<ClamPortalProcessFactory> logger) : base(DarwinCoreRepository, logger)
+            IDarwinCoreRepository darwinCoreRepository,
+            ILogger<ClamPortalProcessFactory> logger) : base(darwinCoreRepository, logger)
         {
             _clamObservationVerbatimRepository = clamObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(clamObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
         /// <inheritdoc />
-        public async Task<bool> ProcessAsync(
+        public async Task<RunInfo> ProcessAsync(
             IDictionary<int, DarwinCoreTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
+            var runInfo = new RunInfo(DataProvider.ClamPortal)
+            {
+                Start = DateTime.Now
+            };
             Logger.LogDebug("Start clam portal process job");
 
             if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider.ClamPortal))
             {
                 Logger.LogError("Failed to delete clam portal data");
 
-                return false;
+                runInfo.Status = RunStatus.Failed;
+                runInfo.End = DateTime.Now;
+                return runInfo;
             }
 
             Logger.LogDebug("Previous processed clam portal data deleted");
 
-            var success = await ProcessClamsAsync(taxa, cancellationToken);
+            await ProcessClamsAsync(taxa, runInfo, cancellationToken);
 
-            Logger.LogDebug($"End clam portal process job. Success: {success}");
+            Logger.LogDebug($"End clam portal process job. Result: {runInfo.Status.ToString()}");
 
-            // return result of all harvests
-            return success;
+            // return result of processing
+            return runInfo;
         }
 
         /// <summary>
         /// Process clams
         /// </summary>
         /// <param name="taxa"></param>
+        /// <param name="runinfo"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<bool> ProcessClamsAsync(
+        private async Task ProcessClamsAsync(
             IDictionary<int, DarwinCoreTaxon> taxa,
+            RunInfo runInfo,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -82,11 +91,12 @@ namespace SOS.Process.Factories
                 if (!verbatim.Any())
                 {
                     Logger.LogError("No clams verbatim data to process");
-                    return false;
+                    runInfo.Status = RunStatus.Failed;
+                    return;
                 }
 
-                var totalCount = 0;
-
+                var successCount = 0;
+                var verbatimCount = 0;
                 while (verbatim.Any())
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
@@ -96,27 +106,30 @@ namespace SOS.Process.Factories
                     // Add area related data to models
                     _areaHelper.AddAreaDataToDarwinCore(darwinCore);
 
-                    await ProcessRepository.AddManyAsync(darwinCore);
+                    successCount += await ProcessRepository.AddManyAsync(darwinCore);
+                    verbatimCount += verbatim.Count();
 
-                    totalCount += verbatim.Count();
+                    Logger.LogInformation($"Clam observations being processed, totalCount: {verbatimCount}");
 
                     // Fetch next batch
-                    verbatim = await _clamObservationVerbatimRepository.GetBatchAsync(totalCount + 1);
-
-                    Logger.LogInformation($"Clam observations being processed, totalCount: {totalCount}");
+                    verbatim = await _clamObservationVerbatimRepository.GetBatchAsync(verbatimCount + 1);
                 }
 
-                return true;
+                runInfo.Count = successCount;
+                runInfo.End = DateTime.Now;
+                runInfo.Status = RunStatus.Success;
             }
             catch (JobAbortedException)
             {
                 Logger.LogInformation("Clam observation processing was canceled.");
-                throw;
+                runInfo.End = DateTime.Now;
+                runInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Failed to process clams verbatim");
-                return false;
+                runInfo.End = DateTime.Now;
+                runInfo.Status = RunStatus.Failed;
             }
         }
     }

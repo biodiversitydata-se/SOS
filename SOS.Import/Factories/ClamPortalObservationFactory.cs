@@ -60,18 +60,18 @@ namespace SOS.Import.Factories
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;
-                harvestInfo.Status = HarvestStatus.Succeded;
+                harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = items?.Count() ?? 0;
             }
             catch (JobAbortedException e)
             {
                 _logger.LogError(e, "Canceled harvest of clams");
-                harvestInfo.Status = HarvestStatus.Canceled;
+                harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed harvest of clams");
-                harvestInfo.Status = HarvestStatus.Failed;
+                harvestInfo.Status = RunStatus.Failed;
             }
             return harvestInfo;
         }

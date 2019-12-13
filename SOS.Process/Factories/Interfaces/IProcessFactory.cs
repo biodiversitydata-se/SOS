@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Hangfire;
 using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Shared.Shared;
 
 namespace SOS.Process.Factories.Interfaces
 {
@@ -16,7 +17,7 @@ namespace SOS.Process.Factories.Interfaces
         /// <param name="taxa"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> ProcessAsync(IDictionary<int, DarwinCoreTaxon> taxa, IJobCancellationToken cancellationToken);
+        Task<RunInfo> ProcessAsync(IDictionary<int, DarwinCoreTaxon> taxa, IJobCancellationToken cancellationToken);
 
     }
 }

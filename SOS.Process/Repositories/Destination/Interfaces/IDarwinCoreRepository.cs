@@ -14,6 +14,13 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     public interface IDarwinCoreRepository : IProcessBaseRepository<DarwinCore<DynamicProperties>, ObjectId>
     {
         /// <summary>
+        /// Add many items 
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        new Task<int> AddManyAsync(IEnumerable<DarwinCore<DynamicProperties>> items);
+
+        /// <summary>
         /// Create search index
         /// </summary>
         /// <returns></returns>

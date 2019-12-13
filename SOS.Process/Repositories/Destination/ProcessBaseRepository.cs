@@ -353,7 +353,7 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task VerifyCollectionAsync()
+        public virtual async Task VerifyCollectionAsync()
         {
             //filter by collection name
             var exists = (await Database

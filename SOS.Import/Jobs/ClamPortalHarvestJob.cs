@@ -46,7 +46,7 @@ namespace SOS.Import.Jobs
             await _harvestInfoRepository.AddOrUpdateAsync(result);
             
             // return result of all harvests
-            return result.Status.Equals(HarvestStatus.Succeded);
+            return result.Status.Equals(RunStatus.Success);
         }
     }
 }

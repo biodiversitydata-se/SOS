@@ -11,6 +11,7 @@ using SOS.Export.Factories;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
+using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
@@ -43,6 +44,7 @@ namespace SOS.Export.Test.Factories
                         exportConfiguration.MongoDbConfiguration.DatabaseName,
                         exportConfiguration.MongoDbConfiguration.BatchSize),
                     new Mock<ILogger<ProcessedDarwinCoreRepository>>().Object),
+                new Mock<IProcessInfoRepository>().Object,
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,
                 new FileDestination { Path = exportConfiguration.FileDestination.Path },
