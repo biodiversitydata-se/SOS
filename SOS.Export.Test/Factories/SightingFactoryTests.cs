@@ -61,6 +61,16 @@ namespace SOS.Export.Test.Factories
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new SightingFactory(
+                null,
+                _processedDarwinCoreRepositoryMock.Object,
+                _processInfoRepositoryMock.Object,
+                _fileServiceMock.Object,
+                _blobStorageServiceMock.Object,
+                new FileDestination { Path = "test" },
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("dwcArchiveFileWriter");
+
+            create = () => new SightingFactory(
                 _dwcArchiveFileWriterMock.Object,
                 null,
                 _processInfoRepositoryMock.Object,
@@ -73,7 +83,6 @@ namespace SOS.Export.Test.Factories
             create = () => new SightingFactory(
                 _dwcArchiveFileWriterMock.Object,
                 _processedDarwinCoreRepositoryMock.Object,
-                _processInfoRepositoryMock.Object,
                 null,
                 _fileServiceMock.Object,
                 _blobStorageServiceMock.Object,
