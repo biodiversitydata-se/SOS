@@ -3,6 +3,7 @@ using System.Net;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Enums;
 using SOS.Process.Jobs.Interfaces;
 
 namespace SOS.Hangfire.UI.Controllers
@@ -12,21 +13,39 @@ namespace SOS.Hangfire.UI.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class SystemJobController : ControllerBase, Interfaces.ISystemJobController
+    public class InstanceJobController : ControllerBase, Interfaces.IInstanceJobController
     {
-        private readonly ILogger<SystemJobController> _logger;
+        private readonly ILogger<InstanceJobController> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="logger"></param>
-        public SystemJobController(ILogger<SystemJobController> logger)
+        public InstanceJobController(ILogger<InstanceJobController> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        [HttpPost("Instance/Activate")]
+        [HttpPost("Copy")]
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public IActionResult RunCopyProviderData(DataProvider provider)
+        {
+            try
+            {
+                BackgroundJob.Enqueue<ICopyProviderDataJob>(job => job.RunAsync(provider));
+                return new OkObjectResult("Started copy provider data job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Starting copy provider data failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Activate")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

@@ -35,7 +35,7 @@ namespace SOS.Process.Repositories.Destination
         /// </summary>
         private bool _disposed;
 
-        protected readonly string _collectionName;
+        protected string _collectionName;
         private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace SOS.Process.Repositories.Destination
             // Init config
             InitializeConfiguration();
             
-            _collectionName = toggleable ? $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ InstanceToUpdate }" : $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }";
+            _collectionName = toggleable ? GetTogglableInstanceName(InstanceToUpdate) : $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }";
         }
 
         private async Task<bool> AddAsync(TEntity item)
@@ -126,6 +126,8 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
+        protected byte ActiveInstance => (byte)(GetConfiguration()?.ActiveInstance ?? 1);
+
         /// <summary>
         /// Get configuration object
         /// </summary>
@@ -146,12 +148,21 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
+        protected string GetTogglableInstanceName(byte instance)
+        {
+            return $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{instance}";
+        }
+
         /// <summary>
-        /// Check config for instance to update
+        /// 
         /// </summary>
+        /// <param name="instance"></param>
         /// <returns></returns>
-        public byte InstanceToUpdate => (byte)((GetConfiguration()?.ActiveInstance ?? 1) == 0 ? 1 : 0);
-        
+        protected void SetCollectionName(byte instance)
+        {
+            _collectionName = GetTogglableInstanceName(instance);
+        }
+
         protected int BatchSize { get; }
 
         /// <summary>
@@ -310,6 +321,12 @@ namespace SOS.Process.Repositories.Destination
                 return false;
             }
         }
+
+        /// <summary>
+        /// Check config for instance to update
+        /// </summary>
+        /// <returns></returns>
+        public byte InstanceToUpdate => (byte)(ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
         public async Task<TEntity> GetAsync(TKey id)

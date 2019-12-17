@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Enums;
 using SOS.Process.Factories.Interfaces;
 using SOS.Process.Jobs.Interfaces;
 
@@ -9,7 +10,7 @@ namespace SOS.Process.Jobs
     /// <summary>
     /// Species portal harvest
     /// </summary>
-    public class ActivateInstanceJob : IActivateInstanceJob
+    public class CopyProviderDataJob : ICopyProviderDataJob
     {
         private readonly IInstanceFactory _instanceFactory;
         private readonly ILogger<ActivateInstanceJob> _logger;
@@ -19,7 +20,7 @@ namespace SOS.Process.Jobs
         /// </summary>
         /// <param name="instanceFactory"></param>
         /// <param name="logger"></param>
-        public ActivateInstanceJob(
+        public CopyProviderDataJob(
             IInstanceFactory instanceFactory,
             ILogger<ActivateInstanceJob> logger)
         {
@@ -28,16 +29,16 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(byte instance)
+        public async Task<bool> RunAsync(DataProvider provider)
         {
             try
             {
                 // Activate passed instance
-                return await _instanceFactory.SetActiveInstanceAsync(instance);
+                return await _instanceFactory.CopyProviderDataAsync(provider);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to active instance");
+                _logger.LogError(e, "Failed to copy provider data");
                 return false;
             }
         }

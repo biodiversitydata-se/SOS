@@ -15,13 +15,13 @@ namespace SOS.Process.Factories
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="DarwinCoreRepository"></param>
+        /// <param name="darwinCoreRepository"></param>
         /// <param name="logger"></param>
         public ProcessBaseFactory(
-            IDarwinCoreRepository DarwinCoreRepository,
+            IDarwinCoreRepository darwinCoreRepository,
             ILogger<TEntity> logger)
         {
-            ProcessRepository = DarwinCoreRepository ?? throw new ArgumentNullException(nameof(DarwinCoreRepository));
+            ProcessRepository = darwinCoreRepository ?? throw new ArgumentNullException(nameof(darwinCoreRepository));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
     }

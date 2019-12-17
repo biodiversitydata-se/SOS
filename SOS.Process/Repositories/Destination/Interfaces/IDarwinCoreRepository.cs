@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Process.Repositories.Destination.Interfaces
 {
@@ -19,6 +17,13 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// <param name="items"></param>
         /// <returns></returns>
         new Task<int> AddManyAsync(IEnumerable<DarwinCore<DynamicProperties>> items);
+
+        /// <summary>
+        /// Copy provider data from active instance to inactive instance
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <returns></returns>
+        Task<bool> CopyProviderDataAsync(DataProvider provider);
 
         /// <summary>
         /// Create search index

@@ -54,11 +54,13 @@ namespace SOS.Process.IoC.Modules
 
             // Add factories
             builder.RegisterType<ClamPortalProcessFactory>().As<IClamPortalProcessFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<InstanceFactory>().As<IInstanceFactory>().InstancePerLifetimeScope();
             builder.RegisterType<KulProcessFactory>().As<IKulProcessFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalProcessFactory>().As<ISpeciesPortalProcessFactory>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();
+            builder.RegisterType<CopyProviderDataJob>().As<ICopyProviderDataJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessJob>().As<IProcessJob>().InstancePerLifetimeScope();
         }
     }

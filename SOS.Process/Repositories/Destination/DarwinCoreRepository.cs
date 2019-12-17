@@ -80,6 +80,8 @@ namespace SOS.Process.Repositories.Destination
             return invalidItems.Any() ? invalidItems : null;
         }
 
+        private new IMongoCollection<DarwinCore<DynamicProperties>> MongoCollection => Database.GetCollection<DarwinCore<DynamicProperties>>(_collectionName);
+
         /// <inheritdoc />
         public async Task<int> AddManyAsync(IEnumerable<DarwinCore<DynamicProperties>> items)
         {
@@ -97,6 +99,22 @@ namespace SOS.Process.Repositories.Destination
 
             // Save inadequate items 
             return success ? items.Count() : 0;
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> CopyProviderDataAsync(DataProvider provider)
+        {
+            // Get data from active instance
+            SetCollectionName(ActiveInstance);
+            
+            var source = await
+                MongoCollection.FindAsync(
+                    Builders<DarwinCore<DynamicProperties>>.Filter.Eq(dwc => dwc.Provider, provider));
+
+            // switch to inactive instance and add data 
+            SetCollectionName(InstanceToUpdate);
+
+            return await AddManyAsync(source.ToEnumerable()) != 0;
         }
 
         /// <inheritdoc />
