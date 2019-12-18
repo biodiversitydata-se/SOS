@@ -26,7 +26,7 @@ namespace SOS.Process.Jobs
     /// </summary>
     public class ProcessJob : IProcessJob
     {
-        private readonly IDarwinCoreRepository _processRepository;
+        private readonly IDarwinCoreRepository _darwinCoreRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ISpeciesPortalProcessFactory _speciesPortalProcessFactory;
@@ -39,7 +39,7 @@ namespace SOS.Process.Jobs
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processRepository"></param>
+        /// <param name="darwinCoreRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="clamPortalProcessFactory"></param>
@@ -49,7 +49,7 @@ namespace SOS.Process.Jobs
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
         public ProcessJob(
-            IDarwinCoreRepository processRepository,
+            IDarwinCoreRepository darwinCoreRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IClamPortalProcessFactory clamPortalProcessFactory,
@@ -59,11 +59,11 @@ namespace SOS.Process.Jobs
             IAreaHelper areaHelper,
             ILogger<ProcessJob> logger)
         {
-            _processRepository = processRepository ?? throw new ArgumentNullException(nameof(processRepository));
+            _darwinCoreRepository = darwinCoreRepository ?? throw new ArgumentNullException(nameof(darwinCoreRepository));
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
-            _kulProcessFactory = kulProcessFactory;
             _clamPortalProcessFactory = clamPortalProcessFactory ?? throw new ArgumentNullException(nameof(clamPortalProcessFactory));
+            _kulProcessFactory = kulProcessFactory ?? throw new ArgumentNullException(nameof(kulProcessFactory));
             _speciesPortalProcessFactory = speciesPortalProcessFactory ?? throw new ArgumentNullException(nameof(speciesPortalProcessFactory));
             _taxonVerbatimRepository = taxonVerbatimRepository ?? throw new ArgumentNullException(nameof(taxonVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -107,7 +107,7 @@ namespace SOS.Process.Jobs
                 _logger.LogDebug("Verify collection");
                
                 // Make sure we have a collection
-                await _processRepository.VerifyCollectionAsync();
+                await _darwinCoreRepository.VerifyCollectionAsync();
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 var currentHarvestInfo = (await _harvestInfoRepository.GetAllAsync())?.ToArray();
@@ -160,12 +160,12 @@ namespace SOS.Process.Jobs
                 if (success)
                 {
                     _logger.LogDebug("Create indexes");
-                    await _processRepository.CreateIndexAsync();
+                    await _darwinCoreRepository.CreateIndexAsync();
 
                     if (toggleInstanceOnSuccess)
                     {
                         _logger.LogDebug("Toggle instance");
-                        await _processRepository.SetActiveInstanceAsync(_processRepository.InstanceToUpdate);
+                        await _darwinCoreRepository.SetActiveInstanceAsync(_darwinCoreRepository.InstanceToUpdate);
                     }
                 }
 
@@ -185,7 +185,7 @@ namespace SOS.Process.Jobs
                 await _processInfoRepository.VerifyCollectionAsync();
 
                 // Get saved process info or create new object. 
-                var processInfo = await _processInfoRepository.GetAsync(_processRepository.InstanceToUpdate) ?? new ProcessInfo(_processRepository.InstanceToUpdate);
+                var processInfo = await _processInfoRepository.GetAsync(_darwinCoreRepository.InstanceToUpdate) ?? new ProcessInfo(_darwinCoreRepository.InstanceToUpdate);
 
                 // Update process info
                 processInfo.End = DateTime.Now;
@@ -194,7 +194,7 @@ namespace SOS.Process.Jobs
                 processInfo.ProviderInfo = providerInfo.Values.Union(processInfo.ProviderInfo.Where(pi => !providerInfo.Values.Select(v => v.Provider).Contains(pi.Provider)));
 
                 // Save process info
-                await _processInfoRepository.AddOrUpdateAsync(processInfo);
+                success = success && await _processInfoRepository.AddOrUpdateAsync(processInfo);
 
                 _logger.LogDebug("Persist area cache");
                 _areaHelper.PersistCache();

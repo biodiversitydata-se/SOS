@@ -13,7 +13,7 @@ namespace SOS.Process.Jobs
     public class CopyProviderDataJob : ICopyProviderDataJob
     {
         private readonly IInstanceFactory _instanceFactory;
-        private readonly ILogger<ActivateInstanceJob> _logger;
+        private readonly ILogger<CopyProviderDataJob> _logger;
 
         /// <summary>
         /// Constructor
@@ -22,7 +22,7 @@ namespace SOS.Process.Jobs
         /// <param name="logger"></param>
         public CopyProviderDataJob(
             IInstanceFactory instanceFactory,
-            ILogger<ActivateInstanceJob> logger)
+            ILogger<CopyProviderDataJob> logger)
         {
             _instanceFactory = instanceFactory ?? throw new ArgumentNullException(nameof(instanceFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

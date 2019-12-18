@@ -12,23 +12,19 @@ namespace SOS.Process.Factories
     public class InstanceFactory : ProcessBaseFactory<InstanceFactory>, Interfaces.IInstanceFactory
     {
         private readonly IProcessInfoRepository _processInfoRepository;
-        private readonly IDarwinCoreRepository _processRepository;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="darwinCoreRepository"></param>
         /// <param name="processInfoRepository"></param>
-        /// <param name="processRepository"></param>
         /// <param name="logger"></param>
         public InstanceFactory(
             IDarwinCoreRepository darwinCoreRepository,
             IProcessInfoRepository processInfoRepository,
-            IDarwinCoreRepository processRepository,
-        ILogger<InstanceFactory> logger) : base(darwinCoreRepository, logger)
+            ILogger<InstanceFactory> logger) : base(darwinCoreRepository, logger)
         {
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
-            _processRepository = processRepository ?? throw new ArgumentNullException(nameof(processRepository));
         }
 
         /// <inheritdoc />
@@ -65,7 +61,7 @@ namespace SOS.Process.Factories
             {
                 Logger.LogDebug($"Activating instance: { instance }");
 
-                return await _processRepository.SetActiveInstanceAsync(instance);
+                return await ProcessRepository.SetActiveInstanceAsync(instance);
             }
             catch (Exception e)
             {
