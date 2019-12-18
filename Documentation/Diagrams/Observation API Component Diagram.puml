@@ -13,10 +13,16 @@ Container_Boundary(api, "Observation API") {
     ContainerDb(mongodb_sos_processed, "sos-processed", "MongoDB 4.x", "Stores processed species observations in DwC format")    
     Container(doi_file_storage, "DOI File Storage", "Azure BLOB storage", "Stores DOI DwC-A files.\nStored indefinitely.")
     Container(file_storage, "File Storage", "NTFS", "Stores DwC-A files.\nStored 1 week.")
-    
+    Component(job_server, "SOS.Hangfire.JobServer", ".Net Core service application", "Hangfire job server that executes scheduled & on demand tasks.")
+
     Rel(observation_api, mongodb_sos_processed, "Read from")
     Rel(observation_api, doi_file_storage, "Read from")
     Rel(observation_api, file_storage, "Read from")
+    Rel(observation_api, job_server, "Start long running tasks")
+
+    'Rel_U(job_server, mongodb_sos_processed, "Reads from")
+    'Rel_U(job_server, doi_file_storage, "Reads from")
+    'Rel_U(job_server, file_storage, "Reads & writes to")
 }
 
 ' Relations
