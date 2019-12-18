@@ -37,32 +37,86 @@ namespace SOS.Export.IO.DwcArchive
             processEndAttribute.Value = processInfo.End.ToString("O");
             processNode.Attributes.Append(processEndAttribute);
 
-            if (processInfo.VerbatimInfo != null)
+            var processSuccessAttribute = doc.CreateAttribute("success");
+            processSuccessAttribute.Value = processInfo.Success.ToString();
+            processNode.Attributes.Append(processSuccessAttribute);
+
+            if (processInfo.ProviderInfo != null)
             {
                 // Add verbatim info
-                foreach (var verbatimInfo in processInfo.VerbatimInfo)
+                foreach (var providerInfo in processInfo.ProviderInfo)
                 {
-                    var verbatimInfoNode = CreateHarvestInfoNode(doc, "verbatim", verbatimInfo);
+                    var providerInfoNode = CreateProviderInfoNode(doc, "verbatim", providerInfo);
 
-                    if (verbatimInfo.Metadata == null)
+                    if (providerInfo.HarvestMetadata != null)
                     {
-                        continue;
+                        // Add verbatim info
+                        foreach (var metadata in providerInfo.HarvestMetadata)
+                        {
+                            var metadataNode = CreateHarvestInfoNode(doc, "metadata", metadata);
+
+                            providerInfoNode.AppendChild(metadataNode);
+                        }
                     }
 
-                    // Add verbatim info
-                    foreach (var metadata in verbatimInfo.Metadata)
-                    {
-                        var metadataNode = CreateHarvestInfoNode(doc, "metadata", metadata);
-
-                        verbatimInfoNode.AppendChild(metadataNode);
-                    }
-
-                    processNode.AppendChild(verbatimInfoNode);
+                    processNode.AppendChild(providerInfoNode);
                 }
             }
 
             doc.AppendChild(processNode);
             doc.Save(stream);
+        }
+
+        /// <summary>
+        /// Create a provider information node
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="nodeName"></param>
+        /// <param name="providerInfo"></param>
+        /// <returns></returns>
+        private static XmlNode CreateProviderInfoNode(XmlDocument doc, string nodeName, ProviderInfo providerInfo)
+        {
+            // Create new node
+            var providerInfoNode = doc.CreateElement(nodeName, _elementNamespace);
+
+            // Add verbatim info attributes
+            var providerAttribute = doc.CreateAttribute("provider");
+            providerAttribute.Value = providerInfo.Provider.ToString();
+            providerInfoNode.Attributes.Append(providerAttribute);
+
+            var harvestCountAttribute = doc.CreateAttribute("harvest-count");
+            harvestCountAttribute.Value = providerInfo.HarvestCount.ToString();
+            providerInfoNode.Attributes.Append(harvestCountAttribute);
+
+            var harvestStartAttribute = doc.CreateAttribute("harvest-start");
+            harvestStartAttribute.Value = providerInfo.HarvestStart.ToString("O");
+            providerInfoNode.Attributes.Append(harvestStartAttribute);
+
+            var harvestEndAttribute = doc.CreateAttribute("harvest-end");
+            harvestEndAttribute.Value = providerInfo.HarvestEnd.ToString("O");
+            providerInfoNode.Attributes.Append(harvestEndAttribute);
+
+            var harvestStatusAttribute = doc.CreateAttribute("harvest-end");
+            harvestStatusAttribute.Value = providerInfo.HarvestStatus.ToString();
+            providerInfoNode.Attributes.Append(harvestStatusAttribute);
+
+            var processCountAttribute = doc.CreateAttribute("process-count");
+            processCountAttribute.Value = providerInfo.ProcessCount.ToString();
+            providerInfoNode.Attributes.Append(processCountAttribute);
+
+            var processStartAttribute = doc.CreateAttribute("process-start");
+            processStartAttribute.Value = providerInfo.ProcessStart.ToString("O");
+            providerInfoNode.Attributes.Append(processStartAttribute);
+
+            var processEndAttribute = doc.CreateAttribute("process-end");
+            processEndAttribute.Value = providerInfo.ProcessEnd.ToString("O");
+            providerInfoNode.Attributes.Append(processEndAttribute);
+
+            var processStatusAttribute = doc.CreateAttribute("process-end");
+            processStatusAttribute.Value = providerInfo.ProcessStatus.ToString();
+            providerInfoNode.Attributes.Append(processStatusAttribute);
+
+            return providerInfoNode;
         }
 
         /// <summary>

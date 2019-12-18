@@ -14,6 +14,7 @@ using SOS.Export.Repositories;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Models.Processed.ProcessInfo;
 using Xunit;
 
 namespace SOS.Export.Test.IO.DwcArchive

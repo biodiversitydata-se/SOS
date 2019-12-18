@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Models.Shared.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
@@ -25,7 +26,7 @@ namespace SOS.Process.Jobs
     /// </summary>
     public class ProcessJob : IProcessJob
     {
-        private readonly IDarwinCoreRepository _processRepository;
+        private readonly IDarwinCoreRepository _darwinCoreRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ISpeciesPortalProcessFactory _speciesPortalProcessFactory;
@@ -38,7 +39,7 @@ namespace SOS.Process.Jobs
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processRepository"></param>
+        /// <param name="darwinCoreRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="clamPortalProcessFactory"></param>
@@ -48,7 +49,7 @@ namespace SOS.Process.Jobs
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
         public ProcessJob(
-            IDarwinCoreRepository processRepository,
+            IDarwinCoreRepository darwinCoreRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IClamPortalProcessFactory clamPortalProcessFactory,
@@ -58,11 +59,11 @@ namespace SOS.Process.Jobs
             IAreaHelper areaHelper,
             ILogger<ProcessJob> logger)
         {
-            _processRepository = processRepository ?? throw new ArgumentNullException(nameof(processRepository));
+            _darwinCoreRepository = darwinCoreRepository ?? throw new ArgumentNullException(nameof(darwinCoreRepository));
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
-            _kulProcessFactory = kulProcessFactory;
             _clamPortalProcessFactory = clamPortalProcessFactory ?? throw new ArgumentNullException(nameof(clamPortalProcessFactory));
+            _kulProcessFactory = kulProcessFactory ?? throw new ArgumentNullException(nameof(kulProcessFactory));
             _speciesPortalProcessFactory = speciesPortalProcessFactory ?? throw new ArgumentNullException(nameof(speciesPortalProcessFactory));
             _taxonVerbatimRepository = taxonVerbatimRepository ?? throw new ArgumentNullException(nameof(taxonVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -106,14 +107,12 @@ namespace SOS.Process.Jobs
                 _logger.LogDebug("Verify collection");
                
                 // Make sure we have a collection
-                await _processRepository.VerifyCollectionAsync();
+                await _darwinCoreRepository.VerifyCollectionAsync();
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 var currentHarvestInfo = (await _harvestInfoRepository.GetAllAsync())?.ToArray();
-                var verbatimInfo = new List<VerbatimInfo>();
-
-                // Create task list
-                var processTasks = new Dictionary<DataProvider, Task<bool>>();
+                var providerInfo = new Dictionary<DataProvider, ProviderInfo>();
+                var processTasks = new Dictionary<DataProvider, Task<RunInfo>>();
 
                 // Add species portal import if first bit is set
                 if ((sources & (int)DataProvider.Artdatabanken) > 0)
@@ -121,13 +120,11 @@ namespace SOS.Process.Jobs
                     processTasks.Add(DataProvider.Artdatabanken, _speciesPortalProcessFactory.ProcessAsync(taxa, cancellationToken));
 
                     var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(APSightingVerbatim))) ?? new HarvestInfo(nameof(APSightingVerbatim), DataProvider.Artdatabanken, DateTime.MinValue);
+
                     //Add information about harvest
-                    verbatimInfo.Add(new VerbatimInfo(nameof(APSightingVerbatim), DataProvider.Artdatabanken, harvestInfo.Start)
-                    {
-                        End = harvestInfo.End,
-                        Count = harvestInfo.Count,
-                        Metadata = currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon))).ToArray()
-                    });
+                    providerInfo.Add(DataProvider.Artdatabanken, CreateProviderInfo(DataProvider.Artdatabanken, harvestInfo,
+                        currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon))).ToArray())
+                    );
                 }
 
                 if ((sources & (int)DataProvider.ClamPortal) > 0)
@@ -135,13 +132,11 @@ namespace SOS.Process.Jobs
                     processTasks.Add(DataProvider.ClamPortal, _clamPortalProcessFactory.ProcessAsync(taxa, cancellationToken));
 
                     var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(ClamObservationVerbatim))) ?? new HarvestInfo(nameof(ClamObservationVerbatim), DataProvider.ClamPortal, DateTime.MinValue);
+                    
                     //Add information about harvest
-                    verbatimInfo.Add(new VerbatimInfo(nameof(ClamObservationVerbatim), DataProvider.ClamPortal, harvestInfo.Start)
-                    {
-                        End = harvestInfo.End,
-                        Count = harvestInfo.Count,
-                        Metadata = currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon)) || hi.Id.Equals(nameof(Area))).ToArray(),
-                    });
+                    providerInfo.Add(DataProvider.ClamPortal, CreateProviderInfo(DataProvider.ClamPortal, harvestInfo,
+                        currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon)) || hi.Id.Equals(nameof(Area))).ToArray())
+                    );
                 }
 
                 if ((sources & (int)DataProvider.KUL) > 0)
@@ -149,48 +144,57 @@ namespace SOS.Process.Jobs
                     processTasks.Add(DataProvider.KUL, _kulProcessFactory.ProcessAsync(taxa, cancellationToken));
 
                     var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(KulObservationVerbatim))) ?? new HarvestInfo(nameof(KulObservationVerbatim), DataProvider.KUL, DateTime.MinValue);
+
                     //Add information about harvest
-                    verbatimInfo.Add(new VerbatimInfo(nameof(KulObservationVerbatim), DataProvider.KUL, harvestInfo.Start)
-                    {
-                        End = harvestInfo.End,
-                        Count = harvestInfo.Count,
-                        Metadata = currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon)) || hi.Id.Equals(nameof(Area))).ToArray(),
-                    });
+                    providerInfo.Add(DataProvider.KUL, CreateProviderInfo(DataProvider.KUL, harvestInfo,
+                        currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon)) || hi.Id.Equals(nameof(Area))).ToArray())
+                    );
                 }
 
                 // Run all tasks async
                 await Task.WhenAll(processTasks.Values);
 
-                var success = processTasks.Values.All(t => t.Result);
+                var success = processTasks.Values.All(t => t.Result.Status == RunStatus.Success);
 
                 // Create index if great success
                 if (success)
                 {
                     _logger.LogDebug("Create indexes");
-                    await _processRepository.CreateIndexAsync();
-
-                    // Add metadata about processing to db
-                    await _processInfoRepository.VerifyCollectionAsync();
-
-                    // Get saved process info or create new object. 
-                    var processInfo = await _processInfoRepository.GetAsync(_processRepository.InstanceToUpdate) ?? new ProcessInfo(_processRepository.InstanceToUpdate);
-
-                    // Update process info
-                    processInfo.End = DateTime.Now;
-                    processInfo.Start = start;                      // Merge current verbatim info with our new data
-                    processInfo.VerbatimInfo = verbatimInfo.Union(processInfo.VerbatimInfo.Where(vi => !verbatimInfo.Select(v => v.Id).Contains(vi.Id)));
-                    
-                    // Save process info
-                    await _processInfoRepository.AddOrUpdateAsync(processInfo);
+                    await _darwinCoreRepository.CreateIndexAsync();
 
                     if (toggleInstanceOnSuccess)
                     {
                         _logger.LogDebug("Toggle instance");
-                        await _processRepository.SetActiveInstanceAsync(_processRepository.InstanceToUpdate);
+                        await _darwinCoreRepository.SetActiveInstanceAsync(_darwinCoreRepository.InstanceToUpdate);
                     }
                 }
 
                 _logger.LogDebug($"Processing done: {success}");
+
+                // Update provider info from process result
+                foreach (var task in processTasks)
+                {
+                    var vi = providerInfo[task.Key];
+                    vi.ProcessCount = task.Value.Result.Count;
+                    vi.ProcessEnd = task.Value.Result.End;
+                    vi.ProcessStart = task.Value.Result.Start;
+                    vi.ProcessStatus = task.Value.Result.Status;
+                }
+
+                // Add metadata about processing to db
+                await _processInfoRepository.VerifyCollectionAsync();
+
+                // Get saved process info or create new object. 
+                var processInfo = await _processInfoRepository.GetAsync(_darwinCoreRepository.InstanceToUpdate) ?? new ProcessInfo(_darwinCoreRepository.InstanceToUpdate);
+
+                // Update process info
+                processInfo.End = DateTime.Now;
+                processInfo.Start = start;
+                processInfo.Success = success;                      // Merge current verbatim info with our new data
+                processInfo.ProviderInfo = providerInfo.Values.Union(processInfo.ProviderInfo.Where(pi => !providerInfo.Values.Select(v => v.Provider).Contains(pi.Provider)));
+
+                // Save process info
+                success = success && await _processInfoRepository.AddOrUpdateAsync(processInfo);
 
                 _logger.LogDebug("Persist area cache");
                 _areaHelper.PersistCache();
@@ -208,6 +212,25 @@ namespace SOS.Process.Jobs
                 _logger.LogError(e, "Process job failed");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Create provider information object
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <param name="harvestInfo"></param>
+        /// <param name="metadata"></param>
+        /// <returns></returns>
+        private ProviderInfo CreateProviderInfo(DataProvider provider, HarvestInfo harvestInfo, IEnumerable<HarvestInfo> metadata)
+        {
+            return new ProviderInfo(DataProvider.ClamPortal)
+            {
+                HarvestEnd = harvestInfo.End,
+                HarvestCount = harvestInfo.Count,
+                HarvestMetadata = metadata,
+                HarvestStart = harvestInfo.Start,
+                HarvestStatus = harvestInfo.Status
+            };
         }
     }
 }

@@ -1,37 +1,29 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Lib.Enums;
-using SOS.Process.Factories;
-using SOS.Lib.Models.Processed.DarwinCore;
-using SOS.Lib.Models.Verbatim.SpeciesPortal;
-using SOS.Process.Repositories.Destination.Interfaces;
-using SOS.Process.Repositories.Source.Interfaces;
+using SOS.Process.Factories.Interfaces;
+using SOS.Process.Jobs;
 using Xunit;
 
-namespace SOS.Process.Test.Factories
+namespace SOS.Process.Test.Jobs
 {
     /// <summary>
-    /// Tests for sighting factory
+    /// Tests for activate instance job
     /// </summary>
-    public class SpeciesPortalProcessFactoryTests
+    public class ActivateInstanceJobTests
     {
-        private readonly Mock<ISpeciesPortalVerbatimRepository> _speciesPortalVerbatimRepository;
-        private readonly Mock<IDarwinCoreRepository> _DarwinCoreRepository;
-        private readonly Mock<ILogger<SpeciesPortalProcessFactory>> _loggerMock;
+        private readonly Mock<IInstanceFactory> _instanceFactoryMock;
+        private readonly Mock<ILogger<ActivateInstanceJob>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public SpeciesPortalProcessFactoryTests()
+        public ActivateInstanceJobTests()
         {
-            _speciesPortalVerbatimRepository = new Mock<ISpeciesPortalVerbatimRepository>();
-            _DarwinCoreRepository = new Mock<IDarwinCoreRepository>();
-            _loggerMock = new Mock<ILogger<SpeciesPortalProcessFactory>>();
+            _instanceFactoryMock = new Mock<IInstanceFactory>();
+            _loggerMock = new Mock<ILogger<ActivateInstanceJob>>();
         }
 
         /// <summary>
@@ -40,27 +32,19 @@ namespace SOS.Process.Test.Factories
         [Fact]
         public void ConstructorTest()
         {
-            new SpeciesPortalProcessFactory(
-                _speciesPortalVerbatimRepository.Object,
-                _DarwinCoreRepository.Object,
+            new ActivateInstanceJob(
+                _instanceFactoryMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new SpeciesPortalProcessFactory(
-                null,
-                _DarwinCoreRepository.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesPortalVerbatimRepository");
-
-            create = () => new SpeciesPortalProcessFactory(
-                _speciesPortalVerbatimRepository.Object,
+            Action create = () => new ActivateInstanceJob(
                 null,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("DarwinCoreRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("instanceFactory");
 
-            create = () => new SpeciesPortalProcessFactory(
-                _speciesPortalVerbatimRepository.Object,
-                _DarwinCoreRepository.Object,
-                null);
+            
+            create = () => new ActivateInstanceJob(
+                _instanceFactoryMock.Object,
+               null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
@@ -69,40 +53,27 @@ namespace SOS.Process.Test.Factories
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task ProcessAsyncSuccess()
+        public async Task RunAsyncSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-
-            _speciesPortalVerbatimRepository.Setup(r => r.GetBatchAsync(0))
-                .ReturnsAsync(new [] { new APSightingVerbatim
-                {
-                    Id = 1
-                } });
-
-            _DarwinCoreRepository.Setup(r => r.AddManyAsync(It.IsAny<ICollection<DarwinCore<DynamicProperties>>>()))
-                .ReturnsAsync(1);
-
-            var taxa = new Dictionary<int, DarwinCoreTaxon>
-            {
-                { 0, new DarwinCoreTaxon { TaxonID = "0", ScientificName = "Biota" } }
-            };
+            _instanceFactoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
+                .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
-                _speciesPortalVerbatimRepository.Object,
-                _DarwinCoreRepository.Object,
+            var job = new ActivateInstanceJob(
+                _instanceFactoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
+            var result = await job.RunAsync(It.IsAny<byte>());
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Status.Should().Be(RunStatus.Success);
+            result.Should().BeTrue();
         }
 
         /// <summary>
@@ -110,26 +81,26 @@ namespace SOS.Process.Test.Factories
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task AggregateAsyncFail()
+        public async Task RunAsyncFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-           
+
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
-                _speciesPortalVerbatimRepository.Object,
-                _DarwinCoreRepository.Object,
+            var job = new ActivateInstanceJob(
+                _instanceFactoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await job.RunAsync(It.IsAny<byte>());
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Status.Should().Be(RunStatus.Failed);
+            result.Should().BeFalse();
         }
 
         /// <summary>
@@ -137,28 +108,26 @@ namespace SOS.Process.Test.Factories
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task ProcessAsyncException()
+        public async Task RunAsyncException()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-
-            _speciesPortalVerbatimRepository.Setup(r => r.GetBatchAsync(0))
+            _instanceFactoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
                 .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
-                _speciesPortalVerbatimRepository.Object,
-                _DarwinCoreRepository.Object,
+            var job = new ActivateInstanceJob(
+                _instanceFactoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await job.RunAsync(It.IsAny<byte>());
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Status.Should().Be(RunStatus.Failed);
+            result.Should().BeFalse();
         }
     }
 }

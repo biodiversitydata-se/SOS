@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Enums;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.Taxon.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
@@ -52,7 +51,6 @@ namespace SOS.Import.Factories
             var harvestInfo = new HarvestInfo(nameof(DarwinCoreTaxon), DataProvider.Artdatabanken, DateTime.Now);
             try
             {
-                var start = DateTime.Now;
                 _logger.LogDebug("Start storing taxa verbatim");
                 var taxa = await _taxonService.GetTaxaAsync();
 
@@ -74,13 +72,13 @@ namespace SOS.Import.Factories
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;
-                harvestInfo.Status = HarvestStatus.Succeded;
+                harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = taxa?.Count() ?? 0;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed harvest taxa");
-                harvestInfo.Status = HarvestStatus.Failed;
+                harvestInfo.Status = RunStatus.Failed;
             }
 
             return harvestInfo;

@@ -80,13 +80,11 @@ namespace SOS.Process.Repositories.Destination
             return invalidItems.Any() ? invalidItems : null;
         }
 
-        /// <inheritdoc />
-        public override async Task<bool> AddManyAsync(IEnumerable<DarwinCore<DynamicProperties>> items)
-        {
-            // Make sure inadequate collection is empty 
-            await _inadequateItemRepository.DeleteCollectionAsync();
-            await _inadequateItemRepository.AddCollectionAsync();
+        private new IMongoCollection<DarwinCore<DynamicProperties>> MongoCollection => Database.GetCollection<DarwinCore<DynamicProperties>>(_collectionName);
 
+        /// <inheritdoc />
+        public async Task<int> AddManyAsync(IEnumerable<DarwinCore<DynamicProperties>> items)
+        {
             // Separate adequate and inadequate data
             var inadequateItems = Validate(ref items);
 
@@ -94,13 +92,29 @@ namespace SOS.Process.Repositories.Destination
             var success = await base.AddManyAsync(items);
             
             // No inadequate items, we are done here
-            if (!inadequateItems?.Any() ?? true)
+            if (success && (inadequateItems?.Any() ?? false))
             {
-                return success;
+                await _inadequateItemRepository.AddManyAsync(inadequateItems);
             }
 
             // Save inadequate items 
-            return success && await _inadequateItemRepository.AddManyAsync(inadequateItems);
+            return success ? items.Count() : 0;
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> CopyProviderDataAsync(DataProvider provider)
+        {
+            // Get data from active instance
+            SetCollectionName(ActiveInstance);
+            
+            var source = await
+                MongoCollection.FindAsync(
+                    Builders<DarwinCore<DynamicProperties>>.Filter.Eq(dwc => dwc.Provider, provider));
+
+            // switch to inactive instance and add data 
+            SetCollectionName(InstanceToUpdate);
+
+            return await AddManyAsync(source.ToEnumerable()) != 0;
         }
 
         /// <inheritdoc />
@@ -136,6 +150,16 @@ namespace SOS.Process.Repositories.Destination
                 Logger.LogError(e.ToString());
                 return false;
             }
+        }
+
+        /// <inheritdoc />
+        public override async Task VerifyCollectionAsync()
+        {
+            await base.VerifyCollectionAsync();
+
+            // Make sure inadequate collection is empty 
+            await _inadequateItemRepository.DeleteCollectionAsync();
+            await _inadequateItemRepository.AddCollectionAsync();
         }
     }
 }

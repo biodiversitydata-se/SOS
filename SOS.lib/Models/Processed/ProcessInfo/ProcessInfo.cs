@@ -16,7 +16,7 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         public ProcessInfo(byte id)
         {
             Id = id;
-            VerbatimInfo = new List<VerbatimInfo>();
+            ProviderInfo = new List<ProviderInfo>();
         }
 
         /// <summary>
@@ -25,9 +25,9 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         public DateTime End { get; set; }
 
         /// <summary>
-        /// Information about harvest
+        /// Information about providers
         /// </summary>
-        public IEnumerable<VerbatimInfo> VerbatimInfo { get; set; }
+        public IEnumerable<ProviderInfo> ProviderInfo { get; set; }
 
         /// <summary>
         /// Id, equals updated instance (0 or 1)
@@ -39,5 +39,9 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// </summary>
         public DateTime Start { get; set; }
 
+        /// <summary>
+        /// True if process was successful
+        /// </summary>
+        public bool Success { get; set; }
     }
 }

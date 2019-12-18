@@ -222,7 +222,7 @@ namespace SOS.Import.Test.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Status.Should().Be(HarvestStatus.Succeded);
+            result.Status.Should().Be(RunStatus.Success);
         }
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace SOS.Import.Test.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Status.Should().Be(HarvestStatus.Failed);
+            result.Status.Should().Be(RunStatus.Failed);
         }
     }
 }

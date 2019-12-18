@@ -62,19 +62,19 @@ namespace SOS.Import.Factories
 
                             // Update harvest info
                             harvestInfo.End = DateTime.Now;
-                            harvestInfo.Status = HarvestStatus.Succeded;
+                            harvestInfo.Status = RunStatus.Success;
                             harvestInfo.Count = areas?.Count() ?? 0;
 
                             return harvestInfo;
                         }
                     }
                 }
-                harvestInfo.Status = HarvestStatus.Failed;
+                harvestInfo.Status = RunStatus.Failed;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed aggregation of areas");
-                harvestInfo.Status = HarvestStatus.Failed;
+                harvestInfo.Status = RunStatus.Failed;
             }
 
             return harvestInfo;

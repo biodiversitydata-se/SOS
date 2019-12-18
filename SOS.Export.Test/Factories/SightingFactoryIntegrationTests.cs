@@ -11,6 +11,7 @@ using SOS.Export.Factories;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
+using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;

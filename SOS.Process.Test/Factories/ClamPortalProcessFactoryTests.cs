@@ -5,8 +5,10 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SOS.Lib.Enums;
 using SOS.Process.Factories;
 using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Shared.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -97,7 +99,7 @@ namespace SOS.Process.Test.Factories
             _areaHelper.Setup(r => r.AddAreaDataToDarwinCore(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()));
 
             _DarwinCoreRepository.Setup(r => r.AddManyAsync(It.IsAny<ICollection<DarwinCore<DynamicProperties>>>()))
-                .ReturnsAsync(true);
+                .ReturnsAsync(1);
 
             var taxa = new Dictionary<int, DarwinCoreTaxon>
             {
@@ -118,7 +120,7 @@ namespace SOS.Process.Test.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeTrue();
+            result.Status.Should().Be(RunStatus.Success);
         }
 
         /// <summary>
@@ -147,7 +149,7 @@ namespace SOS.Process.Test.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeFalse();
+            result.Status.Should().Be(RunStatus.Failed);
         }
 
         /// <summary>
@@ -176,7 +178,7 @@ namespace SOS.Process.Test.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeFalse();
+            result.Status.Should().Be(RunStatus.Failed);
         }
     }
 }

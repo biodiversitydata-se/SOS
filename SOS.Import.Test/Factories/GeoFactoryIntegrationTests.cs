@@ -53,7 +53,7 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Status.Should().Be(HarvestStatus.Succeded);
+            result.Status.Should().Be(RunStatus.Success);
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace SOS.Import.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Status.Should().Be(HarvestStatus.Succeded);
+            result.Status.Should().Be(RunStatus.Success);
         }
     }
 }
