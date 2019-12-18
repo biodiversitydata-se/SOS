@@ -130,14 +130,9 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         public bool ProtectedBySystem { get; set; }
 
         /// <summary>
-        /// Project
-        /// </summary>
-        public Project Project { get; set; }
-
-        /// <summary>
         /// Projects
         /// </summary>
-        public List<Project> Projects { get; set; }
+        public IEnumerable<Project> Projects { get; set; }
 
         /// <summary>
         /// Number of taxa found

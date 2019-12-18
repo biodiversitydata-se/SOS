@@ -1,4 +1,7 @@
-﻿namespace SOS.Lib.Models.Processed.DarwinCore
+﻿using System.Collections.Generic;
+using SOS.Lib.Models.Verbatim.SpeciesPortal;
+
+namespace SOS.Lib.Models.Processed.DarwinCore
 {
     /// <summary>
     /// Not defined in Darwin Core.
@@ -19,19 +22,19 @@
         /// Information about the type of project,
         /// for example 'Environmental monitoring'.
         /// </summary>
-        public string ProjectCategory { get; set; }
+        public string Category { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
         /// Description of a project.
         /// </summary>
-        public string ProjectDescription { get; set; }
+        public string Description { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
         /// Date when the project ends.
         /// </summary>
-        public string ProjectEndDate { get; set; }
+        public string EndDate { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
@@ -44,25 +47,25 @@
         /// (Globally unique identifier).
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string ProjectID { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
         /// Name of the project.
         /// </summary>
-        public string ProjectName { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
         /// Name of person or organization that owns the project.
         /// </summary>
-        public string ProjectOwner { get; set; }
+        public string Owner { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
         /// Date when the project starts.
         /// </summary>
-        public string ProjectStartDate { get; set; }
+        public string StartDate { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
@@ -79,5 +82,15 @@
         /// retrieve species observations.
         /// </summary>
         public string SurveyMethod { get; set; }
+
+        /// <summary>
+        /// Survey method URL.
+        /// </summary>
+        public string SurveyMethodUrl { get; set; }
+
+        /// <summary>
+        /// Project parameters.
+        /// </summary>
+        public IEnumerable<DarwinCoreProjectParameter> ProjectParameters { get; set; }
     }
 }
