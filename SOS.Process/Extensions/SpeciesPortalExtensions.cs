@@ -67,20 +67,7 @@ namespace SOS.Process.Extensions
                     IsPositiveObservation = !(verbatim.NotPresent || verbatim.NotRecovered),
                     OccurrenceURL = $"http://www.artportalen.se/sighting/{verbatim.Id}",
                     Parish = verbatim.Site?.Parish?.Name ?? string.Empty,
-                    Project = verbatim.Project == null
-                        ? null
-                        : new DarwinCoreProject
-                        {
-                            IsPublic = verbatim.Project.IsPublic,
-                            ProjectCategory = verbatim.Project.Category,
-                            ProjectDescription = verbatim.Project.Description,
-                            ProjectEndDate =  verbatim.Project.EndDate?.ToString("yyyy-MM-dd hh:mm"),
-                            ProjectID = verbatim.Project.Id.ToString(),
-                            ProjectName = verbatim.Project.Name,
-                            ProjectOwner = verbatim.Project.Owner,
-                            ProjectStartDate = verbatim.Project.StartDate?.ToString("yyyy-MM-dd hh:mm"),
-                            SurveyMethod = verbatim.Project.SurveyMethod,
-                        },
+                    Projects = verbatim.Projects?.ToDarwinCoreProjects(),
                     ProtectionLevel = CalculateProtectionLevel(taxon, verbatim.HiddenByProvider, verbatim.ProtectedBySystem),
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.ReportedDate,
@@ -92,7 +79,7 @@ namespace SOS.Process.Extensions
                     Habitat = (verbatim.Bioptope != null
                         ? $"{verbatim.Bioptope.Name}{(string.IsNullOrEmpty(verbatim.BiotopeDescription) ? "" : " # ")}{verbatim.BiotopeDescription}"
                         : verbatim.BiotopeDescription).WithMaxLength(255),
-                    SamplingProtocol = verbatim.Project?.SurveyMethod ?? verbatim.Project?.SurveyMethodUrl,
+                    SamplingProtocol = GetSamplingProtocol(verbatim.Projects),
                     VerbatimEventDate = $"{(verbatim.StartDate?.ToString("yyyy-MM-dd hh:mm") ?? "")}{(verbatim.StartDate.HasValue && verbatim.EndDate.HasValue ? "-" : "")}{(verbatim.EndDate?.ToString("yyyy-MM-dd hh:mm") ?? "")}"
                 },
                 Identification = new DarwinCoreIdentification
@@ -173,6 +160,72 @@ namespace SOS.Process.Extensions
         public static ICollection<DarwinCore<DynamicProperties>> ToDarwinCore(this IEnumerable<APSightingVerbatim> verbatims, IDictionary<int, DarwinCoreTaxon> taxa)
         {
             return verbatims.Select(v => v.ToDarwinCore(taxa)).ToArray();
+        }
+
+        private static IEnumerable<DarwinCoreProject> ToDarwinCoreProjects(this IEnumerable<Project> projects)
+        {
+            if (projects == null || !projects.Any()) return null;
+            return projects.Select(p => p.ToDarwinCoreProject());
+        }
+
+        private static DarwinCoreProject ToDarwinCoreProject(this Project project)
+        {
+            if (project == null) return null;
+            
+            return new DarwinCoreProject
+            {
+                IsPublic = project.IsPublic,
+                Category = project.Category,
+                Description = project.Description,
+                EndDate = project.EndDate?.ToString("yyyy-MM-dd hh:mm"),
+                Id = project.Id.ToString(),
+                Name = project.Name,
+                Owner = project.Owner,
+                StartDate = project.StartDate?.ToString("yyyy-MM-dd hh:mm"),
+                SurveyMethod = project.SurveyMethod,
+                SurveyMethodUrl = project.SurveyMethodUrl,
+                ProjectParameters = project.ProjectParameters?.Select(p => p.ToDarwinCoreProjectParameter())
+            };
+        }
+
+        private static DarwinCoreProjectParameter ToDarwinCoreProjectParameter(this ProjectParameter projectParameter)
+        {
+            return new DarwinCoreProjectParameter
+            {
+                Value = projectParameter.Value,
+                DataType = projectParameter.DataType,
+                Description = projectParameter.Description,
+                Name = projectParameter.Name,
+                ProjectId = projectParameter.ProjectId,
+                ProjectParameterId = projectParameter.ProjectParameterId,
+                SightingId = projectParameter.SightingId,
+                Unit = projectParameter.Unit
+            };
+        }
+
+        private static string GetSamplingProtocol(IEnumerable<Project> projects)
+        {
+            if (projects == null || !projects.Any()) return null;
+
+            if (projects.Count() == 1)
+            {
+                var project = projects.First();
+                return project?.SurveyMethod ?? project?.SurveyMethodUrl;
+            }
+
+            var firstSurveyMethod = projects.First().SurveyMethod;
+            if (firstSurveyMethod != null && projects.All(p => p.SurveyMethod == firstSurveyMethod))
+            {
+                return firstSurveyMethod;
+            }
+
+            var firstSurveyMethodUrl = projects.First().SurveyMethodUrl;
+            if (firstSurveyMethodUrl != null && projects.All(p => p.SurveyMethod == firstSurveyMethodUrl))
+            {
+                return firstSurveyMethodUrl;
+            }
+
+            return null;
         }
 
         /// <summary>

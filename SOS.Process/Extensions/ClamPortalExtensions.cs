@@ -35,9 +35,12 @@ namespace SOS.Process.Extensions
                     IsNeverFoundObservation = verbatim.IsNeverFoundObservation,
                     IsNotRediscoveredObservation = verbatim.IsNotRediscoveredObservation,
                     IsPositiveObservation = verbatim.IsPositiveObservation,
-                    Project = string.IsNullOrEmpty(verbatim.ProjectName) ? null : new DarwinCoreProject
+                    Projects = string.IsNullOrEmpty(verbatim.ProjectName) ? null : new[]
                     {
-                        ProjectName = verbatim.ProjectName
+                        new DarwinCoreProject
+                        {
+                            Name = verbatim.ProjectName
+                        }
                     }, 
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.ReportedDate,

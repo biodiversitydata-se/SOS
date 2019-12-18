@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Processed.DarwinCore
 {
@@ -175,10 +176,10 @@ namespace SOS.Lib.Models.Processed.DarwinCore
 
         /// <summary>
         /// Not defined in Darwin Core.
-        /// Information about the project in which this
+        /// Information about the projects in which this
         /// species observation was made.
         /// </summary>
-        public DarwinCoreProject Project { get; set; }
+        public IEnumerable<DarwinCoreProject> Projects { get; set; }
 
         /// <summary>
         /// Protection level
