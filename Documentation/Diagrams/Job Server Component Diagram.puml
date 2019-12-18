@@ -1,6 +1,7 @@
 @startuml
 !includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
 title Component diagram for SOS Job Server
+Container(api_application, "SOS API Application", "C#, .Net Core", "Provides species observations data via a REST JSON/HTTPS API.")
 Container(harvest_api, "SOS Harvest API", "C#, .Net Core", "Provides functionality to change the harvest schedules.")
 Container(job_monitoring_application, "Job Server Monitoring Application", "C#, .Net Core", "Provides functionality to monitor the job server.")
 System_Ext(observation_data_providers, "Species observation data providers", "Artportalen, WRAM, DwC-A, ...")
@@ -34,6 +35,7 @@ Container_Boundary(job_server_container, "Job Server") {
 'Relations
 Rel(import_assembly, observation_data_providers, "Read from", "SQL, HTTPS, File, ...")
 Rel(import_assembly, processing_data_providers, "Read from", "HTTPS")
+Rel(api_application, job_server, "Adds long running tasks")
 Rel(harvest_api, job_server, "Makes API calls to", "JSON/HTTPS")
 Rel(job_monitoring_application, job_server, "Makes API calls to", "JSON/HTTPS")
 @enduml
