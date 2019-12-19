@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -131,6 +132,7 @@ namespace SOS.Import.Factories
                 var (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
                 _logger.LogDebug("Start getting sightings");
                 int nrSightingsHarvested = 0;
+                bool hasAddedTestSightings = false;
 
                 // Loop until all sightings are fetched
                 while (minId <= maxId)
@@ -146,6 +148,12 @@ namespace SOS.Import.Factories
                     
                     // Get chunk of sightings
                     var sightings = (await _sightingRepository.GetChunkAsync(minId, _speciesPortalConfiguration.ChunkSize)).ToArray();
+                    if (_speciesPortalConfiguration.AddTestSightings && !hasAddedTestSightings)
+                    {
+                        AddTestSightings(_sightingRepository, ref sightings, _speciesPortalConfiguration.AddTestSightingIds);
+                        hasAddedTestSightings = true;
+                    }
+
                     var sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
                     nrSightingsHarvested += sightings.Length;
 
@@ -199,6 +207,18 @@ namespace SOS.Import.Factories
             }
 
             return harvestInfo;
+        }
+
+        /// <summary>
+        /// Add test sightings for testing purpose.
+        /// </summary>
+        private void AddTestSightings(
+            ISightingRepository sightingRepository, 
+            ref SightingEntity[] sightings,
+            IEnumerable<int> sightingIds)
+        {
+            var extraSightings = sightingRepository.GetChunkAsync(sightingIds).Result;
+            sightings = extraSightings.Union(sightings.Where(s => extraSightings.All(e => e.Id != s.Id))).ToArray();
         }
 
         private static ProjectEntityDictionaries GetProjectEntityDictionaries(
