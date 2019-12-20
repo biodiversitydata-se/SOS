@@ -6,7 +6,9 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Search;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Repositories
@@ -32,13 +34,25 @@ namespace SOS.Search.Service.Repositories
         /// <summary>
         /// Create search filter
         /// </summary>
-        /// <param name="taxonIds"></param>
+        /// <param name="filter"></param>
         /// <returns></returns>
-        private FilterDefinition<DarwinCore<DynamicProperties>> CreateFilter(IEnumerable<int> taxonIds)
+        private FilterDefinition<DarwinCore<DynamicProperties>> CreateFilter(AdvancedFilter filter)
         {
-            var filter = Builders<DarwinCore<DynamicProperties>>.Filter.Where(m => taxonIds.Contains(m.Taxon.Id));
-          
-            return filter;
+            if (!filter.IsFilterActive)
+            {
+                return FilterDefinition<DarwinCore<DynamicProperties>>.Empty;
+            }
+
+            var filters = new List<FilterDefinition<DarwinCore<DynamicProperties>>>();
+
+            if (filter.TaxonIds?.Any() ?? false)
+            {
+                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.Where(m => filter.TaxonIds.Contains(m.Taxon.Id)));
+            }
+
+            // Todo implement filter for all properties
+
+            return Builders<DarwinCore<DynamicProperties>>.Filter.And(filters);
         }
 
         /// <summary>
@@ -53,33 +67,31 @@ namespace SOS.Search.Service.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<DarwinCore<DynamicProperties>>> GetChunkAsync(int taxonId, int skip, int take)
+        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
         {
-            var filter = CreateFilter(new [] { taxonId });
+            if (filter?.OutputFields?.Any() ?? false)
+            {
+                var res = await MongoCollection
+                    .Find(CreateFilter(filter))
+                    .Project(CreateProjection(filter.OutputFields))
+                    .Skip(skip)
+                    .Limit(take)
+                    .ToListAsync();
 
-            var res = await MongoCollection
-                .Find(filter)
-               // .Sort(Builders<DarwinCore<DynamicProperties>>.Sort.Descending("id"))
-                .Skip(skip)
-                .Limit(take)
-                .ToListAsync();
+                return res.ConvertAll(BsonTypeMapper.MapToDotNetValue);
+                
+            }
+            else
+            {
+                var res = await MongoCollection
+                    .Find(CreateFilter(filter))
+                    // .Sort(Builders<DarwinCore<DynamicProperties>>.Sort.Descending("id"))
+                    .Skip(skip)
+                    .Limit(take)
+                    .ToListAsync();
 
-            return res;
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<dynamic>> GetChunkAsync(int taxonId, IEnumerable<string> fields, int skip, int take)
-        {
-            var filter = CreateFilter(new[] { taxonId });
-
-            var res = await MongoCollection
-                .Find(filter)
-                .Project(CreateProjection(fields))
-                .Skip(skip)
-                .Limit(take)
-                .ToListAsync();
-
-            return res.ConvertAll(BsonTypeMapper.MapToDotNetValue);
+                return res.ToDarwinCore();
+            }
         }
     }
 }

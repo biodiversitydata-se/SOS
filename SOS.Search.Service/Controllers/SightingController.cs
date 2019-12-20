@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Search;
 using SOS.Search.Service.Controllers.Interfaces;
 using SOS.Search.Service.Factories.Interfaces;
 
@@ -33,43 +34,20 @@ namespace SOS.Search.Service.Controllers
         }
 
         /// <inheritdoc />
-        [HttpGet("taxa/{taxonId}")]
-        [ProducesResponseType(typeof(IEnumerable<DarwinCore<string>>), (int)HttpStatusCode.OK)]
+        [HttpPost("search")]
+        [ProducesResponseType(typeof(IEnumerable<dynamic>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetChunkAsync([FromRoute] int taxonId, [FromQuery]int skip, [FromQuery]int take)
+        public async Task<IActionResult> GetChunkAsync([FromBody] AdvancedFilter filter, [FromQuery]int skip, [FromQuery]int take)
         {
             try
             {
-                if (skip < 0 || take <= 0 || take > _maxBatchSize)
+                if (!filter.IsFilterActive || skip < 0 || take <= 0 || take > _maxBatchSize)
                 {
                     return new BadRequestResult();
                 }
 
-                return new OkObjectResult(await _sightingFactory.GetChunkAsync(taxonId, skip, take));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting batch of sightings");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpPost("taxa/{taxonId}")]
-        [ProducesResponseType(typeof(IEnumerable<DarwinCore<string>>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetChunkAsync([FromRoute]int taxonId, [FromBody]IEnumerable<string> fields, [FromQuery]int skip, [FromQuery]int take)
-        {
-            try
-            {
-                if (skip < 0 || take <= 0 || take > _maxBatchSize)
-                {
-                    return new BadRequestResult();
-                }
-
-                return new OkObjectResult(await _sightingFactory.GetChunkAsync(taxonId, fields, skip, take));
+                return new OkObjectResult(await _sightingFactory.GetChunkAsync(filter, skip, take));
             }
             catch (Exception e)
             {
