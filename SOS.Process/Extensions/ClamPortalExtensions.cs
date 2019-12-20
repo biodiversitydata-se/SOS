@@ -27,7 +27,7 @@ namespace SOS.Process.Extensions
             {
                 AccessRights = verbatim.AccessRights,
                 BasisOfRecord = verbatim.BasisOfRecord,
-                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProvider.ClamPortal}",
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.ClamPortal.ToString()}",
                 DatasetName = "Träd och musselportalen",
                 DynamicProperties = new DynamicProperties
                 {

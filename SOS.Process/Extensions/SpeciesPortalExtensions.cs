@@ -51,7 +51,7 @@ namespace SOS.Process.Extensions
                     ? "Artportalen"
                     : verbatim.SpeciesCollection,
                 CollectionID = verbatim.CollectionID,
-                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProvider.Artdatabanken}",
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.Artdatabanken.ToString()}",
                 DatasetName = "Artportalen",
                 DynamicProperties = new DynamicProperties
                 {
