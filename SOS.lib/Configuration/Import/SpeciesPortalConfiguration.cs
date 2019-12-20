@@ -21,5 +21,15 @@ namespace SOS.Lib.Configuration.Import
         /// If set to null all sightings will be fetched.
         /// </summary>
         public int? MaxNumberOfSightingsHarvested { get; set; } = null;
+
+        /// <summary>
+        /// Set to true to add sightings for testing purpose.
+        /// </summary>
+        public bool AddTestSightings { get; set; } = false;
+
+        /// <summary>
+        /// Sighting ids that should be added when AddTestSightings is set to true.
+        /// </summary>
+        public List<int> AddTestSightingIds { get; set; }
     }
 }

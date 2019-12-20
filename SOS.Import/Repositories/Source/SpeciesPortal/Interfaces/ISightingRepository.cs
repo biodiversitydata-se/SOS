@@ -19,6 +19,11 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal.Interfaces
         Task<IEnumerable<SightingEntity>> GetChunkAsync(int startId, int maxRows);
 
         /// <summary>
+        /// Get sightings for specified sighting ids.
+        /// </summary>
+        Task<IEnumerable<SightingEntity>> GetChunkAsync(IEnumerable<int> sightingIds);
+
+        /// <summary>
         /// Get min and max id
         /// </summary>
         /// <returns></returns>
