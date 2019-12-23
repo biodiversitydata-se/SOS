@@ -50,7 +50,35 @@ namespace SOS.Search.Service.Repositories
                 filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Taxon.Id, filter.TaxonIds));
             }
 
-            // Todo implement filter for all properties
+            if (filter.StartDate.HasValue)
+            {
+            //    filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.Gte(m => m.Event.EventDate, filter.StartDate));
+            }
+
+            if (filter.EndDate.HasValue)
+            {
+           //     filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.Lte(m => m.Event.EventDate, filter.EndDate));
+            }
+
+            if (filter.Counties?.Any() ?? false)
+            {
+                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Location.County, filter.Counties));
+            }
+
+            if (filter.Municipalities?.Any() ?? false)
+            {
+                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Location.Municipality, filter.Municipalities));
+            }
+
+            if (filter.Provinces?.Any() ?? false)
+            {
+                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Location.StateProvince, filter.Provinces));
+            }
+
+            if (filter.Sex?.Any() ?? false)
+            {
+                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Occurrence.Sex, filter.Sex));
+            }
 
             return Builders<DarwinCore<DynamicProperties>>.Filter.And(filters);
         }

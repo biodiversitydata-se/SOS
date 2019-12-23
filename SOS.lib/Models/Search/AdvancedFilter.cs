@@ -26,9 +26,7 @@ namespace SOS.Lib.Models.Search
             (Counties?.Any() ?? false) ||
             EndDate != null ||
             (Municipalities?.Any() ?? false) ||
-            (Parishes?.Any() ?? false) ||
             (Provinces?.Any() ?? false) ||
-            (Regions?.Any() ?? false) ||
             (Sex?.Any() ?? false) ||
             (StartDate != null) ||
             (TaxonIds?.Any() ?? false);
@@ -39,19 +37,9 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<string> Municipalities { get; set; }
 
         /// <summary>
-        /// Parishes to match
-        /// </summary>
-        public IEnumerable<string> Parishes { get; set; }
-
-        /// <summary>
         /// Provinces to match
         /// </summary>
         public IEnumerable<string> Provinces { get; set; }
-
-        /// <summary>
-        /// Regions to match
-        /// </summary>
-        public IEnumerable<string> Regions { get; set; }
 
         /// <summary>
         /// Gender to match
