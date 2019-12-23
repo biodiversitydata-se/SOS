@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Search;
