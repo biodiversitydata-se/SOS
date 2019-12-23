@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Search;
@@ -47,7 +48,7 @@ namespace SOS.Search.Service.Repositories
 
             if (filter.TaxonIds?.Any() ?? false)
             {
-                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.Where(m => filter.TaxonIds.Contains(m.Taxon.Id)));
+                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Taxon.Id, filter.TaxonIds));
             }
 
             // Todo implement filter for all properties
