@@ -23,6 +23,7 @@ using SOS.Export.Test.TestHelpers.JsonConverters;
 using SOS.Export.Test.TestHelpers.Stubs;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Search;
 using Xunit;
 
 namespace SOS.Export.Test.IO.DwcArchive
@@ -53,6 +54,7 @@ namespace SOS.Export.Test.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             bool result = await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                new AdvancedFilter(),
                 memoryStream, 
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                 processedDarwinCoreRepositoryMock.Object, 
@@ -84,6 +86,7 @@ namespace SOS.Export.Test.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                new AdvancedFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                 processedDarwinCoreRepositoryMock.Object,
@@ -115,6 +118,7 @@ namespace SOS.Export.Test.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                new AdvancedFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                 processedDarwinCoreRepositoryMock.Object,
@@ -146,6 +150,7 @@ namespace SOS.Export.Test.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                new AdvancedFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                 processedDarwinCoreRepositoryMock.Object,
@@ -181,6 +186,7 @@ namespace SOS.Export.Test.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                new AdvancedFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetFieldDescriptions(fieldDescriptionIds),
                 processedDarwinCoreRepositoryMock.Object,

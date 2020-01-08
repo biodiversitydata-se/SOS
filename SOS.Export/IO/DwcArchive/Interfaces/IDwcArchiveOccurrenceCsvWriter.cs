@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive.Interfaces
 {
@@ -12,12 +13,14 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <summary>
         /// Creates a DwC occurrence CSV file.
         /// </summary>
-        /// <param name="stream">The stream where the file will be saved.</param>
-        /// <param name="fieldDescriptions">The columns that will be used.</param>
-        /// <param name="processedDarwinCoreRepository">The repository to read observation data from.</param>
-        /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
-        /// <returns>true if the file is written; otherwise false.</returns>
+        /// <param name="filter"></param>
+        /// <param name="stream"></param>
+        /// <param name="fieldDescriptions"></param>
+        /// <param name="processedDarwinCoreRepository"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         Task<bool> CreateOccurrenceCsvFileAsync(
+            AdvancedFilter filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedDarwinCoreRepository processedDarwinCoreRepository,

@@ -26,26 +26,25 @@ namespace SOS.Hangfire.UI
     /// </summary>
     public class Startup
     {
-        public IHostingEnvironment Environment { get; }
-
+        
         public IConfiguration Configuration { get; }
 
         public ILifetimeScope AutofacContainer { get; private set; }
 
         public Startup(IHostingEnvironment env)
         {
-            Environment = env;
+            var environment = env.EnvironmentName.ToLower();
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddJsonFile($"appsettings.{environment}.json", optional: true)
                 .AddEnvironmentVariables();
             
             //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
             if (env.IsDevelopment() ||
-                env.EnvironmentName == "DEV" ||
-                env.EnvironmentName == "LOCAL")
+                environment == "dev" ||
+                environment == "local")
             {
                 builder.AddUserSecrets<Startup>();
             }

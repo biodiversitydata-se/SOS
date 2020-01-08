@@ -27,7 +27,7 @@ namespace SOS.Process.Extensions
             {
                 AccessRights = verbatim.AccessRights,
                 BasisOfRecord = verbatim.BasisOfRecord,
-                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProvider.ClamPortal}",
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.ClamPortal.ToString()}",
                 DatasetName = "Träd och musselportalen",
                 DynamicProperties = new DynamicProperties
                 {
@@ -48,9 +48,10 @@ namespace SOS.Process.Extensions
                 },
                 Event = new DarwinCoreEvent
                 {
-                    EventDate = verbatim.ObservationDate.ToString("yyyy-MM-dd"),
-                    EventTime = verbatim.ObservationDate.ToString("HH:mm:ss"),
-                    SamplingProtocol = verbatim.SurveyMethod
+                    EventDate = $"{verbatim.ObservationDate.ToUniversalTime().ToString("s")}Z",
+                    EventTime = verbatim.ObservationDate.ToUniversalTime().ToString("HH':'mm':'ss''K"),
+                    SamplingProtocol = verbatim.SurveyMethod,
+                    VerbatimEventDate = verbatim.ObservationDate.ToString("yyyy-MM-dd HH:mm:ss")
                 },
                 Identification = new DarwinCoreIdentification
                 {

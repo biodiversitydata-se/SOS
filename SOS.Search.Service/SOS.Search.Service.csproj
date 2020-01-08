@@ -36,5 +36,5 @@
       </Content>
     </ItemGroup>
 
-    <ProjectExtensions><VisualStudio><UserProperties appsettings_1local_1json__JsonSchema="UseTls" /></VisualStudio></ProjectExtensions>
+    <ProjectExtensions><VisualStudio><UserProperties properties_4launchsettings_1json__JsonSchema="" appsettings_1local_1json__JsonSchema="UseTls" /></VisualStudio></ProjectExtensions>
 </Project>

@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Export.Test.TestHelpers.JsonConverters;
+using SOS.Lib.Models.Search;
 using Xunit;
 
 namespace SOS.Export.Test.Tools
@@ -38,7 +39,7 @@ namespace SOS.Export.Test.Tools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observations = await processedDarwinCoreRepository.GetChunkAsync(0, nrObservations);
+            var observations = await processedDarwinCoreRepository.GetChunkAsync(new AdvancedFilter(), 0,nrObservations);
 
 
             var serializerSettings = new JsonSerializerSettings()

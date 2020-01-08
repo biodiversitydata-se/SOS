@@ -53,6 +53,7 @@ namespace SOS.Export.IoC.Modules
 
             // Add jobs
             builder.RegisterType<ExportDarwinCoreJob>().As<IExportDarwinCoreJob>().InstancePerLifetimeScope();
+            builder.RegisterType<DOIJob>().As<IDOIJob>().InstancePerLifetimeScope();
 
             // DwC Archive
             builder.RegisterType<DwcArchiveFileWriter>().As<IDwcArchiveFileWriter>().SingleInstance();

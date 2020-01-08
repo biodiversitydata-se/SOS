@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using SOS.Export.Repositories.Interfaces;
-using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Search;
 
 namespace SOS.Export.Test.TestHelpers.Stubs
 {
@@ -28,7 +27,7 @@ namespace SOS.Export.Test.TestHelpers.Stubs
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<DarwinCore<DynamicProperties>>> GetChunkAsync(int skip, int take)
+        public Task<IEnumerable<DarwinCore<DynamicProperties>>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
         {
             throw new NotImplementedException();
         }

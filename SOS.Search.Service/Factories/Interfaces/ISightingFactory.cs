@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Search;
 
 namespace SOS.Search.Service.Factories.Interfaces
 {
@@ -12,13 +12,10 @@ namespace SOS.Search.Service.Factories.Interfaces
         /// <summary>
         /// Get chunk of sightings
         /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<DarwinCore<string>>> GetChunkAsync(int taxonId, int skip, int take);
-
-        /// <summary>
-        /// Get chunk of sightings
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<dynamic>> GetChunkAsync(int taxonId, IEnumerable<string> fields, int skip, int take);
+        Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take);
     }
 }

@@ -6,7 +6,9 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Search;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Repositories
@@ -29,57 +31,31 @@ namespace SOS.Search.Service.Repositories
         {
         }
 
-        /// <summary>
-        /// Create search filter
-        /// </summary>
-        /// <param name="taxonIds"></param>
-        /// <returns></returns>
-        private FilterDefinition<DarwinCore<DynamicProperties>> CreateFilter(IEnumerable<int> taxonIds)
-        {
-            var filter = Builders<DarwinCore<DynamicProperties>>.Filter.Where(m => taxonIds.Contains(m.Taxon.Id));
-          
-            return filter;
-        }
-
-        /// <summary>
-        /// Build a projection string
-        /// </summary>
-        /// <param name="fields"></param>
-        /// <returns></returns>
-        private string CreateProjection(IEnumerable<string> fields)
-        {
-            var projection = $"{{ _id: 0, { string.Join(",", fields?.Where(f => !string.IsNullOrEmpty(f)).Select((f, i) => $"'{f}': {i+1}") ?? new string[0]) } }}";
-            return projection;
-        }
-
         /// <inheritdoc />
-        public async Task<IEnumerable<DarwinCore<DynamicProperties>>> GetChunkAsync(int taxonId, int skip, int take)
+        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
         {
-            var filter = CreateFilter(new [] { taxonId });
+            if (filter?.OutputFields?.Any() ?? false)
+            {
+                var res = await MongoCollection
+                    .Find(filter.ToFilterDefinition())
+                    .Project(filter.OutputFields.ToProjection())
+                    .Skip(skip)
+                    .Limit(take)
+                    .ToListAsync();
 
-            var res = await MongoCollection
-                .Find(filter)
-               // .Sort(Builders<DarwinCore<DynamicProperties>>.Sort.Descending("id"))
-                .Skip(skip)
-                .Limit(take)
-                .ToListAsync();
+                return res.ConvertAll(BsonTypeMapper.MapToDotNetValue);
+            }
+            else
+            {
+                var res = await MongoCollection
+                    .Find(filter.ToFilterDefinition())
+                    // .Sort(Builders<DarwinCore<DynamicProperties>>.Sort.Descending("id"))
+                    .Skip(skip)
+                    .Limit(take)
+                    .ToListAsync();
 
-            return res;
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<dynamic>> GetChunkAsync(int taxonId, IEnumerable<string> fields, int skip, int take)
-        {
-            var filter = CreateFilter(new[] { taxonId });
-
-            var res = await MongoCollection
-                .Find(filter)
-                .Project(CreateProjection(fields))
-                .Skip(skip)
-                .Limit(take)
-                .ToListAsync();
-
-            return res.ConvertAll(BsonTypeMapper.MapToDotNetValue);
+                return res.ToDarwinCore();
+            }
         }
     }
 }

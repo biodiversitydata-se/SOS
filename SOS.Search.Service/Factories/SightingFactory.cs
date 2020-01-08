@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.Processed.DarwinCore;
-using SOS.Lib.Extensions;
+using SOS.Lib.Models.Search;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Factories
@@ -20,40 +19,26 @@ namespace SOS.Search.Service.Factories
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="ProcessedDarwinCoreRepository"></param>
+        /// <param name="processedDarwinCoreRepository"></param>
         /// <param name="logger"></param>
         public SightingFactory(
-            IProcessedDarwinCoreRepository ProcessedDarwinCoreRepository,
+            IProcessedDarwinCoreRepository processedDarwinCoreRepository,
             ILogger<SightingFactory> logger)
         {
-            _processedDarwinCoreRepository = ProcessedDarwinCoreRepository ??
-                                           throw new ArgumentNullException(nameof(ProcessedDarwinCoreRepository));
+            _processedDarwinCoreRepository = processedDarwinCoreRepository ??
+                                           throw new ArgumentNullException(nameof(processedDarwinCoreRepository));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<DarwinCore<string>>> GetChunkAsync(int taxonId, int skip, int take)
+        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
         {
             try
             {
-                var processedDarwinCore = await _processedDarwinCoreRepository.GetChunkAsync(taxonId, skip, take);
-                return processedDarwinCore?.ToDarwinCore();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get chunk of sightings");
-                return null;
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<dynamic>> GetChunkAsync(int taxonId, IEnumerable<string> fields, int skip, int take)
-        {
-            try
-            {
-                var result = await _processedDarwinCoreRepository.GetChunkAsync(taxonId, fields, skip, take);
-                return result;
+                var processedDarwinCore = await _processedDarwinCoreRepository.GetChunkAsync(filter, skip, take);
+                
+                return processedDarwinCore;
             }
             catch (Exception e)
             {

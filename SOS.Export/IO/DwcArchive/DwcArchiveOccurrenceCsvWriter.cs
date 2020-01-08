@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Export.Enums;
-using SOS.Export.Helpers;
 using SOS.Export.Mappings;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive
 {
@@ -29,6 +27,7 @@ namespace SOS.Export.IO.DwcArchive
 
         /// <inheritdoc />
         public async Task<bool> CreateOccurrenceCsvFileAsync(
+            AdvancedFilter filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedDarwinCoreRepository processedDarwinCoreRepository,
@@ -39,19 +38,16 @@ namespace SOS.Export.IO.DwcArchive
                 var skip = 0;
                 const int take = 1000000;
                 var darwinCoreMap = new DarwinCoreDynamicMap(fieldDescriptions);
-                var processedDarwinCore = await processedDarwinCoreRepository.GetChunkAsync(skip, take);
+                var processedDarwinCore = await processedDarwinCoreRepository.GetChunkAsync(filter, skip, take);
 
                 while (processedDarwinCore.Any())
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var writeTasks = new[]
-                    {
-                        WriteOccurrenceCsvAsync(stream, processedDarwinCore, darwinCoreMap)
-                    };
+    
+                    await WriteOccurrenceCsvAsync(stream, processedDarwinCore, darwinCoreMap);
 
-                    await Task.WhenAll(writeTasks);
                     skip += take;
-                    processedDarwinCore = await processedDarwinCoreRepository.GetChunkAsync(skip, take);
+                    processedDarwinCore = await processedDarwinCoreRepository.GetChunkAsync(filter, skip, take);
                 }
 
                 return true;

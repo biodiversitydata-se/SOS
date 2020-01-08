@@ -6,7 +6,9 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Export.Repositories
@@ -28,10 +30,10 @@ namespace SOS.Export.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<DarwinCore<DynamicProperties>>> GetChunkAsync(int skip, int take)
+        public async Task<IEnumerable<DarwinCore<DynamicProperties>>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
         {
             var res = await MongoCollection
-                .Find(_ => true)
+                .Find(filter.ToFilterDefinition())
                 .Skip(skip)
                 .Limit(take)
                 .ToListAsync();

@@ -68,7 +68,7 @@ namespace SOS.Search.Service
                 {
                     configuration
                         .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                        .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", optional: false, reloadOnChange: true)
+                        .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName.ToLower()}.json", optional: false, reloadOnChange: true)
                         .AddEnvironmentVariables();
                 })
                 .ConfigureLogging((hostingContext, logging) =>
@@ -76,7 +76,7 @@ namespace SOS.Search.Service
                     logging
                         .ClearProviders()
                         .AddConfiguration(hostingContext.Configuration.GetSection("Logging"))
-                        .AddNLog(configFileName: $"nlog.{hostingContext.HostingEnvironment.EnvironmentName}.config");
+                        .AddNLog(configFileName: $"nlog.{hostingContext.HostingEnvironment.EnvironmentName.ToLower()}.config");
                 })
                 .ConfigureServices((hostContext, services) =>
                 {

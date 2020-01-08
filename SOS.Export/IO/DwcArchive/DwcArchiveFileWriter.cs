@@ -12,6 +12,7 @@ using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive
 {
@@ -43,12 +44,16 @@ namespace SOS.Export.IO.DwcArchive
 
         /// <inheritdoc />
         public async Task<string> CreateDwcArchiveFileAsync(
+            AdvancedFilter filter,
+            string fileName,
             IProcessedDarwinCoreRepository processedDarwinCoreRepository,
             ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken)
         {
             return await CreateDwcArchiveFileAsync(
+                filter,
+                fileName,
                 processedDarwinCoreRepository,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                 processInfo,
@@ -58,6 +63,8 @@ namespace SOS.Export.IO.DwcArchive
 
         /// <inheritdoc />
         public async Task<string> CreateDwcArchiveFileAsync(
+            AdvancedFilter filter,
+            string fileName,
             IProcessedDarwinCoreRepository processedDarwinCoreRepository,
             IEnumerable<FieldDescription> fieldDescriptions,
             ProcessInfo processInfo,
@@ -68,8 +75,8 @@ namespace SOS.Export.IO.DwcArchive
             
             try
             {
-                var zipFolderName = Guid.NewGuid().ToString();
-                temporaryZipExportFolderPath = Path.Combine(exportFolderPath, zipFolderName);
+                
+                temporaryZipExportFolderPath = Path.Combine(exportFolderPath, fileName);
                 _fileService.CreateFolder(temporaryZipExportFolderPath);
                 string occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.csv");
                 string emofCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "extendedMeasurementOrFact.csv");
@@ -81,6 +88,7 @@ namespace SOS.Export.IO.DwcArchive
                 using (FileStream fileStream = File.Create(occurrenceCsvFilePath))
                 {
                     await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                        filter,
                         fileStream,
                         fieldDescriptions,
                         processedDarwinCoreRepository,
@@ -114,7 +122,7 @@ namespace SOS.Export.IO.DwcArchive
                 await using var processInfoFileStream = File.Create(processInfoXmlFilePath);
                 DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileStream, processInfo);
                 processInfoFileStream.Close();
-                var zipFilePath = _fileService.CompressFolder(exportFolderPath, zipFolderName);
+                var zipFilePath = _fileService.CompressFolder(exportFolderPath, fileName);
                 _fileService.DeleteFolder(temporaryZipExportFolderPath);
                 return zipFilePath;
             }

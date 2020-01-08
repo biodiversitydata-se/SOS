@@ -123,7 +123,7 @@ namespace SOS.Process.Repositories.Destination
             var indexModels = new List<CreateIndexModel<DarwinCore<DynamicProperties>>>()
             {
                 new CreateIndexModel<DarwinCore<DynamicProperties>>(
-                    Builders<DarwinCore<DynamicProperties>>.IndexKeys.Ascending(p => p.Taxon.TaxonID)),
+                    Builders<DarwinCore<DynamicProperties>>.IndexKeys.Ascending(p => p.Taxon.Id)),
                 new CreateIndexModel<DarwinCore<DynamicProperties>>(
                     Builders<DarwinCore<DynamicProperties>>.IndexKeys.Ascending(p => p.Provider))
             };

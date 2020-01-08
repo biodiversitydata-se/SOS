@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Jobs;
 using SOS.Export.Jobs.Interfaces;
+using SOS.Lib.Models.Search;
 
 namespace SOS.Hangfire.UI.Controllers
 {
@@ -34,13 +35,34 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                BackgroundJob.Enqueue<IExportDarwinCoreJob>(job => job.RunAsync(JobCancellationToken.Null));
+                var fileName = Guid.NewGuid().ToString();
+                BackgroundJob.Enqueue<IExportDarwinCoreJob>(job => job.RunAsync(fileName, JobCancellationToken.Null));
 
-                return new OkObjectResult("Running Darwin Core export");
+                return new OkObjectResult($"Running Darwin Core export. File name {fileName}.zip");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Running Darwin Core export failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("DOI/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunDOIExportJob([FromBody]AdvancedFilter filter)
+        {
+            try
+            {
+                var fileName = Guid.NewGuid().ToString();
+                BackgroundJob.Enqueue<IDOIJob>(job => job.RunAsync(filter, fileName, JobCancellationToken.Null));
+
+                return new OkObjectResult($"Running DOI export. File name {fileName}.zip");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running DOI export failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -53,8 +75,9 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<IExportDarwinCoreJob>(nameof(ExportDarwinCoreJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
-                return new OkObjectResult("Export Darwin Core Job Scheduled");
+                var fileName = Guid.NewGuid().ToString();
+                RecurringJob.AddOrUpdate<IExportDarwinCoreJob>(nameof(ExportDarwinCoreJob), job => job.RunAsync(fileName, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult($"Export Darwin Core Job Scheduled. File name {fileName}.zip");
             }
             catch (Exception e)
             {
@@ -62,5 +85,24 @@ namespace SOS.Hangfire.UI.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
-}
+
+        /// <inheritdoc />
+        [HttpPost("DOI/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult ScheduleDailyDOIExportJob([FromBody]AdvancedFilter filter, [FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                var fileName = Guid.NewGuid().ToString();
+                RecurringJob.AddOrUpdate<IDOIJob>(nameof(ExportDarwinCoreJob), job => job.RunAsync(filter, fileName, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult($"Export DOI Scheduled. File name {fileName}.zip");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Scheduling DOI job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+    }
 }

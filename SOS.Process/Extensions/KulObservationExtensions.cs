@@ -31,7 +31,7 @@ namespace SOS.Process.Extensions
             var obs = new DarwinCore<DynamicProperties>(DataProvider.KUL)
             {
                 BasisOfRecord = BasisOfRecord.HumanObservation,
-                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProvider.KUL}",
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.KUL.ToString()}",
                 DatasetName = "KUL",
                 DynamicProperties = new DynamicProperties
                 {
@@ -56,6 +56,9 @@ namespace SOS.Process.Extensions
                 },
                 Event = new DarwinCoreEvent
                 {
+                    EventDate = $"{verbatim.Start.ToUniversalTime().ToString("s")}Z",
+                    EventTime = verbatim.Start.ToUniversalTime().ToString("HH':'mm':'ss''K"),
+                    VerbatimEventDate = verbatim.Start.ToString("yyyy-MM-dd HH:mm:ss")
                 },
                 Identification = new DarwinCoreIdentification
                 {

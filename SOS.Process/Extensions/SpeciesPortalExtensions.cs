@@ -52,7 +52,7 @@ namespace SOS.Process.Extensions
                     ? "Artportalen"
                     : verbatim.SpeciesCollection,
                 CollectionID = verbatim.CollectionID,
-                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{(int)DataProvider.Artdatabanken}",
+                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.Artdatabanken.ToString()}",
                 DatasetName = "Artportalen",
                 DynamicProperties = new DynamicProperties
                 {
@@ -77,11 +77,13 @@ namespace SOS.Process.Extensions
                 },
                 Event = new DarwinCoreEvent
                 {
+                    EventDate = $"{verbatim.StartDate?.ToUniversalTime().ToString("s")}Z" ?? "",
+                    EventTime = verbatim.StartDate?.ToUniversalTime().ToString("HH':'mm':'ss''K") ?? "",
                     Habitat = (verbatim.Bioptope != null
                         ? $"{verbatim.Bioptope.Name}{(string.IsNullOrEmpty(verbatim.BiotopeDescription) ? "" : " # ")}{verbatim.BiotopeDescription}"
                         : verbatim.BiotopeDescription).WithMaxLength(255),
                     SamplingProtocol = GetSamplingProtocol(verbatim.Projects),
-                    VerbatimEventDate = $"{(verbatim.StartDate?.ToString("yyyy-MM-dd hh:mm") ?? "")}{(verbatim.StartDate.HasValue && verbatim.EndDate.HasValue ? "-" : "")}{(verbatim.EndDate?.ToString("yyyy-MM-dd hh:mm") ?? "")}"
+                    VerbatimEventDate = $"{(verbatim.StartDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? "")}{(verbatim.StartDate.HasValue && verbatim.EndDate.HasValue ? "-" : "")}{(verbatim.EndDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? "")}"
                 },
                 Identification = new DarwinCoreIdentification
                 {
