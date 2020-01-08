@@ -2,6 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json;
 using SOS.Export.Models.DarwinCore;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Export.Extensions
@@ -51,7 +52,8 @@ namespace SOS.Export.Extensions
         /// </summary>
         /// <param name="processedDarwinCore"></param>
         /// <returns></returns>
-        public static IEnumerable<DwC> ToDarwinCoreArchive(this IEnumerable<DarwinCore<DynamicProperties>> processedDarwinCore)
+        public static IEnumerable<DwC> ToDarwinCoreArchive(
+            this IEnumerable<DarwinCore<DynamicProperties>> processedDarwinCore)
         {
             return processedDarwinCore?.Select(m => m.ToDarwinCoreArchive());
         }
@@ -317,7 +319,8 @@ namespace SOS.Export.Extensions
         /// <param name="source"></param>
         /// <param name="coreId"></param>
         /// <returns></returns>
-        public static DwCResourceRelationship ToDarwinCoreArchive(this DarwinCoreResourceRelationship source, string coreId)
+        public static DwCResourceRelationship ToDarwinCoreArchive(this DarwinCoreResourceRelationship source,
+            string coreId)
         {
             if (source == null)
             {
@@ -387,6 +390,68 @@ namespace SOS.Export.Extensions
                 TaxonConceptID = source.TaxonConceptID,
                 VerbatimTaxonRank = source.VerbatimTaxonRank
             };
+        }
+
+        public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
+            IEnumerable<DarwinCoreProject> projects)
+        {
+            return projects.SelectMany(ToExtendedMeasurementOrFactRows);
+        }
+
+        private static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(
+            DarwinCoreProject project)
+        {
+            if (project?.ProjectParameters == null || !project.ProjectParameters.Any())
+            {
+                return null;
+            }
+
+            var rows = project.ProjectParameters.Select(projectParameter => ToExtendedMeasurementOrFactRow(project, projectParameter));
+            return rows;
+        }
+
+        private static ExtendedMeasurementOrFactRow ToExtendedMeasurementOrFactRow(
+            DarwinCoreProject project,
+            DarwinCoreProjectParameter projectParameter)
+        {
+            ExtendedMeasurementOrFactRow row = new ExtendedMeasurementOrFactRow();
+            row.OccurrenceID = projectParameter.OccurrenceId;
+            row.MeasurementID = project.Id; // Should this be ProjectId or ProjectParameterId?
+            //row.MeasurementID = projectParameter.ProjectParameterId.ToString(); // Should this be ProjectId or ProjectParameterId?
+            row.MeasurementType = projectParameter.Name;
+            row.MeasurementValue = projectParameter.Value;
+            row.MeasurementUnit = projectParameter.Unit;
+            row.MeasurementDeterminedDate = DwcFormattingHelper.CreateDateIntervalString(project.StartDate, project.EndDate);
+            row.MeasurementMethod = GetMeasurementMethodDescription(project);
+            row.MeasurementRemarks = projectParameter.Description;
+
+            //row.MeasurementAccuracy = ?
+            //row.MeasurementDeterminedBy = ?
+            //row.MeasurementRemarks = ?
+            //row.MeasurementTypeID = ?
+            //row.MeasurementUnitID = ?
+            //row.MeasurementValueID = ?
+            return row;
+        }
+
+        private static string GetMeasurementMethodDescription(DarwinCoreProject project)
+        {
+            if (string.IsNullOrEmpty(project.SurveyMethod) && string.IsNullOrEmpty(project.SurveyMethodUrl))
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(project.SurveyMethodUrl))
+            {
+                return project.SurveyMethod;
+            }
+
+            if (string.IsNullOrEmpty(project.SurveyMethod))
+            {
+                return project.SurveyMethodUrl;
+            }
+
+            return $"{project.SurveyMethod} [{project.SurveyMethodUrl}]";
         }
     }
 }

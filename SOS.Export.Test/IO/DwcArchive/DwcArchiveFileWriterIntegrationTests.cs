@@ -39,10 +39,10 @@ namespace SOS.Export.Test.IO.DwcArchive
                 exportClient,
                 new Mock<ILogger<ProcessedDarwinCoreRepository>>().Object);
             DwcArchiveFileWriter dwcArchiveFileWriter = new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(
-                    new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object), 
-                    new FileService(), 
-                    new Mock<ILogger<DwcArchiveFileWriter>>().Object);
+                new DwcArchiveOccurrenceCsvWriter(new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object),
+                new ExtendedMeasurementOrFactCsvWriter(new Mock<ILogger<ExtendedMeasurementOrFactCsvWriter>>().Object),
+                new FileService(), 
+                new Mock<ILogger<DwcArchiveFileWriter>>().Object);
             var processInfoRepository = new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
             var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
 
@@ -74,10 +74,10 @@ namespace SOS.Export.Test.IO.DwcArchive
             string exportFolderPath = exportConfiguration.FileDestination.Path;
             var processedDarwinCoreRepositoryMock = CreateProcessedDarwinCoreRepositoryMock(@"Resources\TenProcessedTestObservations.json");
             DwcArchiveFileWriter dwcArchiveFileWriter = new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(
-                    new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object),
-                    new FileService(),
-                    new Mock<ILogger<DwcArchiveFileWriter>>().Object);
+                new DwcArchiveOccurrenceCsvWriter(new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object),
+                new ExtendedMeasurementOrFactCsvWriter(new Mock<ILogger<ExtendedMeasurementOrFactCsvWriter>>().Object),
+                new FileService(),
+                new Mock<ILogger<DwcArchiveFileWriter>>().Object);
             
             var exportClient = new ExportClient(
                 exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),

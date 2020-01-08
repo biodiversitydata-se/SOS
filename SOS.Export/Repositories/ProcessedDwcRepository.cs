@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
@@ -6,6 +7,7 @@ using MongoDB.Driver;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Export.Repositories
 {
@@ -35,6 +37,20 @@ namespace SOS.Export.Repositories
                 .ToListAsync();
 
             return res;
+        }
+
+        public async Task<IEnumerable<DarwinCoreProject>> GetProjectParameters(int skip, int take)
+        {
+            BsonDocument bsonDocument = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>("{ 'DynamicProperties.Projects.ProjectParameters' : { $ne: null } }");
+            List<IEnumerable<DarwinCoreProject>> res = await MongoCollection
+                .Find(bsonDocument)
+                .Skip(skip)
+                .Limit(take)
+                .Project(x => x.DynamicProperties.Projects)
+                .ToListAsync();
+
+            var projectParameters = res.SelectMany(pp => pp);
+            return projectParameters;
         }
     }
 }

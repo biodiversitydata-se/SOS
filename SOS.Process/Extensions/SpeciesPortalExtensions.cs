@@ -37,6 +37,7 @@ namespace SOS.Process.Extensions
             var wgs84Point = googleMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
 
             taxa.TryGetValue(taxonId, out var taxon);
+            var occurrenceId = $"urn:lsid:artportalen.se:Sighting:{verbatim.Id}";
             var obs = new DarwinCore<DynamicProperties>(DataProvider.Artdatabanken)
             {
                 AccessRights =
@@ -67,7 +68,7 @@ namespace SOS.Process.Extensions
                     IsPositiveObservation = !(verbatim.NotPresent || verbatim.NotRecovered),
                     OccurrenceURL = $"http://www.artportalen.se/sighting/{verbatim.Id}",
                     Parish = verbatim.Site?.Parish?.Name ?? string.Empty,
-                    Projects = verbatim.Projects?.ToDarwinCoreProjects(),
+                    Projects = verbatim.Projects?.ToDarwinCoreProjects(occurrenceId),
                     ProtectionLevel = CalculateProtectionLevel(taxon, verbatim.HiddenByProvider, verbatim.ProtectedBySystem),
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.ReportedDate,
@@ -129,7 +130,7 @@ namespace SOS.Process.Extensions
                     EstablishmentMeans = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
                     IndividualCount = verbatim.Quantity?.ToString() ?? "",
                     LifeStage = verbatim.Stage?.Name,
-                    OccurrenceID = $"urn:lsid:artportalen.se:Sighting:{verbatim.Id}",
+                    OccurrenceID = occurrenceId,
                     OccurrenceRemarks = verbatim.Comment,
                     OccurrenceStatus = verbatim.NotPresent || verbatim.NotRecovered
                         ? OccurrenceStatus.Absent
@@ -162,13 +163,13 @@ namespace SOS.Process.Extensions
             return verbatims.Select(v => v.ToDarwinCore(taxa)).ToArray();
         }
 
-        private static IEnumerable<DarwinCoreProject> ToDarwinCoreProjects(this IEnumerable<Project> projects)
+        private static IEnumerable<DarwinCoreProject> ToDarwinCoreProjects(this IEnumerable<Project> projects, string occurrenceId)
         {
             if (projects == null || !projects.Any()) return null;
-            return projects.Select(p => p.ToDarwinCoreProject());
+            return projects.Select(p => p.ToDarwinCoreProject(occurrenceId));
         }
 
-        private static DarwinCoreProject ToDarwinCoreProject(this Project project)
+        private static DarwinCoreProject ToDarwinCoreProject(this Project project, string occurrenceId)
         {
             if (project == null) return null;
             
@@ -177,28 +178,28 @@ namespace SOS.Process.Extensions
                 IsPublic = project.IsPublic,
                 Category = project.Category,
                 Description = project.Description,
-                EndDate = project.EndDate?.ToString("yyyy-MM-dd hh:mm"),
+                EndDate = project.EndDate,
                 Id = project.Id.ToString(),
                 Name = project.Name,
                 Owner = project.Owner,
-                StartDate = project.StartDate?.ToString("yyyy-MM-dd hh:mm"),
+                StartDate = project.StartDate,
                 SurveyMethod = project.SurveyMethod,
                 SurveyMethodUrl = project.SurveyMethodUrl,
-                ProjectParameters = project.ProjectParameters?.Select(p => p.ToDarwinCoreProjectParameter())
+                ProjectParameters = project.ProjectParameters?.Select(p => p.ToDarwinCoreProjectParameter(occurrenceId))
             };
         }
 
-        private static DarwinCoreProjectParameter ToDarwinCoreProjectParameter(this ProjectParameter projectParameter)
+        private static DarwinCoreProjectParameter ToDarwinCoreProjectParameter(this ProjectParameter projectParameter, string occurrenceId)
         {
             return new DarwinCoreProjectParameter
             {
+                OccurrenceId = occurrenceId,
                 Value = projectParameter.Value,
                 DataType = projectParameter.DataType,
                 Description = projectParameter.Description,
                 Name = projectParameter.Name,
                 ProjectId = projectParameter.ProjectId,
                 ProjectParameterId = projectParameter.ProjectParameterId,
-                SightingId = projectParameter.SightingId,
                 Unit = projectParameter.Unit
             };
         }

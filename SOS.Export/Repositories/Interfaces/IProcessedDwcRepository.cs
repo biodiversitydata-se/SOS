@@ -17,5 +17,7 @@ namespace SOS.Export.Repositories.Interfaces
         /// <param name="take"></param>
         /// <returns></returns>
         Task<IEnumerable<DarwinCore<DynamicProperties>>> GetChunkAsync(int skip, int take);
+
+        Task<IEnumerable<DarwinCoreProject>> GetProjectParameters(int skip, int take);
     }
 }

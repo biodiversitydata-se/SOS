@@ -31,8 +31,8 @@ namespace SOS.Export.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             var exportConfiguration = GetExportConfiguration();
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(
-                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()), 
+                new DwcArchiveOccurrenceCsvWriter(new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()), 
                     new FileService(), 
                     new NullLogger<DwcArchiveFileWriter>());
 

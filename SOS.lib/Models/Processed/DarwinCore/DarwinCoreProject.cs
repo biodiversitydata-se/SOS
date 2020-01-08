@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Lib.Models.Processed.DarwinCore
@@ -34,7 +35,7 @@ namespace SOS.Lib.Models.Processed.DarwinCore
         /// Not defined in Darwin Core.
         /// Date when the project ends.
         /// </summary>
-        public string EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
@@ -65,7 +66,7 @@ namespace SOS.Lib.Models.Processed.DarwinCore
         /// Not defined in Darwin Core.
         /// Date when the project starts.
         /// </summary>
-        public string StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.

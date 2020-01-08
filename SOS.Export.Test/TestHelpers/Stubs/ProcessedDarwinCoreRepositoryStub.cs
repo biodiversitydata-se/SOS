@@ -32,5 +32,10 @@ namespace SOS.Export.Test.TestHelpers.Stubs
         {
             throw new NotImplementedException();
         }
+
+        public Task<IEnumerable<DarwinCoreProject>> GetProjectParameters(int skip, int take)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
