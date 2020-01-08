@@ -12,6 +12,7 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Search;
 
 namespace SOS.Export.Test
 {
@@ -34,7 +35,7 @@ namespace SOS.Export.Test
             var processedDarwinCoreRepositoryMock = new Mock<IProcessedDarwinCoreRepository>();
             var observations = LoadObservations(fileName);
             processedDarwinCoreRepositoryMock
-                .Setup(pdcr => pdcr.GetChunkAsync(0, It.IsAny<int>()))
+                .Setup(pdcr => pdcr.GetChunkAsync(new AdvancedFilter(), 0, It.IsAny<int>()))
                 .ReturnsAsync(observations);
 
             return processedDarwinCoreRepositoryMock;
@@ -44,7 +45,7 @@ namespace SOS.Export.Test
         {
             var processedDarwinCoreRepositoryMock = new Mock<IProcessedDarwinCoreRepository>();
             processedDarwinCoreRepositoryMock
-                .Setup(pdcr => pdcr.GetChunkAsync(0, It.IsAny<int>()))
+                .Setup(pdcr => pdcr.GetChunkAsync(new AdvancedFilter(), 0, It.IsAny<int>()))
                 .ReturnsAsync(new[] { observation });
 
             return processedDarwinCoreRepositoryMock;

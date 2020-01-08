@@ -15,6 +15,7 @@ using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Models.Search;
 using Xunit;
 
 namespace SOS.Export.Test.IO.DwcArchive
@@ -50,6 +51,8 @@ namespace SOS.Export.Test.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                new AdvancedFilter(),
+                "fileName",
                 processedDarwinCoreRepository,
                 processInfo,
                 exportFolderPath,
@@ -90,6 +93,8 @@ namespace SOS.Export.Test.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                new AdvancedFilter(),
+                "fileName",
                 processedDarwinCoreRepositoryMock.Object,
                 processInfo,
                 exportFolderPath,

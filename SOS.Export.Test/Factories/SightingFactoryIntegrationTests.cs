@@ -54,7 +54,7 @@ namespace SOS.Export.Test.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            bool result = await sightingFactory.ExportAllAsync(JobCancellationToken.Null);
+            bool result = await sightingFactory.ExportAllAsync("fileName", JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

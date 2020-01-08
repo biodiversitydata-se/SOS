@@ -56,6 +56,9 @@ namespace SOS.Process.Extensions
                 },
                 Event = new DarwinCoreEvent
                 {
+                    EventDate = $"{verbatim.Start.ToUniversalTime().ToString("s")}Z",
+                    EventTime = verbatim.Start.ToUniversalTime().ToString("HH':'mm':'ss''K"),
+                    VerbatimEventDate = verbatim.Start.ToString("yyyy-MM-dd HH:mm:ss")
                 },
                 Identification = new DarwinCoreIdentification
                 {

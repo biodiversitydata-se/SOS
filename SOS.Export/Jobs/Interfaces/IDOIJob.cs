@@ -1,19 +1,21 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
+using SOS.Lib.Models.Search;
 
 namespace SOS.Export.Jobs.Interfaces
 {
     /// <summary>
-    /// Interface for export DC job
+    /// Interface for DOI export job
     /// </summary>
-    public interface IExportDarwinCoreJob
+    public interface IDOIJob
     {
         /// <summary>
-        /// Run export Darwin core job
+        /// Run DOI export job
         /// </summary>
+        /// <param name="filter"></param>
         /// <param name="fileName"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> RunAsync(string fileName, IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(AdvancedFilter filter, string fileName, IJobCancellationToken cancellationToken);
     }
 }
