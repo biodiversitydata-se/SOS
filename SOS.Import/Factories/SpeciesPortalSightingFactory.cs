@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities;
 using SOS.Import.Extensions;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Lib.Configuration.Import;
