@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using System.Xml.XPath;
+using CsvHelper.TypeConversion;
 using FluentAssertions;
 using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive;
@@ -19,7 +20,7 @@ namespace SOS.Export.Test.IO.DwcArchive
         [Fact]
         [Trait("Category","Unit")]
         [Trait("Category", "DwcArchiveUnit")]
-        public void CreateMetaXmlFile_When_OccurrenceIdFieldIsFirstInList_Success()
+        public void OccurrenceId_field_description_must_be_first_when_creating_meta_xml_file()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -54,7 +55,7 @@ namespace SOS.Export.Test.IO.DwcArchive
         [Fact]
         [Trait("Category", "Unit")]
         [Trait("Category", "DwcArchiveUnit")]
-        public void CreateMetaXmlFile_When_OccurrenceIdFieldIsNotFirstInList_ExceptionIsThrown()
+        public void Create_meta_xml_file_fails_when_occurrenceId_field_description_is_not_first()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange

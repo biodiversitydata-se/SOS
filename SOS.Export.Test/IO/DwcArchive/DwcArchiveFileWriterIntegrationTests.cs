@@ -13,6 +13,8 @@ using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
+using SOS.Export.Test.TestHelpers;
+using SOS.Export.Test.TestHelpers.Stubs;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
@@ -25,7 +27,7 @@ namespace SOS.Export.Test.IO.DwcArchive
         [Fact]
         [Trait("Category","Integration")]
         [Trait("Category", "DwcArchiveIntegration")]
-        public async Task CreateDwcArchiveFile_ForAllProcessedObservationsInMongoDb()
+        public async Task Creates_a_DwcArchiveFile_with_all_processed_data_in_MongoDb_instance_and_saves_the_file_on_disk()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -46,13 +48,14 @@ namespace SOS.Export.Test.IO.DwcArchive
                 new Mock<ILogger<DwcArchiveFileWriter>>().Object);
             var processInfoRepository = new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
             var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
+            var filename = FilenameGenerator.CreateFilename("sos_dwc_archive_with_all_data");
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                 new AdvancedFilter(),
-                "fileName",
+                filename,
                 processedDarwinCoreRepository,
                 processInfo,
                 exportFolderPath,
@@ -68,14 +71,14 @@ namespace SOS.Export.Test.IO.DwcArchive
         [Fact]
         [Trait("Category", "Integration")]
         [Trait("Category", "DwcArchiveIntegration")]
-        public async Task CreateDwcArchiveFile_ForTenTestObservations()
+        public async Task Creates_a_DwcArchiveFile_with_ten_predefined_observations_and_saves_the_file_on_disk()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var exportConfiguration = GetExportConfiguration();
             string exportFolderPath = exportConfiguration.FileDestination.Path;
-            var processedDarwinCoreRepositoryMock = CreateProcessedDarwinCoreRepositoryMock(@"Resources\TenProcessedTestObservations.json");
+            var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources\TenProcessedTestObservations.json");
             DwcArchiveFileWriter dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object),
                 new ExtendedMeasurementOrFactCsvWriter(new Mock<ILogger<ExtendedMeasurementOrFactCsvWriter>>().Object),
@@ -88,14 +91,15 @@ namespace SOS.Export.Test.IO.DwcArchive
                 exportConfiguration.MongoDbConfiguration.BatchSize);
             var processInfoRepository = new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
             var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
+            var filename = FilenameGenerator.CreateFilename("sos_dwc_archive_with_ten_observations");
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                 new AdvancedFilter(),
-                "fileName",
-                processedDarwinCoreRepositoryMock.Object,
+                filename,
+                processedDarwinCoreRepositoryStub.Object,
                 processInfo,
                 exportFolderPath,
                 JobCancellationToken.Null);

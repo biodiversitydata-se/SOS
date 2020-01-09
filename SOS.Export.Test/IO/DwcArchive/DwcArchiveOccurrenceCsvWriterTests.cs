@@ -2,27 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using CsvHelper;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Moq;
-using Newtonsoft.Json;
 using SOS.Export.Enums;
-using SOS.Export.Factories;
 using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive;
-using SOS.Export.Repositories.Interfaces;
-using SOS.Export.Services;
-using SOS.Export.Services.Interfaces;
-using SOS.Export.Test.TestHelpers.JsonConverters;
+using SOS.Export.Test.TestHelpers.Factories;
 using SOS.Export.Test.TestHelpers.Stubs;
-using SOS.Lib.Configuration.Export;
-using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 using Xunit;
 
@@ -42,12 +32,12 @@ namespace SOS.Export.Test.IO.DwcArchive
         [Fact]
         [Trait("Category", "Unit")]
         [Trait("Category", "DwcArchiveUnit")]
-        public async Task CreateDwcOccurrenceCsvFile_LoadTenObservations_ShouldSucceed()
+        public async Task Creating_a_DwC_occurrence_csv_file_with_ten_observations()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var processedDarwinCoreRepositoryMock = CreateProcessedDarwinCoreRepositoryMock(@"Resources\TenProcessedTestObservations.json");
+            var processedDarwinCoreRepositoryMock = ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources\TenProcessedTestObservations.json");
             var memoryStream = new MemoryStream();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -71,16 +61,16 @@ namespace SOS.Export.Test.IO.DwcArchive
         [Fact]
         [Trait("Category", "Unit")]
         [Trait("Category", "DwcArchiveUnit")]
-        public async Task CreateDwcOccurrenceCsvFile_LongLatProperties_ShouldBeRoundedToFiveDecimals()
+        public async Task Longitude_and_latitude_is_rounded_to_five_decimals()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var memoryStream = new MemoryStream();
-            var observation = GetDefaultObservation();
+            var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
             observation.Location.DecimalLatitude = 13.823392373018132;
             observation.Location.DecimalLongitude = 55.51071440795833;
-            var processedDarwinCoreRepositoryMock = CreateProcessedDarwinCoreRepositoryMock(observation);
+            var processedDarwinCoreRepositoryMock = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -104,15 +94,15 @@ namespace SOS.Export.Test.IO.DwcArchive
         [Fact]
         [Trait("Category", "Unit")]
         [Trait("Category", "DwcArchiveUnit")]
-        public async Task CreateDwcOccurrenceCsvFile_CoordinateUncertaintyProperty_ShouldNeverBeZero()
+        public async Task CoordinateUncertaintyInMeters_property_is_never_zero()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var memoryStream = new MemoryStream();
-            var observation = GetDefaultObservation();
+            var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
             observation.Location.CoordinateUncertaintyInMeters = 0;
-            var processedDarwinCoreRepositoryMock = CreateProcessedDarwinCoreRepositoryMock(observation);
+            var processedDarwinCoreRepositoryMock = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -136,15 +126,15 @@ namespace SOS.Export.Test.IO.DwcArchive
         [Fact]
         [Trait("Category", "Unit")]
         [Trait("Category", "DwcArchiveUnit")]
-        public async Task CreateDwcOccurrenceCsvFile_OccurrenceRemarksWithNewLine_ShouldBeReplacedBySpace()
+        public async Task OccurrenceRemarks_containing_NewLine_characters_is_replaced_by_space()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var memoryStream = new MemoryStream();
-            var observation = GetDefaultObservation();
+            var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
             observation.Occurrence.OccurrenceRemarks = "Sighting found in\r\nUppsala";
-            var processedDarwinCoreRepositoryMock = CreateProcessedDarwinCoreRepositoryMock(observation);
+            var processedDarwinCoreRepositoryMock = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -166,14 +156,14 @@ namespace SOS.Export.Test.IO.DwcArchive
         [Fact]
         [Trait("Category", "Unit")]
         [Trait("Category", "DwcArchiveUnit")]
-        public async Task CreateDwcOccurrenceCsvFile_WithSubsetOfFieldDescriptions_OnlySpecifiedFieldDescriptionsShouldBeUsed()
+        public async Task Creating_Occurrence_csv_file_with_subset_of_field_descriptions_is_using_exactly_the_provided_fields()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var memoryStream = new MemoryStream();
-            var observation = GetDefaultObservation();
-            var processedDarwinCoreRepositoryMock = CreateProcessedDarwinCoreRepositoryMock(observation);
+            var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
+            var processedDarwinCoreRepositoryMock = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
             List<FieldDescriptionId> fieldDescriptionIds = new List<FieldDescriptionId>
             {
                 FieldDescriptionId.OccurrenceID,
@@ -201,8 +191,7 @@ namespace SOS.Export.Test.IO.DwcArchive
             recordDictionary.Should().NotContainKey("basisOfRecord", "because this field was not provided as field description");
         }
 
-
-        private static List<dynamic> ReadCsvFile(MemoryStream memoryStream)
+        private List<dynamic> ReadCsvFile(MemoryStream memoryStream)
         {
             using var readMemoryStream = new MemoryStream(memoryStream.ToArray());
             using var streamReader = new StreamReader(readMemoryStream);
@@ -212,7 +201,7 @@ namespace SOS.Export.Test.IO.DwcArchive
             return records;
         }
 
-        private static void SetCsvConfigurations(CsvReader csv)
+        private void SetCsvConfigurations(CsvReader csv)
         {
             csv.Configuration.HasHeaderRecord = true;
             csv.Configuration.Delimiter = "\t";

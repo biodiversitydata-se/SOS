@@ -15,7 +15,7 @@ namespace SOS.Export.Test.Repositories.Destination
     public class ProcessedDwcRepositoryIntegrationTests : TestBase
     {
         [Fact]
-        public async Task GetProjectParameters()
+        public async Task Project_parameters_is_fetched_from_ProcessedDarwinCoreRepository()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -25,14 +25,14 @@ namespace SOS.Export.Test.Repositories.Destination
                 exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
                 exportConfiguration.MongoDbConfiguration.DatabaseName,
                 exportConfiguration.MongoDbConfiguration.BatchSize);
-            var processedDarwinCoreRepository = new ProcessedDarwinCoreRepository(
+            var sut = new ProcessedDarwinCoreRepository(
                 exportClient,
                 new NullLogger<ProcessedDarwinCoreRepository>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var projectParameters = await processedDarwinCoreRepository.GetProjectParameters(0, 100);
+            var projectParameters = await sut.GetProjectParameters(0, 100);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -41,7 +41,7 @@ namespace SOS.Export.Test.Repositories.Destination
         }
 
         [Fact]
-        public async Task GetProjectParametersAndConvertToExtendedMeasurementOrFactModels()
+        public async Task DarwinCoreProject_objects_is_converted_to_ExtendedMeasurementOrFactRow_objects()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -54,11 +54,11 @@ namespace SOS.Export.Test.Repositories.Destination
             var processedDarwinCoreRepository = new ProcessedDarwinCoreRepository(
                 exportClient,
                 new NullLogger<ProcessedDarwinCoreRepository>());
+            var projectParameters = await processedDarwinCoreRepository.GetProjectParameters(0, 100);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var projectParameters = await processedDarwinCoreRepository.GetProjectParameters(0, 100);
             var extendedMeasurementOrFactRows = projectParameters.ToExtendedMeasurementOrFactRows();
             
             //-----------------------------------------------------------------------------------------------------------
