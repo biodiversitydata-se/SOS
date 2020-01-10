@@ -36,7 +36,7 @@ namespace SOS.Export.IO.DwcArchive
             CreateHeaderNode(doc);
             var archiveNode = CreateArchiveNode(doc);
             CreateCoreNode(fieldDescriptions, doc, archiveNode);
-            // Todo - Add extensions
+            AppendExtension(doc, archiveNode, ExtensionMetadata.EmofFactory.Create());
             doc.Save(stream);
         }
 
@@ -118,6 +118,76 @@ namespace SOS.Export.IO.DwcArchive
                 fieldNode.Attributes.Append(fieldNodeTermAttribute);
                 coreNode.AppendChild(fieldNode);
             }
+        }
+
+        private static void AppendExtension(XmlDocument doc, XmlNode coreNode, ExtensionMetadata metaData)
+        {
+
+            var extension = doc.CreateElement("extension", elementNamespace);
+
+            XmlAttribute attr = doc.CreateAttribute("encoding");
+            attr.Value = "UTF8";
+            extension.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("fieldsTerminatedBy");
+            attr.Value = @"\t";
+            extension.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("linesTerminatedBy");
+            attr.Value = @"\n";
+            extension.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("fieldsEnclosedBy");
+            attr.Value = "";
+            extension.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("ignoreHeaderLines");
+            attr.Value = "1";
+            extension.Attributes.Append(attr);
+
+            attr = doc.CreateAttribute("rowType");
+            attr.Value = metaData.RowType;
+            extension.Attributes.Append(attr);
+
+            var fileLocation = doc.CreateElement("location", elementNamespace);
+            fileLocation.AppendChild(doc.CreateTextNode(metaData.FileLocation));
+
+
+            //    <files>
+            //    <location>VernacularName.tsv</location>
+            //    </files>
+
+            var fileElement = doc.CreateElement("files", elementNamespace);
+            fileElement.AppendChild(fileLocation);
+            extension.AppendChild(fileElement);
+
+            attr = doc.CreateAttribute("index");
+            attr.Value = "0";
+
+            // <coreid index="0" />
+
+            var coreElement = doc.CreateElement("coreid", elementNamespace);
+            coreElement.Attributes.Append(attr);
+            extension.AppendChild(coreElement);
+
+            foreach (var f in metaData.Fields.OrderBy(o => o.Index))
+            {
+                var field = doc.CreateElement("field", elementNamespace);
+
+
+                attr = doc.CreateAttribute("index");
+                attr.Value = f.Index.ToString();
+
+                field.Attributes.Append(attr);
+
+                attr = doc.CreateAttribute("term");
+                attr.Value = f.Term;
+                field.Attributes.Append(attr);
+
+                extension.AppendChild(field);
+            }
+
+            coreNode.AppendChild(extension);
         }
     }
 }

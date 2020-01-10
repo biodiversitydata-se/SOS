@@ -19,5 +19,14 @@ namespace SOS.Export.Repositories.Interfaces
         /// <param name="take"></param>
         /// <returns></returns>
         Task<IEnumerable<DarwinCore<DynamicProperties>>> GetChunkAsync(AdvancedFilter filter, int skip, int take);
+
+        /// <summary>
+        /// Get project parameters.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        Task<IEnumerable<DarwinCoreProject>> GetProjectParameters(AdvancedFilter filter, int skip, int take);
     }
 }

@@ -19,6 +19,7 @@ namespace SOS.Export.IO.DwcArchive
     public class DwcArchiveFileWriter : IDwcArchiveFileWriter
     {
         private readonly IDwcArchiveOccurrenceCsvWriter _dwcArchiveOccurrenceCsvWriter;
+        private readonly IExtendedMeasurementOrFactCsvWriter _extendedMeasurementOrFactCsvWriter;
         private readonly IFileService _fileService;
         private readonly ILogger<DwcArchiveFileWriter> _logger;
 
@@ -26,14 +27,17 @@ namespace SOS.Export.IO.DwcArchive
         /// Constructor.
         /// </summary>
         /// <param name="dwcArchiveOccurrenceCsvWriter"></param>
+        /// <param name="extendedMeasurementOrFactCsvWriter"></param>
         /// <param name="fileService"></param>
         /// <param name="logger"></param>
         public DwcArchiveFileWriter(
             IDwcArchiveOccurrenceCsvWriter dwcArchiveOccurrenceCsvWriter,
+            IExtendedMeasurementOrFactCsvWriter extendedMeasurementOrFactCsvWriter,
             IFileService fileService,
             ILogger<DwcArchiveFileWriter> logger)
         {
             _dwcArchiveOccurrenceCsvWriter = dwcArchiveOccurrenceCsvWriter ?? throw new ArgumentNullException(nameof(dwcArchiveOccurrenceCsvWriter));
+            _extendedMeasurementOrFactCsvWriter = extendedMeasurementOrFactCsvWriter ?? throw new ArgumentNullException(nameof(extendedMeasurementOrFactCsvWriter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -75,6 +79,7 @@ namespace SOS.Export.IO.DwcArchive
                 temporaryZipExportFolderPath = Path.Combine(exportFolderPath, fileName);
                 _fileService.CreateFolder(temporaryZipExportFolderPath);
                 string occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.csv");
+                string emofCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "extendedMeasurementOrFact.csv");
                 string metaXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "meta.xml");
                 string emlXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "eml.xml");
                 string processInfoXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "processinfo.xml");
@@ -83,6 +88,17 @@ namespace SOS.Export.IO.DwcArchive
                 using (FileStream fileStream = File.Create(occurrenceCsvFilePath))
                 {
                     await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                        filter,
+                        fileStream,
+                        fieldDescriptions,
+                        processedDarwinCoreRepository,
+                        cancellationToken);
+                }
+
+                // Create ExtendedMeasurementOrFact.csv
+                using (FileStream fileStream = File.Create(emofCsvFilePath))
+                {
+                    await _extendedMeasurementOrFactCsvWriter.CreateCsvFileAsync(
                         filter,
                         fileStream,
                         fieldDescriptions,

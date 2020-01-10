@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Search;
@@ -8,6 +9,20 @@ namespace SOS.Lib.Extensions
 {
     public static class SearchExtensions
     {
+        /// <summary>
+        /// Create project parameter filter.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public static FilterDefinition<DarwinCore<DynamicProperties>> ToProjectParameteFilterDefinition(this AdvancedFilter filter)
+        {
+            var filters = CreateFilterDefinitions(filter);
+            filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.ElemMatch(
+                o => o.DynamicProperties.Projects, o => o.ProjectParameters != null));
+
+            return Builders<DarwinCore<DynamicProperties>>.Filter.And(filters);
+        }
+
         /// <summary>
         /// Create search filter
         /// </summary>
@@ -20,6 +35,12 @@ namespace SOS.Lib.Extensions
                 return FilterDefinition<DarwinCore<DynamicProperties>>.Empty;
             }
 
+            var filters = CreateFilterDefinitions(filter);
+            return Builders<DarwinCore<DynamicProperties>>.Filter.And(filters);
+        }
+
+        private static List<FilterDefinition<DarwinCore<DynamicProperties>>> CreateFilterDefinitions(AdvancedFilter filter)
+        {
             var filters = new List<FilterDefinition<DarwinCore<DynamicProperties>>>();
 
             if (filter.TaxonIds?.Any() ?? false)
@@ -29,12 +50,14 @@ namespace SOS.Lib.Extensions
 
             if (filter.StartDate.HasValue)
             {
-                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.Gte(m => m.Event.EventDate, $"{filter.StartDate.Value.ToUniversalTime().ToString("s")}Z"));
+                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.Gte(m => m.Event.EventDate,
+                    $"{filter.StartDate.Value.ToUniversalTime().ToString("s")}Z"));
             }
 
             if (filter.EndDate.HasValue)
             {
-                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.Lte(m => m.Event.EventDate, $"{filter.EndDate.Value.ToUniversalTime().ToString("s")}Z"));
+                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.Lte(m => m.Event.EventDate,
+                    $"{filter.EndDate.Value.ToUniversalTime().ToString("s")}Z"));
             }
 
             if (filter.Counties?.Any() ?? false)
@@ -44,7 +67,8 @@ namespace SOS.Lib.Extensions
 
             if (filter.Municipalities?.Any() ?? false)
             {
-                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Location.Municipality, filter.Municipalities));
+                filters.Add(
+                    Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Location.Municipality, filter.Municipalities));
             }
 
             if (filter.Provinces?.Any() ?? false)
@@ -57,7 +81,7 @@ namespace SOS.Lib.Extensions
                 filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Occurrence.Sex, filter.Sex));
             }
 
-            return Builders<DarwinCore<DynamicProperties>>.Filter.And(filters);
+            return filters;
         }
 
         /// <summary>

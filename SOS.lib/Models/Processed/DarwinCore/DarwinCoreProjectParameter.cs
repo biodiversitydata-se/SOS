@@ -9,7 +9,9 @@ namespace SOS.Lib.Models.Processed.DarwinCore
     /// </summary>
     public class DarwinCoreProjectParameter
     {
-        public int SightingId { get; set; }
+        //  "occurrenceID", "measurementType", "measurementValue", "measurementUnit" 
+
+        public string OccurrenceId { get; set; }
         public int ProjectId { get; set; }
         public int ProjectParameterId { get; set; }
         public string Name { get; set; }
