@@ -81,7 +81,6 @@ namespace SOS.Import.Factories
 
             try
             {
-                var start = DateTime.Now;
                 var activities = (await _metadataRepository.GetActivitiesAsync()).ToAggregates().ToDictionary(a => a.Id, a => a);
 
                 var metaDataTasks = new[]

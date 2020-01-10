@@ -167,19 +167,19 @@ namespace SOS.Import.Test.Factories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _metadataRepositoryMock.Setup(mdr => mdr.GetActivitiesAsync())
-                .ReturnsAsync(new [] { new MetadataWithCategoryEntity { Id = 1, Name = "Activity" } });
+                .ReturnsAsync(new [] { new MetadataWithCategoryEntity{ Id = 1, CategoryId = 1, CategoryName = "Category", Translation = "Activity", CultureCode = "sv-GB" }});
             _metadataRepositoryMock.Setup(mdr => mdr.GetBiotopesAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "Biotope" } });
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Biotope", CultureCode = "en-GB" } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetGendersAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "Gender" } });
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Gender", CultureCode = "en-GB" } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetStagesAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "Stage" } });
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Stage", CultureCode = "en-GB" } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetSubstratesAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "Substrate" } });
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Substrate", CultureCode = "en-GB" } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetUnitsAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "Unit" } });
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Unit", CultureCode = "en-GB" } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetValidationStatusAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Name = "ValidationStatus" } });
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "ValidationStatus", CultureCode = "en-GB" } });
             
 
             _projectRepositoryMock.Setup(pr => pr.GetProjectsAsync())

@@ -213,7 +213,7 @@ namespace SOS.Process.Test.Jobs
             _kulProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, DarwinCoreTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(new RunInfo(DataProvider.KUL) { Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now });
 
-
+            _darwinCoreRepository.Setup(r => r.DropIndexAsync());
             _darwinCoreRepository.Setup(r => r.CreateIndexAsync());
 
             _darwinCoreRepository.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()));

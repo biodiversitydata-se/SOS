@@ -27,16 +27,23 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 const string query = @"
                 SELECT 
 	                a.Id, 
-	                t.Value AS Name,
+	                t.Value AS Translation,
                     ac.Id AS CategoryId,
-	                ct.Value AS CategoryName
+	                ct.Value AS CategoryName,
+					gc.CultureCode
                 FROM 
 	                Activity a 
 	                INNER JOIN [Resource] r ON a.ResourceLabel = r.Label
-	                INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49
+	                INNER JOIN Translation t ON r.Id = t.ResourceId
+					INNER JOIN GlobalizationCulture gc ON t.GlobalizationCultureId = gc.Id
 	                INNER JOIN ActivityCategory ac ON a.ActivityCategoryId = ac.Id
 	                INNER JOIN [Resource] cr ON ac.ResourceLabel = cr.Label
-	                INNER JOIN Translation ct ON cr.Id = ct.ResourceId AND ct.GlobalizationCultureId = 49";
+	                INNER JOIN Translation ct ON cr.Id = ct.ResourceId AND ct.GlobalizationCultureId = t.GlobalizationCultureId 
+				WHERE
+					gc.Id IN (49, 175)
+				ORDER BY
+					a.Id,
+					gc.CultureCode";
 
                 return await QueryAsync<MetadataWithCategoryEntity>(query);
             }
@@ -55,11 +62,18 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 const string query = @"
                     SELECT 
 	                    b.Id, 
-	                    t.Value AS Name
+	                    t.Value AS Translation,
+						gc.CultureCode
                     FROM 
 	                    Biotope b 
 	                    INNER JOIN [Resource] r ON b.ResourceLabel = r.Label
-	                    INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
+	                    INNER JOIN Translation t ON r.Id = t.ResourceId 
+						INNER JOIN GlobalizationCulture gc ON t.GlobalizationCultureId = gc.Id
+					WHERE
+						gc.Id IN (49, 175)
+					ORDER BY
+						b.Id,
+						gc.CultureCode";
 
                 return await QueryAsync<MetadataEntity>(query);
             }
@@ -78,11 +92,18 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 const string query = @"
                     SELECT 
 	                    g.Id, 
-	                    t.Value AS Name
+	                    t.Value AS Translation,
+						gc.CultureCode
                     FROM 
 	                    Gender g 
 	                    INNER JOIN [Resource] r ON g.ResourceLabel = r.Label
-	                    INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
+	                    INNER JOIN Translation t ON r.Id = t.ResourceId 
+						INNER JOIN GlobalizationCulture gc ON t.GlobalizationCultureId = gc.Id
+					WHERE
+						gc.Id IN (49, 175)
+					ORDER BY
+						g.Id,
+						gc.CultureCode";
 
                     return await QueryAsync<MetadataEntity>(query);
             }
@@ -101,7 +122,8 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 const string query = @"
                     SELECT 
 	                    Id,
-	                    Name
+	                    Name AS Translation,
+						'sv-SE' AS CultureCode
                     FROM 
                       Organization";
 
@@ -121,12 +143,19 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
             {
                 const string query = @"
                 SELECT 
-	                s.Id, 
-	                t.Value AS Name
-                FROM 
-	                Stage s
-	                INNER JOIN [Resource] r ON s.ResourceLabel = r.Label
-	                INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
+					s.Id, 
+					t.Value AS Translation,
+					gc.CultureCode
+				FROM 
+					Stage s
+					INNER JOIN [Resource] r ON s.ResourceLabel = r.Label
+					INNER JOIN Translation t ON r.Id = t.ResourceId 
+					INNER JOIN GlobalizationCulture gc ON t.GlobalizationCultureId = gc.Id
+				WHERE
+					gc.Id IN (49, 175)
+				ORDER BY
+					s.Id,
+					gc.CultureCode";
 
                 return await QueryAsync<MetadataEntity>(query);
             }
@@ -145,11 +174,18 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 const string query = @"
                     SELECT 
 	                    s.Id, 
-	                    t.Value AS Name
+	                    t.Value AS Translation,
+						gc.CultureCode
                     FROM 
 	                    Substrate s 
 	                    INNER JOIN [Resource] r ON s.ResourceLabel = r.Label
-	                    INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
+	                    INNER JOIN Translation t ON r.Id = t.ResourceId 
+						INNER JOIN GlobalizationCulture gc ON t.GlobalizationCultureId = gc.Id
+					WHERE
+						gc.Id IN (49, 175)
+					ORDER BY
+						s.Id,
+						gc.CultureCode";
 
                 return await QueryAsync<MetadataEntity>(query);
             }
@@ -168,11 +204,18 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 const string query = @"
                     SELECT 
 	                    u.Id, 
-	                    t.Value AS Name
+	                    t.Value AS Translation,
+						gc.CultureCode
                     FROM 
 	                    Unit u 
 	                    INNER JOIN [Resource] r ON u.ResourceLabel = r.Label
-	                    INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
+	                    INNER JOIN Translation t ON r.Id = t.ResourceId 
+						INNER JOIN GlobalizationCulture gc ON t.GlobalizationCultureId = gc.Id
+					WHERE
+						gc.Id IN (49, 175)
+					ORDER BY
+						u.Id,
+						gc.CultureCode";
 
                     return await QueryAsync<MetadataEntity>(query);
             }
@@ -191,11 +234,18 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
                 const string query = @"
                     SELECT 
 	                    vs.Id, 
-	                    t.Value AS Name
+	                    t.Value AS Translation,
+						gc.CultureCode
                     FROM 
 	                    ValidationStatus vs 
 	                    INNER JOIN [Resource] r ON vs.ResourceLabel = r.Label
-	                    INNER JOIN Translation t ON r.Id = t.ResourceId AND t.GlobalizationCultureId = 49";
+	                    INNER JOIN Translation t ON r.Id = t.ResourceId
+						INNER JOIN GlobalizationCulture gc ON t.GlobalizationCultureId = gc.Id
+					WHERE
+						gc.Id IN (49, 175)
+					ORDER BY
+						vs.Id,
+						gc.CultureCode";
 
                 return await QueryAsync<MetadataEntity>(query);
             }

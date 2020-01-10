@@ -13,12 +13,12 @@
         /// <summary>
         /// County of site
         /// </summary>
-        public Metadata County { get; set; }
+        public GeographicalArea County { get; set; }
 
         /// <summary>
         /// Countyry part of site
         /// </summary>
-        public Metadata CountryPart { get; set; }
+        public GeographicalArea CountryPart { get; set; }
 
         /// <summary>
         /// Id of site
@@ -28,17 +28,17 @@
         /// <summary>
         /// Name of site
         /// </summary>
-        public Metadata Municipality { get; set; }
+        public GeographicalArea Municipality { get; set; }
 
         /// <summary>
         /// Parish
         /// </summary>
-        public Metadata Parish { get; set; }
+        public GeographicalArea Parish { get; set; }
 
         /// <summary>
         /// Province
         /// </summary>
-        public Metadata Province { get; set; }
+        public GeographicalArea Province { get; set; }
 
         /// <summary>
         /// Name of site

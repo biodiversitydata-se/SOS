@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using SOS.Import.Entities;
 using SOS.Lib.Enums;
@@ -245,47 +244,32 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast meta data itemEntity to model 
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        public static Metadata ToAggregate(this MetadataEntity entity)
-        {
-            return new Metadata
-            {
-                Id = entity.Id,
-                Name = entity.Name
-            };
-        }
-
-        /// <summary>
         /// Cast multiple sightings entities to models 
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
         public static IEnumerable<Metadata> ToAggregates(this IEnumerable<MetadataEntity> entities)
         {
-            return entities.Select(e => e.ToAggregate());
+            if (!entities?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var metadataItems = new Dictionary<int, Metadata>();
+            foreach (var entity in entities)
+            {
+                if (!metadataItems.ContainsKey(entity.Id))
+                {
+                    metadataItems.Add(entity.Id, new Metadata(entity.Id));
+                }
+
+                metadataItems[entity.Id].Translations.Add(new MetadataTranslation{ Culture = entity.CultureCode, Value = entity.Translation});
+            }
+
+            return metadataItems.Values;
         }
 
-        /// <summary>
-        /// Cast meta data itemEntity to model 
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        public static MetadataWithCategory ToAggregate(this MetadataWithCategoryEntity entity)
-        {
-            return new MetadataWithCategory()
-            {
-                Id = entity.Id,
-                Name = entity.Name,
-                Category = new Metadata
-                {
-                    Id = entity.CategoryId,
-                    Name = entity.CategoryName
-                }
-            };
-        }
+        
 
         /// <summary>
         /// Cast multiple sightings entities to models 
@@ -294,7 +278,34 @@ namespace SOS.Import.Extensions
         /// <returns></returns>
         public static IEnumerable<MetadataWithCategory> ToAggregates(this IEnumerable<MetadataWithCategoryEntity> entities)
         {
-            return entities.Select(e => e.ToAggregate());
+            if (!entities?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var metadataItems = new Dictionary<int, MetadataWithCategory>();
+            foreach (var entity in entities)
+            {
+                if (!metadataItems.ContainsKey(entity.Id))
+                {
+                    metadataItems.Add(entity.Id, new MetadataWithCategory(entity.Id, entity.CategoryId));
+                }
+
+                var metadata = metadataItems[entity.Id];
+                metadata.Translations.Add(new MetadataTranslation
+                {
+                    Culture = entity.CultureCode, 
+                    Value = entity.Translation
+                });
+
+                metadata.Category.Translations.Add(new MetadataTranslation
+                {
+                    Culture = entity.CultureCode,
+                    Value = entity.CategoryName
+                });
+            }
+
+            return metadataItems.Values;
         }
 
         /// <summary>
@@ -416,12 +427,12 @@ namespace SOS.Import.Extensions
             return new Site
             {
                 Accuracy = entity.Accuracy,
-                County = entity.CountyId.HasValue ? new Metadata{ Id = entity.CountyId.Value, Name = entity.CountyName } : null,
-                CountryPart = entity.CountryPartId.HasValue ? new Metadata { Id = entity.CountryPartId.Value, Name = entity.CountryPartName } : null,
+                County = entity.CountyId.HasValue ? new GeographicalArea { Id = entity.CountyId.Value, Name = entity.CountyName } : null,
+                CountryPart = entity.CountryPartId.HasValue ? new GeographicalArea { Id = entity.CountryPartId.Value, Name = entity.CountryPartName } : null,
                 Id = entity.Id,
-                Municipality = entity.MunicipalityId.HasValue ? new Metadata { Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName } : null,
-                Province = entity.ProvinceId.HasValue ? new Metadata { Id = entity.ProvinceId.Value, Name = entity.ProvinceName } : null,
-                Parish = entity.ParishId.HasValue ? new Metadata { Id = entity.ParishId.Value, Name = entity.ParishName } : null,
+                Municipality = entity.MunicipalityId.HasValue ? new GeographicalArea { Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName } : null,
+                Province = entity.ProvinceId.HasValue ? new GeographicalArea { Id = entity.ProvinceId.Value, Name = entity.ProvinceName } : null,
+                Parish = entity.ParishId.HasValue ? new GeographicalArea { Id = entity.ParishId.Value, Name = entity.ParishName } : null,
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord

@@ -3,17 +3,17 @@
     /// <summary>
     /// Represents metadata item with category
     /// </summary>
-    public class MetadataWithCategory
+    public class MetadataWithCategory : Metadata
     {
         /// <summary>
-        /// Id of item
+        /// Constructor
         /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Name of item
-        /// </summary>
-        public string Name { get; set; }
+        /// <param name="id"></param>
+        /// <param name="categoryId"></param>
+        public MetadataWithCategory(int id, int categoryId):base(id)
+        {
+            Category = new Metadata(categoryId);
+        }
 
         /// <summary>
         /// Category of item

@@ -57,10 +57,10 @@ namespace SOS.Import.Test.Repositories
         [Fact]
         public async Task GetActivitiesAsyncSuccess()
         {
-            IEnumerable<MetadataWithCategoryEntity> activities = new []
+            IEnumerable<MetadataWithCategoryEntity> activities = new[]
             {
-                    new MetadataWithCategoryEntity { Id = 1, Name = "Activity 1", CategoryId = 1, CategoryName = "Category" },
-                    new MetadataWithCategoryEntity { Id = 2, Name = "Activity 2", CategoryId = 1, CategoryName = "Category" }
+                new MetadataWithCategoryEntity { Id = 1, CategoryId = 1, CategoryName = "Category", Translation = "Activity 1", CultureCode = "sv-GB" },
+                new MetadataWithCategoryEntity { Id = 2, CategoryId = 1, CategoryName = "Category", Translation = "Activity 2", CultureCode = "sv-GB" }
             };
 
             _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataWithCategoryEntity>(It.IsAny<string>(), null))
@@ -117,8 +117,8 @@ namespace SOS.Import.Test.Repositories
         {
             IEnumerable<MetadataEntity> biotopes = new[]
             {
-                    new MetadataEntity { Id = 1, Name = "Biotope 1" },
-                    new MetadataEntity { Id = 2, Name = "Biotope 2" }
+                new MetadataEntity { Id = 1, Translation = "Biotope 1", CultureCode = "en-GB" },
+                new MetadataEntity { Id = 2, Translation = "Biotope 2", CultureCode = "en-GB" }
             };
 
             _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
@@ -175,8 +175,8 @@ namespace SOS.Import.Test.Repositories
         {
             IEnumerable<MetadataEntity> activities = new[]
             {
-                    new MetadataEntity { Id = 1, Name = "Gender 1" },
-                    new MetadataEntity { Id = 2, Name = "Gender 2" }
+                new MetadataEntity { Id = 1, Translation = "Gender 1", CultureCode = "en-GB" },
+                new MetadataEntity { Id = 2, Translation = "Gender 2", CultureCode = "en-GB" }
             };
 
             _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
@@ -233,8 +233,8 @@ namespace SOS.Import.Test.Repositories
         {
             IEnumerable<MetadataEntity> activities = new[]
             {
-                    new MetadataEntity { Id = 1, Name = "Stage 1" },
-                    new MetadataEntity { Id = 2, Name = "Stage 2" }
+                new MetadataEntity { Id = 1, Translation = "Stage 1", CultureCode = "en-GB" },
+                new MetadataEntity { Id = 2, Translation = "Stage 2", CultureCode = "en-GB" }
             };
 
             _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
@@ -291,8 +291,8 @@ namespace SOS.Import.Test.Repositories
         {
             IEnumerable<MetadataEntity> substrates = new[]
             {
-                    new MetadataEntity { Id = 1, Name = "Substrate 1" },
-                    new MetadataEntity { Id = 2, Name = "Substrate 2" }
+                new MetadataEntity { Id = 1, Translation = "Substrate 1", CultureCode = "en-GB" },
+                new MetadataEntity { Id = 2, Translation = "Substrate 2", CultureCode = "en-GB" }
             };
 
             _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
@@ -349,8 +349,8 @@ namespace SOS.Import.Test.Repositories
         {
             IEnumerable<MetadataEntity> activities = new[]
             {
-                    new MetadataEntity { Id = 1, Name = "Unit 1" },
-                    new MetadataEntity { Id = 2, Name = "Unit 2" }
+                new MetadataEntity { Id = 1, Translation = "Unit 1", CultureCode = "en-GB" },
+                new MetadataEntity { Id = 2, Translation = "Unit 2", CultureCode = "en-GB" }
             };
 
             _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
@@ -407,8 +407,8 @@ namespace SOS.Import.Test.Repositories
         {
             IEnumerable<MetadataEntity> validationStatus = new[]
             {
-                    new MetadataEntity { Id = 1, Name = "ValidationStatus 1" },
-                    new MetadataEntity { Id = 2, Name = "ValidationStatus 2" }
+                new MetadataEntity { Id = 1, Translation = "ValidationStatus 1", CultureCode = "en-GB" },
+                new MetadataEntity { Id = 2, Translation = "ValidationStatus 2", CultureCode = "en-GB" }
             };
 
             _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))

@@ -37,5 +37,11 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// <param name="provider"></param>
         /// <returns></returns>
         Task<bool> DeleteProviderDataAsync(DataProvider provider);
+
+        /// <summary>
+        /// Drop current indexes
+        /// </summary>
+        /// <returns></returns>
+        Task DropIndexAsync();
     }
 }

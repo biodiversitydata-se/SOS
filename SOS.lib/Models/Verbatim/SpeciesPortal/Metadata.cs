@@ -1,10 +1,22 @@
-﻿namespace SOS.Lib.Models.Verbatim.SpeciesPortal
+﻿using System.Collections.Generic;
+
+namespace SOS.Lib.Models.Verbatim.SpeciesPortal
 {
     /// <summary>
-    /// Represents diffrent metadata items
+    /// Represents different metadata items
     /// </summary>
     public class Metadata
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="id"></param>
+        public Metadata(int id)
+        {
+            Id = id;
+            Translations = new List<MetadataTranslation>();
+        }
+
         /// <summary>
         /// Id of item
         /// </summary>
@@ -13,6 +25,6 @@
         /// <summary>
         /// Name of item
         /// </summary>
-        public string Name { get; set; }
+        public ICollection<MetadataTranslation> Translations { get; set; }
     }
 }

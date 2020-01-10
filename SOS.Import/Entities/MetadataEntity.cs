@@ -1,18 +1,23 @@
 ﻿namespace SOS.Import.Entities
 {
     /// <summary>
-    /// Represents diffrent metadata items
+    /// Represents different metadata items
     /// </summary>
     public class MetadataEntity
     {
+        /// <summary>
+        /// Culture
+        /// </summary>
+        public string CultureCode { get; set; }
+
         /// <summary>
         /// Id of item
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Name of item
+        /// Item translation
         /// </summary>
-        public string Name { get; set; }
+        public string Translation { get; set; }
     }
 }

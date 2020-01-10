@@ -14,5 +14,6 @@
         /// Name of category
         /// </summary>
         public string CategoryName { get; set; }
+
     }
 }

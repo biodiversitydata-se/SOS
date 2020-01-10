@@ -132,6 +132,7 @@ namespace SOS.Process.Repositories.Destination
                    Builders<DarwinCore>.IndexKeys.Ascending(x => x.ParentIds),
                    Builders<ImageADarwinCoreggregate>.IndexKeys.Ascending(x => x.Class))));
                    */
+            Logger.LogDebug("Creating indexes");
             await MongoCollection.Indexes.CreateManyAsync(indexModels);
         }
 
@@ -150,6 +151,13 @@ namespace SOS.Process.Repositories.Destination
                 Logger.LogError(e.ToString());
                 return false;
             }
+        }
+
+        /// <inheritdoc />
+        public async Task DropIndexAsync()
+        {
+            Logger.LogDebug("Dropping current indexes");
+            await MongoCollection.Indexes.DropAllAsync();
         }
 
         /// <inheritdoc />

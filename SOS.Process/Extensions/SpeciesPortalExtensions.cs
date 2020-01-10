@@ -79,14 +79,14 @@ namespace SOS.Process.Extensions
                     EventDate = $"{verbatim.StartDate?.ToUniversalTime().ToString("s")}Z" ?? "",
                     EventTime = verbatim.StartDate?.ToUniversalTime().ToString("HH':'mm':'ss''K") ?? "",
                     Habitat = (verbatim.Bioptope != null
-                        ? $"{verbatim.Bioptope.Name}{(string.IsNullOrEmpty(verbatim.BiotopeDescription) ? "" : " # ")}{verbatim.BiotopeDescription}"
+                        ? $"{verbatim.Bioptope.Translations.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value}{(string.IsNullOrEmpty(verbatim.BiotopeDescription) ? "" : " # ")}{verbatim.BiotopeDescription}"
                         : verbatim.BiotopeDescription).WithMaxLength(255),
                     SamplingProtocol = GetSamplingProtocol(verbatim.Projects),
                     VerbatimEventDate = $"{(verbatim.StartDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? "")}{(verbatim.StartDate.HasValue && verbatim.EndDate.HasValue ? "-" : "")}{(verbatim.EndDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? "")}"
                 },
                 Identification = new DarwinCoreIdentification
                 {
-                    IdentificationVerificationStatus = verbatim.ValidationStatus?.Name,
+                    IdentificationVerificationStatus = verbatim.ValidationStatus?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
                     IdentifiedBy = verbatim.VerifiedBy
                 },
                 Organism = new DarwinCoreOrganism()
@@ -94,7 +94,7 @@ namespace SOS.Process.Extensions
 
                 },
                 InformationWithheld = "More information can be obtained from the Data Provider",
-                InstitutionCode = verbatim.OwnerOrganization?.Name ?? "ArtDatabanken",
+                InstitutionCode = verbatim.OwnerOrganization?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value ?? "ArtDatabanken",
                 InstitutionID = verbatim.ControlingOrganisationId.HasValue
                     ? $"urn:lsid:artdata.slu.se:organization:{verbatim.ControlingOrganisationId}"
                     : null,
@@ -126,25 +126,25 @@ namespace SOS.Process.Extensions
                         ? $"http://www.artportalen.se/sighting/{verbatim.Id}#SightingDetailImages"
                         : "",
                     AssociatedReferences = GetAssociatedReferences(verbatim),
-                    Behavior = verbatim.Activity?.Name,
+                    Behavior = verbatim.Activity?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
                     CatalogNumber = verbatim.Id.ToString(),
                     EstablishmentMeans = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
                     IndividualCount = verbatim.Quantity?.ToString() ?? "",
-                    LifeStage = verbatim.Stage?.Name,
+                    LifeStage = verbatim.Stage?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
                     OccurrenceID = $"urn:lsid:artportalen.se:Sighting:{verbatim.Id}",
                     OccurrenceRemarks = verbatim.Comment,
                     OccurrenceStatus = verbatim.NotPresent || verbatim.NotRecovered
                         ? OccurrenceStatus.Absent
                         : OccurrenceStatus.Present,
                     OrganismQuantity = verbatim.Quantity?.ToString() ?? "",
-                    OrganismQuantityType = verbatim.Quantity.HasValue ? verbatim.Unit?.Name ?? "Individuals" : null,
+                    OrganismQuantityType = verbatim.Quantity.HasValue ? verbatim.Unit?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value ?? "Individuals" : null,
                     RecordedBy = verbatim.Observers,
                     RecordNumber = verbatim.Label,
-                    ReproductiveCondition = verbatim.Activity?.Category?.Name,
-                    Sex = verbatim.Gender?.Name
+                    ReproductiveCondition = verbatim.Activity?.Category?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
+                    Sex = verbatim.Gender?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value
                 },
-                OwnerInstitutionCode = verbatim.OwnerOrganization?.Name ?? "ArtDatabanken",
-                RightsHolder = verbatim.RightsHolder ?? verbatim.OwnerOrganization?.Name ?? "Data saknas",
+                OwnerInstitutionCode = verbatim.OwnerOrganization?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value ?? "ArtDatabanken",
+                RightsHolder = verbatim.RightsHolder ?? verbatim.OwnerOrganization?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value ?? "Data saknas",
                 Taxon = taxon,
                 Type = "Occurrence"
             };
@@ -278,7 +278,7 @@ namespace SOS.Process.Extensions
 
             if (verbatim.Substrate != null)
             {
-                substrateDescription.Append($"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatim.Substrate.Name}");
+                substrateDescription.Append($"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatim.Substrate.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value}");
             }
 
             if (!string.IsNullOrEmpty(verbatim.SubstrateDescription))

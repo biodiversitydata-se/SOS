@@ -114,6 +114,9 @@ namespace SOS.Process.Jobs
                 var providerInfo = new Dictionary<DataProvider, ProviderInfo>();
                 var processTasks = new Dictionary<DataProvider, Task<RunInfo>>();
 
+                _logger.LogDebug("Drop indexes");
+                await _darwinCoreRepository.DropIndexAsync();
+
                 // Add species portal import if first bit is set
                 if ((sources & (int)DataProvider.Artdatabanken) > 0)
                 {
