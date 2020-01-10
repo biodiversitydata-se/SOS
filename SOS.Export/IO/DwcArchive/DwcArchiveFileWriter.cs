@@ -99,6 +99,7 @@ namespace SOS.Export.IO.DwcArchive
                 using (FileStream fileStream = File.Create(emofCsvFilePath))
                 {
                     await _extendedMeasurementOrFactCsvWriter.CreateCsvFileAsync(
+                        filter,
                         fileStream,
                         fieldDescriptions,
                         processedDarwinCoreRepository,

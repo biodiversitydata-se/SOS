@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 using Hangfire;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive.Interfaces
 {
     public interface IExtendedMeasurementOrFactCsvWriter
     {
         /// <inheritdoc />
-        Task<bool> CreateCsvFileAsync(
-            Stream stream,
+        Task<bool> CreateCsvFileAsync(AdvancedFilter filter, Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedDarwinCoreRepository processedDarwinCoreRepository,
             IJobCancellationToken cancellationToken);

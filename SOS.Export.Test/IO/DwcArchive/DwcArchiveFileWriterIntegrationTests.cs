@@ -14,7 +14,7 @@ using SOS.Export.Repositories;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Export.Test.TestHelpers;
-using SOS.Export.Test.TestHelpers.Stubs;
+using SOS.Export.Test.TestHelpers.Factories;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
@@ -49,12 +49,14 @@ namespace SOS.Export.Test.IO.DwcArchive
             var processInfoRepository = new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
             var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
             var filename = FilenameGenerator.CreateFilename("sos_dwc_archive_with_all_data");
+            var filter = new AdvancedFilter();
+            //var filter = new AdvancedFilter {TaxonIds = new[] {102951}};
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
-                new AdvancedFilter(),
+                filter,
                 filename,
                 processedDarwinCoreRepository,
                 processInfo,

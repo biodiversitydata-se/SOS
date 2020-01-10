@@ -41,11 +41,13 @@ namespace SOS.Export.Repositories
             return res;
         }
 
-        public async Task<IEnumerable<DarwinCoreProject>> GetProjectParameters(int skip, int take)
+        public async Task<IEnumerable<DarwinCoreProject>> GetProjectParameters(
+            AdvancedFilter filter, 
+            int skip,
+            int take)
         {
-            BsonDocument bsonDocument = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>("{ 'DynamicProperties.Projects.ProjectParameters' : { $ne: null } }");
             List<IEnumerable<DarwinCoreProject>> res = await MongoCollection
-                .Find(bsonDocument)
+                .Find(filter.ToProjectParameteFilterDefinition())
                 .Skip(skip)
                 .Limit(take)
                 .Project(x => x.DynamicProperties.Projects)

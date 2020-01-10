@@ -8,6 +8,7 @@ using SOS.Export.Extensions;
 using SOS.Export.MongoDb;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories;
+using SOS.Lib.Models.Search;
 using Xunit;
 
 namespace SOS.Export.Test.Repositories.Destination
@@ -32,7 +33,7 @@ namespace SOS.Export.Test.Repositories.Destination
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var projectParameters = await sut.GetProjectParameters(0, 100);
+            var projectParameters = await sut.GetProjectParameters(new AdvancedFilter(), 0, 100);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -54,7 +55,7 @@ namespace SOS.Export.Test.Repositories.Destination
             var processedDarwinCoreRepository = new ProcessedDarwinCoreRepository(
                 exportClient,
                 new NullLogger<ProcessedDarwinCoreRepository>());
-            var projectParameters = await processedDarwinCoreRepository.GetProjectParameters(0, 100);
+            var projectParameters = await processedDarwinCoreRepository.GetProjectParameters(new AdvancedFilter(), 0,100);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

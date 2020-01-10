@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using MongoDB.Bson;
 using Moq;
 using Newtonsoft.Json;
 using SOS.Export.Repositories.Interfaces;
@@ -12,7 +9,7 @@ using SOS.Export.Test.TestHelpers.JsonConverters;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Search;
 
-namespace SOS.Export.Test.TestHelpers.Stubs
+namespace SOS.Export.Test.TestHelpers.Factories
 {
     public static class ProcessedDarwinCoreRepositoryStubFactory
     {

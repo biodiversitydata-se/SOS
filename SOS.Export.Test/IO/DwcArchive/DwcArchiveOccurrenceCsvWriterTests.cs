@@ -12,7 +12,6 @@ using SOS.Export.Enums;
 using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Test.TestHelpers.Factories;
-using SOS.Export.Test.TestHelpers.Stubs;
 using SOS.Lib.Models.Search;
 using Xunit;
 

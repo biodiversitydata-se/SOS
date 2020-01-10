@@ -15,6 +15,7 @@ using SOS.Export.Mappings;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive
 {
@@ -29,6 +30,7 @@ namespace SOS.Export.IO.DwcArchive
 
         /// <inheritdoc />
         public async Task<bool> CreateCsvFileAsync(
+            AdvancedFilter filter, 
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedDarwinCoreRepository processedDarwinCoreRepository,
@@ -39,7 +41,7 @@ namespace SOS.Export.IO.DwcArchive
                 var skip = 0;
                 const int take = 100000;
                 var map = new ExtendedMeasurementOrFactRowMap();
-                IEnumerable<DarwinCoreProject> projectParameters = await processedDarwinCoreRepository.GetProjectParameters(skip, take);
+                IEnumerable<DarwinCoreProject> projectParameters = await processedDarwinCoreRepository.GetProjectParameters(filter, skip, take);
 
                 while (projectParameters.Any())
                 {
@@ -47,7 +49,7 @@ namespace SOS.Export.IO.DwcArchive
                     IEnumerable<ExtendedMeasurementOrFactRow> records = projectParameters.ToExtendedMeasurementOrFactRows();
                     await WriteEmofCsvAsync(stream, records, map);
                     skip += take;
-                    projectParameters = await processedDarwinCoreRepository.GetProjectParameters(skip, take);
+                    projectParameters = await processedDarwinCoreRepository.GetProjectParameters(filter, skip, take);
                 }
 
                 return true;

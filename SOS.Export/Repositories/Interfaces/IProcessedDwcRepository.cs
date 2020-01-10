@@ -23,9 +23,10 @@ namespace SOS.Export.Repositories.Interfaces
         /// <summary>
         /// Get project parameters.
         /// </summary>
+        /// <param name="filter"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<DarwinCoreProject>> GetProjectParameters(int skip, int take);
+        Task<IEnumerable<DarwinCoreProject>> GetProjectParameters(AdvancedFilter filter, int skip, int take);
     }
 }
