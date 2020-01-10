@@ -7,7 +7,7 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
-using SOS.Lib.Models.Shared.Shared;
+using SOS.Lib.Models.Shared;
 using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;

@@ -1,4 +1,4 @@
-﻿namespace SOS.Lib.Models.Verbatim.SpeciesPortal
+﻿namespace SOS.Lib.Models.Shared
 {
     /// <summary>
     /// Represents metadata item with category

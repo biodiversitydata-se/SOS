@@ -8,7 +8,6 @@ using Moq;
 using SOS.Lib.Enums;
 using SOS.Process.Factories;
 using SOS.Lib.Models.Processed.DarwinCore;
-using SOS.Lib.Models.Shared.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;

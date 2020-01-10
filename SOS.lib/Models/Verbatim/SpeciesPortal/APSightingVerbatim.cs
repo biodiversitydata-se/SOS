@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Verbatim.SpeciesPortal
 {

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Shared.Shared;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;

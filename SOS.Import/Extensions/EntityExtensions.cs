@@ -3,6 +3,7 @@ using System.Linq;
 using SOS.Import.Entities;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 using SOS.Lib.Models.Verbatim.Shared;
 

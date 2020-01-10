@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Lib.Models.Verbatim.SpeciesPortal
+namespace SOS.Lib.Models.Shared
 {
     /// <summary>
     /// Represents different metadata items

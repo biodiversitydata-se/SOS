@@ -1,7 +1,7 @@
 ﻿using System;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Shared.Shared;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Verbatim.Shared
 {

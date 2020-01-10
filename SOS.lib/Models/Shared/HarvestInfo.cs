@@ -1,7 +1,7 @@
 ﻿using System;
 using SOS.Lib.Enums;
 
-namespace SOS.Lib.Models.Shared.Shared
+namespace SOS.Lib.Models.Shared
 {
     public class RunInfo 
     {
