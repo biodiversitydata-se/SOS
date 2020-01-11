@@ -11,6 +11,7 @@ using SOS.Export.Repositories;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.TestHelpers.IO;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.Factories
@@ -46,11 +47,12 @@ namespace SOS.Export.IntegrationTests.Factories
                 new Mock<IBlobStorageService>().Object,
                 new FileDestination { Path = exportConfiguration.FileDestination.Path },
                 new Mock<ILogger<SightingFactory>>().Object);
+            var filename = FilenameGenerator.CreateFilename("sos_dwc_archive_with_all_data");
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            bool result = await sightingFactory.ExportAllAsync("fileName", JobCancellationToken.Null);
+            bool result = await sightingFactory.ExportAllAsync(filename, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

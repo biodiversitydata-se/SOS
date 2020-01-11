@@ -4,10 +4,10 @@ using System.Reflection;
 using System.Text;
 using Moq;
 using Newtonsoft.Json;
-using SOS.Export.IntegrationTests.TestHelpers.JsonConverters;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Search;
+using SOS.TestHelpers.JsonConverters;
 
 namespace SOS.Export.IntegrationTests.TestHelpers.Factories
 {

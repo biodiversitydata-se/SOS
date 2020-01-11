@@ -41,6 +41,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Src\SOS.Export\SOS.Export.csproj" />
     <ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
+    <ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -36,8 +36,8 @@ namespace SOS.Process.IntegrationTests.Helpers
             {
                 Location = new DarwinCoreLocation
                 {
-                    DecimalLatitude = TestHelpers.Coordinates.TranasMunicipality.Latitude,
-                    DecimalLongitude = TestHelpers.Coordinates.TranasMunicipality.Longitude 
+                    DecimalLatitude = TestHelpers.Gis.Coordinates.TranasMunicipality.Latitude,
+                    DecimalLongitude = TestHelpers.Gis.Coordinates.TranasMunicipality.Longitude 
                 }
             };
             observations.Add(observation);

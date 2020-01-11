@@ -35,6 +35,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\Src\SOS.Search.Service\SOS.Search.Service.csproj" />
+      <ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
     </ItemGroup>
 
 </Project>

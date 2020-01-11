@@ -3,8 +3,8 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
-using SOS.Export.UnitTests.TestHelpers.JsonConverters;
 using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.TestHelpers.JsonConverters;
 
 namespace SOS.Export.UnitTests.TestHelpers.Factories
 {

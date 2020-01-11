@@ -30,8 +30,8 @@ namespace SOS.Process.UnitTests.Helpers
             {
                 Location = new DarwinCoreLocation
                 {
-                    DecimalLatitude = Coordinates.FalkenbergMunicipality.Latitude,
-                    DecimalLongitude = Coordinates.FalkenbergMunicipality.Longitude,
+                    DecimalLatitude = SOS.TestHelpers.Gis.Coordinates.FalkenbergMunicipality.Latitude,
+                    DecimalLongitude = SOS.TestHelpers.Gis.Coordinates.FalkenbergMunicipality.Longitude,
                     County = "Hallnad"
                 }
             };
@@ -64,8 +64,8 @@ namespace SOS.Process.UnitTests.Helpers
             {
                 Location = new DarwinCoreLocation
                 {
-                    DecimalLatitude = Coordinates.KirunaMunicipality.Latitude,
-                    DecimalLongitude = Coordinates.KirunaMunicipality.Longitude,
+                    DecimalLatitude = SOS.TestHelpers.Gis.Coordinates.KirunaMunicipality.Latitude,
+                    DecimalLongitude = SOS.TestHelpers.Gis.Coordinates.KirunaMunicipality.Longitude,
                     StateProvince = "Torne lappmark"
                 }
             };
@@ -99,8 +99,8 @@ namespace SOS.Process.UnitTests.Helpers
             {
                 Location = new DarwinCoreLocation
                 {
-                    DecimalLatitude = Coordinates.KirunaMunicipality.Latitude,
-                    DecimalLongitude = Coordinates.KirunaMunicipality.Longitude,
+                    DecimalLatitude = SOS.TestHelpers.Gis.Coordinates.KirunaMunicipality.Latitude,
+                    DecimalLongitude = SOS.TestHelpers.Gis.Coordinates.KirunaMunicipality.Longitude,
                     StateProvince = "Öland",
                     County = "Kalmar"
                 }

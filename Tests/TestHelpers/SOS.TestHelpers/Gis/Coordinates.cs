@@ -1,4 +1,4 @@
-﻿namespace SOS.Process.UnitTests.TestHelpers
+﻿namespace SOS.TestHelpers.Gis
 {
     public static class Coordinates
     {

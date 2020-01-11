@@ -5,9 +5,9 @@ using System.Text;
 using Moq;
 using Newtonsoft.Json;
 using SOS.Export.Repositories.Interfaces;
-using SOS.Export.UnitTests.TestHelpers.JsonConverters;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Search;
+using SOS.TestHelpers.JsonConverters;
 
 namespace SOS.Export.UnitTests.TestHelpers.Factories
 {

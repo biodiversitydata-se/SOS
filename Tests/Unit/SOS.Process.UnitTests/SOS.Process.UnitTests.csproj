@@ -39,6 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Src\SOS.Process\SOS.Process.csproj" />
+    <ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

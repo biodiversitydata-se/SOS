@@ -7,6 +7,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers;
 using SOS.Process.Repositories.Source.Interfaces;
 using SOS.Process.UnitTests.TestHelpers;
+using SOS.TestHelpers.Gis;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Helpers

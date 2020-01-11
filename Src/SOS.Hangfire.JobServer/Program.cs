@@ -12,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
-using SOS.Core.IoC.Modules;
 using SOS.Export.IoC.Modules;
 using SOS.Import.IoC.Modules;
 using SOS.Lib.Configuration.Export;
@@ -111,7 +110,6 @@ namespace SOS.Hangfire.JobServer
 
                         return new AutofacServiceProviderFactory(builder =>
                             builder
-                                .RegisterModule<CoreModule>()
                                 .RegisterModule(new ImportModule { Configuration = _importConfiguration })
                                 .RegisterModule(new ProcessModule { Configuration = _processConfiguration })
                                 .RegisterModule(new ExportModule { Configuration = _exportConfiguration })

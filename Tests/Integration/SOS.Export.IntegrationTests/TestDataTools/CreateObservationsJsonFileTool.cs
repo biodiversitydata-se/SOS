@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
-using SOS.Export.IntegrationTests.TestHelpers.JsonConverters;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Lib.Models.Search;
+using SOS.TestHelpers.JsonConverters;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.TestDataTools

@@ -10,6 +10,7 @@ using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Export.Services;
 using SOS.Lib.Models.Search;
+using SOS.TestHelpers.IO;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.IO.DwcArchive
