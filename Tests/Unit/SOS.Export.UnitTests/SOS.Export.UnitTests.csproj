@@ -8,6 +8,11 @@
 
   <ItemGroup>
     <None Remove="appsettings.json" />
+    <None Remove="xunit.runner.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,13 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="12.2.2" />
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
     <PackageReference Include="Hangfire.Core" Version="1.7.8" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -34,14 +39,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SOS.Process\SOS.Process.csproj" />
+    <ProjectReference Include="..\..\..\Src\SOS.Export\SOS.Export.csproj" />
+    <ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\Regions\Counties.geojson">
+    <None Update="Resources\DefaultTestObservation.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\Regions\Provinces.geojson">
+    <None Update="Resources\TenProcessedTestObservations.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SOS.Search.Service\SOS.Search.Service.csproj" />
+      <ProjectReference Include="..\..\..\Src\SOS.Search.Service\SOS.Search.Service.csproj" />
     </ItemGroup>
 
 </Project>

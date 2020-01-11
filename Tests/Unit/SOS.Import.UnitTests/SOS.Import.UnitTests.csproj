@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SOS.Import\SOS.Import.csproj" />
+    <ProjectReference Include="..\..\..\Src\SOS.Import\SOS.Import.csproj" />
   </ItemGroup>
 
 </Project>
