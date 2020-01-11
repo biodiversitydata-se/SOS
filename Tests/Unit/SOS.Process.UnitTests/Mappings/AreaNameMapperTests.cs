@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Process.Mappings;
 using Xunit;
 
-namespace SOS.Process.Test.Mappings
+namespace SOS.Process.UnitTests.Mappings
 {
     public class AreaNameMapperTests
     {

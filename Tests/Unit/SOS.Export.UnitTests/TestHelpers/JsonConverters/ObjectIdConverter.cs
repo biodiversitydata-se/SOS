@@ -2,7 +2,7 @@
 using MongoDB.Bson;
 using Newtonsoft.Json;
 
-namespace SOS.Export.Test.TestHelpers.JsonConverters
+namespace SOS.Export.UnitTests.TestHelpers.JsonConverters
 {
     public class ObjectIdConverter : JsonConverter
     {

@@ -6,13 +6,13 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities;
 using SOS.Import.Factories;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Verbatim.Shared;
 using Xunit;
 
-namespace SOS.Import.Test.Factories
+namespace SOS.Import.UnitTests.Factories
 {
     /// <summary>
     /// Tests for sighting factory

@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.Serialization;
 using System.Xml.XPath;
-using CsvHelper.TypeConversion;
 using FluentAssertions;
 using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive;
 using Xunit;
 
-namespace SOS.Export.Test.IO.DwcArchive
+namespace SOS.Export.UnitTests.IO.DwcArchive
 {
     public class DwcArchiveMetaFileWriterTests
     {

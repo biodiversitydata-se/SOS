@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using FluentAssertions;
 using SOS.Export.Enums;
 using SOS.Export.Helpers;
-using SOS.Export.Models;
 using Xunit;
 
-namespace SOS.Export.Test.Helpers
+namespace SOS.Export.UnitTests.Helpers
 {
     public class FieldDescriptionHelperTests
     {

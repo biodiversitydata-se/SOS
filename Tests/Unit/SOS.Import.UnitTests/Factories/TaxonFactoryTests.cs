@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -12,7 +12,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
 using Xunit;
 
-namespace SOS.Import.Test.Factories
+namespace SOS.Import.UnitTests.Factories
 {
     public class TaxonFactoryTests
     {

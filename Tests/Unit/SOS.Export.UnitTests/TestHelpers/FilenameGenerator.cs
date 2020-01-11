@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SOS.Export.Test.TestHelpers
+namespace SOS.Export.UnitTests.TestHelpers
 {
     /// <summary>
     /// Contains functions for generating file names that contain today's date and time.

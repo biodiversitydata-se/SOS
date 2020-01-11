@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -12,7 +12,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using Xunit;
 
-namespace SOS.Import.Test.Factories
+namespace SOS.Import.UnitTests.Factories
 {
     public class ClamPortalObservationFactoryTests
     {

@@ -7,7 +7,7 @@ using SOS.Process.Factories.Interfaces;
 using SOS.Process.Jobs;
 using Xunit;
 
-namespace SOS.Process.Test.Jobs
+namespace SOS.Process.UnitTests.Jobs
 {
     /// <summary>
     /// Tests for activate instance job

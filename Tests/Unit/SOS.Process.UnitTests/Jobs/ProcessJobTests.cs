@@ -17,7 +17,7 @@ using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
 
-namespace SOS.Process.Test.Jobs
+namespace SOS.Process.UnitTests.Jobs
 {
     /// <summary>
     /// Tests for activate instance job

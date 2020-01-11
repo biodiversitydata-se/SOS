@@ -11,11 +11,11 @@ using Moq;
 using SOS.Export.Enums;
 using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive;
-using SOS.Export.Test.TestHelpers.Factories;
+using SOS.Export.UnitTests.TestHelpers.Factories;
 using SOS.Lib.Models.Search;
 using Xunit;
 
-namespace SOS.Export.Test.IO.DwcArchive
+namespace SOS.Export.UnitTests.IO.DwcArchive
 {
     // todo - create DarwinCore class that is used for reading data where all properties is of string class? Suggested names: FlatDwcObservation, CsvDwcObservation, 
     public class DwcArchiveOccurrenceCsvWriterTests : TestBase
@@ -36,7 +36,7 @@ namespace SOS.Export.Test.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var processedDarwinCoreRepositoryMock = ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources\TenProcessedTestObservations.json");
+            var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources\TenProcessedTestObservations.json");
             var memoryStream = new MemoryStream();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ namespace SOS.Export.Test.IO.DwcArchive
                 new AdvancedFilter(),
                 memoryStream, 
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
-                processedDarwinCoreRepositoryMock.Object, 
+                processedDarwinCoreRepositoryStub.Object, 
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ namespace SOS.Export.Test.IO.DwcArchive
             var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
             observation.Location.DecimalLatitude = 13.823392373018132;
             observation.Location.DecimalLongitude = 55.51071440795833;
-            var processedDarwinCoreRepositoryMock = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
+            var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -78,7 +78,7 @@ namespace SOS.Export.Test.IO.DwcArchive
                 new AdvancedFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
-                processedDarwinCoreRepositoryMock.Object,
+                processedDarwinCoreRepositoryStub.Object,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ namespace SOS.Export.Test.IO.DwcArchive
             var memoryStream = new MemoryStream();
             var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
             observation.Location.CoordinateUncertaintyInMeters = 0;
-            var processedDarwinCoreRepositoryMock = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
+            var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -110,7 +110,7 @@ namespace SOS.Export.Test.IO.DwcArchive
                 new AdvancedFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
-                processedDarwinCoreRepositoryMock.Object,
+                processedDarwinCoreRepositoryStub.Object,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ namespace SOS.Export.Test.IO.DwcArchive
             var memoryStream = new MemoryStream();
             var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
             observation.Occurrence.OccurrenceRemarks = "Sighting found in\r\nUppsala";
-            var processedDarwinCoreRepositoryMock = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
+            var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -142,7 +142,7 @@ namespace SOS.Export.Test.IO.DwcArchive
                 new AdvancedFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
-                processedDarwinCoreRepositoryMock.Object,
+                processedDarwinCoreRepositoryStub.Object,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -162,7 +162,7 @@ namespace SOS.Export.Test.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var memoryStream = new MemoryStream();
             var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
-            var processedDarwinCoreRepositoryMock = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
+            var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
             List<FieldDescriptionId> fieldDescriptionIds = new List<FieldDescriptionId>
             {
                 FieldDescriptionId.OccurrenceID,
@@ -178,7 +178,7 @@ namespace SOS.Export.Test.IO.DwcArchive
                 new AdvancedFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetFieldDescriptions(fieldDescriptionIds),
-                processedDarwinCoreRepositoryMock.Object,
+                processedDarwinCoreRepositoryStub.Object,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------

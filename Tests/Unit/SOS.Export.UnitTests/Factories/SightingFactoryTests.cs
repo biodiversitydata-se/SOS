@@ -1,23 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Xml;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Export.Factories;
 using SOS.Export.IO.DwcArchive.Interfaces;
-using SOS.Export.Mappings;
-using SOS.Export.Models.DarwinCore;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
 using Xunit;
 
-namespace SOS.Export.Test.Factories
+namespace SOS.Export.UnitTests.Factories
 {
     /// <summary>
     /// Tests for sighting factory

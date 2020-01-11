@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -11,7 +11,7 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using Xunit;
 
-namespace SOS.Import.Test.Services
+namespace SOS.Import.UnitTests.Services
 {
     public class ClamObservationServiceTests
     {

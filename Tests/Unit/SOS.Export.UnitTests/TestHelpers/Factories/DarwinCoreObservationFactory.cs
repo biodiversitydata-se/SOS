@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
-using SOS.Export.Test.TestHelpers.JsonConverters;
+using SOS.Export.UnitTests.TestHelpers.JsonConverters;
 using SOS.Lib.Models.Processed.DarwinCore;
 
-namespace SOS.Export.Test.TestHelpers.Factories
+namespace SOS.Export.UnitTests.TestHelpers.Factories
 {
     public static class DarwinCoreObservationFactory
     {

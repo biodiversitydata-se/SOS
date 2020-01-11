@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 
-namespace SOS.Import.Test
+namespace SOS.Import.UnitTests
 {
     public class TestBase
     {

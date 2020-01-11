@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using SOS.Import.Entities;
 
-namespace SOS.Import.Test.TestData
+namespace SOS.Import.UnitTests.TestData
 {
     public static class SpeciesCollectionItemEntityTestData
     {

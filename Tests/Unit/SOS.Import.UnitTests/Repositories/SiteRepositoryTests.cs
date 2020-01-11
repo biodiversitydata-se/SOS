@@ -9,7 +9,7 @@ using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Services.Interfaces;
 using Xunit;
 
-namespace SOS.Import.Test.Repositories
+namespace SOS.Import.UnitTests.Repositories
 {
     /// <summary>
     /// Test site repository

@@ -6,15 +6,15 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Enums;
-using SOS.Process.Factories;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Verbatim.ClamPortal;
+using SOS.Process.Factories;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
 
-namespace SOS.Process.Test.Factories
+namespace SOS.Process.UnitTests.Factories
 {
     /// <summary>
     /// Tests for sighting factory

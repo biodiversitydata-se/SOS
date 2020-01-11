@@ -6,7 +6,7 @@ using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination;
 using Xunit;
 
-namespace SOS.Process.Test.Repositories.Destination
+namespace SOS.Process.UnitTests.Repositories.Destination
 {
     public class InadequateItemRepositoryTests
     {

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -10,7 +9,7 @@ using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Services.Interfaces;
 using Xunit;
 
-namespace SOS.Import.Test.Repositories
+namespace SOS.Import.UnitTests.Repositories
 {
     /// <summary>
     /// Project tests

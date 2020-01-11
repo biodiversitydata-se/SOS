@@ -7,7 +7,7 @@ using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
 using Xunit;
 
-namespace SOS.Process.Test.Repositories.Destination
+namespace SOS.Process.UnitTests.Repositories.Destination
 {
     public class DarwinCoreRepositoryTests
     {

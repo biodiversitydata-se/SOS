@@ -6,7 +6,7 @@ using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Source;
 using Xunit;
 
-namespace SOS.Process.Test.Repositories.Source
+namespace SOS.Process.UnitTests.Repositories.Source
 {
     public class SpeciesPortalVerbatimRepositoryTests
     {

@@ -6,7 +6,7 @@ using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories;
 using Xunit;
 
-namespace SOS.Export.Test.Repositories.Destination
+namespace SOS.Export.UnitTests.Repositories
 {
     public class ProcessedDwcRepositoryTests
     {

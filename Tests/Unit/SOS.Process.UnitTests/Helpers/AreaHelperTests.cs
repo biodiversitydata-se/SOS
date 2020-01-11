@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Text;
+﻿using System.Collections.Generic;
 using FluentAssertions;
-using MongoDB.Driver.GeoJsonObjectModel;
 using Moq;
-using NetTopologySuite.Features;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers;
-using SOS.Process.Mappings;
-using SOS.Process.Repositories.Source;
 using SOS.Process.Repositories.Source.Interfaces;
-using SOS.Process.Test.TestRepositories;
+using SOS.Process.UnitTests.TestHelpers;
 using Xunit;
 
-namespace SOS.Process.Test.Helpers
+namespace SOS.Process.UnitTests.Helpers
 {
     public class AreaHelperTests
     {

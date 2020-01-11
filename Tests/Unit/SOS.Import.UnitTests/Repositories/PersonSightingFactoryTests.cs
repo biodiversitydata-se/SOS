@@ -3,10 +3,10 @@ using System.Linq;
 using FluentAssertions;
 using SOS.Import.Extensions;
 using SOS.Import.Factories;
-using SOS.Import.Test.TestData;
+using SOS.Import.UnitTests.TestData;
 using Xunit;
 
-namespace SOS.Import.Test.Repositories
+namespace SOS.Import.UnitTests.Repositories
 {
     public class PersonSightingFactoryTests
     {
