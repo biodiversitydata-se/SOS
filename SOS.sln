@@ -56,7 +56,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Core", "Src\SOS.Core\SO
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.TestHelpers", "Tests\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj", "{28571B85-2E06-4196-A584-E6E8B34C4618}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestHelpers", "TestHelpers", "{A5F589FE-B34F-42BC-B284-30A9629C2ABB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{A5F589FE-B34F-42BC-B284-30A9629C2ABB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
