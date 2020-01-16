@@ -6,13 +6,15 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
+using SOS.Process.Extensions;
 using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs.Interfaces;
@@ -26,7 +28,7 @@ namespace SOS.Process.Jobs
     /// </summary>
     public class ProcessJob : IProcessJob
     {
-        private readonly IDarwinCoreRepository _darwinCoreRepository;
+        private readonly IProcessedSightingRepository _darwinCoreRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ISpeciesPortalProcessFactory _speciesPortalProcessFactory;
@@ -39,7 +41,7 @@ namespace SOS.Process.Jobs
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="darwinCoreRepository"></param>
+        /// <param name="processedSightingRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="clamPortalProcessFactory"></param>
@@ -49,7 +51,7 @@ namespace SOS.Process.Jobs
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
         public ProcessJob(
-            IDarwinCoreRepository darwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IClamPortalProcessFactory clamPortalProcessFactory,
@@ -59,7 +61,7 @@ namespace SOS.Process.Jobs
             IAreaHelper areaHelper,
             ILogger<ProcessJob> logger)
         {
-            _darwinCoreRepository = darwinCoreRepository ?? throw new ArgumentNullException(nameof(darwinCoreRepository));
+            _darwinCoreRepository = processedSightingRepository ?? throw new ArgumentNullException(nameof(processedSightingRepository));
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _clamPortalProcessFactory = clamPortalProcessFactory ?? throw new ArgumentNullException(nameof(clamPortalProcessFactory));
@@ -81,7 +83,7 @@ namespace SOS.Process.Jobs
                 _logger.LogDebug("Start getting taxa");
 
                 // Map out taxon id
-                var taxa = new Dictionary<int, DarwinCoreTaxon>();
+                var taxa = new Dictionary<int, ProcessedTaxon>();
                 var skip = 0;
                 var tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
 
@@ -89,7 +91,7 @@ namespace SOS.Process.Jobs
                 {
                     foreach (var taxon in tmpTaxa)
                     {
-                        taxa.Add(taxon.Id, taxon);
+                        taxa.Add(taxon.Id, taxon.ToProcessed());
                     }
 
                     skip += tmpTaxa.Count();

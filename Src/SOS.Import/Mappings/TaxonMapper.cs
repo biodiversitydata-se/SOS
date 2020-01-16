@@ -1,5 +1,5 @@
 ﻿using CsvHelper.Configuration;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Import.Mappings
 {
@@ -22,7 +22,7 @@ namespace SOS.Import.Mappings
             Map(x => x.Order).Name("order").Index(12);
             Map(x => x.Family).Name("family").Index(13);
             Map(x => x.Genus).Name("genus").Index(14);
-            Map(x => x.DynamicProperties).Ignore(true);
+           // Map(x => x.DynamicProperties).Ignore(true);
         }
     }
 }

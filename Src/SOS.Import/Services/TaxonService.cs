@@ -12,7 +12,7 @@ using System.Xml.Linq;
 using CsvHelper;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Import;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 using SOS.Import.Mappings;
 
 namespace SOS.Import.Services

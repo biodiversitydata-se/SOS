@@ -27,17 +27,17 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             const int nrObservations = 10;
             const string filePath = @"c:\temp\TenProcessedTestObservations.json";
             var exportConfiguration = GetExportConfiguration();
-            var processedDarwinCoreRepository = new ProcessedDarwinCoreRepository(
+            var processedSightingRepository = new ProcessedSightingRepository(
                 new ExportClient(
                     exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
                     exportConfiguration.MongoDbConfiguration.DatabaseName,
                     exportConfiguration.MongoDbConfiguration.BatchSize),
-                new Mock<ILogger<ProcessedDarwinCoreRepository>>().Object);
+                new Mock<ILogger<ProcessedSightingRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observations = await processedDarwinCoreRepository.GetChunkAsync(new AdvancedFilter(), 0,nrObservations);
+            var observations = await processedSightingRepository.GetChunkAsync(new AdvancedFilter(), 0,nrObservations);
 
 
             var serializerSettings = new JsonSerializerSettings()

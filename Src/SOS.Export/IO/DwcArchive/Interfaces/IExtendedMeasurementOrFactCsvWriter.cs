@@ -13,7 +13,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <inheritdoc />
         Task<bool> CreateCsvFileAsync(AdvancedFilter filter, Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             IJobCancellationToken cancellationToken);
     }
 }

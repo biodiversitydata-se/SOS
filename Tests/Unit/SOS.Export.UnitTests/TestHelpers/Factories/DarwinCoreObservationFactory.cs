@@ -3,14 +3,14 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
-using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.TestHelpers.JsonConverters;
 
 namespace SOS.Export.UnitTests.TestHelpers.Factories
 {
     public static class DarwinCoreObservationFactory
     {
-        public static DarwinCore<DynamicProperties> CreateDefaultObservation()
+        public static ProcessedSighting CreateDefaultObservation()
         {
             string fileName = @"Resources\DefaultTestObservation.json";
             string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -21,7 +21,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
                 Converters = new List<JsonConverter> { new ObjectIdConverter() }
             };
 
-            var observation = JsonConvert.DeserializeObject<DarwinCore<DynamicProperties>>(str, serializerSettings);
+            var observation = JsonConvert.DeserializeObject<ProcessedSighting>(str, serializerSettings);
             return observation;
         }
     }

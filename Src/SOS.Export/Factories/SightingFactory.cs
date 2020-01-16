@@ -20,7 +20,7 @@ namespace SOS.Export.Factories
     /// </summary>
     public class SightingFactory : Interfaces.ISightingFactory
     {
-        private readonly IProcessedDarwinCoreRepository _processedDarwinCoreRepository;
+        private readonly IProcessedSightingRepository _processedSightingRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IFileService _fileService;
         private readonly IBlobStorageService _blobStorageService;
@@ -32,7 +32,7 @@ namespace SOS.Export.Factories
         /// Constructor
         /// </summary>
         /// <param name="dwcArchiveFileWriter"></param>
-        /// <param name="processedDarwinCoreRepository"></param>
+        /// <param name="processedSightingRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="blobStorageService"></param>
@@ -40,7 +40,7 @@ namespace SOS.Export.Factories
         /// <param name="logger"></param>
         public SightingFactory(
             IDwcArchiveFileWriter dwcArchiveFileWriter,
-            IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             IProcessInfoRepository processInfoRepository,
             IFileService fileService,
             IBlobStorageService blobStorageService,
@@ -48,7 +48,7 @@ namespace SOS.Export.Factories
 
             ILogger<SightingFactory> logger)
         {
-            _processedDarwinCoreRepository = processedDarwinCoreRepository ?? throw new ArgumentNullException(nameof(processedDarwinCoreRepository));
+            _processedSightingRepository = processedSightingRepository ?? throw new ArgumentNullException(nameof(processedSightingRepository));
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
@@ -75,7 +75,7 @@ namespace SOS.Export.Factories
                 zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     filter,
                     fileName,
-                    _processedDarwinCoreRepository,
+                    _processedSightingRepository,
                     FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                     processInfo,
                     _exportPath,

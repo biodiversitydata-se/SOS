@@ -469,9 +469,7 @@ namespace SOS.Import.Extensions
         {
             return new ProjectParameter
             {
-                SightingId = entity.SightingId,
-                ProjectId = entity.ProjectId,
-                ProjectParameterId = entity.ProjectParameterId,
+                Id = entity.ProjectParameterId,
                 DataType = entity.DataType,
                 Description = entity.Description,
                 Name = entity.Name, 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Import.MongoDb.Interfaces;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Import.Repositories.Destination.Taxon
 {

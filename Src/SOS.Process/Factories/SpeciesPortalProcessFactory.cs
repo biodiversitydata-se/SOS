@@ -6,7 +6,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Extensions;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -25,19 +25,19 @@ namespace SOS.Process.Factories
         /// Constructor
         /// </summary>
         /// <param name="speciesPortalVerbatimRepository"></param>
-        /// <param name="darwinCoreRepository"></param>
+        /// <param name="processedSightingRepository"></param>
         /// <param name="logger"></param>
         public SpeciesPortalProcessFactory(
             ISpeciesPortalVerbatimRepository speciesPortalVerbatimRepository,
-            IDarwinCoreRepository darwinCoreRepository,
-            ILogger<SpeciesPortalProcessFactory> logger) : base(darwinCoreRepository, logger)
+            IProcessedSightingRepository processedSightingRepository,
+            ILogger<SpeciesPortalProcessFactory> logger) : base(processedSightingRepository, logger)
         {
             _speciesPortalVerbatimRepository = speciesPortalVerbatimRepository ?? throw new ArgumentNullException(nameof(speciesPortalVerbatimRepository));
         }
 
         /// <inheritdoc />
         public async Task<RunInfo> ProcessAsync(
-            IDictionary<int, DarwinCoreTaxon> taxa,
+            IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
             var runInfo = new RunInfo(DataProvider.KUL)
@@ -77,9 +77,9 @@ namespace SOS.Process.Factories
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                    
-                    var darwinCore = verbatim.ToDarwinCore(taxa).ToArray();
+                    var processedSightings = verbatim.ToProcessed(taxa).ToArray();
 
-                    successCount += await ProcessRepository.AddManyAsync(darwinCore);
+                    successCount += await ProcessRepository.AddManyAsync(processedSightings);
 
                     verbatimCount += verbatim.Count();
 

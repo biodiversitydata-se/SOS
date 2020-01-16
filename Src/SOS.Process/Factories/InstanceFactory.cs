@@ -16,13 +16,13 @@ namespace SOS.Process.Factories
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="darwinCoreRepository"></param>
+        /// <param name="processedSightingRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="logger"></param>
         public InstanceFactory(
-            IDarwinCoreRepository darwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             IProcessInfoRepository processInfoRepository,
-            ILogger<InstanceFactory> logger) : base(darwinCoreRepository, logger)
+            ILogger<InstanceFactory> logger) : base(processedSightingRepository, logger)
         {
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
         }

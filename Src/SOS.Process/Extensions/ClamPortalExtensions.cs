@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore.Vocabulary;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 
 namespace SOS.Process.Extensions
@@ -14,100 +14,93 @@ namespace SOS.Process.Extensions
     public static class ClamPortalExtensions
     {
         /// <summary>
-        /// Cast clam observation verbatim to Darwin Core
+        /// Cast clam observation verbatim to processed sighting
         /// </summary>
         /// <param name="verbatim"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static DarwinCore<DynamicProperties> ToDarwinCore(this ClamObservationVerbatim verbatim, IDictionary<int, DarwinCoreTaxon> taxa)
+        public static ProcessedSighting ToProcessed(this ClamObservationVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
         {
             taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
 
-            return new DarwinCore<DynamicProperties>(DataProvider.ClamPortal)
+            return new ProcessedSighting(DataProvider.ClamPortal)
             {
                 AccessRights = verbatim.AccessRights,
                 BasisOfRecord = verbatim.BasisOfRecord,
-                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.ClamPortal.ToString()}",
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.ClamPortal.ToString()}",
                 DatasetName = "Träd och musselportalen",
-                DynamicProperties = new DynamicProperties
+                Event = new ProcessedEvent
                 {
-                    IsNaturalOccurrence = verbatim.IsNaturalOccurrence,
-                    IsNeverFoundObservation = verbatim.IsNeverFoundObservation,
-                    IsNotRediscoveredObservation = verbatim.IsNotRediscoveredObservation,
-                    IsPositiveObservation = verbatim.IsPositiveObservation,
-                    Projects = string.IsNullOrEmpty(verbatim.ProjectName) ? null : new[]
-                    {
-                        new DarwinCoreProject
-                        {
-                            Name = verbatim.ProjectName
-                        }
-                    }, 
-                    ReportedBy = verbatim.ReportedBy,
-                    ReportedDate = verbatim.ReportedDate,
-                    UncertainDetermination = verbatim.UncertainDetermination != 0
-                },
-                Event = new DarwinCoreEvent
-                {
-                    EventDate = $"{verbatim.ObservationDate.ToUniversalTime().ToString("s")}Z",
-                    EventTime = verbatim.ObservationDate.ToUniversalTime().ToString("HH':'mm':'ss''K"),
+                    EndDate = verbatim.ObservationDate.ToUniversalTime(),
                     SamplingProtocol = verbatim.SurveyMethod,
-                    VerbatimEventDate = verbatim.ObservationDate.ToString("yyyy-MM-dd HH:mm:ss")
+                    StartDate = verbatim.ObservationDate.ToUniversalTime(),
+                    VerbatimEndDate = verbatim.ObservationDate,
+                    VerbatimStartDate = verbatim.ObservationDate
                 },
-                Identification = new DarwinCoreIdentification
+                Identification = new ProcessedIdentification
                 {
-                    IdentificationVerificationStatus = verbatim.IdentificationVerificationStatus
-                },
-                Organism = new DarwinCoreOrganism()
-                {
-
+                    IdentificationVerificationStatus = verbatim.IdentificationVerificationStatus,
+                    UncertainDetermination = verbatim.UncertainDetermination != 0
                 },
                 InstitutionCode = verbatim.InstitutionCode,
                 Language = verbatim.Language,
-                Location = new DarwinCoreLocation
+                Location = new ProcessedLocation
                 {
                     Continent = "Europa",
-                    CoordinatePrecision = verbatim.CoordinateUncertaintyInMeters?.ToString(),
+                    CoordinatePrecision = verbatim.CoordinateUncertaintyInMeters,
                     CountryCode = verbatim.CountryCode,
                     DecimalLatitude = verbatim.DecimalLatitude,
                     DecimalLongitude = verbatim.DecimalLongitude,
-                    GeodeticDatum = "EPSG:4326",
-                    LocationID = verbatim.LocationId,
+                    GeodeticDatum = GeodeticDatum.Wgs84,
+                    Id = verbatim.LocationId,
                     Locality = verbatim.Locality,
-                    LocationRemarks = verbatim.LocationRemarks,
+                    Remarks = verbatim.LocationRemarks,
                     MaximumDepthInMeters = verbatim.MaximumDepthInMeters,
-                    VerbatimLatitude = verbatim.DecimalLatitude.ToString(),
-                    VerbatimLongitude = verbatim.DecimalLongitude.ToString(),
+                    VerbatimLatitude = verbatim.DecimalLatitude,
+                    VerbatimLongitude = verbatim.DecimalLongitude,
                     VerbatimCoordinateSystem = "EPSG:4326",
                     WaterBody = verbatim.WaterBody
                 },
                 Modified = verbatim.Modified ?? DateTime.MinValue,
-                Occurrence = new DarwinCoreOccurrence
+                Occurrence = new ProcessedOccurrence
                 {
-
                     CatalogNumber = verbatim.CatalogNumber.ToString(),
+                    Id = verbatim.OccurrenceId,
                     IndividualCount = verbatim.IndividualCount,
+                    IsNaturalOccurrence = verbatim.IsNaturalOccurrence,
+                    IsNeverFoundObservation = verbatim.IsNeverFoundObservation,
+                    IsNotRediscoveredObservation = verbatim.IsNotRediscoveredObservation,
+                    IsPositiveObservation = verbatim.IsPositiveObservation,
                     LifeStage = verbatim.LifeStage,
-                    OccurrenceID = verbatim.OccurrenceId,
-                    OccurrenceRemarks = verbatim.OccurrenceRemarks,
-                    OccurrenceStatus = verbatim.OccurrenceStatus,
                     OrganismQuantity = verbatim.Quantity,
                     OrganismQuantityType = verbatim.QuantityUnit,
-                    RecordedBy = verbatim.RecordedBy
+                    RecordedBy = verbatim.RecordedBy,
+                    Remarks = verbatim.OccurrenceRemarks,
+                    Status = verbatim.OccurrenceStatus
                 },
+                Projects = string.IsNullOrEmpty(verbatim.ProjectName) ? null : new[]
+                {
+                    new ProcessedProject
+                    {
+                        Name = verbatim.ProjectName
+                    }
+                },
+                ReportedBy = verbatim.ReportedBy,
+                ReportedDate = verbatim.ReportedDate,
                 RightsHolder = verbatim.RightsHolder,
                 Taxon = taxon
             };
         }
 
         /// <summary>
-        /// Cast multiple clam observations to Darwin Core 
+        /// Cast multiple clam observations to processed sightings
         /// </summary>
         /// <param name="verbatims"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static IEnumerable<DarwinCore<DynamicProperties>> ToDarwinCore(this IEnumerable<ClamObservationVerbatim> verbatims, IDictionary<int, DarwinCoreTaxon> taxa)
+        public static IEnumerable<ProcessedSighting> ToProcessed(this IEnumerable<ClamObservationVerbatim> verbatims, IDictionary<int, ProcessedTaxon> taxa)
         {
-            return verbatims.Select(v => v.ToDarwinCore(taxa));
+            return verbatims.Select(v => v.ToProcessed(taxa));
         }
     }
 }

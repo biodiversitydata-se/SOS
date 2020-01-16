@@ -17,7 +17,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
-        /// <param name="processedDarwinCoreRepository">The repository to read observation data from.</param>
+        /// <param name="processedSightingRepository">The repository to read observation data from.</param>
         /// <param name="processInfo"></param>
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
@@ -25,7 +25,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         Task<string> CreateDwcArchiveFileAsync(
             AdvancedFilter filter,
             string fileName,
-            IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken);
@@ -37,7 +37,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
-        /// <param name="processedDarwinCoreRepository">The repository to read observation data from.</param>
+        /// <param name="processedSightingRepository">The repository to read observation data from.</param>
         /// <param name="fieldDescriptions"></param>
         /// <param name="processInfo"></param>
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
@@ -46,7 +46,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         Task<string> CreateDwcArchiveFileAsync(
             AdvancedFilter filter,
             string fileName,
-            IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             IEnumerable<FieldDescription> fieldDescriptions,
             ProcessInfo processInfo,
             string exportFolderPath,

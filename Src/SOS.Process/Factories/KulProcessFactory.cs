@@ -6,7 +6,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
@@ -28,13 +28,13 @@ namespace SOS.Process.Factories
         /// </summary>
         /// <param name="kulObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="DarwinCoreRepository"></param>
+        /// <param name="ProcessedSightingRepository"></param>
         /// <param name="logger"></param>
         public KulProcessFactory(
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IDarwinCoreRepository DarwinCoreRepository,
-            ILogger<KulProcessFactory> logger) : base(DarwinCoreRepository, logger)
+            IProcessedSightingRepository ProcessedSightingRepository,
+            ILogger<KulProcessFactory> logger) : base(ProcessedSightingRepository, logger)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -42,7 +42,7 @@ namespace SOS.Process.Factories
 
         /// <inheritdoc />
         public async Task<RunInfo> ProcessAsync(
-            IDictionary<int, DarwinCoreTaxon> taxa,
+            IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
             var runInfo = new RunInfo(DataProvider.KUL)
@@ -83,12 +83,12 @@ namespace SOS.Process.Factories
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
-                    var darwinCore = verbatim.ToDarwinCore(taxa).ToArray();
+                    var processed = verbatim.ToProcessed(taxa).ToArray();
 
                     // Add area related data to models
-                    _areaHelper.AddAreaDataToDarwinCore(darwinCore);
+                    _areaHelper.AddAreaDataToProcessed(processed);
 
-                    successCount += await ProcessRepository.AddManyAsync(darwinCore);
+                    successCount += await ProcessRepository.AddManyAsync(processed);
 
                     verbatimCount += verbatim.Count();
 

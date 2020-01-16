@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 using SOS.Process.Database.Interfaces;
 
 namespace SOS.Process.Repositories.Source

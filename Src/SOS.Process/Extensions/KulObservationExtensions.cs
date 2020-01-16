@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
-using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.DarwinCore;
-using  SOS.Lib.Models.Processed.DarwinCore.Vocabulary;
-using SOS.Lib.Models.Verbatim.ClamPortal;
+using   SOS.Lib.Models.DarwinCore.Vocabulary;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Verbatim.Kul;
 
 namespace SOS.Process.Extensions
@@ -24,51 +21,27 @@ namespace SOS.Process.Extensions
         /// <param name="verbatim"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static DarwinCore<DynamicProperties> ToDarwinCore(this KulObservationVerbatim verbatim, IDictionary<int, DarwinCoreTaxon> taxa)
+        public static ProcessedSighting ToProcessed(this KulObservationVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
         {
             taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
             // todo - ProtectionLevel, CoordinateX_RT90, CoordinateY_RT90, CoordinateX_SWEREF99, CoordinateY_SWEREF99, CoordinateX, CoordinateY
-            var obs = new DarwinCore<DynamicProperties>(DataProvider.KUL)
+            var obs = new ProcessedSighting(DataProvider.KUL)
             {
                 BasisOfRecord = BasisOfRecord.HumanObservation,
-                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.KUL.ToString()}",
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.KUL.ToString()}",
                 DatasetName = "KUL",
-                DynamicProperties = new DynamicProperties
+                Event = new ProcessedEvent
                 {
-                    DataProviderId = (int)DataProvider.KUL,
-                    CoordinateX = verbatim.DecimalLongitude, // todo - convert to WebMercator?
-                    CoordinateY = verbatim.DecimalLatitude, // todo - convert to WebMercator?
-                    ObservationDateStart = verbatim.Start,
-                    ObservationDateEnd = verbatim.End,
-                    DyntaxaTaxonID = verbatim.DyntaxaTaxonId,
-                    Conservation = new DarwinCoreConservation()
-                    {
-                        ProtectionLevel = GetProtectionLevel()
-                    },
-                    IsNaturalOccurrence = true,
-                    IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
-                    IsNotRediscoveredObservation = false,
-                    IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
-                    Owner = verbatim.Owner,
-                    ReportedBy = verbatim.ReportedBy,
-                    ReportedDate = verbatim.Start,
+                    EndDate = verbatim.End.ToUniversalTime(),
+                    StartDate = verbatim.Start.ToUniversalTime(),
+                    VerbatimEndDate = verbatim.End,
+                    VerbatimStartDate = verbatim.Start
+                },
+                Identification = new ProcessedIdentification
+                {
                     UncertainDetermination = false
                 },
-                Event = new DarwinCoreEvent
-                {
-                    EventDate = $"{verbatim.Start.ToUniversalTime().ToString("s")}Z",
-                    EventTime = verbatim.Start.ToUniversalTime().ToString("HH':'mm':'ss''K"),
-                    VerbatimEventDate = verbatim.Start.ToString("yyyy-MM-dd HH:mm:ss")
-                },
-                Identification = new DarwinCoreIdentification
-                {
-                    
-                },
-                Organism = new DarwinCoreOrganism()
-                {
-
-                },
-                Location = new DarwinCoreLocation
+                Location = new ProcessedLocation
                 {
                     CoordinateUncertaintyInMeters = verbatim.CoordinateUncertaintyInMeters ?? DefaultCoordinateUncertaintyInMeters,
                     CountryCode = verbatim.CountryCode,
@@ -77,21 +50,30 @@ namespace SOS.Process.Extensions
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Continent = Continent.Europe,
                     Country = Country.Sweden,
-                    Locality = verbatim.Locality
+                    Locality = verbatim.Locality,
+                    VerbatimLatitude = verbatim.DecimalLatitude,
+                    VerbatimLongitude = verbatim.DecimalLongitude
                 },
                 Modified = verbatim.Start,
-                Occurrence = new DarwinCoreOccurrence
+                Occurrence = new ProcessedOccurrence
                 {
                     CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
+                    Id = verbatim.OccurrenceId,
                     IndividualCount = verbatim.IndividualCount?.ToString(),
-                    OccurrenceID = verbatim.OccurrenceId,
-                    OccurrenceStatus = GetOccurrenceStatus(verbatim.DyntaxaTaxonId),
-                    RecordedBy = verbatim.RecordedBy
+                    IsNaturalOccurrence = true,
+                    IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
+                    IsNotRediscoveredObservation = false,
+                    IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
+                    RecordedBy = verbatim.RecordedBy,
+                    Status = GetOccurrenceStatus(verbatim.DyntaxaTaxonId)
                 },
+                Owner = verbatim.Owner,
+                ProtectionLevel = GetProtectionLevel(),
+                ReportedBy = verbatim.ReportedBy,
+                ReportedDate = verbatim.Start,
                 Taxon = taxon
             };
 
-            obs.Event.PopulateDateFields(verbatim.Start, verbatim.End);
             return obs;
         }
 
@@ -101,11 +83,11 @@ namespace SOS.Process.Extensions
         /// <param name="verbatims"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static IEnumerable<DarwinCore<DynamicProperties>> ToDarwinCore(
+        public static IEnumerable<ProcessedSighting> ToProcessed(
             this IEnumerable<KulObservationVerbatim> verbatims, 
-            IDictionary<int, DarwinCoreTaxon> taxa)
+            IDictionary<int, ProcessedTaxon> taxa)
         {
-            return verbatims.Select(v => v.ToDarwinCore(taxa));
+            return verbatims.Select(v => v.ToProcessed(taxa));
         }
 
         /// <summary>

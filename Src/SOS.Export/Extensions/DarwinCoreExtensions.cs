@@ -3,7 +3,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using SOS.Export.Models.DarwinCore;
 using SOS.Lib.Helpers;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.Sighting;
 
 namespace SOS.Export.Extensions
 {
@@ -17,7 +18,7 @@ namespace SOS.Export.Extensions
         /// </summary>
         /// <param name="processedDarwinCore"></param>
         /// <returns></returns>
-        public static DwC ToDarwinCoreArchive(this DarwinCore<DynamicProperties> processedDarwinCore)
+        public static DwC ToDarwinCoreArchive(this DarwinCore processedDarwinCore)
         {
             if (processedDarwinCore == null)
             {
@@ -53,7 +54,7 @@ namespace SOS.Export.Extensions
         /// <param name="processedDarwinCore"></param>
         /// <returns></returns>
         public static IEnumerable<DwC> ToDarwinCoreArchive(
-            this IEnumerable<DarwinCore<DynamicProperties>> processedDarwinCore)
+            this IEnumerable<DarwinCore> processedDarwinCore)
         {
             return processedDarwinCore?.Select(m => m.ToDarwinCoreArchive());
         }
@@ -393,13 +394,13 @@ namespace SOS.Export.Extensions
         }
 
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
-            IEnumerable<DarwinCoreProject> projects)
+            IEnumerable<ProcessedProject> projects)
         {
             return projects.SelectMany(ToExtendedMeasurementOrFactRows);
         }
 
         private static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(
-            DarwinCoreProject project)
+            ProcessedProject project)
         {
             if (project?.ProjectParameters == null || !project.ProjectParameters.Any())
             {
@@ -411,11 +412,10 @@ namespace SOS.Export.Extensions
         }
 
         private static ExtendedMeasurementOrFactRow ToExtendedMeasurementOrFactRow(
-            DarwinCoreProject project,
-            DarwinCoreProjectParameter projectParameter)
+            ProcessedProject project,
+            ProcessedProjectParameter projectParameter)
         {
             ExtendedMeasurementOrFactRow row = new ExtendedMeasurementOrFactRow();
-            row.OccurrenceID = projectParameter.OccurrenceId;
             row.MeasurementID = project.Id; // Should this be ProjectId or ProjectParameterId?
             //row.MeasurementID = projectParameter.ProjectParameterId.ToString(); // Should this be ProjectId or ProjectParameterId?
             row.MeasurementType = projectParameter.Name;
@@ -434,7 +434,7 @@ namespace SOS.Export.Extensions
             return row;
         }
 
-        private static string GetMeasurementMethodDescription(DarwinCoreProject project)
+        private static string GetMeasurementMethodDescription(ProcessedProject project)
         {
             if (string.IsNullOrEmpty(project.SurveyMethod) && string.IsNullOrEmpty(project.SurveyMethodUrl))
             {

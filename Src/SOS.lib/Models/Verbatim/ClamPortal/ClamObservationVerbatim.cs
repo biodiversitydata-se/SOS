@@ -34,7 +34,7 @@ namespace SOS.Lib.Models.Verbatim.ClamPortal
         public string LocationId { get; set; }
         public string Locality { get; set; }
         public string LocationRemarks { get; set; }
-        public string MaximumDepthInMeters { get; set; }
+        public double? MaximumDepthInMeters { get; set; }
         public DateTime? Modified { get; set; }
         public DateTime ObservationDate { get; set; }
         public string OccurrenceId { get; set; }

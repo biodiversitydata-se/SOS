@@ -9,7 +9,7 @@ using SOS.Import.Models.TaxonAttributeService;
 using SOS.Import.Repositories.Destination.Taxon.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Factories

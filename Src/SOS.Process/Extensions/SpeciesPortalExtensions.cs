@@ -6,9 +6,8 @@ using System.Text.RegularExpressions;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.DarwinCore;
-using  SOS.Lib.Models.Processed.DarwinCore.Vocabulary;
+using  SOS.Lib.Models.DarwinCore.Vocabulary;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Process.Extensions
@@ -19,12 +18,12 @@ namespace SOS.Process.Extensions
     public static class SpeciesPortalExtensions
     {
         /// <summary>
-        /// Cast sighting verbatim to Darwin Core
+        /// Cast sighting verbatim to processed data model
         /// </summary>
         /// <param name="verbatim"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static DarwinCore<DynamicProperties> ToDarwinCore(this APSightingVerbatim verbatim, IDictionary<int, DarwinCoreTaxon> taxa)
+        public static ProcessedSighting ToProcessed(this APSightingVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
         {
             if (verbatim == null)
             {
@@ -36,9 +35,12 @@ namespace SOS.Process.Extensions
             var googleMercatorPoint = new Point(verbatim.Site?.XCoord ?? 0, verbatim.Site?.YCoord ?? 0);
             var wgs84Point = googleMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
 
-            taxa.TryGetValue(taxonId, out var taxon);
-            var occurrenceId = $"urn:lsid:artportalen.se:Sighting:{verbatim.Id}";
-            var obs = new DarwinCore<DynamicProperties>(DataProvider.Artdatabanken)
+            if (taxa.TryGetValue(taxonId, out var taxon))
+            {
+                taxon.IndividualId = verbatim.URL;
+            }
+
+            var obs = new ProcessedSighting(DataProvider.Artdatabanken)
             {
                 AccessRights =
                     !verbatim.ProtectedBySystem &&
@@ -51,106 +53,100 @@ namespace SOS.Process.Extensions
                 CollectionCode = string.IsNullOrEmpty(verbatim.SpeciesCollection)
                     ? "Artportalen"
                     : verbatim.SpeciesCollection,
-                CollectionID = verbatim.CollectionID,
-                DatasetID = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.Artdatabanken.ToString()}",
+                CollectionId = verbatim.CollectionID,
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.Artdatabanken.ToString()}",
                 DatasetName = "Artportalen",
-                DynamicProperties = new DynamicProperties
+                Event = new ProcessedEvent
                 {
-                    ActivityId = verbatim.Activity?.Id,
-                    BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon),
-                    CoordinateX = googleMercatorPoint.Coordinate.X,
-                    CoordinateY = googleMercatorPoint.Coordinate.Y,
-                    DyntaxaTaxonID = verbatim.TaxonId,
-                    IndividualID = verbatim.URL,
-                    IsNaturalOccurrence = !verbatim.Unspontaneous,
-                    IsNeverFoundObservation = verbatim.NotPresent,
-                    IsNotRediscoveredObservation = verbatim.NotRecovered,
-                    IsPositiveObservation = !(verbatim.NotPresent || verbatim.NotRecovered),
-                    OccurrenceURL = $"http://www.artportalen.se/sighting/{verbatim.Id}",
-                    Parish = verbatim.Site?.Parish?.Name ?? string.Empty,
-                    Projects = verbatim.Projects?.ToDarwinCoreProjects(occurrenceId),
-                    ProtectionLevel = CalculateProtectionLevel(taxon, verbatim.HiddenByProvider, verbatim.ProtectedBySystem),
-                    ReportedBy = verbatim.ReportedBy,
-                    ReportedDate = verbatim.ReportedDate,
-                    Substrate = GetSubstrateDescription(verbatim, taxa),
-                    UncertainDetermination = verbatim.UnsureDetermination
-                },
-                Event = new DarwinCoreEvent
-                {
-                    EventDate = $"{verbatim.StartDate?.ToUniversalTime().ToString("s")}Z" ?? "",
-                    EventTime = verbatim.StartDate?.ToUniversalTime().ToString("HH':'mm':'ss''K") ?? "",
-                    Habitat = (verbatim.Bioptope != null
-                        ? $"{verbatim.Bioptope.Translations.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value}{(string.IsNullOrEmpty(verbatim.BiotopeDescription) ? "" : " # ")}{verbatim.BiotopeDescription}"
-                        : verbatim.BiotopeDescription).WithMaxLength(255),
+                    Biotope = verbatim.Bioptope,
+                    BiotopeDescription = verbatim.BiotopeDescription,
+                    EndDate = verbatim.EndDate?.ToUniversalTime(),
+                    QuantityOfSubstrate = verbatim.QuantityOfSubstrate,
                     SamplingProtocol = GetSamplingProtocol(verbatim.Projects),
-                    VerbatimEventDate = $"{(verbatim.StartDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? "")}{(verbatim.StartDate.HasValue && verbatim.EndDate.HasValue ? "-" : "")}{(verbatim.EndDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? "")}"
+                    StartDate = verbatim.StartDate?.ToUniversalTime(),
+                    Substrate = verbatim.Substrate,
+                    SubstrateSpeciesDescription = verbatim.SubstrateSpeciesDescription,
+                    SubstrateDescription = GetSubstrateDescription(verbatim, taxa),
+                    VerbatimEndDate = verbatim.EndDate,
+                    VerbatimStartDate = verbatim.StartDate
                 },
-                Identification = new DarwinCoreIdentification
+                Identification = new ProcessedIdentification
                 {
                     IdentificationVerificationStatus = verbatim.ValidationStatus?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
-                    IdentifiedBy = verbatim.VerifiedBy
-                },
-                Organism = new DarwinCoreOrganism()
-                {
-
+                    IdentifiedBy = verbatim.VerifiedBy,
+                    UncertainDetermination = verbatim.UnsureDetermination 
                 },
                 InformationWithheld = "More information can be obtained from the Data Provider",
                 InstitutionCode = verbatim.OwnerOrganization?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value ?? "ArtDatabanken",
-                InstitutionID = verbatim.ControlingOrganisationId.HasValue
+                InstitutionId = verbatim.ControlingOrganisationId.HasValue
                     ? $"urn:lsid:artdata.slu.se:organization:{verbatim.ControlingOrganisationId}"
                     : null,
                 IsInEconomicZoneOfSweden = verbatim.Site?.XCoord != 0 && verbatim.Site?.YCoord != 0, // Species portal validate all sightings, we rely on that validation as long it has coordinates
                 Language = Language.Swedish,
-                Location = new DarwinCoreLocation
+                Location = new ProcessedLocation
                 {
                     Continent = Continent.Europe,
                     CoordinateUncertaintyInMeters = verbatim.Site?.Accuracy,
                     Country = Country.Sweden,
                     CountryCode = CountryCode.Sweden,
-                    County = verbatim.Site?.County?.Name ?? string.Empty,
+                    County = verbatim.Site?.County?.ToProcessed(),
                     DecimalLatitude = wgs84Point.Coordinate?.Y ?? 0,
                     DecimalLongitude = wgs84Point.Coordinate?.X ?? 0,
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Locality = verbatim.Site?.Name,
-                    LocationID = $"urn:lsid:artportalen.se:site:{verbatim.Site?.Id}",
-                    MaximumDepthInMeters = verbatim.MaxDepth?.ToString(),
-                    MaximumElevationInMeters = verbatim.MaxHeight?.ToString(),
-                    MinimumDepthInMeters = verbatim.MinDepth?.ToString(),
-                    MinimumElevationInMeters = verbatim.MinHeight?.ToString(),
-                    Municipality = verbatim.Site?.Municipality?.Name ?? string.Empty,
-                    StateProvince = verbatim.Site?.Province?.Name ?? string.Empty
+                    Id = $"urn:lsid:artportalen.se:site:{verbatim.Site?.Id}",
+                    MaximumDepthInMeters = verbatim.MaxDepth,
+                    MaximumElevationInMeters = verbatim.MaxHeight,
+                    MinimumDepthInMeters = verbatim.MinDepth,
+                    MinimumElevationInMeters = verbatim.MinHeight,
+                    Municipality = verbatim.Site?.Municipality?.ToProcessed(),
+                    Parish = verbatim.Site?.Parish?.ToProcessed(),
+                    Province = verbatim.Site?.Province?.ToProcessed(),
+                    VerbatimLatitude = googleMercatorPoint.Coordinate.Y,
+                    VerbatimLongitude = googleMercatorPoint.Coordinate.X,
+                    VerbatimCoordinateSystem = "EPSG:3857"
                 },
                 Modified = verbatim.EndDate ?? verbatim.ReportedDate,
-                Occurrence = new DarwinCoreOccurrence
+                Occurrence = new ProcessedOccurrence
                 {
+                    Activity = verbatim.Activity,
                     AssociatedMedia = verbatim.HasImages
                         ? $"http://www.artportalen.se/sighting/{verbatim.Id}#SightingDetailImages"
                         : "",
                     AssociatedReferences = GetAssociatedReferences(verbatim),
                     Behavior = verbatim.Activity?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
+                    BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon), 
                     CatalogNumber = verbatim.Id.ToString(),
                     EstablishmentMeans = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
+                    Id = $"urn:lsid:artportalen.se:Sighting:{verbatim.Id}",
                     IndividualCount = verbatim.Quantity?.ToString() ?? "",
+                    IsNaturalOccurrence = !verbatim.Unspontaneous,
+                    IsNeverFoundObservation = verbatim.NotPresent,
+                    IsNotRediscoveredObservation = verbatim.NotRecovered,
+                    IsPositiveObservation = !(verbatim.NotPresent || verbatim.NotRecovered),
                     LifeStage = verbatim.Stage?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
-                    OccurrenceID = occurrenceId,
-                    OccurrenceRemarks = verbatim.Comment,
-                    OccurrenceStatus = verbatim.NotPresent || verbatim.NotRecovered
-                        ? OccurrenceStatus.Absent
-                        : OccurrenceStatus.Present,
                     OrganismQuantity = verbatim.Quantity?.ToString() ?? "",
                     OrganismQuantityType = verbatim.Quantity.HasValue ? verbatim.Unit?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value ?? "Individuals" : null,
                     RecordedBy = verbatim.Observers,
                     RecordNumber = verbatim.Label,
+                    Remarks = verbatim.Comment,
                     ReproductiveCondition = verbatim.Activity?.Category?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
-                    Sex = verbatim.Gender?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value
+                    Sex = verbatim.Gender?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
+                    Status = verbatim.NotPresent || verbatim.NotRecovered
+                        ? OccurrenceStatus.Absent
+                        : OccurrenceStatus.Present,
+                    URL = $"http://www.artportalen.se/sighting/{verbatim.Id}"
                 },
                 OwnerInstitutionCode = verbatim.OwnerOrganization?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value ?? "ArtDatabanken",
+                Projects = verbatim.Projects?.ToProcessedProjects(), 
+                ProtectionLevel = CalculateProtectionLevel(taxon, verbatim.HiddenByProvider, verbatim.ProtectedBySystem),
+                ReportedBy = verbatim.ReportedBy, 
+                ReportedDate = verbatim.ReportedDate,
                 RightsHolder = verbatim.RightsHolder ?? verbatim.OwnerOrganization?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value ?? "Data saknas",
                 Taxon = taxon,
                 Type = "Occurrence"
             };
 
-            obs.Event.PopulateDateFields(verbatim.StartDate.Value, verbatim.EndDate);
             return obs;
         }
         
@@ -160,22 +156,30 @@ namespace SOS.Process.Extensions
         /// <param name="verbatims"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static ICollection<DarwinCore<DynamicProperties>> ToDarwinCore(this IEnumerable<APSightingVerbatim> verbatims, IDictionary<int, DarwinCoreTaxon> taxa)
+        public static ICollection<ProcessedSighting> ToProcessed(this IEnumerable<APSightingVerbatim> verbatims, IDictionary<int, ProcessedTaxon> taxa)
         {
-            return verbatims.Select(v => v.ToDarwinCore(taxa)).ToArray();
+            return verbatims.Select(v => v.ToProcessed(taxa)).ToArray();
         }
 
-        private static IEnumerable<DarwinCoreProject> ToDarwinCoreProjects(this IEnumerable<Project> projects, string occurrenceId)
+        public static ProcessedArea ToProcessed(this GeographicalArea area)
         {
-            if (projects == null || !projects.Any()) return null;
-            return projects.Select(p => p.ToDarwinCoreProject(occurrenceId));
+            return new ProcessedArea
+            {
+                Id = area.Id,
+                Name = area.Name
+            };
         }
 
-        private static DarwinCoreProject ToDarwinCoreProject(this Project project, string occurrenceId)
+        private static IEnumerable<ProcessedProject> ToProcessedProjects(this IEnumerable<Project> projects)
+        {
+            return projects?.Select(p => p.ToProcessedProject());
+        }
+
+        private static ProcessedProject ToProcessedProject(this Project project)
         {
             if (project == null) return null;
             
-            return new DarwinCoreProject
+            return new ProcessedProject
             {
                 IsPublic = project.IsPublic,
                 Category = project.Category,
@@ -187,21 +191,19 @@ namespace SOS.Process.Extensions
                 StartDate = project.StartDate,
                 SurveyMethod = project.SurveyMethod,
                 SurveyMethodUrl = project.SurveyMethodUrl,
-                ProjectParameters = project.ProjectParameters?.Select(p => p.ToDarwinCoreProjectParameter(occurrenceId))
+                ProjectParameters = project.ProjectParameters?.Select(p => p.ToProcessedProjectParameter())
             };
         }
 
-        private static DarwinCoreProjectParameter ToDarwinCoreProjectParameter(this ProjectParameter projectParameter, string occurrenceId)
+        private static ProcessedProjectParameter ToProcessedProjectParameter(this ProjectParameter projectParameter)
         {
-            return new DarwinCoreProjectParameter
+            return new ProcessedProjectParameter
             {
-                OccurrenceId = occurrenceId,
                 Value = projectParameter.Value,
                 DataType = projectParameter.DataType,
                 Description = projectParameter.Description,
                 Name = projectParameter.Name,
-                ProjectId = projectParameter.ProjectId,
-                ProjectParameterId = projectParameter.ProjectParameterId,
+                Id = projectParameter.Id,
                 Unit = projectParameter.Unit
             };
         }
@@ -238,16 +240,16 @@ namespace SOS.Process.Extensions
         /// <param name="hiddenByProvider"></param>
         /// <param name="protectedBySystem"></param>
         /// <returns></returns>
-        private static int CalculateProtectionLevel(DarwinCoreTaxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
+        private static int CalculateProtectionLevel(ProcessedTaxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
         {
-            if (taxon == null || string.IsNullOrEmpty(taxon.DynamicProperties?.ProtectionLevel))
+            if (taxon == null || string.IsNullOrEmpty(taxon.ProtectionLevel))
             {
                 return 1;
             }
 
             var regex = new Regex(@"^\d");
 
-            if (int.TryParse(regex.Match(taxon.DynamicProperties.ProtectionLevel).Value, out var protectionLevel))
+            if (int.TryParse(regex.Match(taxon.ProtectionLevel).Value, out var protectionLevel))
             {
                 if (protectionLevel <= 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now)
                 {
@@ -268,7 +270,7 @@ namespace SOS.Process.Extensions
         /// <param name="verbatim"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        private static string GetSubstrateDescription(APSightingVerbatim verbatim, IDictionary<int, DarwinCoreTaxon> taxa)
+        private static string GetSubstrateDescription(APSightingVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
         {
             var substrateDescription = new StringBuilder();
 
@@ -325,14 +327,14 @@ namespace SOS.Process.Extensions
         /// <param name="verbatim"></param>
         /// <param name="taxon"></param>
         /// <returns></returns>
-        public static int? GetBirdNestActivityId(APSightingVerbatim verbatim, DarwinCoreTaxon taxon)
+        public static int? GetBirdNestActivityId(APSightingVerbatim verbatim, ProcessedTaxon taxon)
         {
             if (taxon == null)
             {
                 return null;
             }
 
-            if (taxon.DynamicProperties?.OrganismGroup?.StartsWith("fåg", StringComparison.CurrentCultureIgnoreCase) ?? false)
+            if (taxon.OrganismGroup?.StartsWith("fåg", StringComparison.CurrentCultureIgnoreCase) ?? false)
             {
                 return (verbatim.Activity?.Id ?? 0) == 0 ? 1000000 : verbatim.Activity.Id;
             }
@@ -347,44 +349,31 @@ namespace SOS.Process.Extensions
         /// <returns></returns>
         public static string GetAssociatedReferences(APSightingVerbatim verbatim)
         {
+            if (!verbatim.MigrateSightingObsId.HasValue)
+            {
+                return null;
+            }
+
             string associatedReferences = null;
             switch (verbatim.MigrateSightingPortalId ?? 0)
             {
                 case 1:
-                    if (verbatim.MigrateSightingObsId.HasValue)
-                    {
-                        associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bird.{verbatim.MigrateSightingObsId.Value}";
-                    }
+                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bird.{verbatim.MigrateSightingObsId.Value}";
                     break;
                 case 2:
-                    if (verbatim.MigrateSightingObsId.HasValue)
-                    {
-                        associatedReferences = $"urn:lsid:artportalen.se:Sighting:PlantAndMushroom.{verbatim.MigrateSightingObsId.Value}";
-                    }
+                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:PlantAndMushroom.{verbatim.MigrateSightingObsId.Value}";
                     break;
                 case 6:
-                    if (verbatim.MigrateSightingObsId.HasValue)
-                    {
-                        associatedReferences = $"urn:lsid:artportalen.se:Sighting:Vertebrate.{verbatim.MigrateSightingObsId.Value}";
-                    }
+                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Vertebrate.{verbatim.MigrateSightingObsId.Value}";
                     break;
                 case 7:
-                    if (verbatim.MigrateSightingObsId.HasValue)
-                    {
-                        associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bugs.{verbatim.MigrateSightingObsId.Value}";
-                    }
+                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bugs.{verbatim.MigrateSightingObsId.Value}";
                     break;
                 case 8:
-                    if (verbatim.MigrateSightingObsId.HasValue)
-                    {
-                        associatedReferences = $"urn:lsid:artportalen.se:Sighting:Fish.{verbatim.MigrateSightingObsId.Value}";
-                    }
+                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Fish.{verbatim.MigrateSightingObsId.Value}";
                     break;
                 case 9:
-                    if (verbatim.MigrateSightingObsId.HasValue)
-                    {
-                        associatedReferences = $"urn:lsid:artportalen.se:Sighting:MarineInvertebrates.{verbatim.MigrateSightingObsId.Value}";
-                    }
+                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:MarineInvertebrates.{verbatim.MigrateSightingObsId.Value}";
                     break;
             }
 

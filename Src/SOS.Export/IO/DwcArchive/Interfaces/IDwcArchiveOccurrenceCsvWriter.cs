@@ -16,14 +16,14 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="filter"></param>
         /// <param name="stream"></param>
         /// <param name="fieldDescriptions"></param>
-        /// <param name="processedDarwinCoreRepository"></param>
+        /// <param name="processedSightingRepository"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<bool> CreateOccurrenceCsvFileAsync(
             AdvancedFilter filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             IJobCancellationToken cancellationToken);
     }
 }

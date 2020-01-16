@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 using SOS.Process.Extensions;
 using SOS.Process.Repositories.Source.Interfaces;
 using NetTopologySuite.Features;
@@ -13,7 +13,7 @@ using NetTopologySuite.Index.Strtree;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Mappings;
 using SOS.Process.Mappings.Interfaces;
-
+// NOT IN USE
 namespace SOS.Process.Helpers
 {
     /// <summary>
@@ -24,7 +24,7 @@ namespace SOS.Process.Helpers
     /// for a county is that if there is a value "Hallnad" from verbatimObs.County
     /// then it is mapped first to "Halland" and then to a FeatureId (13) to speed up searches.
     /// </summary>
-    public class AreaHelperWithNameMapping : Interfaces.IAreaHelper
+    public class AreaHelperWithNameMapping { /*: Interfaces.IAreaHelper
     {
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
         private readonly IAreaNameMapper _areaNameMapper;
@@ -269,6 +269,6 @@ namespace SOS.Process.Helpers
         public void PersistCache()
         {
             throw new NotImplementedException();
-        }
+        }*/
     }
 }

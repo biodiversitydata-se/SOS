@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Export.Mappings;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive
@@ -30,7 +31,7 @@ namespace SOS.Export.IO.DwcArchive
             AdvancedFilter filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -38,16 +39,16 @@ namespace SOS.Export.IO.DwcArchive
                 var skip = 0;
                 const int take = 1000000;
                 var darwinCoreMap = new DarwinCoreDynamicMap(fieldDescriptions);
-                var processedDarwinCore = await processedDarwinCoreRepository.GetChunkAsync(filter, skip, take);
+                var processedSightings = await processedSightingRepository.GetChunkAsync(filter, skip, take);
 
-                while (processedDarwinCore.Any())
+                while (processedSightings.Any())
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
     
-                    await WriteOccurrenceCsvAsync(stream, processedDarwinCore, darwinCoreMap);
+                    await WriteOccurrenceCsvAsync(stream, processedSightings.ToDarwinCore(), darwinCoreMap);
 
                     skip += take;
-                    processedDarwinCore = await processedDarwinCoreRepository.GetChunkAsync(filter, skip, take);
+                    processedSightings = await processedSightingRepository.GetChunkAsync(filter, skip, take);
                 }
 
                 return true;

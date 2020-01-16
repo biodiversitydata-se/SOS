@@ -1,5 +1,5 @@
 ﻿using CsvHelper.Configuration;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Import.Mappings
 {

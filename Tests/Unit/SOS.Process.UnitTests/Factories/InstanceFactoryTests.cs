@@ -15,7 +15,7 @@ namespace SOS.Process.UnitTests.Factories
     /// </summary>
     public class InstanceFactoryTests
     {
-        private readonly Mock<IDarwinCoreRepository> _darwinCoreRepositoryMock;
+        private readonly Mock<IProcessedSightingRepository> _processedSightingRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
         private readonly Mock<ILogger<InstanceFactory>> _loggerMock;
 
@@ -24,7 +24,7 @@ namespace SOS.Process.UnitTests.Factories
         /// </summary>
         public InstanceFactoryTests()
         {
-            _darwinCoreRepositoryMock = new Mock<IDarwinCoreRepository>();
+            _processedSightingRepositoryMock = new Mock<IProcessedSightingRepository>();
             _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
             _loggerMock = new Mock<ILogger<InstanceFactory>>();
         }
@@ -36,7 +36,7 @@ namespace SOS.Process.UnitTests.Factories
         public void ConstructorTest()
         {
             new InstanceFactory(
-                _darwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
@@ -48,13 +48,13 @@ namespace SOS.Process.UnitTests.Factories
 
             
             create = () => new InstanceFactory(
-                _darwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processInfoRepository");
 
             create = () => new InstanceFactory(
-                _darwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
@@ -70,10 +70,10 @@ namespace SOS.Process.UnitTests.Factories
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _darwinCoreRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedSightingRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
 
-            _darwinCoreRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedSightingRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
             
             _processInfoRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
@@ -83,7 +83,7 @@ namespace SOS.Process.UnitTests.Factories
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var factory = new InstanceFactory(
-                _darwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
@@ -111,7 +111,7 @@ namespace SOS.Process.UnitTests.Factories
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var factory = new InstanceFactory(
-                _darwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
@@ -133,14 +133,14 @@ namespace SOS.Process.UnitTests.Factories
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _darwinCoreRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedSightingRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ThrowsAsync(new Exception("Failed"));
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var factory = new InstanceFactory(
-                _darwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
@@ -162,14 +162,14 @@ namespace SOS.Process.UnitTests.Factories
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _darwinCoreRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
+            _processedSightingRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var factory = new InstanceFactory(
-                _darwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
@@ -197,7 +197,7 @@ namespace SOS.Process.UnitTests.Factories
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var factory = new InstanceFactory(
-                _darwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
@@ -219,14 +219,14 @@ namespace SOS.Process.UnitTests.Factories
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _darwinCoreRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
+            _processedSightingRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
                 .ThrowsAsync(new Exception("Failed"));
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var factory = new InstanceFactory(
-                _darwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 

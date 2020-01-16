@@ -132,7 +132,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var memoryStream = new MemoryStream();
             var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
-            observation.Occurrence.OccurrenceRemarks = "Sighting found in\r\nUppsala";
+            observation.Occurrence.Remarks = "Sighting found in\r\nUppsala";
             var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
 
             //-----------------------------------------------------------------------------------------------------------

@@ -12,21 +12,21 @@ namespace SOS.Search.Service.Factories
     /// </summary>
     public class SightingFactory : Interfaces.ISightingFactory
     {
-        private readonly IProcessedDarwinCoreRepository _processedDarwinCoreRepository;
+        private readonly IProcessedSightingRepository _processedDarwinCoreRepository;
 
         private readonly ILogger<SightingFactory> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processedDarwinCoreRepository"></param>
+        /// <param name="processedSightingRepository"></param>
         /// <param name="logger"></param>
         public SightingFactory(
-            IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             ILogger<SightingFactory> logger)
         {
-            _processedDarwinCoreRepository = processedDarwinCoreRepository ??
-                                           throw new ArgumentNullException(nameof(processedDarwinCoreRepository));
+            _processedDarwinCoreRepository = processedSightingRepository ??
+                                           throw new ArgumentNullException(nameof(processedSightingRepository));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }

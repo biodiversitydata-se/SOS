@@ -12,14 +12,14 @@ using SOS.Export.IO.Csv.Converters;
 using SOS.Export.Models;
 using SOS.Export.Models.DarwinCore;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Export.Mappings
 {
     /// <summary>
     /// Mapping of Darwin Core to csv
     /// </summary>
-    public sealed class DarwinCoreDynamicMap : ClassMap<DarwinCore<DynamicProperties>>
+    public sealed class DarwinCoreDynamicMap : ClassMap<DarwinCore>
     {
         /// <summary>
         /// Constructor.
@@ -1021,9 +1021,9 @@ namespace SOS.Export.Mappings
             public int Index { get; set; }
         }
 
-        public static Dictionary<FieldDescriptionId, Expression<Func<DarwinCore<DynamicProperties>, object>>> CreateFieldMappingDictionary()
+        public static Dictionary<FieldDescriptionId, Expression<Func<DarwinCore, object>>> CreateFieldMappingDictionary()
         {
-            var dic = new Dictionary<FieldDescriptionId, Expression<Func<DarwinCore<DynamicProperties>, object>>>();
+            var dic = new Dictionary<FieldDescriptionId, Expression<Func<DarwinCore, object>>>();
 
             // Occurrence
             dic.Add(FieldDescriptionId.OccurrenceID, m => m.Occurrence.OccurrenceID);

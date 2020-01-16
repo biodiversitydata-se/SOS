@@ -2,7 +2,7 @@
 using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Extensions
@@ -14,13 +14,13 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static FilterDefinition<DarwinCore<DynamicProperties>> ToProjectParameteFilterDefinition(this AdvancedFilter filter)
+        public static FilterDefinition<ProcessedSighting> ToProjectParameteFilterDefinition(this AdvancedFilter filter)
         {
             var filters = CreateFilterDefinitions(filter);
-            filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.ElemMatch(
-                o => o.DynamicProperties.Projects, o => o.ProjectParameters != null));
+            filters.Add(Builders<ProcessedSighting>.Filter.ElemMatch(
+                o => o.Projects, o => o.ProjectParameters != null));
 
-            return Builders<DarwinCore<DynamicProperties>>.Filter.And(filters);
+            return Builders<ProcessedSighting>.Filter.And(filters);
         }
 
         /// <summary>
@@ -28,57 +28,55 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static FilterDefinition<DarwinCore<DynamicProperties>> ToFilterDefinition(this AdvancedFilter filter)
+        public static FilterDefinition<ProcessedSighting> ToFilterDefinition(this AdvancedFilter filter)
         {
             if (!filter.IsFilterActive)
             {
-                return FilterDefinition<DarwinCore<DynamicProperties>>.Empty;
+                return FilterDefinition<ProcessedSighting>.Empty;
             }
 
             var filters = CreateFilterDefinitions(filter);
-            return Builders<DarwinCore<DynamicProperties>>.Filter.And(filters);
+            return Builders<ProcessedSighting>.Filter.And(filters);
         }
 
-        private static List<FilterDefinition<DarwinCore<DynamicProperties>>> CreateFilterDefinitions(AdvancedFilter filter)
+        private static List<FilterDefinition<ProcessedSighting>> CreateFilterDefinitions(AdvancedFilter filter)
         {
-            var filters = new List<FilterDefinition<DarwinCore<DynamicProperties>>>();
+            var filters = new List<FilterDefinition<ProcessedSighting>>();
 
             if (filter.TaxonIds?.Any() ?? false)
             {
-                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Taxon.Id, filter.TaxonIds));
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Taxon.Id, filter.TaxonIds));
             }
 
             if (filter.StartDate.HasValue)
             {
-                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.Gte(m => m.Event.EventDate,
-                    $"{filter.StartDate.Value.ToUniversalTime().ToString("s")}Z"));
+                filters.Add(Builders<ProcessedSighting>.Filter.Gte(m => m.Event.StartDate, filter.StartDate.Value));
             }
 
             if (filter.EndDate.HasValue)
             {
-                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.Lte(m => m.Event.EventDate,
-                    $"{filter.EndDate.Value.ToUniversalTime().ToString("s")}Z"));
+                filters.Add(Builders<ProcessedSighting>.Filter.Lte(m => m.Event.EndDate, filter.EndDate));
             }
 
             if (filter.Counties?.Any() ?? false)
             {
-                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Location.County, filter.Counties));
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.County.Name, filter.Counties));
             }
 
             if (filter.Municipalities?.Any() ?? false)
             {
                 filters.Add(
-                    Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Location.Municipality, filter.Municipalities));
+                    Builders<ProcessedSighting>.Filter.In(m => m.Location.Municipality.Name, filter.Municipalities));
             }
 
             if (filter.Provinces?.Any() ?? false)
             {
-                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Location.StateProvince, filter.Provinces));
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.Province.Name, filter.Provinces));
             }
 
             if (filter.Sex?.Any() ?? false)
             {
-                filters.Add(Builders<DarwinCore<DynamicProperties>>.Filter.In(m => m.Occurrence.Sex, filter.Sex));
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Occurrence.Sex, filter.Sex));
             }
 
             return filters;

@@ -44,7 +44,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<SightingFactory>().As<ISightingFactory>().InstancePerLifetimeScope();
 
             // Repositories mongo
-            builder.RegisterType<ProcessedDarwinCoreRepository>().As<IProcessedDarwinCoreRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedSightingRepository>().As<IProcessedSightingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
 
             // Services

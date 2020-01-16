@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Models.Processed.DarwinCore;
+﻿using  SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Process.Repositories.Source.Interfaces
 {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -14,7 +13,8 @@ using SOS.Export.Extensions;
 using SOS.Export.Mappings;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive
@@ -33,7 +33,7 @@ namespace SOS.Export.IO.DwcArchive
             AdvancedFilter filter, 
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -41,7 +41,7 @@ namespace SOS.Export.IO.DwcArchive
                 var skip = 0;
                 const int take = 100000;
                 var map = new ExtendedMeasurementOrFactRowMap();
-                IEnumerable<DarwinCoreProject> projectParameters = await processedDarwinCoreRepository.GetProjectParameters(filter, skip, take);
+                IEnumerable<ProcessedProject> projectParameters = await processedSightingRepository.GetProjectParameters(filter, skip, take);
 
                 while (projectParameters.Any())
                 {
@@ -49,7 +49,7 @@ namespace SOS.Export.IO.DwcArchive
                     IEnumerable<ExtendedMeasurementOrFactRow> records = projectParameters.ToExtendedMeasurementOrFactRows();
                     await WriteEmofCsvAsync(stream, records, map);
                     skip += take;
-                    projectParameters = await processedDarwinCoreRepository.GetProjectParameters(filter, skip, take);
+                    projectParameters = await processedSightingRepository.GetProjectParameters(filter, skip, take);
                 }
 
                 return true;

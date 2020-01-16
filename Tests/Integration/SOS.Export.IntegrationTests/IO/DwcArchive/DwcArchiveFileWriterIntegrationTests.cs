@@ -31,9 +31,9 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                 exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
                 exportConfiguration.MongoDbConfiguration.DatabaseName,
                 exportConfiguration.MongoDbConfiguration.BatchSize);
-            var processedDarwinCoreRepository = new ProcessedDarwinCoreRepository(
+            var processedSightingRepository = new ProcessedSightingRepository(
                 exportClient,
-                new Mock<ILogger<ProcessedDarwinCoreRepository>>().Object);
+                new Mock<ILogger<ProcessedSightingRepository>>().Object);
             DwcArchiveFileWriter dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object),
                 new ExtendedMeasurementOrFactCsvWriter(new Mock<ILogger<ExtendedMeasurementOrFactCsvWriter>>().Object),
@@ -51,7 +51,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                 filter,
                 filename,
-                processedDarwinCoreRepository,
+                processedSightingRepository,
                 processInfo,
                 exportFolderPath,
                 JobCancellationToken.Null);

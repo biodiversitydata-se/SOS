@@ -1,26 +1,28 @@
-﻿namespace SOS.Process.Models.Cache
+﻿using SOS.Lib.Models.Processed.Sighting;
+
+namespace SOS.Process.Models.Cache
 {
     public class PositionLocation
     {
         /// <summary>
         /// County property
         /// </summary>
-        public Location County { get; set; }
+        public ProcessedArea County { get; set; }
 
         /// <summary>
         /// Municipality property
         /// </summary>
-        public Location Municipality { get; set; }
+        public ProcessedArea Municipality { get; set; }
 
         /// <summary>
         /// Parish property
         /// </summary>
-        public Location Parish { get; set; }
+        public ProcessedArea Parish { get; set; }
 
         /// <summary>
         /// Province property
         /// </summary>
-        public Location Province { get; set; }
+        public ProcessedArea Province { get; set; }
 
         /// <summary>
         /// County property
