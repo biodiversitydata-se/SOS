@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Processed.Sighting
 {
@@ -121,14 +122,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// referred to in the record.
         /// Currently this property has the value ArtDatabanken.
         /// </summary>
-        public string InstitutionCode { get; set; }
-
-        /// <summary>
-        /// An identifier for the institution having custody of 
-        /// the object(s) or information referred to in the record.
-        /// This property is currently not used.
-        /// </summary>
-        public string InstitutionId { get; set; }
+        public Metadata Institution { get; set; }
 
         /// <summary>
         /// Internal flag used in validation. must be true to be stored in processed data
@@ -180,11 +174,6 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// dataset (specimen, observation, etc.).
         /// </summary>
         public ProcessedOccurrence Occurrence { get; set; }
-
-        /// <summary>
-        /// Owner of the sighting
-        /// </summary>
-        public string Owner { get; set; }
 
         /// <summary>
         /// The name (or acronym) in use by the institution having

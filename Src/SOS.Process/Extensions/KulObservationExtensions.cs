@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Enums;
-using   SOS.Lib.Models.DarwinCore.Vocabulary;
+using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Verbatim.Kul;
 
@@ -67,7 +67,7 @@ namespace SOS.Process.Extensions
                     RecordedBy = verbatim.RecordedBy,
                     Status = GetOccurrenceStatus(verbatim.DyntaxaTaxonId)
                 },
-                Owner = verbatim.Owner,
+                OwnerInstitutionCode = verbatim.Owner,
                 ProtectionLevel = GetProtectionLevel(),
                 ReportedBy = verbatim.ReportedBy,
                 ReportedDate = verbatim.Start,

@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using SOS.Lib.Constants;
 
 namespace SOS.Import.Extensions
 {
     public static class StringExtensions
     {
-        private static readonly CultureInfo GbCultureInfo = CultureInfo.CreateSpecificCulture("en-GB");
+        private static readonly CultureInfo GbCultureInfo = CultureInfo.CreateSpecificCulture(Cultures.en_GB);
 
         /// <summary>
         /// Truncates a string to a specific length.

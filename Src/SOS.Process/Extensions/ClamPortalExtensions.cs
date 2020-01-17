@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using  SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 
 namespace SOS.Process.Extensions
@@ -39,10 +42,12 @@ namespace SOS.Process.Extensions
                 },
                 Identification = new ProcessedIdentification
                 {
-                    IdentificationVerificationStatus = verbatim.IdentificationVerificationStatus,
+                    VerificationStatus = string.IsNullOrEmpty(verbatim.IdentificationVerificationStatus) ? null : 
+                        new Metadata(0){ Translations = new [] { new MetadataTranslation{ Culture = Cultures.sv_SE, Value = verbatim.IdentificationVerificationStatus }  } }  ,
                     UncertainDetermination = verbatim.UncertainDetermination != 0
                 },
-                InstitutionCode = verbatim.InstitutionCode,
+                Institution = string.IsNullOrEmpty(verbatim.InstitutionCode) ? null : 
+                    new Metadata(0){ Translations = new []{ new MetadataTranslation{ Culture = Cultures.sv_SE, Value = verbatim.InstitutionCode } }},
                 Language = verbatim.Language,
                 Location = new ProcessedLocation
                 {
@@ -71,9 +76,11 @@ namespace SOS.Process.Extensions
                     IsNeverFoundObservation = verbatim.IsNeverFoundObservation,
                     IsNotRediscoveredObservation = verbatim.IsNotRediscoveredObservation,
                     IsPositiveObservation = verbatim.IsPositiveObservation,
-                    LifeStage = verbatim.LifeStage,
+                    LifeStage = string.IsNullOrEmpty(verbatim.LifeStage) ? null :
+                        new Metadata(0) { Translations = new[] { new MetadataTranslation { Culture = Cultures.sv_SE, Value = verbatim.LifeStage } } },
                     OrganismQuantity = verbatim.Quantity,
-                    OrganismQuantityType = verbatim.QuantityUnit,
+                    OrganismQuantityType = string.IsNullOrEmpty(verbatim.QuantityUnit) ? null :
+                        new Metadata(0) { Translations = new[] { new MetadataTranslation { Culture = Cultures.sv_SE, Value = verbatim.QuantityUnit } } },
                     RecordedBy = verbatim.RecordedBy,
                     Remarks = verbatim.OccurrenceRemarks,
                     Status = verbatim.OccurrenceStatus

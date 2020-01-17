@@ -13,9 +13,9 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<KulObservationVerbatim> ToAggregates(this IEnumerable<KulService.WebSpeciesObservation> entities)
+        public static IEnumerable<KulObservationVerbatim> ToVerbatims(this IEnumerable<KulService.WebSpeciesObservation> entities)
         {
-            return entities.Select(e => e.ToAggregate());
+            return entities.Select(e => e.ToVerbatim());
         }
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static KulObservationVerbatim ToAggregate(this KulService.WebSpeciesObservation entity)
+        public static KulObservationVerbatim ToVerbatim(this KulService.WebSpeciesObservation entity)
         {
             KulObservationVerbatim observation = new KulObservationVerbatim();
             observation.ReportedBy = entity.Fields[(int)KulObservationFieldsId.ReportedBy].Value;

@@ -42,7 +42,7 @@ namespace SOS.Lib.Models.Verbatim.ClamPortal
         public string OccurrenceStatus { get; set; }
         public string Owner { get; set; }
         public string ProjectName { get; set; }
-        public string Quantity { get; set; }
+        public int? Quantity { get; set; }
         public string QuantityUnit { get; set; }
         public string RecordedBy { get; set; }
         public string ReportedBy { get; set; }

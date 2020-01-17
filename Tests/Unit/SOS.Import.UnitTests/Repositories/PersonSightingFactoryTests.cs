@@ -60,7 +60,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var sightingRelationEntities = SightingRelationEntityTestData.CreateItems().ToAggregates().ToList();
+            var sightingRelationEntities = SightingRelationEntityTestData.CreateItems().ToVerbatims().ToList();
             var speciesCollectionItemEntities = SpeciesCollectionItemEntityTestData.CreateItems();
             var personByUserId = PersonTestData.CreatePersonDictionary();
             var sightingIds = new HashSet<int>(sightingRelationEntities
@@ -75,7 +75,7 @@ namespace SOS.Import.UnitTests.Repositories
                 sightingIds,
                 personByUserId,
                 null,
-                speciesCollectionItemEntities.ToAggregates().ToList(),
+                speciesCollectionItemEntities.ToVerbatims().ToList(),
                 sightingRelationEntities);
 
             //-----------------------------------------------------------------------------------------------------------

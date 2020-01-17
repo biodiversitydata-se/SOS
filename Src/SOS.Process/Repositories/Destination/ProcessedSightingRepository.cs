@@ -123,9 +123,23 @@ namespace SOS.Process.Repositories.Destination
             var indexModels = new List<CreateIndexModel<ProcessedSighting>>()
             {
                 new CreateIndexModel<ProcessedSighting>(
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.EndDate)),
+                new CreateIndexModel<ProcessedSighting>(
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.StartDate)),
+                new CreateIndexModel<ProcessedSighting>(
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.County.Id)),
+                new CreateIndexModel<ProcessedSighting>(
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.Province.Id)),
+                new CreateIndexModel<ProcessedSighting>(
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.Municipality.Id)),
+                new CreateIndexModel<ProcessedSighting>(
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.Sex.Id)),
+                new CreateIndexModel<ProcessedSighting>(
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Provider)),
+                new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.Id)),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Provider))
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory))
             };
 
             /*   indexModels.Add(new CreateIndexModel<DarwinCore>(Builders<DarwinCore>.IndexKeys.Combine(

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using SOS.Lib.Constants;
 using  SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Sighting;
 
@@ -23,7 +24,7 @@ namespace SOS.Lib.Extensions
                 EventDate = $"{source.StartDate?.ToString("s")}Z" ?? "",
                 EventTime = source.StartDate?.ToUniversalTime().ToString("HH':'mm':'ss''K") ?? "",
                 Habitat = (source.Biotope != null
-                    ? $"{source.Biotope.Translations.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value}{(string.IsNullOrEmpty(source.BiotopeDescription) ? "" : " # ")}{source.BiotopeDescription}"
+                    ? $"{source.Biotope.Translate(Cultures.en_GB)}{(string.IsNullOrEmpty(source.BiotopeDescription) ? "" : " # ")}{source.BiotopeDescription}"
                     : source.BiotopeDescription).WithMaxLength(255),
                 SamplingProtocol = source.SamplingProtocol,
                 VerbatimEventDate =
@@ -43,12 +44,12 @@ namespace SOS.Lib.Extensions
 
             return new DarwinCoreIdentification
             {
-                IdentificationVerificationStatus = source.IdentificationVerificationStatus,
+                IdentificationVerificationStatus = source.VerificationStatus?.Translate(Cultures.en_GB, Cultures.sv_SE),
                 IdentifiedBy = source.IdentifiedBy,
-                IdentificationReferences = source.IdentificationReferences,
-                IdentificationRemarks = source.IdentificationRemarks,
-                IdentificationID = source.IdentificationId,
-                IdentificationQualifier = source.IdentificationQualifier,
+                IdentificationReferences = source.References,
+                IdentificationRemarks = source.Remarks,
+                IdentificationID = source.Id,
+                IdentificationQualifier = source.Qualifier,
                 DateIdentified = $"{source.DateIdentified.ToString("s")}Z" ?? "",
                 TypeStatus = source.TypeStatus
             };
@@ -128,21 +129,21 @@ namespace SOS.Lib.Extensions
                 AssociatedReferences = source.AssociatedReferences,
                 AssociatedSequences = source.AssociatedSequences,
                 AssociatedTaxa = source.AssociatedTaxa,
-                Behavior = source.Behavior,
+                Behavior = source.Activity == null ? source.Behavior : source.Activity.Translate(Cultures.en_GB, Cultures.sv_SE),
                 CatalogNumber = source.CatalogNumber,
                 Disposition = source.Disposition,
                 EstablishmentMeans = source.EstablishmentMeans,
                 IndividualCount = source.IndividualCount,
                 IndividualID = source.IndividualID,
-                LifeStage = source.LifeStage,
+                LifeStage = source.LifeStage?.Translate(Cultures.en_GB, Cultures.sv_SE),
                 OccurrenceID = source.Id,
                 OccurrenceRemarks = source.Remarks,
                 OccurrenceStatus = source.Status,
-                OrganismQuantity = source.OrganismQuantity,
-                OrganismQuantityType = source.OrganismQuantityType,
+                OrganismQuantity = source.OrganismQuantity?.ToString(),
+                OrganismQuantityType = source.OrganismQuantity.HasValue ? source.OrganismQuantityType?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Individuals" : null,
                 OtherCatalogNumbers = source.OtherCatalogNumbers,
-                RecordedBy = source.RecordedBy
-
+                RecordedBy = source.RecordedBy,
+                ReproductiveCondition = source.Activity?.Translate(Cultures.en_GB, Cultures.sv_SE),
             };
         }
         #endregion Occurrence
@@ -173,8 +174,8 @@ namespace SOS.Lib.Extensions
                 Event = processedSighting.Event?.ToDarwinCore(),
                 Identification = processedSighting.Identification?.ToDarwinCore(),
                 InformationWithheld = processedSighting.InformationWithheld,
-                InstitutionCode = processedSighting.InstitutionCode,
-                InstitutionID = processedSighting.InstitutionId,
+                InstitutionCode = processedSighting.Institution?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "ArtDatabanken",
+                InstitutionID = processedSighting.Institution == null ? null : $"urn:lsid:artdata.slu.se:organization:{processedSighting.Institution.Id}",
                 Language = processedSighting.Language,
                 Location = processedSighting.Location?.ToDarwinCore(),
                 MeasurementOrFact = null,

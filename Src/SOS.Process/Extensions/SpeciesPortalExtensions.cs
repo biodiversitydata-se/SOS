@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using NetTopologySuite.Geometries;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using  SOS.Lib.Models.DarwinCore.Vocabulary;
@@ -72,15 +73,12 @@ namespace SOS.Process.Extensions
                 },
                 Identification = new ProcessedIdentification
                 {
-                    IdentificationVerificationStatus = verbatim.ValidationStatus?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
+                    VerificationStatus = verbatim.ValidationStatus,
                     IdentifiedBy = verbatim.VerifiedBy,
                     UncertainDetermination = verbatim.UnsureDetermination 
                 },
                 InformationWithheld = "More information can be obtained from the Data Provider",
-                InstitutionCode = verbatim.OwnerOrganization?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value ?? "ArtDatabanken",
-                InstitutionId = verbatim.ControlingOrganisationId.HasValue
-                    ? $"urn:lsid:artdata.slu.se:organization:{verbatim.ControlingOrganisationId}"
-                    : null,
+                Institution = verbatim.OwnerOrganization,
                 IsInEconomicZoneOfSweden = verbatim.Site?.XCoord != 0 && verbatim.Site?.YCoord != 0, // Species portal validate all sightings, we rely on that validation as long it has coordinates
                 Language = Language.Swedish,
                 Location = new ProcessedLocation
@@ -114,7 +112,6 @@ namespace SOS.Process.Extensions
                         ? $"http://www.artportalen.se/sighting/{verbatim.Id}#SightingDetailImages"
                         : "",
                     AssociatedReferences = GetAssociatedReferences(verbatim),
-                    Behavior = verbatim.Activity?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
                     BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon), 
                     CatalogNumber = verbatim.Id.ToString(),
                     EstablishmentMeans = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
@@ -124,25 +121,25 @@ namespace SOS.Process.Extensions
                     IsNeverFoundObservation = verbatim.NotPresent,
                     IsNotRediscoveredObservation = verbatim.NotRecovered,
                     IsPositiveObservation = !(verbatim.NotPresent || verbatim.NotRecovered),
-                    LifeStage = verbatim.Stage?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
-                    OrganismQuantity = verbatim.Quantity?.ToString() ?? "",
-                    OrganismQuantityType = verbatim.Quantity.HasValue ? verbatim.Unit?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value ?? "Individuals" : null,
+                    LifeStage = verbatim.Stage,
+                    OrganismQuantity = verbatim.Quantity,
+                    OrganismQuantityType = verbatim.Unit,
                     RecordedBy = verbatim.Observers,
                     RecordNumber = verbatim.Label,
                     Remarks = verbatim.Comment,
-                    ReproductiveCondition = verbatim.Activity?.Category?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
-                    Sex = verbatim.Gender?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value,
+                    
+                    Sex = verbatim.Gender,
                     Status = verbatim.NotPresent || verbatim.NotRecovered
                         ? OccurrenceStatus.Absent
                         : OccurrenceStatus.Present,
                     URL = $"http://www.artportalen.se/sighting/{verbatim.Id}"
                 },
-                OwnerInstitutionCode = verbatim.OwnerOrganization?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value ?? "ArtDatabanken",
+                OwnerInstitutionCode = verbatim.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "ArtDatabanken",
                 Projects = verbatim.Projects?.ToProcessedProjects(), 
                 ProtectionLevel = CalculateProtectionLevel(taxon, verbatim.HiddenByProvider, verbatim.ProtectedBySystem),
                 ReportedBy = verbatim.ReportedBy, 
                 ReportedDate = verbatim.ReportedDate,
-                RightsHolder = verbatim.RightsHolder ?? verbatim.OwnerOrganization?.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value ?? "Data saknas",
+                RightsHolder = verbatim.RightsHolder ?? verbatim.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas",
                 Taxon = taxon,
                 Type = "Occurrence"
             };
@@ -281,7 +278,7 @@ namespace SOS.Process.Extensions
 
             if (verbatim.Substrate != null)
             {
-                substrateDescription.Append($"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatim.Substrate.Translations?.FirstOrDefault(t => t.Culture.Equals("en-GB"))?.Value}");
+                substrateDescription.Append($"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatim.Substrate.Translate(Cultures.en_GB)}");
             }
 
             if (!string.IsNullOrEmpty(verbatim.SubstrateDescription))

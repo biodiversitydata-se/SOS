@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Search;
@@ -43,14 +42,9 @@ namespace SOS.Lib.Extensions
         {
             var filters = new List<FilterDefinition<ProcessedSighting>>();
 
-            if (filter.TaxonIds?.Any() ?? false)
+            if (filter.Counties?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Taxon.Id, filter.TaxonIds));
-            }
-
-            if (filter.StartDate.HasValue)
-            {
-                filters.Add(Builders<ProcessedSighting>.Filter.Gte(m => m.Event.StartDate, filter.StartDate.Value));
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.County.Id, filter.Counties));
             }
 
             if (filter.EndDate.HasValue)
@@ -58,25 +52,35 @@ namespace SOS.Lib.Extensions
                 filters.Add(Builders<ProcessedSighting>.Filter.Lte(m => m.Event.EndDate, filter.EndDate));
             }
 
-            if (filter.Counties?.Any() ?? false)
-            {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.County.Name, filter.Counties));
-            }
-
             if (filter.Municipalities?.Any() ?? false)
             {
                 filters.Add(
-                    Builders<ProcessedSighting>.Filter.In(m => m.Location.Municipality.Name, filter.Municipalities));
+                    Builders<ProcessedSighting>.Filter.In(m => m.Location.Municipality.Id, filter.Municipalities));
             }
 
             if (filter.Provinces?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.Province.Name, filter.Provinces));
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.Province.Id, filter.Provinces));
+            }
+
+            if (filter.RedListCategories?.Any() ?? false)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Taxon.RedlistCategory, filter.RedListCategories));
             }
 
             if (filter.Sex?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Occurrence.Sex, filter.Sex));
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Occurrence.Sex.Id, filter.Sex));
+            }
+
+            if (filter.StartDate.HasValue)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.Gte(m => m.Event.StartDate, filter.StartDate.Value));
+            }
+
+            if (filter.TaxonIds?.Any() ?? false)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Taxon.Id, filter.TaxonIds));
             }
 
             return filters;

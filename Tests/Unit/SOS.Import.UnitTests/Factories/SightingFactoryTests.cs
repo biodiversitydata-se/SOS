@@ -11,6 +11,7 @@ using SOS.Import.Repositories.Destination.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 using Xunit;
@@ -169,17 +170,17 @@ namespace SOS.Import.UnitTests.Factories
             _metadataRepositoryMock.Setup(mdr => mdr.GetActivitiesAsync())
                 .ReturnsAsync(new [] { new MetadataWithCategoryEntity{ Id = 1, CategoryId = 1, CategoryName = "Category", Translation = "Activity", CultureCode = "sv-GB" }});
             _metadataRepositoryMock.Setup(mdr => mdr.GetBiotopesAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Biotope", CultureCode = "en-GB" } });
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Biotope", CultureCode = Cultures.en_GB } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetGendersAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Gender", CultureCode = "en-GB" } });
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Gender", CultureCode = Cultures.en_GB } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetStagesAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Stage", CultureCode = "en-GB" } });
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Stage", CultureCode = Cultures.en_GB } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetSubstratesAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Substrate", CultureCode = "en-GB" } });
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Substrate", CultureCode = Cultures.en_GB } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetUnitsAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Unit", CultureCode = "en-GB" } });
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "Unit", CultureCode = Cultures.en_GB } });
             _metadataRepositoryMock.Setup(mdr => mdr.GetValidationStatusAsync())
-                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "ValidationStatus", CultureCode = "en-GB" } });
+                .ReturnsAsync(new[] { new MetadataEntity { Id = 1, Translation = "ValidationStatus", CultureCode = Cultures.en_GB } });
             
 
             _projectRepositoryMock.Setup(pr => pr.GetProjectsAsync())

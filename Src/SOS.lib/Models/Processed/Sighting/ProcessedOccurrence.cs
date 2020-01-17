@@ -142,7 +142,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// at the time the Occurrence was recorded.
         /// Recommended best practice is to use a controlled vocabulary.
         /// </summary>
-        public string LifeStage { get; set; }
+        public Metadata LifeStage { get; set; }
 
         /// <summary>
         /// An identifier for the Occurrence (as opposed to a
@@ -188,7 +188,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// 12.5 (organismQuantity) with %biomass (organismQuantityType).
         /// r (organismQuantity) with BraunBlanquetScale (organismQuantityType).
         /// </example>
-        public string OrganismQuantity { get; set; }
+        public int? OrganismQuantity { get; set; }
 
         /// <summary>
         /// The type of quantification system used for the quantity of organisms.
@@ -199,7 +199,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// 12.5 (organismQuantity) with %biomass (organismQuantityType).
         /// r (organismQuantity) with BraunBlanquetScale (organismQuantityType).
         /// </example>
-        public string OrganismQuantityType { get; set; }
+        public Metadata OrganismQuantityType { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of preparations
@@ -233,19 +233,11 @@ namespace SOS.Lib.Models.Processed.Sighting
         public string RecordNumber { get; set; }
 
         /// <summary>
-        /// The reproductive condition of the biological individual(s)
-        /// represented in the Occurrence.
-        /// Recommended best practice is to use a controlled vocabulary.
-        /// This property is currently not used.
-        /// </summary>
-        public string ReproductiveCondition { get; set; }
-
-        /// <summary>
         /// The sex of the biological individual(s) represented in
         /// the Occurrence.
         /// Recommended best practice is to use a controlled vocabulary.
         /// </summary>
-        public string Sex { get; set; }
+        public Metadata Sex { get; set; }
 
         /// <summary>
         /// A statement about the presence or absence of a Taxon at a

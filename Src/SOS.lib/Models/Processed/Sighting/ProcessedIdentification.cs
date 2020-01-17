@@ -1,4 +1,5 @@
 ﻿using System;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Processed.Sighting
 {
@@ -23,13 +24,13 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string IdentificationId { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// A brief phrase or a standard term ("cf.", "aff.") to
         /// express the determiner's doubts about the Identification.
         /// </summary>
-        public string IdentificationQualifier { get; set; }
+        public string Qualifier { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of references
@@ -37,7 +38,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// the Identification.
         /// This property is currently not used.
         /// </summary>
-        public string IdentificationReferences { get; set; }
+        public string References { get; set; }
 
         /// <summary>
         /// Comments or notes about the Identification.
@@ -45,7 +46,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// the observer is uncertain about which species
         /// that has been observed.
         /// </summary>
-        public string IdentificationRemarks { get; set; }
+        public string Remarks { get; set; }
 
         /// <summary>
         /// A categorical indicator of the extent to which the taxonomic
@@ -54,7 +55,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// such as that used in HISPID/ABCD.
         /// This property is currently not used.
         /// </summary>
-        public string IdentificationVerificationStatus { get; set; }
+        public Metadata VerificationStatus { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of names of people,
