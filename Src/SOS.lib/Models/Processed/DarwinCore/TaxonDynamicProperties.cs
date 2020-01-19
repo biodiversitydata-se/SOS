@@ -1,10 +1,32 @@
-﻿namespace SOS.Lib.Models.Processed.DarwinCore
+﻿using System.Collections.Generic;
+
+namespace SOS.Lib.Models.Processed.DarwinCore
 {
     /// <summary>
     /// This class contains fields not defined in Darwin Core.
     /// </summary>
     public class TaxonDynamicProperties
     {
+        /// <summary>
+        /// Dyntaxa taxon id.
+        /// </summary>
+        public int DyntaxaTaxonId { get; set; }
+
+        /// <summary>
+        /// Main parent Dyntaxa taxon id.
+        /// </summary>
+        public int? ParentDyntaxaTaxonId { get; set; }
+
+        /// <summary>
+        /// Secondary parents dyntaxa taxon ids.
+        /// </summary>
+        public IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }
+
+        /// <summary>
+        /// Vernacular names.
+        /// </summary>
+        public IEnumerable<TaxonVernacularName> VernacularNames { get; set; }
+
         /// <summary>
         /// Action plan
         /// </summary>

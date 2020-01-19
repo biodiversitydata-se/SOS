@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Services;
+using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using Xunit;
 
@@ -12,6 +13,7 @@ namespace SOS.Import.UnitTests.Services
 {
     public class TaxonServiceTests
     {
+        private readonly Mock<ITaxonServiceProxy> _taxonServiceProxyMock;
         private readonly TaxonServiceConfiguration _taxonServiceConfiguration;
         private readonly Mock<ILogger<TaxonService>> _loggerMock;
 
@@ -22,6 +24,7 @@ namespace SOS.Import.UnitTests.Services
         {
             _taxonServiceConfiguration = new TaxonServiceConfiguration { BaseAddress = "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile" };
             _loggerMock = new Mock<ILogger<TaxonService>>();
+            _taxonServiceProxyMock = new Mock<ITaxonServiceProxy>();
         }
 
         /// <summary>
@@ -31,15 +34,18 @@ namespace SOS.Import.UnitTests.Services
         public void ConstructorTest()
         {
             new TaxonService(
+                _taxonServiceProxyMock.Object, 
                 _taxonServiceConfiguration,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new TaxonService(
+                _taxonServiceProxyMock.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("taxonServiceConfiguration");
 
             create = () => new TaxonService(
+                _taxonServiceProxyMock.Object, 
                 _taxonServiceConfiguration,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
@@ -61,6 +67,7 @@ namespace SOS.Import.UnitTests.Services
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var TaxonService = new TaxonService(
+                _taxonServiceProxyMock.Object, 
                 _taxonServiceConfiguration,
                 _loggerMock.Object);
 
@@ -89,6 +96,7 @@ namespace SOS.Import.UnitTests.Services
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var TaxonService = new TaxonService(
+                _taxonServiceProxyMock.Object, 
                 new TaxonServiceConfiguration{BaseAddress = "Tom"}, 
                 _loggerMock.Object);
 

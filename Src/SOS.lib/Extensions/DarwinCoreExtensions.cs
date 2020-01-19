@@ -65,6 +65,32 @@ namespace SOS.Lib.Extensions
             return processedDarwinCore?.Select(m => m.ToDarwinCore());
         }
 
+        /// <summary>
+        /// Cast DarwinCoreVernacularNames to TaxonVernacularNames.
+        /// </summary>
+        /// <param name="darwinCoreVernacularNames"></param>
+        /// <returns></returns>
+        public static IEnumerable<TaxonVernacularName> ToTaxonVernacularNames(this IEnumerable<DarwinCoreVernacularName> darwinCoreVernacularNames)
+        {
+            return darwinCoreVernacularNames?.Select(m => m.ToTaxonVernacularName());
+        }
+
+        /// <summary>
+        /// Cast DarwinCoreVernacularName object to TaxonVernacularName.
+        /// </summary>
+        /// <param name="darwinCoreVernacularName"></param>
+        /// <returns></returns>
+        public static TaxonVernacularName ToTaxonVernacularName(this DarwinCoreVernacularName darwinCoreVernacularName)
+        {
+            return new TaxonVernacularName
+            {
+                CountryCode = darwinCoreVernacularName.CountryCode,
+                IsPreferredName = darwinCoreVernacularName.IsPreferredName,
+                Language = darwinCoreVernacularName.Language,
+                Name = darwinCoreVernacularName.VernacularName
+            };
+        }
+
         #region HasData
         /// <summary>
         /// Check if event has data

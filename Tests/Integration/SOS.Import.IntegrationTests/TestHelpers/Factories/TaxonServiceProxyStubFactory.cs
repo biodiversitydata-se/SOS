@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using Moq;
+using SOS.Import.Services.Interfaces;
+
+namespace SOS.Import.IntegrationTests.TestHelpers.Factories
+{
+    public static class TaxonServiceProxyStubFactory
+    {
+        public static Mock<ITaxonServiceProxy> Create(string filePath)
+        {
+            Stream zipStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            var stub = new Mock<ITaxonServiceProxy>();
+            stub.Setup(m => m.GetDwcaFileAsync(It.IsAny<string>()))
+                .ReturnsAsync(zipStream);
+
+            return stub;
+        }
+    }
+}

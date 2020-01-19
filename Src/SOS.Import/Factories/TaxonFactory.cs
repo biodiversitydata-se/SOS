@@ -53,17 +53,7 @@ namespace SOS.Import.Factories
             {
                 _logger.LogDebug("Start storing taxa verbatim");
                 var taxa = await _taxonService.GetTaxaAsync();
-
-                var regex = new Regex(@"\d+$");
-
-                // Set taxon id
-                foreach (var taxon in taxa)
-                {
-                    taxon.Id = int.Parse(regex.Match(taxon.TaxonID).Value);
-                }
-
                 await PopulateDynamicPropertiesAsync(taxa);
-
                 await _taxonVerbatimRepository.DeleteCollectionAsync();
                 await _taxonVerbatimRepository.AddCollectionAsync();
                 await _taxonVerbatimRepository.AddManyAsync(taxa);
