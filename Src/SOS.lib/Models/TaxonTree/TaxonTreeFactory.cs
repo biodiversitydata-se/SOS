@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Lib.Models.TaxonTree

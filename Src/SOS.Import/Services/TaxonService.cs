@@ -17,7 +17,9 @@ using  SOS.Lib.Models.DarwinCore;
 using SOS.Import.Mappings;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.TaxonTree;
+using TaxonDynamicProperties = SOS.Lib.Models.DarwinCore.TaxonDynamicProperties;
 
 namespace SOS.Import.Services
 {

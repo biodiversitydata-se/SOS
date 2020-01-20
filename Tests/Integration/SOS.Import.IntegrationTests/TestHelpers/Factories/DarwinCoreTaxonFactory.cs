@@ -10,6 +10,7 @@ using MessagePack;
 using MessagePack.Resolvers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.TestHelpers.JsonConverters;
 
