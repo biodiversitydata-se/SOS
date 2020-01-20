@@ -52,6 +52,12 @@ namespace SOS.Lib.Extensions
                 filters.Add(Builders<ProcessedSighting>.Filter.Lte(m => m.Event.EndDate, filter.EndDate));
             }
 
+            if (filter.OnlyValidated.HasValue && filter.OnlyValidated.Value.Equals(true))
+            {
+                filters.Add(
+                    Builders<ProcessedSighting>.Filter.Eq(m => m.Identification.Validated, true));
+            }
+
             if (filter.Municipalities?.Any() ?? false)
             {
                 filters.Add(

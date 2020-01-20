@@ -127,6 +127,8 @@ namespace SOS.Process.Repositories.Destination
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.StartDate)),
                 new CreateIndexModel<ProcessedSighting>(
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Identification.Validated)),
+                new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.County.Id)),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.Province.Id)),

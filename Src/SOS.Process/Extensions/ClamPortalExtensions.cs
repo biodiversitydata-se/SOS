@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -42,6 +41,7 @@ namespace SOS.Process.Extensions
                 },
                 Identification = new ProcessedIdentification
                 {
+                    Validated = verbatim.IdentificationVerificationStatus.Equals("Godkänd", StringComparison.CurrentCultureIgnoreCase),
                     VerificationStatus = string.IsNullOrEmpty(verbatim.IdentificationVerificationStatus) ? null : 
                         new Metadata(0){ Translations = new [] { new MetadataTranslation{ Culture = Cultures.sv_SE, Value = verbatim.IdentificationVerificationStatus }  } }  ,
                     UncertainDetermination = verbatim.UncertainDetermination != 0

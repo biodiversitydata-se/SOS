@@ -73,8 +73,10 @@ namespace SOS.Process.Extensions
                 },
                 Identification = new ProcessedIdentification
                 {
-                    VerificationStatus = verbatim.ValidationStatus,
                     IdentifiedBy = verbatim.VerifiedBy,
+                    Validated = new []{ 60, 61, 62, 63, 64, 65 }.Contains(verbatim.ValidationStatus?.Id ?? 0),
+                    VerificationStatus = verbatim.ValidationStatus,
+                    
                     UncertainDetermination = verbatim.UnsureDetermination 
                 },
                 InformationWithheld = "More information can be obtained from the Data Provider",

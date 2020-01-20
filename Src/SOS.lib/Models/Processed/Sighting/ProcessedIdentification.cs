@@ -49,6 +49,11 @@ namespace SOS.Lib.Models.Processed.Sighting
         public string Remarks { get; set; }
 
         /// <summary>
+        /// True if sighting is validated
+        /// </summary>
+        public bool Validated { get; set; }
+
+        /// <summary>
         /// A categorical indicator of the extent to which the taxonomic
         /// identification has been verified to be correct.
         /// Recommended best practice is to use a controlled vocabulary

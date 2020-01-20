@@ -39,6 +39,7 @@ namespace SOS.Process.Extensions
                 },
                 Identification = new ProcessedIdentification
                 {
+                    Validated = true,
                     UncertainDetermination = false
                 },
                 Location = new ProcessedLocation

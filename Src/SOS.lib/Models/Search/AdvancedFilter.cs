@@ -26,7 +26,9 @@ namespace SOS.Lib.Models.Search
             (Counties?.Any() ?? false) ||
             EndDate != null ||
             (Municipalities?.Any() ?? false) ||
+            OnlyValidated.HasValue ||
             (Provinces?.Any() ?? false) ||
+            (RedListCategories?.Any() ?? false) ||
             (Sex?.Any() ?? false) ||
             (StartDate != null) ||
             (TaxonIds?.Any() ?? false);
@@ -39,7 +41,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// True to return only validated sightings
         /// </summary>
-        public bool OnlyValidated { get; set; }
+        public bool? OnlyValidated { get; set; }
 
         /// <summary>
         /// Fields to return (empty = all)
