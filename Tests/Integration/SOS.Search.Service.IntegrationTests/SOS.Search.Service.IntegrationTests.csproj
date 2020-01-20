@@ -40,4 +40,8 @@
     <ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+
 </Project>

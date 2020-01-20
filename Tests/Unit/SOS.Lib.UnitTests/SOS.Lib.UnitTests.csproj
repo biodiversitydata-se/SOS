@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MessagePack" Version="2.0.335" />
+    <PackageReference Include="Moq" Version="4.13.1" />
+    <PackageReference Include="FluentAssertions" Version="5.9.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+    <PackageReference Include="coverlet.collector" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Taxonomy\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
+    <ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\AllTaxaInMongoDbWithMinimalFields.msgpck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

@@ -22,6 +22,7 @@
 
   <ItemGroup>
       <PackageReference Include="Hangfire.Core" Version="1.7.8" />
+      <PackageReference Include="MessagePack" Version="2.0.335" />
       <PackageReference Include="FluentAssertions" Version="5.10.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.1" />
       <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.1" />
@@ -38,6 +39,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Src\SOS.Import\SOS.Import.csproj" />
     <ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\dyntaxa.custom.dwca.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

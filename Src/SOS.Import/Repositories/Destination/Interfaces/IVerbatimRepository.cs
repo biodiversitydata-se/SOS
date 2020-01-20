@@ -60,6 +60,13 @@ namespace SOS.Import.Repositories.Destination.Interfaces
         Task<bool> DeleteManyAsync(IEnumerable<TKey> ids);
 
         /// <summary>
+        /// Get entity batch
+        /// </summary>
+        /// <param name="skip"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TEntity>> GetBatchAsync(int skip);
+
+        /// <summary>
         /// Update entity
         /// </summary>
         /// <param name="id"></param>
