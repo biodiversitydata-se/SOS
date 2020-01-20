@@ -66,33 +66,6 @@ namespace SOS.Import.IntegrationTests.Taxonomy
         }
 
         [Fact]
-        public async Task Creates_a_taxon_tree_and_verifies_that_Ichthyaetus_genus_has_5_underlying_taxa()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            
-            TaxonServiceConfiguration taxonServiceConfiguration = new TaxonServiceConfiguration() { BaseAddress = "..." };
-            var taxonServiceProxyStub = TaxonServiceProxyStubFactory.Create(@"Resources\dyntaxa.custom.dwca.zip");
-            var taxonService = new TaxonService(taxonServiceProxyStub.Object, taxonServiceConfiguration, new NullLogger<TaxonService>());
-            IEnumerable<DarwinCoreTaxon> taxa = await taxonService.GetTaxaAsync();
-            var tree = TaxonTreeFactory.CreateTaxonTree<object>(taxa);
-            const int ichthyaetusTaxonId = 6011885;
-            int[] expectedUnderlyingTaxonIds = { 266836, 103067, 266238, 267106, 266835 };
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var underlyingTaxa = tree.GetUnderlyingTaxonIds(ichthyaetusTaxonId, false);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            underlyingTaxa.Should().HaveCount(5);
-            underlyingTaxa.Should().BeEquivalentTo(expectedUnderlyingTaxonIds);
-        }
-
-        [Fact]
         public async Task Reads_a_static_dyntaxa_dwca_file_and_stores_the_taxa_in_MongoDb()
         {
             //-----------------------------------------------------------------------------------------------------------
