@@ -36,11 +36,6 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
         public string Comment { get; set; }
 
         /// <summary>
-        /// Id of controlling organisation
-        /// </summary>
-        public int? ControlingOrganisationId { get; set; }
-
-        /// <summary>
         /// Sigthing end data
         /// </summary>
         public DateTime? EndDate { get; set; }

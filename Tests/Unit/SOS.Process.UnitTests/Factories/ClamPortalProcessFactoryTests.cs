@@ -6,7 +6,8 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Process.Factories;
 using SOS.Process.Helpers.Interfaces;
@@ -23,7 +24,7 @@ namespace SOS.Process.UnitTests.Factories
     {
         private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
         private readonly Mock<IAreaHelper> _areaHelper;
-        private readonly Mock<IDarwinCoreRepository> _DarwinCoreRepository;
+        private readonly Mock<IProcessedSightingRepository> _processedSightingRepository;
         private readonly Mock<ILogger<ClamPortalProcessFactory>> _loggerMock;
 
         /// <summary>
@@ -33,7 +34,7 @@ namespace SOS.Process.UnitTests.Factories
         {
             _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
-            _DarwinCoreRepository = new Mock<IDarwinCoreRepository>();
+            _processedSightingRepository = new Mock<IProcessedSightingRepository>();
             _loggerMock = new Mock<ILogger<ClamPortalProcessFactory>>();
         }
 
@@ -46,13 +47,13 @@ namespace SOS.Process.UnitTests.Factories
             new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
-                _DarwinCoreRepository.Object,
+                _processedSightingRepository.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () =>  new ClamPortalProcessFactory(
                 null,
                 _areaHelper.Object,
-                _DarwinCoreRepository.Object,
+                _processedSightingRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
 
@@ -60,7 +61,7 @@ namespace SOS.Process.UnitTests.Factories
             create = () => new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 null,
-                _DarwinCoreRepository.Object,
+                _processedSightingRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
 
@@ -74,7 +75,7 @@ namespace SOS.Process.UnitTests.Factories
             create = () => new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
-                _DarwinCoreRepository.Object,
+                _processedSightingRepository.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -95,14 +96,14 @@ namespace SOS.Process.UnitTests.Factories
                     DyntaxaTaxonId = 0
                 } });
 
-            _areaHelper.Setup(r => r.AddAreaDataToDarwinCore(It.IsAny<IEnumerable<DarwinCore<DynamicProperties>>>()));
+            _areaHelper.Setup(r => r.AddAreaDataToProcessed(It.IsAny<IEnumerable<ProcessedSighting>>()));
 
-            _DarwinCoreRepository.Setup(r => r.AddManyAsync(It.IsAny<ICollection<DarwinCore<DynamicProperties>>>()))
+            _processedSightingRepository.Setup(r => r.AddManyAsync(It.IsAny<ICollection<ProcessedSighting>>()))
                 .ReturnsAsync(1);
 
-            var taxa = new Dictionary<int, DarwinCoreTaxon>
+            var taxa = new Dictionary<int, ProcessedTaxon>
             {
-                { 0, new DarwinCoreTaxon { TaxonID = "0", ScientificName = "Biota" } }
+                { 0, new ProcessedTaxon { Id = 0, TaxonId = "taxon:0", ScientificName = "Biota" } }
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -111,7 +112,7 @@ namespace SOS.Process.UnitTests.Factories
             var clamPortalProcessFactory = new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
-                _DarwinCoreRepository.Object,
+                _processedSightingRepository.Object,
                 _loggerMock.Object);
 
             var result = await clamPortalProcessFactory.ProcessAsync( taxa, JobCancellationToken.Null);
@@ -140,7 +141,7 @@ namespace SOS.Process.UnitTests.Factories
             var clamPortalProcessFactory = new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
-                _DarwinCoreRepository.Object,
+                _processedSightingRepository.Object,
                 _loggerMock.Object);
 
             var result = await clamPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
@@ -169,7 +170,7 @@ namespace SOS.Process.UnitTests.Factories
             var clamPortalProcessFactory = new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
-                _DarwinCoreRepository.Object,
+                _processedSightingRepository.Object,
                 _loggerMock.Object);
 
             var result = await clamPortalProcessFactory.ProcessAsync( null, JobCancellationToken.Null);

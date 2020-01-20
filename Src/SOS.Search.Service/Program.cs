@@ -104,7 +104,7 @@ namespace SOS.Search.Service
                     services.AddScoped<IProcessInfoFactory, ProcessInfoFactory>();
 
                     // Repositories mongo
-                    services.AddScoped<IProcessedDarwinCoreRepository, ProcessedDarwinCoreRepository>();
+                    services.AddScoped<IProcessedSightingRepository, ProcessedSightingRepository>();
                     services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
                     
                     // Configure swagger

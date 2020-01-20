@@ -5,7 +5,7 @@ using System.Text;
 using Moq;
 using Newtonsoft.Json;
 using SOS.Export.Repositories.Interfaces;
-using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Search;
 using SOS.TestHelpers.JsonConverters;
 
@@ -15,9 +15,9 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
     {
         public static string TenObservations = @"Resources\TenProcessedTestObservations.json";
 
-        public static Mock<IProcessedDarwinCoreRepository> Create(string fileName)
+        public static Mock<IProcessedSightingRepository> Create(string fileName)
         {
-            var stub = new Mock<IProcessedDarwinCoreRepository>();
+            var stub = new Mock<IProcessedSightingRepository>();
             var observations = LoadObservations(fileName);
             stub
                 .Setup(pdcr => pdcr.GetChunkAsync(It.IsAny<AdvancedFilter>(), 0, It.IsAny<int>()))
@@ -26,9 +26,9 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             return stub;
         }
         
-        public static Mock<IProcessedDarwinCoreRepository> Create(DarwinCore<DynamicProperties> observation)
+        public static Mock<IProcessedSightingRepository> Create(ProcessedSighting observation)
         {
-            var stub = new Mock<IProcessedDarwinCoreRepository>();
+            var stub = new Mock<IProcessedSightingRepository>();
             stub
                 .Setup(pdcr => pdcr.GetChunkAsync(It.IsAny<AdvancedFilter>(), 0, It.IsAny<int>()))
                 .ReturnsAsync(new[] { observation });
@@ -36,7 +36,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             return stub;
         }
 
-        private static IEnumerable<DarwinCore<DynamicProperties>> LoadObservations(string fileName)
+        private static IEnumerable<ProcessedSighting> LoadObservations(string fileName)
         {
             string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
@@ -46,7 +46,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
                 Converters = new List<JsonConverter> { new ObjectIdConverter() }
             };
 
-            var observations = JsonConvert.DeserializeObject<List<DarwinCore<DynamicProperties>>>(str, serializerSettings);
+            var observations = JsonConvert.DeserializeObject<List<ProcessedSighting>>(str, serializerSettings);
             return observations;
         }
     }

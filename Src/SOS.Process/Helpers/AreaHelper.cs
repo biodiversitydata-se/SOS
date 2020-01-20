@@ -6,16 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Process.Extensions;
 using SOS.Process.Repositories.Source.Interfaces;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
 using Newtonsoft.Json;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Process.Models.Cache;
-
-using Location = SOS.Process.Models.Cache.Location;
 
 namespace SOS.Process.Helpers
 {
@@ -30,7 +28,6 @@ namespace SOS.Process.Helpers
         /// Constructor
         /// </summary>
         /// <param name="areaVerbatimRepository"></param>
-        /// <param name="cacheRepository"></param>
         public AreaHelper(IAreaVerbatimRepository areaVerbatimRepository)
         {
             _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
@@ -107,39 +104,35 @@ namespace SOS.Process.Helpers
         }
 
         /// <inheritdoc />
-        public void AddAreaDataToDarwinCore(IEnumerable<DarwinCore<DynamicProperties>> darwinCoreModels)
+        public void AddAreaDataToProcessed(IEnumerable<ProcessedSighting> processedSightings)
         {
-            if (!darwinCoreModels?.Any() ?? true)
+            if (!processedSightings?.Any() ?? true)
             {
                 return;
             }
 
-            foreach (var dwcModel in darwinCoreModels)
+            foreach (var processedSighting in processedSightings)
             {
-                if (dwcModel.Location == null || (dwcModel.Location.DecimalLatitude.Equals(0) && dwcModel.Location.DecimalLongitude.Equals(0)))
+                if (processedSighting.Location == null || (processedSighting.Location.DecimalLatitude.Equals(0) && processedSighting.Location.DecimalLongitude.Equals(0)))
                 {
                     continue;
                 }
                 
-                if (dwcModel.DynamicProperties == null)
-                {
-                    dwcModel.DynamicProperties = new DynamicProperties();
-                }
-
+               
                 // Round coordinates to 5 decimals (roughly 1m)
-                var key = $"{Math.Round(dwcModel.Location.DecimalLongitude, 5)}-{Math.Round(dwcModel.Location.DecimalLatitude, 5)}";
+                var key = $"{Math.Round(processedSighting.Location.DecimalLongitude, 5)}-{Math.Round(processedSighting.Location.DecimalLatitude, 5)}";
 
                 // Try to get areas from cache. If areas not found for that position, try to get from repository
                 if (!_featureCache.TryGetValue(key, out var positionLocation))
                 {
-                    var features = GetPointFeatures(dwcModel.Location.DecimalLongitude, dwcModel.Location.DecimalLatitude);
+                    var features = GetPointFeatures(processedSighting.Location.DecimalLongitude, processedSighting.Location.DecimalLatitude);
                     positionLocation = new PositionLocation();
 
                     if (features != null)
                     {
                         foreach (var feature in features)
                         {
-                            var location = new Location
+                            var area = new ProcessedArea
                             {
                                 Id = (int)feature.Attributes.GetOptionalValue("featureId"),
                                 Name = (string)feature.Attributes.GetOptionalValue("name")
@@ -147,16 +140,16 @@ namespace SOS.Process.Helpers
                             switch ((AreaType)feature.Attributes.GetOptionalValue("areaType"))
                             {
                                 case AreaType.County:
-                                    positionLocation.County = location;
+                                    positionLocation.County = area;
                                     break;
                                 case AreaType.Municipality:
-                                    positionLocation.Municipality = location;
+                                    positionLocation.Municipality = area;
                                     break;
                                 case AreaType.Parish:
-                                    positionLocation.Parish = location;
+                                    positionLocation.Parish = area;
                                     break;
                                 case AreaType.Province:
-                                    positionLocation.Province = location;
+                                    positionLocation.Province = area;
                                     break;
                                 case AreaType.EconomicZoneOfSweden:
                                     positionLocation.EconomicZoneOfSweden = true;
@@ -168,39 +161,39 @@ namespace SOS.Process.Helpers
                     _featureCache.Add(key, positionLocation);
                 }
 
-                dwcModel.Location.County = positionLocation.County?.Name;
-                dwcModel.DynamicProperties.CountyIdByCoordinate = positionLocation.County?.Id;
-                dwcModel.Location.Municipality = positionLocation.Municipality?.Name;
-                dwcModel.DynamicProperties.MunicipalityIdByCoordinate = positionLocation.Municipality?.Id;
-                dwcModel.DynamicProperties.Parish = positionLocation.Parish?.Name;
-                dwcModel.DynamicProperties.ParishIdByCoordinate = positionLocation.Parish?.Id;
-                dwcModel.Location.StateProvince = positionLocation.Province?.Name;
-                dwcModel.DynamicProperties.ProvinceIdByCoordinate = positionLocation.Province?.Id;
-                dwcModel.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
+                processedSighting.Location.County = positionLocation.County;
+                processedSighting.Location.Municipality = positionLocation.Municipality;
+                processedSighting.Location.Parish = positionLocation.Parish;
+                processedSighting.Location.Province = positionLocation.Province;
+                processedSighting.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
+
 
                 // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
-                dwcModel.DynamicProperties.CountyPartIdByCoordinate = dwcModel.DynamicProperties.CountyIdByCoordinate;
-                if (dwcModel.DynamicProperties.CountyIdByCoordinate == (int)CountyFeatureId.Kalmar)
+                processedSighting.Location.CountyPartIdByCoordinate = processedSighting.Location.County?.Id;
+                if (processedSighting.Location.County?.Id == (int)CountyFeatureId.Kalmar)
                 {
-                    if (dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.Oland)
+                    if (processedSighting.Location.Province?.Id == (int)ProvinceFeatureId.Oland)
                     {
-                        dwcModel.DynamicProperties.CountyPartIdByCoordinate = (int) CountyFeatureId.Oland;
+                        processedSighting.Location.CountyPartIdByCoordinate = (int)CountyFeatureId.Oland;
                     }
                     else
                     {
-                        dwcModel.DynamicProperties.CountyPartIdByCoordinate = (int)CountyFeatureId.KalmarFastland;
+                        processedSighting.Location.CountyPartIdByCoordinate = (int)CountyFeatureId.KalmarFastland;
                     }
                 }
 
                 // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
-                dwcModel.DynamicProperties.ProvincePartIdByCoordinate = dwcModel.DynamicProperties.ProvinceIdByCoordinate;
-                if (dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.LuleLappmark ||
-                    dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.LyckseleLappmark ||
-                    dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.PiteLappmark ||
-                    dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.TorneLappmark ||
-                    dwcModel.DynamicProperties.ProvinceIdByCoordinate == (int)ProvinceFeatureId.AseleLappmark)
+                processedSighting.Location.ProvincePartIdByCoordinate = processedSighting.Location.Province?.Id;
+                if (new []
                 {
-                    dwcModel.DynamicProperties.ProvincePartIdByCoordinate = (int) ProvinceFeatureId.Lappland;
+                    (int)ProvinceFeatureId.LuleLappmark,
+                    (int)ProvinceFeatureId.LyckseleLappmark,
+                    (int)ProvinceFeatureId.PiteLappmark,
+                    (int)ProvinceFeatureId.TorneLappmark,
+                    (int)ProvinceFeatureId.AseleLappmark
+                }.Contains(processedSighting.Location.Province?.Id ?? 0))
+                {
+                    processedSighting.Location.ProvincePartIdByCoordinate = (int) ProvinceFeatureId.Lappland;
                 }
             }
         }

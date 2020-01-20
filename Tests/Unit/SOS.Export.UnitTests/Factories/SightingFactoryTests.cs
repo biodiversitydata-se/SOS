@@ -19,7 +19,7 @@ namespace SOS.Export.UnitTests.Factories
     public class SightingFactoryTests
     {
         private readonly Mock<IDwcArchiveFileWriter> _dwcArchiveFileWriterMock;
-        private readonly Mock<IProcessedDarwinCoreRepository> _processedDarwinCoreRepositoryMock;
+        private readonly Mock<IProcessedSightingRepository> _processedSightingRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
         private readonly Mock<IFileService> _fileServiceMock;
         private readonly Mock<IBlobStorageService> _blobStorageServiceMock;
@@ -31,7 +31,7 @@ namespace SOS.Export.UnitTests.Factories
         public SightingFactoryTests()
         {
             _dwcArchiveFileWriterMock = new Mock<IDwcArchiveFileWriter>();
-            _processedDarwinCoreRepositoryMock = new Mock<IProcessedDarwinCoreRepository>();
+            _processedSightingRepositoryMock = new Mock<IProcessedSightingRepository>();
             _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
             _fileServiceMock = new Mock<IFileService>();
             _blobStorageServiceMock = new Mock<IBlobStorageService>();
@@ -47,7 +47,7 @@ namespace SOS.Export.UnitTests.Factories
         {
             new SightingFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedDarwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 _blobStorageServiceMock.Object,
@@ -56,7 +56,7 @@ namespace SOS.Export.UnitTests.Factories
 
             Action create = () => new SightingFactory(
                 null,
-                _processedDarwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 _blobStorageServiceMock.Object,
@@ -72,11 +72,11 @@ namespace SOS.Export.UnitTests.Factories
                 _blobStorageServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedDarwinCoreRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedSightingRepository");
 
             create = () => new SightingFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedDarwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 null,
                 _fileServiceMock.Object,
                 _blobStorageServiceMock.Object,
@@ -86,7 +86,7 @@ namespace SOS.Export.UnitTests.Factories
 
             create = () => new SightingFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedDarwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 null,
                 _blobStorageServiceMock.Object,
@@ -96,7 +96,7 @@ namespace SOS.Export.UnitTests.Factories
 
             create = () => new SightingFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedDarwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 null,
@@ -106,7 +106,7 @@ namespace SOS.Export.UnitTests.Factories
 
             create = () => new SightingFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedDarwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 _blobStorageServiceMock.Object,
@@ -116,7 +116,7 @@ namespace SOS.Export.UnitTests.Factories
 
             create = () => new SightingFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedDarwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 _blobStorageServiceMock.Object,
@@ -148,7 +148,7 @@ namespace SOS.Export.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             var sightingFactory = new SightingFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedDarwinCoreRepositoryMock.Object,
+                _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 _blobStorageServiceMock.Object,

@@ -82,7 +82,7 @@ namespace SOS.Import.Factories
 
                     // Get sightings for one year
                     var sightings = await _kulObservationService.GetAsync(changedFrom, changedFrom.AddYears(1));
-                    var aggregates = sightings.ToAggregates().ToArray();
+                    var aggregates = sightings.ToVerbatims().ToArray();
                     nrSightingsHarvested += aggregates.Length;
 
                     // Add sightings to MongoDb

@@ -22,9 +22,9 @@ namespace SOS.Export.IntegrationTests.Repositories
                 exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
                 exportConfiguration.MongoDbConfiguration.DatabaseName,
                 exportConfiguration.MongoDbConfiguration.BatchSize);
-            var sut = new ProcessedDarwinCoreRepository(
+            var sut = new ProcessedSightingRepository(
                 exportClient,
-                new NullLogger<ProcessedDarwinCoreRepository>());
+                new NullLogger<ProcessedSightingRepository>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -48,10 +48,10 @@ namespace SOS.Export.IntegrationTests.Repositories
                 exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
                 exportConfiguration.MongoDbConfiguration.DatabaseName,
                 exportConfiguration.MongoDbConfiguration.BatchSize);
-            var processedDarwinCoreRepository = new ProcessedDarwinCoreRepository(
+            var processedSightingRepository = new ProcessedSightingRepository(
                 exportClient,
-                new NullLogger<ProcessedDarwinCoreRepository>());
-            var projectParameters = await processedDarwinCoreRepository.GetProjectParameters(new AdvancedFilter(), 0,100);
+                new NullLogger<ProcessedSightingRepository>());
+            var projectParameters = await processedSightingRepository.GetProjectParameters(new AdvancedFilter(), 0,100);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

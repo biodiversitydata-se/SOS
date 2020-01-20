@@ -6,7 +6,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
@@ -28,13 +28,13 @@ namespace SOS.Process.Factories
         /// </summary>
         /// <param name="clamObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="darwinCoreRepository"></param>
+        /// <param name="processedSightingRepository"></param>
         /// <param name="logger"></param>
         public ClamPortalProcessFactory(
             IClamObservationVerbatimRepository clamObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IDarwinCoreRepository darwinCoreRepository,
-            ILogger<ClamPortalProcessFactory> logger) : base(darwinCoreRepository, logger)
+            IProcessedSightingRepository processedSightingRepository,
+            ILogger<ClamPortalProcessFactory> logger) : base(processedSightingRepository, logger)
         {
             _clamObservationVerbatimRepository = clamObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(clamObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -42,7 +42,7 @@ namespace SOS.Process.Factories
 
         /// <inheritdoc />
         public async Task<RunInfo> ProcessAsync(
-            IDictionary<int, DarwinCoreTaxon> taxa,
+            IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
             var runInfo = new RunInfo(DataProvider.ClamPortal)
@@ -78,7 +78,7 @@ namespace SOS.Process.Factories
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task ProcessClamsAsync(
-            IDictionary<int, DarwinCoreTaxon> taxa,
+            IDictionary<int, ProcessedTaxon> taxa,
             RunInfo runInfo,
             IJobCancellationToken cancellationToken)
         {
@@ -101,12 +101,12 @@ namespace SOS.Process.Factories
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
-                    var darwinCore = verbatim.ToDarwinCore(taxa).ToArray();
+                    var processed = verbatim.ToProcessed(taxa).ToArray();
 
                     // Add area related data to models
-                    _areaHelper.AddAreaDataToDarwinCore(darwinCore);
+                    _areaHelper.AddAreaDataToProcessed(processed);
 
-                    successCount += await ProcessRepository.AddManyAsync(darwinCore);
+                    successCount += await ProcessRepository.AddManyAsync(processed);
                     verbatimCount += verbatim.Count();
 
                     Logger.LogInformation($"Clam observations being processed, totalCount: {verbatimCount}");

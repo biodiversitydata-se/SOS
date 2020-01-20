@@ -32,7 +32,6 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
 					sdb.[Description] AS BiotopeDescription,
                     ssci.Label AS CollectionID,
 	                scp.Comment,
-					si.ControlingOrganisationId,
 	                s.EndDate,
 	                s.EndTime,
 	                s.GenderId,

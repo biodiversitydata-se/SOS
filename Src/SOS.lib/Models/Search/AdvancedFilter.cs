@@ -12,7 +12,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Counties to match
         /// </summary>
-        public IEnumerable<string> Counties { get; set; }
+        public IEnumerable<int> Counties { get; set; }
 
         /// <summary>
         /// Sighting last date
@@ -26,7 +26,9 @@ namespace SOS.Lib.Models.Search
             (Counties?.Any() ?? false) ||
             EndDate != null ||
             (Municipalities?.Any() ?? false) ||
+            OnlyValidated.HasValue ||
             (Provinces?.Any() ?? false) ||
+            (RedListCategories?.Any() ?? false) ||
             (Sex?.Any() ?? false) ||
             (StartDate != null) ||
             (TaxonIds?.Any() ?? false);
@@ -34,17 +36,32 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Municipalities to match
         /// </summary>
-        public IEnumerable<string> Municipalities { get; set; }
+        public IEnumerable<int> Municipalities { get; set; }
+
+        /// <summary>
+        /// True to return only validated sightings
+        /// </summary>
+        public bool? OnlyValidated { get; set; }
+
+        /// <summary>
+        /// Fields to return (empty = all)
+        /// </summary>
+        public IEnumerable<string> OutputFields { get; set; }
 
         /// <summary>
         /// Provinces to match
         /// </summary>
-        public IEnumerable<string> Provinces { get; set; }
+        public IEnumerable<int> Provinces { get; set; }
+
+        /// <summary>
+        /// Redlist categories to match
+        /// </summary>
+        public IEnumerable<string> RedListCategories { get; set; }
 
         /// <summary>
         /// Gender to match
         /// </summary>
-        public IEnumerable<string> Sex { get; set; }
+        public IEnumerable<int> Sex { get; set; }
 
         /// <summary>
         /// Sighting first date
@@ -56,9 +73,6 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public IEnumerable<int> TaxonIds { get; set; }
 
-        /// <summary>
-        /// Fields to return (empty = all)
-        /// </summary>
-        public IEnumerable<string> OutputFields { get; set; }
+       
     }
 }

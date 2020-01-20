@@ -19,7 +19,7 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static Area ToAggregate(this AreaEntity entity)
+        public static Area ToVerbatim(this AreaEntity entity)
         {
             return new Area((AreaType)entity.AreaDatasetId)
             {
@@ -36,9 +36,9 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<Area> ToAggregates(this IEnumerable<AreaEntity> entities)
+        public static IEnumerable<Area> ToVerbatims(this IEnumerable<AreaEntity> entities)
         {
-            return entities.Select(e => e.ToAggregate());
+            return entities.Select(e => e.ToVerbatim());
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace SOS.Import.Extensions
         /// <param name="units"></param>
         /// <param name="projectEntityDictionaries"></param>
         /// <returns></returns>
-        public static IEnumerable<APSightingVerbatim> ToAggregates(this IEnumerable<SightingEntity> entities,
+        public static IEnumerable<APSightingVerbatim> ToVerbatims(this IEnumerable<SightingEntity> entities,
             IDictionary<int, MetadataWithCategory> activities,
             IDictionary<int, Metadata> biotopes,
             IDictionary<int, Metadata> genders,
@@ -70,7 +70,7 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> units,
             ProjectEntityDictionaries projectEntityDictionaries)
         {
-            return entities.Select(e => e.ToAggregate(
+            return entities.Select(e => e.ToVerbatim(
                 activities,
                 biotopes,
                 genders,
@@ -100,7 +100,7 @@ namespace SOS.Import.Extensions
         /// <param name="units"></param>
         /// <param name="projectEntityDictionaries"></param>
         /// <returns></returns>
-        public static APSightingVerbatim ToAggregate(this SightingEntity entity,
+        public static APSightingVerbatim ToVerbatim(this SightingEntity entity,
             IDictionary<int, MetadataWithCategory> activities,
             IDictionary<int, Metadata> biotopes,
             IDictionary<int, Metadata> genders,
@@ -124,7 +124,6 @@ namespace SOS.Import.Extensions
                 BiotopeDescription = entity.BiptopeDescription,
                 CollectionID = entity.CollectionID,
                 Comment = entity.Comment,
-                ControlingOrganisationId = entity.ControlingOrganisationId,
                 EndDate = entity.EndDate,
                 EndTime = entity.EndTime,
                 Gender = entity.GenderId.HasValue && genders.ContainsKey(entity.GenderId.Value)
@@ -202,7 +201,7 @@ namespace SOS.Import.Extensions
             Dictionary<int, Project> projectById = null;
             if (projectEntityDictionaries.ProjectEntitiesBySightingId.TryGetValue(sightingId, out var projectEntities))
             {
-                projectById = projectEntities.ToAggregates().ToDictionary(p => p.Id, p => p);
+                projectById = projectEntities.ToVerbatims().ToDictionary(p => p.Id, p => p);
             }
 
             if (projectEntityDictionaries.ProjectParameterEntitiesBySightingId.TryGetValue(sightingId, out var projectParameterEntities))
@@ -221,15 +220,15 @@ namespace SOS.Import.Extensions
                             project.ProjectParameters = new List<ProjectParameter>();
                         }
 
-                        project.ProjectParameters.Add(projectParameterEntity.ToAggregate());
+                        project.ProjectParameters.Add(projectParameterEntity.ToVerbatim());
                     }
                     else
                     {
                         if (projectEntityDictionaries.ProjectEntityById.TryGetValue(projectParameterEntity.ProjectId, out var projectEntity))
                         {
-                            var newProject = projectEntity.ToAggregate();
+                            var newProject = projectEntity.ToVerbatim();
                             newProject.ProjectParameters = new List<ProjectParameter>();
-                            newProject.ProjectParameters.Add(projectParameterEntity.ToAggregate());
+                            newProject.ProjectParameters.Add(projectParameterEntity.ToVerbatim());
                             projectById.Add(projectParameterEntity.ProjectId, newProject);
                         }
                     }
@@ -249,7 +248,7 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<Metadata> ToAggregates(this IEnumerable<MetadataEntity> entities)
+        public static IEnumerable<Metadata> ToVerbatims(this IEnumerable<MetadataEntity> entities)
         {
             if (!entities?.Any() ?? true)
             {
@@ -277,7 +276,7 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<MetadataWithCategory> ToAggregates(this IEnumerable<MetadataWithCategoryEntity> entities)
+        public static IEnumerable<MetadataWithCategory> ToVerbatims(this IEnumerable<MetadataWithCategoryEntity> entities)
         {
             if (!entities?.Any() ?? true)
             {
@@ -314,7 +313,7 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static Project ToAggregate(this ProjectEntity entity)
+        public static Project ToVerbatim(this ProjectEntity entity)
         {
             return new Project()
             {
@@ -336,9 +335,9 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<Project> ToAggregates(this IEnumerable<ProjectEntity> entities)
+        public static IEnumerable<Project> ToVerbatims(this IEnumerable<ProjectEntity> entities)
         {
-            return entities.Select(e => e.ToAggregate());
+            return entities.Select(e => e.ToVerbatim());
         }
 
         /// <summary>
@@ -346,12 +345,12 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<Organization> ToAggregates(this IEnumerable<OrganizationEntity> entities)
+        public static IEnumerable<Organization> ToVerbatims(this IEnumerable<OrganizationEntity> entities)
         {
-            return entities.Select(e => e.ToAggregate());
+            return entities.Select(e => e.ToVerbatim());
         }
 
-        public static Organization ToAggregate(this OrganizationEntity entity)
+        public static Organization ToVerbatim(this OrganizationEntity entity)
         {
             return new Organization
             {
@@ -361,12 +360,12 @@ namespace SOS.Import.Extensions
             };
         }
 
-        public static IEnumerable<SightingRelation> ToAggregates(this IEnumerable<SightingRelationEntity> entities)
+        public static IEnumerable<SightingRelation> ToVerbatims(this IEnumerable<SightingRelationEntity> entities)
         {
-            return entities.Select(e => e.ToAggregate());
+            return entities.Select(e => e.ToVerbatim());
         }
 
-        public static SightingRelation ToAggregate(this SightingRelationEntity entity)
+        public static SightingRelation ToVerbatim(this SightingRelationEntity entity)
         {
             return new SightingRelation
             {
@@ -382,12 +381,12 @@ namespace SOS.Import.Extensions
             };
         }
 
-        public static IEnumerable<Person> ToAggregates(this IEnumerable<PersonEntity> entities)
+        public static IEnumerable<Person> ToVerbatims(this IEnumerable<PersonEntity> entities)
         {
-            return entities.Select(e => e.ToAggregate());
+            return entities.Select(e => e.ToVerbatim());
         }
 
-        public static Person ToAggregate(this PersonEntity entity)
+        public static Person ToVerbatim(this PersonEntity entity)
         {
             return new Person()
             {
@@ -398,12 +397,12 @@ namespace SOS.Import.Extensions
             };
         }
 
-        public static IEnumerable<SpeciesCollectionItem> ToAggregates(this IEnumerable<SpeciesCollectionItemEntity> entities)
+        public static IEnumerable<SpeciesCollectionItem> ToVerbatims(this IEnumerable<SpeciesCollectionItemEntity> entities)
         {
-            return entities.Select(e => e.ToAggregate());
+            return entities.Select(e => e.ToVerbatim());
         }
 
-        public static SpeciesCollectionItem ToAggregate(this SpeciesCollectionItemEntity itemEntity)
+        public static SpeciesCollectionItem ToVerbatim(this SpeciesCollectionItemEntity itemEntity)
         {
             return new SpeciesCollectionItem()
             {
@@ -423,7 +422,7 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static Site ToAggregate(this SiteEntity entity)
+        public static Site ToVerbatim(this SiteEntity entity)
         {
             return new Site
             {
@@ -445,9 +444,9 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<Site> ToAggregates(this IEnumerable<SiteEntity> entities)
+        public static IEnumerable<Site> ToVerbatims(this IEnumerable<SiteEntity> entities)
         {
-            return entities.Select(e => e.ToAggregate());
+            return entities.Select(e => e.ToVerbatim());
         }
 
         /// <summary>
@@ -455,9 +454,9 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<ProjectParameter> ToAggregates(this IEnumerable<ProjectParameterEntity> entities)
+        public static IEnumerable<ProjectParameter> ToVerbatims(this IEnumerable<ProjectParameterEntity> entities)
         {
-            return entities.Select(e => e.ToAggregate());
+            return entities.Select(e => e.ToVerbatim());
         }
 
         /// <summary>
@@ -465,13 +464,11 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static ProjectParameter ToAggregate(this ProjectParameterEntity entity)
+        public static ProjectParameter ToVerbatim(this ProjectParameterEntity entity)
         {
             return new ProjectParameter
             {
-                SightingId = entity.SightingId,
-                ProjectId = entity.ProjectId,
-                ProjectParameterId = entity.ProjectParameterId,
+                Id = entity.ProjectParameterId,
                 DataType = entity.DataType,
                 Description = entity.Description,
                 Name = entity.Name, 

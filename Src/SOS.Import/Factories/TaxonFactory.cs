@@ -8,7 +8,7 @@ using SOS.Import.Enums;
 using SOS.Import.Repositories.Destination.Taxon.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Factories

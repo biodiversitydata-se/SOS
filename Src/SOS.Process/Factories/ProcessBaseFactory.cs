@@ -9,19 +9,19 @@ namespace SOS.Process.Factories
     /// </summary>
     public class ProcessBaseFactory<TEntity>
     {
-        protected readonly IDarwinCoreRepository ProcessRepository;
+        protected readonly IProcessedSightingRepository ProcessRepository;
         protected readonly ILogger<TEntity> Logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="darwinCoreRepository"></param>
+        /// <param name="processedSightingRepository"></param>
         /// <param name="logger"></param>
         public ProcessBaseFactory(
-            IDarwinCoreRepository darwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             ILogger<TEntity> logger)
         {
-            ProcessRepository = darwinCoreRepository ?? throw new ArgumentNullException(nameof(darwinCoreRepository));
+            ProcessRepository = processedSightingRepository ?? throw new ArgumentNullException(nameof(processedSightingRepository));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
     }

@@ -6,8 +6,9 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Factories.Interfaces;
@@ -24,7 +25,7 @@ namespace SOS.Process.UnitTests.Jobs
     /// </summary>
     public class ProcessJobTests
     {
-        private readonly Mock<IDarwinCoreRepository> _darwinCoreRepository;
+        private readonly Mock<IProcessedSightingRepository> _darwinCoreRepository;
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
         private readonly Mock<IClamPortalProcessFactory> _clamPortalProcessFactory;
@@ -41,7 +42,7 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         public ProcessJobTests()
         {
-            _darwinCoreRepository = new Mock<IDarwinCoreRepository>();
+            _darwinCoreRepository = new Mock<IProcessedSightingRepository>();
             _processInfoRepository = new Mock<IProcessInfoRepository>();
             _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
             _clamPortalProcessFactory = new Mock<IClamPortalProcessFactory>();
@@ -204,13 +205,13 @@ namespace SOS.Process.UnitTests.Jobs
                     new HarvestInfo("0", DataProvider.Artdatabanken, DateTime.Now)
                 });
 
-            _speciesPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, DarwinCoreTaxon>>(), JobCancellationToken.Null))
+            _speciesPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(new RunInfo(DataProvider.Artdatabanken) {Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now});
 
-            _clamPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, DarwinCoreTaxon>>(), JobCancellationToken.Null))
+            _clamPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(new RunInfo(DataProvider.ClamPortal) { Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now });
 
-            _kulProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, DarwinCoreTaxon>>(), JobCancellationToken.Null))
+            _kulProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(new RunInfo(DataProvider.KUL) { Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now });
 
             _darwinCoreRepository.Setup(r => r.DropIndexAsync());

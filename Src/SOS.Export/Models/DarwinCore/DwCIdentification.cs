@@ -1,5 +1,5 @@
 ﻿using SOS.Export.Mappings;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Export.Models.DarwinCore
 {

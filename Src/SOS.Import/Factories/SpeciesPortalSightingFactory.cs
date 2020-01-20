@@ -46,7 +46,6 @@ namespace SOS.Import.Factories
         /// <param name="organizationRepository"></param>
         /// <param name="sightingRelationRepository"></param>
         /// <param name="speciesCollectionItemRepository"></param>
-        /// <param name="harvestInfoRepository"></param>
         /// <param name="logger"></param>
         public SpeciesPortalSightingFactory(
             SpeciesPortalConfiguration speciesPortalConfiguration,
@@ -81,7 +80,7 @@ namespace SOS.Import.Factories
 
             try
             {
-                var activities = (await _metadataRepository.GetActivitiesAsync()).ToAggregates().ToDictionary(a => a.Id, a => a);
+                var activities = (await _metadataRepository.GetActivitiesAsync()).ToVerbatims().ToDictionary(a => a.Id, a => a);
 
                 var metaDataTasks = new[]
                 {
@@ -97,20 +96,20 @@ namespace SOS.Import.Factories
                 _logger.LogDebug("Start getting meta data");
                 await Task.WhenAll(metaDataTasks);
                 cancellationToken?.ThrowIfCancellationRequested();
-                var biotopes = metaDataTasks[0].Result.ToAggregates().ToDictionary(b => b.Id, b => b);
-                var genders = metaDataTasks[1].Result.ToAggregates().ToDictionary(g => g.Id, g => g);
-                var organizations = metaDataTasks[2].Result.ToAggregates().ToDictionary(o => o.Id, o => o);
-                var stages = metaDataTasks[3].Result.ToAggregates().ToDictionary(s => s.Id, s => s);
-                var substrates = metaDataTasks[4].Result.ToAggregates().ToDictionary(s => s.Id, s => s);
-                var units = metaDataTasks[5].Result.ToAggregates().ToDictionary(u => u.Id, u => u);
-                var validationStatus = metaDataTasks[6].Result.ToAggregates().ToDictionary(v => v.Id, v => v);
+                var biotopes = metaDataTasks[0].Result.ToVerbatims().ToDictionary(b => b.Id, b => b);
+                var genders = metaDataTasks[1].Result.ToVerbatims().ToDictionary(g => g.Id, g => g);
+                var organizations = metaDataTasks[2].Result.ToVerbatims().ToDictionary(o => o.Id, o => o);
+                var stages = metaDataTasks[3].Result.ToVerbatims().ToDictionary(s => s.Id, s => s);
+                var substrates = metaDataTasks[4].Result.ToVerbatims().ToDictionary(s => s.Id, s => s);
+                var units = metaDataTasks[5].Result.ToVerbatims().ToDictionary(u => u.Id, u => u);
+                var validationStatus = metaDataTasks[6].Result.ToVerbatims().ToDictionary(v => v.Id, v => v);
 
                 _logger.LogDebug("Start getting persons & organizations data");
-                var personByUserId = (await _personRepository.GetAsync()).ToAggregates().ToDictionary(p => p.UserId, p => p);
-                var organizationById = (await _organizationRepository.GetAsync()).ToAggregates().ToDictionary(o => o.Id, o => o);
+                var personByUserId = (await _personRepository.GetAsync()).ToVerbatims().ToDictionary(p => p.UserId, p => p);
+                var organizationById = (await _organizationRepository.GetAsync()).ToVerbatims().ToDictionary(o => o.Id, o => o);
 
                 _logger.LogDebug("Start getting species collection data");
-                var speciesCollections = (await _speciesCollectionRepository.GetAsync()).ToAggregates().ToList();
+                var speciesCollections = (await _speciesCollectionRepository.GetAsync()).ToVerbatims().ToList();
 
                 _logger.LogDebug("Start getting projects & project parameters");
                 var projectEntityById = (await _projectRepository.GetProjectsAsync()).ToDictionary(p => p.Id, p => p);
@@ -119,7 +118,7 @@ namespace SOS.Import.Factories
                 cancellationToken?.ThrowIfCancellationRequested();
    
                 _logger.LogDebug("Start getting sites");
-                var sites = (await _siteRepository.GetAsync()).ToAggregates().ToDictionary(s => s.Id, s => s);
+                var sites = (await _siteRepository.GetAsync()).ToVerbatims().ToDictionary(s => s.Id, s => s);
 
                 // Make sure we have an empty collection
                 _logger.LogDebug("Empty collection");
@@ -155,7 +154,7 @@ namespace SOS.Import.Factories
                     nrSightingsHarvested += sightings.Length;
 
                     // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
-                    var sightingRelations = (await _sightingRelationRepository.GetAsync(sightingIds)).ToAggregates().ToArray();
+                    var sightingRelations = (await _sightingRelationRepository.GetAsync(sightingIds)).ToVerbatims().ToArray();
                     var personSightingBySightingId = PersonSightingFactory.CalculatePersonSightingDictionary(
                         sightingIds,
                         personByUserId,
@@ -167,7 +166,7 @@ namespace SOS.Import.Factories
                     var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, sightingProjectIds, projectEntityById, projectParameterEntities);
 
                     // Cast sightings to aggregates
-                    IEnumerable<APSightingVerbatim> aggregates = sightings.ToAggregates(
+                    IEnumerable<APSightingVerbatim> aggregates = sightings.ToVerbatims(
                         activities, 
                         biotopes,
                         genders,

@@ -39,9 +39,9 @@ namespace SOS.Export.IntegrationTests.Factories
                 exportConfiguration.MongoDbConfiguration.BatchSize);
             SightingFactory sightingFactory = new SightingFactory(
                 dwcArchiveFileWriter,
-                new ProcessedDarwinCoreRepository(
+                new ProcessedSightingRepository(
                     exportClient,
-                    new Mock<ILogger<ProcessedDarwinCoreRepository>>().Object),
+                    new Mock<ILogger<ProcessedSightingRepository>>().Object),
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object), 
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,

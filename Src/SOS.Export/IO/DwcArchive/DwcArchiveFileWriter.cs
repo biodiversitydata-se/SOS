@@ -46,7 +46,7 @@ namespace SOS.Export.IO.DwcArchive
         public async Task<string> CreateDwcArchiveFileAsync(
             AdvancedFilter filter,
             string fileName,
-            IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken)
@@ -54,7 +54,7 @@ namespace SOS.Export.IO.DwcArchive
             return await CreateDwcArchiveFileAsync(
                 filter,
                 fileName,
-                processedDarwinCoreRepository,
+                processedSightingRepository,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                 processInfo,
                 exportFolderPath,
@@ -65,7 +65,7 @@ namespace SOS.Export.IO.DwcArchive
         public async Task<string> CreateDwcArchiveFileAsync(
             AdvancedFilter filter,
             string fileName,
-            IProcessedDarwinCoreRepository processedDarwinCoreRepository,
+            IProcessedSightingRepository processedSightingRepository,
             IEnumerable<FieldDescription> fieldDescriptions,
             ProcessInfo processInfo,
             string exportFolderPath,
@@ -91,7 +91,7 @@ namespace SOS.Export.IO.DwcArchive
                         filter,
                         fileStream,
                         fieldDescriptions,
-                        processedDarwinCoreRepository,
+                        processedSightingRepository,
                         cancellationToken);
                 }
 
@@ -102,7 +102,7 @@ namespace SOS.Export.IO.DwcArchive
                         filter,
                         fileStream,
                         fieldDescriptions,
-                        processedDarwinCoreRepository,
+                        processedSightingRepository,
                         cancellationToken);
                 }
 

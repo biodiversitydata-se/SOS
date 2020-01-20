@@ -2,9 +2,9 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Repositories.Source;
@@ -31,10 +31,10 @@ namespace SOS.Process.IntegrationTests.Helpers
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
             var areaHelper = new AreaHelper(
                 areaVerbatimRepository);
-            List<DarwinCore<DynamicProperties>> observations = new List<DarwinCore<DynamicProperties>>();
-            DarwinCore<DynamicProperties> observation = new DarwinCore<DynamicProperties>(DataProvider.Artdatabanken)
+            var observations = new List<ProcessedSighting>();
+            var observation = new ProcessedSighting(DataProvider.Artdatabanken)
             {
-                Location = new DarwinCoreLocation
+                Location = new ProcessedLocation
                 {
                     DecimalLatitude = TestHelpers.Gis.Coordinates.TranasMunicipality.Latitude,
                     DecimalLongitude = TestHelpers.Gis.Coordinates.TranasMunicipality.Longitude 
@@ -45,26 +45,15 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            areaHelper.AddAreaDataToDarwinCore(observations);
+            areaHelper.AddAreaDataToProcessed(observations);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             observation.Location.County.Should().Be("Jönköping");
             observation.Location.Municipality.Should().Be("Tranås");
-            observation.Location.StateProvince.Should().Be("Småland");
-            observation.DynamicProperties.Parish.Should().Be("Tranås");
-
-            observation.DynamicProperties.CountyIdByCoordinate.Should().Be(6); // FeatureId
-            observation.DynamicProperties.MunicipalityIdByCoordinate.Should().Be(687); // FeatureId
-            observation.DynamicProperties.ParishIdByCoordinate.Should().Be(671); // FeatureId
-            observation.DynamicProperties.ProvinceIdByCoordinate.Should().Be(3); // FeatureId
-            observation.DynamicProperties.CountyPartIdByCoordinate.Should().Be(6); // FeatureId
-            observation.DynamicProperties.ProvincePartIdByCoordinate.Should().Be(3); // FeatureId
-            //observation.DynamicProperties.CountyIdByCoordinate.Should().Be(7); // Id
-            //observation.DynamicProperties.MunicipalityIdByCoordinate.Should().Be(283); // Id
-            //observation.DynamicProperties.ParishIdByCoordinate.Should().Be(42769); // Id
-            //observation.DynamicProperties.ProvinceIdByCoordinate.Should().Be(8060); // Id
+            observation.Location.Province.Should().Be("Småland");
+            observation.Location.Parish.Should().Be("Tranås");
         }
     }
 }

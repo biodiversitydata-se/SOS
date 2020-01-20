@@ -1,7 +1,7 @@
 ﻿using CsvHelper.Configuration;
 using SOS.Export.IO.Csv.Converters;
 using SOS.Export.Models.DarwinCore;
-using SOS.Lib.Models.Processed.DarwinCore;
+using  SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Export.Mappings
 {

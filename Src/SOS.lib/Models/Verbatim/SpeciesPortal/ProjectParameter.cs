@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace SOS.Lib.Models.Verbatim.SpeciesPortal
 {
     /// <summary>
@@ -9,9 +6,7 @@ namespace SOS.Lib.Models.Verbatim.SpeciesPortal
     /// </summary>
     public class ProjectParameter
     {
-        public int SightingId { get; set; }
-        public int ProjectId { get; set; }
-        public int ProjectParameterId { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Unit { get; set; }

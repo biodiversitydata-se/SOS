@@ -46,7 +46,7 @@ namespace SOS.Import.Factories
                 var start = DateTime.Now;
                 _logger.LogDebug("Start getting areas");
 
-                var areas = (await _areaRepository.GetAsync()).ToAggregates();
+                var areas = (await _areaRepository.GetAsync()).ToVerbatims();
 
                 _logger.LogDebug("Empty area collection");
                 // Make sure we have an empty collection

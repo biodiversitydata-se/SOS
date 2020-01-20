@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Import.Models.TaxonAttributeService;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Constants;
 
 namespace SOS.Import.Services
 {
@@ -42,7 +43,7 @@ namespace SOS.Import.Services
             return new Dictionary<string, string>
             {
                 {"currentUser", "SOS_ServiceUser" },
-                {"culture", "sv-SE"}
+                {"culture", Cultures.sv_SE}
             };
         }
 
