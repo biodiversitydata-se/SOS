@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -104,7 +105,7 @@ namespace SOS.Import.IntegrationTests.Taxonomy
                 importConfiguration.MongoDbConfiguration.BatchSize);
             TaxonService taxonService = new TaxonService(
                 TaxonServiceProxyStubFactory.Create(@"Resources\dyntaxa.custom.dwca.zip").Object,
-                new TaxonServiceConfiguration() { BaseAddress = "..." }, 
+                new TaxonServiceConfiguration { BaseAddress = "..." }, 
                 new NullLogger<TaxonService>());
 
             var taxonVerbatimRepository =
@@ -127,6 +128,29 @@ namespace SOS.Import.IntegrationTests.Taxonomy
             //-----------------------------------------------------------------------------------------------------------
             harvestInfo.Status.Should().Be(RunStatus.Success);
         }
+
+        [Fact]
+        public async Task Creates_a_taxon_tree_from_static_zipped_json_file()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var sp = Stopwatch.StartNew();
+            //var taxa = DarwinCoreTaxonFactory.CreateFromFile(@"Resources\AllTaxaInMongoDb.zip");
+            var taxa = DarwinCoreTaxonFactory.CreateFromFile(@"Resources\AllTaxaInMongoDbWithMinimalFields.zip");
+            sp.Stop();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var tree = TaxonTreeFactory.CreateTaxonTree<object>(taxa);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            tree.Root.ScientificName.Should().Be("Biota");
+        }
+
 
         private List<TaxonVernacularName> CreateExpectedBeechSpeciesTaxonVernacularNames()
         {

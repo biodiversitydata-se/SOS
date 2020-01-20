@@ -39,6 +39,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Resources\AllMongoDbTaxa.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\AllTaxaInMongoDb.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\AllTaxaInMongoDbWithMinimalFields.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\dyntaxa.custom.dwca.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
