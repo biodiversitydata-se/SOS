@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using MessagePack;
+using MessagePack.Resolvers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SOS.Lib.Models.Processed.DarwinCore;
@@ -32,6 +35,16 @@ namespace SOS.Import.IntegrationTests.TestHelpers.Factories
             serializer.Converters.Add(new ObjectIdConverter());
             serializer.ContractResolver = new IgnoreJsonAttributesResolver();
             var taxa = serializer.Deserialize<List<DarwinCoreTaxon>>(reader);
+            return taxa;
+        }
+
+        public static IEnumerable<DarwinCoreTaxon> CreateFromMessagePackFile(string fileName)
+        {
+            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var filePath = Path.Combine(assemblyPath, fileName);
+            var bytes = File.ReadAllBytes(filePath);
+            var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
+            var taxa = MessagePackSerializer.Deserialize<List<DarwinCoreTaxon>>(bytes, options);
             return taxa;
         }
 
