@@ -15,6 +15,11 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<int> Counties { get; set; }
 
         /// <summary>
+        /// Delimit search by geometry
+        /// </summary>
+        public double[][] Delimitation { get; set; }
+
+        /// <summary>
         /// Sighting last date
         /// </summary>
         public DateTime? EndDate { get; set; }
@@ -24,6 +29,7 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public bool IsFilterActive => 
             (Counties?.Any() ?? false) ||
+            (Delimitation?.Any() ?? false) ||
             EndDate != null ||
             (Municipalities?.Any() ?? false) ||
             OnlyValidated.HasValue ||

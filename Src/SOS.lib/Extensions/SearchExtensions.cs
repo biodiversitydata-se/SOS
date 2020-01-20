@@ -9,35 +9,10 @@ namespace SOS.Lib.Extensions
     public static class SearchExtensions
     {
         /// <summary>
-        /// Create project parameter filter.
+        /// Create a filter definition object
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static FilterDefinition<ProcessedSighting> ToProjectParameteFilterDefinition(this AdvancedFilter filter)
-        {
-            var filters = CreateFilterDefinitions(filter);
-            filters.Add(Builders<ProcessedSighting>.Filter.ElemMatch(
-                o => o.Projects, o => o.ProjectParameters != null));
-
-            return Builders<ProcessedSighting>.Filter.And(filters);
-        }
-
-        /// <summary>
-        /// Create search filter
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        public static FilterDefinition<ProcessedSighting> ToFilterDefinition(this AdvancedFilter filter)
-        {
-            if (!filter.IsFilterActive)
-            {
-                return FilterDefinition<ProcessedSighting>.Empty;
-            }
-
-            var filters = CreateFilterDefinitions(filter);
-            return Builders<ProcessedSighting>.Filter.And(filters);
-        }
-
         private static List<FilterDefinition<ProcessedSighting>> CreateFilterDefinitions(AdvancedFilter filter)
         {
             var filters = new List<FilterDefinition<ProcessedSighting>>();
@@ -45,6 +20,11 @@ namespace SOS.Lib.Extensions
             if (filter.Counties?.Any() ?? false)
             {
                 filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.County.Id, filter.Counties));
+            }
+
+            if (filter.Delimitation?.Any() ?? false)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.GeoWithinPolygon(m => m.Location.Point, filter.Delimitation.ToTwoDimensionalArray()));
             }
 
             if (filter.EndDate.HasValue)
@@ -91,6 +71,37 @@ namespace SOS.Lib.Extensions
 
             return filters;
         }
+
+        /// <summary>
+        /// Create project parameter filter.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public static FilterDefinition<ProcessedSighting> ToProjectParameteFilterDefinition(this AdvancedFilter filter)
+        {
+            var filters = CreateFilterDefinitions(filter);
+            filters.Add(Builders<ProcessedSighting>.Filter.ElemMatch(
+                o => o.Projects, o => o.ProjectParameters != null));
+
+            return Builders<ProcessedSighting>.Filter.And(filters);
+        }
+
+        /// <summary>
+        /// Create search filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public static FilterDefinition<ProcessedSighting> ToFilterDefinition(this AdvancedFilter filter)
+        {
+            if (!filter.IsFilterActive)
+            {
+                return FilterDefinition<ProcessedSighting>.Empty;
+            }
+
+            var filters = CreateFilterDefinitions(filter);
+            return Builders<ProcessedSighting>.Filter.And(filters);
+        }
+
 
         /// <summary>
         /// Build a projection string

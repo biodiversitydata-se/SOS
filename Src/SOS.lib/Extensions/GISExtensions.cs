@@ -157,6 +157,40 @@ namespace SOS.Lib.Extensions
 
         #region Public
         /// <summary>
+        /// Get coordinates as two dimensional array
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        public static double[,] ToTwoDimensionalArray(this GeoJsonPolygon<GeoJson2DGeographicCoordinates> polygon)
+        {
+            if (!polygon?.Coordinates?.Exterior?.Positions?.Any() ?? true)
+            {
+                return null;
+            }
+
+            return polygon.Coordinates.Exterior.Positions.Select(p => new [] { p.Longitude, p.Latitude }).ToArray().ToTwoDimensionalArray();
+        }
+
+        public static double[,] ToTwoDimensionalArray(this double[][] coordinates)
+        {
+            if (!coordinates?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var res = new double[coordinates.Length, coordinates.Max(x => x.Length)];
+            for (var i = 0; i < coordinates.Length; ++i)
+            {
+                for (var j = 0; j < coordinates[i].Length; ++j)
+                {
+                    res[i, j] = coordinates[i][j];
+                }
+            }
+
+            return res;
+        }
+
+        /// <summary>
         /// Cast geometry to a mongodb friendly object
         /// </summary>
         /// <param name="geometry"></param>

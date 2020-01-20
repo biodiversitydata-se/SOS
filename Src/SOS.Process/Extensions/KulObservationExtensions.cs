@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
@@ -52,6 +53,7 @@ namespace SOS.Process.Extensions
                     Continent = Continent.Europe,
                     Country = Country.Sweden,
                     Locality = verbatim.Locality,
+                    Point = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(verbatim.DecimalLongitude, verbatim.DecimalLatitude)),
                     VerbatimLatitude = verbatim.DecimalLatitude,
                     VerbatimLongitude = verbatim.DecimalLongitude
                 },

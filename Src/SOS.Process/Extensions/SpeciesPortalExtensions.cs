@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -101,6 +102,7 @@ namespace SOS.Process.Extensions
                     MinimumElevationInMeters = verbatim.MinHeight,
                     Municipality = verbatim.Site?.Municipality?.ToProcessed(),
                     Parish = verbatim.Site?.Parish?.ToProcessed(),
+                    Point = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(wgs84Point.Coordinate?.X ?? 0, wgs84Point.Coordinate?.Y ?? 0)),
                     Province = verbatim.Site?.Province?.ToProcessed(),
                     VerbatimLatitude = googleMercatorPoint.Coordinate.Y,
                     VerbatimLongitude = googleMercatorPoint.Coordinate.X,

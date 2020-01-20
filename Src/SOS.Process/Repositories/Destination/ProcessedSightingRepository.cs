@@ -131,6 +131,8 @@ namespace SOS.Process.Repositories.Destination
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.County.Id)),
                 new CreateIndexModel<ProcessedSighting>(
+                    Builders<ProcessedSighting>.IndexKeys.Geo2DSphere(a => a.Location.Point)),
+                new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.Province.Id)),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.Municipality.Id)),

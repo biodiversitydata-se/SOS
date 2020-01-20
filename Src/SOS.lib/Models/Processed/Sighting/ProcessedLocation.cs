@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Models.Processed.Sighting
+﻿using MongoDB.Driver.GeoJsonObjectModel;
+
+namespace SOS.Lib.Models.Processed.Sighting
 {
     /// <summary>
     /// This class contains location information about a species sighting location
@@ -350,6 +352,11 @@
         /// Parish property
         /// </summary>
         public ProcessedArea Parish { get; set; }
+
+        /// <summary>
+        /// Point (WGS84)
+        /// </summary>
+        public GeoJsonPoint<GeoJson2DGeographicCoordinates> Point { get; set; }
 
         /// <summary>
         /// Darwin Core term name: pointRadiusSpatialFit.
