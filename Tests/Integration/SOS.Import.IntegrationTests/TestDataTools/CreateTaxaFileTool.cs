@@ -12,6 +12,7 @@ using Moq;
 using Newtonsoft.Json;
 using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Taxon;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.TaxonTree;
@@ -83,5 +84,35 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             byte[] bin = MessagePackSerializer.Serialize(taxa, options);
             System.IO.File.WriteAllBytes(filePath, bin);
         }
+
+        [Fact]
+        [Trait("Category", "Tool")]
+        public async Task CreateBasicTaxaMessagePackFile()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            // 1. Remember to first remove JsonIgnore on properties in DarwinCoreTaxon class.
+            const string filePath = @"c:\temp\AllBasicTaxa.msgpck";
+            const int batchSize = 500000; // Get all taxa
+            var importConfiguration = GetImportConfiguration();
+            var importClient = new ImportClient(
+                importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
+                importConfiguration.MongoDbConfiguration.DatabaseName,
+                batchSize);
+
+            var taxonVerbatimRepository =
+                new TaxonVerbatimRepository(importClient, new NullLogger<TaxonVerbatimRepository>());
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var taxa = await taxonVerbatimRepository.GetBatchAsync(0);
+            var basicTaxa = taxa.Select(m => m.ToProcessedBasicTaxon());
+            var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
+            byte[] bin = MessagePackSerializer.Serialize(basicTaxa, options);
+            System.IO.File.WriteAllBytes(filePath, bin);
+        }
+
     }
 }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Process.Extensions;
 using SOS.Process.Jobs.Interfaces;
@@ -40,7 +41,7 @@ namespace SOS.Process.Jobs
             {
                 foreach (var taxon in tmpTaxa)
                 {
-                    taxa.Add(taxon.ToProcessed());
+                    taxa.Add(taxon.ToProcessedTaxon());
                 }
 
                 skip += tmpTaxa.Count();

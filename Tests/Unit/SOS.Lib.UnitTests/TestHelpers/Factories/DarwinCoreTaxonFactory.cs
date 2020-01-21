@@ -37,13 +37,13 @@ namespace SOS.Lib.UnitTests.TestHelpers.Factories
             return taxa;
         }
 
-        public static IEnumerable<DarwinCoreTaxon> CreateFromMessagePackFile(string fileName)
+        public static IEnumerable<T> CreateFromMessagePackFile<T>(string fileName)
         {
             string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
             var bytes = File.ReadAllBytes(filePath);
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
-            var taxa = MessagePackSerializer.Deserialize<List<DarwinCoreTaxon>>(bytes, options);
+            var taxa = MessagePackSerializer.Deserialize<List<T>>(bytes, options);
             return taxa;
         }
 

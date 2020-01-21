@@ -1,11 +1,11 @@
-﻿using  SOS.Lib.Models.DarwinCore;
+﻿using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Sighting;
 
-namespace SOS.Process.Extensions
+namespace SOS.Lib.Extensions
 {
     public static class TaxonExtensions
     {
-        public static ProcessedTaxon ToProcessed(this DarwinCoreTaxon sourceTaxon)
+        public static ProcessedTaxon ToProcessedTaxon(this DarwinCoreTaxon sourceTaxon)
         {
             return new ProcessedTaxon
             {
@@ -59,6 +59,18 @@ namespace SOS.Process.Extensions
                 TaxonomicStatus = sourceTaxon.TaxonomicStatus,
                 VernacularName = sourceTaxon.VernacularName,
                 VerbatimTaxonRank = sourceTaxon.VerbatimTaxonRank,
+            };
+        }
+
+        public static ProcessedBasicTaxon ToProcessedBasicTaxon(this DarwinCoreTaxon sourceTaxon)
+        {
+            return new ProcessedBasicTaxon()
+            {
+                DyntaxaTaxonId = sourceTaxon.DynamicProperties.DyntaxaTaxonId,
+                ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties.ParentDyntaxaTaxonId,
+                SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds,
+                Id = sourceTaxon.Id,
+                ScientificName = sourceTaxon.ScientificName
             };
         }
     }

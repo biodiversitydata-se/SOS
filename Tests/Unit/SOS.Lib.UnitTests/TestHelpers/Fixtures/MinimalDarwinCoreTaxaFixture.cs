@@ -11,11 +11,11 @@ namespace SOS.Lib.UnitTests.TestHelpers.Fixtures
     /// Reads a file created by the MessagePack library, that contains only the necessary fields
     /// for creating a taxon tree. Fields: DyntaxaTaxonId, ParentId, SecondaryParentIds, ScientificName
     /// </summary>
-    public class TaxaWithMinimalFieldsFixture : IDisposable
+    public class MinimalDarwinCoreTaxaFixture : IDisposable
     {
-        public TaxaWithMinimalFieldsFixture()
+        public MinimalDarwinCoreTaxaFixture()
         {
-            Taxa = DarwinCoreTaxonFactory.CreateFromMessagePackFile(@"Resources\AllTaxaInMongoDbWithMinimalFields.msgpck");
+            Taxa = DarwinCoreTaxonFactory.CreateFromMessagePackFile<DarwinCoreTaxon>(@"Resources\AllTaxaInMongoDbWithMinimalFields.msgpck");
         }
 
         public void Dispose()

@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.UnitTests.TestHelpers.Factories;
@@ -12,11 +13,11 @@ using Xunit;
 
 namespace SOS.Lib.UnitTests.Models.TaxonTree
 {
-    public class TaxonTreeTests : IClassFixture<TaxaWithMinimalFieldsFixture>
+    public class ProcessedBasicTaxonTreeTests : IClassFixture<ProcessedBasicTaxaFixture>
     {
-        private readonly TaxaWithMinimalFieldsFixture _fixture;
+        private readonly ProcessedBasicTaxaFixture _fixture;
 
-        public TaxonTreeTests(TaxaWithMinimalFieldsFixture fixture)
+        public ProcessedBasicTaxonTreeTests(ProcessedBasicTaxaFixture fixture)
         {
             _fixture = fixture;
         }
@@ -29,7 +30,7 @@ namespace SOS.Lib.UnitTests.Models.TaxonTree
             //-----------------------------------------------------------------------------------------------------------
             const int ichthyaetusTaxonId = 6011885;
             int[] expectedUnderlyingTaxonIds = { 266836, 103067, 266238, 267106, 266835 };
-            var sut = TaxonTreeFactory.CreateTaxonTree<object>(_fixture.Taxa);
+            var sut = TaxonTreeFactory.CreateTaxonTree(_fixture.Taxa);
             
             //-----------------------------------------------------------------------------------------------------------
             // Act

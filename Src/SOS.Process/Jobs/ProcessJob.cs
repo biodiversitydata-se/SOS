@@ -6,6 +6,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using  SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Processed.Sighting;
@@ -91,7 +92,7 @@ namespace SOS.Process.Jobs
                 {
                     foreach (var taxon in tmpTaxa)
                     {
-                        taxa.Add(taxon.Id, taxon.ToProcessed());
+                        taxa.Add(taxon.Id, taxon.ToProcessedTaxon());
                     }
 
                     skip += tmpTaxa.Count();
