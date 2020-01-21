@@ -73,6 +73,10 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public IEnumerable<int> TaxonIds { get; set; }
 
-       
+        /// <summary>
+        /// Decides whether to search for exact taxonIds or
+        /// for the hierarchical underlying taxa.
+        /// </summary>
+        public bool SearchUnderlyingTaxa { get; set; }
     }
 }

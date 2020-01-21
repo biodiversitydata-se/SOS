@@ -102,7 +102,7 @@ namespace SOS.Search.Service
                     // Add factories
                     services.AddScoped<ISightingFactory, SightingFactory>();
                     services.AddScoped<IProcessInfoFactory, ProcessInfoFactory>();
-                    services.AddScoped<ITaxonFactory, TaxonFactory>();
+                    services.AddSingleton<ITaxonFactory, TaxonFactory>();
 
                     // Repositories mongo
                     services.AddScoped<IProcessedSightingRepository, ProcessedSightingRepository>();

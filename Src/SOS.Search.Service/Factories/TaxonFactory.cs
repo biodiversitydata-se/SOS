@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Search.Service.Factories.Interfaces;
@@ -14,6 +15,8 @@ namespace SOS.Search.Service.Factories
     {
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly ILogger<TaxonFactory> _logger;
+        private TaxonTree<IBasicTaxon> _taxonTree;
+        static object _initLock = new object();
 
         /// <summary>
         /// Constructor
@@ -29,12 +32,31 @@ namespace SOS.Search.Service.Factories
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        //public async Task<TaxonTree<object>> GetTaxonTreeAsync()
-        //{
-        //    var taxa = await GetTaxaAsync();
-        //    var taxonTree = TaxonTreeFactory.CreateTaxonTree<object>(taxa);
-        //    return taxonTree;
-        //}
+        private async Task<TaxonTree<IBasicTaxon>> GetTaxonTreeAsync()
+        {
+            var taxa = await GetBasicTaxaAsync();
+            var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
+            return taxonTree;
+        }
+
+        public TaxonTree<IBasicTaxon> TaxonTree
+        {
+            get
+            {
+                if (_taxonTree == null)
+                {
+                    lock (_initLock)
+                    {
+                        if (_taxonTree == null)
+                        {
+                            _taxonTree = GetTaxonTreeAsync().Result;
+                        }
+                    }
+                }
+
+                return _taxonTree;
+            }
+        }
 
         public async Task<IEnumerable<ProcessedBasicTaxon>> GetBasicTaxaAsync()
         {
