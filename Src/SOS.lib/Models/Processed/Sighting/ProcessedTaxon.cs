@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Lib.Models.Processed.Sighting
 {
@@ -9,8 +11,28 @@ namespace SOS.Lib.Models.Processed.Sighting
     /// Further information about the properties can
     /// be found at http://rs.tdwg.org/dwc/terms/
     /// </summary>
-    public class ProcessedTaxon: IEntity<int>
+    public class ProcessedTaxon: IEntity<int>, IBasicTaxon
     {
+        /// <summary>
+        /// Dyntaxa taxon id.
+        /// </summary>
+        public int DyntaxaTaxonId { get; set; }
+
+        /// <summary>
+        /// Main parent Dyntaxa taxon id.
+        /// </summary>
+        public int? ParentDyntaxaTaxonId { get; set; }
+
+        /// <summary>
+        /// Secondary parents dyntaxa taxon ids.
+        /// </summary>
+        public IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }
+
+        /// <summary>
+        /// Vernacular names.
+        /// </summary>
+        public IEnumerable<TaxonVernacularName> VernacularNames { get; set; }
+
         /// <summary>
         /// Darwin Core term name: acceptedNameUsage.
         /// The full name, with authorship and date information

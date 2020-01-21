@@ -9,6 +9,10 @@ namespace SOS.Process.Extensions
         {
             return new ProcessedTaxon
             {
+                DyntaxaTaxonId = sourceTaxon.DynamicProperties.DyntaxaTaxonId, 
+                ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties.ParentDyntaxaTaxonId,
+                SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds, 
+                VernacularNames = sourceTaxon.DynamicProperties.VernacularNames,
                 AcceptedNameUsage = sourceTaxon.AcceptedNameUsage,
                 AcceptedNameUsageID = sourceTaxon.AcceptedNameUsageID,
                 ActionPlan = sourceTaxon.DynamicProperties?.ActionPlan,

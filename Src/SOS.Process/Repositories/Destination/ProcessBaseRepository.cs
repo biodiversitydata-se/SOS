@@ -17,7 +17,7 @@ namespace SOS.Process.Repositories.Destination
     /// Base class for cosmos db repositories
     /// </summary>
     public class ProcessBaseRepository<TEntity, TKey> : IProcessBaseRepository<TEntity, TKey> where TEntity : IEntity<TKey>
-    { 
+    {
         /// <summary>
         /// Logger 
         /// </summary>
