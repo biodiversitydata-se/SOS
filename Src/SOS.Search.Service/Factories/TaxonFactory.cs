@@ -58,7 +58,7 @@ namespace SOS.Search.Service.Factories
             }
         }
 
-        public async Task<IEnumerable<ProcessedBasicTaxon>> GetBasicTaxaAsync()
+        private async Task<IEnumerable<ProcessedBasicTaxon>> GetBasicTaxaAsync()
         {
             try
             {
@@ -83,9 +83,7 @@ namespace SOS.Search.Service.Factories
             }
         }
 
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<ProcessedTaxon>> GetTaxaAsync()
+        private async Task<IEnumerable<ProcessedTaxon>> GetTaxaAsync()
         {
             try
             {

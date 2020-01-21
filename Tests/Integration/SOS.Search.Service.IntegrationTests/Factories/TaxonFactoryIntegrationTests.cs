@@ -20,7 +20,7 @@ namespace SOS.Search.Service.IntegrationTests.Factories
     public class TaxonFactoryIntegrationTests : TestBase
     {
         [Fact]
-        public async Task Gets_basic_taxa_from_sos_processed_db()
+        public async Task A_taxon_tree_is_created_from_taxon_data_in_sos_processed_db()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -37,39 +37,12 @@ namespace SOS.Search.Service.IntegrationTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var taxa = await taxonFactory.GetBasicTaxaAsync();
+            var taxonTree = taxonFactory.TaxonTree;
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            taxa.Should().NotBeEmpty();
-        }
-
-
-        [Fact]
-        public async Task Gets_taxa_from_sos_processed_db()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var mongoDbConfiguration = GetMongoDbConfiguration();
-            var mongoClient = new MongoClient(mongoDbConfiguration.GetMongoDbSettings());
-            var options = Options.Create(mongoDbConfiguration);
-            var processedTaxonRepository = new ProcessedTaxonRepository(
-                mongoClient,
-                options,
-                new NullLogger<BaseRepository<ProcessedTaxon, int>>());
-            var taxonFactory = new TaxonFactory(processedTaxonRepository, new NullLogger<TaxonFactory>());
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var taxa = await taxonFactory.GetTaxaAsync();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            taxa.Should().NotBeEmpty();
+            taxonTree.Root.ScientificName.Should().Be("Biota");
         }
     }
 }
