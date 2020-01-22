@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using  SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
@@ -59,6 +61,8 @@ namespace SOS.Process.Extensions
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Id = verbatim.LocationId,
                     Locality = verbatim.Locality,
+                    Point = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(verbatim.DecimalLongitude, verbatim.DecimalLatitude)),
+                    PointWithBuffer = new [] { verbatim.DecimalLongitude, verbatim.DecimalLatitude }.ToCircle(verbatim.CoordinateUncertaintyInMeters ?? 0)?.ToGeoJsonGeometry(),
                     Remarks = verbatim.LocationRemarks,
                     MaximumDepthInMeters = verbatim.MaximumDepthInMeters,
                     VerbatimLatitude = verbatim.DecimalLatitude,

@@ -8,6 +8,7 @@ using ProjNet.CoordinateSystems.Transformations;
 using NetTopologySuite.IO;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Extensions
 {
@@ -156,6 +157,52 @@ namespace SOS.Lib.Extensions
         #endregion Private
 
         #region Public
+       
+        public static Geometry ToCircle(this double[] pointCoordinates, double accuracy)
+        {
+            if ((pointCoordinates?.Length ?? 0) != 2 || accuracy.Equals(0))
+            {
+                return null;
+            }
+
+            var longitude = pointCoordinates[0];
+            var latitude = pointCoordinates[1];
+            
+            var wgs84Point = new Point(longitude, latitude);
+
+            // Transform to SWEREF99 TM since it's in meters
+            var sweRef99TMPoint = Transform(wgs84Point, CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
+
+            // Add buffer to point to create a circle
+            var circle = sweRef99TMPoint.Buffer(accuracy);
+
+            // Transform back to WGS84
+            return Transform(circle, CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+        }
+
+        /// <summary>
+        /// Cast input geometry to geojson geometry
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <returns></returns>
+        public static GeoJsonGeometry<GeoJson2DGeographicCoordinates> ToGeoJsonGeometry(this InputGeometry geometry)
+        {
+            if (!geometry.IsValid)
+            {
+                return null;
+            }
+
+            switch (geometry.Type?.ToLower())
+            {
+                case "point":
+                    return GeoJson.Point(GeoJson.Geographic(geometry.Coordinates[0][0], geometry.Coordinates[0][1]));
+                case "polygon":
+                    return GeoJson.Polygon(geometry.Coordinates.Select(c => new GeoJson2DGeographicCoordinates(c[0], c[1])).ToArray());
+                default:
+                    return null;
+            }
+        }
+
         /// <summary>
         /// Cast geometry to a mongodb friendly object
         /// </summary>
@@ -205,6 +252,45 @@ namespace SOS.Lib.Extensions
             var factory = new GeometryFactory();
             var wktReader = new WKTReader(factory);
             return wktReader.Read(sqlGeometry.STAsText().ToSqlString().ToString());
+        }
+
+        /// <summary>
+        /// Get coordinates as two dimensional array
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        public static double[,] ToTwoDimensionalArray(this GeoJsonPolygon<GeoJson2DGeographicCoordinates> polygon)
+        {
+            if (!polygon?.Coordinates?.Exterior?.Positions?.Any() ?? true)
+            {
+                return null;
+            }
+
+            return polygon.Coordinates.Exterior.Positions.Select(p => new[] { p.Longitude, p.Latitude }).ToArray().ToTwoDimensionalArray();
+        }
+
+        /// <summary>
+        /// Get coordinates as two dimensional array
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        public static double[,] ToTwoDimensionalArray(this double[][] coordinates)
+        {
+            if (!coordinates?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var res = new double[coordinates.Length, coordinates.Max(x => x.Length)];
+            for (var i = 0; i < coordinates.Length; ++i)
+            {
+                for (var j = 0; j < coordinates[i].Length; ++j)
+                {
+                    res[i, j] = coordinates[i][j];
+                }
+            }
+
+            return res;
         }
 
         /// <summary>

@@ -14,6 +14,9 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public IEnumerable<int> Counties { get; set; }
 
+
+        public GeometryFilter Delimitation { get; set; }
+
         /// <summary>
         /// Sighting last date
         /// </summary>
@@ -22,11 +25,13 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// True if any filter property is set
         /// </summary>
-        public bool IsFilterActive => 
+        public bool IsFilterActive =>
             (Counties?.Any() ?? false) ||
+            (Delimitation?.IsValid ?? false) ||
             EndDate != null ||
             (Municipalities?.Any() ?? false) ||
             OnlyValidated.HasValue ||
+            PositiveSightings.HasValue ||
             (Provinces?.Any() ?? false) ||
             (RedListCategories?.Any() ?? false) ||
             (Sex?.Any() ?? false) ||
@@ -47,6 +52,11 @@ namespace SOS.Lib.Models.Search
         /// Fields to return (empty = all)
         /// </summary>
         public IEnumerable<string> OutputFields { get; set; }
+
+        /// <summary>
+        /// True to return only positive sightings, false to return negative sightings, null to return both positive and negative sightings
+        /// </summary>
+        public bool? PositiveSightings { get; set; }
 
         /// <summary>
         /// Provinces to match

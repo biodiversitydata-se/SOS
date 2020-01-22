@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Driver;
+using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Search;
 
@@ -8,6 +9,94 @@ namespace SOS.Lib.Extensions
 {
     public static class SearchExtensions
     {
+        /// <summary>
+        /// Create a filter definition object
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        private static List<FilterDefinition<ProcessedSighting>> CreateFilterDefinitions(AdvancedFilter filter)
+        {
+            var filters = new List<FilterDefinition<ProcessedSighting>>();
+
+            if (filter.Counties?.Any() ?? false)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.County.Id, filter.Counties));
+            }
+
+            if (filter.Delimitation?.IsValid ?? false)
+            {
+                GeoJsonGeometry<GeoJson2DGeographicCoordinates> geoJsonGeometry = null;
+
+                switch (filter.Delimitation.Geometry.Type?.ToLower())
+                {
+                    case "point":
+                        geoJsonGeometry = filter.Delimitation.Geometry.Coordinates[0].ToCircle(filter.Delimitation.Accuracy).ToGeoJsonGeometry();
+                        break;
+                    case "polygon":
+                        geoJsonGeometry = filter.Delimitation.Geometry.ToGeoJsonGeometry();
+                        break;
+                }
+
+                if (filter.Delimitation.UsePointAccuracy)
+                {
+                    filters.Add(Builders<ProcessedSighting>.Filter.GeoIntersects(m => m.Location.PointWithBuffer, (GeoJsonPolygon<GeoJson2DGeographicCoordinates>)geoJsonGeometry));
+                }
+                else
+                {
+                    filters.Add(Builders<ProcessedSighting>.Filter.GeoWithinPolygon(m => m.Location.Point, ((GeoJsonPolygon<GeoJson2DGeographicCoordinates>)geoJsonGeometry).ToTwoDimensionalArray()));
+                }
+            }
+
+            if (filter.EndDate.HasValue)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.Lte(m => m.Event.EndDate, filter.EndDate.Value.ToUniversalTime()));
+            }
+
+            if (filter.OnlyValidated.HasValue && filter.OnlyValidated.Value.Equals(true))
+            {
+                filters.Add(
+                    Builders<ProcessedSighting>.Filter.Eq(m => m.Identification.Validated, true));
+            }
+
+            if (filter.Municipalities?.Any() ?? false)
+            {
+                filters.Add(
+                    Builders<ProcessedSighting>.Filter.In(m => m.Location.Municipality.Id, filter.Municipalities));
+            }
+
+            if (filter.PositiveSightings.HasValue)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.Eq(m => m.Occurrence.IsPositiveObservation, filter.PositiveSightings.Value));
+            }
+
+            if (filter.Provinces?.Any() ?? false)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.Province.Id, filter.Provinces));
+            }
+
+            if (filter.RedListCategories?.Any() ?? false)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Taxon.RedlistCategory, filter.RedListCategories));
+            }
+
+            if (filter.Sex?.Any() ?? false)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Occurrence.Sex.Id, filter.Sex));
+            }
+
+            if (filter.StartDate.HasValue)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.Gte(m => m.Event.StartDate, filter.StartDate.Value.ToUniversalTime()));
+            }
+
+            if (filter.TaxonIds?.Any() ?? false)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Taxon.Id, filter.TaxonIds));
+            }
+
+            return filters;
+        }
+
         /// <summary>
         /// Create project parameter filter.
         /// </summary>
@@ -38,59 +127,6 @@ namespace SOS.Lib.Extensions
             return Builders<ProcessedSighting>.Filter.And(filters);
         }
 
-        private static List<FilterDefinition<ProcessedSighting>> CreateFilterDefinitions(AdvancedFilter filter)
-        {
-            var filters = new List<FilterDefinition<ProcessedSighting>>();
-
-            if (filter.Counties?.Any() ?? false)
-            {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.County.Id, filter.Counties));
-            }
-
-            if (filter.EndDate.HasValue)
-            {
-                filters.Add(Builders<ProcessedSighting>.Filter.Lte(m => m.Event.EndDate, filter.EndDate));
-            }
-
-            if (filter.OnlyValidated.HasValue && filter.OnlyValidated.Value.Equals(true))
-            {
-                filters.Add(
-                    Builders<ProcessedSighting>.Filter.Eq(m => m.Identification.Validated, true));
-            }
-
-            if (filter.Municipalities?.Any() ?? false)
-            {
-                filters.Add(
-                    Builders<ProcessedSighting>.Filter.In(m => m.Location.Municipality.Id, filter.Municipalities));
-            }
-
-            if (filter.Provinces?.Any() ?? false)
-            {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.Province.Id, filter.Provinces));
-            }
-
-            if (filter.RedListCategories?.Any() ?? false)
-            {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Taxon.RedlistCategory, filter.RedListCategories));
-            }
-
-            if (filter.Sex?.Any() ?? false)
-            {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Occurrence.Sex.Id, filter.Sex));
-            }
-
-            if (filter.StartDate.HasValue)
-            {
-                filters.Add(Builders<ProcessedSighting>.Filter.Gte(m => m.Event.StartDate, filter.StartDate.Value));
-            }
-
-            if (filter.TaxonIds?.Any() ?? false)
-            {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Taxon.Id, filter.TaxonIds));
-            }
-
-            return filters;
-        }
 
         /// <summary>
         /// Build a projection string

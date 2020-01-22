@@ -1,4 +1,5 @@
 ﻿using System;
+using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Processed.Sighting
@@ -21,6 +22,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// <summary>
         /// End date/time of the event
         /// </summary>
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public DateTime? EndDate { get; set; }
 
         /// <summary>
@@ -99,6 +101,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// <summary>
         /// Start date/time of the event
         /// </summary>
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public DateTime? StartDate { get; set; }
 
         /// <summary>
@@ -124,11 +127,13 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// <summary>
         /// Verbatim end date
         /// </summary>
+        [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
         public DateTime? VerbatimEndDate { get; set; }
 
         /// <summary>
         /// Verbatim start date
         /// </summary>
+        [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
         public DateTime? VerbatimStartDate { get; set; }
     }
 }

@@ -161,7 +161,7 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
-            return new DarwinCore(processedSighting.Provider)
+            return new DarwinCore
             {
                 AccessRights = processedSighting.AccessRights,
                 BasisOfRecord = processedSighting.BasisOfRecord,

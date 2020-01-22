@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.10.1" />
-    <PackageReference Include="Hangfire.Core" Version="1.7.8" />
+    <PackageReference Include="Hangfire.Core" Version="1.7.9" />
   </ItemGroup>
 
 </Project>
