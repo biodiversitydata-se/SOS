@@ -39,7 +39,7 @@ namespace SOS.Lib.Extensions
 
                 if (filter.Delimitation.UsePointAccuracy)
                 {
-               //     filters.Add(Builders<ProcessedSighting>.Filter.GeoIntersects(m => m.Location.PointWithBuffer, ((GeoJsonPolygon<GeoJson2DGeographicCoordinates>)geoJsonGeometry).ToTwoDimensionalArray()));
+                    filters.Add(Builders<ProcessedSighting>.Filter.GeoIntersects(m => m.Location.PointWithBuffer, (GeoJsonPolygon<GeoJson2DGeographicCoordinates>)geoJsonGeometry));
                 }
                 else
                 {
