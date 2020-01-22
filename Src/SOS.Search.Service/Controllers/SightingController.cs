@@ -4,7 +4,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using  SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 using SOS.Search.Service.Controllers.Interfaces;
 using SOS.Search.Service.Factories.Interfaces;

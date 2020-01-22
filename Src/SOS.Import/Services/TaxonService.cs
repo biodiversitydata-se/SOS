@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Import;
 using  SOS.Lib.Models.DarwinCore;
@@ -116,7 +118,7 @@ namespace SOS.Import.Services
 
             // Read taxon data
             using var taxonReader = new StreamReader(taxonFile.Open(), Encoding.UTF8);
-            using var taxonCsv = new CsvReader(taxonReader, new CsvHelper.Configuration.Configuration
+            using var taxonCsv = new CsvReader(taxonReader, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 Delimiter = csvFieldDelimiter,
                 Encoding = Encoding.UTF8,
@@ -166,7 +168,7 @@ namespace SOS.Import.Services
 
             // Read taxon relations data
             using var taxonRelationsReader = new StreamReader(taxonRelationsFile.Open(), Encoding.UTF8);
-            using var taxonRelationsCsv = new CsvReader(taxonRelationsReader, new CsvHelper.Configuration.Configuration
+            using var taxonRelationsCsv = new CsvReader(taxonRelationsReader, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 Delimiter = csvFieldDelimiter,
                 Encoding = Encoding.UTF8,
@@ -224,7 +226,7 @@ namespace SOS.Import.Services
 
             // Read vernacular name data
             using var vernacularNameReader = new StreamReader(vernacularNameFile.Open(), Encoding.UTF8);
-            using var vernacularNameCsv = new CsvReader(vernacularNameReader, new CsvHelper.Configuration.Configuration
+            using var vernacularNameCsv = new CsvReader(vernacularNameReader, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 Delimiter = csvFieldDelimiter,
                 Encoding = Encoding.UTF8,

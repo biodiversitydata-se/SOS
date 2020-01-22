@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Driver;
+using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Search;
 
@@ -22,14 +23,33 @@ namespace SOS.Lib.Extensions
                 filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.County.Id, filter.Counties));
             }
 
-            if (filter.Delimitation?.Any() ?? false)
+            if (filter.Delimitation?.IsValid ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.GeoWithinPolygon(m => m.Location.Point, filter.Delimitation.ToTwoDimensionalArray()));
+                GeoJsonGeometry<GeoJson2DGeographicCoordinates> geoJsonGeometry = null;
+
+                switch (filter.Delimitation.Geometry.Type?.ToLower())
+                {
+                    case "point":
+                        geoJsonGeometry = filter.Delimitation.Geometry.Coordinates[0].ToCircle(filter.Delimitation.Accuracy).ToGeoJsonGeometry();
+                        break;
+                    case "polygon":
+                        geoJsonGeometry = filter.Delimitation.Geometry.ToGeoJsonGeometry();
+                        break;
+                }
+
+                if (filter.Delimitation.UsePointAccuracy)
+                {
+               //     filters.Add(Builders<ProcessedSighting>.Filter.GeoIntersects(m => m.Location.PointWithBuffer, ((GeoJsonPolygon<GeoJson2DGeographicCoordinates>)geoJsonGeometry).ToTwoDimensionalArray()));
+                }
+                else
+                {
+                    filters.Add(Builders<ProcessedSighting>.Filter.GeoWithinPolygon(m => m.Location.Point, ((GeoJsonPolygon<GeoJson2DGeographicCoordinates>)geoJsonGeometry).ToTwoDimensionalArray()));
+                }
             }
 
             if (filter.EndDate.HasValue)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.Lte(m => m.Event.EndDate, filter.EndDate));
+                filters.Add(Builders<ProcessedSighting>.Filter.Lte(m => m.Event.EndDate, filter.EndDate.Value.ToUniversalTime()));
             }
 
             if (filter.OnlyValidated.HasValue && filter.OnlyValidated.Value.Equals(true))
@@ -42,6 +62,11 @@ namespace SOS.Lib.Extensions
             {
                 filters.Add(
                     Builders<ProcessedSighting>.Filter.In(m => m.Location.Municipality.Id, filter.Municipalities));
+            }
+
+            if (filter.PositiveSightings.HasValue)
+            {
+                filters.Add(Builders<ProcessedSighting>.Filter.Eq(m => m.Occurrence.IsPositiveObservation, filter.PositiveSightings.Value));
             }
 
             if (filter.Provinces?.Any() ?? false)
@@ -61,7 +86,7 @@ namespace SOS.Lib.Extensions
 
             if (filter.StartDate.HasValue)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.Gte(m => m.Event.StartDate, filter.StartDate.Value));
+                filters.Add(Builders<ProcessedSighting>.Filter.Gte(m => m.Event.StartDate, filter.StartDate.Value.ToUniversalTime()));
             }
 
             if (filter.TaxonIds?.Any() ?? false)

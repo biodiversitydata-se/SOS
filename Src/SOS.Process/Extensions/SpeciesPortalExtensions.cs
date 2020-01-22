@@ -10,6 +10,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using  SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Process.Extensions
@@ -103,6 +104,7 @@ namespace SOS.Process.Extensions
                     Municipality = verbatim.Site?.Municipality?.ToProcessed(),
                     Parish = verbatim.Site?.Parish?.ToProcessed(),
                     Point = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(wgs84Point.Coordinate?.X ?? 0, wgs84Point.Coordinate?.Y ?? 0)),
+                    PointWithBuffer = new[] { wgs84Point.Coordinate?.X ?? 0, wgs84Point.Coordinate?.Y ?? 0 }.ToCircle(verbatim.Site?.Accuracy ?? 0)?.ToGeoJsonGeometry(),
                     Province = verbatim.Site?.Province?.ToProcessed(),
                     VerbatimLatitude = googleMercatorPoint.Coordinate.Y,
                     VerbatimLongitude = googleMercatorPoint.Coordinate.X,

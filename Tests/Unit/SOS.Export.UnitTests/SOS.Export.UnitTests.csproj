@@ -22,9 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="12.3.2" />
+    <PackageReference Include="CsvHelper" Version="13.0.0" />
     <PackageReference Include="FluentAssertions" Version="5.10.0" />
-    <PackageReference Include="Hangfire.Core" Version="1.7.8" />
+    <PackageReference Include="Hangfire.Core" Version="1.7.9" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.1" />

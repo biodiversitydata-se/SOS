@@ -16,14 +16,6 @@ namespace SOS.Lib.Models.DarwinCore
     public class DarwinCore : IEntity<ObjectId>
     {
         /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="provider"></param>
-        public DarwinCore(DataProvider provider)
-        {
-            Provider = provider;
-        }
-        /// <summary>
         /// Darwin Core term name: dcterms:accessRights.
         /// Information about who can access the resource or
         /// an indication of its security status.
@@ -241,12 +233,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// This property is currently not used.
         /// </summary>
         public string OwnerInstitutionCode { get; set; }
-
-        /// <summary>
-        /// Internal use. Provider of the data
-        /// </summary>
-        [JsonIgnore]
-        public DataProvider Provider { get; set; }
 
         /// <summary>
         /// Darwin Core term name: dcterms:references.

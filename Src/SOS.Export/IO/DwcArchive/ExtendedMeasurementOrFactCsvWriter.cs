@@ -74,12 +74,11 @@ namespace SOS.Export.IO.DwcArchive
             }
 
             await using var streamWriter = new StreamWriter(stream, null, -1, false);
-            var csvConfig = new Configuration
+            var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = true,
                 Delimiter = "\t", // tab
-                Encoding = System.Text.Encoding.UTF8,
-                CultureInfo = CultureInfo.InvariantCulture
+                Encoding = System.Text.Encoding.UTF8
             };
             using var csv = new CsvWriter(streamWriter, csvConfig);
 

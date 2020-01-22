@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Kul;
 
 namespace SOS.Process.Extensions
@@ -54,6 +56,7 @@ namespace SOS.Process.Extensions
                     Country = Country.Sweden,
                     Locality = verbatim.Locality,
                     Point = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(verbatim.DecimalLongitude, verbatim.DecimalLatitude)),
+                    PointWithBuffer = new[] { verbatim.DecimalLongitude, verbatim.DecimalLatitude }.ToCircle(verbatim.CoordinateUncertaintyInMeters ?? 0)?.ToGeoJsonGeometry(),
                     VerbatimLatitude = verbatim.DecimalLatitude,
                     VerbatimLongitude = verbatim.DecimalLongitude
                 },

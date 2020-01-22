@@ -359,6 +359,11 @@ namespace SOS.Lib.Models.Processed.Sighting
         public GeoJsonPoint<GeoJson2DGeographicCoordinates> Point { get; set; }
 
         /// <summary>
+        /// Point with accuracy buffer (WGS84)
+        /// </summary>
+        public GeoJsonGeometry<GeoJson2DGeographicCoordinates> PointWithBuffer { get; set; }
+
+        /// <summary>
         /// Darwin Core term name: pointRadiusSpatialFit.
         /// The ratio of the area of the point-radius
         /// (decimalLatitude, decimalLongitude,

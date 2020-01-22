@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CsvHelper;
+using CsvHelper.Configuration;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -194,7 +196,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
         {
             using var readMemoryStream = new MemoryStream(memoryStream.ToArray());
             using var streamReader = new StreamReader(readMemoryStream);
-            using var csvReader = new CsvReader(streamReader);
+            using var csvReader = new CsvReader(streamReader, new CsvConfiguration(CultureInfo.InvariantCulture));
             SetCsvConfigurations(csvReader);
             var records = csvReader.GetRecords<dynamic>().ToList();
             return records;
