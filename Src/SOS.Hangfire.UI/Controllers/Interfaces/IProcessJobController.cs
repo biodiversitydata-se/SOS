@@ -25,6 +25,24 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// <returns></returns>
         IActionResult RunProcessJob(int sources, bool toggleInstanceOnSuccess);
 
+        /// <summary>
+        /// Add daily process taxa job.
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult ScheduleDailyProcessTaxaJob([FromQuery] int hour, [FromQuery] int minute);
+        
+        /// <summary>
+        /// Run process taxa job.
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunProcessTaxaJob();
+        
+        /// <summary>
+        /// Run KUL process job.
+        /// </summary>
+        /// <returns></returns>
         IActionResult RunKulProcessJob();
     }
 }

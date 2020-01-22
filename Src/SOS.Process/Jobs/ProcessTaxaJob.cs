@@ -14,7 +14,7 @@ using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Jobs
 {
-    public class ProcessTaxaJob : IAddProcessedTaxaJob
+    public class ProcessTaxaJob : IProcessTaxaJob
     {
         private readonly ITaxonVerbatimRepository _taxonVerbatimRepository;
         private readonly ITaxonProcessedRepository _taxonProcessedRepository;

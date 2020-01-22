@@ -63,6 +63,42 @@ namespace SOS.Hangfire.UI.Controllers
             }
         }
 
+        /// <inheritdoc />
+        [HttpPost("Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult ScheduleDailyProcessTaxaJob([FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<IProcessTaxaJob>(nameof(ProcessTaxaJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("Process job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding Process job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunProcessTaxaJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IProcessTaxaJob>(job => job.RunAsync());
+                return new OkObjectResult("Started process job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Starting process job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
         [HttpPost("Kul/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

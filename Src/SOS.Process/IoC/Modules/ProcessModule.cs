@@ -63,6 +63,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();
             builder.RegisterType<CopyProviderDataJob>().As<ICopyProviderDataJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessJob>().As<IProcessJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessTaxaJob>().As<IProcessTaxaJob>().InstancePerLifetimeScope();
         }
     }
 }
