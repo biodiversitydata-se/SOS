@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.TaxonTree;
 using SOS.Process.Extensions;
 using SOS.Process.Jobs.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -33,26 +36,16 @@ namespace SOS.Process.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {
-            var taxa = new List<ProcessedTaxon>();
-            var skip = 0;
-            var tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
-
-            while (tmpTaxa?.Any() ?? false)
-            {
-                foreach (var taxon in tmpTaxa)
-                {
-                    taxa.Add(taxon.ToProcessedTaxon());
-                }
-
-                skip += tmpTaxa.Count();
-                tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
-            }
-
-            if (!taxa?.Any() ?? true)
+            var dwcTaxa = await GetDarwinCoreTaxaAsync();
+            if (!dwcTaxa?.Any() ?? true)
             {
                 _logger.LogDebug("Failed to get taxa");
                 return false;
             }
+
+            // Process taxa
+            var taxa = dwcTaxa.Select(m => m.ToProcessedTaxon());
+            CalculateHigherClassificationField(taxa);
 
             _logger.LogDebug("Start deleting data from inactive instance");
             if (!await _taxonProcessedRepository.DeleteCollectionAsync())
@@ -63,6 +56,40 @@ namespace SOS.Process.Jobs
 
             var result = await _taxonProcessedRepository.AddManyAsync(taxa);
             return result;
+        }
+
+        private async Task<IEnumerable<DarwinCoreTaxon>> GetDarwinCoreTaxaAsync()
+        {
+            var skip = 0;
+            var tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
+            var taxa = new List<DarwinCoreTaxon>();
+
+            while (tmpTaxa?.Any() ?? false)
+            {
+                taxa.AddRange(tmpTaxa);
+                skip += tmpTaxa.Count();
+                tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
+            }
+
+            return taxa;
+        }
+
+        /// <summary>
+        /// Calculate higher classification tree by creating a taxon tree and iterate
+        /// each nodes parents.
+        /// </summary>
+        /// <param name="taxa"></param>
+        private void CalculateHigherClassificationField(IEnumerable<ProcessedTaxon> taxa)
+        {
+            var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
+            var taxonById = taxa.ToDictionary(m => m.Id, m => m);
+            foreach (var treeNode in taxonTree.TreeNodeById.Values)
+            {
+                var parentNames = treeNode.AsParentsNodeIterator().Select(m => m.ScientificName);
+                var reversedParentNames = parentNames.Reverse();
+                string higherClassification = string.Join(" | ", reversedParentNames);
+                taxonById[treeNode.TaxonId].HigherClassification = higherClassification;
+            }
         }
     }
 }

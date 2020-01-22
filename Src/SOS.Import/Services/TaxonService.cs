@@ -57,7 +57,6 @@ namespace SOS.Import.Services
                 Dictionary<string, DarwinCoreTaxon> taxa = GetTaxonCoreData(zipArchive, csvFieldDelimiter);
                 AddVernacularNames(taxa, zipArchive, csvFieldDelimiter);
                 AddTaxonRelations(taxa, zipArchive, csvFieldDelimiter);
-                CalculateHigherClassificationField(taxa.Values.Select(m => m));
                 return taxa.Values;
             }
             catch (Exception e)
@@ -66,24 +65,6 @@ namespace SOS.Import.Services
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Calculate higher classification tree by creating a taxon tree and iterate
-        /// each nodes parents.
-        /// </summary>
-        /// <param name="taxa"></param>
-        private void CalculateHigherClassificationField(IEnumerable<DarwinCoreTaxon> taxa)
-        {
-            var taxonById = taxa.ToDictionary(m => m.Id, m => m);
-            var taxonTree = TaxonTreeFactory.CreateTaxonTree<DarwinCoreTaxon>(taxonById);
-            foreach (var treeNode in taxonTree.TreeNodeById.Values)
-            {
-                var parentNames = treeNode.AsParentsNodeIterator().Select(m => m.ScientificName);
-                var reversedParentNames = parentNames.Reverse();
-                string higherClassification = string.Join(" | ", reversedParentNames);
-                taxonById[treeNode.TaxonId].HigherClassification = higherClassification;
-            }
         }
 
         private string GetCsvFieldDelimiterFromMetaFile(ZipArchive zipArchive)

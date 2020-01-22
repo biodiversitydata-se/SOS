@@ -125,11 +125,11 @@ namespace SOS.Lib.Models.TaxonTree
             return tree;
         }
 
-        public static Dictionary<int, TaxonTreeNode<IBasicTaxon>> CreateTaxonTreeNodeDictionary(Dictionary<int, IBasicTaxon> taxaById)
+        public static Dictionary<int, TaxonTreeNode<IBasicTaxon>> CreateTaxonTreeNodeDictionary(Dictionary<int, IBasicTaxon> taxonById)
         {
             var treeNodeById = new Dictionary<int, TaxonTreeNode<IBasicTaxon>>();
 
-            foreach (var taxon in taxaById.Values)
+            foreach (var taxon in taxonById.Values)
             {
                 if (!treeNodeById.TryGetValue(taxon.Id, out var treeNode))
                 {
@@ -144,8 +144,8 @@ namespace SOS.Lib.Models.TaxonTree
                     {
                         parentNode = new TaxonTreeNode<IBasicTaxon>(
                             taxon.ParentDyntaxaTaxonId.Value,
-                            taxaById[taxon.ParentDyntaxaTaxonId.Value].ScientificName,
-                            taxaById[taxon.ParentDyntaxaTaxonId.Value]);
+                            taxonById[taxon.ParentDyntaxaTaxonId.Value].ScientificName,
+                            taxonById[taxon.ParentDyntaxaTaxonId.Value]);
                         treeNodeById.Add(taxon.ParentDyntaxaTaxonId.Value, parentNode);
                     }
 
@@ -163,8 +163,8 @@ namespace SOS.Lib.Models.TaxonTree
                         {
                             secondaryParentNode = new TaxonTreeNode<IBasicTaxon>(
                                 secondaryParentTaxonId,
-                                taxaById[secondaryParentTaxonId].ScientificName,
-                                taxaById[secondaryParentTaxonId]);
+                                taxonById[secondaryParentTaxonId].ScientificName,
+                                taxonById[secondaryParentTaxonId]);
                             treeNodeById.Add(secondaryParentTaxonId, secondaryParentNode);
                         }
 
