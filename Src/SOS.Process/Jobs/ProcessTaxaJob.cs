@@ -14,16 +14,16 @@ using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Jobs
 {
-    public class AddProcessedTaxaJob : IAddProcessedTaxaJob
+    public class ProcessTaxaJob : IAddProcessedTaxaJob
     {
         private readonly ITaxonVerbatimRepository _taxonVerbatimRepository;
         private readonly ITaxonProcessedRepository _taxonProcessedRepository;
-        private readonly ILogger<AddProcessedTaxaJob> _logger;
+        private readonly ILogger<ProcessTaxaJob> _logger;
 
-        public AddProcessedTaxaJob(
+        public ProcessTaxaJob(
             ITaxonVerbatimRepository taxonVerbatimRepository,
             ITaxonProcessedRepository taxonProcessedRepository,
-            ILogger<AddProcessedTaxaJob> logger)
+            ILogger<ProcessTaxaJob> logger)
         {
             _taxonVerbatimRepository = taxonVerbatimRepository ?? throw new ArgumentNullException(nameof(taxonVerbatimRepository));
             _taxonProcessedRepository = taxonProcessedRepository ?? throw new ArgumentNullException(nameof(taxonProcessedRepository));

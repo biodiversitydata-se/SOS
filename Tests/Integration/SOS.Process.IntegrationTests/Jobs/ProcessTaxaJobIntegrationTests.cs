@@ -17,7 +17,7 @@ using Xunit;
 
 namespace SOS.Process.IntegrationTests.Jobs
 {
-    public class AddProcessedTaxaJobIntegrationTests : TestBase
+    public class ProcessTaxaJobIntegrationTests : TestBase
     {
         [Fact]
         public async Task Runs_the_AddProcessedTaxaJob()
@@ -36,10 +36,10 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
             var taxonVerbatimRepository = new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
             var taxonProcessedRepository = new TaxonProcessedRepository(processClient, new NullLogger<TaxonProcessedRepository>());
-            var addProcessedTaxaJob = new AddProcessedTaxaJob(
+            var addProcessedTaxaJob = new ProcessTaxaJob(
                 taxonVerbatimRepository,
                 taxonProcessedRepository,
-                new NullLogger<AddProcessedTaxaJob>());
+                new NullLogger<ProcessTaxaJob>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
