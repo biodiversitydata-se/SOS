@@ -1,12 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Sighting;
 
 namespace SOS.Process.Repositories.Destination.Interfaces
 {
+    /// <summary>
+    /// Repository for retrieving processd taxa.
+    /// </summary>
     public interface ITaxonProcessedRepository: IProcessBaseRepository<ProcessedTaxon, int>
     {
-
+        /// <summary>
+        /// Gets all processed taxa.
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<ProcessedTaxon>> GetTaxaAsync();
     }
 }

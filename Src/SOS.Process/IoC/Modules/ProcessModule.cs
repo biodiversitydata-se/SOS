@@ -51,6 +51,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ProcessedSightingRepository>().As<IProcessedSightingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<InadequateItemRepository>().As<IInadequateItemRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonProcessedRepository>().As<ITaxonProcessedRepository>().InstancePerLifetimeScope();
 
             // Add factories
             builder.RegisterType<ClamPortalProcessFactory>().As<IClamPortalProcessFactory>().InstancePerLifetimeScope();

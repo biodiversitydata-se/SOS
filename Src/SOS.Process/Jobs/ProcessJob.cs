@@ -35,7 +35,7 @@ namespace SOS.Process.Jobs
         private readonly ISpeciesPortalProcessFactory _speciesPortalProcessFactory;
         private readonly IClamPortalProcessFactory _clamPortalProcessFactory;
         private readonly IKulProcessFactory _kulProcessFactory;
-        private readonly ITaxonVerbatimRepository _taxonVerbatimRepository;
+        private readonly ITaxonProcessedRepository _taxonProcessedRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly ILogger<ProcessJob> _logger;
 
@@ -48,7 +48,7 @@ namespace SOS.Process.Jobs
         /// <param name="clamPortalProcessFactory"></param>
         /// <param name="kulProcessFactory"></param>
         /// <param name="speciesPortalProcessFactory"></param>
-        /// <param name="taxonVerbatimRepository"></param>
+        /// <param name="taxonProcessedRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
         public ProcessJob(
@@ -58,7 +58,7 @@ namespace SOS.Process.Jobs
             IClamPortalProcessFactory clamPortalProcessFactory,
             IKulProcessFactory kulProcessFactory,
             ISpeciesPortalProcessFactory speciesPortalProcessFactory,
-            ITaxonVerbatimRepository taxonVerbatimRepository,
+            ITaxonProcessedRepository taxonProcessedRepository,
             IAreaHelper areaHelper,
             ILogger<ProcessJob> logger)
         {
@@ -68,7 +68,7 @@ namespace SOS.Process.Jobs
             _clamPortalProcessFactory = clamPortalProcessFactory ?? throw new ArgumentNullException(nameof(clamPortalProcessFactory));
             _kulProcessFactory = kulProcessFactory ?? throw new ArgumentNullException(nameof(kulProcessFactory));
             _speciesPortalProcessFactory = speciesPortalProcessFactory ?? throw new ArgumentNullException(nameof(speciesPortalProcessFactory));
-            _taxonVerbatimRepository = taxonVerbatimRepository ?? throw new ArgumentNullException(nameof(taxonVerbatimRepository));
+            _taxonProcessedRepository = taxonProcessedRepository ?? throw new ArgumentNullException(nameof(taxonProcessedRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -83,29 +83,16 @@ namespace SOS.Process.Jobs
                 // Create task list
                 _logger.LogDebug("Start getting taxa");
 
-                // Map out taxon id
-                var taxa = new Dictionary<int, ProcessedTaxon>();
-                var skip = 0;
-                var tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
-
-                while (tmpTaxa?.Any() ?? false)
-                {
-                    foreach (var taxon in tmpTaxa)
-                    {
-                        taxa.Add(taxon.Id, taxon.ToProcessedTaxon());
-                    }
-
-                    skip += tmpTaxa.Count();
-                    tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
-                }
-
+                // Get taxa
+                var taxa = await _taxonProcessedRepository.GetTaxaAsync();
+                
                 if (!taxa?.Any() ?? true)
                 {
                     _logger.LogDebug("Failed to get taxa");
-
                     return false;
                 }
 
+                var taxonById = taxa.ToDictionary(m => m.Id, m => m);
                 cancellationToken?.ThrowIfCancellationRequested();
                 _logger.LogDebug("Verify collection");
                
@@ -123,7 +110,7 @@ namespace SOS.Process.Jobs
                 // Add species portal import if first bit is set
                 if ((sources & (int)DataProvider.Artdatabanken) > 0)
                 {
-                    processTasks.Add(DataProvider.Artdatabanken, _speciesPortalProcessFactory.ProcessAsync(taxa, cancellationToken));
+                    processTasks.Add(DataProvider.Artdatabanken, _speciesPortalProcessFactory.ProcessAsync(taxonById, cancellationToken));
 
                     var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(APSightingVerbatim))) ?? new HarvestInfo(nameof(APSightingVerbatim), DataProvider.Artdatabanken, DateTime.MinValue);
 
@@ -135,7 +122,7 @@ namespace SOS.Process.Jobs
 
                 if ((sources & (int)DataProvider.ClamPortal) > 0)
                 {
-                    processTasks.Add(DataProvider.ClamPortal, _clamPortalProcessFactory.ProcessAsync(taxa, cancellationToken));
+                    processTasks.Add(DataProvider.ClamPortal, _clamPortalProcessFactory.ProcessAsync(taxonById, cancellationToken));
 
                     var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(ClamObservationVerbatim))) ?? new HarvestInfo(nameof(ClamObservationVerbatim), DataProvider.ClamPortal, DateTime.MinValue);
                     
@@ -147,7 +134,7 @@ namespace SOS.Process.Jobs
 
                 if ((sources & (int)DataProvider.KUL) > 0)
                 {
-                    processTasks.Add(DataProvider.KUL, _kulProcessFactory.ProcessAsync(taxa, cancellationToken));
+                    processTasks.Add(DataProvider.KUL, _kulProcessFactory.ProcessAsync(taxonById, cancellationToken));
 
                     var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(KulObservationVerbatim))) ?? new HarvestInfo(nameof(KulObservationVerbatim), DataProvider.KUL, DateTime.MinValue);
 

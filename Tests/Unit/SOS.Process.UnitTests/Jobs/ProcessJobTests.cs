@@ -31,7 +31,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IClamPortalProcessFactory> _clamPortalProcessFactory;
         private readonly Mock<IKulProcessFactory> _kulProcessFactory;
         private readonly Mock<ISpeciesPortalProcessFactory> _speciesPortalProcessFactory;
-        private readonly Mock<ITaxonVerbatimRepository> _taxonVerbatimRepository;
+        private readonly Mock<ITaxonProcessedRepository> _taxonProcessedRepository;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<ILogger<ProcessJob>> _loggerMock;
 
@@ -48,7 +48,7 @@ namespace SOS.Process.UnitTests.Jobs
             _clamPortalProcessFactory = new Mock<IClamPortalProcessFactory>();
             _kulProcessFactory = new Mock<IKulProcessFactory>();
             _speciesPortalProcessFactory = new Mock<ISpeciesPortalProcessFactory>();
-            _taxonVerbatimRepository = new Mock<ITaxonVerbatimRepository>();
+            _taxonProcessedRepository = new Mock<ITaxonProcessedRepository>();
             _areaHelper = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<ProcessJob>>();
         }
@@ -66,7 +66,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
                 _speciesPortalProcessFactory.Object,
-                _taxonVerbatimRepository.Object,
+                _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
@@ -77,7 +77,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
                 _speciesPortalProcessFactory.Object,
-                _taxonVerbatimRepository.Object,
+                _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("darwinCoreRepository");
@@ -89,7 +89,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
                 _speciesPortalProcessFactory.Object,
-                _taxonVerbatimRepository.Object,
+                _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processInfoRepository");
@@ -101,7 +101,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
                 _speciesPortalProcessFactory.Object,
-                _taxonVerbatimRepository.Object,
+                _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
@@ -113,7 +113,7 @@ namespace SOS.Process.UnitTests.Jobs
                 null,
                 _kulProcessFactory.Object,
                 _speciesPortalProcessFactory.Object,
-                _taxonVerbatimRepository.Object,
+                _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamPortalProcessFactory");
@@ -125,7 +125,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessFactory.Object,
                 null,
                 _speciesPortalProcessFactory.Object,
-                _taxonVerbatimRepository.Object,
+                _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("kulProcessFactory");
@@ -137,7 +137,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
                 null,
-                _taxonVerbatimRepository.Object,
+                _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesPortalProcessFactory");
@@ -161,7 +161,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
                 _speciesPortalProcessFactory.Object,
-                _taxonVerbatimRepository.Object,
+                _taxonProcessedRepository.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
@@ -173,7 +173,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
                 _speciesPortalProcessFactory.Object,
-                _taxonVerbatimRepository.Object,
+                _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
@@ -189,13 +189,11 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _taxonVerbatimRepository.Setup(r => r.GetBatchAsync(0))
+            _taxonProcessedRepository.Setup(r => r.GetTaxaAsync())
                 .ReturnsAsync(new []
                 {
-                    new DarwinCoreTaxon() {Id = 100024, ScientificName = "Canus Lupus"},
+                    new ProcessedTaxon() {Id = 100024, ScientificName = "Canus Lupus"},
                 });
-            _taxonVerbatimRepository.Setup(r => r.GetBatchAsync(1))
-                .ReturnsAsync(new List<DarwinCoreTaxon>());
 
             _darwinCoreRepository.Setup(r => r.VerifyCollectionAsync());
 
@@ -238,7 +236,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
                 _speciesPortalProcessFactory.Object,
-                _taxonVerbatimRepository.Object,
+                _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
 
@@ -273,7 +271,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
                 _speciesPortalProcessFactory.Object,
-                _taxonVerbatimRepository.Object,
+                _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
 
@@ -295,7 +293,7 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _taxonVerbatimRepository.Setup(r => r.GetBatchAsync(0))
+            _taxonProcessedRepository.Setup(r => r.GetTaxaAsync())
                 .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -307,7 +305,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
                 _speciesPortalProcessFactory.Object,
-                _taxonVerbatimRepository.Object,
+                _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
 
