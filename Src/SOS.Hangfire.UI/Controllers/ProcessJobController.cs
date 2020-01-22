@@ -64,7 +64,7 @@ namespace SOS.Hangfire.UI.Controllers
         }
 
         /// <inheritdoc />
-        [HttpPost("Daily")]
+        [HttpPost("Taxa/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult ScheduleDailyProcessTaxaJob([FromQuery]int hour, [FromQuery]int minute)
@@ -82,7 +82,7 @@ namespace SOS.Hangfire.UI.Controllers
         }
 
         /// <inheritdoc />
-        [HttpPost("Run")]
+        [HttpPost("Taxa/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult RunProcessTaxaJob()

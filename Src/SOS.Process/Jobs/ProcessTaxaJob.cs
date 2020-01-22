@@ -44,7 +44,7 @@ namespace SOS.Process.Jobs
             }
 
             // Process taxa
-            var taxa = dwcTaxa.Select(m => m.ToProcessedTaxon());
+            var taxa = dwcTaxa.Select(m => m.ToProcessedTaxon()).ToList();
             CalculateHigherClassificationField(taxa);
 
             _logger.LogDebug("Start deleting data from inactive instance");

@@ -24,8 +24,8 @@ namespace SOS.Import.Services
                 return null;
             }
 
-            await using Stream zipFileContentStream = await result.Content.ReadAsStreamAsync();
-            return zipFileContentStream;
+            var bytes = await result.Content.ReadAsByteArrayAsync();
+            return new MemoryStream(bytes);
         }
     }
 }

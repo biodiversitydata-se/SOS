@@ -20,6 +20,7 @@ namespace SOS.Search.Service.Repositories
     /// </summary>
     public class ProcessedSightingRepository : BaseRepository<ProcessedSighting, ObjectId>, IProcessedSightingRepository
     {
+        private const int BiotaTaxonId = 0;
         private readonly ITaxonFactory _taxonFactory;
 
         /// <summary>
@@ -71,7 +72,14 @@ namespace SOS.Search.Service.Repositories
         {
             if (filter.SearchUnderlyingTaxa && filter.TaxonIds != null && filter.TaxonIds.Any())
             {
-                filter.TaxonIds = _taxonFactory.TaxonTree.GetUnderlyingTaxonIds(filter.TaxonIds, true);
+                if (filter.TaxonIds.Contains(BiotaTaxonId)) // If Biota, then clear taxon filter
+                {
+                    filter.TaxonIds = new List<int>();
+                }
+                else
+                {
+                    filter.TaxonIds = _taxonFactory.TaxonTree.GetUnderlyingTaxonIds(filter.TaxonIds, true);
+                }
             }
 
             return filter;

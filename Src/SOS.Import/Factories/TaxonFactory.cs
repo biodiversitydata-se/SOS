@@ -53,7 +53,7 @@ namespace SOS.Import.Factories
             {
                 _logger.LogDebug("Start storing taxa verbatim");
                 var taxa = await _taxonService.GetTaxaAsync();
-                await PopulateDynamicPropertiesAsync(taxa);
+                await AddTaxonAttributesAsync(taxa);
                 await _taxonVerbatimRepository.DeleteCollectionAsync();
                 await _taxonVerbatimRepository.AddCollectionAsync();
                 await _taxonVerbatimRepository.AddManyAsync(taxa);
@@ -79,7 +79,7 @@ namespace SOS.Import.Factories
         /// </summary>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        private async Task PopulateDynamicPropertiesAsync(IEnumerable<DarwinCoreTaxon> taxa)
+        private async Task AddTaxonAttributesAsync(IEnumerable<DarwinCoreTaxon> taxa)
         {
             if (!taxa?.Any() ?? true)
             {
