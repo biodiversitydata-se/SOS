@@ -20,11 +20,26 @@ namespace SOS.Process.IntegrationTests.Jobs
     public class ProcessTaxaJobIntegrationTests : TestBase
     {
         [Fact]
-        public async Task Runs_the_AddProcessedTaxaJob()
+        public async Task Runs_the_ProcessTaxaJob()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            var processTaxaJob = CreateProcessTaxaJob();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await processTaxaJob.RunAsync();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Should().BeTrue();
+        }
+
+        private ProcessTaxaJob CreateProcessTaxaJob()
+        {
             var processConfiguration = GetProcessConfiguration();
             var verbatimClient = new VerbatimClient(
                 processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
@@ -36,21 +51,12 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
             var taxonVerbatimRepository = new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
             var taxonProcessedRepository = new TaxonProcessedRepository(processClient, new NullLogger<TaxonProcessedRepository>());
-            var addProcessedTaxaJob = new ProcessTaxaJob(
+            var processTaxaJob = new ProcessTaxaJob(
                 taxonVerbatimRepository,
                 taxonProcessedRepository,
                 new NullLogger<ProcessTaxaJob>());
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await addProcessedTaxaJob.RunAsync();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
+            return processTaxaJob;
         }
-
     }
 }

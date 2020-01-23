@@ -26,14 +26,29 @@ namespace SOS.Import.IntegrationTests.Taxonomy
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            var taxonFactory = CreateTaxonFactory(@"Resources\dyntaxa.custom.dwca.zip");
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            HarvestInfo harvestInfo = await taxonFactory.HarvestAsync();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            harvestInfo.Status.Should().Be(RunStatus.Success);
+        }
+
+        private TaxonFactory CreateTaxonFactory(string filename)
+        {
             var importConfiguration = GetImportConfiguration();
             var importClient = new ImportClient(
                 importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
                 importConfiguration.MongoDbConfiguration.DatabaseName,
                 importConfiguration.MongoDbConfiguration.BatchSize);
             TaxonService taxonService = new TaxonService(
-                TaxonServiceProxyStubFactory.Create(@"Resources\dyntaxa.custom.dwca.zip").Object,
-                new TaxonServiceConfiguration { BaseAddress = "..." }, 
+                TaxonServiceProxyStubFactory.Create(filename).Object,
+                new TaxonServiceConfiguration { BaseAddress = "..." },
                 new NullLogger<TaxonService>());
 
             var taxonVerbatimRepository =
@@ -41,20 +56,11 @@ namespace SOS.Import.IntegrationTests.Taxonomy
 
             var taxonAttributeService = new TaxonAttributeService(
                 new HttpClientService(new NullLogger<HttpClientService>()),
-                new TaxonAttributeServiceConfiguration {BaseAddress = importConfiguration.TaxonAttributeServiceConfiguration.BaseAddress}, 
+                new TaxonAttributeServiceConfiguration { BaseAddress = importConfiguration.TaxonAttributeServiceConfiguration.BaseAddress },
                 new NullLogger<TaxonAttributeService>());
 
-            var sut = new TaxonFactory(taxonVerbatimRepository, taxonService, taxonAttributeService, new NullLogger<TaxonFactory>());
-        
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            HarvestInfo harvestInfo = await sut.HarvestAsync();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            harvestInfo.Status.Should().Be(RunStatus.Success);
+            var taxonFactory = new TaxonFactory(taxonVerbatimRepository, taxonService, taxonAttributeService, new NullLogger<TaxonFactory>());
+            return taxonFactory;
         }
     }
 }

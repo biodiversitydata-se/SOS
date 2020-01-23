@@ -30,8 +30,7 @@ namespace SOS.Import.IntegrationTests.Factories
                     importConfiguration.MongoDbConfiguration.DatabaseName,
                     importConfiguration.MongoDbConfiguration.BatchSize),
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
-            var processConfig = GetProcessConfiguration().ProcessedDbConfiguration;
-           
+
             var geoFactory = new GeoFactory(
                 new AreaRepository(speciesPortalDataService, new Mock<ILogger<AreaRepository>>().Object),
                 areaVerbatimRepository,
@@ -63,8 +62,6 @@ namespace SOS.Import.IntegrationTests.Factories
                     importConfiguration.MongoDbConfiguration.DatabaseName,
                     importConfiguration.MongoDbConfiguration.BatchSize),
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
-
-            var processConfig = GetProcessConfiguration().ProcessedDbConfiguration;
 
             var geoFactory = new GeoFactory(
                 new AreaRepository(speciesPortalDataService, new Mock<ILogger<AreaRepository>>().Object),
