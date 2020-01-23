@@ -23,6 +23,7 @@
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.0" />
     <PackageReference Include="Hangfire.Core" Version="1.7.9" />
+    <PackageReference Include="MessagePack" Version="2.0.335" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.1" />
@@ -40,6 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
     <ProjectReference Include="..\..\..\Src\SOS.Process\SOS.Process.csproj" />
     <ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
   </ItemGroup>

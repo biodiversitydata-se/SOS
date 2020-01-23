@@ -56,49 +56,5 @@ namespace SOS.Import.IntegrationTests.Taxonomy
             //-----------------------------------------------------------------------------------------------------------
             harvestInfo.Status.Should().Be(RunStatus.Success);
         }
-
-        [Fact]
-        public async Task Creates_a_taxon_tree_from_static_zipped_json_file()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var sp = Stopwatch.StartNew();
-            //var taxa = DarwinCoreTaxonFactory.CreateFromFile(@"Resources\AllTaxaInMongoDb.zip");
-            var taxa = DarwinCoreTaxonFactory.CreateFromFile(@"Resources\AllTaxaInMongoDbWithMinimalFields.zip");
-            sp.Stop();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var tree = TaxonTreeFactory.CreateTaxonTree<object>(taxa);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            tree.Root.ScientificName.Should().Be("Biota");
-        }
-
-        [Fact]
-        public async Task Creates_a_taxon_tree_from_static_messagepack_file()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var sp = Stopwatch.StartNew();
-            var taxa = DarwinCoreTaxonFactory.CreateFromMessagePackFile(@"Resources\AllTaxaInMongoDbWithMinimalFields.msgpck");
-            //var taxa = DarwinCoreTaxonFactory.CreateFromMessagePackFile(@"Resources\AllTaxaInMongoDb.msgpck");
-            sp.Stop();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var tree = TaxonTreeFactory.CreateTaxonTree<object>(taxa);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            tree.Root.ScientificName.Should().Be("Biota");
-        }
     }
 }
