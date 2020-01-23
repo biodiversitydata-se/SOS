@@ -41,9 +41,6 @@
     <None Update="Resources\AllBasicTaxa.msgpck">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\AllTaxaInMongoDbWithMinimalFields.msgpck">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

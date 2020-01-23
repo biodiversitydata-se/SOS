@@ -13,17 +13,17 @@ using Xunit;
 
 namespace SOS.Lib.UnitTests.Models.TaxonTree
 {
-    public class ProcessedBasicTaxonTreeTests : IClassFixture<ProcessedBasicTaxaFixture>
+    public class TaxonTreeTests : IClassFixture<ProcessedBasicTaxaFixture>
     {
         private readonly ProcessedBasicTaxaFixture _fixture;
 
-        public ProcessedBasicTaxonTreeTests(ProcessedBasicTaxaFixture fixture)
+        public TaxonTreeTests(ProcessedBasicTaxaFixture fixture)
         {
             _fixture = fixture;
         }
 
         [Fact]
-        public async Task Ichthyaetus_genus_has_5_underlying_taxa()
+        public void Ichthyaetus_genus_has_5_underlying_taxa()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
