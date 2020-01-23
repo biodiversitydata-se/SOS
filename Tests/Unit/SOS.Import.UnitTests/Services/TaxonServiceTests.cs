@@ -141,14 +141,14 @@ namespace SOS.Import.UnitTests.Services
             beechSpeciesTaxon.NomenclaturalStatus.Should().Be("valid");
             beechSpeciesTaxon.TaxonomicStatus.Should().Be("accepted");
             beechSpeciesTaxon.DynamicProperties.DyntaxaTaxonId.Should().Be(220778);
-            beechSpeciesTaxon.HigherClassification.Should().Be("Biota | Plantae | Viridiplantae | Streptophyta | Embryophyta | Tracheophyta | Euphyllophytina | Spermatophytae | Angiospermae | Magnoliopsida | Fagales | Fagaceae | Fagus");
+            beechSpeciesTaxon.HigherClassification.Should().BeNull("because this isn't calculated in this step. It is calculated in ProcessTaxa job.");
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert - Beech (bok) species has one recommended swedish vernacular name,
             //          two swedish synonyms and one english synonym
             //-----------------------------------------------------------------------------------------------------------
             var expectedBeechSpeciesTaxonVernacularNames = CreateExpectedBeechSpeciesTaxonVernacularNames();
-            beechSpeciesTaxon.DynamicProperties.VernacularNames.Should().BeEquivalentTo(expectedBeechSpeciesTaxonVernacularNames);
+            beechSpeciesTaxon.VernacularNames.Should().BeEquivalentTo(expectedBeechSpeciesTaxonVernacularNames);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert - Beech (bok) genus has one main parent and one secondary parent.
@@ -158,19 +158,17 @@ namespace SOS.Import.UnitTests.Services
             beechGenusTaxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds.Should().BeEquivalentTo(new List<int> { 6005257 }); // Organism group - Hardwood forest trees (ädellövträd)
         }
 
-
-        private List<TaxonVernacularName> CreateExpectedBeechSpeciesTaxonVernacularNames()
+        private List<DarwinCoreVernacularName> CreateExpectedBeechSpeciesTaxonVernacularNames()
         {
-            List<TaxonVernacularName> beechVernacularNames = new List<TaxonVernacularName>
+            var beechVernacularNames = new List<DarwinCoreVernacularName>
             {
-                new TaxonVernacularName { Name = "bok", Language = "sv", CountryCode = "SE", IsPreferredName = true },
-                new TaxonVernacularName { Name = "vanlig bok", Language = "sv", CountryCode = "SE", IsPreferredName = false },
-                new TaxonVernacularName { Name = "rödbok", Language = "sv", CountryCode = "SE", IsPreferredName = false },
-                new TaxonVernacularName { Name = "Beech", Language = "en", CountryCode = "GB", IsPreferredName = false }
+                new DarwinCoreVernacularName { VernacularName = "bok", Language = "sv", CountryCode = "SE", IsPreferredName = true, Source = "Dyntaxa. Svensk taxonomisk databas", TaxonID = "urn:lsid:dyntaxa.se:Taxon:220778", TaxonRemarks = ""},
+                new DarwinCoreVernacularName { VernacularName = "vanlig bok", Language = "sv", CountryCode = "SE", IsPreferredName = false, Source = "Dyntaxa. Svensk taxonomisk databas", TaxonID = "urn:lsid:dyntaxa.se:Taxon:220778", TaxonRemarks = "" },
+                new DarwinCoreVernacularName { VernacularName = "rödbok", Language = "sv", CountryCode = "SE", IsPreferredName = false, Source = "Dyntaxa. Svensk taxonomisk databas", TaxonID = "urn:lsid:dyntaxa.se:Taxon:220778", TaxonRemarks = "" },
+                new DarwinCoreVernacularName { VernacularName = "Beech", Language = "en", CountryCode = "GB", IsPreferredName = false, Source = "Dyntaxa. Svensk taxonomisk databas", TaxonID = "urn:lsid:dyntaxa.se:Taxon:220778", TaxonRemarks = "" }
             };
 
             return beechVernacularNames;
         }
-
     }
 }

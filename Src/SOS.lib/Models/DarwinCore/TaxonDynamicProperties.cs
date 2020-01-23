@@ -24,11 +24,6 @@ namespace SOS.Lib.Models.DarwinCore
         public IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }
 
         /// <summary>
-        /// Vernacular names.
-        /// </summary>
-        public IEnumerable<TaxonVernacularName> VernacularNames { get; set; }
-
-        /// <summary>
         /// Action plan
         /// </summary>
         public string ActionPlan { get; set; }

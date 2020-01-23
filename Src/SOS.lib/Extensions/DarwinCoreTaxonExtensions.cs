@@ -1,18 +1,24 @@
-﻿using SOS.Lib.Models.DarwinCore;
+﻿using System.Collections.Generic;
+using System.Linq;
+using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Processed.Sighting;
 
 namespace SOS.Lib.Extensions
 {
-    public static class TaxonExtensions
+    /// <summary>
+    /// Extensions for Darwin Core
+    /// </summary>
+    public static class DarwinCoreTaxonExtensions
     {
         public static ProcessedTaxon ToProcessedTaxon(this DarwinCoreTaxon sourceTaxon)
         {
             return new ProcessedTaxon
             {
-                DyntaxaTaxonId = sourceTaxon.DynamicProperties.DyntaxaTaxonId, 
+                DyntaxaTaxonId = sourceTaxon.DynamicProperties.DyntaxaTaxonId,
                 ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties.ParentDyntaxaTaxonId,
-                SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds, 
-                VernacularNames = sourceTaxon.DynamicProperties.VernacularNames,
+                SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds,
+                VernacularNames = sourceTaxon.VernacularNames?.ToTaxonVernacularNames(),
                 AcceptedNameUsage = sourceTaxon.AcceptedNameUsage,
                 AcceptedNameUsageID = sourceTaxon.AcceptedNameUsageID,
                 ActionPlan = sourceTaxon.DynamicProperties?.ActionPlan,
@@ -71,6 +77,32 @@ namespace SOS.Lib.Extensions
                 SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds,
                 Id = sourceTaxon.Id,
                 ScientificName = sourceTaxon.ScientificName
+            };
+        }
+
+        /// <summary>
+        /// Cast DarwinCoreVernacularNames to TaxonVernacularNames.
+        /// </summary>
+        /// <param name="darwinCoreVernacularNames"></param>
+        /// <returns></returns>
+        private static IEnumerable<TaxonVernacularName> ToTaxonVernacularNames(this IEnumerable<DarwinCoreVernacularName> darwinCoreVernacularNames)
+        {
+            return darwinCoreVernacularNames?.Select(m => m.ToTaxonVernacularName());
+        }
+
+        /// <summary>
+        /// Cast DarwinCoreVernacularName object to TaxonVernacularName.
+        /// </summary>
+        /// <param name="darwinCoreVernacularName"></param>
+        /// <returns></returns>
+        private static TaxonVernacularName ToTaxonVernacularName(this DarwinCoreVernacularName darwinCoreVernacularName)
+        {
+            return new TaxonVernacularName
+            {
+                CountryCode = darwinCoreVernacularName.CountryCode,
+                IsPreferredName = darwinCoreVernacularName.IsPreferredName,
+                Language = darwinCoreVernacularName.Language,
+                Name = darwinCoreVernacularName.VernacularName
             };
         }
     }

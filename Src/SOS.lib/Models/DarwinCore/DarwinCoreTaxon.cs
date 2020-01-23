@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.DarwinCore
@@ -341,5 +342,10 @@ namespace SOS.Lib.Models.DarwinCore
         /// A common or vernacular name.
         /// </summary>
         public string VernacularName { get; set; }
+
+        /// <summary>
+        /// Vernacular names that is used in the vernacular name extension.
+        /// </summary>
+        public IEnumerable<DarwinCoreVernacularName> VernacularNames { get; set; }
     }
 }
