@@ -12,7 +12,7 @@ namespace SOS.Search.Service.Factories
     /// </summary>
     public class SightingFactory : Interfaces.ISightingFactory
     {
-        private readonly IProcessedSightingRepository _processedDarwinCoreRepository;
+        private readonly IProcessedSightingRepository _processedSightingRepository;
 
         private readonly ILogger<SightingFactory> _logger;
 
@@ -25,7 +25,7 @@ namespace SOS.Search.Service.Factories
             IProcessedSightingRepository processedSightingRepository,
             ILogger<SightingFactory> logger)
         {
-            _processedDarwinCoreRepository = processedSightingRepository ??
+            _processedSightingRepository = processedSightingRepository ??
                                            throw new ArgumentNullException(nameof(processedSightingRepository));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -36,9 +36,9 @@ namespace SOS.Search.Service.Factories
         {
             try
             {
-                var processedDarwinCore = await _processedDarwinCoreRepository.GetChunkAsync(filter, skip, take);
+                var processedSightings = await _processedSightingRepository.GetChunkAsync(filter, skip, take);
                 
-                return processedDarwinCore;
+                return processedSightings;
             }
             catch (Exception e)
             {

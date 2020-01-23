@@ -13,7 +13,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// <summary>
         /// Activity property
         /// </summary>
-        public Metadata Activity { get; set; }
+        public MetadataWithCategory Activity { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of identifiers
