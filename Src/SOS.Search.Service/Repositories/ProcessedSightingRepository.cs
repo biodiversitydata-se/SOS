@@ -42,11 +42,16 @@ namespace SOS.Search.Service.Repositories
         /// <inheritdoc />
         public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
         {
+            SortDefinition<ProcessedSighting> sorting = string.IsNullOrEmpty(filter.SortBy) ? 
+                null : filter.SortDescending ? 
+                    Builders<ProcessedSighting>.Sort.Descending(filter.SortBy) : Builders<ProcessedSighting>.Sort.Ascending(x => x.Event.StartDate);
+
             if (filter?.OutputFields?.Any() ?? false)
             {
                 filter = PrepareFilter(filter);
                 var res = await MongoCollection
                     .Find(filter.ToFilterDefinition())
+                    .Sort(sorting)
                     .Project(filter.OutputFields.ToProjection())
                     .Skip(skip)
                     .Limit(take)
@@ -59,7 +64,7 @@ namespace SOS.Search.Service.Repositories
                 filter = PrepareFilter(filter);
                 var res = await MongoCollection
                     .Find(filter.ToFilterDefinition())
-                    // .Sort(Builders<DarwinCore<DynamicProperties>>.Sort.Descending("id"))
+                    .Sort(sorting)
                     .Skip(skip)
                     .Limit(take)
                     .ToListAsync();
