@@ -26,30 +26,12 @@ namespace SOS.Import.IntegrationTests.Taxonomy
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.MongoDbConfiguration.DatabaseName,
-                importConfiguration.MongoDbConfiguration.BatchSize);
-            TaxonService taxonService = new TaxonService(
-                TaxonServiceProxyStubFactory.Create(@"Resources\dyntaxa.custom.dwca.zip").Object,
-                new TaxonServiceConfiguration { BaseAddress = "..." }, 
-                new NullLogger<TaxonService>());
+            var taxonFactory = CreateTaxonFactory(@"Resources\dyntaxa.custom.dwca.zip");
 
-            var taxonVerbatimRepository =
-                new TaxonVerbatimRepository(importClient, new NullLogger<TaxonVerbatimRepository>());
-
-            var taxonAttributeService = new TaxonAttributeService(
-                new HttpClientService(new NullLogger<HttpClientService>()),
-                new TaxonAttributeServiceConfiguration {BaseAddress = importConfiguration.TaxonAttributeServiceConfiguration.BaseAddress}, 
-                new NullLogger<TaxonAttributeService>());
-
-            var sut = new TaxonFactory(taxonVerbatimRepository, taxonService, taxonAttributeService, new NullLogger<TaxonFactory>());
-        
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            HarvestInfo harvestInfo = await sut.HarvestAsync();
+            HarvestInfo harvestInfo = await taxonFactory.HarvestAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -57,48 +39,28 @@ namespace SOS.Import.IntegrationTests.Taxonomy
             harvestInfo.Status.Should().Be(RunStatus.Success);
         }
 
-        [Fact]
-        public async Task Creates_a_taxon_tree_from_static_zipped_json_file()
+        private TaxonFactory CreateTaxonFactory(string filename)
         {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var sp = Stopwatch.StartNew();
-            //var taxa = DarwinCoreTaxonFactory.CreateFromFile(@"Resources\AllTaxaInMongoDb.zip");
-            var taxa = DarwinCoreTaxonFactory.CreateFromFile(@"Resources\AllTaxaInMongoDbWithMinimalFields.zip");
-            sp.Stop();
+            var importConfiguration = GetImportConfiguration();
+            var importClient = new ImportClient(
+                importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
+                importConfiguration.MongoDbConfiguration.DatabaseName,
+                importConfiguration.MongoDbConfiguration.BatchSize);
+            TaxonService taxonService = new TaxonService(
+                TaxonServiceProxyStubFactory.Create(filename).Object,
+                new TaxonServiceConfiguration { BaseAddress = "..." },
+                new NullLogger<TaxonService>());
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var tree = TaxonTreeFactory.CreateTaxonTree<object>(taxa);
+            var taxonVerbatimRepository =
+                new TaxonVerbatimRepository(importClient, new NullLogger<TaxonVerbatimRepository>());
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            tree.Root.ScientificName.Should().Be("Biota");
-        }
+            var taxonAttributeService = new TaxonAttributeService(
+                new HttpClientService(new NullLogger<HttpClientService>()),
+                new TaxonAttributeServiceConfiguration { BaseAddress = importConfiguration.TaxonAttributeServiceConfiguration.BaseAddress },
+                new NullLogger<TaxonAttributeService>());
 
-        [Fact]
-        public async Task Creates_a_taxon_tree_from_static_messagepack_file()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var sp = Stopwatch.StartNew();
-            var taxa = DarwinCoreTaxonFactory.CreateFromMessagePackFile(@"Resources\AllTaxaInMongoDbWithMinimalFields.msgpck");
-            //var taxa = DarwinCoreTaxonFactory.CreateFromMessagePackFile(@"Resources\AllTaxaInMongoDb.msgpck");
-            sp.Stop();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var tree = TaxonTreeFactory.CreateTaxonTree<object>(taxa);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            tree.Root.ScientificName.Should().Be("Biota");
+            var taxonFactory = new TaxonFactory(taxonVerbatimRepository, taxonService, taxonAttributeService, new NullLogger<TaxonFactory>());
+            return taxonFactory;
         }
     }
 }

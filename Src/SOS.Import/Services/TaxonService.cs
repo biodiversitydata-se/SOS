@@ -225,10 +225,9 @@ namespace SOS.Import.Services
             {
                 if (vernacularNamesByTaxonId.TryGetValue(taxon.TaxonID, out var dwcVernacularNames))
                 {
-                    var taxonVernacularNames = dwcVernacularNames.ToTaxonVernacularNames();
-                    taxon.DynamicProperties.VernacularNames = taxonVernacularNames;
-                    taxon.VernacularName = taxonVernacularNames
-                        .FirstOrDefault(m => m.Language == "sv" && m.IsPreferredName)?.Name;
+                    taxon.VernacularNames = dwcVernacularNames;
+                    taxon.VernacularName = dwcVernacularNames
+                        .FirstOrDefault(m => m.Language == "sv" && m.IsPreferredName)?.VernacularName;
                 }
             }
         }

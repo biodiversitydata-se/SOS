@@ -17,19 +17,12 @@ namespace SOS.Export.IntegrationTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var exportConfiguration = GetExportConfiguration();
-            var exportClient = new ExportClient(
-                exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                exportConfiguration.MongoDbConfiguration.DatabaseName,
-                exportConfiguration.MongoDbConfiguration.BatchSize);
-            var sut = new ProcessedSightingRepository(
-                exportClient,
-                new NullLogger<ProcessedSightingRepository>());
+            var processedSightingRepository = GetProcessedSightingRepository();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var projectParameters = await sut.GetProjectParameters(new AdvancedFilter(), 0, 100);
+            var projectParameters = await processedSightingRepository.GetProjectParameters(new AdvancedFilter(), 0, 100);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -43,14 +36,7 @@ namespace SOS.Export.IntegrationTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var exportConfiguration = GetExportConfiguration();
-            var exportClient = new ExportClient(
-                exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                exportConfiguration.MongoDbConfiguration.DatabaseName,
-                exportConfiguration.MongoDbConfiguration.BatchSize);
-            var processedSightingRepository = new ProcessedSightingRepository(
-                exportClient,
-                new NullLogger<ProcessedSightingRepository>());
+            var processedSightingRepository = GetProcessedSightingRepository();
             var projectParameters = await processedSightingRepository.GetProjectParameters(new AdvancedFilter(), 0,100);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -62,6 +48,20 @@ namespace SOS.Export.IntegrationTests.Repositories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             extendedMeasurementOrFactRows.Should().NotBeEmpty();
+        }
+
+        private ProcessedSightingRepository GetProcessedSightingRepository()
+        {
+            var exportConfiguration = GetExportConfiguration();
+            var exportClient = new ExportClient(
+                exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
+                exportConfiguration.MongoDbConfiguration.DatabaseName,
+                exportConfiguration.MongoDbConfiguration.BatchSize);
+            ProcessedSightingRepository processedSightingRepository = new ProcessedSightingRepository(
+                exportClient,
+                new NullLogger<ProcessedSightingRepository>());
+
+            return processedSightingRepository;
         }
     }
 }

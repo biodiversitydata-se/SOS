@@ -17,7 +17,8 @@ namespace SOS.Lib.UnitTests.TestHelpers.Fixtures
     {
         public ProcessedBasicTaxaFixture()
         {
-            Taxa = DarwinCoreTaxonFactory.CreateFromMessagePackFile<ProcessedBasicTaxon>(@"Resources\AllBasicTaxa.msgpck");
+            Taxa = DarwinCoreTaxonFactory.CreateFromMessagePackFile<ProcessedBasicTaxon>(@"Resources\AllProcessedBasicTaxa.msgpck");
+            //Taxa = DarwinCoreTaxonFactory.CreateFromMessagePackFile<ProcessedBasicTaxon>(@"Resources\AllBasicTaxa.msgpck");
         }
 
         public void Dispose()

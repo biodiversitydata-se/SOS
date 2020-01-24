@@ -21,16 +21,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var processConfiguration = GetProcessConfiguration();
-            var verbatimClient = new VerbatimClient(
-                processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.VerbatimDbConfiguration.DatabaseName,
-                processConfiguration.VerbatimDbConfiguration.BatchSize);
-            AreaVerbatimRepository areaVerbatimRepository = new AreaVerbatimRepository(
-                verbatimClient,
-                new Mock<ILogger<AreaVerbatimRepository>>().Object);
-            var areaHelper = new AreaHelper(
-                areaVerbatimRepository);
+            var areaHelper = CreateAreaHelper();
             var observations = new List<ProcessedSighting>();
             var observation = new ProcessedSighting(DataProvider.Artdatabanken)
             {
@@ -54,6 +45,22 @@ namespace SOS.Process.IntegrationTests.Helpers
             observation.Location.Municipality.Should().Be("Tranås");
             observation.Location.Province.Should().Be("Småland");
             observation.Location.Parish.Should().Be("Tranås");
+        }
+
+        private AreaHelper CreateAreaHelper()
+        {
+            var processConfiguration = GetProcessConfiguration();
+            var verbatimClient = new VerbatimClient(
+                processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                processConfiguration.VerbatimDbConfiguration.DatabaseName,
+                processConfiguration.VerbatimDbConfiguration.BatchSize);
+            AreaVerbatimRepository areaVerbatimRepository = new AreaVerbatimRepository(
+                verbatimClient,
+                new Mock<ILogger<AreaVerbatimRepository>>().Object);
+            var areaHelper = new AreaHelper(
+                areaVerbatimRepository);
+
+            return areaHelper;
         }
     }
 }

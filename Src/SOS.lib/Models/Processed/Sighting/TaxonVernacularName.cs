@@ -1,4 +1,4 @@
-﻿namespace SOS.Lib.Models.Processed.DarwinCore
+﻿namespace SOS.Lib.Models.Processed.Sighting
 {
     public class TaxonVernacularName
     {

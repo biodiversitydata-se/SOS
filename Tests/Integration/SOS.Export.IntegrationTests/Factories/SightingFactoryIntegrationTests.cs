@@ -26,27 +26,7 @@ namespace SOS.Export.IntegrationTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var exportConfiguration = GetExportConfiguration();
-            var dwcArchiveFileWriter = new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
-                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()), 
-                    new FileService(), 
-                    new NullLogger<DwcArchiveFileWriter>());
-
-            var exportClient = new ExportClient(
-                exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                exportConfiguration.MongoDbConfiguration.DatabaseName,
-                exportConfiguration.MongoDbConfiguration.BatchSize);
-            SightingFactory sightingFactory = new SightingFactory(
-                dwcArchiveFileWriter,
-                new ProcessedSightingRepository(
-                    exportClient,
-                    new Mock<ILogger<ProcessedSightingRepository>>().Object),
-                new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object), 
-                new FileService(),
-                new Mock<IBlobStorageService>().Object,
-                new FileDestination { Path = exportConfiguration.FileDestination.Path },
-                new Mock<ILogger<SightingFactory>>().Object);
+            var sightingFactory = CreateSightingFactory();
             var filename = FilenameGenerator.CreateFilename("sos_dwc_archive_with_all_data");
 
             //-----------------------------------------------------------------------------------------------------------
@@ -58,6 +38,33 @@ namespace SOS.Export.IntegrationTests.Factories
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             result.Should().BeTrue();
+        }
+
+        private SightingFactory CreateSightingFactory()
+        {
+            var exportConfiguration = GetExportConfiguration();
+            var dwcArchiveFileWriter = new DwcArchiveFileWriter(
+                new DwcArchiveOccurrenceCsvWriter(new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new FileService(),
+                new NullLogger<DwcArchiveFileWriter>());
+
+            var exportClient = new ExportClient(
+                exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
+                exportConfiguration.MongoDbConfiguration.DatabaseName,
+                exportConfiguration.MongoDbConfiguration.BatchSize);
+            SightingFactory sightingFactory = new SightingFactory(
+                dwcArchiveFileWriter,
+                new ProcessedSightingRepository(
+                    exportClient,
+                    new Mock<ILogger<ProcessedSightingRepository>>().Object),
+                new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
+                new FileService(),
+                new Mock<IBlobStorageService>().Object,
+                new FileDestination { Path = exportConfiguration.FileDestination.Path },
+                new Mock<ILogger<SightingFactory>>().Object);
+
+            return sightingFactory;
         }
     }
 }
