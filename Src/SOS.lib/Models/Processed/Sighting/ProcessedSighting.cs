@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;

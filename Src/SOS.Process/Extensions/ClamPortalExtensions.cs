@@ -62,7 +62,7 @@ namespace SOS.Process.Extensions
                     Id = verbatim.LocationId,
                     Locality = verbatim.Locality,
                     Point = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(verbatim.DecimalLongitude, verbatim.DecimalLatitude)),
-                    PointWithBuffer = new [] { verbatim.DecimalLongitude, verbatim.DecimalLatitude }.ToCircle(verbatim.CoordinateUncertaintyInMeters ?? 0)?.ToGeoJsonGeometry(),
+                    PointWithBuffer = new [] { verbatim.DecimalLongitude, verbatim.DecimalLatitude }.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoJsonGeometry(),
                     Remarks = verbatim.LocationRemarks,
                     MaximumDepthInMeters = verbatim.MaximumDepthInMeters,
                     VerbatimLatitude = verbatim.DecimalLatitude,

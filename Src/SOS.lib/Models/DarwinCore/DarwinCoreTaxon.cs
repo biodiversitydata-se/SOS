@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.DarwinCore

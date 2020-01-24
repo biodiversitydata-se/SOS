@@ -69,16 +69,6 @@ namespace SOS.Lib.Models.Search
         public IEnumerable<string> RedListCategories { get; set; }
 
         /// <summary>
-        /// Sort descending if true, else ascending
-        /// </summary>
-        public bool SortDescending { get; set; }
-
-        /// <summary>
-        /// Sorting field
-        /// </summary>
-        public string SortBy { get; set; }
-
-        /// <summary>
         /// Gender to match
         /// </summary>
         public IEnumerable<int> Sex { get; set; }

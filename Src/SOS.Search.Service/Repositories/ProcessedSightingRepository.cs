@@ -10,6 +10,7 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Search;
+using SOS.Search.Service.Enum;
 using SOS.Search.Service.Factories.Interfaces;
 using SOS.Search.Service.Repositories.Interfaces;
 
@@ -39,12 +40,34 @@ namespace SOS.Search.Service.Repositories
             _taxonFactory = taxonFactory ?? throw new ArgumentNullException(nameof(taxonFactory));
         }
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
+        private AdvancedFilter PrepareFilter(AdvancedFilter filter)
         {
-            SortDefinition<ProcessedSighting> sorting = string.IsNullOrEmpty(filter.SortBy) ? 
-                null : filter.SortDescending ? 
-                    Builders<ProcessedSighting>.Sort.Descending(filter.SortBy) : Builders<ProcessedSighting>.Sort.Ascending(x => x.Event.StartDate);
+            if (filter.SearchUnderlyingTaxa && filter.TaxonIds != null && filter.TaxonIds.Any())
+            {
+                if (filter.TaxonIds.Contains(BiotaTaxonId)) // If Biota, then clear taxon filter
+                {
+                    filter.TaxonIds = new List<int>();
+                }
+                else
+                {
+                    filter.TaxonIds = _taxonFactory.TaxonTree.GetUnderlyingTaxonIds(filter.TaxonIds, true);
+                }
+            }
+
+            return filter;
+        }
+
+        private SortDefinition<ProcessedSighting> PrepareSorting(string sortBy, SearchSortOrder sortOrder)
+        {
+            return string.IsNullOrEmpty(sortBy) ?
+                null : sortOrder.Equals(SearchSortOrder.Desc) ?
+                    Builders<ProcessedSighting>.Sort.Descending(sortBy) : Builders<ProcessedSighting>.Sort.Ascending(sortBy);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder)
+        {
+            var sorting = PrepareSorting(sortBy, sortOrder);
 
             if (filter?.OutputFields?.Any() ?? false)
             {
@@ -69,25 +92,8 @@ namespace SOS.Search.Service.Repositories
                     .Limit(take)
                     .ToListAsync();
 
-                return res.ToDarwinCore();
+                return res;
             }
-        }
-
-        private AdvancedFilter PrepareFilter(AdvancedFilter filter)
-        {
-            if (filter.SearchUnderlyingTaxa && filter.TaxonIds != null && filter.TaxonIds.Any())
-            {
-                if (filter.TaxonIds.Contains(BiotaTaxonId)) // If Biota, then clear taxon filter
-                {
-                    filter.TaxonIds = new List<int>();
-                }
-                else
-                {
-                    filter.TaxonIds = _taxonFactory.TaxonTree.GetUnderlyingTaxonIds(filter.TaxonIds, true);
-                }
-            }
-
-            return filter;
         }
     }
 }

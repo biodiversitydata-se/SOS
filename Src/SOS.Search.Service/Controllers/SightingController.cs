@@ -4,8 +4,10 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Search;
 using SOS.Search.Service.Controllers.Interfaces;
+using SOS.Search.Service.Enum;
 using SOS.Search.Service.Factories.Interfaces;
 
 namespace SOS.Search.Service.Controllers
@@ -34,10 +36,12 @@ namespace SOS.Search.Service.Controllers
 
         /// <inheritdoc />
         [HttpPost("search")]
-        [ProducesResponseType(typeof(IEnumerable<dynamic>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<ProcessedSighting>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetChunkAsync([FromBody] AdvancedFilter filter, [FromQuery]int skip, [FromQuery]int take)
+        public async Task<IActionResult> GetChunkAsync([FromBody] AdvancedFilter filter, [FromQuery]int skip, [FromQuery]int take, 
+            [FromQuery]string sortBy, 
+            [FromQuery]SearchSortOrder sortOrder = SearchSortOrder.Asc)
         {
             try
             {
@@ -46,7 +50,7 @@ namespace SOS.Search.Service.Controllers
                     return new BadRequestResult();
                 }
 
-                return new OkObjectResult(await _sightingFactory.GetChunkAsync(filter, skip, take));
+                return new OkObjectResult(await _sightingFactory.GetChunkAsync(filter, skip, take, sortBy, sortOrder));
             }
             catch (Exception e)
             {

@@ -9,9 +9,9 @@ namespace SOS.Lib.Models.Search
     public class GeometryFilter
     {
         /// <summary>
-        /// Add buffer to geometry if greater than 0
+        /// Add buffer to geometry
         /// </summary>
-        public double Accuracy { get; set; }
+        public int? Accuracy { get; set; }
 
         /// <summary>
         /// Point or polygon geometry used for search

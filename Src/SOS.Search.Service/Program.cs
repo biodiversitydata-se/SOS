@@ -2,6 +2,7 @@
 using System.Linq;
 using System.IO;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -17,6 +18,8 @@ using SOS.Search.Service.Factories;
 using SOS.Search.Service.Factories.Interfaces;
 using SOS.Search.Service.Repositories;
 using SOS.Search.Service.Repositories.Interfaces;
+using SOS.Search.Service.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace SOS.Search.Service
 {
@@ -80,9 +83,14 @@ namespace SOS.Search.Service
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
+                    
                     // Add Mvc Core services
                     services.AddMvcCore(option => { option.EnableEndpointRouting = false; })
-                        .AddApiExplorer();
+                        .AddApiExplorer()
+                        .AddJsonOptions(options =>
+                            {
+                                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                            });
 
                     services.Configure<MongoDbConfiguration>(hostContext.Configuration.GetSection("MongoDbConfiguration"));
 
@@ -126,6 +134,8 @@ namespace SOS.Search.Service
                             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                            
                             options.IncludeXmlComments(xmlPath);
+
+                            options.SchemaFilter<SwaggerIgnoreFilter>();
                         });
 
                 })

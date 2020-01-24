@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MessagePack;
 using MessagePack.Resolvers;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using Newtonsoft.Json;
 using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Taxon;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Processed.DarwinCore;
-using SOS.Lib.Models.Search;
-using SOS.Lib.Models.TaxonTree;
 using SOS.TestHelpers.JsonConverters;
 using Xunit;
 
