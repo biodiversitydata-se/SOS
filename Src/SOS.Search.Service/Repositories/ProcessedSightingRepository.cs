@@ -42,19 +42,21 @@ namespace SOS.Search.Service.Repositories
 
         private AdvancedFilter PrepareFilter(AdvancedFilter filter)
         {
-            if (filter.SearchUnderlyingTaxa && filter.TaxonIds != null && filter.TaxonIds.Any())
+            AdvancedFilter preparedFilter = filter.Clone();
+
+            if (preparedFilter.SearchUnderlyingTaxa && preparedFilter.TaxonIds != null && preparedFilter.TaxonIds.Any())
             {
-                if (filter.TaxonIds.Contains(BiotaTaxonId)) // If Biota, then clear taxon filter
+                if (preparedFilter.TaxonIds.Contains(BiotaTaxonId)) // If Biota, then clear taxon filter
                 {
-                    filter.TaxonIds = new List<int>();
+                    preparedFilter.TaxonIds = new List<int>();
                 }
                 else
                 {
-                    filter.TaxonIds = _taxonFactory.TaxonTree.GetUnderlyingTaxonIds(filter.TaxonIds, true);
+                    preparedFilter.TaxonIds = _taxonFactory.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
                 }
             }
 
-            return filter;
+            return preparedFilter;
         }
 
         private SortDefinition<ProcessedSighting> PrepareSorting(string sortBy, SearchSortOrder sortOrder)

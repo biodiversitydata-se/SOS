@@ -88,5 +88,11 @@ namespace SOS.Lib.Models.Search
         /// for the hierarchical underlying taxa.
         /// </summary>
         public bool SearchUnderlyingTaxa { get; set; }
+
+        public AdvancedFilter Clone()
+        {
+            var advancedFilter = (AdvancedFilter)MemberwiseClone();
+            return advancedFilter;
+        }
     }
 }
