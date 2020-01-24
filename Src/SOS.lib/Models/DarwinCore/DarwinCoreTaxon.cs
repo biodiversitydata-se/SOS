@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.DarwinCore
