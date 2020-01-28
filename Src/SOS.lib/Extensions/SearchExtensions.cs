@@ -25,25 +25,21 @@ namespace SOS.Lib.Extensions
 
             if (filter.Delimitation?.IsValid ?? false)
             {
-                GeoJsonGeometry<GeoJson2DGeographicCoordinates> geoJsonGeometry = null;
+                var geoJsonGeometry = filter.Delimitation.Geometry.ToGeoJsonGeometry(); ;
 
-                switch (filter.Delimitation.Geometry.Type?.ToLower())
+                switch (geoJsonGeometry.Type)
                 {
-                    case "point":
-                        geoJsonGeometry = filter.Delimitation.Geometry.Coordinates[0].ToCircle(filter.Delimitation.Accuracy).ToGeoJsonGeometry();
+                    case GeoJsonObjectType.Point:
+                        filters.Add(Builders<ProcessedSighting>.Filter.Near(m => m.Location.Point, (GeoJsonPoint<GeoJson2DGeographicCoordinates>)geoJsonGeometry, filter.Delimitation.MaxDistanceFromPoint, 0.0 ));
                         break;
-                    case "polygon":
-                        geoJsonGeometry = filter.Delimitation.Geometry.ToGeoJsonGeometry();
+                    case GeoJsonObjectType.Polygon:
+                    case GeoJsonObjectType.MultiPolygon:
+                        filters.Add(filter.Delimitation.UsePointAccuracy ? 
+                            Builders<ProcessedSighting>.Filter.GeoIntersects(m => m.Location.PointWithBuffer, geoJsonGeometry)
+                            :
+                            Builders<ProcessedSighting>.Filter.GeoWithin(m => m.Location.Point, geoJsonGeometry));
+                        
                         break;
-                }
-
-                if (filter.Delimitation.UsePointAccuracy)
-                {
-                    filters.Add(Builders<ProcessedSighting>.Filter.GeoIntersects(m => m.Location.PointWithBuffer, (GeoJsonPolygon<GeoJson2DGeographicCoordinates>)geoJsonGeometry));
-                }
-                else
-                {
-                    filters.Add(Builders<ProcessedSighting>.Filter.GeoWithinPolygon(m => m.Location.Point, ((GeoJsonPolygon<GeoJson2DGeographicCoordinates>)geoJsonGeometry).ToTwoDimensionalArray()));
                 }
             }
 

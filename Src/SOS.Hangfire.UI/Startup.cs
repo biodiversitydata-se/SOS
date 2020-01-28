@@ -26,11 +26,20 @@ namespace SOS.Hangfire.UI
     /// </summary>
     public class Startup
     {
-        
+        /// <summary>
+        /// Configuration
+        /// </summary>
         public IConfiguration Configuration { get; }
 
+        /// <summary>
+        /// Auto fac
+        /// </summary>
         public ILifetimeScope AutofacContainer { get; private set; }
 
+        /// <summary>
+        /// Start up
+        /// </summary>
+        /// <param name="env"></param>
         public Startup(IHostingEnvironment env)
         {
             var environment = env.EnvironmentName.ToLower();

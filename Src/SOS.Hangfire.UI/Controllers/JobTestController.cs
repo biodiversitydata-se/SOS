@@ -9,6 +9,9 @@ using SOS.Core.Repositories;
 
 namespace SOS.Hangfire.UI.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class JobTestController : ControllerBase
@@ -17,6 +20,11 @@ namespace SOS.Hangfire.UI.Controllers
         private readonly string _mongoDbConnectionString;
         private readonly IBackgroundJobClient _client;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="repositorySettings"></param>
         public JobTestController(
             IBackgroundJobClient client,
             IRepositorySettings repositorySettings)

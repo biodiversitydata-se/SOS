@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using Microsoft.SqlServer.Types;
 using MongoDB.Driver.GeoJsonObjectModel;
 using ProjNet.CoordinateSystems;
@@ -74,6 +76,22 @@ namespace SOS.Lib.Extensions
         private static string GetCrsUrn(int srid)
         {
             return $"urn:ogc:def:crs:EPSG::{srid}";
+        }
+
+        /// <summary>
+        /// Cast array of array of array of double to polygon coordinates
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        private static GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates> ToGeoJsonPolygonCoordinates(this
+            IEnumerable<IEnumerable<IEnumerable<double>>> polygon)
+        {
+            var rings = polygon.Select(r =>
+                new GeoJsonLinearRingCoordinates<GeoJson2DGeographicCoordinates>(r.Select(p => new GeoJson2DGeographicCoordinates(p.ElementAt(0), p.ElementAt(1)))));
+
+            return new GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates>(
+                rings.FirstOrDefault(),
+                rings.Skip(1));
         }
 
         /// <summary>
@@ -186,23 +204,37 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Cast input geometry to geojson geometry
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        public static GeoJsonGeometry<GeoJson2DGeographicCoordinates> ToGeoJsonGeometry(this InputGeometry geometry)
+            /// Cast input geometry to geojson geometry
+            /// </summary>
+            /// <param name="geometry"></param>
+            /// <returns></returns>
+            public static GeoJsonGeometry<GeoJson2DGeographicCoordinates> ToGeoJsonGeometry(this InputGeometry geometry)
         {
             if (!geometry.IsValid)
             {
                 return null;
             }
-
+            
             switch (geometry.Type?.ToLower())
             {
                 case "point":
-                    return GeoJson.Point(GeoJson.Geographic(geometry.Coordinates[0][0], geometry.Coordinates[0][1]));
+                    var coordinates = geometry.Coordinates.ToArray().Select(p => ((JsonElement) p).GetDouble()).ToArray();
+                    return GeoJson.Point(GeoJson.Geographic(coordinates[0], coordinates[1]));
                 case "polygon":
-                    return GeoJson.Polygon(geometry.Coordinates.Select(c => new GeoJson2DGeographicCoordinates(c[0], c[1])).ToArray());
+                    var polygon = geometry.Coordinates.ToArray()
+                        .Select(ring =>
+                            ((JsonElement)ring).EnumerateArray().Select(point => point.EnumerateArray().Select(nmr => nmr.GetDouble())));
+
+                    return GeoJson.Polygon(polygon.ToGeoJsonPolygonCoordinates());
+                    
+                case "multipolygon":
+                   var multipolygon = geometry.Coordinates.ToArray()
+                        .Select(polygon => ((JsonElement)polygon).EnumerateArray()
+                            .Select(ring =>
+                                ring.EnumerateArray().Select(point => point.EnumerateArray().Select(nmr => nmr.GetDouble()))));
+
+                   return GeoJson.MultiPolygon(multipolygon.Select(p => p.ToGeoJsonPolygonCoordinates()).ToArray());
+
                 default:
                     return null;
             }
@@ -257,45 +289,6 @@ namespace SOS.Lib.Extensions
             var factory = new GeometryFactory();
             var wktReader = new WKTReader(factory);
             return wktReader.Read(sqlGeometry.STAsText().ToSqlString().ToString());
-        }
-
-        /// <summary>
-        /// Get coordinates as two dimensional array
-        /// </summary>
-        /// <param name="polygon"></param>
-        /// <returns></returns>
-        public static double[,] ToTwoDimensionalArray(this GeoJsonPolygon<GeoJson2DGeographicCoordinates> polygon)
-        {
-            if (!polygon?.Coordinates?.Exterior?.Positions?.Any() ?? true)
-            {
-                return null;
-            }
-
-            return polygon.Coordinates.Exterior.Positions.Select(p => new[] { p.Longitude, p.Latitude }).ToArray().ToTwoDimensionalArray();
-        }
-
-        /// <summary>
-        /// Get coordinates as two dimensional array
-        /// </summary>
-        /// <param name="polygon"></param>
-        /// <returns></returns>
-        public static double[,] ToTwoDimensionalArray(this double[][] coordinates)
-        {
-            if (!coordinates?.Any() ?? true)
-            {
-                return null;
-            }
-
-            var res = new double[coordinates.Length, coordinates.Max(x => x.Length)];
-            for (var i = 0; i < coordinates.Length; ++i)
-            {
-                for (var j = 0; j < coordinates[i].Length; ++j)
-                {
-                    res[i, j] = coordinates[i][j];
-                }
-            }
-
-            return res;
         }
 
         /// <summary>

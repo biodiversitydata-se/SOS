@@ -7,8 +7,15 @@ using NLog.Web;
 
 namespace SOS.Hangfire.UI
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// Main 
+        /// </summary>
+        /// <param name="args"></param>
         public static void Main(string[] args)
         {
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");

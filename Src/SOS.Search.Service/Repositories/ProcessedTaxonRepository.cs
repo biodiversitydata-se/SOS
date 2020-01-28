@@ -11,8 +11,17 @@ using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Repositories
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ProcessedTaxonRepository : BaseRepository<ProcessedTaxon, int>, IProcessedTaxonRepository
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="mongoClient"></param>
+        /// <param name="mongoDbConfiguration"></param>
+        /// <param name="logger"></param>
         public ProcessedTaxonRepository(
             IMongoClient mongoClient, 
             IOptions<MongoDbConfiguration> mongoDbConfiguration,

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Sighting;
 
 namespace SOS.Search.Service.Repositories.Interfaces
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public interface IProcessedTaxonRepository : IBaseRepository<ProcessedTaxon, int>
     {
         /// <summary>

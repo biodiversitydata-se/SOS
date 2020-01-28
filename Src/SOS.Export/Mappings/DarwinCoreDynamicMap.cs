@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using CsvHelper.Configuration;
 using SOS.Export.Enums;
 using SOS.Export.Helpers;
-using SOS.Export.IO.Csv;
 using SOS.Export.IO.Csv.Converters;
 using SOS.Export.Models;
-using SOS.Export.Models.DarwinCore;
 using SOS.Lib.Models.DarwinCore;
-using  SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Export.Mappings
 {
