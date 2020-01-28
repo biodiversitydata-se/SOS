@@ -29,6 +29,12 @@ namespace SOS.Search.Service.Repositories
         {
         }
 
+        /// <summary>
+        /// Get chunk of taxa
+        /// </summary>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<ProcessedBasicTaxon>> GetBasicTaxonChunkAsync(int skip, int take)
         {
             var res = await MongoCollection
@@ -48,7 +54,12 @@ namespace SOS.Search.Service.Repositories
             return res;
         }
 
-
+        /// <summary>
+        /// Get chunk of taxa
+        /// </summary>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<ProcessedTaxon>> GetChunkAsync(int skip, int take)
         {
             var res = await MongoCollection

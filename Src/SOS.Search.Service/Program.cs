@@ -19,7 +19,6 @@ using SOS.Search.Service.Factories.Interfaces;
 using SOS.Search.Service.Repositories;
 using SOS.Search.Service.Repositories.Interfaces;
 using SOS.Search.Service.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace SOS.Search.Service
 {

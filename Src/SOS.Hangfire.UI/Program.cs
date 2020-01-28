@@ -40,6 +40,11 @@ namespace SOS.Hangfire.UI
             }
         }
 
+        /// <summary>
+        /// Create a host builder
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())

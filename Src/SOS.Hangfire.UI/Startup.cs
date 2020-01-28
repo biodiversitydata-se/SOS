@@ -17,7 +17,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SOS.Core.Repositories;
 using SOS.Lib.Configuration.Shared;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace SOS.Hangfire.UI
 {
@@ -40,7 +39,7 @@ namespace SOS.Hangfire.UI
         /// Start up
         /// </summary>
         /// <param name="env"></param>
-        public Startup(IHostingEnvironment env)
+        public Startup(IWebHostEnvironment env)
         {
             var environment = env.EnvironmentName.ToLower();
 
@@ -62,7 +61,10 @@ namespace SOS.Hangfire.UI
         }
 
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// </summary>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
@@ -195,8 +197,16 @@ namespace SOS.Hangfire.UI
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public bool Authorize(DashboardContext context)
         {
             // Allow outside. You need an authentication scenario for this part.
