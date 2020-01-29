@@ -52,6 +52,9 @@
     <None Update="Resources\dyntaxa.custom.dwca.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\SourceSystems\ArtportalenActivityValues.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

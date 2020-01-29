@@ -1,0 +1,162 @@
+{
+	"Id": 0,
+	"Name": "GenderId",
+	"Values": [
+		{
+			"Id": 0,
+			"Description": "empty",
+			"Translations": [
+				{
+					"CultureCode": "sv-SE",
+					"Value": ""
+				},
+				{
+					"CultureCode": "en-GB",
+					"Value": ""
+				}
+			]
+		},
+		{
+			"Id": 1,
+			"Description": "male",
+			"Translations": [
+				{
+					"CultureCode": "sv-SE",
+					"Value": "hane"
+				},
+				{
+					"CultureCode": "en-GB",
+					"Value": "male"
+				}
+			]
+		},
+		{
+			"Id": 2,
+			"Description": "female",
+			"Translations": [
+				{
+					"CultureCode": "sv-SE",
+					"Value": "hona"
+				},
+				{
+					"CultureCode": "en-GB",
+					"Value": "female"
+				}
+			]
+		},
+		{
+			"Id": 3,
+			"Description": "female coloured",
+			"Translations": [
+				{
+					"CultureCode": "sv-SE",
+					"Value": "honfärgad"
+				},
+				{
+					"CultureCode": "en-GB",
+					"Value": "female coloured"
+				}
+			]
+		},
+		{
+			"Id": 4,
+			"Description": "in pair",
+			"Translations": [
+				{
+					"CultureCode": "sv-SE",
+					"Value": "i par"
+				},
+				{
+					"CultureCode": "en-GB",
+					"Value": "in pair"
+				}
+			]
+		},
+		{
+			"Id": 5,
+			"Description": "worker",
+			"Translations": [
+				{
+					"CultureCode": "sv-SE",
+					"Value": "arbetare"
+				},
+				{
+					"CultureCode": "en-GB",
+					"Value": "worker"
+				}
+			]
+		},
+		{
+			"Id": 6,
+			"Description": "hermaphroditic",
+			"Translations": [
+				{
+					"CultureCode": "sv-SE",
+					"Value": "hermafrodit"
+				},
+				{
+					"CultureCode": "en-GB",
+					"Value": "hermaphroditic"
+				}
+			]
+		}
+	],
+	"DataProviderTypeFieldMappings": [
+		{
+			"Id": 0,
+			"Name": "Artportalen",
+			"Mappings": [
+				{
+					"Value": 0,
+					"SosId": 0
+				},
+				{
+					"Value": 1,
+					"SosId": 1
+				},
+				{
+					"Value": 2,
+					"SosId": 2
+				},
+				{
+					"Value": 3,
+					"SosId": 3
+				},
+				{
+					"Value": 4,
+					"SosId": 4
+				},
+				{
+					"Value": 5,
+					"SosId": 5
+				},
+				{
+					"Value": 6,
+					"SosId": 6
+				}
+			]
+		},
+		{
+			"Id": 1,
+			"Name": "DwC",
+			"Mappings": [
+				{
+					"Value": "male",
+					"SosId": 1
+				},
+				{
+					"Value": "female",
+					"SosId": 2
+				},
+				{
+					"Value": "hermaphrodite",
+					"SosId": 6
+				},
+				{
+					"Value": "undetermined",
+					"SosId": 0
+				}
+			]
+		}
+	]
+}
