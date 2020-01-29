@@ -26,6 +26,7 @@ namespace SOS.Process.Extensions
         /// <returns></returns>
         public static ProcessedSighting ToProcessed(this KulObservationVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
         {
+            var hasPosition = verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0;
             taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
             // todo - ProtectionLevel, CoordinateX_RT90, CoordinateY_RT90, CoordinateX_SWEREF99, CoordinateY_SWEREF99, CoordinateX, CoordinateY
             var obs = new ProcessedSighting(DataProvider.KUL)
@@ -55,8 +56,8 @@ namespace SOS.Process.Extensions
                     Continent = Continent.Europe,
                     Country = Country.Sweden,
                     Locality = verbatim.Locality,
-                    Point = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(verbatim.DecimalLongitude, verbatim.DecimalLatitude)),
-                    PointWithBuffer = new[] { verbatim.DecimalLongitude, verbatim.DecimalLatitude }.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoJsonGeometry(),
+                    Point = hasPosition ? new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(verbatim.DecimalLongitude, verbatim.DecimalLatitude)) : null,
+                    PointWithBuffer = hasPosition ? new[] { verbatim.DecimalLongitude, verbatim.DecimalLatitude }.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoJsonGeometry() : null,
                     VerbatimLatitude = verbatim.DecimalLatitude,
                     VerbatimLongitude = verbatim.DecimalLongitude
                 },

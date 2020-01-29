@@ -10,7 +10,6 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using  SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Process.Extensions
@@ -35,8 +34,9 @@ namespace SOS.Process.Extensions
 
             var taxonId = verbatim.TaxonId ?? -1;
 
-            var googleMercatorPoint = new Point(verbatim.Site?.XCoord ?? 0, verbatim.Site?.YCoord ?? 0);
-            var wgs84Point = googleMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+            var hasPosition = (verbatim.Site?.XCoord ?? 0) > 0 && (verbatim.Site?.YCoord ?? 0) > 0;
+            var googleMercatorPoint = hasPosition ? new Point(verbatim.Site.XCoord, verbatim.Site.YCoord) : null;
+            var wgs84Point = hasPosition ? googleMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84) : null;
 
             if (taxa.TryGetValue(taxonId, out var taxon))
             {
@@ -83,7 +83,7 @@ namespace SOS.Process.Extensions
                 },
                 InformationWithheld = "More information can be obtained from the Data Provider",
                 Institution = verbatim.OwnerOrganization,
-                IsInEconomicZoneOfSweden = verbatim.Site?.XCoord != 0 && verbatim.Site?.YCoord != 0, // Species portal validate all sightings, we rely on that validation as long it has coordinates
+                IsInEconomicZoneOfSweden = hasPosition, // Species portal validate all sightings, we rely on that validation as long it has coordinates
                 Language = Language.Swedish,
                 Location = new ProcessedLocation
                 {
@@ -92,8 +92,8 @@ namespace SOS.Process.Extensions
                     Country = Country.Sweden,
                     CountryCode = CountryCode.Sweden,
                     County = verbatim.Site?.County?.ToProcessed(),
-                    DecimalLatitude = wgs84Point.Coordinate?.Y ?? 0,
-                    DecimalLongitude = wgs84Point.Coordinate?.X ?? 0,
+                    DecimalLatitude = hasPosition ? wgs84Point.Coordinate.Y : 0,
+                    DecimalLongitude = hasPosition ? wgs84Point.Coordinate.X : 0,
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Locality = verbatim.Site?.Name,
                     Id = $"urn:lsid:artportalen.se:site:{verbatim.Site?.Id}",
@@ -103,11 +103,11 @@ namespace SOS.Process.Extensions
                     MinimumElevationInMeters = verbatim.MinHeight,
                     Municipality = verbatim.Site?.Municipality?.ToProcessed(),
                     Parish = verbatim.Site?.Parish?.ToProcessed(),
-                    Point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point.ToGeoJsonGeometry(),
-                    PointWithBuffer = new[] { wgs84Point.Coordinate?.X ?? 0, wgs84Point.Coordinate?.Y ?? 0 }.ToCircle(verbatim.Site?.Accuracy)?.ToGeoJsonGeometry(),
+                    Point = hasPosition ? (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point.ToGeoJsonGeometry() : null,
+                    PointWithBuffer = hasPosition ? new[] { wgs84Point.Coordinate.X, wgs84Point.Coordinate.Y }.ToCircle(verbatim.Site?.Accuracy)?.ToGeoJsonGeometry() : null,
                     Province = verbatim.Site?.Province?.ToProcessed(),
-                    VerbatimLatitude = googleMercatorPoint.Coordinate.Y,
-                    VerbatimLongitude = googleMercatorPoint.Coordinate.X,
+                    VerbatimLatitude = hasPosition ? googleMercatorPoint.Coordinate.Y : 0,
+                    VerbatimLongitude = hasPosition ? googleMercatorPoint.Coordinate.X : 0,
                     VerbatimCoordinateSystem = "EPSG:3857"
                 },
                 Modified = verbatim.EndDate ?? verbatim.ReportedDate,

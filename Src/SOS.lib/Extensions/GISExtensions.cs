@@ -183,21 +183,22 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static Geometry ToCircle(this double[] pointCoordinates, int? accuracy)
         {
-            if ((pointCoordinates?.Length ?? 0) != 2 || accuracy == null)
+           
+            if ((pointCoordinates?.Length ?? 0) != 2 || accuracy == null || accuracy < 0.0)
             {
                 return null;
             }
 
             var longitude = pointCoordinates[0];
             var latitude = pointCoordinates[1];
-            
+
             var wgs84Point = new Point(longitude, latitude);
 
             // Transform to SWEREF99 TM since it's in meters
             var sweRef99TMPoint = Transform(wgs84Point, CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
 
             // Add buffer to point to create a circle. If accuracy equals 0, add one meter in order to make a polygon. 
-            var circle = sweRef99TMPoint.Buffer((double)(accuracy == 0 ? 1 : accuracy));
+            var circle = sweRef99TMPoint.Buffer((double)(accuracy == 0 ? 10 : accuracy));
 
             // Transform back to WGS84
             return Transform(circle, CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
@@ -247,6 +248,11 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static GeoJsonGeometry<GeoJson2DGeographicCoordinates> ToGeoJsonGeometry(this Geometry geometry)
         {
+            if (geometry?.Coordinates == null)
+            {
+                return null;
+            }
+
             switch (geometry.OgcGeometryType)
             {
                 case OgcGeometryType.Point:
@@ -255,11 +261,11 @@ namespace SOS.Lib.Extensions
                     return GeoJson.Point(GeoJson.Geographic(point.X, point.Y));
                 case OgcGeometryType.LineString:
                     var lineString = (LineString)geometry;
-                    
+
                     return GeoJson.LineString(lineString.Coordinates.Select(p => GeoJson.Geographic(p.X, p.Y)).ToArray());
                 case OgcGeometryType.MultiLineString:
                     var multiLineString = (MultiLineString)geometry;
-                   
+
                     return GeoJson.MultiLineString(multiLineString.Geometries.Select(mls => GeoJson.LineStringCoordinates(mls.Coordinates.Select(p => GeoJson.Geographic(p.X, p.Y)).ToArray())).ToArray());
                 case OgcGeometryType.MultiPoint:
                     var multiPoint = (MultiPoint)geometry;
@@ -272,7 +278,7 @@ namespace SOS.Lib.Extensions
                 case OgcGeometryType.MultiPolygon:
                     var multiPolygon = (MultiPolygon)geometry;
 
-                    return GeoJson.MultiPolygon(multiPolygon.Geometries.Select(p => ((Polygon) p).MakeValid().ToGeoJsonPolygonCoordinates()).ToArray());
+                    return GeoJson.MultiPolygon(multiPolygon.Geometries.Select(p => ((Polygon)p).MakeValid().ToGeoJsonPolygonCoordinates()).ToArray());
                 default:
                     throw new ArgumentException($"Not handled geometry type: {geometry.GeometryType}");
             }
