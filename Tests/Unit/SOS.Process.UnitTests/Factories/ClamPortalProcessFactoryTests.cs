@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using Moq;
 using SOS.Lib.Enums;
 using  SOS.Lib.Models.DarwinCore;
@@ -90,7 +91,7 @@ namespace SOS.Process.UnitTests.Factories
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(0))
+            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty))
                 .ReturnsAsync(new [] { new ClamObservationVerbatim 
                 {
                     DyntaxaTaxonId = 0
@@ -162,7 +163,7 @@ namespace SOS.Process.UnitTests.Factories
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(0))
+            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty))
                 .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
             // Act

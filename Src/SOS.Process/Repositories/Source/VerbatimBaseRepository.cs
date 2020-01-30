@@ -61,14 +61,14 @@ namespace SOS.Process.Repositories.Source
         protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName);
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetBatchAsync(int skip)
+        public async Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId)
         {
             try
             {
+                
                 var res = await MongoCollection
-                    .Find(FilterDefinition<TEntity>.Empty)
-                    //.Sort(Builders<TEntity>.Sort.Descending("id"))
-                    .Skip(skip)
+                    .Find(Builders<TEntity>.Filter.Gt(e => e.Id, startId))
+                    .Sort(Builders<TEntity>.Sort.Ascending(e => e.Id))
                     .Limit(_batchSize)
                     .ToListAsync();
 

@@ -15,8 +15,8 @@ namespace SOS.Process.Repositories.Source.Interfaces
         /// <summary>
         /// Get entity batch
         /// </summary>
-        /// <param name="skip"></param>
+        /// <param name="startId"></param>
         /// <returns></returns>
-        Task<IEnumerable<TEntity>> GetBatchAsync(int skip);
+        Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId);
     }
 }

@@ -65,7 +65,7 @@ namespace SOS.Process.Factories
 
                 Logger.LogDebug("Previous processed KUL data deleted");
 
-                var verbatim = await _kulObservationVerbatimRepository.GetBatchAsync(0);
+                var verbatim = await _kulObservationVerbatimRepository.GetBatchAsync(string.Empty);
                 
                 if (!verbatim.Any())
                 {
@@ -78,8 +78,9 @@ namespace SOS.Process.Factories
 
                 var successCount = 0;
                 var verbatimCount = 0;
+                var count = verbatim.Count();
 
-                while (verbatim.Any())
+                while (count != 0)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
@@ -90,12 +91,12 @@ namespace SOS.Process.Factories
 
                     successCount += await ProcessRepository.AddManyAsync(processed);
 
-                    verbatimCount += verbatim.Count();
+                    verbatimCount += count;
+                    Logger.LogInformation($"KUL observations being processed, totalCount: {verbatimCount}");
 
                     // Fetch next batch
-                    verbatim = await _kulObservationVerbatimRepository.GetBatchAsync(verbatimCount + 1);
-                    
-                    Logger.LogInformation($"KUL observations being processed, totalCount: {verbatimCount}");
+                    verbatim = await _kulObservationVerbatimRepository.GetBatchAsync(verbatim.Last().Id);
+                    count = verbatim.Count();
                 }
 
                 Logger.LogDebug($"End KUL Verbatim observations process job. Success: true");

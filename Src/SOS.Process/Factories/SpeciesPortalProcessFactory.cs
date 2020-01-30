@@ -72,8 +72,8 @@ namespace SOS.Process.Factories
 
                 var successCount = 0;
                 var verbatimCount = 0;
-
-                while (verbatim.Any())
+                var count = verbatim.Count();
+                while (count != 0)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                    
@@ -81,12 +81,13 @@ namespace SOS.Process.Factories
 
                     successCount += await ProcessRepository.AddManyAsync(processedSightings);
 
-                    verbatimCount += verbatim.Count();
+                    verbatimCount += count;
+                    Logger.LogInformation($"Species Portal observations being processed, totalCount: {verbatimCount}");
 
                     // Fetch next batch
-                    verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(verbatimCount + 1);
-
-                    Logger.LogInformation($"Species Portal observations being processed, totalCount: {verbatimCount}");
+                    verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(verbatim.Last().Id);
+                    
+                    count = verbatim.Count();
                 }
 
                 runInfo.Count = successCount;
