@@ -19,21 +19,24 @@ namespace SOS.Process.Repositories.Source
         public FieldMappingVerbatimRepository(IVerbatimClient client,
             ILogger<FieldMappingVerbatimRepository> logger) : base(client, logger)
         {
-            BsonClassMap.RegisterClassMap<FieldMappingValue>();
-            BsonClassMap.RegisterClassMap<FieldMappingWithCategoryValue>();
+            if (!BsonClassMap.IsClassMapRegistered(typeof(FieldMappingValue)))
+            {
+                BsonClassMap.RegisterClassMap<FieldMappingValue>();
+                BsonClassMap.RegisterClassMap<FieldMappingWithCategoryValue>();
+            }
         }
 
         public async Task<IEnumerable<FieldMapping>> GetFieldMappingsAsync()
         {
             var skip = 0;
-            var fieldMappingsBatch = await GetBatchAsync(skip);
+            var fieldMappingsBatch = await GetBatchBySkipAsync(skip);
             var fieldMappings = new List<FieldMapping>();
 
             while (fieldMappingsBatch?.Any() ?? false)
             {
                 fieldMappings.AddRange(fieldMappingsBatch);
                 skip += fieldMappingsBatch.Count();
-                fieldMappingsBatch = await GetBatchAsync(skip);
+                fieldMappingsBatch = await GetBatchBySkipAsync(skip);
             }
 
             return fieldMappings;

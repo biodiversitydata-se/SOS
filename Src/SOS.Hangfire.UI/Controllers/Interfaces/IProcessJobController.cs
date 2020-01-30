@@ -38,7 +38,13 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         IActionResult RunProcessTaxaJob();
-        
+
+        /// <summary>
+        /// Run copy field mapping job.
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunCopyFieldMappingJob();
+
         /// <summary>
         /// Run KUL process job.
         /// </summary>

@@ -31,8 +31,11 @@ namespace SOS.Process.Repositories.Destination
             ILogger<ProcessedFieldMappingRepository> logger) 
             : base(client, true, logger)
         {
-            BsonClassMap.RegisterClassMap<FieldMappingValue>();
-            BsonClassMap.RegisterClassMap<FieldMappingWithCategoryValue>();
+            if (!BsonClassMap.IsClassMapRegistered(typeof(FieldMappingValue)))
+            {
+                BsonClassMap.RegisterClassMap<FieldMappingValue>();
+                BsonClassMap.RegisterClassMap<FieldMappingWithCategoryValue>();
+            }
         }
 
         public async Task<IEnumerable<FieldMapping>> GetFieldMappingsAsync()

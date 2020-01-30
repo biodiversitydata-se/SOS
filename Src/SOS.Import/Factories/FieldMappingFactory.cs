@@ -26,19 +26,19 @@ namespace SOS.Import.Factories
     /// </summary>
     public class FieldMappingFactory : Interfaces.IFieldMappingFactory { 
 
-        private readonly IFieldMappingResourceRepository _fieldMappingResourceRepository;
+        private readonly IFieldMappingRepository _fieldMappingRepository;
         private readonly ILogger<FieldMappingFactory> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="fieldMappingResourceRepository"></param>
+        /// <param name="fieldMappingRepository"></param>
         /// <param name="logger"></param>
         public FieldMappingFactory(
-            IFieldMappingResourceRepository fieldMappingResourceRepository,
+            IFieldMappingRepository fieldMappingRepository,
             ILogger<FieldMappingFactory> logger)
         {
-            _fieldMappingResourceRepository = fieldMappingResourceRepository ?? throw new ArgumentNullException(nameof(fieldMappingResourceRepository));
+            _fieldMappingRepository = fieldMappingRepository ?? throw new ArgumentNullException(nameof(fieldMappingRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -54,9 +54,9 @@ namespace SOS.Import.Factories
                 var genderFieldMapping = CreateFieldMappingFromFile(@"Resources\GenderFieldMapping.json");
                 var activityFieldMapping = CreateFieldMappingFromFile(@"Resources\ActivityFieldMapping.json");
                 var fieldMappings = new List<FieldMapping> { genderFieldMapping, activityFieldMapping };
-                await _fieldMappingResourceRepository.DeleteCollectionAsync();
-                await _fieldMappingResourceRepository.AddCollectionAsync();
-                await _fieldMappingResourceRepository.AddManyAsync(fieldMappings);
+                await _fieldMappingRepository.DeleteCollectionAsync();
+                await _fieldMappingRepository.AddCollectionAsync();
+                await _fieldMappingRepository.AddManyAsync(fieldMappings);
                 _logger.LogDebug("Finish storing field mappings");
             }
             catch (Exception e)

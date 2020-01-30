@@ -215,5 +215,25 @@ namespace SOS.Hangfire.UI.Controllers
             }
         }
         #endregion Taxon
+
+        #region FieldMapping
+        /// <inheritdoc />
+        [HttpPost("ImportFieldMapping/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunImportFieldMappingJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IFieldMappingImportJob>(job => job.RunAsync());
+                return new OkObjectResult("Started import field mapping job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running import field mapping job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        #endregion FieldMapping
     }
 }

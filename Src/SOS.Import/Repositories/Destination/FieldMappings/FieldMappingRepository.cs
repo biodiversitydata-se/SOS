@@ -10,7 +10,7 @@ namespace SOS.Import.Repositories.Destination.FieldMappings
     /// <summary>
     /// Field mapping repository.
     /// </summary>
-    public class FieldMappingRepository : VerbatimRepository<FieldMapping, int>, IFieldMappingResourceRepository
+    public class FieldMappingRepository : VerbatimRepository<FieldMapping, int>, IFieldMappingRepository
     {
         /// <summary>
         /// Constructor

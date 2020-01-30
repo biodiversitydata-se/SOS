@@ -61,14 +61,14 @@ namespace SOS.Process.Jobs
         private async Task<IEnumerable<DarwinCoreTaxon>> GetDarwinCoreTaxaAsync()
         {
             var skip = 0;
-            var tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
+            var tmpTaxa = await _taxonVerbatimRepository.GetBatchBySkipAsync(skip);
             var taxa = new List<DarwinCoreTaxon>();
 
             while (tmpTaxa?.Any() ?? false)
             {
                 taxa.AddRange(tmpTaxa);
                 skip += tmpTaxa.Count();
-                tmpTaxa = await _taxonVerbatimRepository.GetBatchAsync(skip);
+                tmpTaxa = await _taxonVerbatimRepository.GetBatchBySkipAsync(skip);
             }
 
             return taxa;

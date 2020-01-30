@@ -170,6 +170,7 @@ namespace SOS.Process.Extensions
                 Type = "Occurrence"
             };
             
+            
             obs.Occurrence.SexId = GetSosLookupId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Sex]);
             obs.Occurrence.ActivityId = GetSosLookupId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]);
             return obs;

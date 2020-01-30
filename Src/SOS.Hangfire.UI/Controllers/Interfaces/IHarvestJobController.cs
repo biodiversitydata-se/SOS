@@ -76,5 +76,11 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         IActionResult RunTaxonHarvestJob();
+
+        /// <summary>
+        /// Run import field mapping.
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunImportFieldMappingJob();
     }
 }

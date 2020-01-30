@@ -6,7 +6,7 @@ namespace SOS.Import.Repositories.Destination.FieldMappings.Interfaces
     /// <summary>
     /// 
     /// </summary>
-    public interface IFieldMappingResourceRepository : IVerbatimRepository<FieldMapping, int>
+    public interface IFieldMappingRepository : IVerbatimRepository<FieldMapping, int>
     {
 
     }

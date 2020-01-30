@@ -11,20 +11,19 @@ namespace SOS.Import.Jobs
     /// <summary>
     /// Field mapping import job.
     /// </summary>
-    public class FieldMappingsImportJob : Interfaces.IFieldMappingImportJob
+    public class FieldMappingImportJob : Interfaces.IFieldMappingImportJob
     {
         private readonly IFieldMappingFactory _fieldMappingFactory;
-        private readonly ILogger<FieldMappingsImportJob> _logger;
+        private readonly ILogger<FieldMappingImportJob> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="fieldMappingFactory"></param>
         /// <param name="logger"></param>
-        public FieldMappingsImportJob(
-            
+        public FieldMappingImportJob(
             IFieldMappingFactory fieldMappingFactory,
-            ILogger<FieldMappingsImportJob> logger)
+            ILogger<FieldMappingImportJob> logger)
         {
             _fieldMappingFactory = fieldMappingFactory ?? throw new ArgumentNullException(nameof(fieldMappingFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
