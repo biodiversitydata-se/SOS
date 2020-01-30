@@ -38,6 +38,7 @@ namespace SOS.Process.Factories
         /// <inheritdoc />
         public async Task<RunInfo> ProcessAsync(
             IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, FieldMapping> fieldMappingById,
             IJobCancellationToken cancellationToken)
         {
             var runInfo = new RunInfo(DataProvider.KUL)
@@ -48,7 +49,7 @@ namespace SOS.Process.Factories
             try
             {
                 Logger.LogDebug("Start Processing Species Portal Verbatim");
-
+                var fieldMappings = GetFieldMappingsDictionary(VerbatimDataProviderTypeId.Artportalen, fieldMappingById);
                 if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider.Artdatabanken))
                 {
                     Logger.LogError("Failed to delete Species Portal data");
@@ -77,7 +78,7 @@ namespace SOS.Process.Factories
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                    
-                    var processedSightings = verbatim.ToProcessed(taxa).ToArray();
+                    var processedSightings = verbatim.ToProcessed(taxa, fieldMappings).ToArray();
 
                     successCount += await ProcessRepository.AddManyAsync(processedSightings);
 
@@ -108,6 +109,31 @@ namespace SOS.Process.Factories
             }
 
             return runInfo;
+        }
+
+        /// <summary>
+        /// Get field mappings for Artportalen.
+        /// </summary>
+        /// <param name="dataProviderTypeId"></param>
+        /// <param name="fieldMappingByFieldId"></param>
+        /// <returns></returns>
+        private IDictionary<FieldMappingFieldId, IDictionary<object, int>> GetFieldMappingsDictionary(
+            VerbatimDataProviderTypeId dataProviderTypeId,
+            IDictionary<int, FieldMapping> fieldMappingByFieldId)
+        {
+            var dic = new Dictionary<FieldMappingFieldId, IDictionary<object, int>>(); 
+
+            foreach (var pair in fieldMappingByFieldId)
+            {
+                var fieldMappings = pair.Value.DataProviderTypeFieldMappings.FirstOrDefault(m => m.Id == (int) dataProviderTypeId);
+                if (fieldMappings != null)
+                {
+                    var sosIdByValue = fieldMappings.Mappings.ToDictionary(m => (object)Convert.ToInt32(m.Value), m => m.SosId);
+                    dic.Add((FieldMappingFieldId)pair.Key, sosIdByValue);
+                }
+            }
+
+            return dic;
         }
     }
 }

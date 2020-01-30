@@ -13,6 +13,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using FluentAssertions;
 using Newtonsoft.Json;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 using Xunit;
@@ -43,15 +44,15 @@ namespace SOS.Import.IntegrationTests.TestDataTools
         {
             FieldMapping fieldMapping = new FieldMapping
             {
-                Id = 1,
-                Name = "ActivityId",
+                Id = (int)FieldMappingFieldId.Activity,
+                Name = FieldMappingFieldId.Activity.ToString(),
                 Values = fieldMappingValues,
                 DataProviderTypeFieldMappings = new List<DataProviderTypeFieldMapping>()
             };
             DataProviderTypeFieldMapping artportalenMappings = new DataProviderTypeFieldMapping
             {
-                Id = 0,
-                Name = "Artportalen",
+                Id = (int)VerbatimDataProviderTypeId.Artportalen,
+                Name = VerbatimDataProviderTypeId.Artportalen.ToString(),
                 Mappings = new List<DataProviderTypeFieldValueMapping>()
             };
             foreach (var fieldMappingValue in fieldMappingValues)
@@ -148,7 +149,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             return new FieldMappingValue
             {
                 Id = val.Id,
-
                 Description = val.Description,
                 Translations = val.Translations
             };

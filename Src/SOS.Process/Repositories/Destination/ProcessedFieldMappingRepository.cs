@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Processed.Sighting;
@@ -30,7 +31,8 @@ namespace SOS.Process.Repositories.Destination
             ILogger<ProcessedFieldMappingRepository> logger) 
             : base(client, true, logger)
         {
-
+            BsonClassMap.RegisterClassMap<FieldMappingValue>();
+            BsonClassMap.RegisterClassMap<FieldMappingWithCategoryValue>();
         }
 
         public async Task<IEnumerable<FieldMapping>> GetFieldMappingsAsync()

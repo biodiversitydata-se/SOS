@@ -8,6 +8,7 @@ using Moq;
 using SOS.Lib.Enums;
 using  SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 using SOS.Process.Factories;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -90,6 +91,11 @@ namespace SOS.Process.UnitTests.Factories
                 { 0, new ProcessedTaxon { Id = 0, TaxonId = "0", ScientificName = "Biota" } }
             };
 
+            var fieldMappingById = new Dictionary<int, FieldMapping>
+            {
+                {0, new FieldMapping {Id = 0, Name = "ActivityId"}}
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -98,7 +104,7 @@ namespace SOS.Process.UnitTests.Factories
                 _processedSightingRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(taxa, fieldMappingById, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -125,7 +131,7 @@ namespace SOS.Process.UnitTests.Factories
                 _processedSightingRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(null, null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -154,7 +160,7 @@ namespace SOS.Process.UnitTests.Factories
                 _processedSightingRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(null, null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

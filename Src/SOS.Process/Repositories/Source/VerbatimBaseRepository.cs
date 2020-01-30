@@ -82,6 +82,28 @@ namespace SOS.Process.Repositories.Source
             }
         }
 
+        /// <inheritdoc />
+        public async Task<IEnumerable<TEntity>> GetBatchBySkipAsync(int skip)
+        {
+            try
+            {
+                var res = await MongoCollection
+                    .Find(FilterDefinition<TEntity>.Empty)
+                    //.Sort(Builders<TEntity>.Sort.Descending("id"))
+                    .Skip(skip)
+                    .Limit(_batchSize)
+                    .ToListAsync();
+
+                return res;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+
+                return default;
+            }
+        }
+
         /// <summary>
         /// Dispose
         /// </summary>
