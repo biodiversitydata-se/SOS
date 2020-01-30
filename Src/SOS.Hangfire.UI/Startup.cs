@@ -17,7 +17,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SOS.Core.Repositories;
 using SOS.Lib.Configuration.Shared;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace SOS.Hangfire.UI
 {
@@ -26,12 +25,21 @@ namespace SOS.Hangfire.UI
     /// </summary>
     public class Startup
     {
-        
+        /// <summary>
+        /// Configuration
+        /// </summary>
         public IConfiguration Configuration { get; }
 
+        /// <summary>
+        /// Auto fac
+        /// </summary>
         public ILifetimeScope AutofacContainer { get; private set; }
 
-        public Startup(IHostingEnvironment env)
+        /// <summary>
+        /// Start up
+        /// </summary>
+        /// <param name="env"></param>
+        public Startup(IWebHostEnvironment env)
         {
             var environment = env.EnvironmentName.ToLower();
 
@@ -53,7 +61,10 @@ namespace SOS.Hangfire.UI
         }
 
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// </summary>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
@@ -70,7 +81,6 @@ namespace SOS.Hangfire.UI
                             Description = "An API to handle various processing jobs" //,
                             //TermsOfService = "None"
                         });
-                    options.DescribeAllEnumsAsStrings();
                     // Set the comments path for the Swagger JSON and UI.
                     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -186,8 +196,16 @@ namespace SOS.Hangfire.UI
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public bool Authorize(DashboardContext context)
         {
             // Allow outside. You need an authentication scenario for this part.

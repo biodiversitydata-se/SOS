@@ -11,6 +11,9 @@ using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Factories
 {
+    /// <summary>
+    /// Taxon factory
+    /// </summary>
     public class TaxonFactory : ITaxonFactory
     {
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
@@ -39,6 +42,9 @@ namespace SOS.Search.Service.Factories
             return taxonTree;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public TaxonTree<IBasicTaxon> TaxonTree
         {
             get

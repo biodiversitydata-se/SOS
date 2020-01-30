@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Search
@@ -9,9 +10,9 @@ namespace SOS.Lib.Models.Search
     public class GeometryFilter
     {
         /// <summary>
-        /// Add buffer to geometry if greater than 0
+        /// Add buffer to geometry
         /// </summary>
-        public double Accuracy { get; set; }
+        public double? MaxDistanceFromPoint { get; set; }
 
         /// <summary>
         /// Point or polygon geometry used for search
@@ -22,8 +23,8 @@ namespace SOS.Lib.Models.Search
         public InputGeometry Geometry { get; set; }
 
         public bool IsValid => (Geometry?.IsValid ?? false) && 
-                               (Geometry.Type.Equals("Point", StringComparison.CurrentCultureIgnoreCase) && Accuracy > 0 ||
-                                Geometry.Type.Equals("Polygon", StringComparison.CurrentCultureIgnoreCase) && Accuracy >= 0);
+                               (Geometry.Type.Equals("Point", StringComparison.CurrentCultureIgnoreCase) && MaxDistanceFromPoint > 0.0 ||
+                                new []{ "polygon", "multipolygon"}.Contains(Geometry.Type.ToLower()) && MaxDistanceFromPoint >= 0.0);
 
         /// <summary>
         /// If true, use Point accuracy when searching

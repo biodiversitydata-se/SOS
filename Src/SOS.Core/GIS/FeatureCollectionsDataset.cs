@@ -35,7 +35,7 @@ namespace SOS.Core.GIS
                     featureCollections = LoadFeatureCollections(filePaths);
                     break;
                 }
-                catch (IOException e) when (i <= NumberOfRetries) 
+                catch (IOException) when (i <= NumberOfRetries) 
                 {                                        
                     Thread.Sleep(rnd.Next(MinDelayOnRetry, MaxDelayOnRetry));
                 }

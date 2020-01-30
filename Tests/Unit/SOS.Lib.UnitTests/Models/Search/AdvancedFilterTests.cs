@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -24,11 +25,11 @@ namespace SOS.Lib.UnitTests.Models.Search
                 Counties = new[] {1, 2, 3},
                 Delimitation = new GeometryFilter
                 {
-                    Accuracy = 50,
+                    MaxDistanceFromPoint = 50,
                     UsePointAccuracy = true,
                     Geometry = new InputGeometry
                     {
-                        Coordinates = new[] {new double[] {1, 2}, new double[] {3, 4}}
+                        Coordinates = new ArrayList(){ new[] { new double[] { 1, 2 }, new double[] { 3, 4 } } } 
                     }
                 },
                 EndDate = currentDate
@@ -58,11 +59,11 @@ namespace SOS.Lib.UnitTests.Models.Search
                 Counties = new[] { 1, 2, 3 },
                 Delimitation = new GeometryFilter
                 {
-                    Accuracy = 50,
+                    MaxDistanceFromPoint = 50,
                     UsePointAccuracy = true,
                     Geometry = new InputGeometry
                     {
-                        Coordinates = new[] { new double[] { 1, 2 }, new double[] { 3, 4 } }
+                        Coordinates = new ArrayList(){ new[] { new double[] { 1, 2 }, new double[] { 3, 4 } } } 
                     }
                 },
                 EndDate = currentDate

@@ -5,7 +5,7 @@ using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using  SOS.Lib.Models.DarwinCore.Vocabulary;
+using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
@@ -25,6 +25,7 @@ namespace SOS.Process.Extensions
         /// <returns></returns>
         public static ProcessedSighting ToProcessed(this ClamObservationVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
         {
+            var hasPosition = verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0;
             taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
 
             return new ProcessedSighting(DataProvider.ClamPortal)
@@ -61,8 +62,8 @@ namespace SOS.Process.Extensions
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Id = verbatim.LocationId,
                     Locality = verbatim.Locality,
-                    Point = new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(verbatim.DecimalLongitude, verbatim.DecimalLatitude)),
-                    PointWithBuffer = new [] { verbatim.DecimalLongitude, verbatim.DecimalLatitude }.ToCircle(verbatim.CoordinateUncertaintyInMeters ?? 0)?.ToGeoJsonGeometry(),
+                    Point = hasPosition ? new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(verbatim.DecimalLongitude, verbatim.DecimalLatitude)) : null,
+                    PointWithBuffer = hasPosition ? new[] { verbatim.DecimalLongitude, verbatim.DecimalLatitude }.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoJsonGeometry() : null,
                     Remarks = verbatim.LocationRemarks,
                     MaximumDepthInMeters = verbatim.MaximumDepthInMeters,
                     VerbatimLatitude = verbatim.DecimalLatitude,

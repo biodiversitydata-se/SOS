@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver.GeoJsonObjectModel;
+using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.Processed.Sighting
 {
@@ -356,11 +357,13 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// <summary>
         /// Point (WGS84)
         /// </summary>
+        [JsonIgnore]
         public GeoJsonPoint<GeoJson2DGeographicCoordinates> Point { get; set; }
 
         /// <summary>
         /// Point with accuracy buffer (WGS84)
         /// </summary>
+        [JsonIgnore]
         public GeoJsonGeometry<GeoJson2DGeographicCoordinates> PointWithBuffer { get; set; }
 
         /// <summary>

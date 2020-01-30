@@ -83,7 +83,7 @@ namespace SOS.Process.Repositories.Destination
         private new IMongoCollection<ProcessedSighting> MongoCollection => Database.GetCollection<ProcessedSighting>(_collectionName);
 
         /// <inheritdoc />
-        public async Task<int> AddManyAsync(IEnumerable<ProcessedSighting> items)
+        public new async Task<int> AddManyAsync(IEnumerable<ProcessedSighting> items)
         {
             // Separate adequate and inadequate data
             var inadequateItems = Validate(ref items);

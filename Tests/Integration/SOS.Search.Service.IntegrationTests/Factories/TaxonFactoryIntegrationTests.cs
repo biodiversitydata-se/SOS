@@ -20,7 +20,7 @@ namespace SOS.Search.Service.IntegrationTests.Factories
     public class TaxonFactoryIntegrationTests : TestBase
     {
         [Fact]
-        public async Task A_taxon_tree_is_created_from_taxon_data_in_sos_processed_db()
+        public void A_taxon_tree_is_created_from_taxon_data_in_sos_processed_db()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange

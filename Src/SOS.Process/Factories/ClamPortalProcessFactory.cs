@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
@@ -86,7 +87,7 @@ namespace SOS.Process.Factories
             {
                 Logger.LogDebug("Start processing clams verbatim");
 
-                var verbatim = await _clamObservationVerbatimRepository.GetBatchAsync(0);
+                var verbatim = await _clamObservationVerbatimRepository.GetBatchAsync(ObjectId.Empty);
 
                 if (!verbatim.Any())
                 {
@@ -97,7 +98,8 @@ namespace SOS.Process.Factories
 
                 var successCount = 0;
                 var verbatimCount = 0;
-                while (verbatim.Any())
+                var count = verbatim.Count();
+                while (count != 0)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
@@ -107,12 +109,12 @@ namespace SOS.Process.Factories
                     _areaHelper.AddAreaDataToProcessed(processed);
 
                     successCount += await ProcessRepository.AddManyAsync(processed);
-                    verbatimCount += verbatim.Count();
-
+                    verbatimCount += count;
                     Logger.LogInformation($"Clam observations being processed, totalCount: {verbatimCount}");
 
                     // Fetch next batch
-                    verbatim = await _clamObservationVerbatimRepository.GetBatchAsync(verbatimCount + 1);
+                    verbatim = await _clamObservationVerbatimRepository.GetBatchAsync(verbatim.Last().Id);
+                    count = verbatim.Count();
                 }
 
                 runInfo.Count = successCount;

@@ -10,6 +10,7 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Search;
+using SOS.Search.Service.Enum;
 using SOS.Search.Service.Factories.Interfaces;
 using SOS.Search.Service.Repositories.Interfaces;
 
@@ -39,12 +40,36 @@ namespace SOS.Search.Service.Repositories
             _taxonFactory = taxonFactory ?? throw new ArgumentNullException(nameof(taxonFactory));
         }
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
+        private AdvancedFilter PrepareFilter(AdvancedFilter filter)
         {
-            SortDefinition<ProcessedSighting> sorting = string.IsNullOrEmpty(filter.SortBy) ? 
-                null : filter.SortDescending ? 
-                    Builders<ProcessedSighting>.Sort.Descending(filter.SortBy) : Builders<ProcessedSighting>.Sort.Ascending(x => x.Event.StartDate);
+            AdvancedFilter preparedFilter = filter.Clone();
+
+            if (preparedFilter.SearchUnderlyingTaxa && preparedFilter.TaxonIds != null && preparedFilter.TaxonIds.Any())
+            {
+                if (preparedFilter.TaxonIds.Contains(BiotaTaxonId)) // If Biota, then clear taxon filter
+                {
+                    preparedFilter.TaxonIds = new List<int>();
+                }
+                else
+                {
+                    preparedFilter.TaxonIds = _taxonFactory.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
+                }
+            }
+
+            return preparedFilter;
+        }
+
+        private SortDefinition<ProcessedSighting> PrepareSorting(string sortBy, SearchSortOrder sortOrder)
+        {
+            return string.IsNullOrEmpty(sortBy) ?
+                null : sortOrder.Equals(SearchSortOrder.Desc) ?
+                    Builders<ProcessedSighting>.Sort.Descending(sortBy) : Builders<ProcessedSighting>.Sort.Ascending(sortBy);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder)
+        {
+            var sorting = PrepareSorting(sortBy, sortOrder);
 
             if (filter?.OutputFields?.Any() ?? false)
             {
@@ -69,27 +94,8 @@ namespace SOS.Search.Service.Repositories
                     .Limit(take)
                     .ToListAsync();
 
-                return res.ToDarwinCore();
+                return res;
             }
-        }
-
-        private AdvancedFilter PrepareFilter(AdvancedFilter filter)
-        {
-            AdvancedFilter preparedFilter = filter.Clone();
-
-            if (preparedFilter.SearchUnderlyingTaxa && preparedFilter.TaxonIds != null && preparedFilter.TaxonIds.Any())
-            {
-                if (preparedFilter.TaxonIds.Contains(BiotaTaxonId)) // If Biota, then clear taxon filter
-                {
-                    preparedFilter.TaxonIds = new List<int>();
-                }
-                else
-                {
-                    preparedFilter.TaxonIds = _taxonFactory.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
-                }
-            }
-
-            return preparedFilter;
         }
     }
 }

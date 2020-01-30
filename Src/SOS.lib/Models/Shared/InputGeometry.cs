@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Linq;
 
 namespace SOS.Lib.Models.Shared
 {
@@ -7,13 +9,12 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         /// Geometry coordinates
         /// </summary>
-        public double[][] Coordinates { get; set; }
+        public ArrayList Coordinates { get; set; }
 
         /// <summary>
         /// Simple check to check if geometry looks ok
         /// </summary>
-        public bool IsValid => Type.Equals("Point", StringComparison.CurrentCultureIgnoreCase) && (Coordinates?.Length.Equals(1) ?? false) ||
-                               Type.Equals("Polygon", StringComparison.CurrentCultureIgnoreCase) && (Coordinates?.Length ?? 0) > 1;
+        public bool IsValid => new []{ "point", "polygon", "multipolygon"}.Contains(Type?.ToLower()) ;
 
         /// <summary>
         /// Type of geometry (point or polygon)

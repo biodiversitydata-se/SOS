@@ -9,6 +9,9 @@ using SOS.Core.Repositories;
 
 namespace SOS.Hangfire.UI.Controllers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class JobTestController : ControllerBase
@@ -17,6 +20,11 @@ namespace SOS.Hangfire.UI.Controllers
         private readonly string _mongoDbConnectionString;
         private readonly IBackgroundJobClient _client;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="repositorySettings"></param>
         public JobTestController(
             IBackgroundJobClient client,
             IRepositorySettings repositorySettings)
@@ -26,6 +34,11 @@ namespace SOS.Hangfire.UI.Controllers
             _mongoDbJobsDatabaseName = repositorySettings.JobsDatabaseName;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nrObservations"></param>
+        /// <returns></returns>
         [HttpPost("AddVerbatimTestDataProviderHarvestJob")]
         public ActionResult<IEnumerable<string>> AddVerbatimTestDataProviderHarvestJobRunOnce(int nrObservations)
         {
@@ -33,6 +46,10 @@ namespace SOS.Hangfire.UI.Controllers
             return Ok("VerbatimTestDataProvider observation harvest job added");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("AddVerbatimTestDataProviderProcessJob")]
         public ActionResult<IEnumerable<string>> AddVerbatimTestDataProviderProcessJob()
         {
@@ -40,7 +57,11 @@ namespace SOS.Hangfire.UI.Controllers
             return Ok("VerbatimTestDataProvider observation process job added");
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nrObservations"></param>
+        /// <returns></returns>
         [HttpPost("AddVerbatimTestDataProviderHarvestJobAndContinueWithProcessing")]
         public ActionResult<IEnumerable<string>> AddVerbatimTestDataProviderHarvestJobAndContinueWithProcessing(int nrObservations)
         {
@@ -52,6 +73,10 @@ namespace SOS.Hangfire.UI.Controllers
             return Ok("VerbatimTestDataProvider observation harvest job added with processing continuation");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("DropProcessedObservationCollection")]
         public ActionResult<string> DropProcessedObservationCollection()
         {
@@ -63,7 +88,10 @@ namespace SOS.Hangfire.UI.Controllers
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
 
         [HttpPost("AddSharkRecurringJobOnceEveryNight")]
         public ActionResult<IEnumerable<string>> AddSharkRecurringJobOnceEveryNight()
@@ -72,6 +100,10 @@ namespace SOS.Hangfire.UI.Controllers
             return Ok("Shark recurring job successfully added");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("AddSharkRecurringJobEveryMinute")]
         public ActionResult<IEnumerable<string>> AddSharkRecurringJobEveryMinute()
         {
@@ -79,6 +111,10 @@ namespace SOS.Hangfire.UI.Controllers
             return Ok("Shark recurring job successfully added");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("AddMvmRecurringJobEveryHour")]
         public ActionResult<IEnumerable<string>> AddMvmRecurringJobEveryHour()
         {

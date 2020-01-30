@@ -99,6 +99,7 @@ namespace SOS.Hangfire.UI.Controllers
             }
         }
 
+        /// <inheritdoc />
         [HttpPost("Kul/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

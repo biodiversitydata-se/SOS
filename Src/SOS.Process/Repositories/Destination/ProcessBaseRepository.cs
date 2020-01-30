@@ -116,7 +116,7 @@ namespace SOS.Process.Repositories.Destination
                 var updateResult = await MongoCollection.ReplaceOneAsync(
                     x => x.Id.Equals(id),
                     entity,
-                    new UpdateOptions { IsUpsert = true });
+                    new ReplaceOptions { IsUpsert = true });
                 return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
             }
             catch (Exception e)
@@ -357,7 +357,7 @@ namespace SOS.Process.Repositories.Destination
                 var updateResult = await MongoCollectionConfiguration.ReplaceOneAsync(
                     x => x.Id.Equals(config.Id),
                     config,
-                    new UpdateOptions { IsUpsert = true });
+                    new ReplaceOptions { IsUpsert = true });
 
                 return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
             }
