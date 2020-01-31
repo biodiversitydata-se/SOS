@@ -190,7 +190,7 @@ namespace SOS.Process.Repositories.Destination
 
             try
             {
-                await MongoCollection.InsertManyAsync(batch, new InsertManyOptions() { IsOrdered = false });
+                await MongoCollection.InsertManyAsync(batch, new InsertManyOptions() { IsOrdered = false, BypassDocumentValidation = true});
                 
                 return true;
             }

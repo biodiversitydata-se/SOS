@@ -103,22 +103,27 @@ namespace SOS.Import.Factories
                 var substrates = metaDataTasks[4].Result.ToVerbatims().ToDictionary(s => s.Id, s => s);
                 var units = metaDataTasks[5].Result.ToVerbatims().ToDictionary(u => u.Id, u => u);
                 var validationStatus = metaDataTasks[6].Result.ToVerbatims().ToDictionary(v => v.Id, v => v);
+                _logger.LogDebug("Finish getting meta data");
 
                 _logger.LogDebug("Start getting persons & organizations data");
                 var personByUserId = (await _personRepository.GetAsync()).ToVerbatims().ToDictionary(p => p.UserId, p => p);
                 var organizationById = (await _organizationRepository.GetAsync()).ToVerbatims().ToDictionary(o => o.Id, o => o);
+                _logger.LogDebug("Finish getting persons & organizations data");
 
                 _logger.LogDebug("Start getting species collection data");
                 var speciesCollections = (await _speciesCollectionRepository.GetAsync()).ToVerbatims().ToList();
+                _logger.LogDebug("Finish getting species collection data");
 
                 _logger.LogDebug("Start getting projects & project parameters");
                 var projectEntityById = (await _projectRepository.GetProjectsAsync()).ToDictionary(p => p.Id, p => p);
                 var projectParameterEntities = await _projectRepository.GetProjectParametersAsync();
                 var sightingProjectIds = await _sightingRepository.GetProjectIdsAsync();
                 cancellationToken?.ThrowIfCancellationRequested();
-   
-                _logger.LogDebug("Start getting sites");
+                _logger.LogDebug("Finish getting projects & project parameters");
+
+                _logger.LogDebug("Start getting sites and calculate positions in WGS84");
                 var sites = (await _siteRepository.GetAsync()).ToVerbatims().ToDictionary(s => s.Id, s => s);
+                _logger.LogDebug("Finish getting sites and calculate positions in WGS84");
 
                 // Make sure we have an empty collection
                 _logger.LogDebug("Empty collection");
@@ -185,6 +190,7 @@ namespace SOS.Import.Factories
                     // Calculate start of next chunk
                     minId += _speciesPortalConfiguration.ChunkSize;
                 }
+                _logger.LogDebug("Finish getting sightings");
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;
