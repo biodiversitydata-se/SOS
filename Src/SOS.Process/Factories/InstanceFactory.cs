@@ -35,15 +35,21 @@ namespace SOS.Process.Factories
                 Logger.LogDebug("Start deleting data from inactive instance");
                 if (!await ProcessRepository.DeleteProviderDataAsync(provider))
                 {
-                    Logger.LogError("Failed to delete clam portal data");
+                    Logger.LogError("Failed to delete from inactive instance");
                     return false;
                 }
+                Logger.LogDebug("Finish deleting data from inactive instance");
 
                 Logger.LogDebug("Start copying data from active to inactive instance");
                 if (await ProcessRepository.CopyProviderDataAsync(provider))
                 {
+                    Logger.LogDebug("Finish copying data from active to inactive instance");
+
                     Logger.LogDebug("Start copying metadata from active to inactive instance");
-                    return await _processInfoRepository.CopyProviderDataAsync(provider);
+                    var res =  await _processInfoRepository.CopyProviderDataAsync(provider);
+                    Logger.LogDebug("Finish copying metadata from active to inactive instance");
+
+                    return res;
                 }
 
                 return false;

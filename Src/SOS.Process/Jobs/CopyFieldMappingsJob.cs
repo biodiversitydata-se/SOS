@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Process.Extensions;
 using SOS.Process.Jobs.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -37,15 +34,17 @@ namespace SOS.Process.Jobs
                 return false;
             }
 
-            _logger.LogDebug("Start deleting data from inactive instance");
+            _logger.LogDebug("Start deleting field mappings from inactive instance");
             if (!await _fieldMappingProcessedRepository.DeleteCollectionAsync())
             {
                 _logger.LogError("Failed to delete field mappings data");
                 return false;
             }
+            _logger.LogDebug("Finish deleting field mappings from inactive instance");
 
-            var result = await _fieldMappingProcessedRepository.AddManyAsync(fieldMappings);
-            return result;
+            var success = await _fieldMappingProcessedRepository.AddManyAsync(fieldMappings);
+
+            return success ? true : throw new Exception("Copy field mappings job failed");
         }
     }
 }

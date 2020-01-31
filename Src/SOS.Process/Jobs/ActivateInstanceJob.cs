@@ -33,7 +33,8 @@ namespace SOS.Process.Jobs
             try
             {
                 // Activate passed instance
-                return await _instanceFactory.SetActiveInstanceAsync(instance);
+                var success = await _instanceFactory.SetActiveInstanceAsync(instance);
+                return success ? true : throw new Exception("Activate instance job failed");
             }
             catch (Exception e)
             {

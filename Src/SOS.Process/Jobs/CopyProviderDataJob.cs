@@ -34,7 +34,8 @@ namespace SOS.Process.Jobs
             try
             {
                 // Activate passed instance
-                return await _instanceFactory.CopyProviderDataAsync(provider);
+                var success =  await _instanceFactory.CopyProviderDataAsync(provider);
+                return success ? true : throw new Exception("Copy provider data job failed");
             }
             catch (Exception e)
             {

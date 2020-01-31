@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Lib.Enums;
@@ -47,18 +46,24 @@ namespace SOS.Import.Factories
                 _logger.LogDebug("Start getting areas");
 
                 var areas = (await _areaRepository.GetAsync()).ToVerbatims();
+                _logger.LogDebug("Finish getting areas");
 
-                _logger.LogDebug("Empty area collection");
+                _logger.LogDebug("Start preparing area collection");
                 // Make sure we have an empty collection
                 if (await _areaVerbatimRepository.DeleteCollectionAsync())
                 {
                     if (await _areaVerbatimRepository.AddCollectionAsync())
                     {
-                        _logger.LogDebug("Adding areas to db");
+                        _logger.LogDebug("Finish preparing area collection");
+                        _logger.LogDebug("Start adding areas");
                         if (await _areaVerbatimRepository.AddManyAsync(areas))
                         {
+                            _logger.LogDebug("Finish adding areas");
+
+                            _logger.LogDebug("Start creating area indexes");
                             await _areaVerbatimRepository.CreateIndexAsync();
-                            _logger.LogDebug("Succeeded adding areas");
+                            _logger.LogDebug("Finish creating area indexes");
+                            _logger.LogDebug("Adding areas succeeded");
 
                             // Update harvest info
                             harvestInfo.End = DateTime.Now;
@@ -73,7 +78,7 @@ namespace SOS.Import.Factories
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed aggregation of areas");
+                _logger.LogError(e, "Failed harvest of areas");
                 harvestInfo.Status = RunStatus.Failed;
             }
 

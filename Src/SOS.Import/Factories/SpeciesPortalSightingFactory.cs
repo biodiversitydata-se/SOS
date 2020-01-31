@@ -131,7 +131,7 @@ namespace SOS.Import.Factories
                 await _sightingVerbatimRepository.AddCollectionAsync();
 
                 var (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
-                _logger.LogDebug("Start getting sightings");
+                _logger.LogDebug("Start getting species portal sightings");
                 int nrSightingsHarvested = 0;
                 bool hasAddedTestSightings = false;
 
@@ -145,7 +145,7 @@ namespace SOS.Import.Factories
                         break;
                     }
 
-                    _logger.LogDebug($"Getting sightings from { minId } to { minId + _speciesPortalConfiguration.ChunkSize -1 }");
+                    _logger.LogDebug($"Getting species portal sightings from { minId } to { minId + _speciesPortalConfiguration.ChunkSize -1 }");
                     
                     // Get chunk of sightings
                     var sightings = (await _sightingRepository.GetChunkAsync(minId, _speciesPortalConfiguration.ChunkSize)).ToArray();
@@ -190,7 +190,7 @@ namespace SOS.Import.Factories
                     // Calculate start of next chunk
                     minId += _speciesPortalConfiguration.ChunkSize;
                 }
-                _logger.LogDebug("Finish getting sightings");
+                _logger.LogDebug("Finish getting species portal sightings");
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;

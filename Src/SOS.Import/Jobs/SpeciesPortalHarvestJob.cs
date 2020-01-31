@@ -46,7 +46,7 @@ namespace SOS.Import.Jobs
             await _harvestInfoRepository.AddOrUpdateAsync(result);
 
             // return result of all imports
-            return result.Status.Equals(RunStatus.Success);
+            return result.Status.Equals(RunStatus.Success) ? true : throw new Exception("Species Portal Harvest Job failed");
         }
     }
 }

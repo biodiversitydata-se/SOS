@@ -53,6 +53,7 @@ namespace SOS.Process.Factories
             };
             Logger.LogDebug("Start clam portal process job");
 
+            Logger.LogDebug("Start deleting clam portal data");
             if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider.ClamPortal))
             {
                 Logger.LogError("Failed to delete clam portal data");
@@ -61,8 +62,7 @@ namespace SOS.Process.Factories
                 runInfo.End = DateTime.Now;
                 return runInfo;
             }
-
-            Logger.LogDebug("Previous processed clam portal data deleted");
+            Logger.LogDebug("Finish deleting clam portal data");
 
             await ProcessClamsAsync(taxa, runInfo, cancellationToken);
 
@@ -117,6 +117,7 @@ namespace SOS.Process.Factories
                     verbatim = await _clamObservationVerbatimRepository.GetBatchAsync(verbatim.Last().Id);
                     count = verbatim.Count();
                 }
+                Logger.LogDebug("Finish processing clams verbatim");
 
                 runInfo.Count = successCount;
                 runInfo.End = DateTime.Now;

@@ -6,16 +6,13 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using  SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
-using SOS.Process.Extensions;
 using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs.Interfaces;
@@ -200,7 +197,7 @@ namespace SOS.Process.Jobs
                 _areaHelper.PersistCache();
 
                 // return result of all processing
-                return success;
+                return success ? true : throw new Exception("Process sightings job failed");
             }
             catch (JobAbortedException)
             {

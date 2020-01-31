@@ -37,7 +37,8 @@ namespace SOS.Import.Jobs
             var result = await _fieldMappingFactory.ImportAsync();
 
             _logger.LogDebug($"End Field Mapping Import Job. Result: {result}");
-            return result;
+
+            return result ? true : throw new Exception("Field Mapping Import Job failed");
         }
     }
 }
