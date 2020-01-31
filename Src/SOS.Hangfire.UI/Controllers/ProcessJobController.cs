@@ -100,6 +100,24 @@ namespace SOS.Hangfire.UI.Controllers
         }
 
         /// <inheritdoc />
+        [HttpPost("CopyFieldMapping/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunCopyFieldMappingJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<ICopyFieldMappingsJob>(job => job.RunAsync());
+                return new OkObjectResult("Started copy field mapping job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Starting copy field mapping job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
         [HttpPost("Kul/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

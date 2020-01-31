@@ -15,9 +15,13 @@ namespace SOS.Process.Factories.Interfaces
         /// Process sightings
         /// </summary>
         /// <param name="taxa"></param>
+        /// <param name="fieldMappingById"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<RunInfo> ProcessAsync(IDictionary<int, ProcessedTaxon> taxa, IJobCancellationToken cancellationToken);
+        Task<RunInfo> ProcessAsync(
+            IDictionary<int, ProcessedTaxon> taxa, 
+            IDictionary<int, FieldMapping> fieldMappingById,
+            IJobCancellationToken cancellationToken);
 
     }
 }

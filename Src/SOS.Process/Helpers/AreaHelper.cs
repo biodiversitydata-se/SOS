@@ -59,7 +59,7 @@ namespace SOS.Process.Helpers
                 return;
             }
 
-            var areas = await _areaVerbatimRepository.GetBatchAsync(0);
+            var areas = await _areaVerbatimRepository.GetBatchBySkipAsync(0);
             var count = areas.Count();
             var totalCount = count;
 
@@ -71,7 +71,7 @@ namespace SOS.Process.Helpers
                     _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
                 }
                 
-                areas = await _areaVerbatimRepository.GetBatchAsync(totalCount + 1);
+                areas = await _areaVerbatimRepository.GetBatchBySkipAsync(totalCount + 1);
                 count = areas.Count();
                 totalCount += count;
             }

@@ -16,6 +16,11 @@ namespace SOS.Lib.Models.Processed.Sighting
         public MetadataWithCategory Activity { get; set; }
 
         /// <summary>
+        /// Activity lookup value. This will replace Activity property when implementation of lookup values is finished.
+        /// </summary>
+        public ProcessedLookupValue ActivityId { get; set; }
+
+        /// <summary>
         /// A list (concatenated and separated) of identifiers
         /// (publication, global unique identifier, URI) of
         /// media associated with the Occurrence.
@@ -238,6 +243,11 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// Recommended best practice is to use a controlled vocabulary.
         /// </summary>
         public Metadata Sex { get; set; }
+
+        /// <summary>
+        /// Sex lookup value. This will replace Sex property when implementation of lookup values is finished.
+        /// </summary>
+        public ProcessedLookupValue SexId { get; set; }
 
         /// <summary>
         /// A statement about the presence or absence of a Taxon at a

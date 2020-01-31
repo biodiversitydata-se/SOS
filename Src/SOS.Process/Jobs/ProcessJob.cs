@@ -37,6 +37,7 @@ namespace SOS.Process.Jobs
         private readonly IKulProcessFactory _kulProcessFactory;
         private readonly ITaxonProcessedRepository _taxonProcessedRepository;
         private readonly IAreaHelper _areaHelper;
+        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly ILogger<ProcessJob> _logger;
 
         /// <summary>
@@ -49,6 +50,7 @@ namespace SOS.Process.Jobs
         /// <param name="kulProcessFactory"></param>
         /// <param name="speciesPortalProcessFactory"></param>
         /// <param name="taxonProcessedRepository"></param>
+        /// <param name="processedFieldMappingRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
         public ProcessJob(
@@ -59,6 +61,7 @@ namespace SOS.Process.Jobs
             IKulProcessFactory kulProcessFactory,
             ISpeciesPortalProcessFactory speciesPortalProcessFactory,
             ITaxonProcessedRepository taxonProcessedRepository,
+            IProcessedFieldMappingRepository processedFieldMappingRepository,
             IAreaHelper areaHelper,
             ILogger<ProcessJob> logger)
         {
@@ -69,6 +72,7 @@ namespace SOS.Process.Jobs
             _kulProcessFactory = kulProcessFactory ?? throw new ArgumentNullException(nameof(kulProcessFactory));
             _speciesPortalProcessFactory = speciesPortalProcessFactory ?? throw new ArgumentNullException(nameof(speciesPortalProcessFactory));
             _taxonProcessedRepository = taxonProcessedRepository ?? throw new ArgumentNullException(nameof(taxonProcessedRepository));
+            _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -85,12 +89,15 @@ namespace SOS.Process.Jobs
 
                 // Get taxa
                 var taxa = await _taxonProcessedRepository.GetTaxaAsync();
-                
                 if (!taxa?.Any() ?? true)
                 {
                     _logger.LogDebug("Failed to get taxa");
                     return false;
                 }
+
+                // Get field mappings
+                var fieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
+                var fieldMappingsById = fieldMappings.ToDictionary(m => m.Id, m => m);
 
                 var taxonById = taxa.ToDictionary(m => m.Id, m => m);
                 cancellationToken?.ThrowIfCancellationRequested();
@@ -110,7 +117,7 @@ namespace SOS.Process.Jobs
                 // Add species portal import if first bit is set
                 if ((sources & (int)DataProvider.Artdatabanken) > 0)
                 {
-                    processTasks.Add(DataProvider.Artdatabanken, _speciesPortalProcessFactory.ProcessAsync(taxonById, cancellationToken));
+                    processTasks.Add(DataProvider.Artdatabanken, _speciesPortalProcessFactory.ProcessAsync(taxonById, fieldMappingsById, cancellationToken));
 
                     var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(APSightingVerbatim))) ?? new HarvestInfo(nameof(APSightingVerbatim), DataProvider.Artdatabanken, DateTime.MinValue);
 
@@ -122,7 +129,7 @@ namespace SOS.Process.Jobs
 
                 if ((sources & (int)DataProvider.ClamPortal) > 0)
                 {
-                    processTasks.Add(DataProvider.ClamPortal, _clamPortalProcessFactory.ProcessAsync(taxonById, cancellationToken));
+                    processTasks.Add(DataProvider.ClamPortal, _clamPortalProcessFactory.ProcessAsync(taxonById, fieldMappingsById, cancellationToken));
 
                     var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(ClamObservationVerbatim))) ?? new HarvestInfo(nameof(ClamObservationVerbatim), DataProvider.ClamPortal, DateTime.MinValue);
                     
@@ -134,7 +141,7 @@ namespace SOS.Process.Jobs
 
                 if ((sources & (int)DataProvider.KUL) > 0)
                 {
-                    processTasks.Add(DataProvider.KUL, _kulProcessFactory.ProcessAsync(taxonById, cancellationToken));
+                    processTasks.Add(DataProvider.KUL, _kulProcessFactory.ProcessAsync(taxonById, fieldMappingsById, cancellationToken));
 
                     var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(KulObservationVerbatim))) ?? new HarvestInfo(nameof(KulObservationVerbatim), DataProvider.KUL, DateTime.MinValue);
 

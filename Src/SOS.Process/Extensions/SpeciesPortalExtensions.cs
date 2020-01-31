@@ -9,6 +9,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Process.Extensions
@@ -19,12 +20,31 @@ namespace SOS.Process.Extensions
     public static class SpeciesPortalExtensions
     {
         /// <summary>
+        /// Cast multiple sightings entities to models 
+        /// </summary>
+        /// <param name="verbatims"></param>
+        /// <param name="taxa"></param>
+        /// <param name="fieldMappings"></param>
+        /// <returns></returns>
+        public static ICollection<ProcessedSighting> ToProcessed(
+            this IEnumerable<APSightingVerbatim> verbatims,
+            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings)
+        {
+            return verbatims.Select(v => v.ToProcessed(taxa, fieldMappings)).ToArray();
+        }
+
+        /// <summary>
         /// Cast sighting verbatim to processed data model
         /// </summary>
         /// <param name="verbatim"></param>
         /// <param name="taxa"></param>
+        /// <param name="fieldMappings"></param>
         /// <returns></returns>
-        public static ProcessedSighting ToProcessed(this APSightingVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
+        public static ProcessedSighting ToProcessed(
+            this APSightingVerbatim verbatim, 
+            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings)
         {
             if (verbatim == null)
             {
@@ -146,19 +166,31 @@ namespace SOS.Process.Extensions
                 Taxon = taxon,
                 Type = "Occurrence"
             };
-
+            
+            
+            obs.Occurrence.SexId = GetSosLookupId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Sex]);
+            obs.Occurrence.ActivityId = GetSosLookupId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]);
             return obs;
         }
-        
+
         /// <summary>
-        /// Cast multiple sightings entities to models 
+        /// Get SOS internal Id for the id specific for the data provider.
         /// </summary>
-        /// <param name="verbatims"></param>
-        /// <param name="taxa"></param>
+        /// <param name="val"></param>
+        /// <param name="sosIdByProviderValue"></param>
         /// <returns></returns>
-        public static ICollection<ProcessedSighting> ToProcessed(this IEnumerable<APSightingVerbatim> verbatims, IDictionary<int, ProcessedTaxon> taxa)
+        private static ProcessedLookupValue GetSosLookupId(int? val, IDictionary<object, int> sosIdByProviderValue)
         {
-            return verbatims.Select(v => v.ToProcessed(taxa)).ToArray();
+            if (!val.HasValue) return null;
+
+            if (sosIdByProviderValue.TryGetValue(val.Value, out int sosId))
+            {
+                return new ProcessedLookupValue { Id = sosId };
+            }
+            else
+            {
+                return new ProcessedLookupValue { Id = -1, Value = val.ToString() };
+            }
         }
 
         public static ProcessedArea ToProcessed(this GeographicalArea area)
