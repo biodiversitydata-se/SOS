@@ -56,8 +56,9 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         Task<bool> SetActiveInstanceAsync(byte instance);
 
         /// <summary>
-        /// Make sure collection exists
+        ///  Make sure collection exists
         /// </summary>
-        Task VerifyCollectionAsync();
+        /// <returns>true if new collection was created</returns>
+        Task<bool> VerifyCollectionAsync();
     }
 }

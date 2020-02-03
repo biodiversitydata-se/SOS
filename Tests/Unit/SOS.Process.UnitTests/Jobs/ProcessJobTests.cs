@@ -254,7 +254,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _loggerMock.Object);
 
             var sources = (byte) DataProvider.Artdatabanken + (byte) DataProvider.ClamPortal + (byte) DataProvider.KUL;
-            var result = await job.RunAsync(sources, true, JobCancellationToken.Null);
+            var result = await job.RunAsync(sources, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -289,7 +289,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _areaHelper.Object,
                 _loggerMock.Object);
 
-            var result = await job.RunAsync(It.IsAny<int>(), true, JobCancellationToken.Null);
+            var result = await job.RunAsync(It.IsAny<int>(), false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -324,7 +324,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _areaHelper.Object,
                 _loggerMock.Object);
 
-            var result = await job.RunAsync(It.IsAny<int>(), true, JobCancellationToken.Null);
+            var result = await job.RunAsync(It.IsAny<int>(), false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

@@ -10,20 +10,22 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// <summary>
         /// Add daily process job
         /// </summary>
-        /// <param name="sources">Bit flag. 1-Species Portal</param>
+        /// <param name="sources"></param>
+        /// <param name="cleanStart"></param>
         /// <param name="toggleInstanceOnSuccess"></param>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult ScheduleDailyProcessJob(int sources, bool toggleInstanceOnSuccess, int hour, int minute);
+        IActionResult ScheduleDailyProcessJob(int sources, bool cleanStart, bool toggleInstanceOnSuccess, int hour, int minute);
 
         /// <summary>
         /// Run process job
         /// </summary>
-        /// <param name="sources">Bit flag. 1-Species Portal</param>
+        /// <param name="sources"></param>
+        /// <param name="cleanStart"></param>
         /// <param name="toggleInstanceOnSuccess"></param>
         /// <returns></returns>
-        IActionResult RunProcessJob(int sources, bool toggleInstanceOnSuccess);
+        IActionResult RunProcessJob(int sources, bool cleanStart, bool toggleInstanceOnSuccess);
 
         /// <summary>
         /// Add daily process taxa job.
