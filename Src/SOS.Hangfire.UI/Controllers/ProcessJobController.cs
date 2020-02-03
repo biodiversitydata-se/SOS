@@ -31,7 +31,7 @@ namespace SOS.Hangfire.UI.Controllers
         [HttpPost("Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult ScheduleDailyProcessJob([FromQuery]int sources, [FromQuery]bool cleanStart, [FromQuery]bool toggleInstanceOnSuccess, [FromQuery]int hour, [FromQuery]int minute)
+        public IActionResult ScheduleDailyProcessJob([FromQuery]int sources, [FromQuery]bool cleanStart = true, [FromQuery]bool toggleInstanceOnSuccess = true, [FromQuery]int hour = 0, [FromQuery]int minute = 0)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace SOS.Hangfire.UI.Controllers
         [HttpPost("Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunProcessJob([FromQuery]int sources, [FromQuery]bool cleanStart, [FromQuery]bool toggleInstanceOnSuccess)
+        public IActionResult RunProcessJob([FromQuery]int sources, [FromQuery]bool cleanStart = true, [FromQuery]bool toggleInstanceOnSuccess = true)
         {
             try
             {

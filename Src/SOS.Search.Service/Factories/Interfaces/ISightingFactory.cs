@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SOS.Lib.Models.Search;
 using SOS.Search.Service.Enum;
 
@@ -19,6 +18,6 @@ namespace SOS.Search.Service.Factories.Interfaces
         /// <param name="sortBy"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder);
+        Task<PagedResult<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder);
     }
 }

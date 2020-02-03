@@ -42,7 +42,7 @@ namespace SOS.Search.Service.Repositories
 
         private AdvancedFilter PrepareFilter(AdvancedFilter filter)
         {
-            AdvancedFilter preparedFilter = filter.Clone();
+            var preparedFilter = filter.Clone();
 
             if (preparedFilter.SearchUnderlyingTaxa && preparedFilter.TaxonIds != null && preparedFilter.TaxonIds.Any())
             {
@@ -67,34 +67,46 @@ namespace SOS.Search.Service.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder)
+        public async Task<PagedResult<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder)
         {
             var sorting = PrepareSorting(sortBy, sortOrder);
-
+            filter = PrepareFilter(filter);
             if (filter?.OutputFields?.Any() ?? false)
             {
-                filter = PrepareFilter(filter);
-                var res = await MongoCollection
+                var query = MongoCollection
                     .Find(filter.ToFilterDefinition())
                     .Sort(sorting)
-                    .Project(filter.OutputFields.ToProjection())
-                    .Skip(skip)
-                    .Limit(take)
-                    .ToListAsync();
+                    .Project(filter.OutputFields.ToProjection());
 
-                return res.ConvertAll(BsonTypeMapper.MapToDotNetValue);
+                var count = await query.CountDocumentsAsync();
+                
+                query
+                    .Sort(sorting)
+                    .Skip(skip)
+                    .Limit(take);
+
+                return new PagedResult<dynamic>()
+                {
+                    Records = (await query.ToListAsync()).ConvertAll(BsonTypeMapper.MapToDotNetValue),
+                    TotalCount = count
+                };
             }
             else
             {
-                filter = PrepareFilter(filter);
-                var res = await MongoCollection
-                    .Find(filter.ToFilterDefinition())
+                var query = MongoCollection
+                    .Find(filter.ToFilterDefinition());
+
+                var count = await query.CountDocumentsAsync();
+                query
                     .Sort(sorting)
                     .Skip(skip)
-                    .Limit(take)
-                    .ToListAsync();
+                    .Limit(take);
 
-                return res;
+                return new PagedResult<dynamic>()
+                {
+                    Records = await query.ToListAsync(),
+                    TotalCount = count
+                };
             }
         }
     }

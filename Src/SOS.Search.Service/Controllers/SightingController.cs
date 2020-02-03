@@ -39,7 +39,7 @@ namespace SOS.Search.Service.Controllers
 
         /// <inheritdoc />
         [HttpPost("search")]
-        [ProducesResponseType(typeof(IEnumerable<ProcessedSighting>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResult<ProcessedSighting>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetChunkAsync([FromBody] AdvancedFilter filter, [FromQuery]int skip, [FromQuery]int take, 

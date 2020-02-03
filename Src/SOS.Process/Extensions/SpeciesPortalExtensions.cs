@@ -149,7 +149,6 @@ namespace SOS.Process.Extensions
                     RecordedBy = verbatim.Observers,
                     RecordNumber = verbatim.Label,
                     Remarks = verbatim.Comment,
-                    
                     Sex = verbatim.Gender,
                     Status = verbatim.NotPresent || verbatim.NotRecovered
                         ? OccurrenceStatus.Absent

@@ -21,6 +21,6 @@ namespace SOS.Search.Service.Repositories.Interfaces
         /// <param name="sortBy"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder);
+        Task<PagedResult<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder);
     }
 }
