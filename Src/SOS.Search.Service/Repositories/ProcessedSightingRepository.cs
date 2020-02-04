@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
@@ -62,51 +63,34 @@ namespace SOS.Search.Service.Repositories
         private SortDefinition<ProcessedSighting> PrepareSorting(string sortBy, SearchSortOrder sortOrder)
         {
             return string.IsNullOrEmpty(sortBy) ?
-                null : sortOrder.Equals(SearchSortOrder.Desc) ?
+                Builders<ProcessedSighting>.Sort.Descending(s => s.Id) : sortOrder.Equals(SearchSortOrder.Desc) ?
                     Builders<ProcessedSighting>.Sort.Descending(sortBy) : Builders<ProcessedSighting>.Sort.Ascending(sortBy);
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder)
+        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
         {
-            var sorting = PrepareSorting(sortBy, sortOrder);
+           // var sorting = PrepareSorting(sortBy, sortOrder);
             filter = PrepareFilter(filter);
+
             if (filter?.OutputFields?.Any() ?? false)
             {
                 var query = MongoCollection
                     .Find(filter.ToFilterDefinition())
-                    .Sort(sorting)
-                    .Project(filter.OutputFields.ToProjection());
-
-                var count = await query.CountDocumentsAsync();
-                
-                query
-                    .Sort(sorting)
+                    .Project(filter.OutputFields.ToProjection())
                     .Skip(skip)
                     .Limit(take);
 
-                return new PagedResult<dynamic>()
-                {
-                    Records = (await query.ToListAsync()).ConvertAll(BsonTypeMapper.MapToDotNetValue),
-                    TotalCount = count
-                };
+                return (await query.ToListAsync()).ConvertAll(BsonTypeMapper.MapToDotNetValue);
             }
             else
             {
                 var query = MongoCollection
-                    .Find(filter.ToFilterDefinition());
+                    .Find(filter.ToFilterDefinition())
+                    .Limit(take)
+                    .Skip(skip);
 
-                var count = await query.CountDocumentsAsync();
-                query
-                    .Sort(sorting)
-                    .Skip(skip)
-                    .Limit(take);
-
-                return new PagedResult<dynamic>()
-                {
-                    Records = await query.ToListAsync(),
-                    TotalCount = count
-                };
+                return await query.ToListAsync();
             }
         }
     }
