@@ -121,9 +121,13 @@ namespace SOS.Import.Factories
                 cancellationToken?.ThrowIfCancellationRequested();
                 _logger.LogDebug("Finish getting projects & project parameters");
 
-                _logger.LogDebug("Start getting sites and calculate positions in WGS84");
-                var sites = (await _siteRepository.GetAsync()).ToVerbatims().ToDictionary(s => s.Id, s => s);
-                _logger.LogDebug("Finish getting sites and calculate positions in WGS84");
+                _logger.LogDebug("Start getting sites");
+                var siteEntities = await _siteRepository.GetAsync();
+                _logger.LogDebug("Finish getting sites");
+
+                _logger.LogDebug("Start casting site entities to verbatims");
+                var sites = siteEntities.ToVerbatims().ToDictionary(s => s.Id, s => s);
+                _logger.LogDebug("Finish casting site entities to verbatims");
 
                 // Make sure we have an empty collection
                 _logger.LogDebug("Empty collection");

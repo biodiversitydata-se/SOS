@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Models.Verbatim.SpeciesPortal
+﻿using MongoDB.Driver.GeoJsonObjectModel;
+
+namespace SOS.Lib.Models.Verbatim.SpeciesPortal
 {
     /// <summary>
     /// Site object
@@ -34,6 +36,16 @@
         /// Parish
         /// </summary>
         public GeographicalArea Parish { get; set; }
+
+        /// <summary>
+        /// Point (WGS84)
+        /// </summary>
+        public GeoJsonPoint<GeoJson2DGeographicCoordinates> Point { get; set; }
+
+        /// <summary>
+        /// Point with accuracy buffer (WGS84)
+        /// </summary>
+        public GeoJsonGeometry<GeoJson2DGeographicCoordinates> PointWithBuffer { get; set; }
 
         /// <summary>
         /// Province

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -119,8 +118,8 @@ namespace SOS.Process.Extensions
                     MinimumElevationInMeters = verbatim.MinHeight,
                     Municipality = verbatim.Site?.Municipality?.ToProcessed(),
                     Parish = verbatim.Site?.Parish?.ToProcessed(),
-                    Point = hasPosition ? new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(verbatim.Site.XCoordWGS84, verbatim.Site.YCoordWGS84)) : null,
-                    PointWithBuffer = hasPosition ? new[] { verbatim.Site.XCoordWGS84, verbatim.Site.YCoordWGS84 }.ToCircle(verbatim.Site?.Accuracy)?.ToGeoJsonGeometry() : null,
+                    Point = verbatim.Site?.Point,
+                    PointWithBuffer = verbatim.Site?.PointWithBuffer,
                     Province = verbatim.Site?.Province?.ToProcessed(),
                     VerbatimLatitude = hasPosition ? verbatim.Site.YCoord : 0,
                     VerbatimLongitude = hasPosition ? verbatim.Site.XCoord : 0,
@@ -130,6 +129,7 @@ namespace SOS.Process.Extensions
                 Occurrence = new ProcessedOccurrence
                 {
                     Activity = verbatim.Activity,
+                    ActivityId = GetSosLookupId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]),
                     AssociatedMedia = verbatim.HasImages
                         ? $"http://www.artportalen.se/sighting/{verbatim.Id}#SightingDetailImages"
                         : "",
@@ -150,6 +150,7 @@ namespace SOS.Process.Extensions
                     RecordNumber = verbatim.Label,
                     Remarks = verbatim.Comment,
                     Sex = verbatim.Gender,
+                    SexId = GetSosLookupId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Sex]),
                     Status = verbatim.NotPresent || verbatim.NotRecovered
                         ? OccurrenceStatus.Absent
                         : OccurrenceStatus.Present,
@@ -165,9 +166,6 @@ namespace SOS.Process.Extensions
                 Type = "Occurrence"
             };
             
-            
-            obs.Occurrence.SexId = GetSosLookupId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Sex]);
-            obs.Occurrence.ActivityId = GetSosLookupId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]);
             return obs;
         }
 
