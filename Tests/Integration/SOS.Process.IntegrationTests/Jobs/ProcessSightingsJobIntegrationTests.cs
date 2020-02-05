@@ -34,6 +34,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             var result = await processJob.RunAsync(
                 (int)DataProvider.Artdatabanken, 
+                false,
                 false, 
                 JobCancellationToken.Null);
 

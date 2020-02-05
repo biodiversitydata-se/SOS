@@ -19,19 +19,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="NLog.local.config">
+    <None Include="nlog.local.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="NLog.at.config">
+    <None Include="nlog.at.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="NLog.dev.config">
+    <None Include="nlog.dev.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="NLog.prod.config">
+    <None Include="nlog.prod.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="NLog.st.config">
+    <None Include="nlog.st.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

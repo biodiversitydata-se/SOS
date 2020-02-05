@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using MongoDB.Driver.GeoJsonObjectModel;
-using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using  SOS.Lib.Models.DarwinCore.Vocabulary;
+using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Process.Extensions
@@ -55,9 +53,7 @@ namespace SOS.Process.Extensions
             var taxonId = verbatim.TaxonId ?? -1;
 
             var hasPosition = (verbatim.Site?.XCoord ?? 0) > 0 && (verbatim.Site?.YCoord ?? 0) > 0;
-            var googleMercatorPoint = hasPosition ? new Point(verbatim.Site.XCoord, verbatim.Site.YCoord) : null;
-            var wgs84Point = hasPosition ? googleMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84) : null;
-
+            
             if (taxa.TryGetValue(taxonId, out var taxon))
             {
                 taxon.IndividualId = verbatim.URL;
@@ -112,8 +108,8 @@ namespace SOS.Process.Extensions
                     Country = Country.Sweden,
                     CountryCode = CountryCode.Sweden,
                     County = verbatim.Site?.County?.ToProcessed(),
-                    DecimalLatitude = hasPosition ? wgs84Point.Coordinate.Y : 0,
-                    DecimalLongitude = hasPosition ? wgs84Point.Coordinate.X : 0,
+                    DecimalLatitude = hasPosition ? verbatim.Site.YCoordWGS84 : 0,
+                    DecimalLongitude = hasPosition ? verbatim.Site.XCoordWGS84 : 0,
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Locality = verbatim.Site?.Name,
                     Id = $"urn:lsid:artportalen.se:site:{verbatim.Site?.Id}",
@@ -123,11 +119,11 @@ namespace SOS.Process.Extensions
                     MinimumElevationInMeters = verbatim.MinHeight,
                     Municipality = verbatim.Site?.Municipality?.ToProcessed(),
                     Parish = verbatim.Site?.Parish?.ToProcessed(),
-                    Point = hasPosition ? (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point.ToGeoJsonGeometry() : null,
-                    PointWithBuffer = hasPosition ? new[] { wgs84Point.Coordinate.X, wgs84Point.Coordinate.Y }.ToCircle(verbatim.Site?.Accuracy)?.ToGeoJsonGeometry() : null,
+                    Point = hasPosition ? new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(verbatim.Site.XCoordWGS84, verbatim.Site.YCoordWGS84)) : null,
+                    PointWithBuffer = hasPosition ? new[] { verbatim.Site.XCoordWGS84, verbatim.Site.YCoordWGS84 }.ToCircle(verbatim.Site?.Accuracy)?.ToGeoJsonGeometry() : null,
                     Province = verbatim.Site?.Province?.ToProcessed(),
-                    VerbatimLatitude = hasPosition ? googleMercatorPoint.Coordinate.Y : 0,
-                    VerbatimLongitude = hasPosition ? googleMercatorPoint.Coordinate.X : 0,
+                    VerbatimLatitude = hasPosition ? verbatim.Site.YCoord : 0,
+                    VerbatimLongitude = hasPosition ? verbatim.Site.XCoord : 0,
                     VerbatimCoordinateSystem = "EPSG:3857"
                 },
                 Modified = verbatim.EndDate ?? verbatim.ReportedDate,
@@ -153,7 +149,6 @@ namespace SOS.Process.Extensions
                     RecordedBy = verbatim.Observers,
                     RecordNumber = verbatim.Label,
                     Remarks = verbatim.Comment,
-                    
                     Sex = verbatim.Gender,
                     Status = verbatim.NotPresent || verbatim.NotRecovered
                         ? OccurrenceStatus.Absent
@@ -247,19 +242,20 @@ namespace SOS.Process.Extensions
         {
             if (projects == null || !projects.Any()) return null;
 
+            var project = projects.First();
+
             if (projects.Count() == 1)
             {
-                var project = projects.First();
                 return project?.SurveyMethod ?? project?.SurveyMethodUrl;
             }
 
-            var firstSurveyMethod = projects.First().SurveyMethod;
+            var firstSurveyMethod = project.SurveyMethod;
             if (firstSurveyMethod != null && projects.All(p => p.SurveyMethod == firstSurveyMethod))
             {
                 return firstSurveyMethod;
             }
 
-            var firstSurveyMethodUrl = projects.First().SurveyMethodUrl;
+            var firstSurveyMethodUrl = project.SurveyMethodUrl;
             if (firstSurveyMethodUrl != null && projects.All(p => p.SurveyMethod == firstSurveyMethodUrl))
             {
                 return firstSurveyMethodUrl;

@@ -5,7 +5,6 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Repositories.Destination.ClamPortal.Interfaces;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.ClamPortal;

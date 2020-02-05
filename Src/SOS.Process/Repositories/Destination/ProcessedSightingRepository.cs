@@ -183,13 +183,15 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public override async Task VerifyCollectionAsync()
+        public override async Task<bool> VerifyCollectionAsync()
         {
-            await base.VerifyCollectionAsync();
+            var newCreated = await base.VerifyCollectionAsync();
 
             // Make sure inadequate collection is empty 
             await _inadequateItemRepository.DeleteCollectionAsync();
             await _inadequateItemRepository.AddCollectionAsync();
+
+            return newCreated;
         }
     }
 }

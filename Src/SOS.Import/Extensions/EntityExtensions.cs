@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using NetTopologySuite.Geometries;
 using SOS.Import.Entities;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -424,6 +425,14 @@ namespace SOS.Import.Extensions
         /// <returns></returns>
         public static Site ToVerbatim(this SiteEntity entity)
         {
+            Point wgs84Point = null;
+
+            if (entity.XCoord > 0 && entity.YCoord > 0)
+            {
+                var googleMercatorPoint = new Point(entity.XCoord, entity.YCoord);
+                wgs84Point = (Point)googleMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+            }
+           
             return new Site
             {
                 Accuracy = entity.Accuracy,
@@ -435,7 +444,9 @@ namespace SOS.Import.Extensions
                 Parish = entity.ParishId.HasValue ? new GeographicalArea { Id = entity.ParishId.Value, Name = entity.ParishName } : null,
                 Name = entity.Name,
                 XCoord = entity.XCoord,
-                YCoord = entity.YCoord
+                XCoordWGS84 = wgs84Point?.Coordinate?.X ?? 0,
+                YCoord = entity.YCoord,
+                YCoordWGS84 = wgs84Point?.Coordinate?.Y ?? 0
             };
         }
 

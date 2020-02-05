@@ -6,7 +6,6 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
@@ -62,9 +61,10 @@ namespace SOS.Import.Factories
                 _logger.LogInformation(GetKulHarvestSettingsInfoString());
 
                 // Make sure we have an empty collection.
-                _logger.LogInformation("Empty collection for KUL verbatim collection");
+                _logger.LogInformation("Start empty collection for KUL verbatim collection");
                 await _kulObservationVerbatimRepository.DeleteCollectionAsync();
                 await _kulObservationVerbatimRepository.AddCollectionAsync();
+                _logger.LogInformation("Finish empty collection for KUL verbatim collection");
 
                 DateTime changedFrom = new DateTime(_kulServiceConfiguration.StartHarvestYear, 1, 1);
                 DateTime changedToEnd = DateTime.Now;

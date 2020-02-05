@@ -49,7 +49,12 @@ namespace SOS.Process.Factories
             try
             {
                 Logger.LogDebug("Start Processing Species Portal Verbatim");
+
+                Logger.LogDebug("Start getting field mappings");
                 var fieldMappings = GetFieldMappingsDictionary(VerbatimDataProviderTypeId.Artportalen, fieldMappingById);
+                Logger.LogDebug("Finsih getting field mappings");
+
+                Logger.LogDebug("Start deleting Species Portal data");
                 if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider.Artdatabanken))
                 {
                     Logger.LogError("Failed to delete Species Portal data");
@@ -58,9 +63,9 @@ namespace SOS.Process.Factories
                     runInfo.Status = RunStatus.Failed;
                     return runInfo;
                 }
+                Logger.LogDebug("Finish deleting Species Portal data");
 
-                Logger.LogDebug("Previous processed Species Portal data deleted");
-
+                Logger.LogDebug("Start getting Species Portal data");
                 var verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(0);
                 
                 if (!verbatim.Any())
@@ -90,6 +95,7 @@ namespace SOS.Process.Factories
                     
                     count = verbatim.Count();
                 }
+                Logger.LogDebug("Finish getting Species Portal data");
 
                 runInfo.Count = successCount;
                 runInfo.End = DateTime.Now;

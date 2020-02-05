@@ -16,9 +16,7 @@ namespace SOS.Search.Service.Factories.Interfaces
         /// <param name="filter"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
-        /// <param name="sortBy"></param>
-        /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder);
+        Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take);
     }
 }

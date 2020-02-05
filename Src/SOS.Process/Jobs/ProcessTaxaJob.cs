@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.TaxonTree;
-using SOS.Process.Extensions;
 using SOS.Process.Jobs.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -47,15 +43,16 @@ namespace SOS.Process.Jobs
             var taxa = dwcTaxa.Select(m => m.ToProcessedTaxon()).ToList();
             CalculateHigherClassificationField(taxa);
 
-            _logger.LogDebug("Start deleting data from inactive instance");
+            _logger.LogDebug("Start deleting processed taxa from inactive instance");
             if (!await _taxonProcessedRepository.DeleteCollectionAsync())
             {
-                _logger.LogError("Failed to delete ProcessedTaxon data");
+                _logger.LogError("Failed to delete processed taxa");
                 return false;
             }
+            _logger.LogDebug("Finish deleting processed taxa from inactive instance");
 
-            var result = await _taxonProcessedRepository.AddManyAsync(taxa);
-            return result;
+            var success = await _taxonProcessedRepository.AddManyAsync(taxa);
+            return success ? true : throw new Exception("Process taxa job failed");
         }
 
         private async Task<IEnumerable<DarwinCoreTaxon>> GetDarwinCoreTaxaAsync()

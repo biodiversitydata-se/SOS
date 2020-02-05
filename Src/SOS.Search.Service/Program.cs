@@ -68,9 +68,12 @@ namespace SOS.Search.Service
                 })
                 .ConfigureAppConfiguration((hostingContext, configuration) =>
                 {
+                    var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
                     configuration
                         .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                        .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName.ToLower()}.json", optional: false, reloadOnChange: true)
+                       // .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName.ToLower()}.json", optional: false, reloadOnChange: true)
+                        .AddJsonFile($"appsettings.{env}.json", optional: false, reloadOnChange: true)
                         .AddEnvironmentVariables();
                 })
                 .ConfigureLogging((hostingContext, logging) =>

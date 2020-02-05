@@ -190,7 +190,7 @@ namespace SOS.Process.Repositories.Destination
 
             try
             {
-                await MongoCollection.InsertManyAsync(batch, new InsertManyOptions() { IsOrdered = false });
+                await MongoCollection.InsertManyAsync(batch, new InsertManyOptions() { IsOrdered = false, BypassDocumentValidation = true});
                 
                 return true;
             }
@@ -370,7 +370,7 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public virtual async Task VerifyCollectionAsync()
+        public virtual async Task<bool> VerifyCollectionAsync()
         {
             //filter by collection name
             var exists = (await Database
@@ -385,7 +385,11 @@ namespace SOS.Process.Repositories.Destination
             {
                 // Create the collection
                 await Database.CreateCollectionAsync(_collectionName);
+
+                return true;
             }
+
+            return false;
         }
     }
 }

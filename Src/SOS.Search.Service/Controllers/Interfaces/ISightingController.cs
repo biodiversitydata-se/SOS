@@ -16,8 +16,6 @@ namespace SOS.Search.Service.Controllers.Interfaces
         /// <param name="filter"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
-        /// <param name="sortBy"></param>
-        /// <param name="sortOrder"></param>
         /// <returns></returns>
         Task<IActionResult> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder);
 

@@ -51,8 +51,18 @@
         public int XCoord { get; set; }
 
         /// <summary>
+        /// X coordinate in WGS 84
+        /// </summary>
+        public double XCoordWGS84 { get; set; }
+
+        /// <summary>
         /// Y coordinate of site
         /// </summary>
         public int YCoord { get; set; }
+
+        /// <summary>
+        /// Y coordinate in WGS 84
+        /// </summary>
+        public double YCoordWGS84 { get; set; }
     }
 }

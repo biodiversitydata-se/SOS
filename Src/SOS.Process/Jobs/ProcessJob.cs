@@ -6,16 +6,13 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
-using  SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
-using SOS.Process.Extensions;
 using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs.Interfaces;
@@ -78,7 +75,7 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(int sources, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(int sources, bool cleanStart, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -102,17 +99,32 @@ namespace SOS.Process.Jobs
                 var taxonById = taxa.ToDictionary(m => m.Id, m => m);
                 cancellationToken?.ThrowIfCancellationRequested();
                 _logger.LogDebug("Verify collection");
-               
+
+                var newCollection = false;
                 // Make sure we have a collection
-                await _darwinCoreRepository.VerifyCollectionAsync();
+                if (cleanStart)
+                {
+                    await _darwinCoreRepository.DeleteCollectionAsync();
+                    await _darwinCoreRepository.AddCollectionAsync();
+
+                    newCollection = true;
+                }
+                else
+                {
+                    newCollection = await _darwinCoreRepository.VerifyCollectionAsync();
+                }
+
+                if (newCollection)
+                {
+                    _logger.LogDebug("Create indexes");
+                    await _darwinCoreRepository.CreateIndexAsync();
+                }
+
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 var currentHarvestInfo = (await _harvestInfoRepository.GetAllAsync())?.ToArray();
                 var providerInfo = new Dictionary<DataProvider, ProviderInfo>();
                 var processTasks = new Dictionary<DataProvider, Task<RunInfo>>();
-
-                _logger.LogDebug("Drop indexes");
-                await _darwinCoreRepository.DropIndexAsync();
 
                 // Add species portal import if first bit is set
                 if ((sources & (int)DataProvider.Artdatabanken) > 0)
@@ -159,9 +171,6 @@ namespace SOS.Process.Jobs
                 // Create index if great success
                 if (success)
                 {
-                    _logger.LogDebug("Create indexes");
-                    await _darwinCoreRepository.CreateIndexAsync();
-
                     if (toggleInstanceOnSuccess)
                     {
                         _logger.LogDebug("Toggle instance");
@@ -200,7 +209,7 @@ namespace SOS.Process.Jobs
                 _areaHelper.PersistCache();
 
                 // return result of all processing
-                return success;
+                return success ? true : throw new Exception("Process sightings job failed");
             }
             catch (JobAbortedException)
             {

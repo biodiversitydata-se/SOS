@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
@@ -42,7 +43,7 @@ namespace SOS.Search.Service.Repositories
 
         private AdvancedFilter PrepareFilter(AdvancedFilter filter)
         {
-            AdvancedFilter preparedFilter = filter.Clone();
+            var preparedFilter = filter.Clone();
 
             if (preparedFilter.SearchUnderlyingTaxa && preparedFilter.TaxonIds != null && preparedFilter.TaxonIds.Any())
             {
@@ -62,39 +63,34 @@ namespace SOS.Search.Service.Repositories
         private SortDefinition<ProcessedSighting> PrepareSorting(string sortBy, SearchSortOrder sortOrder)
         {
             return string.IsNullOrEmpty(sortBy) ?
-                null : sortOrder.Equals(SearchSortOrder.Desc) ?
+                Builders<ProcessedSighting>.Sort.Descending(s => s.Id) : sortOrder.Equals(SearchSortOrder.Desc) ?
                     Builders<ProcessedSighting>.Sort.Descending(sortBy) : Builders<ProcessedSighting>.Sort.Ascending(sortBy);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder)
+        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
         {
-            var sorting = PrepareSorting(sortBy, sortOrder);
+           // var sorting = PrepareSorting(sortBy, sortOrder);
+            filter = PrepareFilter(filter);
 
             if (filter?.OutputFields?.Any() ?? false)
             {
-                filter = PrepareFilter(filter);
-                var res = await MongoCollection
+                var query = MongoCollection
                     .Find(filter.ToFilterDefinition())
-                    .Sort(sorting)
                     .Project(filter.OutputFields.ToProjection())
                     .Skip(skip)
-                    .Limit(take)
-                    .ToListAsync();
+                    .Limit(take);
 
-                return res.ConvertAll(BsonTypeMapper.MapToDotNetValue);
+                return (await query.ToListAsync()).ConvertAll(BsonTypeMapper.MapToDotNetValue);
             }
             else
             {
-                filter = PrepareFilter(filter);
-                var res = await MongoCollection
+                var query = MongoCollection
                     .Find(filter.ToFilterDefinition())
-                    .Sort(sorting)
-                    .Skip(skip)
                     .Limit(take)
-                    .ToListAsync();
+                    .Skip(skip);
 
-                return res;
+                return await query.ToListAsync();
             }
         }
     }
