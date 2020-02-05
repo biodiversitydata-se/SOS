@@ -46,7 +46,7 @@ namespace SOS.Search.Service.Factories
         {
             try
             {
-                var processedSightings = await _processedSightingRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder);
+                var processedSightings = await _processedSightingRepository.GetChunkAsync(filter, skip, take);
                 ProcessFieldMappings(filter, processedSightings);
                 return processedSightings;
             }
