@@ -1,35 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Database.Interfaces;
-using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Search.Service.Repositories.Interfaces;
 
-namespace SOS.Process.Repositories.Destination
+namespace SOS.Search.Service.Repositories
 {
     /// <summary>
-    /// Repository for retrieving field mappings.
+    /// Field mappings repository.
     /// </summary>
-    public class ProcessedFieldMappingRepository : ProcessBaseRepository<FieldMapping, int>, IProcessedFieldMappingRepository
+    public class ProcessedFieldMappingRepository : BaseRepository<FieldMapping, int>, IProcessedFieldMappingRepository
     {
-        private new IMongoCollection<FieldMapping> MongoCollection => Database.GetCollection<FieldMapping>(_collectionName);
-
         /// <summary>
-        /// Constructor.
+        /// Constructor
         /// </summary>
-        /// <param name="client"></param>
+        /// <param name="mongoClient"></param>
+        /// <param name="mongoDbConfiguration"></param>
         /// <param name="logger"></param>
         public ProcessedFieldMappingRepository(
-            IProcessClient client, 
-            ILogger<ProcessedFieldMappingRepository> logger) 
-            : base(client, true, logger)
+            IMongoClient mongoClient, 
+            IOptions<MongoDbConfiguration> mongoDbConfiguration,
+            ILogger<BaseRepository<FieldMapping, int>> logger) : base(mongoClient, mongoDbConfiguration, true, logger)
         {
             if (!BsonClassMap.IsClassMapRegistered(typeof(FieldMappingValue)))
             {
@@ -64,6 +62,12 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
+        /// <summary>
+        /// Get chunk of taxa
+        /// </summary>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
         private async Task<IEnumerable<FieldMapping>> GetChunkAsync(int skip, int take)
         {
             var res = await MongoCollection

@@ -20,5 +20,11 @@ namespace SOS.Search.Service.Controllers.Interfaces
         /// <param name="sortOrder"></param>
         /// <returns></returns>
         Task<IActionResult> GetChunkAsync(AdvancedFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder);
+
+        /// <summary>
+        /// Get field mappings.
+        /// </summary>
+        /// <returns></returns>
+        Task<IActionResult> GetFieldMappingAsync();
     }
 }
