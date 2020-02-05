@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.Search
 {
@@ -88,6 +89,11 @@ namespace SOS.Lib.Models.Search
         /// for the hierarchical underlying taxa.
         /// </summary>
         public bool SearchUnderlyingTaxa { get; set; }
+
+        /// <summary>
+        /// Return value for fields that are using a controlled vocabulary.
+        /// </summary>
+        public FieldMapReturnValue FieldMapReturnValue { get; set; } = FieldMapReturnValue.Verbatim;
 
         public AdvancedFilter Clone()
         {
