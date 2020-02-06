@@ -126,7 +126,8 @@ namespace SOS.Import.Factories
                 _logger.LogDebug("Finish getting sites");
 
                 _logger.LogDebug("Start casting site entities to verbatims");
-                var sites = siteEntities.ToVerbatims().ToDictionary(s => s.Id, s => s);
+                var siteVerbatims = siteEntities.ToVerbatims();
+                var sites = siteVerbatims.ToDictionary(s => s.Id, s => s);
                 _logger.LogDebug("Finish casting site entities to verbatims");
 
                 // Make sure we have an empty collection
@@ -136,8 +137,8 @@ namespace SOS.Import.Factories
 
                 var (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
                 _logger.LogDebug("Start getting species portal sightings");
-                int nrSightingsHarvested = 0;
-                bool hasAddedTestSightings = false;
+                var nrSightingsHarvested = 0;
+                var hasAddedTestSightings = false;
 
                 // Loop until all sightings are fetched
                 while (minId <= maxId)
@@ -149,19 +150,24 @@ namespace SOS.Import.Factories
                         break;
                     }
 
-                    _logger.LogDebug($"Getting species portal sightings from { minId } to { minId + _speciesPortalConfiguration.ChunkSize -1 }");
+                    _logger.LogDebug($"Start getting species portal sightings from id: { minId } to id: { minId + _speciesPortalConfiguration.ChunkSize -1 }");
                     
                     // Get chunk of sightings
                     var sightings = (await _sightingRepository.GetChunkAsync(minId, _speciesPortalConfiguration.ChunkSize)).ToArray();
+                    _logger.LogDebug($"Finish getting species portal sightings from id: { minId } to id: { minId + _speciesPortalConfiguration.ChunkSize - 1 }");
+
                     if (_speciesPortalConfiguration.AddTestSightings && !hasAddedTestSightings)
                     {
+                        _logger.LogDebug("Start adding test sightings");
                         AddTestSightings(_sightingRepository, ref sightings, _speciesPortalConfiguration.AddTestSightingIds);
                         hasAddedTestSightings = true;
+                        _logger.LogDebug("Finish adding test sightings");
                     }
 
                     var sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
                     nrSightingsHarvested += sightings.Length;
 
+                    _logger.LogDebug("Start calculating person sighting directory");
                     // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
                     var sightingRelations = (await _sightingRelationRepository.GetAsync(sightingIds)).ToVerbatims().ToArray();
                     var personSightingBySightingId = PersonSightingFactory.CalculatePersonSightingDictionary(
@@ -170,10 +176,14 @@ namespace SOS.Import.Factories
                         organizationById,
                         speciesCollections,
                         sightingRelations);
+                    _logger.LogDebug("Finsih calculating person sighting directory");
 
+                    _logger.LogDebug("Start getting projects and parameters");
                     // Get projects & project parameters
                     var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, sightingProjectIds, projectEntityById, projectParameterEntities);
+                    _logger.LogDebug("Finsish getting projects and parameters");
 
+                    _logger.LogDebug("Start casting entities to verbatim");
                     // Cast sightings to aggregates
                     IEnumerable<APSightingVerbatim> aggregates = sightings.ToVerbatims(
                         activities, 
@@ -187,9 +197,12 @@ namespace SOS.Import.Factories
                         validationStatus,
                         units,
                         projectEntityDictionaries);
-                    
+                    _logger.LogDebug("Finsih casting entities to verbatim");
+
+                    _logger.LogDebug("Start storing batch");
                     // Add sightings to mongodb
                     await _sightingVerbatimRepository.AddManyAsync(aggregates);
+                    _logger.LogDebug("Finish storing batch");
 
                     // Calculate start of next chunk
                     minId += _speciesPortalConfiguration.ChunkSize;
