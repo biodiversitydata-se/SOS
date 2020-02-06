@@ -47,11 +47,12 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Calculate degrees from meters
         /// </summary>
+        /// <param name="latitude"></param>
         /// <param name="meters"></param>
         /// <returns></returns>
-        private static double CalculateDegreesFromMeters(this double meters)
+        private static double CalculateDegreesFromMeters(double latitude, double meters)
         {
-            return meters / 6371000;
+            return meters / (111.32 * 1000 * Math.Cos(latitude * (Math.PI / 180)));
         }
 
         /// <summary>
@@ -220,7 +221,9 @@ namespace SOS.Lib.Extensions
             }
 
             // Add buffer to point to create a circle. If accuracy equals 0, add one meter in order to make a polygon. 
-            return wgs84Point.Buffer(CalculateDegreesFromMeters((double) (accuracy == 0 ? 1 : accuracy)));
+            var circle =
+                wgs84Point.Buffer(CalculateDegreesFromMeters(wgs84Point.Y, (double) (accuracy == 0 ? 1 : accuracy)));
+            return circle;
 
             // Transform to SWEREF99 TM since it's in meters
             //  var sweRef99TMPoint = Transform(wgs84Point, CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
