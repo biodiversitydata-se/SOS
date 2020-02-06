@@ -45,6 +45,16 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Calculate degrees from meters
+        /// </summary>
+        /// <param name="meters"></param>
+        /// <returns></returns>
+        private static double CalculateDegreesFromMeters(this double meters)
+        {
+            return meters / 6371000;
+        }
+
+        /// <summary>
         /// Get coordinate system wkt
         /// </summary>
         /// <param name="coordinateSystem"></param>
@@ -209,14 +219,17 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
+            // Add buffer to point to create a circle. If accuracy equals 0, add one meter in order to make a polygon. 
+            return wgs84Point.Buffer(CalculateDegreesFromMeters((double) (accuracy == 0 ? 1 : accuracy)));
+
             // Transform to SWEREF99 TM since it's in meters
-            var sweRef99TMPoint = Transform(wgs84Point, CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
+            //  var sweRef99TMPoint = Transform(wgs84Point, CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
 
             // Add buffer to point to create a circle. If accuracy equals 0, add one meter in order to make a polygon. 
-            var circle = sweRef99TMPoint.Buffer((double)(accuracy == 0 ? 1 : accuracy));
+            //   var circle = sweRef99TMPoint.Buffer((double)(accuracy == 0 ? 1 : accuracy));
 
             // Transform back to WGS84
-            return Transform(circle, CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+            // return Transform(circle, CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
         }
 
         /// <summary>
