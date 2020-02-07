@@ -95,7 +95,7 @@ namespace SOS.Import.Repositories.Destination
             var items = batch?.ToArray();
             try
             {
-                await MongoCollection.InsertManyAsync(items, new InsertManyOptions() { IsOrdered = false });
+                await MongoCollection.InsertManyAsync(batch, new InsertManyOptions() { IsOrdered = false, BypassDocumentValidation = true });
                 return true;
             }
             catch (MongoCommandException e)
