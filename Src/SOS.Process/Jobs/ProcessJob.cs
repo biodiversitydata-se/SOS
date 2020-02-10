@@ -104,20 +104,20 @@ namespace SOS.Process.Jobs
                 // Make sure we have a collection
                 if (cleanStart)
                 {
+                    _logger.LogDebug("Start deleting current collection");
                     await _darwinCoreRepository.DeleteCollectionAsync();
+                    _logger.LogDebug("Finish deleting current collection");
+                    _logger.LogDebug("Start creating new collection");
                     await _darwinCoreRepository.AddCollectionAsync();
+                    _logger.LogDebug("Finish creating new collection");
 
                     newCollection = true;
                 }
                 else
                 {
+                    _logger.LogDebug("Start verifying collection");
                     newCollection = await _darwinCoreRepository.VerifyCollectionAsync();
-                }
-
-                if (newCollection)
-                {
-                    _logger.LogDebug("Create indexes");
-                    await _darwinCoreRepository.CreateIndexAsync();
+                    _logger.LogDebug("Finish verifying collection");
                 }
 
                 cancellationToken?.ThrowIfCancellationRequested();
@@ -171,6 +171,13 @@ namespace SOS.Process.Jobs
                 // Create index if great success
                 if (success)
                 {
+                    if (newCollection)
+                    {
+                        _logger.LogDebug("Start creating indexes");
+                        await _darwinCoreRepository.CreateIndexAsync();
+                        _logger.LogDebug("Finish creating indexes");
+                    }
+
                     if (toggleInstanceOnSuccess)
                     {
                         _logger.LogDebug("Toggle instance");

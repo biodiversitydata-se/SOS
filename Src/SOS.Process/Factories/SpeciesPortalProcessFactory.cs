@@ -65,9 +65,10 @@ namespace SOS.Process.Factories
                 }
                 Logger.LogDebug("Finish deleting Species Portal data");
 
-                Logger.LogDebug("Start getting Species Portal data");
+                Logger.LogDebug("Start getting first Species Portal batch");
                 var verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(0);
-                
+                Logger.LogDebug("Finish getting first Species Portal batch");
+
                 if (!verbatim.Any())
                 {
                     Logger.LogError("No verbatim data to process");
@@ -82,17 +83,22 @@ namespace SOS.Process.Factories
                 while (count != 0)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                   
-                    var processedSightings = verbatim.ToProcessed(taxa, fieldMappings).ToArray();
 
+                    Logger.LogDebug("Start processing Species Portal batch");
+                    var processedSightings = verbatim.ToProcessed(taxa, fieldMappings).ToArray();
+                    Logger.LogDebug("Finish processing Species Portal batch");
+
+                    Logger.LogDebug("Start adding Species Portal batch to db");
                     successCount += await ProcessRepository.AddManyAsync(processedSightings);
+                    Logger.LogDebug("Finish adding Species Portal batch to db");
 
                     verbatimCount += count;
                     Logger.LogInformation($"Species Portal observations being processed, totalCount: {verbatimCount}");
 
-                    // Fetch next batch
+                    Logger.LogDebug("Start getting next Species Portal batch");
                     verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(verbatim.Last().Id);
-                    
+                    Logger.LogDebug("Finish getting next Species Portal batch");
+
                     count = verbatim.Count();
                 }
                 Logger.LogDebug("Finish getting Species Portal data");
