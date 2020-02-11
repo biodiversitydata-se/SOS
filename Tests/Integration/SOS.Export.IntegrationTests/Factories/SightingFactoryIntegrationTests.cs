@@ -50,13 +50,15 @@ namespace SOS.Export.IntegrationTests.Factories
                 new NullLogger<DwcArchiveFileWriter>());
 
             var exportClient = new ExportClient(
-                exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                exportConfiguration.MongoDbConfiguration.DatabaseName,
-                exportConfiguration.MongoDbConfiguration.BatchSize);
+                exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
+                exportConfiguration.ProcessedDbConfiguration.DatabaseName,
+                exportConfiguration.ProcessedDbConfiguration.BatchSize);
             SightingFactory sightingFactory = new SightingFactory(
                 dwcArchiveFileWriter,
                 new ProcessedSightingRepository(
                     exportClient,
+                    new TaxonFactory(
+                        new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonFactory>>().Object), 
                     new Mock<ILogger<ProcessedSightingRepository>>().Object),
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),

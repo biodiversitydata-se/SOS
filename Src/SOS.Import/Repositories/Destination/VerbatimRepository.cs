@@ -13,12 +13,12 @@ namespace SOS.Import.Repositories.Destination
     /// <summary>
     /// Base class for cosmos db repositories
     /// </summary>
-    public class VerbatimRepository<TEntity, TKey> : Interfaces.IVerbatimRepository<TEntity, TKey> where TEntity : IEntity<TKey>
+    public class VerbatimDbConfiguration<TEntity, TKey> : Interfaces.IVerbatimRepository<TEntity, TKey> where TEntity : IEntity<TKey>
     {
         /// <summary>
         /// Logger 
         /// </summary>
-        protected readonly ILogger<VerbatimRepository<TEntity, TKey>> Logger;
+        protected readonly ILogger<VerbatimDbConfiguration<TEntity, TKey>> Logger;
 
         /// <summary>
         /// Mongo db
@@ -38,9 +38,9 @@ namespace SOS.Import.Repositories.Destination
         /// </summary>
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
-        protected VerbatimRepository(
+        protected VerbatimDbConfiguration(
             IImportClient importClient,
-            ILogger<VerbatimRepository<TEntity, TKey>> logger
+            ILogger<VerbatimDbConfiguration<TEntity, TKey>> logger
         )
         {
             if (importClient == null)

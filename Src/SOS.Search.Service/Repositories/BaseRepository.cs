@@ -39,24 +39,24 @@ namespace SOS.Search.Service.Repositories
         /// Constructor
         /// </summary>
         /// <param name="mongoClient"></param>
-        /// <param name="mongoDbConfiguration"></param>
+        /// <param name="processedDbConfiguration"></param>
         /// <param name="multipleInstances"></param>
         /// <param name="logger"></param>
         protected BaseRepository(
             IMongoClient mongoClient,
-            IOptions<MongoDbConfiguration> mongoDbConfiguration,
+            IOptions<MongoDbConfiguration> processedDbConfiguration,
             bool multipleInstances,
             ILogger<BaseRepository<TEntity, TKey>> logger
         )
         {
-            if (mongoDbConfiguration?.Value == null)
+            if (processedDbConfiguration?.Value == null)
             {
-                throw new ArgumentNullException(nameof(mongoDbConfiguration));
+                throw new ArgumentNullException(nameof(processedDbConfiguration));
             }
 
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            Database = mongoClient.GetDatabase($"{mongoDbConfiguration.Value.DatabaseName}");
+            Database = mongoClient.GetDatabase($"{processedDbConfiguration.Value.DatabaseName}");
 
             _collectionName = multipleInstances ? $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ ActiveInstance }" : typeof(TEntity).Name.UntilNonAlfanumeric();
         }

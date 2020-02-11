@@ -39,8 +39,8 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterInstance(Configuration.TaxonServiceConfiguration).As<TaxonServiceConfiguration>().SingleInstance();
 
             // Init mongodb
-            var importSettings = Configuration.MongoDbConfiguration.GetMongoDbSettings();
-            var importClient = new ImportClient(importSettings, Configuration.MongoDbConfiguration.DatabaseName, Configuration.MongoDbConfiguration.BatchSize);
+            var importSettings = Configuration.VerbatimDbConfiguration.GetMongoDbSettings();
+            var importClient = new ImportClient(importSettings, Configuration.VerbatimDbConfiguration.DatabaseName, Configuration.VerbatimDbConfiguration.BatchSize);
             builder.RegisterInstance(importClient).As<IImportClient>().SingleInstance();
             
             // Repositories source

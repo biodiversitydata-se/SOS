@@ -32,9 +32,9 @@ namespace SOS.Import.IntegrationTests.Factories
 
             var speciesPortalDataService = new SpeciesPortalDataService(importConfiguration.SpeciesPortalConfiguration);
             var importClient = new ImportClient(
-                importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.MongoDbConfiguration.DatabaseName,
-                importConfiguration.MongoDbConfiguration.BatchSize);
+                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                importConfiguration.VerbatimDbConfiguration.DatabaseName,
+                importConfiguration.VerbatimDbConfiguration.BatchSize);
             var sightingVerbatimRepository = new SightingVerbatimRepository(importClient, new Mock<ILogger<SightingVerbatimRepository>>().Object);
             var metadataRepository = new MetadataRepository(speciesPortalDataService, new Mock<ILogger<MetadataRepository>>().Object);
             var projectRepository = new ProjectRepository(speciesPortalDataService, new Mock<ILogger<ProjectRepository>>().Object);

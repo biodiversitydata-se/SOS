@@ -36,17 +36,19 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterInstance(Configuration.FileDestination).As<FileDestination>().SingleInstance();
 
             // Init mongodb
-            var exportSettings = Configuration.MongoDbConfiguration.GetMongoDbSettings();
-            var exportClient = new ExportClient(exportSettings, Configuration.MongoDbConfiguration.DatabaseName, Configuration.MongoDbConfiguration.BatchSize);
+            var exportSettings = Configuration.ProcessedDbConfiguration.GetMongoDbSettings();
+            var exportClient = new ExportClient(exportSettings, Configuration.ProcessedDbConfiguration.DatabaseName, Configuration.ProcessedDbConfiguration.BatchSize);
             builder.RegisterInstance(exportClient).As<IExportClient>().SingleInstance();
 
             // Add factories
             builder.RegisterType<SightingFactory>().As<ISightingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
 
             // Repositories mongo
             builder.RegisterType<ProcessedSightingRepository>().As<IProcessedSightingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
-
+            builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
+            
             // Services
             builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().InstancePerLifetimeScope();
             builder.RegisterType<FileService>().As<IFileService>().InstancePerLifetimeScope();

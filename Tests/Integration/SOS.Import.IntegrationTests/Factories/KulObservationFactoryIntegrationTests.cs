@@ -33,9 +33,9 @@ namespace SOS.Import.IntegrationTests.Factories
             
             var kulObservationVerbatimRepository = new KulObservationVerbatimRepository(
                 new ImportClient(
-                    importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                    importConfiguration.MongoDbConfiguration.DatabaseName,
-                    importConfiguration.MongoDbConfiguration.BatchSize), 
+                    importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                    importConfiguration.VerbatimDbConfiguration.DatabaseName,
+                    importConfiguration.VerbatimDbConfiguration.BatchSize), 
                 new Mock<ILogger<KulObservationVerbatimRepository>>().Object);
 
         var kulObservationFactory = new KulObservationFactory(

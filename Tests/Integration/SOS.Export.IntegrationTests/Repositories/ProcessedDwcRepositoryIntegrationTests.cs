@@ -1,7 +1,10 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using SOS.Export.Extensions;
+using SOS.Export.Factories;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Lib.Models.Search;
@@ -54,12 +57,15 @@ namespace SOS.Export.IntegrationTests.Repositories
         {
             var exportConfiguration = GetExportConfiguration();
             var exportClient = new ExportClient(
-                exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                exportConfiguration.MongoDbConfiguration.DatabaseName,
-                exportConfiguration.MongoDbConfiguration.BatchSize);
-            ProcessedSightingRepository processedSightingRepository = new ProcessedSightingRepository(
-                exportClient,
-                new NullLogger<ProcessedSightingRepository>());
+                exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
+                exportConfiguration.ProcessedDbConfiguration.DatabaseName,
+                exportConfiguration.ProcessedDbConfiguration.BatchSize);
+            ProcessedSightingRepository processedSightingRepository =
+                new ProcessedSightingRepository(
+                    exportClient,
+                    new TaxonFactory(
+                        new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonFactory>>().Object),
+                    new NullLogger<ProcessedSightingRepository>());
 
             return processedSightingRepository;
         }

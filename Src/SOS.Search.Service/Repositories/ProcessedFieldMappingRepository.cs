@@ -7,7 +7,6 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Search.Service.Repositories.Interfaces;
 
@@ -22,12 +21,12 @@ namespace SOS.Search.Service.Repositories
         /// Constructor
         /// </summary>
         /// <param name="mongoClient"></param>
-        /// <param name="mongoDbConfiguration"></param>
+        /// <param name="processedDbConfiguration"></param>
         /// <param name="logger"></param>
         public ProcessedFieldMappingRepository(
             IMongoClient mongoClient, 
-            IOptions<MongoDbConfiguration> mongoDbConfiguration,
-            ILogger<BaseRepository<FieldMapping, int>> logger) : base(mongoClient, mongoDbConfiguration, true, logger)
+            IOptions<MongoDbConfiguration> processedDbConfiguration,
+            ILogger<BaseRepository<FieldMapping, int>> logger) : base(mongoClient, processedDbConfiguration, true, logger)
         {
             if (!BsonClassMap.IsClassMapRegistered(typeof(FieldMappingValue)))
             {

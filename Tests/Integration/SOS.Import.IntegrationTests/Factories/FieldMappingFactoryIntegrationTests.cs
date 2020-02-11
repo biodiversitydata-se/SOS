@@ -28,9 +28,9 @@ namespace SOS.Import.IntegrationTests.Factories
             ImportConfiguration importConfiguration = GetImportConfiguration();
             var fieldMappingResourceRepository = new FieldMappingRepository(
                 new ImportClient(
-                    importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                    importConfiguration.MongoDbConfiguration.DatabaseName,
-                    importConfiguration.MongoDbConfiguration.BatchSize), 
+                    importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                    importConfiguration.VerbatimDbConfiguration.DatabaseName,
+                    importConfiguration.VerbatimDbConfiguration.BatchSize), 
                 new NullLogger<FieldMappingRepository>());
 
             var fieldMappingFactory = new FieldMappingFactory(

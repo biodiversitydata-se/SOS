@@ -8,7 +8,7 @@ namespace SOS.Import.Repositories.Destination.ClamPortal
     /// <summary>
     /// Clam verbatim repository
     /// </summary>
-    public class ClamObservationVerbatimRepository : VerbatimRepository<ClamObservationVerbatim, ObjectId>, Interfaces.IClamObservationVerbatimRepository
+    public class ClamObservationVerbatimRepository : VerbatimDbConfiguration<ClamObservationVerbatim, ObjectId>, Interfaces.IClamObservationVerbatimRepository
     {
         /// <summary>
         /// Constructor

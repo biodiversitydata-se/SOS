@@ -20,6 +20,6 @@ namespace SOS.Lib.Configuration.Export
         /// <summary>
         /// Host
         /// </summary>
-        public MongoDbConfiguration MongoDbConfiguration { get; set; }
+        public MongoDbConfiguration ProcessedDbConfiguration { get; set; }
     }
 }

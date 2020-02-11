@@ -7,7 +7,7 @@ namespace SOS.Import.Repositories.Destination.SpeciesPortal
     /// <summary>
     /// Species data service
     /// </summary>
-    public class SightingVerbatimRepository : VerbatimRepository<APSightingVerbatim, int>, Interfaces.ISightingVerbatimRepository
+    public class SightingVerbatimRepository : VerbatimDbConfiguration<APSightingVerbatim, int>, Interfaces.ISightingVerbatimRepository
     {
         /// <summary>
         /// Constructor

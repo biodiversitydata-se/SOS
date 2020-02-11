@@ -3,7 +3,7 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Export.IntegrationTests.TestHelpers;
+using SOS.Export.Factories;
 using SOS.Export.IntegrationTests.TestHelpers.Factories;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.MongoDb;
@@ -28,11 +28,13 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var exportConfiguration = GetExportConfiguration();
             string exportFolderPath = exportConfiguration.FileDestination.Path;
             var exportClient = new ExportClient(
-                exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                exportConfiguration.MongoDbConfiguration.DatabaseName,
-                exportConfiguration.MongoDbConfiguration.BatchSize);
+                exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
+                exportConfiguration.ProcessedDbConfiguration.DatabaseName,
+                exportConfiguration.ProcessedDbConfiguration.BatchSize);
             var processedSightingRepository = new ProcessedSightingRepository(
                 exportClient,
+                new TaxonFactory(
+                    new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonFactory>>().Object),
                 new Mock<ILogger<ProcessedSightingRepository>>().Object);
             DwcArchiveFileWriter dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object),
@@ -81,9 +83,9 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                 new Mock<ILogger<DwcArchiveFileWriter>>().Object);
             
             var exportClient = new ExportClient(
-                exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                exportConfiguration.MongoDbConfiguration.DatabaseName,
-                exportConfiguration.MongoDbConfiguration.BatchSize);
+                exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
+                exportConfiguration.ProcessedDbConfiguration.DatabaseName,
+                exportConfiguration.ProcessedDbConfiguration.BatchSize);
             var processInfoRepository = new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
             var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
             var filename = FilenameGenerator.CreateFilename("sos_dwc_archive_with_ten_observations");

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
+using SOS.Export.Factories;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Lib.Models.Search;
@@ -27,18 +28,20 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             const int nrObservations = 10;
             const string filePath = @"c:\temp\TenProcessedTestObservations.json";
             var exportConfiguration = GetExportConfiguration();
+            var exportClient = new ExportClient(
+                exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
+                exportConfiguration.ProcessedDbConfiguration.DatabaseName,
+                exportConfiguration.ProcessedDbConfiguration.BatchSize);
             var processedSightingRepository = new ProcessedSightingRepository(
-                new ExportClient(
-                    exportConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                    exportConfiguration.MongoDbConfiguration.DatabaseName,
-                    exportConfiguration.MongoDbConfiguration.BatchSize),
+                exportClient,
+                new TaxonFactory(
+                    new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonFactory>>().Object),
                 new Mock<ILogger<ProcessedSightingRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var observations = await processedSightingRepository.GetChunkAsync(new AdvancedFilter(), 0,nrObservations);
-
 
             var serializerSettings = new JsonSerializerSettings()
             {

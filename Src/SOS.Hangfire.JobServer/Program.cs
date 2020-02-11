@@ -80,7 +80,7 @@ namespace SOS.Hangfire.JobServer
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var mongoConfiguration = hostContext.Configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository").Get<MongoDbConfiguration>();
+                    var mongoConfiguration = hostContext.Configuration.GetSection("ApplicationSettings").GetSection("HangfireDbConfiguration").Get<MongoDbConfiguration>();
                     
                     services.AddHangfire(configuration =>
                             configuration
@@ -132,9 +132,9 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine($"[ClamService].[Address]: {_importConfiguration.ClamServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[TaxonAttributeService].[Address]: {_importConfiguration.TaxonAttributeServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[TaxonService].[Address]: {_importConfiguration.TaxonServiceConfiguration.BaseAddress}");
-            sb.AppendLine($"[MongoDb].[Servers]: { string.Join(", ", _importConfiguration.MongoDbConfiguration.Hosts.Select(x => x.Name))}");
-            sb.AppendLine($"[MongoDb].[DatabaseName]: {_importConfiguration.MongoDbConfiguration.DatabaseName}");
-            sb.AppendLine($"[MongoDb].[BatchSize]: {_importConfiguration.MongoDbConfiguration.BatchSize}");
+            sb.AppendLine($"[MongoDb].[Servers]: { string.Join(", ", _importConfiguration.VerbatimDbConfiguration.Hosts.Select(x => x.Name))}");
+            sb.AppendLine($"[MongoDb].[DatabaseName]: {_importConfiguration.VerbatimDbConfiguration.DatabaseName}");
+            sb.AppendLine($"[MongoDb].[BatchSize]: {_importConfiguration.VerbatimDbConfiguration.BatchSize}");
             sb.AppendLine("");
 
             sb.AppendLine("Process settings:");
@@ -149,8 +149,8 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine("Export settings:");
             sb.AppendLine("================");
             sb.AppendLine($"[BlobStorage].[ConnectionString]: { _exportConfiguration.BlobStorageConfiguration.ConnectionString}");
-            sb.AppendLine($"[MongoDb].[Servers]: { string.Join(", ", _exportConfiguration.MongoDbConfiguration.Hosts.Select(x => x.Name))}");
-            sb.AppendLine($"[MongoDb].[DatabaseName]: { _exportConfiguration.MongoDbConfiguration.DatabaseName}");
+            sb.AppendLine($"[MongoDb].[Servers]: { string.Join(", ", _exportConfiguration.ProcessedDbConfiguration.Hosts.Select(x => x.Name))}");
+            sb.AppendLine($"[MongoDb].[DatabaseName]: { _exportConfiguration.ProcessedDbConfiguration.DatabaseName}");
             sb.AppendLine($"[FileDestination].[Path]: { _exportConfiguration.FileDestination.Path}");
 
             logger.LogInformation(sb.ToString());
