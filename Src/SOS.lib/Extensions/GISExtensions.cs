@@ -9,6 +9,7 @@ using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using NetTopologySuite.IO;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Operation.Buffer;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
@@ -42,17 +43,6 @@ namespace SOS.Lib.Extensions
                 seq.SetY(i, y);
                 seq.SetZ(i, z);
             }
-        }
-
-        /// <summary>
-        /// Calculate degrees from meters
-        /// </summary>
-        /// <param name="latitude"></param>
-        /// <param name="meters"></param>
-        /// <returns></returns>
-        private static double CalculateDegreesFromMeters(double latitude, double meters)
-        {
-            return meters / (111.32 * 1000 * Math.Cos(latitude * (Math.PI / 180)));
         }
 
         /// <summary>
@@ -187,52 +177,29 @@ namespace SOS.Lib.Extensions
 
         #region Public
         /// <summary>
-        /// 
+        ///  Transform WGS 84 point to circle by adding a buffer to it
         /// </summary>
-        /// <param name="pointCoordinates"></param>
+        /// <param name="point"></param>
         /// <param name="accuracy"></param>
+        /// <param name="targetCoordinateSystem"></param>
         /// <returns></returns>
-        public static Geometry ToCircle(this double[] pointCoordinates, int? accuracy)
-        {
-            if ((pointCoordinates?.Length ?? 0) != 2)
-            {
-                return null;
-            }
-
-            var longitude = pointCoordinates[0];
-            var latitude = pointCoordinates[1];
-
-            var wgs84Point = new Point(longitude, latitude);
-
-            return wgs84Point.ToCircle(accuracy);
-        }
-
-        /// <summary>
-        /// Transform WGS 84 point to circle by adding a buffer to it
-        /// </summary>
-        /// <param name="wgs84Point"></param>
-        /// <param name="accuracy"></param>
-        /// <returns></returns>
-        public static Geometry ToCircle(this Point wgs84Point, int? accuracy)
+        public static Geometry ToCircle(this Point point, int? accuracy, CoordinateSys? targetCoordinateSystem = null)
         {
             if (accuracy == null || accuracy < 0.0)
             {
                 return null;
             }
 
+            var sweRef99TMPoint = point.SRID == (int)CoordinateSys.SWEREF99_TM ? 
+                point 
+                : 
+                Transform(point, (CoordinateSys)point.SRID, CoordinateSys.SWEREF99_TM);
+            
             // Add buffer to point to create a circle. If accuracy equals 0, add one meter in order to make a polygon. 
-            var circle =
-                wgs84Point.Buffer(CalculateDegreesFromMeters(wgs84Point.Y, (double) (accuracy == 0 ? 1 : accuracy)));
-            return circle;
+            var circle = sweRef99TMPoint.Buffer((double)(accuracy == 0 ? 1 : accuracy));
 
-            // Transform to SWEREF99 TM since it's in meters
-            //  var sweRef99TMPoint = Transform(wgs84Point, CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
-
-            // Add buffer to point to create a circle. If accuracy equals 0, add one meter in order to make a polygon. 
-            //   var circle = sweRef99TMPoint.Buffer((double)(accuracy == 0 ? 1 : accuracy));
-
-            // Transform back to WGS84
-            // return Transform(circle, CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+            // Transform to target coordinate system if passed, else to original
+            return Transform(circle, CoordinateSys.SWEREF99_TM, targetCoordinateSystem ?? (CoordinateSys)point.SRID);
         }
 
         /// <summary>

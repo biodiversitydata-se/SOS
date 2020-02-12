@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MongoDB.Driver.GeoJsonObjectModel;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -25,7 +26,12 @@ namespace SOS.Process.Extensions
         /// <returns></returns>
         public static ProcessedSighting ToProcessed(this ClamObservationVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
         {
-            var hasPosition = verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0;
+            Point wgs84Point = null;
+            if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
+            {
+                wgs84Point = new Point(verbatim.DecimalLongitude, verbatim.DecimalLatitude) { SRID = (int)CoordinateSys.WGS84 };
+            }
+            
             taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
 
             return new ProcessedSighting(DataProvider.ClamPortal)
@@ -62,8 +68,8 @@ namespace SOS.Process.Extensions
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Id = verbatim.LocationId,
                     Locality = verbatim.Locality,
-                    Point = hasPosition ? new GeoJsonPoint<GeoJson2DGeographicCoordinates>(new GeoJson2DGeographicCoordinates(verbatim.DecimalLongitude, verbatim.DecimalLatitude)) : null,
-                    PointWithBuffer = hasPosition ? new[] { verbatim.DecimalLongitude, verbatim.DecimalLatitude }.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoJsonGeometry() : null,
+                    Point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry(),
+                    PointWithBuffer = wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoJsonGeometry(),
                     Remarks = verbatim.LocationRemarks,
                     MaximumDepthInMeters = verbatim.MaximumDepthInMeters,
                     VerbatimLatitude = verbatim.DecimalLatitude,
