@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Models.Search;
-using SOS.Search.Service.Enum;
 
 namespace SOS.Search.Service.Controllers.Interfaces
 {

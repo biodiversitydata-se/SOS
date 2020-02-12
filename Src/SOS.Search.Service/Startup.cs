@@ -42,22 +42,6 @@ namespace SOS.Search.Service
 
         private string _environment;
 
-        
-        internal class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
-        {
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="context"></param>
-            /// <returns></returns>
-            public bool Authorize(DashboardContext context)
-            {
-                // Allow outside. You need an authentication scenario for this part.
-                // DON'T GO PRODUCTION WITH THIS LINES.
-                return true;
-            }
-        }
-
         /// <summary>
         /// Start up
         /// </summary>
@@ -208,11 +192,7 @@ namespace SOS.Search.Service
                 app.UseHsts();
             }
 
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions()
-            {
-                Authorization = new[] { new AllowAllConnectionsFilter() },
-                IgnoreAntiforgeryToken = true
-            });
+            app.UseHangfireServer();
 
             // app.UseAuthentication();
             app.UseHttpsRedirection();
