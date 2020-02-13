@@ -26,9 +26,9 @@ namespace SOS.Import.IntegrationTests.Factories
             var speciesPortalDataService = new SpeciesPortalDataService(importConfiguration.SpeciesPortalConfiguration);
             var areaVerbatimRepository = new AreaVerbatimRepository(
                 new ImportClient(
-                    importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                    importConfiguration.MongoDbConfiguration.DatabaseName,
-                    importConfiguration.MongoDbConfiguration.BatchSize),
+                    importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                    importConfiguration.VerbatimDbConfiguration.DatabaseName,
+                    importConfiguration.VerbatimDbConfiguration.BatchSize),
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
 
             var geoFactory = new GeoFactory(
@@ -58,9 +58,9 @@ namespace SOS.Import.IntegrationTests.Factories
             var speciesPortalDataService = new SpeciesPortalDataService(importConfiguration.SpeciesPortalConfiguration);
             var areaVerbatimRepository = new AreaVerbatimRepository(
                 new ImportClient(
-                    importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                    importConfiguration.MongoDbConfiguration.DatabaseName,
-                    importConfiguration.MongoDbConfiguration.BatchSize),
+                    importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                    importConfiguration.VerbatimDbConfiguration.DatabaseName,
+                    importConfiguration.VerbatimDbConfiguration.BatchSize),
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
 
             var geoFactory = new GeoFactory(

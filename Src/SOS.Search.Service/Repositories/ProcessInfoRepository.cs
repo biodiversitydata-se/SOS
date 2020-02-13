@@ -17,12 +17,12 @@ namespace SOS.Search.Service.Repositories
         /// Constructor
         /// </summary>
         /// <param name="mongoClient"></param>
-        /// <param name="mongoDbConfiguration"></param>
+        /// <param name="processedDbConfiguration"></param>
         /// <param name="logger"></param>
         public ProcessInfoRepository(
             IMongoClient mongoClient,
-            IOptions<MongoDbConfiguration> mongoDbConfiguration, 
-            ILogger<ProcessInfoRepository> logger) : base(mongoClient, mongoDbConfiguration, false, logger)
+            IOptions<MongoDbConfiguration> processedDbConfiguration, 
+            ILogger<ProcessInfoRepository> logger) : base(mongoClient, processedDbConfiguration, false, logger)
         {
         }
 

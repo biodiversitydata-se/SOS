@@ -48,11 +48,11 @@ namespace SOS.Import.IoC.Modules
             // Init mongodb
             if (Configuration.MongoDbConfiguration != null)
             {
-                var importSettings = Configuration.MongoDbConfiguration.GetMongoDbSettings();
+                var importSettings = Configuration.VerbatimDbConfiguration.GetMongoDbSettings();
                 var importClient = new ImportClient(
                     importSettings, 
-                    Configuration.MongoDbConfiguration.DatabaseName,
-                    Configuration.MongoDbConfiguration.BatchSize);
+                    Configuration.VerbatimDbConfiguration.DatabaseName,
+                    Configuration.VerbatimDbConfiguration.BatchSize);
                 builder.RegisterInstance(importClient).As<IImportClient>().SingleInstance();
             }
 

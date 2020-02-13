@@ -14,7 +14,7 @@ namespace SOS.Search.Service.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var mongoDbConfiguration = config.GetSection("MongoDbConfiguration").Get<MongoDbConfiguration>();
+            var mongoDbConfiguration = config.GetSection("ProcessedDbConfiguration").Get<MongoDbConfiguration>();
             return mongoDbConfiguration;
         }
     }

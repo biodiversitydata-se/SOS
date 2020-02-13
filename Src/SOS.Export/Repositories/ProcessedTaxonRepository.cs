@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using SOS.Lib.Configuration.Shared;
+using SOS.Export.MongoDb.Interfaces;
+using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Models.Processed.Sighting;
-using SOS.Search.Service.Repositories.Interfaces;
 
-namespace SOS.Search.Service.Repositories
+namespace SOS.Export.Repositories
 {
     /// <summary>
     /// 
@@ -20,12 +17,11 @@ namespace SOS.Search.Service.Repositories
         /// Constructor
         /// </summary>
         /// <param name="mongoClient"></param>
-        /// <param name="processedDbConfiguration"></param>
+        /// <param name="mongoDbConfiguration"></param>
         /// <param name="logger"></param>
         public ProcessedTaxonRepository(
-            IMongoClient mongoClient, 
-            IOptions<MongoDbConfiguration> processedDbConfiguration,
-            ILogger<BaseRepository<ProcessedTaxon, int>> logger) : base(mongoClient, processedDbConfiguration, true, logger)
+            IExportClient exportClient,
+            ILogger<ProcessedTaxonRepository> logger) : base(exportClient, true, logger)
         {
         }
 
@@ -47,23 +43,6 @@ namespace SOS.Search.Service.Repositories
                     SecondaryParentDyntaxaTaxonIds = m.SecondaryParentDyntaxaTaxonIds, 
                     ScientificName = m.ScientificName
                 })
-                .Skip(skip)
-                .Limit(take)
-                .ToListAsync();
-
-            return res;
-        }
-
-        /// <summary>
-        /// Get chunk of taxa
-        /// </summary>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<ProcessedTaxon>> GetChunkAsync(int skip, int take)
-        {
-            var res = await MongoCollection
-                .Find(x => true)
                 .Skip(skip)
                 .Limit(take)
                 .ToListAsync();

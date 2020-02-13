@@ -36,15 +36,17 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterInstance(Configuration.FileDestination).As<FileDestination>().SingleInstance();
 
             // Init mongodb
-            var exportSettings = Configuration.MongoDbConfiguration.GetMongoDbSettings();
-            var exportClient = new ExportClient(exportSettings, Configuration.MongoDbConfiguration.DatabaseName, Configuration.MongoDbConfiguration.BatchSize);
+            var exportSettings = Configuration.ProcessedDbConfiguration.GetMongoDbSettings();
+            var exportClient = new ExportClient(exportSettings, Configuration.ProcessedDbConfiguration.DatabaseName, Configuration.ProcessedDbConfiguration.BatchSize);
             builder.RegisterInstance(exportClient).As<IExportClient>().SingleInstance();
 
             // Add factories
             builder.RegisterType<SightingFactory>().As<ISightingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
 
             // Repositories mongo
             builder.RegisterType<ProcessedSightingRepository>().As<IProcessedSightingRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
 
             // Services
@@ -58,6 +60,7 @@ namespace SOS.Export.IoC.Modules
             // DwC Archive
             builder.RegisterType<DwcArchiveFileWriter>().As<IDwcArchiveFileWriter>().SingleInstance();
             builder.RegisterType<DwcArchiveOccurrenceCsvWriter>().As<IDwcArchiveOccurrenceCsvWriter>().SingleInstance();
+            builder.RegisterType<ExtendedMeasurementOrFactCsvWriter>().As<IExtendedMeasurementOrFactCsvWriter>().SingleInstance();
         }
     }
 }

@@ -10,6 +10,6 @@ namespace SOS.Hangfire.JobServer.Configuration
         /// <summary>
         /// Mongo db connection settings
         /// </summary>
-        public MongoDbConfiguration MongoDbRepository { get; set; }
+        public MongoDbConfiguration HangfireDbConfiguration { get; set; }
     }
 }

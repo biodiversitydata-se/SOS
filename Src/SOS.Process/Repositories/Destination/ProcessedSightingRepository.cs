@@ -154,7 +154,6 @@ namespace SOS.Process.Repositories.Destination
                    Builders<DarwinCore>.IndexKeys.Ascending(x => x.ParentIds),
                    Builders<ImageADarwinCoreggregate>.IndexKeys.Ascending(x => x.Class))));
                    */
-            Logger.LogDebug("Creating indexes");
             await MongoCollection.Indexes.CreateManyAsync(indexModels);
         }
 

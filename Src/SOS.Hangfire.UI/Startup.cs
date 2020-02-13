@@ -96,7 +96,7 @@ namespace SOS.Hangfire.UI
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Hangfire
-            var mongoConfiguration = Configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository").Get<MongoDbConfiguration>();
+            var mongoConfiguration = Configuration.GetSection("ApplicationSettings").GetSection("HangfireDbConfiguration").Get<MongoDbConfiguration>();
 
             services.AddHangfire(configuration =>
                 configuration
@@ -175,7 +175,7 @@ namespace SOS.Hangfire.UI
 
         private IRepositorySettings CreateRepositorySettings()
         {
-            var mongoConfiguration = Configuration.GetSection("ApplicationSettings").GetSection("MongoDbRepository").Get<MongoDbConfiguration>();
+            var mongoConfiguration = Configuration.GetSection("ApplicationSettings").GetSection("HangfireDbConfiguration").Get<MongoDbConfiguration>();
 
             return new RepositorySettings
             {

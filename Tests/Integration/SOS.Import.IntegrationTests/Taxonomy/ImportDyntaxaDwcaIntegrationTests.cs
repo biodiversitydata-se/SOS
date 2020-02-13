@@ -43,9 +43,9 @@ namespace SOS.Import.IntegrationTests.Taxonomy
         {
             var importConfiguration = GetImportConfiguration();
             var importClient = new ImportClient(
-                importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.MongoDbConfiguration.DatabaseName,
-                importConfiguration.MongoDbConfiguration.BatchSize);
+                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                importConfiguration.VerbatimDbConfiguration.DatabaseName,
+                importConfiguration.VerbatimDbConfiguration.BatchSize);
             TaxonService taxonService = new TaxonService(
                 TaxonServiceProxyStubFactory.Create(filename).Object,
                 new TaxonServiceConfiguration { BaseAddress = "..." },

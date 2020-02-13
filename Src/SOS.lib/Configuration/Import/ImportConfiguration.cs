@@ -20,7 +20,7 @@ namespace SOS.Lib.Configuration.Import
         /// <summary>
         /// Host
         /// </summary>
-        public MongoDbConfiguration MongoDbConfiguration { get; set; }
+        public MongoDbConfiguration VerbatimDbConfiguration { get; set; }
 
         /// <summary>
         /// KUL Service/repository configuration.

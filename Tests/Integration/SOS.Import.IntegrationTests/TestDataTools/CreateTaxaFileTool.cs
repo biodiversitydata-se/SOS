@@ -31,8 +31,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             const int batchSize = 500000; // Get all taxa
             var importConfiguration = GetImportConfiguration();
             var importClient = new ImportClient(
-                importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.MongoDbConfiguration.DatabaseName,
+                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                importConfiguration.VerbatimDbConfiguration.DatabaseName,
                 batchSize);
 
             var taxonVerbatimRepository =
@@ -62,8 +62,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             const int batchSize = 500000; // Get all taxa
             var importConfiguration = GetImportConfiguration();
             var importClient = new ImportClient(
-                importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.MongoDbConfiguration.DatabaseName,
+                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                importConfiguration.VerbatimDbConfiguration.DatabaseName,
                 batchSize);
 
             var taxonVerbatimRepository =
@@ -90,8 +90,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             const int batchSize = 500000; // Get all taxa
             var importConfiguration = GetImportConfiguration();
             var importClient = new ImportClient(
-                importConfiguration.MongoDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.MongoDbConfiguration.DatabaseName,
+                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                importConfiguration.VerbatimDbConfiguration.DatabaseName,
                 batchSize);
 
             var taxonVerbatimRepository =

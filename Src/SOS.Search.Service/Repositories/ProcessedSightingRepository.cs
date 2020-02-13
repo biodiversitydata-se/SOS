@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
@@ -29,14 +28,14 @@ namespace SOS.Search.Service.Repositories
         /// Constructor
         /// </summary>
         /// <param name="mongoClient"></param>
-        /// <param name="mongoDbConfiguration"></param>
+        /// <param name="processedDbConfiguration"></param>
         /// <param name="taxonFactory"></param>
         /// <param name="logger"></param>
         public ProcessedSightingRepository(
             IMongoClient mongoClient,
-            IOptions<MongoDbConfiguration> mongoDbConfiguration,
+            IOptions<MongoDbConfiguration> processedDbConfiguration,
             ITaxonFactory taxonFactory,
-            ILogger<ProcessedSightingRepository> logger) : base(mongoClient, mongoDbConfiguration, true, logger)
+            ILogger<ProcessedSightingRepository> logger) : base(mongoClient, processedDbConfiguration, true, logger)
         {
             _taxonFactory = taxonFactory ?? throw new ArgumentNullException(nameof(taxonFactory));
         }

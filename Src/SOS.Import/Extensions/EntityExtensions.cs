@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Geometries;
 using SOS.Import.Entities;
 using SOS.Lib.Enums;
@@ -442,6 +443,8 @@ namespace SOS.Import.Extensions
                 Municipality = entity.MunicipalityId.HasValue ? new GeographicalArea { Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName } : null,
                 Province = entity.ProvinceId.HasValue ? new GeographicalArea { Id = entity.ProvinceId.Value, Name = entity.ProvinceName } : null,
                 Parish = entity.ParishId.HasValue ? new GeographicalArea { Id = entity.ParishId.Value, Name = entity.ParishName } : null,
+                Point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry(),
+                PointWithBuffer = wgs84Point?.ToCircle(entity.Accuracy)?.ToGeoJsonGeometry(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 XCoordWGS84 = wgs84Point?.Coordinate?.X ?? 0,
