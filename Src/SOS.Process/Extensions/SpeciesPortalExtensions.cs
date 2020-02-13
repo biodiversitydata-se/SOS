@@ -130,7 +130,6 @@ namespace SOS.Process.Extensions
                 Occurrence = new ProcessedOccurrence
                 {
                     Activity = verbatim.Activity,
-                    ActivityId = GetSosLookupId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]),
                     AssociatedMedia = verbatim.HasImages
                         ? $"http://www.artportalen.se/sighting/{verbatim.Id}#SightingDetailImages"
                         : "",
@@ -151,7 +150,6 @@ namespace SOS.Process.Extensions
                     RecordNumber = verbatim.Label,
                     Remarks = verbatim.Comment,
                     Sex = verbatim.Gender,
-                    SexId = GetSosLookupId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Sex]),
                     Status = verbatim.NotPresent || verbatim.NotRecovered
                         ? OccurrenceStatus.Absent
                         : OccurrenceStatus.Present,
