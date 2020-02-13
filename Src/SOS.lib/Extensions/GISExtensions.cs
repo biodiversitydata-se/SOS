@@ -10,6 +10,7 @@ using ProjNet.CoordinateSystems.Transformations;
 using NetTopologySuite.IO;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Operation.Buffer;
+using NetTopologySuite.Utilities;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
@@ -114,6 +115,16 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Convert angle to radians
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        private static double ToRadians(this double val)
+        {
+            return (Math.PI / 180) * val;
+        }
+
+        /// <summary>
         /// Make polygon valid
         /// </summary>
         /// <param name="polygon"></param>
@@ -181,25 +192,43 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="point"></param>
         /// <param name="accuracy"></param>
-        /// <param name="targetCoordinateSystem"></param>
         /// <returns></returns>
-        public static Geometry ToCircle(this Point point, int? accuracy, CoordinateSys? targetCoordinateSystem = null)
+        public static Geometry ToCircle(this Point point, int? accuracy)
         {
             if (accuracy == null || accuracy < 0.0)
             {
                 return null;
             }
 
-            var sweRef99TMPoint = point.SRID == (int)CoordinateSys.SWEREF99_TM ? 
-                point 
-                : 
-                Transform(point, (CoordinateSys)point.SRID, CoordinateSys.SWEREF99_TM);
-            
-            // Add buffer to point to create a circle. If accuracy equals 0, add one meter in order to make a polygon. 
-            var circle = sweRef99TMPoint.Buffer((double)(accuracy == 0 ? 1 : accuracy));
+            Geometry circle = null;
+            switch ((CoordinateSys)point.SRID)
+            {
+                // Metric systems, add buffer to create a circle
+                case CoordinateSys.SWEREF99:
+                case CoordinateSys.SWEREF99_TM:
+                case CoordinateSys.Rt90_25_gon_v:
+                    circle = point.Buffer((double)(accuracy == 0 ? 1 : accuracy));
+                    break;
+                case CoordinateSys.WebMercator:
+                case CoordinateSys.WGS84:
+                    // Degrees systems
+                    var diameterInMeters = (double)(accuracy == 0 ? 1 : accuracy * 2);
 
-            // Transform to target coordinate system if passed, else to original
-            return Transform(circle, CoordinateSys.SWEREF99_TM, targetCoordinateSystem ?? (CoordinateSys)point.SRID);
+                    var shapeFactory = new GeometricShapeFactory();
+                    shapeFactory.NumPoints = accuracy < 1000 ? 32 : accuracy < 10000 ? 64 : 128;
+                    shapeFactory.Centre = point.Coordinate;
+
+                    // Length in meters of 1° of latitude = always 111.32 km
+                    shapeFactory.Height = diameterInMeters / 111320d;
+
+                    // Length in meters of 1° of longitude = 40075 km * cos( latitude radian ) / 360
+                    shapeFactory.Width = diameterInMeters / (40075000 * Math.Cos(point.Y.ToRadians()) / 360);
+
+                    circle = shapeFactory.CreateCircle();
+                    break;
+            }
+
+            return circle;
         }
 
         /// <summary>
@@ -307,6 +336,11 @@ namespace SOS.Lib.Extensions
             CoordinateSys fromCoordinateSystem,
             CoordinateSys toCoordinateSystem)
         {
+            if (fromCoordinateSystem == toCoordinateSystem)
+            {
+                return geometry;
+            }
+
             // Create coordinate systems
             var coordinateSystemFactory = new CoordinateSystemFactory();
             var sourceCoordinateSystem = coordinateSystemFactory.CreateFromWkt(GetCoordinateSystemWkt(fromCoordinateSystem));
