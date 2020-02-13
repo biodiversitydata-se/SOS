@@ -67,6 +67,12 @@ namespace SOS.Import.Repositories.Destination.Interfaces
         Task<IEnumerable<TEntity>> GetBatchAsync(int skip);
 
         /// <summary>
+        /// Get all entities
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<TEntity>> GetAllAsync();
+
+        /// <summary>
         /// Update entity
         /// </summary>
         /// <param name="id"></param>

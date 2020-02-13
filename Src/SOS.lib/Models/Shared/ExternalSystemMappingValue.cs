@@ -1,10 +1,15 @@
-﻿namespace SOS.Lib.Models.Shared
+﻿using System.Dynamic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace SOS.Lib.Models.Shared
 {
-    public class DataProviderTypeFieldValueMapping
+    public class ExternalSystemMappingValue
     {
         /// <summary>
         /// Value in data provider.
         /// </summary>
+        [JsonConverter(typeof(ExpandoObjectConverter))]
         public object Value { get; set; }
 
         /// <summary>

@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <Folder Include="Entities\Kul\" />
+    <Folder Include="Resources\FieldMappings\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,10 +37,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\ActivityFieldMapping.json">
+    <None Update="Resources\FieldMappings\ActivityFieldMapping.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Resources\GenderFieldMapping.json">
+    <None Update="Resources\FieldMappings\CountyFieldMapping.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\FieldMappings\GenderFieldMapping.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\FieldMappings\MunicipalityFieldMapping.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\FieldMappings\ParishFieldMapping.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\FieldMappings\ProvinceFieldMapping.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

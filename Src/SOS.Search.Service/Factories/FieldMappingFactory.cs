@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
@@ -17,6 +18,7 @@ namespace SOS.Search.Service.Factories
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly ILogger<FieldMappingFactory> _logger;
         private Dictionary<FieldMappingFieldId, Dictionary<int, Dictionary<string, string>>> _translationDictionary;
+        private Dictionary<FieldMappingFieldId, Dictionary<int, string>> _nonLocalizedTranslationDictionary;
         static readonly object InitLock = new object();
 
         /// <summary>
@@ -33,11 +35,11 @@ namespace SOS.Search.Service.Factories
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private async Task<Dictionary<FieldMappingFieldId, Dictionary<int, Dictionary<string, string>>>> CreateTranslationDictionaryAsync()
+        private async Task<Dictionary<FieldMappingFieldId, Dictionary<int, Dictionary<string, string>>>> CreateLocalizedTranslationDictionaryAsync()
         {
             var dic = new Dictionary<FieldMappingFieldId, Dictionary<int, Dictionary<string, string>>>();
             var fieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
-            foreach (var fieldMapping in fieldMappings)
+            foreach (var fieldMapping in fieldMappings.Where(m => m.Localized))
             {
                 var fieldMappingFieldId = (FieldMappingFieldId) fieldMapping.Id;
                 dic.Add(fieldMappingFieldId, new Dictionary<int, Dictionary<string, string>>());
@@ -48,6 +50,23 @@ namespace SOS.Search.Service.Factories
                     {
                         dic[fieldMappingFieldId][fieldMappingValue.Id].Add(fieldMappingTranslation.CultureCode, fieldMappingTranslation.Value);
                     }
+                }
+            }
+
+            return dic;
+        }
+
+        private async Task<Dictionary<FieldMappingFieldId, Dictionary<int, string>>> CreateNonLocalizedTranslationDictionaryAsync()
+        {
+            var dic = new Dictionary<FieldMappingFieldId, Dictionary<int, string>>();
+            var fieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
+            foreach (var fieldMapping in fieldMappings.Where(m => !m.Localized))
+            {
+                var fieldMappingFieldId = (FieldMappingFieldId)fieldMapping.Id;
+                dic.Add(fieldMappingFieldId, new Dictionary<int, string>());
+                foreach (var fieldMappingValue in fieldMapping.Values)
+                {
+                    dic[fieldMappingFieldId].Add(fieldMappingValue.Id, fieldMappingValue.Name);
                 }
             }
 
@@ -68,12 +87,31 @@ namespace SOS.Search.Service.Factories
                     {
                         if (_translationDictionary == null)
                         {
-                            _translationDictionary = CreateTranslationDictionaryAsync().Result;
+                            _translationDictionary = CreateLocalizedTranslationDictionaryAsync().Result;
                         }
                     }
                 }
 
                 return _translationDictionary;
+            }
+        }
+
+        private Dictionary<FieldMappingFieldId, Dictionary<int, string>> NonLocalizedTranslationDictionary
+        {
+            get
+            {
+                if (_nonLocalizedTranslationDictionary == null)
+                {
+                    lock (InitLock)
+                    {
+                        if (_nonLocalizedTranslationDictionary == null)
+                        {
+                            _nonLocalizedTranslationDictionary = CreateNonLocalizedTranslationDictionaryAsync().Result;
+                        }
+                    }
+                }
+
+                return _nonLocalizedTranslationDictionary;
             }
         }
 
@@ -96,6 +134,12 @@ namespace SOS.Search.Service.Factories
                 translatedValue = null;
                 return false;
             }
+        }
+
+        /// <inheritdoc />
+        public bool TryGetValue(FieldMappingFieldId fieldId, int sosId, out string translatedValue)
+        {
+            return NonLocalizedTranslationDictionary[fieldId].TryGetValue(sosId, out translatedValue);
         }
     }
 }

@@ -9,6 +9,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Process.Extensions
@@ -165,9 +166,13 @@ namespace SOS.Process.Extensions
                 Type = "Occurrence"
             };
             
-            
-            obs.Occurrence.SexId = GetSosLookupId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Sex]);
+            // Get field mapping values
+            obs.Occurrence.SexId = GetSosLookupId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Gender]);
             obs.Occurrence.ActivityId = GetSosLookupId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]);
+            obs.Location.CountyIdByCoordinate = GetSosLookupId(verbatim.Site.County?.Id, fieldMappings[FieldMappingFieldId.County]);
+            obs.Location.MunicipalityIdByCoordinate = GetSosLookupId(verbatim.Site.Municipality?.Id, fieldMappings[FieldMappingFieldId.Municipality]);
+            obs.Location.ProvinceIdByCoordinate = GetSosLookupId(verbatim.Site.Province?.Id, fieldMappings[FieldMappingFieldId.Province]);
+            obs.Location.ParishIdByCoordinate = GetSosLookupId(verbatim.Site.Parish?.Id, fieldMappings[FieldMappingFieldId.Parish]);
             return obs;
         }
 

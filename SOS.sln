@@ -58,7 +58,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.TestHelpers", "Tests\Te
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Helpers", "Helpers", "{A5F589FE-B34F-42BC-B284-30A9629C2ABB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Lib.UnitTests", "Tests\Unit\SOS.Lib.UnitTests\SOS.Lib.UnitTests.csproj", "{60FA637D-7C9D-404C-A889-EE0523CDA1FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Lib.UnitTests", "Tests\Unit\SOS.Lib.UnitTests\SOS.Lib.UnitTests.csproj", "{60FA637D-7C9D-404C-A889-EE0523CDA1FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

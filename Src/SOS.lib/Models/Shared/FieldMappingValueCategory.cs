@@ -1,26 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
+﻿using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
+using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Shared
 {
-    public class FieldMappingValue
+    public class FieldMappingValueCategory
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public bool Localized { get; set; }
-
-        [BsonIgnoreIfNull]
-        [JsonConverter(typeof(ExpandoObjectConverter))]
-        public dynamic Extra { get; set; }
-
-        [BsonIgnoreIfNull]
-        public FieldMappingValueCategory Category { get; set; }
 
         /// <summary>
         /// Translations.

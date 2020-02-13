@@ -9,7 +9,7 @@ namespace SOS.Lib.Enums
     /// </summary>
     public enum FieldMapReturnValue
     {
-        Verbatim = 0,
+        UseIdValues = 0,
         Swedish = 1,
         English = 2
     }

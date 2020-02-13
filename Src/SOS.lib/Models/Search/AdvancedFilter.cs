@@ -93,7 +93,12 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Return value for fields that are using a controlled vocabulary.
         /// </summary>
-        public FieldMapReturnValue FieldMapReturnValue { get; set; } = FieldMapReturnValue.Verbatim;
+        public FieldMapReturnValue TranslateLocalizedFieldMappedValues { get; set; } = FieldMapReturnValue.UseIdValues;
+
+        /// <summary>
+        /// Decides whether non localized field mapped fields should return their mapped value.
+        /// </summary>
+        public bool TranslateFieldMappedValues { get; set; } = false;
 
         public AdvancedFilter Clone()
         {

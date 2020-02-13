@@ -127,19 +127,38 @@ namespace SOS.Process.Factories
             VerbatimDataProviderTypeId dataProviderTypeId,
             IDictionary<int, FieldMapping> fieldMappingByFieldId)
         {
-            var dic = new Dictionary<FieldMappingFieldId, IDictionary<object, int>>(); 
+            var dic = new Dictionary<FieldMappingFieldId, IDictionary<object, int>>();
 
             foreach (var pair in fieldMappingByFieldId)
             {
-                var fieldMappings = pair.Value.DataProviderTypeFieldMappings.FirstOrDefault(m => m.Id == (int) dataProviderTypeId);
+                var fieldMappingFieldId = (FieldMappingFieldId) pair.Key;
+                var fieldMappings = pair.Value.ExternalSystemsMapping.FirstOrDefault(m => m.Id == (int)dataProviderTypeId);
                 if (fieldMappings != null)
                 {
-                    var sosIdByValue = fieldMappings.Mappings.ToDictionary(m => (object)Convert.ToInt32(m.Value), m => m.SosId);
+                    string mappingKey = GetMappingKey(fieldMappingFieldId);
+                    var mapping = fieldMappings.Mappings.Single(m => m.Key == mappingKey);
+                    var sosIdByValue = mapping.GetIdByValueDictionary();
                     dic.Add((FieldMappingFieldId)pair.Key, sosIdByValue);
                 }
             }
 
             return dic;
+        }
+
+        private string GetMappingKey(FieldMappingFieldId fieldMappingFieldId)
+        {
+            switch (fieldMappingFieldId)
+            {
+                case FieldMappingFieldId.Activity:
+                case FieldMappingFieldId.Gender:
+                case FieldMappingFieldId.County:
+                case FieldMappingFieldId.Municipality: 
+                case FieldMappingFieldId.Parish:
+                case FieldMappingFieldId.Province:
+                    return "Id";
+                default:
+                    throw new ArgumentException($"No mapping exist for the field: {fieldMappingFieldId}");
+            }
         }
     }
 }

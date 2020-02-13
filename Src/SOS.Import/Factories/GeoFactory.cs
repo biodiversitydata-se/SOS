@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -6,12 +7,13 @@ using SOS.Import.Extensions;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Factories
 {
     /// <summary>
-    /// Sighting factory class
+    /// Geo factory class
     /// </summary>
     public class GeoFactory : Interfaces.IGeoFactory
     {
@@ -31,7 +33,6 @@ namespace SOS.Import.Factories
             ILogger<GeoFactory> logger)
         {
             _areaRepository = areaRepository ?? throw new ArgumentNullException(nameof(areaRepository));
-            _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
             _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }

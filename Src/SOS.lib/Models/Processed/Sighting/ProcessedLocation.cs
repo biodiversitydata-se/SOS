@@ -66,6 +66,26 @@ namespace SOS.Lib.Models.Processed.Sighting
         public ProcessedArea County { get; set; }
 
         /// <summary>
+        /// County id by observation coordinate.
+        /// </summary>
+        public ProcessedLookupValue CountyIdByCoordinate { get; set; }
+        
+        /// <summary>
+        /// Municipality id by observation coordinate.
+        /// </summary>
+        public ProcessedLookupValue MunicipalityIdByCoordinate { get; set; }
+        
+        /// <summary>
+        /// Parish id by observation coordinate.
+        /// </summary>
+        public ProcessedLookupValue ParishIdByCoordinate { get; set; }
+        
+        /// <summary>
+        /// Province id by observation coordinate.
+        /// </summary>
+        public ProcessedLookupValue ProvinceIdByCoordinate { get; set; }
+
+        /// <summary>
         /// Darwin Core term name: decimalLatitude.
         /// Definition in Darwin Core:
         /// The geographic latitude (in decimal degrees, using

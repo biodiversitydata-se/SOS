@@ -6,6 +6,7 @@
     public enum VerbatimDataProviderTypeId
     {
         Artportalen = 0,
-        DarwinCore = 1
+        DarwinCore = 1,
+        SwedishSpeciesObservationService = 2
     }
 }

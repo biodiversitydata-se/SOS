@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using SOS.Lib.Configuration.Import;
 using SOS.Import.Factories;
+using SOS.Import.Factories.FieldMappings;
+using SOS.Import.Factories.FieldMappings.Interfaces;
 using SOS.Import.Factories.Interfaces;
 using SOS.Import.Jobs;
 using SOS.Import.Jobs.Interfaces;
@@ -32,17 +34,28 @@ namespace SOS.Import.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             // Add configuration
-            builder.RegisterInstance(Configuration.ClamServiceConfiguration).As<ClamServiceConfiguration>().SingleInstance();
-            builder.RegisterInstance(Configuration.KulServiceConfiguration).As<KulServiceConfiguration>().SingleInstance();
-            builder.RegisterInstance(Configuration.SpeciesPortalConfiguration).As<SpeciesPortalConfiguration>().SingleInstance();
-            builder.RegisterInstance(Configuration.TaxonAttributeServiceConfiguration).As<TaxonAttributeServiceConfiguration>().SingleInstance();
-            builder.RegisterInstance(Configuration.TaxonServiceConfiguration).As<TaxonServiceConfiguration>().SingleInstance();
+            if (Configuration.ClamServiceConfiguration != null)
+                builder.RegisterInstance(Configuration.ClamServiceConfiguration).As<ClamServiceConfiguration>().SingleInstance();
+            if (Configuration.KulServiceConfiguration != null)
+                builder.RegisterInstance(Configuration.KulServiceConfiguration).As<KulServiceConfiguration>().SingleInstance();
+            if (Configuration.SpeciesPortalConfiguration != null)
+                builder.RegisterInstance(Configuration.SpeciesPortalConfiguration).As<SpeciesPortalConfiguration>().SingleInstance();
+            if (Configuration.TaxonAttributeServiceConfiguration != null)
+                builder.RegisterInstance(Configuration.TaxonAttributeServiceConfiguration).As<TaxonAttributeServiceConfiguration>().SingleInstance();
+            if (Configuration.TaxonServiceConfiguration != null)
+                builder.RegisterInstance(Configuration.TaxonServiceConfiguration).As<TaxonServiceConfiguration>().SingleInstance();
 
             // Init mongodb
-            var importSettings = Configuration.MongoDbConfiguration.GetMongoDbSettings();
-            var importClient = new ImportClient(importSettings, Configuration.MongoDbConfiguration.DatabaseName, Configuration.MongoDbConfiguration.BatchSize);
-            builder.RegisterInstance(importClient).As<IImportClient>().SingleInstance();
-            
+            if (Configuration.MongoDbConfiguration != null)
+            {
+                var importSettings = Configuration.MongoDbConfiguration.GetMongoDbSettings();
+                var importClient = new ImportClient(
+                    importSettings, 
+                    Configuration.MongoDbConfiguration.DatabaseName,
+                    Configuration.MongoDbConfiguration.BatchSize);
+                builder.RegisterInstance(importClient).As<IImportClient>().SingleInstance();
+            }
+
             // Repositories source
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<MetadataRepository>().As<IMetadataRepository>().InstancePerLifetimeScope();
@@ -71,7 +84,9 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SpeciesPortalSightingFactory>().As<ISpeciesPortalSightingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingFactory>().As<IFieldMappingFactory>().InstancePerLifetimeScope();
-            
+            builder.RegisterType<GeoRegionFieldMappingFactory>().As<IGeoRegionFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ActivityFieldMappingFactory>().As<IActivityFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<GenderFieldMappingFactory>().As<IGenderFieldMappingFactory>().InstancePerLifetimeScope();
 
             // Add Services
             builder.RegisterType<ClamObservationService>().As<IClamObservationService>().InstancePerLifetimeScope();

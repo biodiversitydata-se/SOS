@@ -46,8 +46,9 @@ namespace SOS.Search.Service.Factories
         {
             try
             {
-                var processedSightings = await _processedSightingRepository.GetChunkAsync(filter, skip, take);
-                ProcessFieldMappings(filter, processedSightings);
+                var processedSightings = (await _processedSightingRepository.GetChunkAsync(filter, skip, take)).ToArray();
+                ProcessLocalizedFieldMappings(filter, processedSightings);
+                ProcessNonLocalizedFieldMappings(filter, processedSightings);
                 return processedSightings;
             }
             catch (Exception e)
@@ -57,10 +58,41 @@ namespace SOS.Search.Service.Factories
             }
         }
 
-        private void ProcessFieldMappings(AdvancedFilter filter, IEnumerable<dynamic> processedSightings)
+        private void ProcessNonLocalizedFieldMappings(AdvancedFilter filter, IEnumerable<object> processedSightings)
         {
-            if (filter.FieldMapReturnValue == FieldMapReturnValue.Verbatim) return;
-            string cultureCode = GetCultureCode(filter.FieldMapReturnValue);
+            if (!filter.TranslateFieldMappedValues) return;
+
+            if (filter.OutputFields == null || !filter.OutputFields.Any()) // ProcessedSighting objects is returned wen OutputFields is not used.
+            {
+                var sightings = processedSightings.Cast<ProcessedSighting>();
+                foreach (var sighting in sightings)
+                {
+                    TranslateValue(sighting.Location?.CountyIdByCoordinate, FieldMappingFieldId.County);
+                    TranslateValue(sighting.Location?.MunicipalityIdByCoordinate, FieldMappingFieldId.Municipality);
+                    TranslateValue(sighting.Location?.ProvinceIdByCoordinate, FieldMappingFieldId.Province);
+                    TranslateValue(sighting.Location?.ParishIdByCoordinate, FieldMappingFieldId.Parish);
+                }
+            }
+            else // dynamic objects is returned when OutputFields is used
+            {
+                foreach (var sighting in processedSightings)
+                {
+                    if (sighting is IDictionary<string, object> obs && obs.ContainsKey("Occurrence"))
+                    {
+                        var location = obs["Location"] as IDictionary<string, object>;
+                        TranslateValue(location, FieldMappingFieldId.County, nameof(ProcessedSighting.Location.CountyIdByCoordinate));
+                        TranslateValue(location, FieldMappingFieldId.Municipality, nameof(ProcessedSighting.Location.MunicipalityIdByCoordinate));
+                        TranslateValue(location, FieldMappingFieldId.Province, nameof(ProcessedSighting.Location.ProvinceIdByCoordinate));
+                        TranslateValue(location, FieldMappingFieldId.Parish, nameof(ProcessedSighting.Location.ParishIdByCoordinate));
+                    }
+                }
+            }
+        }
+
+        private void ProcessLocalizedFieldMappings(AdvancedFilter filter, IEnumerable<dynamic> processedSightings)
+        {
+            if (filter.TranslateLocalizedFieldMappedValues == FieldMapReturnValue.UseIdValues) return;
+            string cultureCode = GetCultureCode(filter.TranslateLocalizedFieldMappedValues);
 
             if (filter.OutputFields == null || !filter.OutputFields.Any()) // ProcessedSighting objects is returned wen OutputFields is not used.
             {
@@ -79,10 +111,11 @@ namespace SOS.Search.Service.Factories
         {
             foreach (var sighting in processedSightings)
             {
-                TranslateValue(sighting.Occurrence?.ActivityId, FieldMappingFieldId.Activity, cultureCode);
-                TranslateValue(sighting.Occurrence?.SexId, FieldMappingFieldId.Sex, cultureCode);
+                TranslateLocalizedValue(sighting.Occurrence?.ActivityId, FieldMappingFieldId.Activity, cultureCode);
+                TranslateLocalizedValue(sighting.Occurrence?.SexId, FieldMappingFieldId.Gender, cultureCode);
             }
         }
+
 
         private void ProcessFieldMappedReturnValues(
             IEnumerable<dynamic> processedSightings,
@@ -95,8 +128,14 @@ namespace SOS.Search.Service.Factories
                     if (sighting is IDictionary<string, object> obs && obs.ContainsKey("Occurrence"))
                     {
                         var occurrence = obs["Occurrence"] as IDictionary<string, object>;
-                        TranslateValue(occurrence, FieldMappingFieldId.Activity, "ActivityId", cultureCode);
-                        TranslateValue(occurrence, FieldMappingFieldId.Sex, "SexId", cultureCode);
+                        TranslateLocalizedValue(occurrence, FieldMappingFieldId.Activity, nameof(ProcessedSighting.Occurrence.ActivityId), cultureCode);
+                        TranslateLocalizedValue(occurrence, FieldMappingFieldId.Gender, nameof(ProcessedSighting.Occurrence.SexId), cultureCode);
+
+                        var location = obs["Location"] as IDictionary<string, object>;
+                        TranslateValue(location, FieldMappingFieldId.County, nameof(ProcessedSighting.Location.CountyIdByCoordinate));
+                        TranslateValue(location, FieldMappingFieldId.Municipality, nameof(ProcessedSighting.Location.MunicipalityIdByCoordinate));
+                        TranslateValue(location, FieldMappingFieldId.Province, nameof(ProcessedSighting.Location.ProvinceIdByCoordinate));
+                        TranslateValue(location, FieldMappingFieldId.Parish, nameof(ProcessedSighting.Location.ParishIdByCoordinate));
                     }
                 }
             }
@@ -108,6 +147,35 @@ namespace SOS.Search.Service.Factories
         }
 
         private void TranslateValue(
+            IDictionary<string, object> sightingNode, 
+            FieldMappingFieldId fieldMappingFieldId, 
+            string fieldName)
+        {
+            if (sightingNode == null) return;
+
+            if (sightingNode.ContainsKey(fieldName))
+            {
+                if (sightingNode[fieldName] is IDictionary<string, object> fieldNode && fieldNode.ContainsKey("Value") && fieldNode.ContainsKey("_id"))
+                {
+                    int id = (int)fieldNode["_id"];
+                    if (id != CustomValueId && _fieldMappingFactory.TryGetValue(fieldMappingFieldId, id, out var translatedValue))
+                    {
+                        fieldNode["Value"] = translatedValue;
+                    }
+                }
+            }
+        }
+        private void TranslateValue(ProcessedLookupValue lookupValue, FieldMappingFieldId fieldMappingFieldId)
+        {
+            if (lookupValue == null) return;
+            if (lookupValue.Id != CustomValueId
+                && _fieldMappingFactory.TryGetValue(fieldMappingFieldId, lookupValue.Id, out var translatedValue))
+            {
+                lookupValue.Value = translatedValue;
+            }
+        }
+
+        private void TranslateLocalizedValue(
             ProcessedLookupValue lookupValue,
             FieldMappingFieldId fieldMappingFieldId,
             string cultureCode)
@@ -121,7 +189,7 @@ namespace SOS.Search.Service.Factories
             }
         }
 
-        private void TranslateValue(
+        private void TranslateLocalizedValue(
             IDictionary<string, object> sightingNode, 
             FieldMappingFieldId fieldMappingFieldId, 
             string fieldName,
@@ -133,9 +201,8 @@ namespace SOS.Search.Service.Factories
             {
                 if (sightingNode[fieldName] is IDictionary<string, object> fieldNode && fieldNode.ContainsKey("Value") && fieldNode.ContainsKey("_id"))
                 {
-                    int activityId = (int)fieldNode["_id"];
-                    if (activityId != CustomValueId
-                        && _fieldMappingFactory.TryGetTranslatedValue(FieldMappingFieldId.Activity, cultureCode, activityId, out var translatedValue))
+                    int id = (int)fieldNode["_id"];
+                    if (id != CustomValueId && _fieldMappingFactory.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, id, out var translatedValue))
                     {
                         fieldNode["Value"] = translatedValue;
                     }
