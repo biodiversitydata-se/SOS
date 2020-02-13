@@ -419,6 +419,7 @@ namespace SOS.Import.Extensions
             };
         }
 
+        
         /// <summary>
         /// Cast site itemEntity to aggregate
         /// </summary>
@@ -430,10 +431,10 @@ namespace SOS.Import.Extensions
 
             if (entity.XCoord > 0 && entity.YCoord > 0)
             {
-                var googleMercatorPoint = new Point(entity.XCoord, entity.YCoord);
-                wgs84Point = (Point)googleMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+                var webMercatorPoint = new Point(entity.XCoord, entity.YCoord);
+                wgs84Point = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
             }
-           
+
             return new Site
             {
                 Accuracy = entity.Accuracy,
