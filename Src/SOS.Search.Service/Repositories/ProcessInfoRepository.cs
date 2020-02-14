@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Search.Service.Database.Interfaces;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Repositories
@@ -11,18 +12,16 @@ namespace SOS.Search.Service.Repositories
     /// <summary>
     /// Process information repository
     /// </summary>
-    public class ProcessInfoRepository : BaseRepository<ProcessInfo, byte>, IProcessInfoRepository
+    public class ProcessInfoRepository : ProcessBaseRepository<ProcessInfo, byte>, IProcessInfoRepository
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="mongoClient"></param>
-        /// <param name="processedDbConfiguration"></param>
+        /// <param name="client"></param>
         /// <param name="logger"></param>
         public ProcessInfoRepository(
-            IMongoClient mongoClient,
-            IOptions<MongoDbConfiguration> processedDbConfiguration, 
-            ILogger<ProcessInfoRepository> logger) : base(mongoClient, processedDbConfiguration, false, logger)
+            IProcessClient client, 
+            ILogger<ProcessInfoRepository> logger) : base(client, false, logger)
         {
         }
 

@@ -31,11 +31,7 @@ namespace SOS.Process.Repositories.Destination
             ILogger<ProcessedFieldMappingRepository> logger) 
             : base(client, true, logger)
         {
-            if (!BsonClassMap.IsClassMapRegistered(typeof(FieldMappingValue)))
-            {
-                BsonClassMap.RegisterClassMap<FieldMappingValue>();
-                BsonClassMap.RegisterClassMap<FieldMappingWithCategoryValue>();
-            }
+           
         }
 
         /// <inheritdoc />

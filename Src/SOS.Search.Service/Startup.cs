@@ -4,23 +4,20 @@ using System.IO;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Hangfire;
-using Hangfire.Dashboard;
 using Hangfire.Mongo;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using MongoDB.Driver;
 using NLog.Web;
 using SOS.Core.Repositories;
 using SOS.Lib.Configuration.Shared;
-using SOS.Search.Service.Factories;
-using SOS.Search.Service.Factories.Interfaces;
-using SOS.Search.Service.Repositories;
-using SOS.Search.Service.Repositories.Interfaces;
 using SOS.Search.Service.Swagger;
 
 namespace SOS.Search.Service
@@ -40,7 +37,7 @@ namespace SOS.Search.Service
         /// </summary>
         public ILifetimeScope AutofacContainer { get; private set; }
 
-        private string _environment;
+        private readonly string _environment;
 
         /// <summary>
         /// Start up
@@ -48,7 +45,7 @@ namespace SOS.Search.Service
         /// <param name="env"></param>
         public Startup(IWebHostEnvironment env)
         {
-            var _environment = env.EnvironmentName.ToLower();
+            _environment = env.EnvironmentName.ToLower();
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -57,11 +54,13 @@ namespace SOS.Search.Service
                 .AddEnvironmentVariables();
 
             //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
-            if (new[] { "dev", "local" }.Contains(_environment))
+            if (env.IsDevelopment() ||
+                _environment == "dev" ||
+                _environment == "local")
             {
                 builder.AddUserSecrets<Startup>();
             }
-           
+
             Configuration = builder.Build();
         }
         public void ConfigureLogging(ContainerBuilder builder, ILoggingBuilder logging)
@@ -70,6 +69,7 @@ namespace SOS.Search.Service
             logging.AddConfiguration(Configuration.GetSection("Logging"))
                 .AddNLog(configFileName: $"nlog.{_environment}.config");
         }
+
 
         /// <summary>
         /// Register Autofac services. This runs after ConfigureServices so the things
@@ -89,7 +89,7 @@ namespace SOS.Search.Service
             builder.Register(r => repositorySettings).As<IRepositorySettings>().SingleInstance();
         }
 
-        // <summary>
+        /// <summary>
         /// This method gets called by the runtime. Use this method to add services to the container.
         /// </summary>
         /// <param name="services"></param>
@@ -102,32 +102,6 @@ namespace SOS.Search.Service
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
-
-            services.Configure<MongoDbConfiguration>(Configuration.GetSection("ProcessedDbConfiguration"));
-
-            // Add CORS
-            services.AddCors();
-
-            // Add options
-            services.AddOptions();
-
-            // Mongo Db
-            var config = Configuration.GetSection("ProcessedDbConfiguration").Get<MongoDbConfiguration>();
-
-            // Setup db
-            services.AddSingleton<IMongoClient, MongoClient>(x => new MongoClient(config.GetMongoDbSettings()));
-
-            // Add factories
-            services.AddScoped<ISightingFactory, SightingFactory>();
-            services.AddScoped<IProcessInfoFactory, ProcessInfoFactory>();
-            services.AddSingleton<ITaxonFactory, TaxonFactory>();
-            services.AddSingleton<IFieldMappingFactory, FieldMappingFactory>();
-
-            // Repositories mongo
-            services.AddScoped<IProcessedSightingRepository, ProcessedSightingRepository>();
-            services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
-            services.AddScoped<IProcessedTaxonRepository, ProcessedTaxonRepository>();
-            services.AddScoped<IProcessedFieldMappingRepository, ProcessedFieldMappingRepository>();
 
             // Configure swagger
             services.AddSwaggerGen(
@@ -149,6 +123,9 @@ namespace SOS.Search.Service
 
                     options.SchemaFilter<SwaggerIgnoreFilter>();
                 });
+
+
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Hangfire
             var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<MongoDbConfiguration>();
@@ -178,10 +155,7 @@ namespace SOS.Search.Service
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Use CORS in the application
-            app.UseCors(x => x.AllowAnyOrigin()
-                .AllowAnyHeader()
-                .AllowAnyMethod());
+            this.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
 
             if (new[] { "dev", "local" }.Contains(env.EnvironmentName.ToLower()))
             {
@@ -192,14 +166,6 @@ namespace SOS.Search.Service
                 app.UseHsts();
             }
 
-            app.UseHangfireServer();
-
-            // app.UseAuthentication();
-            app.UseHttpsRedirection();
-            app.UseMvc();
-            app.UseStaticFiles();
-
-            // Use Swagger and SwaggerUI
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
@@ -208,6 +174,18 @@ namespace SOS.Search.Service
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "SOS Search service");
+            });
+
+            app.UseHangfireServer();
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
             });
         }
     }

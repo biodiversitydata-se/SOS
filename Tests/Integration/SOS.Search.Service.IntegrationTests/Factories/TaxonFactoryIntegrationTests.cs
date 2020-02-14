@@ -19,30 +19,30 @@ namespace SOS.Search.Service.IntegrationTests.Factories
 {
     public class TaxonFactoryIntegrationTests : TestBase
     {
-        [Fact]
-        public void A_taxon_tree_is_created_from_taxon_data_in_sos_processed_db()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var mongoDbConfiguration = GetMongoDbConfiguration();
-            var mongoClient = new MongoClient(mongoDbConfiguration.GetMongoDbSettings());
-            var options = Options.Create(mongoDbConfiguration);
-            var processedTaxonRepository = new ProcessedTaxonRepository(
-                mongoClient,
-                options,
-                new NullLogger<BaseRepository<ProcessedTaxon, int>>());
-            var taxonFactory = new TaxonFactory(processedTaxonRepository, new NullLogger<TaxonFactory>());
+        //[Fact]
+        //public void A_taxon_tree_is_created_from_taxon_data_in_sos_processed_db()
+        //{
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Arrange
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    var mongoDbConfiguration = GetMongoDbConfiguration();
+        //    var mongoClient = new MongoClient(mongoDbConfiguration.GetMongoDbSettings());
+        //    var options = Options.Create(mongoDbConfiguration);
+        //    var processedTaxonRepository = new ProcessedTaxonRepository(
+        //        mongoClient,
+        //        options,
+        //        new NullLogger<BaseRepository<ProcessedTaxon, int>>());
+        //    var taxonFactory = new TaxonFactory(processedTaxonRepository, new NullLogger<TaxonFactory>());
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var taxonTree = taxonFactory.TaxonTree;
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Act
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    var taxonTree = taxonFactory.TaxonTree;
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            taxonTree.Root.ScientificName.Should().Be("Biota");
-        }
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Assert
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    taxonTree.Root.ScientificName.Should().Be("Biota");
+        //}
     }
 }

@@ -8,6 +8,7 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
+using SOS.Search.Service.Database.Interfaces;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Repositories
@@ -15,18 +16,24 @@ namespace SOS.Search.Service.Repositories
     /// <summary>
     /// Base class for cosmos db repositories
     /// </summary>
-    public class BaseRepository<TEntity, TKey> : IBaseRepository<TEntity, TKey> where TEntity : IEntity<TKey>
+    public class ProcessBaseRepository<TEntity, TKey> : IBaseRepository<TEntity, TKey> where TEntity : IEntity<TKey>
     {
         /// <summary>
         /// Logger 
         /// </summary>
-        protected readonly ILogger<BaseRepository<TEntity, TKey>> Logger;
+        protected readonly ILogger<ProcessBaseRepository<TEntity, TKey>> Logger;
 
+        private readonly IProcessClient _client;
         /// <summary>
         /// Mongo db
         /// </summary>
         protected readonly IMongoDatabase Database;
-
+        
+        /// <summary>
+        /// Batch size.
+        /// </summary>
+        protected int BatchSize { get; }
+        
         /// <summary>
         /// Disposed
         /// </summary>
@@ -38,26 +45,19 @@ namespace SOS.Search.Service.Repositories
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="mongoClient"></param>
-        /// <param name="processedDbConfiguration"></param>
+        /// <param name="client"></param>
         /// <param name="multipleInstances"></param>
         /// <param name="logger"></param>
-        protected BaseRepository(
-            IMongoClient mongoClient,
-            IOptions<MongoDbConfiguration> processedDbConfiguration,
+        protected ProcessBaseRepository(
+            IProcessClient client,
             bool multipleInstances,
-            ILogger<BaseRepository<TEntity, TKey>> logger
+            ILogger<ProcessBaseRepository<TEntity, TKey>> logger
         )
         {
-            if (processedDbConfiguration?.Value == null)
-            {
-                throw new ArgumentNullException(nameof(processedDbConfiguration));
-            }
-
+            _client = client ?? throw new ArgumentNullException(nameof(client));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            Database = mongoClient.GetDatabase($"{processedDbConfiguration.Value.DatabaseName}");
-
+            BatchSize = _client.BatchSize;
+            Database = _client.GetDatabase();
             _collectionName = multipleInstances ? $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ ActiveInstance }" : typeof(TEntity).Name.UntilNonAlfanumeric();
         }
 

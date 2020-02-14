@@ -8,6 +8,7 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Shared;
+using SOS.Search.Service.Database.Interfaces;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Repositories
@@ -15,24 +16,18 @@ namespace SOS.Search.Service.Repositories
     /// <summary>
     /// Field mappings repository.
     /// </summary>
-    public class ProcessedFieldMappingRepository : BaseRepository<FieldMapping, int>, IProcessedFieldMappingRepository
+    public class ProcessedFieldMappingRepository : ProcessBaseRepository<FieldMapping, int>, IProcessedFieldMappingRepository
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="mongoClient"></param>
-        /// <param name="processedDbConfiguration"></param>
+        /// <param name="client"></param>
         /// <param name="logger"></param>
         public ProcessedFieldMappingRepository(
-            IMongoClient mongoClient, 
-            IOptions<MongoDbConfiguration> processedDbConfiguration,
-            ILogger<BaseRepository<FieldMapping, int>> logger) : base(mongoClient, processedDbConfiguration, true, logger)
+            IProcessClient client,
+            ILogger<ProcessBaseRepository<FieldMapping, int>> logger) : base(client, true, logger)
         {
-            if (!BsonClassMap.IsClassMapRegistered(typeof(FieldMappingValue)))
-            {
-                BsonClassMap.RegisterClassMap<FieldMappingValue>();
-                BsonClassMap.RegisterClassMap<FieldMappingWithCategoryValue>();
-            }
+            
         }
 
         /// <inheritdoc />
