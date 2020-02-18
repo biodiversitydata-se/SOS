@@ -19,11 +19,7 @@ namespace SOS.Process.Repositories.Source
         public FieldMappingVerbatimRepository(IVerbatimClient client,
             ILogger<FieldMappingVerbatimRepository> logger) : base(client, logger)
         {
-            if (!BsonClassMap.IsClassMapRegistered(typeof(FieldMappingValue)))
-            {
-                BsonClassMap.RegisterClassMap<FieldMappingValue>();
-                BsonClassMap.RegisterClassMap<FieldMappingWithCategoryValue>();
-            }
+           
         }
 
         public async Task<IEnumerable<FieldMapping>> GetFieldMappingsAsync()

@@ -2,24 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using Newtonsoft.Json;
-using SOS.Import.Enums;
 using SOS.Import.Factories.FieldMappings.Interfaces;
 using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;
-using SOS.Import.Repositories.Destination.Taxon.Interfaces;
-using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.JsonConverters;
-using  SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Factories
 {

@@ -50,6 +50,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\Shared\" />
     <Folder Include="TestHelpers\Factories\" />
   </ItemGroup>
 
