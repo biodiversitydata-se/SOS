@@ -107,7 +107,6 @@ namespace SOS.Process.Extensions
                     CoordinateUncertaintyInMeters = verbatim.Site?.Accuracy,
                     Country = Country.Sweden,
                     CountryCode = CountryCode.Sweden,
-                    County = verbatim.Site?.County?.ToProcessed(),
                     DecimalLatitude = hasPosition ? verbatim.Site.YCoordWGS84 : 0,
                     DecimalLongitude = hasPosition ? verbatim.Site.XCoordWGS84 : 0,
                     GeodeticDatum = GeodeticDatum.Wgs84,
@@ -117,11 +116,8 @@ namespace SOS.Process.Extensions
                     MaximumElevationInMeters = verbatim.MaxHeight,
                     MinimumDepthInMeters = verbatim.MinDepth,
                     MinimumElevationInMeters = verbatim.MinHeight,
-                    Municipality = verbatim.Site?.Municipality?.ToProcessed(),
-                    Parish = verbatim.Site?.Parish?.ToProcessed(),
                     Point = verbatim.Site?.Point,
                     PointWithBuffer = verbatim.Site?.PointWithBuffer,
-                    Province = verbatim.Site?.Province?.ToProcessed(),
                     VerbatimLatitude = hasPosition ? verbatim.Site.YCoord : 0,
                     VerbatimLongitude = hasPosition ? verbatim.Site.XCoord : 0,
                     VerbatimCoordinateSystem = "EPSG:3857"
@@ -166,12 +162,12 @@ namespace SOS.Process.Extensions
             };
             
             // Get field mapping values
-            obs.Occurrence.SexId = GetSosLookupId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Gender]);
-            obs.Occurrence.ActivityId = GetSosLookupId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]);
-            obs.Location.CountyIdByCoordinate = GetSosLookupId(verbatim.Site.County?.Id, fieldMappings[FieldMappingFieldId.County]);
-            obs.Location.MunicipalityIdByCoordinate = GetSosLookupId(verbatim.Site.Municipality?.Id, fieldMappings[FieldMappingFieldId.Municipality]);
-            obs.Location.ProvinceIdByCoordinate = GetSosLookupId(verbatim.Site.Province?.Id, fieldMappings[FieldMappingFieldId.Province]);
-            obs.Location.ParishIdByCoordinate = GetSosLookupId(verbatim.Site.Parish?.Id, fieldMappings[FieldMappingFieldId.Parish]);
+            obs.Occurrence.SexId = GetSosId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Gender]);
+            obs.Occurrence.ActivityId = GetSosId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]);
+            obs.Location.CountyId = GetSosId(verbatim.Site.County?.Id, fieldMappings[FieldMappingFieldId.County]);
+            obs.Location.MunicipalityId = GetSosId(verbatim.Site.Municipality?.Id, fieldMappings[FieldMappingFieldId.Municipality]);
+            obs.Location.ProvinceId = GetSosId(verbatim.Site.Province?.Id, fieldMappings[FieldMappingFieldId.Province]);
+            obs.Location.ParishId = GetSosId(verbatim.Site.Parish?.Id, fieldMappings[FieldMappingFieldId.Parish]);
             return obs;
         }
 
@@ -181,7 +177,7 @@ namespace SOS.Process.Extensions
         /// <param name="val"></param>
         /// <param name="sosIdByProviderValue"></param>
         /// <returns></returns>
-        private static ProcessedLookupValue GetSosLookupId(int? val, IDictionary<object, int> sosIdByProviderValue)
+        private static ProcessedLookupValue GetSosId(int? val, IDictionary<object, int> sosIdByProviderValue)
         {
             if (!val.HasValue) return null;
 

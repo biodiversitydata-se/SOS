@@ -465,6 +465,96 @@
               "SosId": 21
             }
           ]
+        },
+        {
+          "Key": "FeatureId",
+          "Description": "The key is FeatureId",
+          "Values": [
+            {
+              "Value": 10,
+              "SosId": 1
+            },
+            {
+              "Value": 20,
+              "SosId": 2
+            },
+            {
+              "Value": 9,
+              "SosId": 3
+            },
+            {
+              "Value": 21,
+              "SosId": 4
+            },
+            {
+              "Value": 13,
+              "SosId": 5
+            },
+            {
+              "Value": 23,
+              "SosId": 6
+            },
+            {
+              "Value": 6,
+              "SosId": 7
+            },
+            {
+              "Value": 8,
+              "SosId": 8
+            },
+            {
+              "Value": 7,
+              "SosId": 9
+            },
+            {
+              "Value": 25,
+              "SosId": 10
+            },
+            {
+              "Value": 12,
+              "SosId": 11
+            },
+            {
+              "Value": 1,
+              "SosId": 12
+            },
+            {
+              "Value": 4,
+              "SosId": 13
+            },
+            {
+              "Value": 3,
+              "SosId": 14
+            },
+            {
+              "Value": 17,
+              "SosId": 15
+            },
+            {
+              "Value": 24,
+              "SosId": 16
+            },
+            {
+              "Value": 5,
+              "SosId": 17
+            },
+            {
+              "Value": 22,
+              "SosId": 18
+            },
+            {
+              "Value": 19,
+              "SosId": 19
+            },
+            {
+              "Value": 14,
+              "SosId": 20
+            },
+            {
+              "Value": 18,
+              "SosId": 21
+            }
+          ]
         }
       ]
     },

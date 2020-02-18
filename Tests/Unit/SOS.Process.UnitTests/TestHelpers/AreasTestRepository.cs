@@ -65,7 +65,6 @@ namespace SOS.Process.UnitTests.TestHelpers
             {
                 Id = int.Parse(feature.Attributes["id"].ToString()),
                 FeatureId = int.Parse(feature.Attributes["nativeId"].ToString()),
-                //ParentId = feature.ParentId,
                 Geometry = feature.Geometry.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoJsonGeometry(),
                 Name = feature.Attributes["name"].ToString()
             };

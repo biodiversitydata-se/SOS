@@ -738,6 +738,148 @@
               "SosId": 55239
             }
           ]
+        },
+        {
+          "Key": "FeatureId",
+          "Description": "The key is FeatureId",
+          "Values": [
+            {
+              "Value": 1,
+              "SosId": 8058
+            },
+            {
+              "Value": 2,
+              "SosId": 8059
+            },
+            {
+              "Value": 3,
+              "SosId": 8060
+            },
+            {
+              "Value": 4,
+              "SosId": 8061
+            },
+            {
+              "Value": 5,
+              "SosId": 8062
+            },
+            {
+              "Value": 6,
+              "SosId": 8063
+            },
+            {
+              "Value": 7,
+              "SosId": 8064
+            },
+            {
+              "Value": 8,
+              "SosId": 8065
+            },
+            {
+              "Value": 9,
+              "SosId": 8066
+            },
+            {
+              "Value": 10,
+              "SosId": 8067
+            },
+            {
+              "Value": 11,
+              "SosId": 8068
+            },
+            {
+              "Value": 12,
+              "SosId": 8069
+            },
+            {
+              "Value": 13,
+              "SosId": 8070
+            },
+            {
+              "Value": 14,
+              "SosId": 8071
+            },
+            {
+              "Value": 15,
+              "SosId": 8072
+            },
+            {
+              "Value": 16,
+              "SosId": 8073
+            },
+            {
+              "Value": 17,
+              "SosId": 8074
+            },
+            {
+              "Value": 18,
+              "SosId": 8075
+            },
+            {
+              "Value": 19,
+              "SosId": 8076
+            },
+            {
+              "Value": 20,
+              "SosId": 8077
+            },
+            {
+              "Value": 21,
+              "SosId": 8078
+            },
+            {
+              "Value": 22,
+              "SosId": 8079
+            },
+            {
+              "Value": 23,
+              "SosId": 8080
+            },
+            {
+              "Value": 24,
+              "SosId": 8081
+            },
+            {
+              "Value": 25,
+              "SosId": 8082
+            },
+            {
+              "Value": 26,
+              "SosId": 8083
+            },
+            {
+              "Value": 27,
+              "SosId": 8084
+            },
+            {
+              "Value": 28,
+              "SosId": 8085
+            },
+            {
+              "Value": 29,
+              "SosId": 8086
+            },
+            {
+              "Value": 30,
+              "SosId": 55235
+            },
+            {
+              "Value": 31,
+              "SosId": 55236
+            },
+            {
+              "Value": 32,
+              "SosId": 55237
+            },
+            {
+              "Value": 33,
+              "SosId": 55238
+            },
+            {
+              "Value": 34,
+              "SosId": 55239
+            }
+          ]
         }
       ]
     },

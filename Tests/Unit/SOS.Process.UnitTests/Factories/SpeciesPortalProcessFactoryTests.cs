@@ -24,6 +24,7 @@ namespace SOS.Process.UnitTests.Factories
     {
         private readonly Mock<ISpeciesPortalVerbatimRepository> _speciesPortalVerbatimRepository;
         private readonly Mock<IProcessedSightingRepository> _processedSightingRepositoryMock;
+        private readonly Mock<IProcessedFieldMappingRepository> _processedFieldMappingRepositoryMock;
         private readonly Mock<ILogger<SpeciesPortalProcessFactory>> _loggerMock;
 
         /// <summary>
@@ -33,6 +34,7 @@ namespace SOS.Process.UnitTests.Factories
         {
             _speciesPortalVerbatimRepository = new Mock<ISpeciesPortalVerbatimRepository>();
             _processedSightingRepositoryMock = new Mock<IProcessedSightingRepository>();
+            _processedFieldMappingRepositoryMock = new Mock<IProcessedFieldMappingRepository>();
             _loggerMock = new Mock<ILogger<SpeciesPortalProcessFactory>>();
         }
 
@@ -45,23 +47,27 @@ namespace SOS.Process.UnitTests.Factories
             new SpeciesPortalProcessFactory(
                 _speciesPortalVerbatimRepository.Object,
                 _processedSightingRepositoryMock.Object,
+                _processedFieldMappingRepositoryMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new SpeciesPortalProcessFactory(
                 null,
                 _processedSightingRepositoryMock.Object,
+                _processedFieldMappingRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesPortalVerbatimRepository");
 
             create = () => new SpeciesPortalProcessFactory(
                 _speciesPortalVerbatimRepository.Object,
                 null,
+                _processedFieldMappingRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("DarwinCoreRepository");
 
             create = () => new SpeciesPortalProcessFactory(
                 _speciesPortalVerbatimRepository.Object,
                 _processedSightingRepositoryMock.Object,
+                _processedFieldMappingRepositoryMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -102,9 +108,10 @@ namespace SOS.Process.UnitTests.Factories
             var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
                 _speciesPortalVerbatimRepository.Object,
                 _processedSightingRepositoryMock.Object,
+                _processedFieldMappingRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(taxa, fieldMappingById, JobCancellationToken.Null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -129,9 +136,10 @@ namespace SOS.Process.UnitTests.Factories
             var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
                 _speciesPortalVerbatimRepository.Object,
                 _processedSightingRepositoryMock.Object,
+                _processedFieldMappingRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(null, null, JobCancellationToken.Null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -158,9 +166,10 @@ namespace SOS.Process.UnitTests.Factories
             var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
                 _speciesPortalVerbatimRepository.Object,
                 _processedSightingRepositoryMock.Object,
+                _processedFieldMappingRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await speciesPortalProcessFactory.ProcessAsync(null, null, JobCancellationToken.Null);
+            var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

@@ -129,15 +129,15 @@ namespace SOS.Process.Repositories.Destination
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Identification.Validated)),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.County.Id)),
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.CountyId.Id)),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Geo2DSphere(a => a.Location.Point)),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Geo2DSphere(a => a.Location.PointWithBuffer)),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.Province.Id)),
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.ProvinceId.Id)),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.Municipality.Id)),
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.MunicipalityId.Id)),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation)),
                 new CreateIndexModel<ProcessedSighting>(

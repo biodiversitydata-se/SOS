@@ -2,12 +2,15 @@
 using FluentAssertions;
 using Moq;
 using SOS.Lib.Enums;
-using  SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers;
+using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 using SOS.Process.UnitTests.TestHelpers;
+using SOS.Process.UnitTests.TestHelpers.Factories;
 using SOS.TestHelpers.Gis;
 using Xunit;
 
@@ -16,20 +19,22 @@ namespace SOS.Process.UnitTests.Helpers
     public class AreaHelperTests
     {
         [Fact]
-        [Trait("Category","Unit")]
+        [Trait("Category", "Unit")]
         public void ProvincePartIdByCoordinateShouldBeSetToLappland_When_ObservationIsInLappmark()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var provinceAreas = AreasTestRepository.LoadAreas(new[] { AreaType.County, AreaType.Province});
-            var areaHelper = new AreaHelper(CreateAreaVerbatimRepositoryMock(provinceAreas).Object);
-            var observations = new List<ProcessedSighting> ();
+            var areaTypes = new[] {AreaType.County, AreaType.Province};
+            var areaHelper = new AreaHelper(
+                AreaVerbatimRepositoryStubFactory.Create(areaTypes) .Object,
+                ProcessedFieldMappingRepositoryStubFactory.Create().Object);
+            var observations = new List<ProcessedSighting>();
             var observation = new ProcessedSighting(DataProvider.Artdatabanken)
             {
                 Location = new ProcessedLocation
                 {
-                    DecimalLatitude = Coordinates.KirunaMunicipality.Latitude, 
+                    DecimalLatitude = Coordinates.KirunaMunicipality.Latitude,
                     DecimalLongitude = Coordinates.KirunaMunicipality.Longitude
                 }
             };
@@ -43,8 +48,8 @@ namespace SOS.Process.UnitTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Location.ProvincePartIdByCoordinate.Should().Be((int) ProvinceFeatureId.Lappland);
-            observation.Location.Province.Id.Should().Be((int)ProvinceFeatureId.AseleLappmark);
+            observation.Location.ProvincePartIdByCoordinate.Should().Be((int)ProvinceFeatureId.Lappland);
+            observation.Location.ProvinceId.Id.Should().Be((int)ProvinceFeatureId.AseleLappmark);
         }
 
         [Fact]
@@ -54,8 +59,10 @@ namespace SOS.Process.UnitTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var provinceAreas = AreasTestRepository.LoadAreas(new[] { AreaType.County, AreaType.Province });
-            var areaHelper = new AreaHelper(CreateAreaVerbatimRepositoryMock(provinceAreas).Object);
+            var areaTypes = new[] { AreaType.County, AreaType.Province };
+            var areaHelper = new AreaHelper(
+                AreaVerbatimRepositoryStubFactory.Create(areaTypes).Object,
+                ProcessedFieldMappingRepositoryStubFactory.Create().Object);
             var observations = new List<ProcessedSighting>();
             var observation = new ProcessedSighting(DataProvider.Artdatabanken)
             {
@@ -76,7 +83,7 @@ namespace SOS.Process.UnitTests.Helpers
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             observation.Location.CountyPartIdByCoordinate.Should().Be((int)CountyFeatureId.Oland);
-            observation.Location.County.Id.Should().Be((int)CountyFeatureId.Kalmar);
+            observation.Location.CountyId.Id.Should().Be((int)CountyFeatureId.Kalmar);
         }
 
         [Fact]
@@ -86,8 +93,10 @@ namespace SOS.Process.UnitTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var provinceAreas = AreasTestRepository.LoadAreas(new[] { AreaType.County, AreaType.Province });
-            var areaHelper = new AreaHelper(CreateAreaVerbatimRepositoryMock(provinceAreas).Object);
+            var areaTypes = new[] { AreaType.County, AreaType.Province };
+            var areaHelper = new AreaHelper(
+                AreaVerbatimRepositoryStubFactory.Create(areaTypes).Object,
+                ProcessedFieldMappingRepositoryStubFactory.Create().Object);
             var observations = new List<ProcessedSighting>();
             var observation = new ProcessedSighting(DataProvider.Artdatabanken)
             {
@@ -108,17 +117,7 @@ namespace SOS.Process.UnitTests.Helpers
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             observation.Location.CountyPartIdByCoordinate.Should().Be((int)CountyFeatureId.KalmarFastland);
-            observation.Location.County.Id.Should().Be((int)CountyFeatureId.Kalmar);
-        }
-
-        private Mock<IAreaVerbatimRepository> CreateAreaVerbatimRepositoryMock(IEnumerable<Area> areas)
-        {
-            Mock<IAreaVerbatimRepository> areaVerbatimRepositoryMock = new Mock<IAreaVerbatimRepository>();
-            areaVerbatimRepositoryMock
-                .Setup(avm => avm.GetBatchAsync(0))
-                .ReturnsAsync(areas);
-
-            return areaVerbatimRepositoryMock;
+            observation.Location.CountyId.Id.Should().Be((int)CountyFeatureId.Kalmar);
         }
     }
 }

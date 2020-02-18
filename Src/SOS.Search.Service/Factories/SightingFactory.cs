@@ -67,10 +67,10 @@ namespace SOS.Search.Service.Factories
                 var sightings = processedSightings.Cast<ProcessedSighting>();
                 foreach (var sighting in sightings)
                 {
-                    TranslateValue(sighting.Location?.CountyIdByCoordinate, FieldMappingFieldId.County);
-                    TranslateValue(sighting.Location?.MunicipalityIdByCoordinate, FieldMappingFieldId.Municipality);
-                    TranslateValue(sighting.Location?.ProvinceIdByCoordinate, FieldMappingFieldId.Province);
-                    TranslateValue(sighting.Location?.ParishIdByCoordinate, FieldMappingFieldId.Parish);
+                    TranslateValue(sighting.Location?.CountyId, FieldMappingFieldId.County);
+                    TranslateValue(sighting.Location?.MunicipalityId, FieldMappingFieldId.Municipality);
+                    TranslateValue(sighting.Location?.ProvinceId, FieldMappingFieldId.Province);
+                    TranslateValue(sighting.Location?.ParishId, FieldMappingFieldId.Parish);
                 }
             }
             else // dynamic objects is returned when OutputFields is used
@@ -80,10 +80,10 @@ namespace SOS.Search.Service.Factories
                     if (sighting is IDictionary<string, object> obs && obs.ContainsKey("Occurrence"))
                     {
                         var location = obs["Location"] as IDictionary<string, object>;
-                        TranslateValue(location, FieldMappingFieldId.County, nameof(ProcessedSighting.Location.CountyIdByCoordinate));
-                        TranslateValue(location, FieldMappingFieldId.Municipality, nameof(ProcessedSighting.Location.MunicipalityIdByCoordinate));
-                        TranslateValue(location, FieldMappingFieldId.Province, nameof(ProcessedSighting.Location.ProvinceIdByCoordinate));
-                        TranslateValue(location, FieldMappingFieldId.Parish, nameof(ProcessedSighting.Location.ParishIdByCoordinate));
+                        TranslateValue(location, FieldMappingFieldId.County, nameof(ProcessedSighting.Location.CountyId));
+                        TranslateValue(location, FieldMappingFieldId.Municipality, nameof(ProcessedSighting.Location.MunicipalityId));
+                        TranslateValue(location, FieldMappingFieldId.Province, nameof(ProcessedSighting.Location.ProvinceId));
+                        TranslateValue(location, FieldMappingFieldId.Parish, nameof(ProcessedSighting.Location.ParishId));
                     }
                 }
             }
@@ -132,10 +132,10 @@ namespace SOS.Search.Service.Factories
                         TranslateLocalizedValue(occurrence, FieldMappingFieldId.Gender, nameof(ProcessedSighting.Occurrence.SexId), cultureCode);
 
                         var location = obs["Location"] as IDictionary<string, object>;
-                        TranslateValue(location, FieldMappingFieldId.County, nameof(ProcessedSighting.Location.CountyIdByCoordinate));
-                        TranslateValue(location, FieldMappingFieldId.Municipality, nameof(ProcessedSighting.Location.MunicipalityIdByCoordinate));
-                        TranslateValue(location, FieldMappingFieldId.Province, nameof(ProcessedSighting.Location.ProvinceIdByCoordinate));
-                        TranslateValue(location, FieldMappingFieldId.Parish, nameof(ProcessedSighting.Location.ParishIdByCoordinate));
+                        TranslateValue(location, FieldMappingFieldId.County, nameof(ProcessedSighting.Location.CountyId));
+                        TranslateValue(location, FieldMappingFieldId.Municipality, nameof(ProcessedSighting.Location.MunicipalityId));
+                        TranslateValue(location, FieldMappingFieldId.Province, nameof(ProcessedSighting.Location.ProvinceId));
+                        TranslateValue(location, FieldMappingFieldId.Parish, nameof(ProcessedSighting.Location.ParishId));
                     }
                 }
             }

@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using SOS.Import.Entities;
-using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
-using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
-using SOS.Import.Services;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
@@ -74,7 +66,7 @@ namespace SOS.Import.Factories.FieldMappings
                 ExternalSystemsMapping = new List<ExternalSystemMapping>()
             };
 
-            fieldMapping.ExternalSystemsMapping.Add(GetArtportalenExternalSystemMapping(selectedAreas, areaType));
+            fieldMapping.ExternalSystemsMapping.Add(GetArtportalenExternalSystemMapping(selectedAreas));
             if (areaType == AreaType.County || areaType == AreaType.Municipality || areaType == AreaType.Province)
             {
                 fieldMapping.ExternalSystemsMapping.Add(GetDarwinCoreExternalSystemMapping(selectedAreas, areaType));
@@ -137,7 +129,7 @@ namespace SOS.Import.Factories.FieldMappings
             return mappingField;
         }
 
-        private ExternalSystemMapping GetArtportalenExternalSystemMapping(ICollection<Area> areas, AreaType areaType)
+        private ExternalSystemMapping GetArtportalenExternalSystemMapping(ICollection<Area> areas)
         {
             ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping
             {
@@ -151,6 +143,7 @@ namespace SOS.Import.Factories.FieldMappings
 
             externalSystemMapping.Mappings.Add(GetArtportalenIdMapping(areas));
             externalSystemMapping.Mappings.Add(GetArtportalenTupleMapping(areas));
+            externalSystemMapping.Mappings.Add(GetArtportalenFeatureIdMapping(areas));
             return externalSystemMapping;
         }
 
@@ -163,7 +156,6 @@ namespace SOS.Import.Factories.FieldMappings
                 Values = new List<ExternalSystemMappingValue>()
             };
 
-            // 1-1 mapping between Id fields.
             foreach (var areaEntity in areas)
             {
                 mappingField.Values.Add(new ExternalSystemMappingValue
@@ -175,6 +167,28 @@ namespace SOS.Import.Factories.FieldMappings
 
             return mappingField;
         }
+
+        private ExternalSystemMappingField GetArtportalenFeatureIdMapping(IEnumerable<Area> areas)
+        {
+            ExternalSystemMappingField mappingField = new ExternalSystemMappingField
+            {
+                Key = "FeatureId",
+                Description = "The key is FeatureId",
+                Values = new List<ExternalSystemMappingValue>()
+            };
+
+            foreach (var areaEntity in areas)
+            {
+                mappingField.Values.Add(new ExternalSystemMappingValue
+                {
+                    Value = areaEntity.FeatureId,
+                    SosId = areaEntity.Id
+                });
+            }
+
+            return mappingField;
+        }
+
 
         private ExternalSystemMappingField GetArtportalenIdMapping(IEnumerable<Area> areas)
         {

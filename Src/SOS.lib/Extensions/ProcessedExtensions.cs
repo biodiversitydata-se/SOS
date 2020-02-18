@@ -64,6 +64,7 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
+            // todo - initialize the Value property for field mapped types.
             return new DarwinCoreLocation
             {
                 Continent = source.Continent,
@@ -71,7 +72,7 @@ namespace SOS.Lib.Extensions
                 CoordinateUncertaintyInMeters = source.CoordinateUncertaintyInMeters,
                 Country = source.Country,
                 CountryCode = source.CountryCode,
-                County = source.County?.Name,
+                County = source.CountyId?.Value,
                 DecimalLatitude = source.DecimalLatitude,
                 DecimalLongitude = source.DecimalLongitude,
                 FootprintSRS = source.FootprintSRS,
@@ -98,9 +99,9 @@ namespace SOS.Lib.Extensions
                 MinimumDepthInMeters = source.MinimumDepthInMeters?.ToString(),
                 MinimumDistanceAboveSurfaceInMeters = source.MinimumDistanceAboveSurfaceInMeters?.ToString(),
                 MinimumElevationInMeters = source.MinimumElevationInMeters?.ToString(),
-                Municipality = source.Municipality?.Name,
+                Municipality = source.MunicipalityId?.Value,
                 PointRadiusSpatialFit = source.PointRadiusSpatialFit,
-                StateProvince = source.Province?.Name,
+                StateProvince = source.ProvinceId?.Value,
                 VerbatimCoordinates = null,
                 VerbatimCoordinateSystem = source.VerbatimCoordinateSystem,
                 VerbatimDepth = source.VerbatimDepth?.ToString(),

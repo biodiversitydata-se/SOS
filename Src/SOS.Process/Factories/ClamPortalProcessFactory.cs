@@ -44,7 +44,6 @@ namespace SOS.Process.Factories
         /// <inheritdoc />
         public async Task<RunInfo> ProcessAsync(
             IDictionary<int, ProcessedTaxon> taxa,
-            IDictionary<int, FieldMapping> fieldMappingById,
             IJobCancellationToken cancellationToken)
         {
             var runInfo = new RunInfo(DataProvider.ClamPortal)
@@ -76,8 +75,9 @@ namespace SOS.Process.Factories
         /// Process clams
         /// </summary>
         /// <param name="taxa"></param>
-        /// <param name="runinfo"></param>
+        /// <param name="runInfo"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="runinfo"></param>
         /// <returns></returns>
         private async Task ProcessClamsAsync(
             IDictionary<int, ProcessedTaxon> taxa,

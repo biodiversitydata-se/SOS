@@ -14,9 +14,7 @@ namespace SOS.Lib.Models.Shared
         public ICollection<ExternalSystemMappingValue> Values { get; set; }
         public Dictionary<object, int> GetIdByValueDictionary()
         {
-            var typeCode = Type.GetTypeCode(Values.First().GetType());
-            var res = typeCode == TypeCode.Int64;
-            if (Values.First().Value is long)
+            if (Values.First().Value is long || Values.First().Value is byte)
             {
                 return Values?.ToDictionary(m => (object)Convert.ToInt32(m.Value), m => m.SosId);
             }

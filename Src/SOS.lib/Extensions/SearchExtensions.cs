@@ -20,7 +20,7 @@ namespace SOS.Lib.Extensions
 
             if (filter.Counties?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.County.Id, filter.Counties));
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.CountyId.Id, filter.Counties));
             }
 
             if (filter.Delimitation?.IsValid ?? false)
@@ -57,7 +57,7 @@ namespace SOS.Lib.Extensions
             if (filter.Municipalities?.Any() ?? false)
             {
                 filters.Add(
-                    Builders<ProcessedSighting>.Filter.In(m => m.Location.Municipality.Id, filter.Municipalities));
+                    Builders<ProcessedSighting>.Filter.In(m => m.Location.MunicipalityId.Id, filter.Municipalities));
             }
 
             if (filter.PositiveSightings.HasValue)
@@ -67,7 +67,7 @@ namespace SOS.Lib.Extensions
 
             if (filter.Provinces?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.Province.Id, filter.Provinces));
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.ProvinceId.Id, filter.Provinces));
             }
 
             if (filter.RedListCategories?.Any() ?? false)

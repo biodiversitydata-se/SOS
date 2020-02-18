@@ -33,7 +33,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
         [Fact]
         [Trait("Category", "Unit")]
         [Trait("Category", "DwcArchiveUnit")]
-        public async Task Creating_a_DwC_occurrence_csv_file_with_ten_observations()
+        public async Task Create_a_DwC_occurrence_csv_file_with_ten_observations()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
