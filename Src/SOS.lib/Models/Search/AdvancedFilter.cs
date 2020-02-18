@@ -91,14 +91,16 @@ namespace SOS.Lib.Models.Search
         public bool SearchUnderlyingTaxa { get; set; }
 
         /// <summary>
-        /// Return value for fields that are using a controlled vocabulary.
-        /// </summary>
-        public FieldMapReturnValue TranslateLocalizedFieldMappedValues { get; set; } = FieldMapReturnValue.UseIdValues;
-
-        /// <summary>
-        /// Decides whether non localized field mapped fields should return their mapped value.
+        /// Decides whether field mapped fields, in addition to its Id value, also should returned its associated value.
         /// </summary>
         public bool TranslateFieldMappedValues { get; set; } = false;
+
+        /// <summary>
+        /// Field mapping translation culture code.
+        /// sv-SE (Swedish)
+        /// en-GB (English)
+        /// </summary>
+        public string TranslationCultureCode { get; set; } = "en-GB";
 
         public AdvancedFilter Clone()
         {

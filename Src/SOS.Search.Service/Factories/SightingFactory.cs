@@ -91,9 +91,8 @@ namespace SOS.Search.Service.Factories
 
         private void ProcessLocalizedFieldMappings(AdvancedFilter filter, IEnumerable<dynamic> processedSightings)
         {
-            if (filter.TranslateLocalizedFieldMappedValues == FieldMapReturnValue.UseIdValues) return;
-            string cultureCode = GetCultureCode(filter.TranslateLocalizedFieldMappedValues);
-
+            if (!filter.TranslateFieldMappedValues) return;
+            string cultureCode = filter.TranslationCultureCode;
             if (filter.OutputFields == null || !filter.OutputFields.Any()) // ProcessedSighting objects is returned wen OutputFields is not used.
             {
                 var sightings = processedSightings.Cast<ProcessedSighting>();
@@ -207,19 +206,6 @@ namespace SOS.Search.Service.Factories
                         fieldNode["Value"] = translatedValue;
                     }
                 }
-            }
-        }
-
-        private string GetCultureCode(FieldMapReturnValue language)
-        {
-            switch (language)
-            {
-                case FieldMapReturnValue.Swedish:
-                    return "sv-SE";
-                case FieldMapReturnValue.English:
-                    return "en-GB";
-                default:
-                    return "";
             }
         }
     }
