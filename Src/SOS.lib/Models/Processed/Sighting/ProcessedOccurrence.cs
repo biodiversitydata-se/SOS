@@ -11,13 +11,11 @@ namespace SOS.Lib.Models.Processed.Sighting
     public class ProcessedOccurrence
     {
         /// <summary>
-        /// Activity property
+        /// Activity property.
         /// </summary>
-        public MetadataWithCategory Activity { get; set; }
-
-        /// <summary>
-        /// Activity lookup value. This will replace Activity property when implementation of lookup values is finished.
-        /// </summary>
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
         public ProcessedLookupValue ActivityId { get; set; }
 
         /// <summary>
@@ -242,12 +240,10 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// the Occurrence.
         /// Recommended best practice is to use a controlled vocabulary.
         /// </summary>
-        public Metadata Sex { get; set; }
-
-        /// <summary>
-        /// Sex lookup value. This will replace Sex property when implementation of lookup values is finished.
-        /// </summary>
-        public ProcessedLookupValue SexId { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedLookupValue GenderId { get; set; }
 
         /// <summary>
         /// A statement about the presence or absence of a Taxon at a

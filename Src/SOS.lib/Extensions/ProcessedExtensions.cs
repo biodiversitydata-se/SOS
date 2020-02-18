@@ -130,7 +130,7 @@ namespace SOS.Lib.Extensions
                 AssociatedReferences = source.AssociatedReferences,
                 AssociatedSequences = source.AssociatedSequences,
                 AssociatedTaxa = source.AssociatedTaxa,
-                Behavior = source.Activity == null ? source.Behavior : source.Activity.Translate(Cultures.en_GB, Cultures.sv_SE),
+                Behavior = source.ActivityId?.Value,
                 CatalogNumber = source.CatalogNumber,
                 Disposition = source.Disposition,
                 EstablishmentMeans = source.EstablishmentMeans,
@@ -144,7 +144,7 @@ namespace SOS.Lib.Extensions
                 OrganismQuantityType = source.OrganismQuantity.HasValue ? source.OrganismQuantityType?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Individuals" : null,
                 OtherCatalogNumbers = source.OtherCatalogNumbers,
                 RecordedBy = source.RecordedBy,
-                ReproductiveCondition = source.Activity?.Translate(Cultures.en_GB, Cultures.sv_SE),
+                ReproductiveCondition = source.ActivityId?.Value
             };
         }
         #endregion Occurrence

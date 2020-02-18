@@ -141,7 +141,7 @@ namespace SOS.Process.Repositories.Destination
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation)),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.Sex.Id)),
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.GenderId.Id)),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Provider)),
                 new CreateIndexModel<ProcessedSighting>(

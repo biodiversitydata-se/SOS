@@ -35,7 +35,7 @@ namespace SOS.Lib.Models.Search
             PositiveSightings.HasValue ||
             (Provinces?.Any() ?? false) ||
             (RedListCategories?.Any() ?? false) ||
-            (Sex?.Any() ?? false) ||
+            (Gender?.Any() ?? false) ||
             (StartDate != null) ||
             (TaxonIds?.Any() ?? false);
 
@@ -72,7 +72,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Gender to match
         /// </summary>
-        public IEnumerable<int> Sex { get; set; }
+        public IEnumerable<int> Gender { get; set; }
 
         /// <summary>
         /// Sighting first date

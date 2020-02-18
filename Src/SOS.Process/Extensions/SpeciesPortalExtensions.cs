@@ -125,7 +125,6 @@ namespace SOS.Process.Extensions
                 Modified = verbatim.EndDate ?? verbatim.ReportedDate,
                 Occurrence = new ProcessedOccurrence
                 {
-                    Activity = verbatim.Activity,
                     AssociatedMedia = verbatim.HasImages
                         ? $"http://www.artportalen.se/sighting/{verbatim.Id}#SightingDetailImages"
                         : "",
@@ -145,7 +144,6 @@ namespace SOS.Process.Extensions
                     RecordedBy = verbatim.Observers,
                     RecordNumber = verbatim.Label,
                     Remarks = verbatim.Comment,
-                    Sex = verbatim.Gender,
                     Status = verbatim.NotPresent || verbatim.NotRecovered
                         ? OccurrenceStatus.Absent
                         : OccurrenceStatus.Present,
@@ -162,7 +160,7 @@ namespace SOS.Process.Extensions
             };
             
             // Get field mapping values
-            obs.Occurrence.SexId = GetSosId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Gender]);
+            obs.Occurrence.GenderId = GetSosId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Gender]);
             obs.Occurrence.ActivityId = GetSosId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]);
             obs.Location.CountyId = GetSosId(verbatim.Site.County?.Id, fieldMappings[FieldMappingFieldId.County]);
             obs.Location.MunicipalityId = GetSosId(verbatim.Site.Municipality?.Id, fieldMappings[FieldMappingFieldId.Municipality]);

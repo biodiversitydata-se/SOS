@@ -112,7 +112,7 @@ namespace SOS.Search.Service.Factories
             foreach (var sighting in processedSightings)
             {
                 TranslateLocalizedValue(sighting.Occurrence?.ActivityId, FieldMappingFieldId.Activity, cultureCode);
-                TranslateLocalizedValue(sighting.Occurrence?.SexId, FieldMappingFieldId.Gender, cultureCode);
+                TranslateLocalizedValue(sighting.Occurrence?.GenderId, FieldMappingFieldId.Gender, cultureCode);
             }
         }
 
@@ -129,7 +129,7 @@ namespace SOS.Search.Service.Factories
                     {
                         var occurrence = obs["Occurrence"] as IDictionary<string, object>;
                         TranslateLocalizedValue(occurrence, FieldMappingFieldId.Activity, nameof(ProcessedSighting.Occurrence.ActivityId), cultureCode);
-                        TranslateLocalizedValue(occurrence, FieldMappingFieldId.Gender, nameof(ProcessedSighting.Occurrence.SexId), cultureCode);
+                        TranslateLocalizedValue(occurrence, FieldMappingFieldId.Gender, nameof(ProcessedSighting.Occurrence.GenderId), cultureCode);
 
                         var location = obs["Location"] as IDictionary<string, object>;
                         TranslateValue(location, FieldMappingFieldId.County, nameof(ProcessedSighting.Location.CountyId));
