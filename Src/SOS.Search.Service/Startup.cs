@@ -16,7 +16,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using NLog.Web;
-using SOS.Core.Repositories;
 using SOS.Lib.Configuration.Shared;
 using SOS.Search.Service.Swagger;
 
@@ -70,7 +69,6 @@ namespace SOS.Search.Service
                 .AddNLog(configFileName: $"nlog.{_environment}.config");
         }
 
-
         /// <summary>
         /// Register Autofac services. This runs after ConfigureServices so the things
         /// here will override registrations made in ConfigureServices.
@@ -78,15 +76,7 @@ namespace SOS.Search.Service
         /// <param name="builder"></param>
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<MongoDbConfiguration>();
-
-            var repositorySettings = new RepositorySettings
-            {
-                JobsDatabaseName = mongoConfiguration.DatabaseName,
-                MongoDbConnectionString = $"mongodb://{string.Join(",", mongoConfiguration.Hosts.Select(h => h.Name))}"
-            };
-
-            builder.Register(r => repositorySettings).As<IRepositorySettings>().SingleInstance();
+            
         }
 
         /// <summary>
