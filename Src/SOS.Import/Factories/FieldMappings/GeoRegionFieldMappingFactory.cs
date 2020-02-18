@@ -67,6 +67,7 @@ namespace SOS.Import.Factories.FieldMappings
             };
 
             fieldMapping.ExternalSystemsMapping.Add(GetArtportalenExternalSystemMapping(selectedAreas));
+            fieldMapping.ExternalSystemsMapping.Add(GetSSosExternalSystemMapping(selectedAreas));
             if (areaType == AreaType.County || areaType == AreaType.Municipality || areaType == AreaType.Province)
             {
                 fieldMapping.ExternalSystemsMapping.Add(GetDarwinCoreExternalSystemMapping(selectedAreas, areaType));
@@ -228,6 +229,43 @@ namespace SOS.Import.Factories.FieldMappings
             }
 
             return values;
+        }
+
+        private ExternalSystemMapping GetSSosExternalSystemMapping(ICollection<Area> areas)
+        {
+            ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping
+            {
+                Id = (int)VerbatimDataProviderTypeId.SwedishSpeciesObservationService,
+                VerbatimDataProviderTypeId = VerbatimDataProviderTypeId.SwedishSpeciesObservationService,
+                ExternalSystemId = ExternalSystemId.SwedishSpeciesObservationService,
+                Name = "Swedish Species Observation Service (SSOS)",
+                Description = "The Artdatabanken SOAP-based Swedish Species Observation Service (SSOS)",
+                Mappings = new List<ExternalSystemMappingField>()
+            };
+
+            externalSystemMapping.Mappings.Add(GetSsosGuidMapping(areas));
+            return externalSystemMapping;
+        }
+
+        private ExternalSystemMappingField GetSsosGuidMapping(ICollection<Area> areas)
+        {
+            ExternalSystemMappingField mappingField = new ExternalSystemMappingField
+            {
+                Key = "GUID",
+                Description = "The key is WebRegion.GUID in SSOS",
+                Values = new List<ExternalSystemMappingValue>()
+            };
+
+            foreach (var areaEntity in areas)
+            {
+                mappingField.Values.Add(new ExternalSystemMappingValue
+                {
+                    Value = $"URN:LSID:artportalen.se:area:DataSet{areaEntity.AreaType}Feature{areaEntity.FeatureId}",
+                    SosId = areaEntity.Id
+                });
+            }
+
+            return mappingField;
         }
     }
 }

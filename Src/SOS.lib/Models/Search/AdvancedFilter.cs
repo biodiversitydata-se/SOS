@@ -91,7 +91,7 @@ namespace SOS.Lib.Models.Search
         public bool SearchUnderlyingTaxa { get; set; }
 
         /// <summary>
-        /// Decides whether field mapped fields, in addition to its Id value, also should returned its associated value.
+        /// Decides whether field mapped fields, in addition to its Id value, also should return its associated value.
         /// </summary>
         public bool TranslateFieldMappedValues { get; set; } = false;
 
