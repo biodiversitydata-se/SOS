@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Import.Entities;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
@@ -43,8 +44,7 @@ namespace SOS.Import.Factories.FieldMappings
 
             FieldMapping fieldMapping = new FieldMapping
             {
-                Id = (int)FieldMappingFieldId.Activity,
-                FieldMappingFieldId = FieldMappingFieldId.Activity,
+                Id = FieldMappingFieldId.Activity,
                 Name = FieldMappingFieldId.Activity.ToString(),
                 Localized = true,
                 Values = fieldMappingValues,
@@ -105,14 +105,12 @@ namespace SOS.Import.Factories.FieldMappings
         private ExternalSystemMapping GetExternalSystemMapping(ICollection<FieldMappingValue> fieldMappingValues)
         {
             ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping();
-            externalSystemMapping.Id = (int)VerbatimDataProviderTypeId.Artportalen;
-            externalSystemMapping.VerbatimDataProviderTypeId = VerbatimDataProviderTypeId.Artportalen;
-            externalSystemMapping.ExternalSystemId = ExternalSystemId.Artportalen;
-            externalSystemMapping.Name = "Artportalen";
+            externalSystemMapping.Id = ExternalSystemId.Artportalen;
+            externalSystemMapping.Name = ExternalSystemId.Artportalen.ToString();
             externalSystemMapping.Mappings = new List<ExternalSystemMappingField>();
 
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField();
-            mappingField.Key = "Id";
+            mappingField.Key = MappingKeyFields.Id;
             mappingField.Description = "The Activity.Id field";
             mappingField.Values = new List<ExternalSystemMappingValue>();
 

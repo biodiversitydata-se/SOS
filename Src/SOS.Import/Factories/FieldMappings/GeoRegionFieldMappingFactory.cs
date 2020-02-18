@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
@@ -58,8 +59,7 @@ namespace SOS.Import.Factories.FieldMappings
             var selectedAreas = areas.Where(m => m.AreaType == areaType).ToArray();
             FieldMapping fieldMapping = new FieldMapping
             {
-                Id = (int)fieldMappingFieldId,
-                FieldMappingFieldId = fieldMappingFieldId,
+                Id = fieldMappingFieldId,
                 Name = fieldMappingFieldId.ToString(),
                 Localized = false,
                 Values = CreateFieldMappingValues(selectedAreas, areaType),
@@ -80,10 +80,8 @@ namespace SOS.Import.Factories.FieldMappings
         {
             ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping
             {
-                Id = (int)VerbatimDataProviderTypeId.DarwinCore,
-                VerbatimDataProviderTypeId = VerbatimDataProviderTypeId.DarwinCore,
-                ExternalSystemId = ExternalSystemId.DarwinCore,
-                Name = "DarwinCore",
+                Id = ExternalSystemId.DarwinCore,
+                Name = ExternalSystemId.DarwinCore.ToString(),
                 Description = "The Darwin Core format(https://dwc.tdwg.org/terms/)",
                 Mappings = new List<ExternalSystemMappingField>()
             };
@@ -97,11 +95,11 @@ namespace SOS.Import.Factories.FieldMappings
             switch (areaType)
             {
                 case AreaType.County:
-                    return "county";
+                    return MappingKeyFields.DwcCounty;
                 case AreaType.Municipality:
-                    return "municipality";
+                    return MappingKeyFields.DwcMunicipality;
                 case AreaType.Province:
-                    return "stateProvince";
+                    return MappingKeyFields.DwcStateProvince;
                 default:
                     throw new ArgumentException($"DarwinCore don't have support for {areaType}");
             }
@@ -134,10 +132,8 @@ namespace SOS.Import.Factories.FieldMappings
         {
             ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping
             {
-                Id = (int)VerbatimDataProviderTypeId.Artportalen,
-                VerbatimDataProviderTypeId = VerbatimDataProviderTypeId.Artportalen,
-                ExternalSystemId = ExternalSystemId.Artportalen,
-                Name = "Artportalen",
+                Id = ExternalSystemId.Artportalen,
+                Name = ExternalSystemId.Artportalen.ToString(),
                 Description = "The Artportalen system",
                 Mappings = new List<ExternalSystemMappingField>()
             };
@@ -152,7 +148,7 @@ namespace SOS.Import.Factories.FieldMappings
         {
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField
             {
-                Key = "<AreaDatasetId, FeatureId>",
+                Key = MappingKeyFields.AreaDatasetIdFeatureIdTuple,
                 Description = "The key is a tuple of <AreaDatasetId, FeatureId>",
                 Values = new List<ExternalSystemMappingValue>()
             };
@@ -173,7 +169,7 @@ namespace SOS.Import.Factories.FieldMappings
         {
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField
             {
-                Key = "FeatureId",
+                Key = MappingKeyFields.FeatureId,
                 Description = "The key is FeatureId",
                 Values = new List<ExternalSystemMappingValue>()
             };
@@ -195,7 +191,7 @@ namespace SOS.Import.Factories.FieldMappings
         {
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField
             {
-                Key = "Id",
+                Key = MappingKeyFields.Id,
                 Description = "The Area.Id field",
                 Values = new List<ExternalSystemMappingValue>()
             };
@@ -222,7 +218,6 @@ namespace SOS.Import.Factories.FieldMappings
                 {
                     Id = area.Id,
                     Name = area.Name,
-                    Description = area.Name,
                     Localized = false,
                     Extra = new { AreaDatasetId = area.AreaType, FeatureId = area.FeatureId }
                 });
@@ -235,9 +230,7 @@ namespace SOS.Import.Factories.FieldMappings
         {
             ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping
             {
-                Id = (int)VerbatimDataProviderTypeId.SwedishSpeciesObservationService,
-                VerbatimDataProviderTypeId = VerbatimDataProviderTypeId.SwedishSpeciesObservationService,
-                ExternalSystemId = ExternalSystemId.SwedishSpeciesObservationService,
+                Id = ExternalSystemId.SwedishSpeciesObservationService,
                 Name = "Swedish Species Observation Service (SSOS)",
                 Description = "The Artdatabanken SOAP-based Swedish Species Observation Service (SSOS)",
                 Mappings = new List<ExternalSystemMappingField>()
@@ -251,7 +244,7 @@ namespace SOS.Import.Factories.FieldMappings
         {
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField
             {
-                Key = "GUID",
+                Key = MappingKeyFields.Guid,
                 Description = "The key is WebRegion.GUID in SSOS",
                 Values = new List<ExternalSystemMappingValue>()
             };
@@ -260,7 +253,7 @@ namespace SOS.Import.Factories.FieldMappings
             {
                 mappingField.Values.Add(new ExternalSystemMappingValue
                 {
-                    Value = $"URN:LSID:artportalen.se:area:DataSet{areaEntity.AreaType}Feature{areaEntity.FeatureId}",
+                    Value = $"URN:LSID:artportalen.se:area:DataSet{(int)areaEntity.AreaType}Feature{areaEntity.FeatureId}",
                     SosId = areaEntity.Id
                 });
             }

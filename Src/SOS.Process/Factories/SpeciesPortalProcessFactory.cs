@@ -53,7 +53,7 @@ namespace SOS.Process.Factories
             {
                 var allFieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
                 Logger.LogDebug("Start Processing Species Portal Verbatim");
-                var fieldMappings = GetFieldMappingsDictionary(VerbatimDataProviderTypeId.Artportalen, allFieldMappings.ToArray());
+                var fieldMappings = GetFieldMappingsDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
 
                 Logger.LogDebug("Start deleting Species Portal data");
                 if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider.Artdatabanken))
@@ -127,24 +127,24 @@ namespace SOS.Process.Factories
         /// <summary>
         /// Get field mappings for Artportalen.
         /// </summary>
-        /// <param name="dataProviderTypeId"></param>
+        /// <param name="externalSystemId"></param>
         /// <param name="allFieldMappings"></param>
         /// <returns></returns>
         private IDictionary<FieldMappingFieldId, IDictionary<object, int>> GetFieldMappingsDictionary(
-            VerbatimDataProviderTypeId dataProviderTypeId,
+            ExternalSystemId externalSystemId,
             ICollection<FieldMapping> allFieldMappings)
         {
             var dic = new Dictionary<FieldMappingFieldId, IDictionary<object, int>>();
 
             foreach (var fieldMapping in allFieldMappings)
             {
-                var fieldMappings = fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == (int)dataProviderTypeId);
+                var fieldMappings = fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
                 if (fieldMappings != null)
                 {
-                    string mappingKey = GetMappingKey(fieldMapping.FieldMappingFieldId);
+                    string mappingKey = GetMappingKey(fieldMapping.Id);
                     var mapping = fieldMappings.Mappings.Single(m => m.Key == mappingKey);
                     var sosIdByValue = mapping.GetIdByValueDictionary();
-                    dic.Add((FieldMappingFieldId)fieldMapping.FieldMappingFieldId, sosIdByValue);
+                    dic.Add(fieldMapping.Id, sosIdByValue);
                 }
             }
 

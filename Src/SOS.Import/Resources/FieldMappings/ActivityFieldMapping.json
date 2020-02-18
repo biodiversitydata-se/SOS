@@ -1,6 +1,5 @@
 {
   "Id": 1,
-  "FieldMappingFieldId": 1,
   "Name": "Activity",
   "Localized": true,
   "Values": [
@@ -3068,8 +3067,6 @@
   "ExternalSystemsMapping": [
     {
       "Id": 0,
-      "ExternalSystemId": 0,
-      "VerbatimDataProviderTypeId": 0,
       "Name": "Artportalen",
       "Mappings": [
         {

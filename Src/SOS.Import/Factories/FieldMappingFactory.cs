@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -62,6 +63,7 @@ namespace SOS.Import.Factories
                     var fieldMapping = CreateFieldMappingFromJsonFile(fileName);
                     fieldMappings.Add(fieldMapping);
                 }
+                fieldMappings = fieldMappings.OrderBy(m => m.Id).ToList();
                 
                 await _fieldMappingRepository.DeleteCollectionAsync();
                 await _fieldMappingRepository.AddCollectionAsync();

@@ -1,6 +1,5 @@
 {
   "Id": 0,
-  "FieldMappingFieldId": 0,
   "Name": "Gender",
   "Localized": true,
   "Values": [
@@ -113,8 +112,6 @@
   "ExternalSystemsMapping": [
     {
       "Id": 0,
-      "ExternalSystemId": 0,
-      "VerbatimDataProviderTypeId": 0,
       "Name": "Artportalen",
       "Mappings": [
         {
@@ -155,8 +152,6 @@
     },
     {
       "Id": 1,
-      "ExternalSystemId": 1,
-      "VerbatimDataProviderTypeId": 1,
       "Name": "DarwinCore",
       "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
       "Mappings": [

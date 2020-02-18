@@ -1,13 +1,11 @@
 {
   "Id": 4,
-  "FieldMappingFieldId": 4,
   "Name": "Municipality",
   "Localized": false,
   "Values": [
     {
       "Id": 53,
       "Name": "Ale",
-      "Description": "Ale",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -17,7 +15,6 @@
     {
       "Id": 54,
       "Name": "Alingsås",
-      "Description": "Alingsås",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -27,7 +24,6 @@
     {
       "Id": 55,
       "Name": "Alvesta",
-      "Description": "Alvesta",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -37,7 +33,6 @@
     {
       "Id": 56,
       "Name": "Aneby",
-      "Description": "Aneby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -47,7 +42,6 @@
     {
       "Id": 57,
       "Name": "Arboga",
-      "Description": "Arboga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -57,7 +51,6 @@
     {
       "Id": 58,
       "Name": "Arjeplog",
-      "Description": "Arjeplog",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -67,7 +60,6 @@
     {
       "Id": 59,
       "Name": "Bjurholm",
-      "Description": "Bjurholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -77,7 +69,6 @@
     {
       "Id": 60,
       "Name": "Arvidsjaur",
-      "Description": "Arvidsjaur",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -87,7 +78,6 @@
     {
       "Id": 61,
       "Name": "Arvika",
-      "Description": "Arvika",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -97,7 +87,6 @@
     {
       "Id": 62,
       "Name": "Askersund",
-      "Description": "Askersund",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -107,7 +96,6 @@
     {
       "Id": 63,
       "Name": "Avesta",
-      "Description": "Avesta",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -117,7 +105,6 @@
     {
       "Id": 64,
       "Name": "Bengtsfors",
-      "Description": "Bengtsfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -127,7 +114,6 @@
     {
       "Id": 65,
       "Name": "Berg",
-      "Description": "Berg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -137,7 +123,6 @@
     {
       "Id": 66,
       "Name": "Bjuv",
-      "Description": "Bjuv",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -147,7 +132,6 @@
     {
       "Id": 67,
       "Name": "Boden",
-      "Description": "Boden",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -157,7 +141,6 @@
     {
       "Id": 68,
       "Name": "Bollebygd",
-      "Description": "Bollebygd",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -167,7 +150,6 @@
     {
       "Id": 69,
       "Name": "Bollnäs",
-      "Description": "Bollnäs",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -177,7 +159,6 @@
     {
       "Id": 70,
       "Name": "Lycksele",
-      "Description": "Lycksele",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -187,7 +168,6 @@
     {
       "Id": 71,
       "Name": "Lysekil",
-      "Description": "Lysekil",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -197,7 +177,6 @@
     {
       "Id": 72,
       "Name": "Malmö",
-      "Description": "Malmö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -207,7 +186,6 @@
     {
       "Id": 73,
       "Name": "Malung-Sälen",
-      "Description": "Malung-Sälen",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -217,7 +195,6 @@
     {
       "Id": 74,
       "Name": "Malå",
-      "Description": "Malå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -227,7 +204,6 @@
     {
       "Id": 75,
       "Name": "Mariestad",
-      "Description": "Mariestad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -237,7 +213,6 @@
     {
       "Id": 76,
       "Name": "Mark",
-      "Description": "Mark",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -247,7 +222,6 @@
     {
       "Id": 77,
       "Name": "Markaryd",
-      "Description": "Markaryd",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -257,7 +231,6 @@
     {
       "Id": 78,
       "Name": "Mellerud",
-      "Description": "Mellerud",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -267,7 +240,6 @@
     {
       "Id": 79,
       "Name": "Mjölby",
-      "Description": "Mjölby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -277,7 +249,6 @@
     {
       "Id": 80,
       "Name": "Mora",
-      "Description": "Mora",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -287,7 +258,6 @@
     {
       "Id": 81,
       "Name": "Motala",
-      "Description": "Motala",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -297,7 +267,6 @@
     {
       "Id": 82,
       "Name": "Mullsjö",
-      "Description": "Mullsjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -307,7 +276,6 @@
     {
       "Id": 83,
       "Name": "Munkedal",
-      "Description": "Munkedal",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -317,7 +285,6 @@
     {
       "Id": 84,
       "Name": "Munkfors",
-      "Description": "Munkfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -327,7 +294,6 @@
     {
       "Id": 85,
       "Name": "Mölndal",
-      "Description": "Mölndal",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -337,7 +303,6 @@
     {
       "Id": 86,
       "Name": "Mönsterås",
-      "Description": "Mönsterås",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -347,7 +312,6 @@
     {
       "Id": 87,
       "Name": "Mörbylånga",
-      "Description": "Mörbylånga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -357,7 +321,6 @@
     {
       "Id": 88,
       "Name": "Nacka",
-      "Description": "Nacka",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -367,7 +330,6 @@
     {
       "Id": 89,
       "Name": "Nordmaling",
-      "Description": "Nordmaling",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -377,7 +339,6 @@
     {
       "Id": 90,
       "Name": "Norrköping",
-      "Description": "Norrköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -387,7 +348,6 @@
     {
       "Id": 91,
       "Name": "Norrtälje",
-      "Description": "Norrtälje",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -397,7 +357,6 @@
     {
       "Id": 92,
       "Name": "Norsjö",
-      "Description": "Norsjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -407,7 +366,6 @@
     {
       "Id": 93,
       "Name": "Nora",
-      "Description": "Nora",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -417,7 +375,6 @@
     {
       "Id": 94,
       "Name": "Norberg",
-      "Description": "Norberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -427,7 +384,6 @@
     {
       "Id": 95,
       "Name": "Nordanstig",
-      "Description": "Nordanstig",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -437,7 +393,6 @@
     {
       "Id": 96,
       "Name": "Nykvarn",
-      "Description": "Nykvarn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -447,7 +402,6 @@
     {
       "Id": 97,
       "Name": "Nyköping",
-      "Description": "Nyköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -457,7 +411,6 @@
     {
       "Id": 98,
       "Name": "Nynäshamn",
-      "Description": "Nynäshamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -467,7 +420,6 @@
     {
       "Id": 99,
       "Name": "Nässjö",
-      "Description": "Nässjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -477,7 +429,6 @@
     {
       "Id": 100,
       "Name": "Ockelbo",
-      "Description": "Ockelbo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -487,7 +438,6 @@
     {
       "Id": 101,
       "Name": "Olofström",
-      "Description": "Olofström",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -497,7 +447,6 @@
     {
       "Id": 102,
       "Name": "Orsa",
-      "Description": "Orsa",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -507,7 +456,6 @@
     {
       "Id": 103,
       "Name": "Orust",
-      "Description": "Orust",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -517,7 +465,6 @@
     {
       "Id": 104,
       "Name": "Osby",
-      "Description": "Osby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -527,7 +474,6 @@
     {
       "Id": 105,
       "Name": "Oskarshamn",
-      "Description": "Oskarshamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -537,7 +483,6 @@
     {
       "Id": 106,
       "Name": "Ovanåker",
-      "Description": "Ovanåker",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -547,7 +492,6 @@
     {
       "Id": 107,
       "Name": "Oxelösund",
-      "Description": "Oxelösund",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -557,7 +501,6 @@
     {
       "Id": 108,
       "Name": "Pajala",
-      "Description": "Pajala",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -567,7 +510,6 @@
     {
       "Id": 109,
       "Name": "Partille",
-      "Description": "Partille",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -577,7 +519,6 @@
     {
       "Id": 110,
       "Name": "Perstorp",
-      "Description": "Perstorp",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -587,7 +528,6 @@
     {
       "Id": 111,
       "Name": "Piteå",
-      "Description": "Piteå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -597,7 +537,6 @@
     {
       "Id": 112,
       "Name": "Ragunda",
-      "Description": "Ragunda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -607,7 +546,6 @@
     {
       "Id": 113,
       "Name": "Robertsfors",
-      "Description": "Robertsfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -617,7 +555,6 @@
     {
       "Id": 114,
       "Name": "Ronneby",
-      "Description": "Ronneby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -627,7 +564,6 @@
     {
       "Id": 115,
       "Name": "Rättvik",
-      "Description": "Rättvik",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -637,7 +573,6 @@
     {
       "Id": 116,
       "Name": "Sala",
-      "Description": "Sala",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -647,7 +582,6 @@
     {
       "Id": 117,
       "Name": "Salem",
-      "Description": "Salem",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -657,7 +591,6 @@
     {
       "Id": 118,
       "Name": "Sandviken",
-      "Description": "Sandviken",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -667,7 +600,6 @@
     {
       "Id": 119,
       "Name": "Sigtuna",
-      "Description": "Sigtuna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -677,7 +609,6 @@
     {
       "Id": 120,
       "Name": "Simrishamn",
-      "Description": "Simrishamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -687,7 +618,6 @@
     {
       "Id": 121,
       "Name": "Sjöbo",
-      "Description": "Sjöbo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -697,7 +627,6 @@
     {
       "Id": 122,
       "Name": "Skara",
-      "Description": "Skara",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -707,7 +636,6 @@
     {
       "Id": 123,
       "Name": "Skellefteå",
-      "Description": "Skellefteå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -717,7 +645,6 @@
     {
       "Id": 124,
       "Name": "Tingsryd",
-      "Description": "Tingsryd",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -727,7 +654,6 @@
     {
       "Id": 125,
       "Name": "Tjörn",
-      "Description": "Tjörn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -737,7 +663,6 @@
     {
       "Id": 126,
       "Name": "Tomelilla",
-      "Description": "Tomelilla",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -747,7 +672,6 @@
     {
       "Id": 127,
       "Name": "Skinnskatteberg",
-      "Description": "Skinnskatteberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -757,7 +681,6 @@
     {
       "Id": 128,
       "Name": "Sorsele",
-      "Description": "Sorsele",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -767,7 +690,6 @@
     {
       "Id": 129,
       "Name": "Sotenäs",
-      "Description": "Sotenäs",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -777,7 +699,6 @@
     {
       "Id": 130,
       "Name": "Skurup",
-      "Description": "Skurup",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -787,7 +708,6 @@
     {
       "Id": 131,
       "Name": "Skövde",
-      "Description": "Skövde",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -797,7 +717,6 @@
     {
       "Id": 132,
       "Name": "Smedjebacken",
-      "Description": "Smedjebacken",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -807,7 +726,6 @@
     {
       "Id": 133,
       "Name": "Sollefteå",
-      "Description": "Sollefteå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -817,7 +735,6 @@
     {
       "Id": 134,
       "Name": "Sollentuna",
-      "Description": "Sollentuna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -827,7 +744,6 @@
     {
       "Id": 135,
       "Name": "Solna",
-      "Description": "Solna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -837,7 +753,6 @@
     {
       "Id": 136,
       "Name": "Staffanstorp",
-      "Description": "Staffanstorp",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -847,7 +762,6 @@
     {
       "Id": 137,
       "Name": "Stenungsund",
-      "Description": "Stenungsund",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -857,7 +771,6 @@
     {
       "Id": 138,
       "Name": "Stockholm",
-      "Description": "Stockholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -867,7 +780,6 @@
     {
       "Id": 139,
       "Name": "Storfors",
-      "Description": "Storfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -877,7 +789,6 @@
     {
       "Id": 140,
       "Name": "Storuman",
-      "Description": "Storuman",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -887,7 +798,6 @@
     {
       "Id": 141,
       "Name": "Strängnäs",
-      "Description": "Strängnäs",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -897,7 +807,6 @@
     {
       "Id": 142,
       "Name": "Strömstad",
-      "Description": "Strömstad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -907,7 +816,6 @@
     {
       "Id": 143,
       "Name": "Strömsund",
-      "Description": "Strömsund",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -917,7 +825,6 @@
     {
       "Id": 144,
       "Name": "Sundbyberg",
-      "Description": "Sundbyberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -927,7 +834,6 @@
     {
       "Id": 145,
       "Name": "Sundsvall",
-      "Description": "Sundsvall",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -937,7 +843,6 @@
     {
       "Id": 146,
       "Name": "Sunne",
-      "Description": "Sunne",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -947,7 +852,6 @@
     {
       "Id": 147,
       "Name": "Borgholm",
-      "Description": "Borgholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -957,7 +861,6 @@
     {
       "Id": 148,
       "Name": "Borlänge",
-      "Description": "Borlänge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -967,7 +870,6 @@
     {
       "Id": 149,
       "Name": "Borås",
-      "Description": "Borås",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -977,7 +879,6 @@
     {
       "Id": 150,
       "Name": "Botkyrka",
-      "Description": "Botkyrka",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -987,7 +888,6 @@
     {
       "Id": 151,
       "Name": "Boxholm",
-      "Description": "Boxholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -997,7 +897,6 @@
     {
       "Id": 152,
       "Name": "Bromölla",
-      "Description": "Bromölla",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1007,7 +906,6 @@
     {
       "Id": 153,
       "Name": "Bräcke",
-      "Description": "Bräcke",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1017,7 +915,6 @@
     {
       "Id": 154,
       "Name": "Burlöv",
-      "Description": "Burlöv",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1027,7 +924,6 @@
     {
       "Id": 155,
       "Name": "Båstad",
-      "Description": "Båstad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1037,7 +933,6 @@
     {
       "Id": 156,
       "Name": "Dals-Ed",
-      "Description": "Dals-Ed",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1047,7 +942,6 @@
     {
       "Id": 157,
       "Name": "Danderyd",
-      "Description": "Danderyd",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1057,7 +951,6 @@
     {
       "Id": 158,
       "Name": "Degerfors",
-      "Description": "Degerfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1067,7 +960,6 @@
     {
       "Id": 159,
       "Name": "Dorotea",
-      "Description": "Dorotea",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1077,7 +969,6 @@
     {
       "Id": 160,
       "Name": "Eda",
-      "Description": "Eda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1087,7 +978,6 @@
     {
       "Id": 161,
       "Name": "Ekerö",
-      "Description": "Ekerö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1097,7 +987,6 @@
     {
       "Id": 162,
       "Name": "Eksjö",
-      "Description": "Eksjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1107,7 +996,6 @@
     {
       "Id": 163,
       "Name": "Emmaboda",
-      "Description": "Emmaboda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1117,7 +1005,6 @@
     {
       "Id": 164,
       "Name": "Enköping",
-      "Description": "Enköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1127,7 +1014,6 @@
     {
       "Id": 165,
       "Name": "Eskilstuna",
-      "Description": "Eskilstuna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1137,7 +1023,6 @@
     {
       "Id": 166,
       "Name": "Eslöv",
-      "Description": "Eslöv",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1147,7 +1032,6 @@
     {
       "Id": 167,
       "Name": "Essunga",
-      "Description": "Essunga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1157,7 +1041,6 @@
     {
       "Id": 168,
       "Name": "Fagersta",
-      "Description": "Fagersta",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1167,7 +1050,6 @@
     {
       "Id": 169,
       "Name": "Falkenberg",
-      "Description": "Falkenberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1177,7 +1059,6 @@
     {
       "Id": 170,
       "Name": "Falköping",
-      "Description": "Falköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1187,7 +1068,6 @@
     {
       "Id": 171,
       "Name": "Falun",
-      "Description": "Falun",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1197,7 +1077,6 @@
     {
       "Id": 172,
       "Name": "Gagnef",
-      "Description": "Gagnef",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1207,7 +1086,6 @@
     {
       "Id": 173,
       "Name": "Gislaved",
-      "Description": "Gislaved",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1217,7 +1095,6 @@
     {
       "Id": 174,
       "Name": "Filipstad",
-      "Description": "Filipstad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1227,7 +1104,6 @@
     {
       "Id": 175,
       "Name": "Finspång",
-      "Description": "Finspång",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1237,7 +1113,6 @@
     {
       "Id": 176,
       "Name": "Flen",
-      "Description": "Flen",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1247,7 +1122,6 @@
     {
       "Id": 177,
       "Name": "Forshaga",
-      "Description": "Forshaga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1257,7 +1131,6 @@
     {
       "Id": 178,
       "Name": "Färgelanda",
-      "Description": "Färgelanda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1267,7 +1140,6 @@
     {
       "Id": 179,
       "Name": "Gnesta",
-      "Description": "Gnesta",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1277,7 +1149,6 @@
     {
       "Id": 180,
       "Name": "Gnosjö",
-      "Description": "Gnosjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1287,7 +1158,6 @@
     {
       "Id": 181,
       "Name": "Gotland",
-      "Description": "Gotland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1297,7 +1167,6 @@
     {
       "Id": 182,
       "Name": "Grums",
-      "Description": "Grums",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1307,7 +1176,6 @@
     {
       "Id": 183,
       "Name": "Grästorp",
-      "Description": "Grästorp",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1317,7 +1185,6 @@
     {
       "Id": 184,
       "Name": "Gullspång",
-      "Description": "Gullspång",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1327,7 +1194,6 @@
     {
       "Id": 185,
       "Name": "Gällivare",
-      "Description": "Gällivare",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1337,7 +1203,6 @@
     {
       "Id": 186,
       "Name": "Gävle",
-      "Description": "Gävle",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1347,7 +1212,6 @@
     {
       "Id": 187,
       "Name": "Hallstahammar",
-      "Description": "Hallstahammar",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1357,7 +1221,6 @@
     {
       "Id": 188,
       "Name": "Halmstad",
-      "Description": "Halmstad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1367,7 +1230,6 @@
     {
       "Id": 189,
       "Name": "Göteborg",
-      "Description": "Göteborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1377,7 +1239,6 @@
     {
       "Id": 190,
       "Name": "Hammarö",
-      "Description": "Hammarö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1387,7 +1248,6 @@
     {
       "Id": 191,
       "Name": "Krokom",
-      "Description": "Krokom",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1397,7 +1257,6 @@
     {
       "Id": 192,
       "Name": "Götene",
-      "Description": "Götene",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1407,7 +1266,6 @@
     {
       "Id": 193,
       "Name": "Habo",
-      "Description": "Habo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1417,7 +1275,6 @@
     {
       "Id": 194,
       "Name": "Hagfors",
-      "Description": "Hagfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1427,7 +1284,6 @@
     {
       "Id": 195,
       "Name": "Hallsberg",
-      "Description": "Hallsberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1437,7 +1293,6 @@
     {
       "Id": 196,
       "Name": "Haninge",
-      "Description": "Haninge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1447,7 +1302,6 @@
     {
       "Id": 197,
       "Name": "Haparanda",
-      "Description": "Haparanda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1457,7 +1311,6 @@
     {
       "Id": 198,
       "Name": "Hedemora",
-      "Description": "Hedemora",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1467,7 +1320,6 @@
     {
       "Id": 199,
       "Name": "Heby",
-      "Description": "Heby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1477,7 +1329,6 @@
     {
       "Id": 200,
       "Name": "Helsingborg",
-      "Description": "Helsingborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1487,7 +1338,6 @@
     {
       "Id": 201,
       "Name": "Herrljunga",
-      "Description": "Herrljunga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1497,7 +1347,6 @@
     {
       "Id": 202,
       "Name": "Hjo",
-      "Description": "Hjo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1507,7 +1356,6 @@
     {
       "Id": 203,
       "Name": "Hofors",
-      "Description": "Hofors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1517,7 +1365,6 @@
     {
       "Id": 204,
       "Name": "Huddinge",
-      "Description": "Huddinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1527,7 +1374,6 @@
     {
       "Id": 205,
       "Name": "Hudiksvall",
-      "Description": "Hudiksvall",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1537,7 +1383,6 @@
     {
       "Id": 206,
       "Name": "Hultsfred",
-      "Description": "Hultsfred",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1547,7 +1392,6 @@
     {
       "Id": 207,
       "Name": "Hylte",
-      "Description": "Hylte",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1557,7 +1401,6 @@
     {
       "Id": 208,
       "Name": "Hällefors",
-      "Description": "Hällefors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1567,7 +1410,6 @@
     {
       "Id": 209,
       "Name": "Härjedalen",
-      "Description": "Härjedalen",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1577,7 +1419,6 @@
     {
       "Id": 210,
       "Name": "Härnösand",
-      "Description": "Härnösand",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1587,7 +1428,6 @@
     {
       "Id": 211,
       "Name": "Härryda",
-      "Description": "Härryda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1597,7 +1437,6 @@
     {
       "Id": 212,
       "Name": "Hässleholm",
-      "Description": "Hässleholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1607,7 +1446,6 @@
     {
       "Id": 213,
       "Name": "Håbo",
-      "Description": "Håbo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1617,7 +1455,6 @@
     {
       "Id": 214,
       "Name": "Höganäs",
-      "Description": "Höganäs",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1627,7 +1464,6 @@
     {
       "Id": 215,
       "Name": "Högsby",
-      "Description": "Högsby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1637,7 +1473,6 @@
     {
       "Id": 216,
       "Name": "Hörby",
-      "Description": "Hörby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1647,7 +1482,6 @@
     {
       "Id": 217,
       "Name": "Höör",
-      "Description": "Höör",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1657,7 +1491,6 @@
     {
       "Id": 218,
       "Name": "Jokkmokk",
-      "Description": "Jokkmokk",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1667,7 +1500,6 @@
     {
       "Id": 219,
       "Name": "Järfälla",
-      "Description": "Järfälla",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1677,7 +1509,6 @@
     {
       "Id": 220,
       "Name": "Jönköping",
-      "Description": "Jönköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1687,7 +1518,6 @@
     {
       "Id": 221,
       "Name": "Kalix",
-      "Description": "Kalix",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1697,7 +1527,6 @@
     {
       "Id": 222,
       "Name": "Kalmar",
-      "Description": "Kalmar",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1707,7 +1536,6 @@
     {
       "Id": 223,
       "Name": "Karlsborg",
-      "Description": "Karlsborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1717,7 +1545,6 @@
     {
       "Id": 224,
       "Name": "Karlshamn",
-      "Description": "Karlshamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1727,7 +1554,6 @@
     {
       "Id": 225,
       "Name": "Karlskoga",
-      "Description": "Karlskoga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1737,7 +1563,6 @@
     {
       "Id": 226,
       "Name": "Karlskrona",
-      "Description": "Karlskrona",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1747,7 +1572,6 @@
     {
       "Id": 227,
       "Name": "Karlstad",
-      "Description": "Karlstad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1757,7 +1581,6 @@
     {
       "Id": 228,
       "Name": "Katrineholm",
-      "Description": "Katrineholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1767,7 +1590,6 @@
     {
       "Id": 229,
       "Name": "Kil",
-      "Description": "Kil",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1777,7 +1599,6 @@
     {
       "Id": 230,
       "Name": "Kinda",
-      "Description": "Kinda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1787,7 +1608,6 @@
     {
       "Id": 231,
       "Name": "Kiruna",
-      "Description": "Kiruna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1797,7 +1617,6 @@
     {
       "Id": 232,
       "Name": "Klippan",
-      "Description": "Klippan",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1807,7 +1626,6 @@
     {
       "Id": 233,
       "Name": "Knivsta",
-      "Description": "Knivsta",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1817,7 +1635,6 @@
     {
       "Id": 234,
       "Name": "Kramfors",
-      "Description": "Kramfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1827,7 +1644,6 @@
     {
       "Id": 235,
       "Name": "Kristianstad",
-      "Description": "Kristianstad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1837,7 +1653,6 @@
     {
       "Id": 236,
       "Name": "Kristinehamn",
-      "Description": "Kristinehamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1847,7 +1662,6 @@
     {
       "Id": 237,
       "Name": "Kumla",
-      "Description": "Kumla",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1857,7 +1671,6 @@
     {
       "Id": 238,
       "Name": "Kungsbacka",
-      "Description": "Kungsbacka",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1867,7 +1680,6 @@
     {
       "Id": 239,
       "Name": "Nybro",
-      "Description": "Nybro",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1877,7 +1689,6 @@
     {
       "Id": 240,
       "Name": "Kungsör",
-      "Description": "Kungsör",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1887,7 +1698,6 @@
     {
       "Id": 241,
       "Name": "Kungälv",
-      "Description": "Kungälv",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1897,7 +1707,6 @@
     {
       "Id": 242,
       "Name": "Kävlinge",
-      "Description": "Kävlinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1907,7 +1716,6 @@
     {
       "Id": 243,
       "Name": "Landskrona",
-      "Description": "Landskrona",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1917,7 +1725,6 @@
     {
       "Id": 244,
       "Name": "Laxå",
-      "Description": "Laxå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1927,7 +1734,6 @@
     {
       "Id": 245,
       "Name": "Lekeberg",
-      "Description": "Lekeberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1937,7 +1743,6 @@
     {
       "Id": 246,
       "Name": "Leksand",
-      "Description": "Leksand",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1947,7 +1752,6 @@
     {
       "Id": 247,
       "Name": "Köping",
-      "Description": "Köping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1957,7 +1761,6 @@
     {
       "Id": 248,
       "Name": "Laholm",
-      "Description": "Laholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1967,7 +1770,6 @@
     {
       "Id": 249,
       "Name": "Lerum",
-      "Description": "Lerum",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1977,7 +1779,6 @@
     {
       "Id": 250,
       "Name": "Ljusnarsberg",
-      "Description": "Ljusnarsberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1987,7 +1788,6 @@
     {
       "Id": 251,
       "Name": "Lomma",
-      "Description": "Lomma",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1997,7 +1797,6 @@
     {
       "Id": 252,
       "Name": "Lessebo",
-      "Description": "Lessebo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2007,7 +1806,6 @@
     {
       "Id": 253,
       "Name": "Lidingö",
-      "Description": "Lidingö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2017,7 +1815,6 @@
     {
       "Id": 254,
       "Name": "Lidköping",
-      "Description": "Lidköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2027,7 +1824,6 @@
     {
       "Id": 255,
       "Name": "Lilla Edet",
-      "Description": "Lilla Edet",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2037,7 +1833,6 @@
     {
       "Id": 256,
       "Name": "Lindesberg",
-      "Description": "Lindesberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2047,7 +1842,6 @@
     {
       "Id": 257,
       "Name": "Linköping",
-      "Description": "Linköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2057,7 +1851,6 @@
     {
       "Id": 258,
       "Name": "Ljungby",
-      "Description": "Ljungby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2067,7 +1860,6 @@
     {
       "Id": 259,
       "Name": "Ljusdal",
-      "Description": "Ljusdal",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2077,7 +1869,6 @@
     {
       "Id": 260,
       "Name": "Ludvika",
-      "Description": "Ludvika",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2087,7 +1878,6 @@
     {
       "Id": 261,
       "Name": "Luleå",
-      "Description": "Luleå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2097,7 +1887,6 @@
     {
       "Id": 262,
       "Name": "Lund",
-      "Description": "Lund",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2107,7 +1896,6 @@
     {
       "Id": 263,
       "Name": "Surahammar",
-      "Description": "Surahammar",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2117,7 +1905,6 @@
     {
       "Id": 264,
       "Name": "Svalöv",
-      "Description": "Svalöv",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2127,7 +1914,6 @@
     {
       "Id": 265,
       "Name": "Svedala",
-      "Description": "Svedala",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2137,7 +1923,6 @@
     {
       "Id": 266,
       "Name": "Svenljunga",
-      "Description": "Svenljunga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2147,7 +1932,6 @@
     {
       "Id": 267,
       "Name": "Säffle",
-      "Description": "Säffle",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2157,7 +1941,6 @@
     {
       "Id": 268,
       "Name": "Säter",
-      "Description": "Säter",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2167,7 +1950,6 @@
     {
       "Id": 269,
       "Name": "Sävsjö",
-      "Description": "Sävsjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2177,7 +1959,6 @@
     {
       "Id": 270,
       "Name": "Söderhamn",
-      "Description": "Söderhamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2187,7 +1968,6 @@
     {
       "Id": 271,
       "Name": "Söderköping",
-      "Description": "Söderköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2197,7 +1977,6 @@
     {
       "Id": 272,
       "Name": "Södertälje",
-      "Description": "Södertälje",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2207,7 +1986,6 @@
     {
       "Id": 273,
       "Name": "Sölvesborg",
-      "Description": "Sölvesborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2217,7 +1995,6 @@
     {
       "Id": 274,
       "Name": "Tanum",
-      "Description": "Tanum",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2227,7 +2004,6 @@
     {
       "Id": 275,
       "Name": "Tibro",
-      "Description": "Tibro",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2237,7 +2013,6 @@
     {
       "Id": 276,
       "Name": "Tidaholm",
-      "Description": "Tidaholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2247,7 +2022,6 @@
     {
       "Id": 277,
       "Name": "Tierp",
-      "Description": "Tierp",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2257,7 +2031,6 @@
     {
       "Id": 278,
       "Name": "Timrå",
-      "Description": "Timrå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2267,7 +2040,6 @@
     {
       "Id": 279,
       "Name": "Torsby",
-      "Description": "Torsby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2277,7 +2049,6 @@
     {
       "Id": 280,
       "Name": "Torsås",
-      "Description": "Torsås",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2287,7 +2058,6 @@
     {
       "Id": 281,
       "Name": "Älvsbyn",
-      "Description": "Älvsbyn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2297,7 +2067,6 @@
     {
       "Id": 282,
       "Name": "Tranemo",
-      "Description": "Tranemo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2307,7 +2076,6 @@
     {
       "Id": 283,
       "Name": "Tranås",
-      "Description": "Tranås",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2317,7 +2085,6 @@
     {
       "Id": 284,
       "Name": "Trelleborg",
-      "Description": "Trelleborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2327,7 +2094,6 @@
     {
       "Id": 285,
       "Name": "Trollhättan",
-      "Description": "Trollhättan",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2337,7 +2103,6 @@
     {
       "Id": 286,
       "Name": "Trosa",
-      "Description": "Trosa",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2347,7 +2112,6 @@
     {
       "Id": 287,
       "Name": "Tyresö",
-      "Description": "Tyresö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2357,7 +2121,6 @@
     {
       "Id": 288,
       "Name": "Täby",
-      "Description": "Täby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2367,7 +2130,6 @@
     {
       "Id": 289,
       "Name": "Töreboda",
-      "Description": "Töreboda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2377,7 +2139,6 @@
     {
       "Id": 290,
       "Name": "Upplands Väsby",
-      "Description": "Upplands Väsby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2387,7 +2148,6 @@
     {
       "Id": 291,
       "Name": "Uppsala",
-      "Description": "Uppsala",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2397,7 +2157,6 @@
     {
       "Id": 292,
       "Name": "Uppvidinge",
-      "Description": "Uppvidinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2407,7 +2166,6 @@
     {
       "Id": 293,
       "Name": "Uddevalla",
-      "Description": "Uddevalla",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2417,7 +2175,6 @@
     {
       "Id": 294,
       "Name": "Ulricehamn",
-      "Description": "Ulricehamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2427,7 +2184,6 @@
     {
       "Id": 295,
       "Name": "Umeå",
-      "Description": "Umeå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2437,7 +2193,6 @@
     {
       "Id": 296,
       "Name": "Upplands-Bro",
-      "Description": "Upplands-Bro",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2447,7 +2202,6 @@
     {
       "Id": 297,
       "Name": "Vadstena",
-      "Description": "Vadstena",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2457,7 +2211,6 @@
     {
       "Id": 298,
       "Name": "Vaggeryd",
-      "Description": "Vaggeryd",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2467,7 +2220,6 @@
     {
       "Id": 299,
       "Name": "Valdemarsvik",
-      "Description": "Valdemarsvik",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2477,7 +2229,6 @@
     {
       "Id": 300,
       "Name": "Vallentuna",
-      "Description": "Vallentuna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2487,7 +2238,6 @@
     {
       "Id": 301,
       "Name": "Vansbro",
-      "Description": "Vansbro",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2497,7 +2247,6 @@
     {
       "Id": 302,
       "Name": "Vara",
-      "Description": "Vara",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2507,7 +2256,6 @@
     {
       "Id": 303,
       "Name": "Varberg",
-      "Description": "Varberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2517,7 +2265,6 @@
     {
       "Id": 304,
       "Name": "Vaxholm",
-      "Description": "Vaxholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2527,7 +2274,6 @@
     {
       "Id": 305,
       "Name": "Vellinge",
-      "Description": "Vellinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2537,7 +2283,6 @@
     {
       "Id": 306,
       "Name": "Vetlanda",
-      "Description": "Vetlanda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2547,7 +2292,6 @@
     {
       "Id": 307,
       "Name": "Vilhelmina",
-      "Description": "Vilhelmina",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2557,7 +2301,6 @@
     {
       "Id": 308,
       "Name": "Vimmerby",
-      "Description": "Vimmerby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2567,7 +2310,6 @@
     {
       "Id": 309,
       "Name": "Vindeln",
-      "Description": "Vindeln",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2577,7 +2319,6 @@
     {
       "Id": 310,
       "Name": "Vingåker",
-      "Description": "Vingåker",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2587,7 +2328,6 @@
     {
       "Id": 311,
       "Name": "Vänersborg",
-      "Description": "Vänersborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2597,7 +2337,6 @@
     {
       "Id": 312,
       "Name": "Vännäs",
-      "Description": "Vännäs",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2607,7 +2346,6 @@
     {
       "Id": 313,
       "Name": "Älvdalen",
-      "Description": "Älvdalen",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2617,7 +2355,6 @@
     {
       "Id": 314,
       "Name": "Älvkarleby",
-      "Description": "Älvkarleby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2627,7 +2364,6 @@
     {
       "Id": 315,
       "Name": "Värmdö",
-      "Description": "Värmdö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2637,7 +2373,6 @@
     {
       "Id": 316,
       "Name": "Värnamo",
-      "Description": "Värnamo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2647,7 +2382,6 @@
     {
       "Id": 317,
       "Name": "Västervik",
-      "Description": "Västervik",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2657,7 +2391,6 @@
     {
       "Id": 318,
       "Name": "Västerås",
-      "Description": "Västerås",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2667,7 +2400,6 @@
     {
       "Id": 319,
       "Name": "Växjö",
-      "Description": "Växjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2677,7 +2409,6 @@
     {
       "Id": 320,
       "Name": "Vårgårda",
-      "Description": "Vårgårda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2687,7 +2418,6 @@
     {
       "Id": 321,
       "Name": "Ydre",
-      "Description": "Ydre",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2697,7 +2427,6 @@
     {
       "Id": 322,
       "Name": "Ystad",
-      "Description": "Ystad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2707,7 +2436,6 @@
     {
       "Id": 323,
       "Name": "Älmhult",
-      "Description": "Älmhult",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2717,7 +2445,6 @@
     {
       "Id": 324,
       "Name": "Ängelholm",
-      "Description": "Ängelholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2727,7 +2454,6 @@
     {
       "Id": 325,
       "Name": "Åmål",
-      "Description": "Åmål",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2737,7 +2463,6 @@
     {
       "Id": 326,
       "Name": "Ånge",
-      "Description": "Ånge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2747,7 +2472,6 @@
     {
       "Id": 327,
       "Name": "Åre",
-      "Description": "Åre",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2757,7 +2481,6 @@
     {
       "Id": 328,
       "Name": "Årjäng",
-      "Description": "Årjäng",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2767,7 +2490,6 @@
     {
       "Id": 329,
       "Name": "Åsele",
-      "Description": "Åsele",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2777,7 +2499,6 @@
     {
       "Id": 330,
       "Name": "Åstorp",
-      "Description": "Åstorp",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2787,7 +2508,6 @@
     {
       "Id": 331,
       "Name": "Åtvidaberg",
-      "Description": "Åtvidaberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2797,7 +2517,6 @@
     {
       "Id": 332,
       "Name": "Öckerö",
-      "Description": "Öckerö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2807,7 +2526,6 @@
     {
       "Id": 333,
       "Name": "Ödeshög",
-      "Description": "Ödeshög",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2817,7 +2535,6 @@
     {
       "Id": 334,
       "Name": "Örebro",
-      "Description": "Örebro",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2827,7 +2544,6 @@
     {
       "Id": 335,
       "Name": "Örkelljunga",
-      "Description": "Örkelljunga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2837,7 +2553,6 @@
     {
       "Id": 336,
       "Name": "Örnsköldsvik",
-      "Description": "Örnsköldsvik",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2847,7 +2562,6 @@
     {
       "Id": 337,
       "Name": "Östersund",
-      "Description": "Östersund",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2857,7 +2571,6 @@
     {
       "Id": 338,
       "Name": "Österåker",
-      "Description": "Österåker",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2867,7 +2580,6 @@
     {
       "Id": 339,
       "Name": "Östhammar",
-      "Description": "Östhammar",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2877,7 +2589,6 @@
     {
       "Id": 340,
       "Name": "Östra Göinge",
-      "Description": "Östra Göinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2887,7 +2598,6 @@
     {
       "Id": 341,
       "Name": "Överkalix",
-      "Description": "Överkalix",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2897,7 +2607,6 @@
     {
       "Id": 342,
       "Name": "Övertorneå",
-      "Description": "Övertorneå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2908,8 +2617,6 @@
   "ExternalSystemsMapping": [
     {
       "Id": 0,
-      "ExternalSystemId": 0,
-      "VerbatimDataProviderTypeId": 0,
       "Name": "Artportalen",
       "Description": "The Artportalen system",
       "Mappings": [
@@ -4080,7 +3787,7 @@
           ]
         },
         {
-          "Key": "<AreaDatasetId, FeatureId>",
+          "Key": "<AreaDatasetId,FeatureId>",
           "Description": "The key is a tuple of <AreaDatasetId, FeatureId>",
           "Values": [
             {
@@ -7284,9 +6991,1180 @@
       ]
     },
     {
+      "Id": 2,
+      "Name": "Swedish Species Observation Service (SSOS)",
+      "Description": "The Artdatabanken SOAP-based Swedish Species Observation Service (SSOS)",
+      "Mappings": [
+        {
+          "Key": "GUID",
+          "Description": "The key is WebRegion.GUID in SSOS",
+          "Values": [
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1440",
+              "SosId": 53
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1489",
+              "SosId": 54
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature764",
+              "SosId": 55
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature604",
+              "SosId": 56
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1984",
+              "SosId": 57
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2506",
+              "SosId": 58
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2403",
+              "SosId": 59
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2505",
+              "SosId": 60
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1784",
+              "SosId": 61
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1882",
+              "SosId": 62
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2084",
+              "SosId": 63
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1460",
+              "SosId": 64
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2326",
+              "SosId": 65
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1260",
+              "SosId": 66
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2582",
+              "SosId": 67
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1443",
+              "SosId": 68
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2183",
+              "SosId": 69
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2481",
+              "SosId": 70
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1484",
+              "SosId": 71
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1280",
+              "SosId": 72
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2023",
+              "SosId": 73
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2418",
+              "SosId": 74
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1493",
+              "SosId": 75
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1463",
+              "SosId": 76
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature767",
+              "SosId": 77
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1461",
+              "SosId": 78
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature586",
+              "SosId": 79
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2062",
+              "SosId": 80
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature583",
+              "SosId": 81
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature642",
+              "SosId": 82
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1430",
+              "SosId": 83
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1762",
+              "SosId": 84
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1481",
+              "SosId": 85
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature861",
+              "SosId": 86
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature840",
+              "SosId": 87
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature182",
+              "SosId": 88
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2401",
+              "SosId": 89
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature581",
+              "SosId": 90
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature188",
+              "SosId": 91
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2417",
+              "SosId": 92
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1884",
+              "SosId": 93
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1962",
+              "SosId": 94
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2132",
+              "SosId": 95
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature140",
+              "SosId": 96
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature480",
+              "SosId": 97
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature192",
+              "SosId": 98
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature682",
+              "SosId": 99
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2101",
+              "SosId": 100
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1060",
+              "SosId": 101
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2034",
+              "SosId": 102
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1421",
+              "SosId": 103
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1273",
+              "SosId": 104
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature882",
+              "SosId": 105
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2121",
+              "SosId": 106
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature481",
+              "SosId": 107
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2521",
+              "SosId": 108
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1402",
+              "SosId": 109
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1275",
+              "SosId": 110
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2581",
+              "SosId": 111
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2303",
+              "SosId": 112
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2409",
+              "SosId": 113
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1081",
+              "SosId": 114
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2031",
+              "SosId": 115
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1981",
+              "SosId": 116
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature128",
+              "SosId": 117
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2181",
+              "SosId": 118
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature191",
+              "SosId": 119
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1291",
+              "SosId": 120
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1265",
+              "SosId": 121
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1495",
+              "SosId": 122
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2482",
+              "SosId": 123
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature763",
+              "SosId": 124
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1419",
+              "SosId": 125
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1270",
+              "SosId": 126
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1904",
+              "SosId": 127
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2422",
+              "SosId": 128
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1427",
+              "SosId": 129
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1264",
+              "SosId": 130
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1496",
+              "SosId": 131
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2061",
+              "SosId": 132
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2283",
+              "SosId": 133
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature163",
+              "SosId": 134
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature184",
+              "SosId": 135
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1230",
+              "SosId": 136
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1415",
+              "SosId": 137
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature180",
+              "SosId": 138
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1760",
+              "SosId": 139
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2421",
+              "SosId": 140
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature486",
+              "SosId": 141
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1486",
+              "SosId": 142
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2313",
+              "SosId": 143
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature183",
+              "SosId": 144
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2281",
+              "SosId": 145
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1766",
+              "SosId": 146
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature885",
+              "SosId": 147
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2081",
+              "SosId": 148
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1490",
+              "SosId": 149
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature127",
+              "SosId": 150
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature560",
+              "SosId": 151
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1272",
+              "SosId": 152
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2305",
+              "SosId": 153
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1231",
+              "SosId": 154
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1278",
+              "SosId": 155
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1438",
+              "SosId": 156
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature162",
+              "SosId": 157
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1862",
+              "SosId": 158
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2425",
+              "SosId": 159
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1730",
+              "SosId": 160
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature125",
+              "SosId": 161
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature686",
+              "SosId": 162
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature862",
+              "SosId": 163
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature381",
+              "SosId": 164
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature484",
+              "SosId": 165
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1285",
+              "SosId": 166
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1445",
+              "SosId": 167
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1982",
+              "SosId": 168
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1382",
+              "SosId": 169
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1499",
+              "SosId": 170
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2080",
+              "SosId": 171
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2026",
+              "SosId": 172
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature662",
+              "SosId": 173
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1782",
+              "SosId": 174
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature562",
+              "SosId": 175
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature482",
+              "SosId": 176
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1763",
+              "SosId": 177
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1439",
+              "SosId": 178
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature461",
+              "SosId": 179
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature617",
+              "SosId": 180
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature980",
+              "SosId": 181
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1764",
+              "SosId": 182
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1444",
+              "SosId": 183
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1447",
+              "SosId": 184
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2523",
+              "SosId": 185
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2180",
+              "SosId": 186
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1961",
+              "SosId": 187
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1380",
+              "SosId": 188
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1480",
+              "SosId": 189
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1761",
+              "SosId": 190
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2309",
+              "SosId": 191
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1471",
+              "SosId": 192
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature643",
+              "SosId": 193
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1783",
+              "SosId": 194
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1861",
+              "SosId": 195
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature136",
+              "SosId": 196
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2583",
+              "SosId": 197
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2083",
+              "SosId": 198
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature331",
+              "SosId": 199
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1283",
+              "SosId": 200
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1466",
+              "SosId": 201
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1497",
+              "SosId": 202
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2104",
+              "SosId": 203
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature126",
+              "SosId": 204
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2184",
+              "SosId": 205
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature860",
+              "SosId": 206
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1315",
+              "SosId": 207
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1863",
+              "SosId": 208
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2361",
+              "SosId": 209
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2280",
+              "SosId": 210
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1401",
+              "SosId": 211
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1293",
+              "SosId": 212
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature305",
+              "SosId": 213
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1284",
+              "SosId": 214
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature821",
+              "SosId": 215
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1266",
+              "SosId": 216
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1267",
+              "SosId": 217
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2510",
+              "SosId": 218
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature123",
+              "SosId": 219
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature680",
+              "SosId": 220
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2514",
+              "SosId": 221
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature880",
+              "SosId": 222
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1446",
+              "SosId": 223
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1082",
+              "SosId": 224
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1883",
+              "SosId": 225
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1080",
+              "SosId": 226
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1780",
+              "SosId": 227
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature483",
+              "SosId": 228
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1715",
+              "SosId": 229
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature513",
+              "SosId": 230
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2584",
+              "SosId": 231
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1276",
+              "SosId": 232
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature330",
+              "SosId": 233
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2282",
+              "SosId": 234
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1290",
+              "SosId": 235
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1781",
+              "SosId": 236
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1881",
+              "SosId": 237
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1384",
+              "SosId": 238
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature881",
+              "SosId": 239
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1960",
+              "SosId": 240
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1482",
+              "SosId": 241
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1261",
+              "SosId": 242
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1282",
+              "SosId": 243
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1860",
+              "SosId": 244
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1814",
+              "SosId": 245
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2029",
+              "SosId": 246
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1983",
+              "SosId": 247
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1381",
+              "SosId": 248
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1441",
+              "SosId": 249
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1864",
+              "SosId": 250
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1262",
+              "SosId": 251
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature761",
+              "SosId": 252
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature186",
+              "SosId": 253
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1494",
+              "SosId": 254
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1462",
+              "SosId": 255
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1885",
+              "SosId": 256
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature580",
+              "SosId": 257
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature781",
+              "SosId": 258
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2161",
+              "SosId": 259
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2085",
+              "SosId": 260
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2580",
+              "SosId": 261
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1281",
+              "SosId": 262
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1907",
+              "SosId": 263
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1214",
+              "SosId": 264
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1263",
+              "SosId": 265
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1465",
+              "SosId": 266
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1785",
+              "SosId": 267
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2082",
+              "SosId": 268
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature684",
+              "SosId": 269
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2182",
+              "SosId": 270
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature582",
+              "SosId": 271
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature181",
+              "SosId": 272
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1083",
+              "SosId": 273
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1435",
+              "SosId": 274
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1472",
+              "SosId": 275
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1498",
+              "SosId": 276
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature360",
+              "SosId": 277
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2262",
+              "SosId": 278
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1737",
+              "SosId": 279
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature834",
+              "SosId": 280
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2560",
+              "SosId": 281
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1452",
+              "SosId": 282
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature687",
+              "SosId": 283
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1287",
+              "SosId": 284
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1488",
+              "SosId": 285
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature488",
+              "SosId": 286
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature138",
+              "SosId": 287
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature160",
+              "SosId": 288
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1473",
+              "SosId": 289
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature114",
+              "SosId": 290
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature380",
+              "SosId": 291
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature760",
+              "SosId": 292
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1485",
+              "SosId": 293
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1491",
+              "SosId": 294
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2480",
+              "SosId": 295
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature139",
+              "SosId": 296
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature584",
+              "SosId": 297
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature665",
+              "SosId": 298
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature563",
+              "SosId": 299
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature115",
+              "SosId": 300
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2021",
+              "SosId": 301
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1470",
+              "SosId": 302
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1383",
+              "SosId": 303
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature187",
+              "SosId": 304
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1233",
+              "SosId": 305
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature685",
+              "SosId": 306
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2462",
+              "SosId": 307
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature884",
+              "SosId": 308
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2404",
+              "SosId": 309
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature428",
+              "SosId": 310
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1487",
+              "SosId": 311
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2460",
+              "SosId": 312
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2039",
+              "SosId": 313
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature319",
+              "SosId": 314
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature120",
+              "SosId": 315
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature683",
+              "SosId": 316
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature883",
+              "SosId": 317
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1980",
+              "SosId": 318
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature780",
+              "SosId": 319
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1442",
+              "SosId": 320
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature512",
+              "SosId": 321
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1286",
+              "SosId": 322
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature765",
+              "SosId": 323
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1292",
+              "SosId": 324
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1492",
+              "SosId": 325
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2260",
+              "SosId": 326
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2321",
+              "SosId": 327
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1765",
+              "SosId": 328
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2463",
+              "SosId": 329
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1277",
+              "SosId": 330
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature561",
+              "SosId": 331
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1407",
+              "SosId": 332
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature509",
+              "SosId": 333
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1880",
+              "SosId": 334
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1257",
+              "SosId": 335
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2284",
+              "SosId": 336
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2380",
+              "SosId": 337
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature117",
+              "SosId": 338
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature382",
+              "SosId": 339
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature1256",
+              "SosId": 340
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2513",
+              "SosId": 341
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet1Feature2518",
+              "SosId": 342
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": 1,
-      "ExternalSystemId": 1,
-      "VerbatimDataProviderTypeId": 1,
       "Name": "DarwinCore",
       "Description": "The Darwin Core format(https://dwc.tdwg.org/terms/)",
       "Mappings": [

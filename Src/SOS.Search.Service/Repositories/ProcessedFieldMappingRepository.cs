@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Search.Service.Database.Interfaces;
 using SOS.Search.Service.Repositories.Interfaces;
@@ -16,7 +17,7 @@ namespace SOS.Search.Service.Repositories
     /// <summary>
     /// Field mappings repository.
     /// </summary>
-    public class ProcessedFieldMappingRepository : ProcessBaseRepository<FieldMapping, int>, IProcessedFieldMappingRepository
+    public class ProcessedFieldMappingRepository : ProcessBaseRepository<FieldMapping, FieldMappingFieldId>, IProcessedFieldMappingRepository
     {
         /// <summary>
         /// Constructor
@@ -25,7 +26,7 @@ namespace SOS.Search.Service.Repositories
         /// <param name="logger"></param>
         public ProcessedFieldMappingRepository(
             IProcessClient client,
-            ILogger<ProcessBaseRepository<FieldMapping, int>> logger) : base(client, true, logger)
+            ILogger<ProcessBaseRepository<FieldMapping, FieldMappingFieldId>> logger) : base(client, true, logger)
         {
             
         }

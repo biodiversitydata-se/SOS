@@ -6,10 +6,9 @@ using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Shared
 {
-    public class FieldMapping : IEntity<int>
+    public class FieldMapping : IEntity<FieldMappingFieldId>
     {
-        public int Id { get; set; }
-        public FieldMappingFieldId FieldMappingFieldId { get; set; }
+        public FieldMappingFieldId Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public bool Localized { get; set; }

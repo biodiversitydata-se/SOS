@@ -12,6 +12,7 @@ using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
 using Newtonsoft.Json;
+using SOS.Lib.Constants;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
@@ -66,7 +67,7 @@ namespace SOS.Process.Helpers
             // Get field mappings
             var fieldMappings = (await _processedFieldMappingRepository.GetFieldMappingsAsync()).ToArray();
             _fieldMappingsByFeatureId = GetGeoRegionFieldMappingDictionaries(fieldMappings);
-            _fieldMappingValueById = fieldMappings.ToDictionary(m => m.FieldMappingFieldId,
+            _fieldMappingValueById = fieldMappings.ToDictionary(m => m.Id,
                 m => m.Values.ToDictionary(v => v.Id, v => v));
 
             // If tree already initialized, return
@@ -244,15 +245,14 @@ namespace SOS.Process.Helpers
             ICollection<FieldMapping> verbatimFieldMappings)
         {
             var dic = new Dictionary<FieldMappingFieldId, IDictionary<object, int>>();
-            foreach (var fieldMapping in verbatimFieldMappings.Where(m => m.FieldMappingFieldId.IsGeographicRegionField()))
+            foreach (var fieldMapping in verbatimFieldMappings.Where(m => m.Id.IsGeographicRegionField()))
             {
-                var fieldMappings = fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == (int)VerbatimDataProviderTypeId.Artportalen);
+                var fieldMappings = fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == ExternalSystemId.Artportalen);
                 if (fieldMappings != null)
                 {
-                    string mappingKey = "FeatureId";
-                    ExternalSystemMappingField mapping = fieldMappings.Mappings.Single(m => m.Key == mappingKey);
+                    ExternalSystemMappingField mapping = fieldMappings.Mappings.Single(m => m.Key == MappingKeyFields.FeatureId);
                     var sosIdByValue = mapping.GetIdByValueDictionary();
-                    dic.Add(fieldMapping.FieldMappingFieldId, sosIdByValue);
+                    dic.Add(fieldMapping.Id, sosIdByValue);
                 }
             }
 

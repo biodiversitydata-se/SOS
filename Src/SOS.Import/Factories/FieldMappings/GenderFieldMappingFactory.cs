@@ -13,6 +13,7 @@ using SOS.Import.Repositories.Source.SpeciesPortal;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
 using SOS.Import.Services;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
@@ -47,8 +48,7 @@ namespace SOS.Import.Factories.FieldMappings
 
             FieldMapping fieldMapping = new FieldMapping
             {
-                Id = (int)FieldMappingFieldId.Gender,
-                FieldMappingFieldId = FieldMappingFieldId.Gender,
+                Id = FieldMappingFieldId.Gender,
                 Name = FieldMappingFieldId.Gender.ToString(),
                 Localized = true,
                 Values = fieldMappingValues,
@@ -94,14 +94,12 @@ namespace SOS.Import.Factories.FieldMappings
         private ExternalSystemMapping GetArtportalenExternalSystemMapping(ICollection<FieldMappingValue> fieldMappingValues)
         {
             ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping();
-            externalSystemMapping.Id = (int)VerbatimDataProviderTypeId.Artportalen;
-            externalSystemMapping.VerbatimDataProviderTypeId = VerbatimDataProviderTypeId.Artportalen;
-            externalSystemMapping.ExternalSystemId = ExternalSystemId.Artportalen;
-            externalSystemMapping.Name = "Artportalen";
+            externalSystemMapping.Id = ExternalSystemId.Artportalen;
+            externalSystemMapping.Name = ExternalSystemId.Artportalen.ToString();
             externalSystemMapping.Mappings = new List<ExternalSystemMappingField>();
 
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField();
-            mappingField.Key = "Id";
+            mappingField.Key = MappingKeyFields.Id;
             mappingField.Description = "The Gender.Id field";
             mappingField.Values = new List<ExternalSystemMappingValue>();
 
@@ -123,17 +121,15 @@ namespace SOS.Import.Factories.FieldMappings
         {
             ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping
             {
-                Id = (int)VerbatimDataProviderTypeId.DarwinCore,
-                VerbatimDataProviderTypeId = VerbatimDataProviderTypeId.DarwinCore,
-                ExternalSystemId = ExternalSystemId.DarwinCore,
-                Name = "DarwinCore",
+                Id = ExternalSystemId.DarwinCore,
+                Name = ExternalSystemId.DarwinCore.ToString(),
                 Description = "The Darwin Core format (https://dwc.tdwg.org/terms/)",
                 Mappings = new List<ExternalSystemMappingField>()
             };
 
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField
             {
-                Key = "sex",
+                Key = MappingKeyFields.DwcSex,
                 Description = "The sex term (http://rs.tdwg.org/dwc/terms/sex)",
                 Values = new List<ExternalSystemMappingValue>
                 {

@@ -1,13 +1,11 @@
 {
   "Id": 5,
-  "FieldMappingFieldId": 5,
   "Name": "Province",
   "Localized": false,
   "Values": [
     {
       "Id": 8058,
       "Name": "Skåne",
-      "Description": "Skåne",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -17,7 +15,6 @@
     {
       "Id": 8059,
       "Name": "Blekinge",
-      "Description": "Blekinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -27,7 +24,6 @@
     {
       "Id": 8060,
       "Name": "Småland",
-      "Description": "Småland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -37,7 +33,6 @@
     {
       "Id": 8061,
       "Name": "Öland",
-      "Description": "Öland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -47,7 +42,6 @@
     {
       "Id": 8062,
       "Name": "Gotland",
-      "Description": "Gotland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -57,7 +51,6 @@
     {
       "Id": 8063,
       "Name": "Halland",
-      "Description": "Halland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -67,7 +60,6 @@
     {
       "Id": 8064,
       "Name": "Bohuslän",
-      "Description": "Bohuslän",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -77,7 +69,6 @@
     {
       "Id": 8065,
       "Name": "Dalsland",
-      "Description": "Dalsland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -87,7 +78,6 @@
     {
       "Id": 8066,
       "Name": "Västergötland",
-      "Description": "Västergötland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -97,7 +87,6 @@
     {
       "Id": 8067,
       "Name": "Närke",
-      "Description": "Närke",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -107,7 +96,6 @@
     {
       "Id": 8068,
       "Name": "Östergötland",
-      "Description": "Östergötland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -117,7 +105,6 @@
     {
       "Id": 8069,
       "Name": "Södermanland",
-      "Description": "Södermanland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -127,7 +114,6 @@
     {
       "Id": 8070,
       "Name": "Uppland",
-      "Description": "Uppland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -137,7 +123,6 @@
     {
       "Id": 8071,
       "Name": "Västmanland",
-      "Description": "Västmanland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -147,7 +132,6 @@
     {
       "Id": 8072,
       "Name": "Värmland",
-      "Description": "Värmland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -157,7 +141,6 @@
     {
       "Id": 8073,
       "Name": "Dalarna",
-      "Description": "Dalarna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -167,7 +150,6 @@
     {
       "Id": 8074,
       "Name": "Gästrikland",
-      "Description": "Gästrikland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -177,7 +159,6 @@
     {
       "Id": 8075,
       "Name": "Hälsingland",
-      "Description": "Hälsingland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -187,7 +168,6 @@
     {
       "Id": 8076,
       "Name": "Medelpad",
-      "Description": "Medelpad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -197,7 +177,6 @@
     {
       "Id": 8077,
       "Name": "Ångermanland",
-      "Description": "Ångermanland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -207,7 +186,6 @@
     {
       "Id": 8078,
       "Name": "Västerbotten",
-      "Description": "Västerbotten",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -217,7 +195,6 @@
     {
       "Id": 8079,
       "Name": "Norrbotten",
-      "Description": "Norrbotten",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -227,7 +204,6 @@
     {
       "Id": 8080,
       "Name": "Härjedalen",
-      "Description": "Härjedalen",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -237,7 +213,6 @@
     {
       "Id": 8081,
       "Name": "Jämtland",
-      "Description": "Jämtland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -247,7 +222,6 @@
     {
       "Id": 8082,
       "Name": "Åsele lappmark",
-      "Description": "Åsele lappmark",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -257,7 +231,6 @@
     {
       "Id": 8083,
       "Name": "Lycksele lappmark",
-      "Description": "Lycksele lappmark",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -267,7 +240,6 @@
     {
       "Id": 8084,
       "Name": "Pite lappmark",
-      "Description": "Pite lappmark",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -277,7 +249,6 @@
     {
       "Id": 8085,
       "Name": "Lule lappmark",
-      "Description": "Lule lappmark",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -287,7 +258,6 @@
     {
       "Id": 8086,
       "Name": "Torne lappmark",
-      "Description": "Torne lappmark",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -297,7 +267,6 @@
     {
       "Id": 55235,
       "Name": "Bottenviken",
-      "Description": "Bottenviken",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -307,7 +276,6 @@
     {
       "Id": 55236,
       "Name": "Bottenhavet",
-      "Description": "Bottenhavet",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -317,7 +285,6 @@
     {
       "Id": 55237,
       "Name": "Östersjön",
-      "Description": "Östersjön",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -327,7 +294,6 @@
     {
       "Id": 55238,
       "Name": "Kattegatt",
-      "Description": "Kattegatt",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -337,7 +303,6 @@
     {
       "Id": 55239,
       "Name": "Skagerrak",
-      "Description": "Skagerrak",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -348,8 +313,6 @@
   "ExternalSystemsMapping": [
     {
       "Id": 0,
-      "ExternalSystemId": 0,
-      "VerbatimDataProviderTypeId": 0,
       "Name": "Artportalen",
       "Description": "The Artportalen system",
       "Mappings": [
@@ -496,7 +459,7 @@
           ]
         },
         {
-          "Key": "<AreaDatasetId, FeatureId>",
+          "Key": "<AreaDatasetId,FeatureId>",
           "Description": "The key is a tuple of <AreaDatasetId, FeatureId>",
           "Values": [
             {
@@ -884,9 +847,156 @@
       ]
     },
     {
+      "Id": 2,
+      "Name": "Swedish Species Observation Service (SSOS)",
+      "Description": "The Artdatabanken SOAP-based Swedish Species Observation Service (SSOS)",
+      "Mappings": [
+        {
+          "Key": "GUID",
+          "Description": "The key is WebRegion.GUID in SSOS",
+          "Values": [
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature1",
+              "SosId": 8058
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature2",
+              "SosId": 8059
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature3",
+              "SosId": 8060
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature4",
+              "SosId": 8061
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature5",
+              "SosId": 8062
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature6",
+              "SosId": 8063
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature7",
+              "SosId": 8064
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature8",
+              "SosId": 8065
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature9",
+              "SosId": 8066
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature10",
+              "SosId": 8067
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature11",
+              "SosId": 8068
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature12",
+              "SosId": 8069
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature13",
+              "SosId": 8070
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature14",
+              "SosId": 8071
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature15",
+              "SosId": 8072
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature16",
+              "SosId": 8073
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature17",
+              "SosId": 8074
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature18",
+              "SosId": 8075
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature19",
+              "SosId": 8076
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature20",
+              "SosId": 8077
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature21",
+              "SosId": 8078
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature22",
+              "SosId": 8079
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature23",
+              "SosId": 8080
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature24",
+              "SosId": 8081
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature25",
+              "SosId": 8082
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature26",
+              "SosId": 8083
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature27",
+              "SosId": 8084
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature28",
+              "SosId": 8085
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature29",
+              "SosId": 8086
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature30",
+              "SosId": 55235
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature31",
+              "SosId": 55236
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature32",
+              "SosId": 55237
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature33",
+              "SosId": 55238
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet16Feature34",
+              "SosId": 55239
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": 1,
-      "ExternalSystemId": 1,
-      "VerbatimDataProviderTypeId": 1,
       "Name": "DarwinCore",
       "Description": "The Darwin Core format(https://dwc.tdwg.org/terms/)",
       "Mappings": [

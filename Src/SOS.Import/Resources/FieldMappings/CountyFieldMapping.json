@@ -1,13 +1,11 @@
 {
   "Id": 2,
-  "FieldMappingFieldId": 2,
   "Name": "County",
   "Localized": false,
   "Values": [
     {
       "Id": 1,
       "Name": "Blekinge",
-      "Description": "Blekinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -17,7 +15,6 @@
     {
       "Id": 2,
       "Name": "Dalarna",
-      "Description": "Dalarna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -27,7 +24,6 @@
     {
       "Id": 3,
       "Name": "Gotland",
-      "Description": "Gotland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -37,7 +33,6 @@
     {
       "Id": 4,
       "Name": "Gävleborg",
-      "Description": "Gävleborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -47,7 +42,6 @@
     {
       "Id": 5,
       "Name": "Halland",
-      "Description": "Halland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -57,7 +51,6 @@
     {
       "Id": 6,
       "Name": "Jämtland",
-      "Description": "Jämtland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -67,7 +60,6 @@
     {
       "Id": 7,
       "Name": "Jönköping",
-      "Description": "Jönköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -77,7 +69,6 @@
     {
       "Id": 8,
       "Name": "Kalmar",
-      "Description": "Kalmar",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -87,7 +78,6 @@
     {
       "Id": 9,
       "Name": "Kronoberg",
-      "Description": "Kronoberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -97,7 +87,6 @@
     {
       "Id": 10,
       "Name": "Norrbotten",
-      "Description": "Norrbotten",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -107,7 +96,6 @@
     {
       "Id": 11,
       "Name": "Skåne",
-      "Description": "Skåne",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -117,7 +105,6 @@
     {
       "Id": 12,
       "Name": "Stockholm",
-      "Description": "Stockholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -127,7 +114,6 @@
     {
       "Id": 13,
       "Name": "Södermanland",
-      "Description": "Södermanland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -137,7 +123,6 @@
     {
       "Id": 14,
       "Name": "Uppsala",
-      "Description": "Uppsala",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -147,7 +132,6 @@
     {
       "Id": 15,
       "Name": "Värmland",
-      "Description": "Värmland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -157,7 +141,6 @@
     {
       "Id": 16,
       "Name": "Västerbotten",
-      "Description": "Västerbotten",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -167,7 +150,6 @@
     {
       "Id": 17,
       "Name": "Östergötland",
-      "Description": "Östergötland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -177,7 +159,6 @@
     {
       "Id": 18,
       "Name": "Västernorrland",
-      "Description": "Västernorrland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -187,7 +168,6 @@
     {
       "Id": 19,
       "Name": "Västmanland",
-      "Description": "Västmanland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -197,7 +177,6 @@
     {
       "Id": 20,
       "Name": "Västra Götaland",
-      "Description": "Västra Götaland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -207,7 +186,6 @@
     {
       "Id": 21,
       "Name": "Örebro",
-      "Description": "Örebro",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -218,8 +196,6 @@
   "ExternalSystemsMapping": [
     {
       "Id": 0,
-      "ExternalSystemId": 0,
-      "VerbatimDataProviderTypeId": 0,
       "Name": "Artportalen",
       "Description": "The Artportalen system",
       "Mappings": [
@@ -314,7 +290,7 @@
           ]
         },
         {
-          "Key": "<AreaDatasetId, FeatureId>",
+          "Key": "<AreaDatasetId,FeatureId>",
           "Description": "The key is a tuple of <AreaDatasetId, FeatureId>",
           "Values": [
             {
@@ -559,9 +535,104 @@
       ]
     },
     {
+      "Id": 2,
+      "Name": "Swedish Species Observation Service (SSOS)",
+      "Description": "The Artdatabanken SOAP-based Swedish Species Observation Service (SSOS)",
+      "Mappings": [
+        {
+          "Key": "GUID",
+          "Description": "The key is WebRegion.GUID in SSOS",
+          "Values": [
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature10",
+              "SosId": 1
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature20",
+              "SosId": 2
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature9",
+              "SosId": 3
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature21",
+              "SosId": 4
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature13",
+              "SosId": 5
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature23",
+              "SosId": 6
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature6",
+              "SosId": 7
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature8",
+              "SosId": 8
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature7",
+              "SosId": 9
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature25",
+              "SosId": 10
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature12",
+              "SosId": 11
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature1",
+              "SosId": 12
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature4",
+              "SosId": 13
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature3",
+              "SosId": 14
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature17",
+              "SosId": 15
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature24",
+              "SosId": 16
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature5",
+              "SosId": 17
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature22",
+              "SosId": 18
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature19",
+              "SosId": 19
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature14",
+              "SosId": 20
+            },
+            {
+              "Value": "URN:LSID:artportalen.se:area:DataSet21Feature18",
+              "SosId": 21
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": 1,
-      "ExternalSystemId": 1,
-      "VerbatimDataProviderTypeId": 1,
       "Name": "DarwinCore",
       "Description": "The Darwin Core format(https://dwc.tdwg.org/terms/)",
       "Mappings": [
