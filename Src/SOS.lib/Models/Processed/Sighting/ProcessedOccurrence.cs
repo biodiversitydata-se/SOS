@@ -16,7 +16,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedLookupValue ActivityId { get; set; }
+        public ProcessedFieldMapValue ActivityId { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of identifiers
@@ -243,7 +243,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedLookupValue GenderId { get; set; }
+        public ProcessedFieldMapValue GenderId { get; set; }
 
         /// <summary>
         /// A statement about the presence or absence of a Taxon at a

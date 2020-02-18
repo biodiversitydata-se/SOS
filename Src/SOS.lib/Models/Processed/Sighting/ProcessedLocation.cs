@@ -69,7 +69,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedLookupValue CountyId { get; set; }
+        public ProcessedFieldMapValue CountyId { get; set; }
 
         /// <summary>
         /// Darwin Core term name: municipality.
@@ -80,7 +80,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedLookupValue MunicipalityId { get; set; }
+        public ProcessedFieldMapValue MunicipalityId { get; set; }
         
         /// <summary>
         /// Parish ('socken' in swedish).
@@ -88,7 +88,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedLookupValue ParishId { get; set; }
+        public ProcessedFieldMapValue ParishId { get; set; }
 
         /// <summary>
         /// Darwin Core term name: stateProvince.
@@ -100,7 +100,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedLookupValue ProvinceId { get; set; }
+        public ProcessedFieldMapValue ProvinceId { get; set; }
 
         /// <summary>
         /// Darwin Core term name: decimalLatitude.

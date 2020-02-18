@@ -165,27 +165,27 @@ namespace SOS.Search.Service.Factories
                 }
             }
         }
-        private void TranslateValue(ProcessedLookupValue lookupValue, FieldMappingFieldId fieldMappingFieldId)
+        private void TranslateValue(ProcessedFieldMapValue fieldMapValue, FieldMappingFieldId fieldMappingFieldId)
         {
-            if (lookupValue == null) return;
-            if (lookupValue.Id != CustomValueId
-                && _fieldMappingFactory.TryGetValue(fieldMappingFieldId, lookupValue.Id, out var translatedValue))
+            if (fieldMapValue == null) return;
+            if (fieldMapValue.Id != CustomValueId
+                && _fieldMappingFactory.TryGetValue(fieldMappingFieldId, fieldMapValue.Id, out var translatedValue))
             {
-                lookupValue.Value = translatedValue;
+                fieldMapValue.Value = translatedValue;
             }
         }
 
         private void TranslateLocalizedValue(
-            ProcessedLookupValue lookupValue,
+            ProcessedFieldMapValue fieldMapValue,
             FieldMappingFieldId fieldMappingFieldId,
             string cultureCode)
         {
-            if (lookupValue == null) return;
+            if (fieldMapValue == null) return;
 
-            if (lookupValue.Id != CustomValueId
-                && _fieldMappingFactory.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, lookupValue.Id, out var translatedValue))
+            if (fieldMapValue.Id != CustomValueId
+                && _fieldMappingFactory.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, fieldMapValue.Id, out var translatedValue))
             {
-                lookupValue.Value = translatedValue;
+                fieldMapValue.Value = translatedValue;
             }
         }
 

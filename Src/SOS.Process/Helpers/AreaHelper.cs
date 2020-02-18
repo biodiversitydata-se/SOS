@@ -218,17 +218,17 @@ namespace SOS.Process.Helpers
         /// <param name="val"></param>
         /// <param name="sosIdByProviderValue"></param>
         /// <returns></returns>
-        private static ProcessedLookupValue GetSosId(int? val, IDictionary<object, int> sosIdByProviderValue)
+        private static ProcessedFieldMapValue GetSosId(int? val, IDictionary<object, int> sosIdByProviderValue)
         {
             if (!val.HasValue) return null;
 
             if (sosIdByProviderValue.TryGetValue(val.Value, out int sosId))
             {
-                return new ProcessedLookupValue { Id = sosId };
+                return new ProcessedFieldMapValue { Id = sosId };
             }
             else
             {
-                return new ProcessedLookupValue { Id = -1, Value = val.ToString() };
+                return new ProcessedFieldMapValue { Id = -1, Value = val.ToString() };
             }
         }
 
@@ -268,7 +268,7 @@ namespace SOS.Process.Helpers
 
         }
 
-        private void SetValue(ProcessedLookupValue val, IDictionary<int, FieldMappingValue> fieldMappingValueById)
+        private void SetValue(ProcessedFieldMapValue val, IDictionary<int, FieldMappingValue> fieldMappingValueById)
         {
             if (val == null) return;
             if (fieldMappingValueById.TryGetValue(val.Id, out FieldMappingValue fieldMappingValue))
