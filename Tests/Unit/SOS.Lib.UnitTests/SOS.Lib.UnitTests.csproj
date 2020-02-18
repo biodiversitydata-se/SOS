@@ -49,4 +49,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="TestHelpers\Factories\" />
+  </ItemGroup>
+
 </Project>
