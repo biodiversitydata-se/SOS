@@ -48,6 +48,9 @@
     <None Update="Resources\DefaultTestObservation.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\FieldMappings.msgpck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\TenProcessedTestObservations.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

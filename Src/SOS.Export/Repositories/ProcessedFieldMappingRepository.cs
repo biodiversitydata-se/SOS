@@ -3,21 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using SOS.Lib.Configuration.Shared;
+using SOS.Export.MongoDb.Interfaces;
+using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Search.Service.Database.Interfaces;
-using SOS.Search.Service.Repositories.Interfaces;
 
-namespace SOS.Search.Service.Repositories
+namespace SOS.Export.Repositories
 {
     /// <summary>
     /// Field mappings repository.
     /// </summary>
-    public class ProcessedFieldMappingRepository : ProcessBaseRepository<FieldMapping, FieldMappingFieldId>, IProcessedFieldMappingRepository
+    public class ProcessedFieldMappingRepository : BaseRepository<FieldMapping, FieldMappingFieldId>, IProcessedFieldMappingRepository
     {
         /// <summary>
         /// Constructor
@@ -25,8 +22,8 @@ namespace SOS.Search.Service.Repositories
         /// <param name="client"></param>
         /// <param name="logger"></param>
         public ProcessedFieldMappingRepository(
-            IProcessClient client,
-            ILogger<ProcessBaseRepository<FieldMapping, FieldMappingFieldId>> logger) : base(client, true, logger)
+            IExportClient client,
+            ILogger<ProcessedFieldMappingRepository> logger) : base(client, true, logger)
         {
             
         }

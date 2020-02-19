@@ -21,7 +21,7 @@ namespace SOS.Export.IntegrationTests.Factories
         [Fact]
         [Trait("Category", "Integration")]
         [Trait("Category", "DwcArchiveIntegration")]
-        public async Task TestCreateDwcArchiveFileForAllObservations()
+        public async Task Create_DwcArchive_file_for_all_observations_and_delete_the_file_afterwards()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -43,22 +43,23 @@ namespace SOS.Export.IntegrationTests.Factories
         private SightingFactory CreateSightingFactory()
         {
             var exportConfiguration = GetExportConfiguration();
-            var dwcArchiveFileWriter = new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
-                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
-                new FileService(),
-                new NullLogger<DwcArchiveFileWriter>());
-
             var exportClient = new ExportClient(
                 exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 exportConfiguration.ProcessedDbConfiguration.DatabaseName,
                 exportConfiguration.ProcessedDbConfiguration.BatchSize);
+            var dwcArchiveFileWriter = new DwcArchiveFileWriter(
+                new DwcArchiveOccurrenceCsvWriter(
+                    new ProcessedFieldMappingRepository(exportClient, new NullLogger<ProcessedFieldMappingRepository>()), 
+                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new FileService(),
+                new NullLogger<DwcArchiveFileWriter>());
             SightingFactory sightingFactory = new SightingFactory(
                 dwcArchiveFileWriter,
                 new ProcessedSightingRepository(
                     exportClient,
                     new TaxonFactory(
-                        new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonFactory>>().Object), 
+                        new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonFactory>>().Object),
                     new Mock<ILogger<ProcessedSightingRepository>>().Object),
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),

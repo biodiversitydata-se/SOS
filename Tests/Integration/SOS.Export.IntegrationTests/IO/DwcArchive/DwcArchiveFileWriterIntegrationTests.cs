@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Export.Factories;
 using SOS.Export.IntegrationTests.TestHelpers.Factories;
@@ -9,6 +10,7 @@ using SOS.Export.IO.DwcArchive;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Export.Services;
+using SOS.Lib.Configuration.Export;
 using SOS.Lib.Models.Search;
 using SOS.TestHelpers.IO;
 using Xunit;
@@ -27,25 +29,14 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var exportConfiguration = GetExportConfiguration();
             string exportFolderPath = exportConfiguration.FileDestination.Path;
-            var exportClient = new ExportClient(
-                exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                exportConfiguration.ProcessedDbConfiguration.DatabaseName,
-                exportConfiguration.ProcessedDbConfiguration.BatchSize);
-            var processedSightingRepository = new ProcessedSightingRepository(
-                exportClient,
-                new TaxonFactory(
-                    new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonFactory>>().Object),
-                new Mock<ILogger<ProcessedSightingRepository>>().Object);
-            DwcArchiveFileWriter dwcArchiveFileWriter = new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object),
-                new ExtendedMeasurementOrFactCsvWriter(new Mock<ILogger<ExtendedMeasurementOrFactCsvWriter>>().Object),
-                new FileService(), 
-                new Mock<ILogger<DwcArchiveFileWriter>>().Object);
+            var exportClient = CreateExportClient(exportConfiguration);
+            var processedSightingRepository = CreateProcessedSightingRepository(exportClient);
+            var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository = new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
             var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
             var filename = FilenameGenerator.CreateFilename("sos_dwc_archive_with_all_data");
-            var filter = new AdvancedFilter();
-            //var filter = new AdvancedFilter {TaxonIds = new[] {102951}};
+            //var filter = new AdvancedFilter();
+            var filter = new AdvancedFilter {TaxonIds = new[] {102951}};
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -74,18 +65,10 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var exportConfiguration = GetExportConfiguration();
+            var exportClient = CreateExportClient(exportConfiguration);
             string exportFolderPath = exportConfiguration.FileDestination.Path;
             var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources\TenProcessedTestObservations.json");
-            DwcArchiveFileWriter dwcArchiveFileWriter = new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object),
-                new ExtendedMeasurementOrFactCsvWriter(new Mock<ILogger<ExtendedMeasurementOrFactCsvWriter>>().Object),
-                new FileService(),
-                new Mock<ILogger<DwcArchiveFileWriter>>().Object);
-            
-            var exportClient = new ExportClient(
-                exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                exportConfiguration.ProcessedDbConfiguration.DatabaseName,
-                exportConfiguration.ProcessedDbConfiguration.BatchSize);
+            var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository = new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
             var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
             var filename = FilenameGenerator.CreateFilename("sos_dwc_archive_with_ten_observations");
@@ -106,6 +89,43 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             bool fileExists = System.IO.File.Exists(zipFilePath);
             fileExists.Should().BeTrue("because the zip file should have been generated");
+        }
+
+        private static ExportClient CreateExportClient(ExportConfiguration exportConfiguration)
+        {
+            var exportClient = new ExportClient(
+                exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
+                exportConfiguration.ProcessedDbConfiguration.DatabaseName,
+                exportConfiguration.ProcessedDbConfiguration.BatchSize);
+            return exportClient;
+        }
+
+        private static DwcArchiveFileWriter CreateDwcArchiveFileWriter(ExportClient exportClient)
+        {
+            var processedFieldMappingRepository = new ProcessedFieldMappingRepository(
+                exportClient,
+                new NullLogger<ProcessedFieldMappingRepository>());
+            DwcArchiveFileWriter dwcArchiveFileWriter = new DwcArchiveFileWriter(
+                new DwcArchiveOccurrenceCsvWriter(
+                    processedFieldMappingRepository,
+                    new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object),
+                new ExtendedMeasurementOrFactCsvWriter(new Mock<ILogger<ExtendedMeasurementOrFactCsvWriter>>().Object),
+                new FileService(),
+                new Mock<ILogger<DwcArchiveFileWriter>>().Object);
+            return dwcArchiveFileWriter;
+        }
+
+        private static ProcessedSightingRepository CreateProcessedSightingRepository(ExportClient exportClient)
+        {
+            var processedSightingRepository = new ProcessedSightingRepository(
+                exportClient,
+                new TaxonFactory(
+                    new ProcessedTaxonRepository(
+                        exportClient,
+                        new Mock<ILogger<ProcessedTaxonRepository>>().Object),
+                    new Mock<ILogger<TaxonFactory>>().Object),
+                new Mock<ILogger<ProcessedSightingRepository>>().Object);
+            return processedSightingRepository;
         }
     }
 }

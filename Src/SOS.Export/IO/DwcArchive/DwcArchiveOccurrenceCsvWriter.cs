@@ -12,17 +12,24 @@ using Microsoft.Extensions.Logging;
 using SOS.Export.Mappings;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive
 {
     public class DwcArchiveOccurrenceCsvWriter : Interfaces.IDwcArchiveOccurrenceCsvWriter
     {
+        private const int CustomValueId = -1;
         private readonly ILogger<DwcArchiveOccurrenceCsvWriter> _logger;
+        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
 
-        public DwcArchiveOccurrenceCsvWriter(ILogger<DwcArchiveOccurrenceCsvWriter> logger)
+        public DwcArchiveOccurrenceCsvWriter(
+            IProcessedFieldMappingRepository processedFieldMappingRepository,
+            ILogger<DwcArchiveOccurrenceCsvWriter> logger)
         {
+            _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -39,16 +46,24 @@ namespace SOS.Export.IO.DwcArchive
                 var skip = 0;
                 const int take = 1000000;
                 var darwinCoreMap = new DarwinCoreDynamicMap(fieldDescriptions);
-                var processedSightings = await processedSightingRepository.GetChunkAsync(filter, skip, take);
+                var fieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
+                var valueMappingDictionaries = fieldMappings.ToDictionary(m => m.Id, m => m.CreateValueDictionary());
+                var processedSightings = (await processedSightingRepository.GetChunkAsync(filter, skip, take)).ToArray();
 
                 while (processedSightings.Any())
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-    
-                    await WriteOccurrenceCsvAsync(stream, processedSightings.ToDarwinCore(), darwinCoreMap);
+                    foreach (var processedSighting in processedSightings)
+                    {
+                        ResolveValue(processedSighting?.Location?.CountyId, valueMappingDictionaries[FieldMappingFieldId.County]);
+                        ResolveValue(processedSighting?.Location?.MunicipalityId, valueMappingDictionaries[FieldMappingFieldId.Municipality]);
+                        ResolveValue(processedSighting?.Location?.ParishId, valueMappingDictionaries[FieldMappingFieldId.Parish]);
+                        ResolveValue(processedSighting?.Location?.ProvinceId, valueMappingDictionaries[FieldMappingFieldId.Province]);
+                    }
 
+                    await WriteOccurrenceCsvAsync(stream, processedSightings.ToDarwinCore(), darwinCoreMap);
                     skip += take;
-                    processedSightings = await processedSightingRepository.GetChunkAsync(filter, skip, take);
+                    processedSightings = (await processedSightingRepository.GetChunkAsync(filter, skip, take)).ToArray();
                 }
 
                 return true;
@@ -65,6 +80,17 @@ namespace SOS.Export.IO.DwcArchive
             }
         }
 
+        private void ResolveValue(
+            ProcessedFieldMapValue fieldMapValue,
+            Dictionary<int, string> valueById)
+        {
+            if (fieldMapValue == null) return;
+            if (fieldMapValue.Id != CustomValueId
+                && valueById.TryGetValue(fieldMapValue.Id, out var translatedValue))
+            {
+                fieldMapValue.Value = translatedValue;
+            }
+        }
         private async Task WriteOccurrenceCsvAsync<T>(Stream stream, IEnumerable<T> records, ClassMap<T> map)
         {
             if (!records?.Any() ?? true)
