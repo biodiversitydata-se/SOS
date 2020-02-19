@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
@@ -20,7 +21,6 @@ namespace SOS.Search.Service.Factories
     /// </summary>
     public class SightingFactory : Interfaces.ISightingFactory
     {
-        private const int CustomValueId = -1;
         private readonly IProcessedSightingRepository _processedSightingRepository;
         private readonly IFieldMappingFactory _fieldMappingFactory;
         private readonly ILogger<SightingFactory> _logger;
@@ -157,7 +157,7 @@ namespace SOS.Search.Service.Factories
                 if (sightingNode[fieldName] is IDictionary<string, object> fieldNode && fieldNode.ContainsKey("Value") && fieldNode.ContainsKey("_id"))
                 {
                     int id = (int)fieldNode["_id"];
-                    if (id != CustomValueId && _fieldMappingFactory.TryGetValue(fieldMappingFieldId, id, out var translatedValue))
+                    if (id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId && _fieldMappingFactory.TryGetValue(fieldMappingFieldId, id, out var translatedValue))
                     {
                         fieldNode["Value"] = translatedValue;
                     }
@@ -167,7 +167,7 @@ namespace SOS.Search.Service.Factories
         private void TranslateValue(ProcessedFieldMapValue fieldMapValue, FieldMappingFieldId fieldMappingFieldId)
         {
             if (fieldMapValue == null) return;
-            if (fieldMapValue.Id != CustomValueId
+            if (fieldMapValue.Id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId
                 && _fieldMappingFactory.TryGetValue(fieldMappingFieldId, fieldMapValue.Id, out var translatedValue))
             {
                 fieldMapValue.Value = translatedValue;
@@ -181,7 +181,7 @@ namespace SOS.Search.Service.Factories
         {
             if (fieldMapValue == null) return;
 
-            if (fieldMapValue.Id != CustomValueId
+            if (fieldMapValue.Id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId
                 && _fieldMappingFactory.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, fieldMapValue.Id, out var translatedValue))
             {
                 fieldMapValue.Value = translatedValue;
@@ -201,7 +201,7 @@ namespace SOS.Search.Service.Factories
                 if (sightingNode[fieldName] is IDictionary<string, object> fieldNode && fieldNode.ContainsKey("Value") && fieldNode.ContainsKey("_id"))
                 {
                     int id = (int)fieldNode["_id"];
-                    if (id != CustomValueId && _fieldMappingFactory.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, id, out var translatedValue))
+                    if (id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId && _fieldMappingFactory.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, id, out var translatedValue))
                     {
                         fieldNode["Value"] = translatedValue;
                     }

@@ -185,7 +185,7 @@ namespace SOS.Process.Extensions
             }
             else
             {
-                return new ProcessedFieldMapValue { Id = -1, Value = val.ToString() };
+                return new ProcessedFieldMapValue { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
             }
         }
 

@@ -99,7 +99,7 @@ namespace SOS.Import.Factories.FieldMappings
             externalSystemMapping.Mappings = new List<ExternalSystemMappingField>();
 
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField();
-            mappingField.Key = MappingKeyFields.Id;
+            mappingField.Key = FieldMappingKeyFields.Id;
             mappingField.Description = "The Gender.Id field";
             mappingField.Values = new List<ExternalSystemMappingValue>();
 
@@ -129,7 +129,7 @@ namespace SOS.Import.Factories.FieldMappings
 
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField
             {
-                Key = MappingKeyFields.DwcSex,
+                Key = FieldMappingKeyFields.DwcSex,
                 Description = "The sex term (http://rs.tdwg.org/dwc/terms/sex)",
                 Values = new List<ExternalSystemMappingValue>
                 {

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SOS.Lib.Constants
 {
-    public static class MappingKeyFields
+    public static class FieldMappingKeyFields
     {
         public const string FeatureId = "FeatureId";
         public const string Id = "Id";

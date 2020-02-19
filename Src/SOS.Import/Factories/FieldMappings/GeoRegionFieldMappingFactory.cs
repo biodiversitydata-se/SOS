@@ -95,11 +95,11 @@ namespace SOS.Import.Factories.FieldMappings
             switch (areaType)
             {
                 case AreaType.County:
-                    return MappingKeyFields.DwcCounty;
+                    return FieldMappingKeyFields.DwcCounty;
                 case AreaType.Municipality:
-                    return MappingKeyFields.DwcMunicipality;
+                    return FieldMappingKeyFields.DwcMunicipality;
                 case AreaType.Province:
-                    return MappingKeyFields.DwcStateProvince;
+                    return FieldMappingKeyFields.DwcStateProvince;
                 default:
                     throw new ArgumentException($"DarwinCore don't have support for {areaType}");
             }
@@ -148,7 +148,7 @@ namespace SOS.Import.Factories.FieldMappings
         {
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField
             {
-                Key = MappingKeyFields.AreaDatasetIdFeatureIdTuple,
+                Key = FieldMappingKeyFields.AreaDatasetIdFeatureIdTuple,
                 Description = "The key is a tuple of <AreaDatasetId, FeatureId>",
                 Values = new List<ExternalSystemMappingValue>()
             };
@@ -169,7 +169,7 @@ namespace SOS.Import.Factories.FieldMappings
         {
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField
             {
-                Key = MappingKeyFields.FeatureId,
+                Key = FieldMappingKeyFields.FeatureId,
                 Description = "The key is FeatureId",
                 Values = new List<ExternalSystemMappingValue>()
             };
@@ -191,7 +191,7 @@ namespace SOS.Import.Factories.FieldMappings
         {
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField
             {
-                Key = MappingKeyFields.Id,
+                Key = FieldMappingKeyFields.Id,
                 Description = "The Area.Id field",
                 Values = new List<ExternalSystemMappingValue>()
             };
@@ -244,7 +244,7 @@ namespace SOS.Import.Factories.FieldMappings
         {
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField
             {
-                Key = MappingKeyFields.Guid,
+                Key = FieldMappingKeyFields.Guid,
                 Description = "The key is WebRegion.GUID in SSOS",
                 Values = new List<ExternalSystemMappingValue>()
             };

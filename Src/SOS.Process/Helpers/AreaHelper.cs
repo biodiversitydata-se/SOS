@@ -229,7 +229,7 @@ namespace SOS.Process.Helpers
             }
             else
             {
-                return new ProcessedFieldMapValue { Id = -1, Value = val.ToString() };
+                return new ProcessedFieldMapValue { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
             }
         }
 
@@ -250,7 +250,7 @@ namespace SOS.Process.Helpers
                 var fieldMappings = fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == ExternalSystemId.Artportalen);
                 if (fieldMappings != null)
                 {
-                    ExternalSystemMappingField mapping = fieldMappings.Mappings.Single(m => m.Key == MappingKeyFields.FeatureId);
+                    ExternalSystemMappingField mapping = fieldMappings.Mappings.Single(m => m.Key == FieldMappingKeyFields.FeatureId);
                     var sosIdByValue = mapping.GetIdByValueDictionary();
                     dic.Add(fieldMapping.Id, sosIdByValue);
                 }

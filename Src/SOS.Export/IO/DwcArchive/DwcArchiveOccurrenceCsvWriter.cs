@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Export.Mappings;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Sighting;
@@ -21,7 +22,6 @@ namespace SOS.Export.IO.DwcArchive
 {
     public class DwcArchiveOccurrenceCsvWriter : Interfaces.IDwcArchiveOccurrenceCsvWriter
     {
-        private const int CustomValueId = -1;
         private readonly ILogger<DwcArchiveOccurrenceCsvWriter> _logger;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
 
@@ -85,7 +85,7 @@ namespace SOS.Export.IO.DwcArchive
             Dictionary<int, string> valueById)
         {
             if (fieldMapValue == null) return;
-            if (fieldMapValue.Id != CustomValueId
+            if (fieldMapValue.Id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId
                 && valueById.TryGetValue(fieldMapValue.Id, out var translatedValue))
             {
                 fieldMapValue.Value = translatedValue;

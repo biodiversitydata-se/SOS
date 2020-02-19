@@ -110,7 +110,7 @@ namespace SOS.Import.Factories.FieldMappings
             externalSystemMapping.Mappings = new List<ExternalSystemMappingField>();
 
             ExternalSystemMappingField mappingField = new ExternalSystemMappingField();
-            mappingField.Key = MappingKeyFields.Id;
+            mappingField.Key = FieldMappingKeyFields.Id;
             mappingField.Description = "The Activity.Id field";
             mappingField.Values = new List<ExternalSystemMappingValue>();
 
