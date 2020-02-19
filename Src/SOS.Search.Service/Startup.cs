@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Hangfire;
+using Hangfire.Dashboard;
 using Hangfire.Mongo;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -136,6 +137,7 @@ namespace SOS.Search.Service
                             }
                         })
             );
+
         }
 
         /// <summary>
@@ -166,7 +168,11 @@ namespace SOS.Search.Service
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "SOS Search service");
             });
 
-            app.UseHangfireServer();
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions()
+            {
+                Authorization = new[] { new AllowAllConnectionsFilter() },
+                IgnoreAntiforgeryToken = true
+            });
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
@@ -179,4 +185,23 @@ namespace SOS.Search.Service
             });
         }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public bool Authorize(DashboardContext context)
+        {
+            // Allow outside. You need an authentication scenario for this part.
+            // DON'T GO PRODUCTION WITH THIS LINES.
+            return true;
+        }
+    }
+
 }
