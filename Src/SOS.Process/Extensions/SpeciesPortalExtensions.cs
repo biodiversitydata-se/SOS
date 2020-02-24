@@ -107,7 +107,6 @@ namespace SOS.Process.Extensions
                     CoordinateUncertaintyInMeters = verbatim.Site?.Accuracy,
                     Country = Country.Sweden,
                     CountryCode = CountryCode.Sweden,
-                    County = verbatim.Site?.County?.ToProcessed(),
                     DecimalLatitude = verbatim.Site?.Point?.Coordinates?.Latitude ?? 0,
                     DecimalLongitude = verbatim.Site?.Point?.Coordinates?.Longitude ?? 0,
                     GeodeticDatum = GeodeticDatum.Wgs84,
