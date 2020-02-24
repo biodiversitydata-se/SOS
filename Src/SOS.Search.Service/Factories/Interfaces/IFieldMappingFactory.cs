@@ -27,5 +27,14 @@ namespace SOS.Search.Service.Factories.Interfaces
         /// <param name="translatedValue"></param>
         /// <returns></returns>
         bool TryGetTranslatedValue(FieldMappingFieldId fieldId, string cultureCode, int sosId, out string translatedValue);
+
+        /// <summary>
+        /// Tries to get a non localized value.
+        /// </summary>
+        /// <param name="fieldId"></param>
+        /// <param name="sosId"></param>
+        /// <param name="translatedValue"></param>
+        /// <returns></returns>
+        bool TryGetValue(FieldMappingFieldId fieldId, int sosId, out string translatedValue);
     }
 }

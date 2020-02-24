@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
@@ -17,7 +18,7 @@ namespace SOS.Process.Repositories.Destination
     /// <summary>
     /// Repository for retrieving field mappings.
     /// </summary>
-    public class ProcessedFieldMappingRepository : ProcessBaseRepository<FieldMapping, int>, IProcessedFieldMappingRepository
+    public class ProcessedFieldMappingRepository : ProcessBaseRepository<FieldMapping, FieldMappingFieldId>, IProcessedFieldMappingRepository
     {
         private new IMongoCollection<FieldMapping> MongoCollection => Database.GetCollection<FieldMapping>(_collectionName);
 
@@ -31,11 +32,7 @@ namespace SOS.Process.Repositories.Destination
             ILogger<ProcessedFieldMappingRepository> logger) 
             : base(client, true, logger)
         {
-            if (!BsonClassMap.IsClassMapRegistered(typeof(FieldMappingValue)))
-            {
-                BsonClassMap.RegisterClassMap<FieldMappingValue>();
-                BsonClassMap.RegisterClassMap<FieldMappingWithCategoryValue>();
-            }
+           
         }
 
         /// <inheritdoc />

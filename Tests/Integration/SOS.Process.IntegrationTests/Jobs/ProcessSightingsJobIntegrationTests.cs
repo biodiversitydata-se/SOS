@@ -55,7 +55,9 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 processConfiguration.ProcessedDbConfiguration.DatabaseName,
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
-            var areaHelper = new AreaHelper(new AreaVerbatimRepository(verbatimClient, new NullLogger<AreaVerbatimRepository>()));
+            var areaHelper = new AreaHelper(
+                new AreaVerbatimRepository(verbatimClient, new NullLogger<AreaVerbatimRepository>()), 
+                new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>()));
             var taxonProcessedRepository = new TaxonProcessedRepository(processClient, new NullLogger<TaxonProcessedRepository>());
             var inadequateItemRepository = new InadequateItemRepository(processClient, new NullLogger<InadequateItemRepository>());
             var processedSightingRepository = new ProcessedSightingRepository(processClient, inadequateItemRepository, new NullLogger<ProcessedSightingRepository>());
@@ -74,8 +76,8 @@ namespace SOS.Process.IntegrationTests.Jobs
             var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
                 new SpeciesPortalVerbatimRepository(verbatimClient, new NullLogger<SpeciesPortalVerbatimRepository>()),
                 processedSightingRepository,
+                new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>()), 
                 new NullLogger<SpeciesPortalProcessFactory>());
-            var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
 
             var processTaxaJob = new ProcessJob(
                 processedSightingRepository,
@@ -85,7 +87,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 kulProcessFactory,
                 speciesPortalProcessFactory,
                 taxonProcessedRepository,
-                processedFieldMappingRepository,
                 areaHelper,
                 new NullLogger<ProcessJob>());
 

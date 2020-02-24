@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Hangfire;
@@ -15,7 +16,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using SOS.Core.Repositories;
 using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Hangfire.UI
@@ -67,7 +67,11 @@ namespace SOS.Hangfire.UI
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(x =>
+                {
+                    x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
 
             // Swagger
             services.AddSwaggerGen(
@@ -112,7 +116,6 @@ namespace SOS.Hangfire.UI
 
         }
 
-        
         /// <summary>
         /// Register Autofac services. This runs after ConfigureServices so the things
         /// here will override registrations made in ConfigureServices.
@@ -120,10 +123,8 @@ namespace SOS.Hangfire.UI
         /// <param name="builder"></param>
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            var repositorySettings = CreateRepositorySettings();
-            builder.Register(r => repositorySettings).As<IRepositorySettings>().SingleInstance();
+            
         }
-
 
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline. 
@@ -166,17 +167,6 @@ namespace SOS.Hangfire.UI
             {
                 endpoints.MapControllers();
             });
-        }
-
-        private IRepositorySettings CreateRepositorySettings()
-        {
-            var mongoConfiguration = Configuration.GetSection("ApplicationSettings").GetSection("HangfireDbConfiguration").Get<MongoDbConfiguration>();
-
-            return new RepositorySettings
-            {
-                JobsDatabaseName = mongoConfiguration.DatabaseName,
-                MongoDbConnectionString = $"mongodb://{string.Join(",", mongoConfiguration.Hosts.Select(h => h.Name))}" 
-            };
         }
 
         private static MongoStorageOptions MongoStorageOptions

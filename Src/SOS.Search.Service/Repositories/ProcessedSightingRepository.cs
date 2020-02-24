@@ -10,6 +10,7 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Search;
+using SOS.Search.Service.Database.Interfaces;
 using SOS.Search.Service.Enum;
 using SOS.Search.Service.Factories.Interfaces;
 using SOS.Search.Service.Repositories.Interfaces;
@@ -19,7 +20,7 @@ namespace SOS.Search.Service.Repositories
     /// <summary>
     /// Species data service
     /// </summary>
-    public class ProcessedSightingRepository : BaseRepository<ProcessedSighting, ObjectId>, IProcessedSightingRepository
+    public class ProcessedSightingRepository : ProcessBaseRepository<ProcessedSighting, ObjectId>, IProcessedSightingRepository
     {
         private const int BiotaTaxonId = 0;
         private readonly ITaxonFactory _taxonFactory;
@@ -27,15 +28,13 @@ namespace SOS.Search.Service.Repositories
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="mongoClient"></param>
-        /// <param name="processedDbConfiguration"></param>
+        /// <param name="client"></param>
         /// <param name="taxonFactory"></param>
         /// <param name="logger"></param>
         public ProcessedSightingRepository(
-            IMongoClient mongoClient,
-            IOptions<MongoDbConfiguration> processedDbConfiguration,
+            IProcessClient client,
             ITaxonFactory taxonFactory,
-            ILogger<ProcessedSightingRepository> logger) : base(mongoClient, processedDbConfiguration, true, logger)
+            ILogger<ProcessedSightingRepository> logger) : base(client, true, logger)
         {
             _taxonFactory = taxonFactory ?? throw new ArgumentNullException(nameof(taxonFactory));
         }

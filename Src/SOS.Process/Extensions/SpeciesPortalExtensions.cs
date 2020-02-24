@@ -8,6 +8,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Process.Extensions
@@ -116,11 +117,8 @@ namespace SOS.Process.Extensions
                     MaximumElevationInMeters = verbatim.MaxHeight,
                     MinimumDepthInMeters = verbatim.MinDepth,
                     MinimumElevationInMeters = verbatim.MinHeight,
-                    Municipality = verbatim.Site?.Municipality?.ToProcessed(),
-                    Parish = verbatim.Site?.Parish?.ToProcessed(),
                     Point = verbatim.Site?.Point,
                     PointWithBuffer = verbatim.Site?.PointWithBuffer,
-                    Province = verbatim.Site?.Province?.ToProcessed(),
                     VerbatimLatitude = hasPosition ? verbatim.Site.YCoord : 0,
                     VerbatimLongitude = hasPosition ? verbatim.Site.XCoord : 0,
                     VerbatimCoordinateSystem = "EPSG:3857"
@@ -128,8 +126,6 @@ namespace SOS.Process.Extensions
                 Modified = verbatim.EndDate ?? verbatim.ReportedDate,
                 Occurrence = new ProcessedOccurrence
                 {
-                    Activity = verbatim.Activity,
-                    ActivityId = GetSosLookupId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]),
                     AssociatedMedia = verbatim.HasImages
                         ? $"http://www.artportalen.se/sighting/{verbatim.Id}#SightingDetailImages"
                         : "",
@@ -149,8 +145,6 @@ namespace SOS.Process.Extensions
                     RecordedBy = verbatim.Observers,
                     RecordNumber = verbatim.Label,
                     Remarks = verbatim.Comment,
-                    Sex = verbatim.Gender,
-                    SexId = GetSosLookupId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Sex]),
                     Status = verbatim.NotPresent || verbatim.NotRecovered
                         ? OccurrenceStatus.Absent
                         : OccurrenceStatus.Present,
@@ -166,6 +160,13 @@ namespace SOS.Process.Extensions
                 Type = "Occurrence"
             };
             
+            // Get field mapping values
+            obs.Occurrence.GenderId = GetSosId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Gender]);
+            obs.Occurrence.ActivityId = GetSosId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]);
+            obs.Location.CountyId = GetSosId(verbatim.Site.County?.Id, fieldMappings[FieldMappingFieldId.County]);
+            obs.Location.MunicipalityId = GetSosId(verbatim.Site.Municipality?.Id, fieldMappings[FieldMappingFieldId.Municipality]);
+            obs.Location.ProvinceId = GetSosId(verbatim.Site.Province?.Id, fieldMappings[FieldMappingFieldId.Province]);
+            obs.Location.ParishId = GetSosId(verbatim.Site.Parish?.Id, fieldMappings[FieldMappingFieldId.Parish]);
             return obs;
         }
 
@@ -175,17 +176,17 @@ namespace SOS.Process.Extensions
         /// <param name="val"></param>
         /// <param name="sosIdByProviderValue"></param>
         /// <returns></returns>
-        private static ProcessedLookupValue GetSosLookupId(int? val, IDictionary<object, int> sosIdByProviderValue)
+        private static ProcessedFieldMapValue GetSosId(int? val, IDictionary<object, int> sosIdByProviderValue)
         {
             if (!val.HasValue) return null;
 
             if (sosIdByProviderValue.TryGetValue(val.Value, out int sosId))
             {
-                return new ProcessedLookupValue { Id = sosId };
+                return new ProcessedFieldMapValue { Id = sosId };
             }
             else
             {
-                return new ProcessedLookupValue { Id = -1, Value = val.ToString() };
+                return new ProcessedFieldMapValue { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
             }
         }
 

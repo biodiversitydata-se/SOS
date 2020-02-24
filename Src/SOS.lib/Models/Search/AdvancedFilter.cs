@@ -35,7 +35,7 @@ namespace SOS.Lib.Models.Search
             PositiveSightings.HasValue ||
             (Provinces?.Any() ?? false) ||
             (RedListCategories?.Any() ?? false) ||
-            (Sex?.Any() ?? false) ||
+            (Gender?.Any() ?? false) ||
             (StartDate != null) ||
             (TaxonIds?.Any() ?? false);
 
@@ -72,7 +72,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Gender to match
         /// </summary>
-        public IEnumerable<int> Sex { get; set; }
+        public IEnumerable<int> Gender { get; set; }
 
         /// <summary>
         /// Sighting first date
@@ -91,9 +91,16 @@ namespace SOS.Lib.Models.Search
         public bool SearchUnderlyingTaxa { get; set; }
 
         /// <summary>
-        /// Return value for fields that are using a controlled vocabulary.
+        /// Decides whether field mapped fields, in addition to its Id value, also should return its associated value.
         /// </summary>
-        public FieldMapReturnValue FieldMapReturnValue { get; set; } = FieldMapReturnValue.Verbatim;
+        public bool TranslateFieldMappedValues { get; set; } = false;
+
+        /// <summary>
+        /// Field mapping translation culture code.
+        /// sv-SE (Swedish)
+        /// en-GB (English)
+        /// </summary>
+        public string TranslationCultureCode { get; set; } = "en-GB";
 
         public AdvancedFilter Clone()
         {

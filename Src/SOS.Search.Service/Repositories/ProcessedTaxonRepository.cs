@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Processed.Sighting;
+using SOS.Search.Service.Database.Interfaces;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Repositories
@@ -14,18 +15,16 @@ namespace SOS.Search.Service.Repositories
     /// <summary>
     /// 
     /// </summary>
-    public class ProcessedTaxonRepository : BaseRepository<ProcessedTaxon, int>, IProcessedTaxonRepository
+    public class ProcessedTaxonRepository : ProcessBaseRepository<ProcessedTaxon, int>, IProcessedTaxonRepository
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="mongoClient"></param>
-        /// <param name="processedDbConfiguration"></param>
+        /// <param name="client"></param>
         /// <param name="logger"></param>
         public ProcessedTaxonRepository(
-            IMongoClient mongoClient, 
-            IOptions<MongoDbConfiguration> processedDbConfiguration,
-            ILogger<BaseRepository<ProcessedTaxon, int>> logger) : base(mongoClient, processedDbConfiguration, true, logger)
+            IProcessClient client,
+            ILogger<ProcessBaseRepository<ProcessedTaxon, int>> logger) : base(client, true, logger)
         {
         }
 

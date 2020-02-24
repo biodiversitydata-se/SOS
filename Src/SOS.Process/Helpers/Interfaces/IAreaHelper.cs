@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Sighting;
 
 namespace SOS.Process.Helpers.Interfaces

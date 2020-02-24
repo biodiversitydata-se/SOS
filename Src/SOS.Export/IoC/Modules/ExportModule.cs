@@ -48,6 +48,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<ProcessedSightingRepository>().As<IProcessedSightingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>().InstancePerLifetimeScope();
 
             // Services
             builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().InstancePerLifetimeScope();

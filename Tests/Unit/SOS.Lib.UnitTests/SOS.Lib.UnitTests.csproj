@@ -41,9 +41,17 @@
     <None Update="Resources\AllProcessedBasicTaxa.msgpck">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\FieldMappings.msgpck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\GenderFieldMapping.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\Shared\" />
+    <Folder Include="TestHelpers\Factories\" />
   </ItemGroup>
 
 </Project>

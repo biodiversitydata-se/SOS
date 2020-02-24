@@ -20,25 +20,28 @@ namespace SOS.Process.Factories
     public class SpeciesPortalProcessFactory : ProcessBaseFactory<SpeciesPortalProcessFactory>, Interfaces.ISpeciesPortalProcessFactory
     {
         private readonly ISpeciesPortalVerbatimRepository _speciesPortalVerbatimRepository;
+        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="speciesPortalVerbatimRepository"></param>
         /// <param name="processedSightingRepository"></param>
+        /// <param name="processedFieldMappingRepository"></param>
         /// <param name="logger"></param>
         public SpeciesPortalProcessFactory(
             ISpeciesPortalVerbatimRepository speciesPortalVerbatimRepository,
             IProcessedSightingRepository processedSightingRepository,
+            IProcessedFieldMappingRepository processedFieldMappingRepository,
             ILogger<SpeciesPortalProcessFactory> logger) : base(processedSightingRepository, logger)
         {
             _speciesPortalVerbatimRepository = speciesPortalVerbatimRepository ?? throw new ArgumentNullException(nameof(speciesPortalVerbatimRepository));
+            _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
         }
 
         /// <inheritdoc />
         public async Task<RunInfo> ProcessAsync(
             IDictionary<int, ProcessedTaxon> taxa,
-            IDictionary<int, FieldMapping> fieldMappingById,
             IJobCancellationToken cancellationToken)
         {
             var runInfo = new RunInfo(DataProvider.KUL)
@@ -48,11 +51,9 @@ namespace SOS.Process.Factories
 
             try
             {
+                var allFieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
                 Logger.LogDebug("Start Processing Species Portal Verbatim");
-
-                Logger.LogDebug("Start getting field mappings");
-                var fieldMappings = GetFieldMappingsDictionary(VerbatimDataProviderTypeId.Artportalen, fieldMappingById);
-                Logger.LogDebug("Finsih getting field mappings");
+                var fieldMappings = GetFieldMappingsDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
 
                 Logger.LogDebug("Start deleting Species Portal data");
                 if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider.Artdatabanken))
@@ -126,26 +127,44 @@ namespace SOS.Process.Factories
         /// <summary>
         /// Get field mappings for Artportalen.
         /// </summary>
-        /// <param name="dataProviderTypeId"></param>
-        /// <param name="fieldMappingByFieldId"></param>
+        /// <param name="externalSystemId"></param>
+        /// <param name="allFieldMappings"></param>
         /// <returns></returns>
         private IDictionary<FieldMappingFieldId, IDictionary<object, int>> GetFieldMappingsDictionary(
-            VerbatimDataProviderTypeId dataProviderTypeId,
-            IDictionary<int, FieldMapping> fieldMappingByFieldId)
+            ExternalSystemId externalSystemId,
+            ICollection<FieldMapping> allFieldMappings)
         {
-            var dic = new Dictionary<FieldMappingFieldId, IDictionary<object, int>>(); 
+            var dic = new Dictionary<FieldMappingFieldId, IDictionary<object, int>>();
 
-            foreach (var pair in fieldMappingByFieldId)
+            foreach (var fieldMapping in allFieldMappings)
             {
-                var fieldMappings = pair.Value.DataProviderTypeFieldMappings.FirstOrDefault(m => m.Id == (int) dataProviderTypeId);
+                var fieldMappings = fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
                 if (fieldMappings != null)
                 {
-                    var sosIdByValue = fieldMappings.Mappings.ToDictionary(m => (object)Convert.ToInt32(m.Value), m => m.SosId);
-                    dic.Add((FieldMappingFieldId)pair.Key, sosIdByValue);
+                    string mappingKey = GetMappingKey(fieldMapping.Id);
+                    var mapping = fieldMappings.Mappings.Single(m => m.Key == mappingKey);
+                    var sosIdByValue = mapping.GetIdByValueDictionary();
+                    dic.Add(fieldMapping.Id, sosIdByValue);
                 }
             }
 
             return dic;
+        }
+
+        private string GetMappingKey(FieldMappingFieldId fieldMappingFieldId)
+        {
+            switch (fieldMappingFieldId)
+            {
+                case FieldMappingFieldId.Activity:
+                case FieldMappingFieldId.Gender:
+                case FieldMappingFieldId.County:
+                case FieldMappingFieldId.Municipality: 
+                case FieldMappingFieldId.Parish:
+                case FieldMappingFieldId.Province:
+                    return "Id";
+                default:
+                    throw new ArgumentException($"No mapping exist for the field: {fieldMappingFieldId}");
+            }
         }
     }
 }

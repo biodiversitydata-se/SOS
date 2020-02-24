@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Extensions;
@@ -28,13 +31,13 @@ namespace SOS.Process.Factories
         /// </summary>
         /// <param name="kulObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="ProcessedSightingRepository"></param>
+        /// <param name="processedSightingRepository"></param>
         /// <param name="logger"></param>
         public KulProcessFactory(
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedSightingRepository ProcessedSightingRepository,
-            ILogger<KulProcessFactory> logger) : base(ProcessedSightingRepository, logger)
+            IProcessedSightingRepository processedSightingRepository,
+            ILogger<KulProcessFactory> logger) : base(processedSightingRepository, logger)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -43,7 +46,6 @@ namespace SOS.Process.Factories
         /// <inheritdoc />
         public async Task<RunInfo> ProcessAsync(
             IDictionary<int, ProcessedTaxon> taxa,
-            IDictionary<int, FieldMapping> fieldMappingById,
             IJobCancellationToken cancellationToken)
         {
             var runInfo = new RunInfo(DataProvider.KUL)

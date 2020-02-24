@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Lib.Enums;
-using  SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
+using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Source;
 using Xunit;
 
@@ -28,7 +30,7 @@ namespace SOS.Process.IntegrationTests.Helpers
                 Location = new ProcessedLocation
                 {
                     DecimalLatitude = TestHelpers.Gis.Coordinates.TranasMunicipality.Latitude,
-                    DecimalLongitude = TestHelpers.Gis.Coordinates.TranasMunicipality.Longitude 
+                    DecimalLongitude = TestHelpers.Gis.Coordinates.TranasMunicipality.Longitude
                 }
             };
             observations.Add(observation);
@@ -41,10 +43,11 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observation.Location.County.Should().Be("Jönköping");
-            observation.Location.Municipality.Should().Be("Tranås");
-            observation.Location.Province.Should().Be("Småland");
-            observation.Location.Parish.Should().Be("Tranås");
+            areaHelper.AddValueDataToGeographicalFields(observation);
+            observation.Location.CountyId.Value.Should().Be("Jönköping");
+            observation.Location.MunicipalityId.Value.Should().Be("Tranås");
+            observation.Location.ProvinceId.Value.Should().Be("Småland");
+            observation.Location.ParishId.Value.Should().Be("Tranås");
         }
 
         private AreaHelper CreateAreaHelper()
@@ -54,11 +57,19 @@ namespace SOS.Process.IntegrationTests.Helpers
                 processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
                 processConfiguration.VerbatimDbConfiguration.DatabaseName,
                 processConfiguration.VerbatimDbConfiguration.BatchSize);
-            AreaVerbatimRepository areaVerbatimRepository = new AreaVerbatimRepository(
+            var processClient = new ProcessClient(
+                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
+                processConfiguration.ProcessedDbConfiguration.DatabaseName,
+                processConfiguration.ProcessedDbConfiguration.BatchSize);
+            var areaVerbatimRepository = new AreaVerbatimRepository(
                 verbatimClient,
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
+            var processedFieldMappingRepository = new ProcessedFieldMappingRepository(
+                processClient,
+                new NullLogger<ProcessedFieldMappingRepository>());
             var areaHelper = new AreaHelper(
-                areaVerbatimRepository);
+                areaVerbatimRepository,
+                processedFieldMappingRepository);
 
             return areaHelper;
         }

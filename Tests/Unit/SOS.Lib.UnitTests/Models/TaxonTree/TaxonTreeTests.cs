@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -7,7 +8,6 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.TaxonTree;
-using SOS.Lib.UnitTests.TestHelpers.Factories;
 using SOS.Lib.UnitTests.TestHelpers.Fixtures;
 using Xunit;
 
@@ -35,7 +35,7 @@ namespace SOS.Lib.UnitTests.Models.TaxonTree
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var underlyingTaxa = sut.GetUnderlyingTaxonIds(ichthyaetusTaxonId, false);
+            var underlyingTaxa = sut.GetUnderlyingTaxonIds(ichthyaetusTaxonId, false).ToArray();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

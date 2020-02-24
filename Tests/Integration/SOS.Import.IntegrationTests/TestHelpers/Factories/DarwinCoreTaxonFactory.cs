@@ -39,16 +39,6 @@ namespace SOS.Import.IntegrationTests.TestHelpers.Factories
             return taxa;
         }
 
-        public static IEnumerable<DarwinCoreTaxon> CreateFromMessagePackFile(string fileName)
-        {
-            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath, fileName);
-            var bytes = File.ReadAllBytes(filePath);
-            var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
-            var taxa = MessagePackSerializer.Deserialize<List<DarwinCoreTaxon>>(bytes, options);
-            return taxa;
-        }
-
         /// <summary>
         /// Class that is used to ignore the JsonIgnore attribute, so that those properties will be included.
         /// </summary>

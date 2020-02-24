@@ -57,13 +57,50 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// </summary>
         public string CountryCode { get; set; }
 
+        
+        //public ProcessedArea County { get; set; }
+
         /// <summary>
         /// The full, unabbreviated name of the next smaller
         /// administrative region than stateProvince(county, shire,
         /// department, etc.) in which the Location occurs
         /// ('län' in swedish).
         /// </summary>
-        public ProcessedArea County { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue CountyId { get; set; }
+
+        /// <summary>
+        /// Darwin Core term name: municipality.
+        /// The full, unabbreviated name of the next smaller
+        /// administrative region than county (city, municipality, etc.)
+        /// in which the Location occurs.
+        /// </summary>
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue MunicipalityId { get; set; }
+        
+        /// <summary>
+        /// Parish ('socken' in swedish).
+        /// </summary>
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue ParishId { get; set; }
+
+        /// <summary>
+        /// Darwin Core term name: stateProvince.
+        /// The name of the next smaller administrative region than
+        /// country (state, province, canton, department, region, etc.)
+        /// in which the Location occurs.
+        /// ('landskap' in swedish).
+        /// </summary>
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue ProvinceId { get; set; }
 
         /// <summary>
         /// Darwin Core term name: decimalLatitude.
@@ -339,20 +376,13 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// </summary>
         public double? MinimumElevationInMeters { get; set; }
 
-        /// <summary>
-        /// Darwin Core term name: municipality.
-        /// The full, unabbreviated name of the next smaller
-        /// administrative region than county (city, municipality, etc.)
-        /// in which the Location occurs.
-        /// Do not use this term for a nearby named place
-        /// that does not contain the actual location.
-        /// </summary>
-        public ProcessedArea Municipality { get; set; }
+        
+        //public ProcessedArea Municipality { get; set; }
 
-        /// <summary>
-        /// Parish property
-        /// </summary>
-        public ProcessedArea Parish { get; set; }
+        ///// <summary>
+        ///// Parish property
+        ///// </summary>
+        //public ProcessedArea Parish { get; set; }
 
         /// <summary>
         /// Point (WGS84)
@@ -386,14 +416,8 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// </summary>
         public string PointRadiusSpatialFit { get; set; }
 
-        /// <summary>
-        /// Darwin Core term name: stateProvince.
-        /// The name of the next smaller administrative region than
-        /// country (state, province, canton, department, region, etc.)
-        /// in which the Location occurs.
-        /// ('landskap' in swedish).
-        /// </summary>
-        public ProcessedArea Province { get; set; }
+        
+        //public ProcessedArea Province { get; set; }
 
         /// <summary>
         /// Spacial handling of Lappland

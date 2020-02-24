@@ -15,6 +15,7 @@ using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.UnitTests.TestHelpers.Factories;
 using SOS.Lib.Models.Search;
+using SOS.TestHelpers.Helpers;
 using Xunit;
 
 namespace SOS.Export.UnitTests.IO.DwcArchive
@@ -22,33 +23,26 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
     // todo - create DarwinCore class that is used for reading data where all properties is of string class? Suggested names: FlatDwcObservation, CsvDwcObservation, 
     public class DwcArchiveOccurrenceCsvWriterTests : TestBase
     {
-        private readonly DwcArchiveOccurrenceCsvWriter _dwcArchiveOccurrenceCsvWriter;
-
-        public DwcArchiveOccurrenceCsvWriterTests()
-        {
-            _dwcArchiveOccurrenceCsvWriter = new DwcArchiveOccurrenceCsvWriter(
-                new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object);
-        }
-
         [Fact]
         [Trait("Category", "Unit")]
         [Trait("Category", "DwcArchiveUnit")]
-        public async Task Creating_a_DwC_occurrence_csv_file_with_ten_observations()
+        public async Task Create_a_DwC_occurrence_csv_file_with_ten_observations()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources\TenProcessedTestObservations.json");
             var memoryStream = new MemoryStream();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            bool result = await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+            bool result = await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                 new AdvancedFilter(),
-                memoryStream, 
+                memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
-                processedDarwinCoreRepositoryStub.Object, 
+                processedDarwinCoreRepositoryStub.Object,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -67,6 +61,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
             var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
             observation.Location.DecimalLatitude = 13.823392373018132;
@@ -76,7 +71,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+            await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                 new AdvancedFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
@@ -100,6 +95,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
             var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
             observation.Location.CoordinateUncertaintyInMeters = 0;
@@ -108,7 +104,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+            await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                 new AdvancedFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
@@ -132,6 +128,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
             var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
             observation.Occurrence.Remarks = "Sighting found in\r\nUppsala";
@@ -140,7 +137,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+            await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                 new AdvancedFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
@@ -162,6 +159,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
             var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
             var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
@@ -176,7 +174,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+            await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                 new AdvancedFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetFieldDescriptions(fieldDescriptionIds),
@@ -187,7 +185,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             dynamic record = ReadCsvFile(memoryStream).First();
-            var recordDictionary = (IDictionary<string, object>) record;
+            var recordDictionary = (IDictionary<string, object>)record;
             recordDictionary.Should().ContainKey("occurrenceID", "because this field was provided as field description");
             recordDictionary.Should().NotContainKey("basisOfRecord", "because this field was not provided as field description");
         }
@@ -208,6 +206,14 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             csv.Configuration.Delimiter = "\t";
             csv.Configuration.Encoding = System.Text.Encoding.UTF8;
             csv.Configuration.BadDataFound = x => { Console.WriteLine($"Bad data: <{x.RawRecord}>"); };
+        }
+
+        private DwcArchiveOccurrenceCsvWriter CreateDwcArchiveOccurrenceCsvWriter()
+        {
+            var writer = new DwcArchiveOccurrenceCsvWriter(
+                ProcessedFieldMappingRepositoryStubFactory.Create().Object,
+                new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object);
+            return writer;
         }
     }
 }

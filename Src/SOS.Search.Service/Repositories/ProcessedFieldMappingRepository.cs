@@ -7,7 +7,9 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using SOS.Search.Service.Database.Interfaces;
 using SOS.Search.Service.Repositories.Interfaces;
 
 namespace SOS.Search.Service.Repositories
@@ -15,24 +17,18 @@ namespace SOS.Search.Service.Repositories
     /// <summary>
     /// Field mappings repository.
     /// </summary>
-    public class ProcessedFieldMappingRepository : BaseRepository<FieldMapping, int>, IProcessedFieldMappingRepository
+    public class ProcessedFieldMappingRepository : ProcessBaseRepository<FieldMapping, FieldMappingFieldId>, IProcessedFieldMappingRepository
     {
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="mongoClient"></param>
-        /// <param name="processedDbConfiguration"></param>
+        /// <param name="client"></param>
         /// <param name="logger"></param>
         public ProcessedFieldMappingRepository(
-            IMongoClient mongoClient, 
-            IOptions<MongoDbConfiguration> processedDbConfiguration,
-            ILogger<BaseRepository<FieldMapping, int>> logger) : base(mongoClient, processedDbConfiguration, true, logger)
+            IProcessClient client,
+            ILogger<ProcessBaseRepository<FieldMapping, FieldMappingFieldId>> logger) : base(client, true, logger)
         {
-            if (!BsonClassMap.IsClassMapRegistered(typeof(FieldMappingValue)))
-            {
-                BsonClassMap.RegisterClassMap<FieldMappingValue>();
-                BsonClassMap.RegisterClassMap<FieldMappingWithCategoryValue>();
-            }
+            
         }
 
         /// <inheritdoc />
@@ -61,12 +57,6 @@ namespace SOS.Search.Service.Repositories
             }
         }
 
-        /// <summary>
-        /// Get chunk of taxa
-        /// </summary>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
         private async Task<IEnumerable<FieldMapping>> GetChunkAsync(int skip, int take)
         {
             var res = await MongoCollection

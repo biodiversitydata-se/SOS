@@ -5,7 +5,7 @@ using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Processed.Sighting;
-using SOS.Lib.UnitTests.TestHelpers.Factories;
+using SOS.TestHelpers.Helpers;
 
 namespace SOS.Lib.UnitTests.TestHelpers.Fixtures
 {
@@ -17,8 +17,7 @@ namespace SOS.Lib.UnitTests.TestHelpers.Fixtures
     {
         public ProcessedBasicTaxaFixture()
         {
-            Taxa = DarwinCoreTaxonFactory.CreateFromMessagePackFile<ProcessedBasicTaxon>(@"Resources\AllProcessedBasicTaxa.msgpck");
-            //Taxa = DarwinCoreTaxonFactory.CreateFromMessagePackFile<ProcessedBasicTaxon>(@"Resources\AllBasicTaxa.msgpck");
+            Taxa = MessagePackHelper.CreateListFromMessagePackFile<ProcessedBasicTaxon>(@"Resources\AllProcessedBasicTaxa.msgpck");
         }
 
         public void Dispose()

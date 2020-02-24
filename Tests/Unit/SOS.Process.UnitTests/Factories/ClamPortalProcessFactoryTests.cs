@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using Moq;
 using SOS.Lib.Enums;
-using  SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
@@ -52,14 +52,14 @@ namespace SOS.Process.UnitTests.Factories
                 _processedSightingRepository.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () =>  new ClamPortalProcessFactory(
+            Action create = () => new ClamPortalProcessFactory(
                 null,
                 _areaHelper.Object,
                 _processedSightingRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
 
-            
+
             create = () => new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 null,
@@ -93,7 +93,7 @@ namespace SOS.Process.UnitTests.Factories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty))
-                .ReturnsAsync(new [] { new ClamObservationVerbatim 
+                .ReturnsAsync(new[] { new ClamObservationVerbatim
                 {
                     DyntaxaTaxonId = 0
                 } });
@@ -108,11 +108,6 @@ namespace SOS.Process.UnitTests.Factories
                 { 0, new ProcessedTaxon { Id = 0, TaxonId = "taxon:0", ScientificName = "Biota" } }
             };
 
-            var fieldMappingById = new Dictionary<int, FieldMapping>
-            {
-                {0, new FieldMapping {Id = 0, Name = "ActivityId"}}
-            };
-
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -122,7 +117,7 @@ namespace SOS.Process.UnitTests.Factories
                 _processedSightingRepository.Object,
                 _loggerMock.Object);
 
-            var result = await clamPortalProcessFactory.ProcessAsync(taxa, fieldMappingById, JobCancellationToken.Null);
+            var result = await clamPortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -151,7 +146,7 @@ namespace SOS.Process.UnitTests.Factories
                 _processedSightingRepository.Object,
                 _loggerMock.Object);
 
-            var result = await clamPortalProcessFactory.ProcessAsync(null, null, JobCancellationToken.Null);
+            var result = await clamPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -180,7 +175,7 @@ namespace SOS.Process.UnitTests.Factories
                 _processedSightingRepository.Object,
                 _loggerMock.Object);
 
-            var result = await clamPortalProcessFactory.ProcessAsync( null, null, JobCancellationToken.Null);
+            var result = await clamPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
