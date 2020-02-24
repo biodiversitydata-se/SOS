@@ -211,13 +211,13 @@ namespace SOS.Lib.Extensions
                     break;
                 case CoordinateSys.WebMercator:
                 case CoordinateSys.WGS84:
-                    // Degrees systems
+                    // Degree systems
                     var diameterInMeters = (double)(accuracy == 0 ? 1 : accuracy * 2);
 
                     var shapeFactory = new GeometricShapeFactory();
                     shapeFactory.NumPoints = accuracy < 1000 ? 32 : accuracy < 10000 ? 64 : 128;
                     shapeFactory.Centre = point.Coordinate;
-
+                   
                     // Length in meters of 1° of latitude = always 111.32 km
                     shapeFactory.Height = diameterInMeters / 111320d;
 

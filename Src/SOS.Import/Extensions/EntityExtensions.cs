@@ -448,9 +448,7 @@ namespace SOS.Import.Extensions
                 PointWithBuffer = wgs84Point?.ToCircle(entity.Accuracy)?.ToGeoJsonGeometry(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
-                XCoordWGS84 = wgs84Point?.Coordinate?.X ?? 0,
                 YCoord = entity.YCoord,
-                YCoordWGS84 = wgs84Point?.Coordinate?.Y ?? 0
             };
         }
 
