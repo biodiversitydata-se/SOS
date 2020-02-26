@@ -67,7 +67,7 @@ namespace SOS.Process.Factories
                 Logger.LogDebug("Finish deleting Species Portal data");
 
                 Logger.LogDebug("Start getting first Species Portal batch");
-                var verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(7000000);
+                var verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(0);
                 Logger.LogDebug("Finish getting first Species Portal batch");
 
                 if (!verbatim.Any())
