@@ -13,6 +13,11 @@ namespace SOS.Lib.Configuration.Export
         public BlobStorageConfiguration BlobStorageConfiguration { get; set; }
 
         /// <summary>
+        /// Email configuration
+        /// </summary>
+        public EmailConfiguration EmailConfiguration { get; set; }
+
+        /// <summary>
         /// Destination file settings
         /// </summary>
         public FileDestination FileDestination { get; set; }

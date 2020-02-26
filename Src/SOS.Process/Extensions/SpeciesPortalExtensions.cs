@@ -8,7 +8,6 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 
 namespace SOS.Process.Extensions
@@ -62,16 +61,16 @@ namespace SOS.Process.Extensions
             var obs = new ProcessedSighting(DataProvider.Artdatabanken)
             {
                 AccessRights =
-                    !verbatim.ProtectedBySystem &&
-                    verbatim.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now
-                        ? AccessRights.FreeUsage
-                        : AccessRights.NotForPublicUsage,
+                !verbatim.ProtectedBySystem && verbatim.HiddenByProvider.HasValue &&
+                verbatim.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now
+                    ? AccessRights.FreeUsage
+                    : AccessRights.NotForPublicUsage,
                 BasisOfRecord = string.IsNullOrEmpty(verbatim.SpeciesCollection)
-                    ? BasisOfRecord.HumanObservation
-                    : BasisOfRecord.PreservedSpecimen,
+                ? BasisOfRecord.HumanObservation
+                : BasisOfRecord.PreservedSpecimen,
                 CollectionCode = string.IsNullOrEmpty(verbatim.SpeciesCollection)
-                    ? "Artportalen"
-                    : verbatim.SpeciesCollection,
+                ? "Artportalen"
+                : verbatim.SpeciesCollection,
                 CollectionId = verbatim.CollectionID,
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.Artdatabanken.ToString()}",
                 DatasetName = "Artportalen",
@@ -92,10 +91,10 @@ namespace SOS.Process.Extensions
                 Identification = new ProcessedIdentification
                 {
                     IdentifiedBy = verbatim.VerifiedBy,
-                    Validated = new []{ 60, 61, 62, 63, 64, 65 }.Contains(verbatim.ValidationStatus?.Id ?? 0),
+                    Validated = new[] { 60, 61, 62, 63, 64, 65 }.Contains(verbatim.ValidationStatus?.Id ?? 0),
                     VerificationStatus = verbatim.ValidationStatus,
-                    
-                    UncertainDetermination = verbatim.UnsureDetermination 
+
+                    UncertainDetermination = verbatim.UnsureDetermination
                 },
                 InformationWithheld = "More information can be obtained from the Data Provider",
                 Institution = verbatim.OwnerOrganization,
@@ -126,10 +125,10 @@ namespace SOS.Process.Extensions
                 Occurrence = new ProcessedOccurrence
                 {
                     AssociatedMedia = verbatim.HasImages
-                        ? $"http://www.artportalen.se/sighting/{verbatim.Id}#SightingDetailImages"
-                        : "",
+                    ? $"http://www.artportalen.se/sighting/{verbatim.Id}#SightingDetailImages"
+                    : "",
                     AssociatedReferences = GetAssociatedReferences(verbatim),
-                    BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon), 
+                    BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon),
                     CatalogNumber = verbatim.Id.ToString(),
                     EstablishmentMeans = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
                     Id = $"urn:lsid:artportalen.se:Sighting:{verbatim.Id}",
@@ -145,27 +144,27 @@ namespace SOS.Process.Extensions
                     RecordNumber = verbatim.Label,
                     Remarks = verbatim.Comment,
                     Status = verbatim.NotPresent || verbatim.NotRecovered
-                        ? OccurrenceStatus.Absent
-                        : OccurrenceStatus.Present,
+                    ? OccurrenceStatus.Absent
+                    : OccurrenceStatus.Present,
                     URL = $"http://www.artportalen.se/sighting/{verbatim.Id}"
                 },
                 OwnerInstitutionCode = verbatim.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "ArtDatabanken",
-                Projects = verbatim.Projects?.ToProcessedProjects(), 
+                Projects = verbatim.Projects?.ToProcessedProjects(),
                 ProtectionLevel = CalculateProtectionLevel(taxon, verbatim.HiddenByProvider, verbatim.ProtectedBySystem),
-                ReportedBy = verbatim.ReportedBy, 
+                ReportedBy = verbatim.ReportedBy,
                 ReportedDate = verbatim.ReportedDate,
                 RightsHolder = verbatim.RightsHolder ?? verbatim.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas",
                 Taxon = taxon,
                 Type = "Occurrence"
             };
-            
+
             // Get field mapping values
             obs.Occurrence.GenderId = GetSosId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Gender]);
             obs.Occurrence.ActivityId = GetSosId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]);
-            obs.Location.CountyId = GetSosId(verbatim.Site.County?.Id, fieldMappings[FieldMappingFieldId.County]);
-            obs.Location.MunicipalityId = GetSosId(verbatim.Site.Municipality?.Id, fieldMappings[FieldMappingFieldId.Municipality]);
-            obs.Location.ProvinceId = GetSosId(verbatim.Site.Province?.Id, fieldMappings[FieldMappingFieldId.Province]);
-            obs.Location.ParishId = GetSosId(verbatim.Site.Parish?.Id, fieldMappings[FieldMappingFieldId.Parish]);
+            obs.Location.CountyId = GetSosId(verbatim.Site?.County?.Id, fieldMappings[FieldMappingFieldId.County]);
+            obs.Location.MunicipalityId = GetSosId(verbatim.Site?.Municipality?.Id, fieldMappings[FieldMappingFieldId.Municipality]);
+            obs.Location.ProvinceId = GetSosId(verbatim.Site?.Province?.Id, fieldMappings[FieldMappingFieldId.Province]);
+            obs.Location.ParishId = GetSosId(verbatim.Site?.Parish?.Id, fieldMappings[FieldMappingFieldId.Parish]);
             return obs;
         }
 
@@ -177,25 +176,15 @@ namespace SOS.Process.Extensions
         /// <returns></returns>
         private static ProcessedFieldMapValue GetSosId(int? val, IDictionary<object, int> sosIdByProviderValue)
         {
-            if (!val.HasValue) return null;
+            if (!val.HasValue || sosIdByProviderValue == null) return null;
 
-            if (sosIdByProviderValue.TryGetValue(val.Value, out int sosId))
+            if (sosIdByProviderValue.TryGetValue(val.Value, out var sosId))
             {
                 return new ProcessedFieldMapValue { Id = sosId };
             }
-            else
-            {
-                return new ProcessedFieldMapValue { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
-            }
-        }
-
-        public static ProcessedArea ToProcessed(this GeographicalArea area)
-        {
-            return new ProcessedArea
-            {
-                Id = area.Id,
-                Name = area.Name
-            };
+           
+            return new ProcessedFieldMapValue { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
+           
         }
 
         private static IEnumerable<ProcessedProject> ToProcessedProjects(this IEnumerable<Project> projects)
@@ -225,6 +214,11 @@ namespace SOS.Process.Extensions
 
         private static ProcessedProjectParameter ToProcessedProjectParameter(this ProjectParameter projectParameter)
         {
+            if (projectParameter == null)
+            {
+                return null;
+            }
+
             return new ProcessedProjectParameter
             {
                 Value = projectParameter.Value,
@@ -238,7 +232,7 @@ namespace SOS.Process.Extensions
 
         private static string GetSamplingProtocol(IEnumerable<Project> projects)
         {
-            if (projects == null || !projects.Any()) return null;
+            if (!projects?.Any() ?? true) return null;
 
             var project = projects.First();
 
@@ -271,7 +265,7 @@ namespace SOS.Process.Extensions
         /// <returns></returns>
         private static int CalculateProtectionLevel(ProcessedTaxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
         {
-            if (taxon == null || string.IsNullOrEmpty(taxon.ProtectionLevel))
+            if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
             {
                 return 1;
             }
@@ -301,6 +295,11 @@ namespace SOS.Process.Extensions
         /// <returns></returns>
         private static string GetSubstrateDescription(APSightingVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
         {
+            if (verbatim == null)
+            {
+                return null;
+            }
+
             var substrateDescription = new StringBuilder();
 
             if (verbatim.QuantityOfSubstrate.HasValue)
@@ -358,7 +357,7 @@ namespace SOS.Process.Extensions
         /// <returns></returns>
         public static int? GetBirdNestActivityId(APSightingVerbatim verbatim, ProcessedTaxon taxon)
         {
-            if (taxon == null)
+            if (verbatim == null || taxon == null)
             {
                 return null;
             }
@@ -378,7 +377,7 @@ namespace SOS.Process.Extensions
         /// <returns></returns>
         public static string GetAssociatedReferences(APSightingVerbatim verbatim)
         {
-            if (!verbatim.MigrateSightingObsId.HasValue)
+            if (!verbatim?.MigrateSightingObsId.HasValue ?? true)
             {
                 return null;
             }

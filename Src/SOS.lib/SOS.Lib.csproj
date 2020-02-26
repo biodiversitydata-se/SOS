@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="2.5.1" />
     <PackageReference Include="Microsoft.SqlServer.Types" Version="14.0.1016.290" />
     <PackageReference Include="MongoDB.Driver" Version="2.10.1" />
     <PackageReference Include="NetTopologySuite" Version="2.0.0" />
