@@ -4,12 +4,6 @@ namespace SOS.Export.UnitTests.TestHelpers.Builders
 {
     public class ProcessedSightingBuilder : BuilderBase<ProcessedSightingBuilder, ProcessedSighting>
     {
-        public static ProcessedSightingBuilder InMemory => new ProcessedSightingBuilder();
-
-        public ProcessedSightingBuilder()
-        {
-        }
-
         public ProcessedSightingBuilder WithDecimalLatitude(double decimalLatitude)
         {
             return With(entity => entity.Location.DecimalLatitude = decimalLatitude);
