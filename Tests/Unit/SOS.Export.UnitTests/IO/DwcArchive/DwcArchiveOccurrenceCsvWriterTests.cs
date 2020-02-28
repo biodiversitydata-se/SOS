@@ -13,6 +13,7 @@ using Moq;
 using SOS.Export.Enums;
 using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive;
+using SOS.Export.UnitTests.TestHelpers.Builders;
 using SOS.Export.UnitTests.TestHelpers.Factories;
 using SOS.Lib.Models.Search;
 using SOS.TestHelpers.Helpers;
@@ -63,10 +64,12 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
-            observation.Location.DecimalLatitude = 13.823392373018132;
-            observation.Location.DecimalLongitude = 55.51071440795833;
-            var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
+            var sightingBuilder = new ProcessedSightingBuilder();
+            var observation = sightingBuilder
+                .WithDecimalLatitude(13.823392373018132)
+                .WithDecimalLongitude(55.51071440795833)
+                .Build();
+            var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation );
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -97,8 +100,10 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
-            observation.Location.CoordinateUncertaintyInMeters = 0;
+            var sightingBuilder = new ProcessedSightingBuilder();
+            var observation = sightingBuilder
+                .WithCoordinateUncertaintyInMeters(0)
+                .Build();
             var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -130,8 +135,10 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var observation = DarwinCoreObservationFactory.CreateDefaultObservation();
-            observation.Occurrence.Remarks = "Sighting found in\r\nUppsala";
+            var sightingBuilder = new ProcessedSightingBuilder();
+            var observation = sightingBuilder
+                .WithOccurrenceRemarks("Sighting found in\r\nUppsala")
+                .Build();
             var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
 
             //-----------------------------------------------------------------------------------------------------------

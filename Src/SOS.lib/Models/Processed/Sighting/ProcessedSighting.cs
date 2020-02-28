@@ -22,6 +22,11 @@ namespace SOS.Lib.Models.Processed.Sighting
         {
             Provider = provider;
         }
+
+        public ProcessedSighting()
+        {
+        }
+
         /// <summary>
         /// Information about who can access the resource or
         /// an indication of its security status.
