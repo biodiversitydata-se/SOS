@@ -112,13 +112,6 @@ namespace SOS.Process.Jobs
                     _logger.LogDebug("Finish verifying collection");
                 }
 
-                if (newCollection)
-                {
-                    _logger.LogDebug("Start creating indexes");
-                    await _darwinCoreRepository.CreateIndexAsync();
-                    _logger.LogDebug("Finish creating indexes");
-                }
-
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 var currentHarvestInfo = (await _harvestInfoRepository.GetAllAsync())?.ToArray();
@@ -170,6 +163,13 @@ namespace SOS.Process.Jobs
                 // Create index if great success
                 if (success)
                 {
+                    if (newCollection)
+                    {
+                        _logger.LogDebug("Start creating indexes");
+                        await _darwinCoreRepository.CreateIndexAsync();
+                        _logger.LogDebug("Finish creating indexes");
+                    }
+
                     if (toggleInstanceOnSuccess)
                     {
                         _logger.LogDebug("Toggle instance");

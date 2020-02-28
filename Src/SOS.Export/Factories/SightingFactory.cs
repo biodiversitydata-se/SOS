@@ -56,20 +56,15 @@ namespace SOS.Export.Factories
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <summary>
-        /// Create a Darwin Core Export file
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="fileName"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        private async Task<bool> ExportDWCAsync(AdvancedFilter filter, string fileName, IJobCancellationToken cancellationToken)
+        /// <inheritdoc />
+        public async Task<string> ExportDWCAsync(AdvancedFilter filter, IJobCancellationToken cancellationToken)
         {
             string zipFilePath = null;
 
             try
             {
                 var processInfo = await _processInfoRepository.GetAsync(_processInfoRepository.ActiveInstance);
+                var fileName = Guid.NewGuid().ToString();
 
                 zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     filter,
@@ -90,9 +85,11 @@ namespace SOS.Export.Factories
                 {
                     // Remove local file
                     _fileService.DeleteFile(zipFilePath);
+
+                    return $"{fileName}.zip";
                 }
 
-                return true;
+                return null;
             }
             catch (JobAbortedException)
             {
@@ -102,7 +99,7 @@ namespace SOS.Export.Factories
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to export sightings");
-                return false;
+                return null;
             }
             finally
             {
@@ -110,29 +107,22 @@ namespace SOS.Export.Factories
             }
         }
 
-
         /// <inheritdoc />
-        public async Task<bool> CreateDOIAsync(AdvancedFilter filter, string fileName, IJobCancellationToken cancellationToken)
-        {
-            return await ExportDWCAsync(filter, fileName, cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> ExportAllAsync(string fileName, IJobCancellationToken cancellationToken)
+        public async Task<bool> ExportAllAsync(IJobCancellationToken cancellationToken)
         {
             return await ExportAllAsync(
-                fileName,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(), 
                 cancellationToken);
         }
 
         /// <inheritdoc />
         public async Task<bool> ExportAllAsync(
-            string fileName,
             IEnumerable<FieldDescription> fieldDescriptions, 
             IJobCancellationToken cancellationToken)
         {
-            return await ExportDWCAsync(new AdvancedFilter(), fileName, cancellationToken);
+            var fileName = await ExportDWCAsync(new AdvancedFilter(), cancellationToken);
+           
+            return !string.IsNullOrEmpty(fileName);
         }
     }
 }

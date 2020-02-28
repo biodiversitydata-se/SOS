@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Jobs;
 using SOS.Export.Jobs.Interfaces;
+using SOS.Lib.Models.Search;
 
 namespace SOS.Hangfire.UI.Controllers
 {
@@ -30,14 +31,13 @@ namespace SOS.Hangfire.UI.Controllers
         [HttpPost("DarwinCore/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunDarwinCoreExportJob()
+        public IActionResult RunDarwinCoreExportJob([FromBody]AdvancedFilter filter)
         {
             try
             {
-                var fileName = Guid.NewGuid().ToString();
-                BackgroundJob.Enqueue<IExportDarwinCoreJob>(job => job.RunAsync(fileName, JobCancellationToken.Null));
+                BackgroundJob.Enqueue<IExportJob>(job => job.RunAsync(filter, null, JobCancellationToken.Null));
 
-                return new OkObjectResult($"Running Darwin Core export. File name {fileName}.zip");
+                return new OkObjectResult($"Running Darwin Core export");
             }
             catch (Exception e)
             {
@@ -50,13 +50,13 @@ namespace SOS.Hangfire.UI.Controllers
         [HttpPost("DarwinCore/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult ScheduleDailyDarwinCoreExportJob([FromQuery]int hour, [FromQuery]int minute)
+        public IActionResult ScheduleDailyDarwinCoreExportJob([FromBody]AdvancedFilter filter, [FromQuery]int hour, [FromQuery]int minute)
         {
             try
             {
-                var fileName = Guid.NewGuid().ToString();
-                RecurringJob.AddOrUpdate<IExportDarwinCoreJob>(nameof(ExportDarwinCoreJob), job => job.RunAsync(fileName, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
-                return new OkObjectResult($"Export Darwin Core Job Scheduled. File name {fileName}.zip");
+
+                RecurringJob.AddOrUpdate<IExportJob>(nameof(ExportJob), job => job.RunAsync(filter, null, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult($"Export Darwin Core Job Scheduled.");
             }
             catch (Exception e)
             {

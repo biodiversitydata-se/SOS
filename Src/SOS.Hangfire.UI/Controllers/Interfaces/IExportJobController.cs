@@ -9,17 +9,19 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
     public interface IExportJobController
     {
         /// <summary>
-        /// Run export all job
+        /// Run export job
         /// </summary>
+        /// <param name="filter"></param>
         /// <returns></returns>
-        IActionResult RunDarwinCoreExportJob();
+        IActionResult RunDarwinCoreExportJob(AdvancedFilter filter);
 
         /// <summary>
-        /// Schedule daily export all job
+        /// Schedule daily export job
         /// </summary>
+        /// <param name="filter"></param>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult ScheduleDailyDarwinCoreExportJob(int hour, int minute);
+        IActionResult ScheduleDailyDarwinCoreExportJob(AdvancedFilter filter, int hour, int minute);
     }
 }

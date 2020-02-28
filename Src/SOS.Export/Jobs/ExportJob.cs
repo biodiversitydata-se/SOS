@@ -14,11 +14,11 @@ namespace SOS.Export.Jobs
     /// <summary>
     /// Species portal harvest
     /// </summary>
-    public class DOIJob : IDOIJob
+    public class ExportJob : IExportJob
     {
         private readonly ISightingFactory _sightingFactory;
         private readonly IEmailService _emailService;
-        private readonly ILogger<DOIJob> _logger;
+        private readonly ILogger<ExportJob> _logger;
 
         /// <summary>
         /// Constructor
@@ -26,7 +26,7 @@ namespace SOS.Export.Jobs
         /// <param name="sightingFactory"></param>
         /// <param name="emailService"></param>
         /// <param name="logger"></param>
-        public DOIJob(ISightingFactory sightingFactory, IEmailService emailService, ILogger<DOIJob> logger)
+        public ExportJob(ISightingFactory sightingFactory, IEmailService emailService, ILogger<ExportJob> logger)
         {
             _sightingFactory = sightingFactory ?? throw new ArgumentNullException(nameof(sightingFactory));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
@@ -34,26 +34,32 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(AdvancedFilter filter, string fileName, IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(AdvancedFilter filter, string email, IJobCancellationToken cancellationToken)
         {
             try
             {
-                _emailService.Send(new EmailMessage{ Content = "Hej hopp i lingon...", Subject = "Hello world", To = new []{ "mats.lindgren@slu.se" }});
+                _logger.LogDebug("Start export job");
+                var fileName = await _sightingFactory.ExportDWCAsync(filter, cancellationToken);
+                var success = !string.IsNullOrEmpty(fileName);
 
-                _logger.LogDebug("Start DOI job");
-                var success = await _sightingFactory.CreateDOIAsync(filter, fileName, cancellationToken);
+                if (success && !string.IsNullOrEmpty(email))
+                {
+                    _emailService.Send(new EmailMessage { Content = "Hej,</br>Din fil är nu skapad. Klicka på länken nedan för att hämta den...", Subject = "Exportfil skapad", To = new[] { email } });
+                }
+
                 _logger.LogDebug($"End DOI job. Success: {success}");
-                return success;
+                
+                return success ? true : throw new Exception("Export Job failed");
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation("DOI job was cancelled.");
+                _logger.LogInformation("Export job was cancelled.");
                 return false;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "DOI job failed");
-                return false;
+                _logger.LogError(e, "Export job failed");
+                throw new Exception("Export Job failed");
             }
         }
     }
