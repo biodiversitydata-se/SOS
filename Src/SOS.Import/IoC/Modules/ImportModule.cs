@@ -87,6 +87,10 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<GeoRegionFieldMappingFactory>().As<IGeoRegionFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ActivityFieldMappingFactory>().As<IActivityFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<GenderFieldMappingFactory>().As<IGenderFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<LifeStageFieldMappingFactory>().As<ILifeStageFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<BiotopeFieldMappingFactory>().As<IBiotopeFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<SubstrateFieldMappingFactory>().As<ISubstrateFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ValidationStatusFieldMappingFactory>().As<IValidationStatusFieldMappingFactory>().InstancePerLifetimeScope();
 
             // Add Services
             builder.RegisterType<ClamObservationService>().As<IClamObservationService>().InstancePerLifetimeScope();

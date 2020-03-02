@@ -15,24 +15,23 @@ using SOS.Lib.Models.Shared;
 
 namespace SOS.Import.Factories.FieldMappings
 {
-
     /// <summary>
-    /// Class for creating Activity field mapping.
+    /// Class for creating substrate field mapping.
     /// </summary>
-    public class ActivityFieldMappingFactory : FieldMappingFactoryBase, Interfaces.IActivityFieldMappingFactory
+    public class SubstrateFieldMappingFactory : FieldMappingFactoryBase, Interfaces.ISubstrateFieldMappingFactory
     {
         private readonly IMetadataRepository _artportalenMetadataRepository;
-        private readonly ILogger<ActivityFieldMappingFactory> _logger;
-        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Activity;
+        private readonly ILogger<SubstrateFieldMappingFactory> _logger;
+        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Substrate;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="artportalenMetadataRepository"></param>
         /// <param name="logger"></param>
-        public ActivityFieldMappingFactory(
+        public SubstrateFieldMappingFactory(
             IMetadataRepository artportalenMetadataRepository,
-            ILogger<ActivityFieldMappingFactory> logger)
+            ILogger<SubstrateFieldMappingFactory> logger)
         {
             _artportalenMetadataRepository = artportalenMetadataRepository ?? throw new ArgumentNullException(nameof(artportalenMetadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -40,8 +39,8 @@ namespace SOS.Import.Factories.FieldMappings
 
         protected override async Task<ICollection<FieldMappingValue>> GetFieldMappingValues()
         {
-            IEnumerable<MetadataWithCategoryEntity> activities = await _artportalenMetadataRepository.GetActivitiesAsync();
-            var fieldMappingValues = ConvertToFieldMappingValuesWithCategory(activities.ToArray());
+            var substrates = await _artportalenMetadataRepository.GetSubstratesAsync();
+            var fieldMappingValues = base.ConvertToFieldMappingValues(substrates.ToArray());
             return fieldMappingValues;
         }
     }

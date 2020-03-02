@@ -8,12 +8,12 @@ namespace SOS.Import.Factories.FieldMappings.Interfaces
     /// <summary>
     /// Interface for creating field mapping for activity field.
     /// </summary>
-    public interface IActivityFieldMappingFactory
+    public interface IActivityFieldMappingFactory : IFieldMappingCreatorFactory
     {
-        /// <summary>
-        /// Create field mapping for activity field.
-        /// </summary>
-        /// <returns></returns>
-        Task<FieldMapping> CreateFieldMappingAsync();
+        ///// <summary>
+        ///// Create field mapping for activity field.
+        ///// </summary>
+        ///// <returns></returns>
+        //Task<FieldMapping> CreateFieldMappingAsync();
     }
 }

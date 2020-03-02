@@ -10,6 +10,10 @@
         County = 2,
         Parish = 3,
         Municipality = 4,
-        Province = 5
+        Province = 5,
+        LifeStage = 6,
+        Biotope = 7,
+        Substrate = 8,
+        ValidationStatus = 9
     }
 }
