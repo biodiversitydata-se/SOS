@@ -155,7 +155,7 @@ namespace SOS.Export.UnitTests.Factories
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
 
-            var result = await sightingFactory.ExportAllAsync("fileName", JobCancellationToken.Null);
+            var result = await sightingFactory.ExportAllAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

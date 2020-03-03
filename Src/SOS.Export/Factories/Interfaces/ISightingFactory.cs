@@ -12,31 +12,27 @@ namespace SOS.Export.Factories.Interfaces
     public interface ISightingFactory
     {
         /// <summary>
-        /// Create a DOI
+        /// Create a export file
         /// </summary>
         /// <param name="filter"></param>
-        /// <param name="fileName"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> CreateDOIAsync(AdvancedFilter filter, string fileName, IJobCancellationToken cancellationToken);
+        Task<string> ExportDWCAsync(AdvancedFilter filter, IJobCancellationToken cancellationToken);
 
         /// <summary>
         /// Export all sightings as DwC-A.
         /// </summary>
-        /// <param name="fileName"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> ExportAllAsync(string fileName, IJobCancellationToken cancellationToken);
+        Task<bool> ExportAllAsync(IJobCancellationToken cancellationToken);
 
         /// <summary>
         /// Export all sightings as DwC-A where only the fields in <paramref name="fieldDescriptions"/> are used, plus the mandatory DwC-A fields.
         /// </summary>
-        /// <param name="fileName"></param>
         /// <param name="fieldDescriptions"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<bool> ExportAllAsync(
-            string fileName,
             IEnumerable<FieldDescription> fieldDescriptions,
             IJobCancellationToken cancellationToken);
     }

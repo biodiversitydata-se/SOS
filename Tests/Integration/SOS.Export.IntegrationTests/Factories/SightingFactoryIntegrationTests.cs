@@ -27,12 +27,11 @@ namespace SOS.Export.IntegrationTests.Factories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var sightingFactory = CreateSightingFactory();
-            var filename = FilenameGenerator.CreateFilename("sos_dwc_archive_with_all_data");
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            bool result = await sightingFactory.ExportAllAsync(filename, JobCancellationToken.Null);
+            bool result = await sightingFactory.ExportAllAsync(JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

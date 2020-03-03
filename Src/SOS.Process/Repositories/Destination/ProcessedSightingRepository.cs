@@ -55,6 +55,11 @@ namespace SOS.Process.Repositories.Destination
                     inadequateItem.Defects.Add("Taxon not found");
                 }
 
+                if ((item.Location?.CoordinateUncertaintyInMeters ?? 0) > 100000)
+                {
+                    inadequateItem.Defects.Add("CoordinateUncertaintyInMeters exceeds max value 100 km");
+                }
+                
                 if (!item.IsInEconomicZoneOfSweden)
                 {
                     inadequateItem.Defects.Add("Sighting outside Swedish economic zone");
