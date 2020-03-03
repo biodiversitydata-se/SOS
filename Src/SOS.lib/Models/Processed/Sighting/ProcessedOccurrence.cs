@@ -145,7 +145,10 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// at the time the Occurrence was recorded.
         /// Recommended best practice is to use a controlled vocabulary.
         /// </summary>
-        public Metadata LifeStage { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue LifeStageId { get; set; }
 
         /// <summary>
         /// An identifier for the Occurrence (as opposed to a

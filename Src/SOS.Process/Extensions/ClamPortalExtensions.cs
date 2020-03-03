@@ -5,6 +5,7 @@ using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
@@ -18,6 +19,8 @@ namespace SOS.Process.Extensions
     /// </summary>
     public static class ClamPortalExtensions
     {
+        private const string ValidatedObservationStringValue = "Godkänd";
+
         /// <summary>
         /// Cast clam observation verbatim to processed sighting
         /// </summary>
@@ -50,9 +53,8 @@ namespace SOS.Process.Extensions
                 },
                 Identification = new ProcessedIdentification
                 {
-                    Validated = verbatim.IdentificationVerificationStatus.Equals("Godkänd", StringComparison.CurrentCultureIgnoreCase),
-                    VerificationStatus = string.IsNullOrEmpty(verbatim.IdentificationVerificationStatus) ? null : 
-                        new Metadata(0){ Translations = new [] { new MetadataTranslation{ Culture = Cultures.sv_SE, Value = verbatim.IdentificationVerificationStatus }  } }  ,
+                    Validated = verbatim.IdentificationVerificationStatus.Equals(ValidatedObservationStringValue, StringComparison.CurrentCultureIgnoreCase),
+                    ValidationStatusId = GetValidationStatusIdFromString(verbatim.IdentificationVerificationStatus),
                     UncertainDetermination = verbatim.UncertainDetermination != 0
                 },
                 Institution = string.IsNullOrEmpty(verbatim.InstitutionCode) ? null : 
@@ -87,8 +89,7 @@ namespace SOS.Process.Extensions
                     IsNeverFoundObservation = verbatim.IsNeverFoundObservation,
                     IsNotRediscoveredObservation = verbatim.IsNotRediscoveredObservation,
                     IsPositiveObservation = verbatim.IsPositiveObservation,
-                    LifeStage = string.IsNullOrEmpty(verbatim.LifeStage) ? null :
-                        new Metadata(0) { Translations = new[] { new MetadataTranslation { Culture = Cultures.sv_SE, Value = verbatim.LifeStage } } },
+                    LifeStageId = GetLifeStageIdFromString(verbatim.LifeStage),
                     OrganismQuantity = verbatim.Quantity,
                     OrganismQuantityType = string.IsNullOrEmpty(verbatim.QuantityUnit) ? null :
                         new Metadata(0) { Translations = new[] { new MetadataTranslation { Culture = Cultures.sv_SE, Value = verbatim.QuantityUnit } } },
@@ -107,6 +108,36 @@ namespace SOS.Process.Extensions
                 ReportedDate = verbatim.ReportedDate,
                 RightsHolder = verbatim.RightsHolder,
                 Taxon = taxon
+            };
+        }
+
+        private static ProcessedFieldMapValue GetLifeStageIdFromString(string lifeStage)
+        {
+            if (string.IsNullOrEmpty(lifeStage)) return null;
+
+            // todo - map values to LifeStageId enum
+            return new ProcessedFieldMapValue
+            {
+                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                Value = lifeStage
+            };
+        }
+
+        private static ProcessedFieldMapValue GetValidationStatusIdFromString(string validationStatus)
+        {
+            if (string.IsNullOrEmpty(validationStatus)) return null;
+            if (validationStatus.Equals(ValidatedObservationStringValue, StringComparison.CurrentCultureIgnoreCase))
+            {
+                return new ProcessedFieldMapValue
+                {
+                    Id = (int)ValidationStatusId.ApprovedBasedOnReportersDocumentation
+                };
+            }
+
+            return new ProcessedFieldMapValue
+            {
+                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                Value = validationStatus
             };
         }
 

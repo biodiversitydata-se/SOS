@@ -53,14 +53,7 @@ namespace SOS.Export.IO.DwcArchive
                 while (processedSightings.Any())
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    foreach (var processedSighting in processedSightings)
-                    {
-                        ResolveValue(processedSighting?.Location?.CountyId, valueMappingDictionaries[FieldMappingFieldId.County]);
-                        ResolveValue(processedSighting?.Location?.MunicipalityId, valueMappingDictionaries[FieldMappingFieldId.Municipality]);
-                        ResolveValue(processedSighting?.Location?.ParishId, valueMappingDictionaries[FieldMappingFieldId.Parish]);
-                        ResolveValue(processedSighting?.Location?.ProvinceId, valueMappingDictionaries[FieldMappingFieldId.Province]);
-                    }
-
+                    ResolveFieldMappedValues(processedSightings, valueMappingDictionaries);
                     await WriteOccurrenceCsvAsync(stream, processedSightings.ToDarwinCore(), darwinCoreMap);
                     skip += take;
                     processedSightings = (await processedSightingRepository.GetChunkAsync(filter, skip, take)).ToArray();
@@ -80,7 +73,23 @@ namespace SOS.Export.IO.DwcArchive
             }
         }
 
-        private void ResolveValue(
+        private void ResolveFieldMappedValues(ProcessedSighting[] processedSightings, Dictionary<FieldMappingFieldId, Dictionary<int, string>> valueMappingDictionaries)
+        {
+            foreach (var processedSighting in processedSightings)
+            {
+                ResolveFieldMappedValue(processedSighting.Location?.CountyId, valueMappingDictionaries[FieldMappingFieldId.County]);
+                ResolveFieldMappedValue(processedSighting.Location?.MunicipalityId, valueMappingDictionaries[FieldMappingFieldId.Municipality]);
+                ResolveFieldMappedValue(processedSighting.Location?.ParishId, valueMappingDictionaries[FieldMappingFieldId.Parish]);
+                ResolveFieldMappedValue(processedSighting.Location?.ProvinceId, valueMappingDictionaries[FieldMappingFieldId.Province]);
+                ResolveFieldMappedValue(processedSighting.Event?.BiotopeId, valueMappingDictionaries[FieldMappingFieldId.Biotope]);
+                ResolveFieldMappedValue(processedSighting.Identification?.ValidationStatusId, valueMappingDictionaries[FieldMappingFieldId.ValidationStatus]);
+                ResolveFieldMappedValue(processedSighting.Occurrence?.LifeStageId, valueMappingDictionaries[FieldMappingFieldId.LifeStage]);
+                ResolveFieldMappedValue(processedSighting.Occurrence?.ActivityId, valueMappingDictionaries[FieldMappingFieldId.Activity]);
+                ResolveFieldMappedValue(processedSighting.Occurrence?.GenderId, valueMappingDictionaries[FieldMappingFieldId.Gender]);
+            }
+        }
+
+        private void ResolveFieldMappedValue(
             ProcessedFieldMapValue fieldMapValue,
             Dictionary<int, string> valueById)
         {
