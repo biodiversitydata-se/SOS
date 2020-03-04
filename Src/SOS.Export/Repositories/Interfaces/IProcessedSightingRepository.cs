@@ -18,7 +18,7 @@ namespace SOS.Export.Repositories.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessedSighting>> GetChunkAsync(AdvancedFilter filter, int skip, int take);
+        Task<IEnumerable<ProcessedSighting>> GetChunkAsync(FilterBase filter, int skip, int take);
 
         /// <summary>
         /// Get project parameters.
@@ -27,6 +27,6 @@ namespace SOS.Export.Repositories.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessedProject>> GetProjectParameters(AdvancedFilter filter, int skip, int take);
+        Task<IEnumerable<ProcessedProject>> GetProjectParameters(FilterBase filter, int skip, int take);
     }
 }

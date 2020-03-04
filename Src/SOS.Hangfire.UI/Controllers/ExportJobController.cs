@@ -31,7 +31,7 @@ namespace SOS.Hangfire.UI.Controllers
         [HttpPost("DarwinCore/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunDarwinCoreExportJob([FromBody]AdvancedFilter filter)
+        public IActionResult RunDarwinCoreExportJob([FromBody]ExportFilter filter)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace SOS.Hangfire.UI.Controllers
         [HttpPost("DarwinCore/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult ScheduleDailyDarwinCoreExportJob([FromBody]AdvancedFilter filter, [FromQuery]int hour, [FromQuery]int minute)
+        public IActionResult ScheduleDailyDarwinCoreExportJob([FromBody]ExportFilter filter, [FromQuery]int hour, [FromQuery]int minute)
         {
             try
             {

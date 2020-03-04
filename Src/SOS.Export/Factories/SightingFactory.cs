@@ -57,7 +57,7 @@ namespace SOS.Export.Factories
         }
 
         /// <inheritdoc />
-        public async Task<string> ExportDWCAsync(AdvancedFilter filter, IJobCancellationToken cancellationToken)
+        public async Task<string> ExportDWCAsync(ExportFilter filter, IJobCancellationToken cancellationToken)
         {
             string zipFilePath = null;
 
@@ -120,7 +120,7 @@ namespace SOS.Export.Factories
             IEnumerable<FieldDescription> fieldDescriptions, 
             IJobCancellationToken cancellationToken)
         {
-            var fileName = await ExportDWCAsync(new AdvancedFilter(), cancellationToken);
+            var fileName = await ExportDWCAsync(new ExportFilter(), cancellationToken);
            
             return !string.IsNullOrEmpty(fileName);
         }

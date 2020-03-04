@@ -11,7 +11,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
     public interface IExtendedMeasurementOrFactCsvWriter
     {
         /// <inheritdoc />
-        Task<bool> CreateCsvFileAsync(AdvancedFilter filter, Stream stream,
+        Task<bool> CreateCsvFileAsync(FilterBase filter, Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedSightingRepository processedSightingRepository,
             IJobCancellationToken cancellationToken);

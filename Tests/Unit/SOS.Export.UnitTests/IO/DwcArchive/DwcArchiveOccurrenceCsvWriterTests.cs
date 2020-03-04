@@ -40,7 +40,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             bool result = await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
-                new AdvancedFilter(),
+                new SearchFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                 processedDarwinCoreRepositoryStub.Object,
@@ -75,7 +75,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
-                new AdvancedFilter(),
+                new SearchFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                 processedDarwinCoreRepositoryStub.Object,
@@ -110,7 +110,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
-                new AdvancedFilter(),
+                new SearchFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                 processedDarwinCoreRepositoryStub.Object,
@@ -145,7 +145,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
-                new AdvancedFilter(),
+                new SearchFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                 processedDarwinCoreRepositoryStub.Object,
@@ -182,7 +182,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             await dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
-                new AdvancedFilter(),
+                new SearchFilter(),
                 memoryStream,
                 FieldDescriptionHelper.GetFieldDescriptions(fieldDescriptionIds),
                 processedDarwinCoreRepositoryStub.Object,

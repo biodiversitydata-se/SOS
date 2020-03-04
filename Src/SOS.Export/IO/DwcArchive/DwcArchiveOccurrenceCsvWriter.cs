@@ -35,7 +35,7 @@ namespace SOS.Export.IO.DwcArchive
 
         /// <inheritdoc />
         public async Task<bool> CreateOccurrenceCsvFileAsync(
-            AdvancedFilter filter,
+            FilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedSightingRepository processedSightingRepository,

@@ -14,7 +14,7 @@ namespace SOS.Search.Service.Controllers.Interfaces
         /// <param name="filter"></param>
         /// <param name="email"></param>
         /// <returns></returns>
-        IActionResult RunExportJob(AdvancedFilter filter, string email);
+        IActionResult RunExportJob(ExportFilter filter, string email);
 
         /// <summary>
         /// Get status of export job

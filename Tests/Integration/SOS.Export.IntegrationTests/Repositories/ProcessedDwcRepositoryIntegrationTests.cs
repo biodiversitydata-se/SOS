@@ -25,7 +25,7 @@ namespace SOS.Export.IntegrationTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var projectParameters = await processedSightingRepository.GetProjectParameters(new AdvancedFilter(), 0, 100);
+            var projectParameters = await processedSightingRepository.GetProjectParameters(new SearchFilter(), 0, 100);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -40,7 +40,7 @@ namespace SOS.Export.IntegrationTests.Repositories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var processedSightingRepository = GetProcessedSightingRepository();
-            var projectParameters = await processedSightingRepository.GetProjectParameters(new AdvancedFilter(), 0,100);
+            var projectParameters = await processedSightingRepository.GetProjectParameters(new SearchFilter(), 0,100);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

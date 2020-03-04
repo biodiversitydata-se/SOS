@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Extensions;
@@ -69,43 +67,35 @@ namespace SOS.Process.Factories
                 Logger.LogDebug("Finsih deleting KUL Verbatim observations");
 
                 Logger.LogDebug("Start getting KUL Verbatim observations");
-                var verbatim = await _kulObservationVerbatimRepository.GetBatchAsync(string.Empty);
-                
-                if (!verbatim.Any())
-                {
-                    Logger.LogError("No verbatim data to process");
-
-                    runInfo.End = DateTime.Now;
-                    runInfo.Status = RunStatus.Failed;
-                    return runInfo;
-                }
-
-                var successCount = 0;
                 var verbatimCount = 0;
-                var count = verbatim.Count();
+                var successCount = 0;
+                using var cursor = await _kulObservationVerbatimRepository.GetAllAsync();
 
-                while (count != 0)
+                ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
+                await cursor.ForEachAsync(c =>
                 {
-                    cancellationToken?.ThrowIfCancellationRequested();
+                    sightings.Add(c.ToProcessed(taxa));
 
-                    var processed = verbatim.ToProcessed(taxa).ToArray();
+                    if (sightings.Count % ProcessRepository.BatchSize == 0)
+                    {
+                        verbatimCount += ProcessRepository.BatchSize;
+                        Logger.LogDebug($"KUL sightings processed: {verbatimCount}");
+                        successCount += ProcessRepository.AddManyAsync(sightings).Result;
+                        sightings.Clear();
+                    }
+                });
 
-                    // Add area related data to models
-                    _areaHelper.AddAreaDataToProcessed(processed);
-
-                    successCount += await ProcessRepository.AddManyAsync(processed);
-
-                    verbatimCount += count;
-                    Logger.LogInformation($"KUL observations being processed, totalCount: {verbatimCount}");
-
-                    // Fetch next batch
-                    verbatim = await _kulObservationVerbatimRepository.GetBatchAsync(verbatim.Last().Id);
-                    count = verbatim.Count();
+                if (sightings.Any())
+                {
+                    verbatimCount += sightings.Count;
+                    Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
+                    successCount += await ProcessRepository.AddManyAsync(sightings);
+                    sightings.Clear();
                 }
-                Logger.LogDebug("Finish getting KUL Verbatim observations. Success: true");
+                Logger.LogDebug($"Finish Processing KUL Verbatim observations. {successCount} successful of {verbatimCount} verbatims");
 
-                runInfo.Count = successCount;
                 runInfo.End = DateTime.Now;
+                runInfo.Count = successCount;
                 runInfo.Status = RunStatus.Success;
             }
             catch (JobAbortedException)

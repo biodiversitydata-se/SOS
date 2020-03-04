@@ -34,7 +34,7 @@ namespace SOS.Export.Repositories
             _taxonFactory = taxonFactory ?? throw new ArgumentNullException(nameof(taxonFactory));
         }
 
-        private AdvancedFilter PrepareFilter(AdvancedFilter filter)
+        private SearchFilter PrepareFilter(FilterBase filter)
         {
             var preparedFilter = filter.Clone();
 
@@ -54,7 +54,7 @@ namespace SOS.Export.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ProcessedSighting>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
+        public async Task<IEnumerable<ProcessedSighting>> GetChunkAsync(FilterBase filter, int skip, int take)
         {
             filter = PrepareFilter(filter);
 
@@ -68,7 +68,7 @@ namespace SOS.Export.Repositories
         }
 
         public async Task<IEnumerable<ProcessedProject>> GetProjectParameters(
-            AdvancedFilter filter, 
+            FilterBase filter, 
             int skip,
             int take)
         {

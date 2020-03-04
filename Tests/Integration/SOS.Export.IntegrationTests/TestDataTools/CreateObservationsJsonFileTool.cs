@@ -41,7 +41,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observations = await processedSightingRepository.GetChunkAsync(new AdvancedFilter(), 0,nrObservations);
+            var observations = await processedSightingRepository.GetChunkAsync(new SearchFilter(), 0,nrObservations);
 
             var serializerSettings = new JsonSerializerSettings()
             {

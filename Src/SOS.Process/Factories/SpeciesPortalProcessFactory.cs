@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
@@ -65,47 +66,37 @@ namespace SOS.Process.Factories
                     return runInfo;
                 }
                 Logger.LogDebug("Finish deleting Species Portal data");
+                Logger.LogDebug("Start processing Species Portal data");
 
-                Logger.LogDebug("Start getting first Species Portal batch");
-                var verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(0);
-                Logger.LogDebug("Finish getting first Species Portal batch");
-
-                if (!verbatim.Any())
-                {
-                    Logger.LogError("No verbatim data to process");
-                    runInfo.End = DateTime.Now;
-                    runInfo.Status = RunStatus.Failed;
-                    return runInfo;
-                }
-
-                var successCount = 0;
                 var verbatimCount = 0;
-                var count = verbatim.Count();
-                while (count != 0)
+                var successCount = 0;
+                using var cursor = await _speciesPortalVerbatimRepository.GetAllAsync();
+
+                ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
+                await cursor.ForEachAsync(c =>
                 {
-                    cancellationToken?.ThrowIfCancellationRequested();
+                    sightings.Add(c.ToProcessed(taxa, fieldMappings));
+                    
+                    if (sightings.Count % ProcessRepository.BatchSize == 0)
+                    {
+                        verbatimCount += ProcessRepository.BatchSize;
+                        Logger.LogDebug($"Species Portal Sightings processed: {verbatimCount}");
+                        successCount += ProcessRepository.AddManyAsync(sightings).Result;
+                        sightings.Clear();
+                    }
+                });
 
-                    Logger.LogDebug("Start processing Species Portal batch");
-                    var processedSightings = verbatim.ToProcessed(taxa, fieldMappings).ToArray();
-                    Logger.LogDebug("Finish processing Species Portal batch");
-
-                    Logger.LogDebug("Start adding Species Portal batch to db");
-                    successCount += await ProcessRepository.AddManyAsync(processedSightings);
-                    Logger.LogDebug("Finish adding Species Portal batch to db");
-
-                    verbatimCount += count;
-                    Logger.LogInformation($"Species Portal observations being processed, totalCount: {verbatimCount}");
-
-                    Logger.LogDebug("Start getting next Species Portal batch");
-                    verbatim = await _speciesPortalVerbatimRepository.GetBatchAsync(verbatim.Last().Id);
-                    Logger.LogDebug("Finish getting next Species Portal batch");
-
-                    count = verbatim.Count();
+                if (sightings.Any())
+                {
+                    verbatimCount += sightings.Count;
+                    Logger.LogDebug($"Species Portal Sightings processed: {verbatimCount}");
+                    successCount += await ProcessRepository.AddManyAsync(sightings);
+                    sightings.Clear();
                 }
-                Logger.LogDebug("Finish getting Species Portal data");
+                Logger.LogDebug($"Finish processing Species Portal data. {successCount} successful of {verbatimCount} verbatims");
 
-                runInfo.Count = successCount;
                 runInfo.End = DateTime.Now;
+                runInfo.Count = successCount;
                 runInfo.Status = RunStatus.Success;
             }
             catch (JobAbortedException)

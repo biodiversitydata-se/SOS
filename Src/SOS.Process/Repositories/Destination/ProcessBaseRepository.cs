@@ -62,20 +62,6 @@ namespace SOS.Process.Repositories.Destination
             _collectionName = toggleable ? GetTogglableInstanceName(InstanceToUpdate) : $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }";
         }
 
-        private async Task<bool> AddAsync(TEntity item)
-        {
-            try
-            {
-                await MongoCollection.InsertOneAsync(item);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
-            }
-        }
 
         /// <summary>
         /// Make sure configuration collection exists
@@ -163,8 +149,6 @@ namespace SOS.Process.Repositories.Destination
             _collectionName = GetTogglableInstanceName(instance);
         }
 
-        protected int BatchSize { get; }
-
         /// <summary>
         /// Get collection
         /// </summary>
@@ -249,6 +233,8 @@ namespace SOS.Process.Repositories.Destination
             _disposed = true;
         }
 
+        public int BatchSize { get; }
+
         /// <summary>
         /// Dispose
         /// </summary>
@@ -256,6 +242,22 @@ namespace SOS.Process.Repositories.Destination
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> AddAsync(TEntity item)
+        {
+            try
+            {
+                await MongoCollection.InsertOneAsync(item);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
         }
 
         /// <inheritdoc />
@@ -278,18 +280,7 @@ namespace SOS.Process.Repositories.Destination
         /// <inheritdoc />
         public virtual async Task<bool> AddManyAsync(IEnumerable<TEntity> items)
         {
-            var success = true;
-            var count = 0;
-            var batch = items.Skip(0).Take(BatchSize).ToArray();
-
-            while (batch?.Any() ?? false)
-            {
-                success = success && await AddBatchAsync(batch);
-                count++;
-                batch = items.Skip(BatchSize * count).Take(BatchSize).ToArray();
-            }
-
-            return success;
+            return await AddBatchAsync(items);
         }
 
         /// <inheritdoc />

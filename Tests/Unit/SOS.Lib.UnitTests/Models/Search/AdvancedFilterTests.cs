@@ -20,7 +20,7 @@ namespace SOS.Lib.UnitTests.Models.Search
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var currentDate = DateTime.Now;
-            var filter = new AdvancedFilter
+            var filter = new SearchFilter
             {
                 Counties = new[] {1, 2, 3},
                 Delimitation = new GeometryFilter
@@ -54,7 +54,7 @@ namespace SOS.Lib.UnitTests.Models.Search
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var currentDate = DateTime.Now;
-            var filter = new AdvancedFilter
+            var filter = new SearchFilter
             {
                 Counties = new[] { 1, 2, 3 },
                 Delimitation = new GeometryFilter

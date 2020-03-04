@@ -36,7 +36,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
             var filename = FilenameGenerator.CreateFilename("sos_dwc_archive_with_all_data");
             //var filter = new AdvancedFilter();
-            var filter = new AdvancedFilter {TaxonIds = new[] {102951}};
+            var filter = new SearchFilter {TaxonIds = new[] {102951}};
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -77,7 +77,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
-                new AdvancedFilter(),
+                new SearchFilter(),
                 filename,
                 processedDarwinCoreRepositoryStub.Object,
                 processInfo,

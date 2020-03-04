@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MongoDB.Driver;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Process.Repositories.Source.Interfaces
@@ -12,6 +13,12 @@ namespace SOS.Process.Repositories.Source.Interfaces
     /// <typeparam name="TKey"></typeparam>
     public interface IVerbatimBaseRepository<TEntity, in TKey> : IDisposable where TEntity : IEntity<TKey>
     {
+        /// <summary>
+        /// Get cursor to all documents in collection
+        /// </summary>
+        /// <returns></returns>
+        Task<IAsyncCursor<TEntity>> GetAllAsync();
+
         /// <summary>
         /// Get entity batch
         /// </summary>

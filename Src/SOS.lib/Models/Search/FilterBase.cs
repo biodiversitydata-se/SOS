@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.Search
 {
     /// <summary>
-    /// Search filter for advanced search
+    /// Base filter class
     /// </summary>
-    public class AdvancedFilter
+    public class FilterBase
     {
         /// <summary>
         /// Counties to match
@@ -48,11 +47,6 @@ namespace SOS.Lib.Models.Search
         /// True to return only validated sightings
         /// </summary>
         public bool? OnlyValidated { get; set; }
-
-        /// <summary>
-        /// Fields to return (empty = all)
-        /// </summary>
-        public IEnumerable<string> OutputFields { get; set; }
 
         /// <summary>
         /// True to return only positive sightings, false to return negative sightings, null to return both positive and negative sightings
@@ -102,9 +96,9 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public string TranslationCultureCode { get; set; } = "en-GB";
 
-        public AdvancedFilter Clone()
+        public SearchFilter Clone()
         {
-            var advancedFilter = (AdvancedFilter)MemberwiseClone();
+            var advancedFilter = (SearchFilter)MemberwiseClone();
             return advancedFilter;
         }
     }

@@ -42,7 +42,7 @@ namespace SOS.Search.Service.Factories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
+        public async Task<IEnumerable<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
         {
             try
             {
@@ -58,7 +58,7 @@ namespace SOS.Search.Service.Factories
             }
         }
 
-        private void ProcessNonLocalizedFieldMappings(AdvancedFilter filter, IEnumerable<object> processedSightings)
+        private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedSightings)
         {
             if (!filter.TranslateFieldMappedValues) return;
 
@@ -89,7 +89,7 @@ namespace SOS.Search.Service.Factories
             }
         }
 
-        private void ProcessLocalizedFieldMappings(AdvancedFilter filter, IEnumerable<dynamic> processedSightings)
+        private void ProcessLocalizedFieldMappings(SearchFilter filter, IEnumerable<dynamic> processedSightings)
         {
             if (!filter.TranslateFieldMappedValues) return;
             string cultureCode = filter.TranslationCultureCode;

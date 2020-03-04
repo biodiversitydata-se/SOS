@@ -45,7 +45,7 @@ namespace SOS.Search.Service.Controllers
         [ProducesResponseType(typeof(IEnumerable<ProcessedSighting>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetChunkAsync([FromBody] AdvancedFilter filter, [FromQuery]int skip, [FromQuery]int take)
+        public async Task<IActionResult> GetChunkAsync([FromBody] SearchFilter filter, [FromQuery]int skip, [FromQuery]int take)
         {
             try
             {
