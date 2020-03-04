@@ -58,9 +58,11 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// identification has been verified to be correct.
         /// Recommended best practice is to use a controlled vocabulary
         /// such as that used in HISPID/ABCD.
-        /// This property is currently not used.
         /// </summary>
-        public Metadata VerificationStatus { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue ValidationStatusId { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of names of people,

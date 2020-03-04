@@ -3071,7 +3071,7 @@
       "Mappings": [
         {
           "Key": "Id",
-          "Description": "The Activity.Id field",
+          "Description": "Id field mapping",
           "Values": [
             {
               "Value": 0,

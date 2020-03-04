@@ -10,9 +10,12 @@ namespace SOS.Lib.Models.Processed.Sighting
     public class ProcessedEvent 
     {
         /// <summary>
-        /// Biotope
+        /// Biotope.
         /// </summary>
-        public Metadata Biotope { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue BiotopeId { get; set; }
 
         /// <summary>
         /// Description of biotope
@@ -105,9 +108,12 @@ namespace SOS.Lib.Models.Processed.Sighting
         public DateTime? StartDate { get; set; }
 
         /// <summary>
-        /// Substrate
+        /// Substrate.
         /// </summary>
-        public Metadata Substrate { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue SubstrateId { get; set; }
 
         /// <summary>
         /// Description of substrate

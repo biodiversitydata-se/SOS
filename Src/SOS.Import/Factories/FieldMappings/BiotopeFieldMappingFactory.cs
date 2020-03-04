@@ -15,24 +15,23 @@ using SOS.Lib.Models.Shared;
 
 namespace SOS.Import.Factories.FieldMappings
 {
-
     /// <summary>
-    /// Class for creating Activity field mapping.
+    /// Class for creating biotope field mapping.
     /// </summary>
-    public class ActivityFieldMappingFactory : FieldMappingFactoryBase, Interfaces.IActivityFieldMappingFactory
+    public class BiotopeFieldMappingFactory : FieldMappingFactoryBase, Interfaces.IBiotopeFieldMappingFactory
     {
         private readonly IMetadataRepository _artportalenMetadataRepository;
-        private readonly ILogger<ActivityFieldMappingFactory> _logger;
-        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Activity;
+        private readonly ILogger<BiotopeFieldMappingFactory> _logger;
+        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Biotope;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="artportalenMetadataRepository"></param>
         /// <param name="logger"></param>
-        public ActivityFieldMappingFactory(
+        public BiotopeFieldMappingFactory(
             IMetadataRepository artportalenMetadataRepository,
-            ILogger<ActivityFieldMappingFactory> logger)
+            ILogger<BiotopeFieldMappingFactory> logger)
         {
             _artportalenMetadataRepository = artportalenMetadataRepository ?? throw new ArgumentNullException(nameof(artportalenMetadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -40,8 +39,8 @@ namespace SOS.Import.Factories.FieldMappings
 
         protected override async Task<ICollection<FieldMappingValue>> GetFieldMappingValues()
         {
-            IEnumerable<MetadataWithCategoryEntity> activities = await _artportalenMetadataRepository.GetActivitiesAsync();
-            var fieldMappingValues = ConvertToFieldMappingValuesWithCategory(activities.ToArray());
+            var biotopes = await _artportalenMetadataRepository.GetBiotopesAsync();
+            var fieldMappingValues = ConvertToFieldMappingValues(biotopes.ToArray());
             return fieldMappingValues;
         }
     }

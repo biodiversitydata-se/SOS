@@ -76,13 +76,11 @@ namespace SOS.Process.Extensions
                 DatasetName = "Artportalen",
                 Event = new ProcessedEvent
                 {
-                    Biotope = verbatim.Bioptope,
                     BiotopeDescription = verbatim.BiotopeDescription,
                     EndDate = verbatim.EndDate?.ToUniversalTime(),
                     QuantityOfSubstrate = verbatim.QuantityOfSubstrate,
                     SamplingProtocol = GetSamplingProtocol(verbatim.Projects),
                     StartDate = verbatim.StartDate?.ToUniversalTime(),
-                    Substrate = verbatim.Substrate,
                     SubstrateSpeciesDescription = verbatim.SubstrateSpeciesDescription,
                     SubstrateDescription = GetSubstrateDescription(verbatim, taxa),
                     VerbatimEndDate = verbatim.EndDate,
@@ -92,8 +90,6 @@ namespace SOS.Process.Extensions
                 {
                     IdentifiedBy = verbatim.VerifiedBy,
                     Validated = new[] { 60, 61, 62, 63, 64, 65 }.Contains(verbatim.ValidationStatus?.Id ?? 0),
-                    VerificationStatus = verbatim.ValidationStatus,
-
                     UncertainDetermination = verbatim.UnsureDetermination
                 },
                 InformationWithheld = "More information can be obtained from the Data Provider",
@@ -137,7 +133,6 @@ namespace SOS.Process.Extensions
                     IsNeverFoundObservation = verbatim.NotPresent,
                     IsNotRediscoveredObservation = verbatim.NotRecovered,
                     IsPositiveObservation = !(verbatim.NotPresent || verbatim.NotRecovered),
-                    LifeStage = verbatim.Stage,
                     OrganismQuantity = verbatim.Quantity,
                     OrganismQuantityType = verbatim.Unit,
                     RecordedBy = verbatim.Observers,
@@ -165,6 +160,10 @@ namespace SOS.Process.Extensions
             obs.Location.MunicipalityId = GetSosId(verbatim.Site?.Municipality?.Id, fieldMappings[FieldMappingFieldId.Municipality]);
             obs.Location.ProvinceId = GetSosId(verbatim.Site?.Province?.Id, fieldMappings[FieldMappingFieldId.Province]);
             obs.Location.ParishId = GetSosId(verbatim.Site?.Parish?.Id, fieldMappings[FieldMappingFieldId.Parish]);
+            obs.Event.BiotopeId = GetSosId(verbatim?.Bioptope?.Id, fieldMappings[FieldMappingFieldId.Biotope]);
+            obs.Event.SubstrateId = GetSosId(verbatim?.Bioptope?.Id, fieldMappings[FieldMappingFieldId.Substrate]);
+            obs.Identification.ValidationStatusId = GetSosId(verbatim?.ValidationStatus?.Id, fieldMappings[FieldMappingFieldId.ValidationStatus]);
+            obs.Occurrence.LifeStageId = GetSosId(verbatim?.Stage?.Id, fieldMappings[FieldMappingFieldId.LifeStage]);
             return obs;
         }
 

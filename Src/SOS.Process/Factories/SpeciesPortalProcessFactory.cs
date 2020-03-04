@@ -152,6 +152,10 @@ namespace SOS.Process.Factories
                 case FieldMappingFieldId.Municipality: 
                 case FieldMappingFieldId.Parish:
                 case FieldMappingFieldId.Province:
+                case FieldMappingFieldId.LifeStage:
+                case FieldMappingFieldId.Substrate:
+                case FieldMappingFieldId.ValidationStatus:
+                case FieldMappingFieldId.Biotope:
                     return "Id";
                 default:
                     throw new ArgumentException($"No mapping exist for the field: {fieldMappingFieldId}");

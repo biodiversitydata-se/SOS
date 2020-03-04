@@ -19,13 +19,15 @@ using SOS.Lib.Models.Shared;
 
 namespace SOS.Import.Factories.FieldMappings
 {
+
     /// <summary>
     /// Class for creating Gender field mapping.
     /// </summary>
-    public class GenderFieldMappingFactory : Interfaces.IGenderFieldMappingFactory
+    public class GenderFieldMappingFactory : FieldMappingFactoryBase, Interfaces.IGenderFieldMappingFactory
     {
-        private readonly IMetadataRepository _metadataRepository;
+        private readonly IMetadataRepository _artportalenMetadataRepository;
         private readonly ILogger<GenderFieldMappingFactory> _logger;
+        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Gender;
 
         /// <summary>
         /// Constructor
@@ -36,88 +38,27 @@ namespace SOS.Import.Factories.FieldMappings
             IMetadataRepository metadataRepository,
             ILogger<GenderFieldMappingFactory> logger)
         {
-            _metadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
+            _artportalenMetadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
-        public async Task<FieldMapping> CreateFieldMappingAsync()
+        protected override async Task<ICollection<FieldMappingValue>> GetFieldMappingValues()
         {
-            IEnumerable<MetadataEntity> genderValues = await _metadataRepository.GetGendersAsync();
-            ICollection<FieldMappingValue> fieldMappingValues = ConvertToFieldMappingValues(genderValues.ToArray());
-
-            FieldMapping fieldMapping = new FieldMapping
-            {
-                Id = FieldMappingFieldId.Gender,
-                Name = FieldMappingFieldId.Gender.ToString(),
-                Localized = true,
-                Values = fieldMappingValues,
-                ExternalSystemsMapping = new List<ExternalSystemMapping>
-                {
-                    GetArtportalenExternalSystemMapping(fieldMappingValues),
-                    GetDarwinCoreExternalSystemMapping(fieldMappingValues)
-                }
-            };
-
-            return fieldMapping;
-        }
-
-        private ICollection<FieldMappingValue> ConvertToFieldMappingValues(ICollection<MetadataEntity> genderValues)
-        {
-            var fieldMappingValues = new List<FieldMappingValue>(genderValues.Count());
-            foreach (var group in genderValues.GroupBy(m => m.Id))
-            {
-                var swedishRecord = group.Single(m => m.CultureCode == "sv-SE");
-                var englishRecord = group.Single(m => m.CultureCode == "en-GB");
-                var val = new FieldMappingValue();
-                val.Id = group.Key;
-                val.Name = string.IsNullOrWhiteSpace(englishRecord.Translation) ? "empty" : englishRecord.Translation;
-                val.Localized = true;
-                val.Translations = new List<FieldMappingTranslation>
-                {
-                    new FieldMappingTranslation()
-                    {
-                        CultureCode = swedishRecord.CultureCode, Value = swedishRecord.Translation
-                    },
-                    new FieldMappingTranslation()
-                    {
-                        CultureCode = englishRecord.CultureCode, Value = englishRecord.Translation
-                    }
-                };
-
-                fieldMappingValues.Add(val);
-            }
-
+            var genders = await _artportalenMetadataRepository.GetGendersAsync();
+            var fieldMappingValues = base.ConvertToFieldMappingValues(genders.ToArray());
             return fieldMappingValues;
         }
 
-        private ExternalSystemMapping GetArtportalenExternalSystemMapping(ICollection<FieldMappingValue> fieldMappingValues)
+        protected override List<ExternalSystemMapping> GetExternalSystemMappings(ICollection<FieldMappingValue> fieldMappingValues)
         {
-            ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping();
-            externalSystemMapping.Id = ExternalSystemId.Artportalen;
-            externalSystemMapping.Name = ExternalSystemId.Artportalen.ToString();
-            externalSystemMapping.Mappings = new List<ExternalSystemMappingField>();
-
-            ExternalSystemMappingField mappingField = new ExternalSystemMappingField();
-            mappingField.Key = FieldMappingKeyFields.Id;
-            mappingField.Description = "The Gender.Id field";
-            mappingField.Values = new List<ExternalSystemMappingValue>();
-
-            // 1-1 mapping between Id fields.
-            foreach (var fieldMappingValue in fieldMappingValues)
+            return new List<ExternalSystemMapping>
             {
-                mappingField.Values.Add(new ExternalSystemMappingValue
-                {
-                    Value = fieldMappingValue.Id,
-                    SosId = fieldMappingValue.Id
-                });
-            }
-
-            externalSystemMapping.Mappings.Add(mappingField);
-            return externalSystemMapping;
+                GetArtportalenExternalSystemMapping(fieldMappingValues),
+                GetDarwinCoreExternalSystemMapping(fieldMappingValues)
+            };
         }
 
-        private static ExternalSystemMapping GetDarwinCoreExternalSystemMapping(ICollection<FieldMappingValue> fieldMappingValues)
+        private ExternalSystemMapping GetDarwinCoreExternalSystemMapping(ICollection<FieldMappingValue> fieldMappingValues)
         {
             ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping
             {

@@ -42,14 +42,14 @@ namespace SOS.Process.Repositories.Destination
             {
                 const int batchSize = 200000;
                 var skip = 0;
-                var fieldMappingsChunk = await GetChunkAsync(skip, batchSize);
+                var fieldMappingsChunk = (await GetChunkAsync(skip, batchSize)).ToArray();
                 var fieldMappings = new List<FieldMapping>();
 
                 while (fieldMappingsChunk?.Any() ?? false)
                 {
                     fieldMappings.AddRange(fieldMappingsChunk);
                     skip += fieldMappingsChunk.Count();
-                    fieldMappingsChunk = await GetChunkAsync(skip, batchSize);
+                    fieldMappingsChunk = (await GetChunkAsync(skip, batchSize)).ToArray();
                 }
 
                 return fieldMappings;

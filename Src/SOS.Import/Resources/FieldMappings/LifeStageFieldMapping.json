@@ -1,0 +1,1123 @@
+{
+  "Id": 6,
+  "Name": "LifeStage",
+  "Localized": true,
+  "Values": [
+    {
+      "Id": 0,
+      "Name": "empty",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": " "
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": " "
+        }
+      ]
+    },
+    {
+      "Id": 1,
+      "Name": "egg",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "ägg"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "egg"
+        }
+      ]
+    },
+    {
+      "Id": 2,
+      "Name": "nestling",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "pulli"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "nestling"
+        }
+      ]
+    },
+    {
+      "Id": 3,
+      "Name": "1st calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "1K"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "1st calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 4,
+      "Name": "at least 1st calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "1K+"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "at least 1st calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 5,
+      "Name": "2nd calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "2K"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "2nd calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 6,
+      "Name": "at least 2nd calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "2K+"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "at least 2nd calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 7,
+      "Name": "2nd calendar year or younger",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "2K-"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "2nd calendar year or younger"
+        }
+      ]
+    },
+    {
+      "Id": 8,
+      "Name": "3rd calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "3K"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "3rd calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 9,
+      "Name": "at least 3rd calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "3K+"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "at least 3rd calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 10,
+      "Name": "3rd calendar year or younger",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "3K-"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "3rd calendar year or younger"
+        }
+      ]
+    },
+    {
+      "Id": 11,
+      "Name": "4th calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "4K"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "4th calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 12,
+      "Name": "at least 4th calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "4K+"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "at least 4th calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 13,
+      "Name": "4th calendar year or younger",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "4K-"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "4th calendar year or younger"
+        }
+      ]
+    },
+    {
+      "Id": 14,
+      "Name": "5th calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "5K"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "5th calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 15,
+      "Name": "at least 5th calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "5K+"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "at least 5th calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 16,
+      "Name": "5th calendar year or younger",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "5K-"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "5th calendar year or younger"
+        }
+      ]
+    },
+    {
+      "Id": 17,
+      "Name": "6th calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "6K"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "6th calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 18,
+      "Name": "at least 6th calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "6K+"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "at least 6th calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 19,
+      "Name": "6th calendar year or younger",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "6K-"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "6th calendar year or younger"
+        }
+      ]
+    },
+    {
+      "Id": 20,
+      "Name": "7th calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "7K"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "7th calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 21,
+      "Name": "at least 7th calendar year",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "7K+"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "at least 7th calendar year"
+        }
+      ]
+    },
+    {
+      "Id": 22,
+      "Name": "7th calendar year or younger",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "7K-"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "7th calendar year or younger"
+        }
+      ]
+    },
+    {
+      "Id": 23,
+      "Name": "adult",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "adult"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "adult"
+        }
+      ]
+    },
+    {
+      "Id": 24,
+      "Name": "larva/nymph ",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "larv/nymf"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "larva/nymph "
+        }
+      ]
+    },
+    {
+      "Id": 25,
+      "Name": "pupa",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "puppa"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "pupa"
+        }
+      ]
+    },
+    {
+      "Id": 26,
+      "Name": "juvenile",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "juvenil"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "juvenile"
+        }
+      ]
+    },
+    {
+      "Id": 27,
+      "Name": "imago/adult",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "imago/adult"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "imago/adult"
+        }
+      ]
+    },
+    {
+      "Id": 28,
+      "Name": "rom",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "rom"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "rom"
+        }
+      ]
+    },
+    {
+      "Id": 29,
+      "Name": "0+",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "årsyngel"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "0+"
+        }
+      ]
+    },
+    {
+      "Id": 30,
+      "Name": "1+",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "1+"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "1+"
+        }
+      ]
+    },
+    {
+      "Id": 31,
+      "Name": "larvae",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "larv"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "larvae"
+        }
+      ]
+    },
+    {
+      "Id": 32,
+      "Name": "cub",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "årsunge"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "cub"
+        }
+      ]
+    },
+    {
+      "Id": 33,
+      "Name": "yearling",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "fjolårsunge"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "yearling"
+        }
+      ]
+    },
+    {
+      "Id": 34,
+      "Name": "rest",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "vilstadium"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "rest"
+        }
+      ]
+    },
+    {
+      "Id": 35,
+      "Name": "bud burst",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "knoppbristning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "bud burst"
+        }
+      ]
+    },
+    {
+      "Id": 36,
+      "Name": "fully developed leaf",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "fullt utvecklade blad"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "fully developed leaf"
+        }
+      ]
+    },
+    {
+      "Id": 37,
+      "Name": "flower bud",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "blomknopp"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "flower bud"
+        }
+      ]
+    },
+    {
+      "Id": 38,
+      "Name": "flowering",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "blomning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "flowering"
+        }
+      ]
+    },
+    {
+      "Id": 39,
+      "Name": "overblown",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "överblommad"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "overblown"
+        }
+      ]
+    },
+    {
+      "Id": 40,
+      "Name": "in fruit",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "i frukt"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "in fruit"
+        }
+      ]
+    },
+    {
+      "Id": 41,
+      "Name": "yellowing leaves",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "gulnande löv/blad"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "yellowing leaves"
+        }
+      ]
+    },
+    {
+      "Id": 42,
+      "Name": "leaf cutting",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "bladfällning, vissnar"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "leaf cutting"
+        }
+      ]
+    },
+    {
+      "Id": 43,
+      "Name": "winter stamen",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "vinterståndare"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "winter stamen"
+        }
+      ]
+    },
+    {
+      "Id": 44,
+      "Name": "with capsule",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "med kapsel"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "with capsule"
+        }
+      ]
+    },
+    {
+      "Id": 45,
+      "Name": "without capsule",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "utan kapsel"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "without capsule"
+        }
+      ]
+    },
+    {
+      "Id": 46,
+      "Name": "sprout",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "med groddkorn"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "sprout"
+        }
+      ]
+    },
+    {
+      "Id": 47,
+      "Name": "with female parts",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "med honorgan"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "with female parts"
+        }
+      ]
+    },
+    {
+      "Id": 48,
+      "Name": "with male parts",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "med hanorgan"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "with male parts"
+        }
+      ]
+    },
+    {
+      "Id": 49,
+      "Name": "with apothecies",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "med apothecier"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "with apothecies"
+        }
+      ]
+    },
+    {
+      "Id": 50,
+      "Name": "with perithecies",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "med perithecier"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "with perithecies"
+        }
+      ]
+    },
+    {
+      "Id": 51,
+      "Name": "with soral",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "med soral"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "with soral"
+        }
+      ]
+    },
+    {
+      "Id": 52,
+      "Name": "with isidies",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "med isidier"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "with isidies"
+        }
+      ]
+    },
+    {
+      "Id": 53,
+      "Name": "with schistidies",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "med schistisidier"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "with schistidies"
+        }
+      ]
+    },
+    {
+      "Id": 54,
+      "Name": "fruit/seed dispersal",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "frukt-/fröspridning"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "fruit/seed dispersal"
+        }
+      ]
+    },
+    {
+      "Id": 55,
+      "Name": "anamorph",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "anamorf"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "anamorph"
+        }
+      ]
+    },
+    {
+      "Id": 56,
+      "Name": "juvenile2",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "juvenil2"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "juvenile2"
+        }
+      ]
+    },
+    {
+      "Id": 57,
+      "Name": "teleomorph (perfect)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "teleomorf"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "teleomorph (perfect)"
+        }
+      ]
+    }
+  ],
+  "ExternalSystemsMapping": [
+    {
+      "Id": 0,
+      "Name": "Artportalen",
+      "Mappings": [
+        {
+          "Key": "Id",
+          "Description": "Id field mapping",
+          "Values": [
+            {
+              "Value": 0,
+              "SosId": 0
+            },
+            {
+              "Value": 1,
+              "SosId": 1
+            },
+            {
+              "Value": 2,
+              "SosId": 2
+            },
+            {
+              "Value": 3,
+              "SosId": 3
+            },
+            {
+              "Value": 4,
+              "SosId": 4
+            },
+            {
+              "Value": 5,
+              "SosId": 5
+            },
+            {
+              "Value": 6,
+              "SosId": 6
+            },
+            {
+              "Value": 7,
+              "SosId": 7
+            },
+            {
+              "Value": 8,
+              "SosId": 8
+            },
+            {
+              "Value": 9,
+              "SosId": 9
+            },
+            {
+              "Value": 10,
+              "SosId": 10
+            },
+            {
+              "Value": 11,
+              "SosId": 11
+            },
+            {
+              "Value": 12,
+              "SosId": 12
+            },
+            {
+              "Value": 13,
+              "SosId": 13
+            },
+            {
+              "Value": 14,
+              "SosId": 14
+            },
+            {
+              "Value": 15,
+              "SosId": 15
+            },
+            {
+              "Value": 16,
+              "SosId": 16
+            },
+            {
+              "Value": 17,
+              "SosId": 17
+            },
+            {
+              "Value": 18,
+              "SosId": 18
+            },
+            {
+              "Value": 19,
+              "SosId": 19
+            },
+            {
+              "Value": 20,
+              "SosId": 20
+            },
+            {
+              "Value": 21,
+              "SosId": 21
+            },
+            {
+              "Value": 22,
+              "SosId": 22
+            },
+            {
+              "Value": 23,
+              "SosId": 23
+            },
+            {
+              "Value": 24,
+              "SosId": 24
+            },
+            {
+              "Value": 25,
+              "SosId": 25
+            },
+            {
+              "Value": 26,
+              "SosId": 26
+            },
+            {
+              "Value": 27,
+              "SosId": 27
+            },
+            {
+              "Value": 28,
+              "SosId": 28
+            },
+            {
+              "Value": 29,
+              "SosId": 29
+            },
+            {
+              "Value": 30,
+              "SosId": 30
+            },
+            {
+              "Value": 31,
+              "SosId": 31
+            },
+            {
+              "Value": 32,
+              "SosId": 32
+            },
+            {
+              "Value": 33,
+              "SosId": 33
+            },
+            {
+              "Value": 34,
+              "SosId": 34
+            },
+            {
+              "Value": 35,
+              "SosId": 35
+            },
+            {
+              "Value": 36,
+              "SosId": 36
+            },
+            {
+              "Value": 37,
+              "SosId": 37
+            },
+            {
+              "Value": 38,
+              "SosId": 38
+            },
+            {
+              "Value": 39,
+              "SosId": 39
+            },
+            {
+              "Value": 40,
+              "SosId": 40
+            },
+            {
+              "Value": 41,
+              "SosId": 41
+            },
+            {
+              "Value": 42,
+              "SosId": 42
+            },
+            {
+              "Value": 43,
+              "SosId": 43
+            },
+            {
+              "Value": 44,
+              "SosId": 44
+            },
+            {
+              "Value": 45,
+              "SosId": 45
+            },
+            {
+              "Value": 46,
+              "SosId": 46
+            },
+            {
+              "Value": 47,
+              "SosId": 47
+            },
+            {
+              "Value": 48,
+              "SosId": 48
+            },
+            {
+              "Value": 49,
+              "SosId": 49
+            },
+            {
+              "Value": 50,
+              "SosId": 50
+            },
+            {
+              "Value": 51,
+              "SosId": 51
+            },
+            {
+              "Value": 52,
+              "SosId": 52
+            },
+            {
+              "Value": 53,
+              "SosId": 53
+            },
+            {
+              "Value": 54,
+              "SosId": 54
+            },
+            {
+              "Value": 55,
+              "SosId": 55
+            },
+            {
+              "Value": 56,
+              "SosId": 56
+            },
+            {
+              "Value": 57,
+              "SosId": 57
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
