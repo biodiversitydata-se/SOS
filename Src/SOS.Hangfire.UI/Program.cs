@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using NLog.Web;
 using SOS.Import.IoC.Modules;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Configuration.Process;
+using SOS.Process.IoC.Modules;
 
 namespace SOS.Hangfire.UI
 {
@@ -17,6 +19,7 @@ namespace SOS.Hangfire.UI
     public class Program
     {
         private static ImportConfiguration _importConfiguration;
+        private static ProcessConfiguration _processConfiguration;
 
         /// <summary>
         /// Main 
@@ -66,9 +69,12 @@ namespace SOS.Hangfire.UI
                 .UseServiceProviderFactory(hostContext =>
                     {
                         _importConfiguration = hostContext.Configuration.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();
+                        _processConfiguration = hostContext.Configuration.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
 
                         return new AutofacServiceProviderFactory(builder =>
-                            builder.RegisterModule(new ImportModule { Configuration = _importConfiguration })
+                            builder
+                                .RegisterModule(new ImportModule { Configuration = _importConfiguration })
+                                .RegisterModule(new ProcessModule { Configuration = _processConfiguration })
                         );
                     }
                 )

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Factories.Interfaces
@@ -29,5 +30,7 @@ namespace SOS.Import.Factories.Interfaces
         /// <param name="fieldMappingFieldIds"></param>
         /// <returns></returns>
         Task<byte[]> CreateFieldMappingsZipFileAsync(IEnumerable<FieldMappingFieldId> fieldMappingFieldIds);
+
+        Task<IEnumerable<FieldMapping>> CreateAllFieldMappingsAsync(IEnumerable<FieldMappingFieldId> fieldMappingFieldIds);
     }
 }

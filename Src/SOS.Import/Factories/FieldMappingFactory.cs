@@ -118,11 +118,27 @@ namespace SOS.Import.Factories
             return zipFile;
         }
 
+        public async Task<IEnumerable<FieldMapping>> CreateAllFieldMappingsAsync(IEnumerable<FieldMappingFieldId> fieldMappingFieldIds)
+        {
+            List<FieldMapping> fieldMappings = new List<FieldMapping>();
+            foreach (var fieldMappingFieldId in fieldMappingFieldIds)
+            {
+                var fieldMapping = await CreateFieldMappingAsync(fieldMappingFieldId);
+                fieldMappings.Add(fieldMapping);
+            }
+            return fieldMappings;
+        }
+
         /// <inheritdoc />
         public async Task<(string Filename, byte[] Bytes)> CreateFieldMappingFileAsync(FieldMappingFieldId fieldMappingFieldId)
         {
-            FieldMapping fieldMapping;
             string filename = $"{fieldMappingFieldId.ToString()}FieldMapping.json";
+            FieldMapping fieldMapping = await CreateFieldMappingAsync(fieldMappingFieldId);
+            return CreateFieldMappingFileResult(fieldMapping, filename);
+        }
+
+        private async Task<FieldMapping> CreateFieldMappingAsync(FieldMappingFieldId fieldMappingFieldId)
+        {
             switch (fieldMappingFieldId)
             {
                 case FieldMappingFieldId.Activity:
@@ -132,23 +148,19 @@ namespace SOS.Import.Factories
                 case FieldMappingFieldId.Substrate:
                 case FieldMappingFieldId.ValidationStatus:
                     var fieldMappingFactory = _fieldMappingFactoryById[fieldMappingFieldId];
-                    fieldMapping = await fieldMappingFactory.CreateFieldMappingAsync();
-                    break;
+                    return await fieldMappingFactory.CreateFieldMappingAsync();
 
                 case FieldMappingFieldId.County:
                 case FieldMappingFieldId.Municipality:
                 case FieldMappingFieldId.Province:
                 case FieldMappingFieldId.Parish:
                     var fieldMappingDictionary = await _geoRegionFieldMappingFactory.CreateFieldMappingsAsync();
-                    fieldMapping = fieldMappingDictionary[fieldMappingFieldId];
-                    break;
-                
+                    return fieldMappingDictionary[fieldMappingFieldId];
+
                 default:
                     throw new ArgumentException(
                         $"{MethodBase.GetCurrentMethod().Name}() does not support the value {fieldMappingFieldId}", nameof(fieldMappingFieldId));
             }
-
-            return CreateFieldMappingFileResult(fieldMapping, filename);
         }
 
         private FieldMapping CreateFieldMappingFromJsonFile(string filename)
