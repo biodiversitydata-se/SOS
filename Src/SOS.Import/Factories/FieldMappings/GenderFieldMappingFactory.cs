@@ -28,6 +28,7 @@ namespace SOS.Import.Factories.FieldMappings
         private readonly IMetadataRepository _artportalenMetadataRepository;
         private readonly ILogger<GenderFieldMappingFactory> _logger;
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Gender;
+        protected override bool Localized => true;
 
         /// <summary>
         /// Constructor
@@ -45,7 +46,7 @@ namespace SOS.Import.Factories.FieldMappings
         protected override async Task<ICollection<FieldMappingValue>> GetFieldMappingValues()
         {
             var genders = await _artportalenMetadataRepository.GetGendersAsync();
-            var fieldMappingValues = base.ConvertToFieldMappingValues(genders.ToArray());
+            var fieldMappingValues = base.ConvertToLocalizedFieldMappingValues(genders.ToArray());
             return fieldMappingValues;
         }
 

@@ -14,6 +14,7 @@
         LifeStage = 6,
         Biotope = 7,
         Substrate = 8,
-        ValidationStatus = 9
+        ValidationStatus = 9,
+        Organization = 10
     }
 }

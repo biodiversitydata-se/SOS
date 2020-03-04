@@ -91,6 +91,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<BiotopeFieldMappingFactory>().As<IBiotopeFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SubstrateFieldMappingFactory>().As<ISubstrateFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ValidationStatusFieldMappingFactory>().As<IValidationStatusFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<OrganizationFieldMappingFactory>().As<IOrganizationFieldMappingFactory>().InstancePerLifetimeScope();
 
             // Add Services
             builder.RegisterType<ClamObservationService>().As<IClamObservationService>().InstancePerLifetimeScope();

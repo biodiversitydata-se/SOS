@@ -155,6 +155,7 @@ namespace SOS.Process.Factories
                 case FieldMappingFieldId.Substrate:
                 case FieldMappingFieldId.ValidationStatus:
                 case FieldMappingFieldId.Biotope:
+                case FieldMappingFieldId.Organization:
                     return "Id";
                 default:
                     throw new ArgumentException($"No mapping exist for the field: {fieldMappingFieldId}");

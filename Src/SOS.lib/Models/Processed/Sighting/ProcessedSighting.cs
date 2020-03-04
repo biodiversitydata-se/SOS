@@ -125,9 +125,11 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// The name (or acronym) in use by the institution
         /// having custody of the object(s) or information
         /// referred to in the record.
-        /// Currently this property has the value ArtDatabanken.
         /// </summary>
-        public Metadata Institution { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue OrganizationId { get; set; }
 
         /// <summary>
         /// Internal flag used in validation. must be true to be stored in processed data

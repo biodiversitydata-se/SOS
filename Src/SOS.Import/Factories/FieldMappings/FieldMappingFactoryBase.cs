@@ -14,24 +14,17 @@ namespace SOS.Import.Factories.FieldMappings
     public abstract class FieldMappingFactoryBase : IFieldMappingCreatorFactory
     {
         protected abstract FieldMappingFieldId FieldId { get; }
-        //protected abstract Task<IEnumerable<MetadataEntity>> GetMetadataEntitiesCore();
+        protected abstract bool Localized { get; }
         protected abstract Task<ICollection<FieldMappingValue>> GetFieldMappingValues();
         public virtual async Task<FieldMapping> CreateFieldMappingAsync()
         {
-            return await CreateLocalizedFieldMappingAsync();
-
-        }
-
-        protected virtual async Task<FieldMapping> CreateLocalizedFieldMappingAsync()
-        {
-            //IEnumerable<MetadataEntity> metadataEntities = await GetMetadataEntitiesCore();
-            var fieldMappingValues = await GetFieldMappingValues(); // ConvertToFieldMappingValues(metadataEntities.ToArray());
+            var fieldMappingValues = await GetFieldMappingValues();
 
             FieldMapping fieldMapping = new FieldMapping
             {
                 Id = FieldId,
                 Name = FieldId.ToString(),
-                Localized = true,
+                Localized = Localized,
                 Values = fieldMappingValues,
                 ExternalSystemsMapping = GetExternalSystemMappings(fieldMappingValues)
             };
@@ -39,7 +32,7 @@ namespace SOS.Import.Factories.FieldMappings
             return fieldMapping;
         }
 
-        protected virtual ICollection<FieldMappingValue> ConvertToFieldMappingValues(ICollection<MetadataEntity> metadataEntities)
+        protected virtual ICollection<FieldMappingValue> ConvertToLocalizedFieldMappingValues(ICollection<MetadataEntity> metadataEntities)
         {
             List<FieldMappingValue> fieldMappingValues = new List<FieldMappingValue>(metadataEntities.Count());
             foreach (var group in metadataEntities.GroupBy(m => m.Id))
@@ -69,6 +62,23 @@ namespace SOS.Import.Factories.FieldMappings
 
             return fieldMappingValues;
         }
+
+        protected virtual ICollection<FieldMappingValue> ConvertToNonLocalizedFieldMappingValues(ICollection<MetadataEntity> metadataEntities)
+        {
+            List<FieldMappingValue> fieldMappingValues = new List<FieldMappingValue>(metadataEntities.Count());
+            foreach (var metadataEntity in metadataEntities)
+            {
+                fieldMappingValues.Add(new FieldMappingValue
+                {
+                    Id = metadataEntity.Id,
+                    Name = metadataEntity.Translation,
+                    Localized = false
+                });
+            }
+
+            return fieldMappingValues;
+        }
+
 
         protected virtual ICollection<FieldMappingValue> ConvertToFieldMappingValuesWithCategory(ICollection<MetadataWithCategoryEntity> metadataWithCategoryEntities)
         {

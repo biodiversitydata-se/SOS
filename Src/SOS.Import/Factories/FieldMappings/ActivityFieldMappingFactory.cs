@@ -24,7 +24,7 @@ namespace SOS.Import.Factories.FieldMappings
         private readonly IMetadataRepository _artportalenMetadataRepository;
         private readonly ILogger<ActivityFieldMappingFactory> _logger;
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Activity;
-
+        protected override bool Localized => true;
         /// <summary>
         /// Constructor
         /// </summary>

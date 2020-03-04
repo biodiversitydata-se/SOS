@@ -23,6 +23,7 @@ namespace SOS.Import.Factories.FieldMappings
         private readonly IMetadataRepository _artportalenMetadataRepository;
         private readonly ILogger<SubstrateFieldMappingFactory> _logger;
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Substrate;
+        protected override bool Localized => true;
 
         /// <summary>
         /// Constructor
@@ -40,7 +41,7 @@ namespace SOS.Import.Factories.FieldMappings
         protected override async Task<ICollection<FieldMappingValue>> GetFieldMappingValues()
         {
             var substrates = await _artportalenMetadataRepository.GetSubstratesAsync();
-            var fieldMappingValues = base.ConvertToFieldMappingValues(substrates.ToArray());
+            var fieldMappingValues = base.ConvertToLocalizedFieldMappingValues(substrates.ToArray());
             return fieldMappingValues;
         }
     }

@@ -53,7 +53,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             foreach (var fieldMapping in fieldMappings)
             {
                 if (fieldMapping.Id == FieldMappingFieldId.Municipality ||
-                    fieldMapping.Id == FieldMappingFieldId.Parish)
+                    fieldMapping.Id == FieldMappingFieldId.Parish ||
+                    fieldMapping.Id == FieldMappingFieldId.Organization)
                     continue;
 
                 sb.Append(CreateEnum(fieldMapping));

@@ -57,8 +57,7 @@ namespace SOS.Process.Extensions
                     ValidationStatusId = GetValidationStatusIdFromString(verbatim.IdentificationVerificationStatus),
                     UncertainDetermination = verbatim.UncertainDetermination != 0
                 },
-                Institution = string.IsNullOrEmpty(verbatim.InstitutionCode) ? null : 
-                    new Metadata(0){ Translations = new []{ new MetadataTranslation{ Culture = Cultures.sv_SE, Value = verbatim.InstitutionCode } }},
+                OrganizationId = GetOrganizationIdFromString(verbatim.InstitutionCode),
                 Language = verbatim.Language,
                 Location = new ProcessedLocation
                 {
@@ -108,6 +107,18 @@ namespace SOS.Process.Extensions
                 ReportedDate = verbatim.ReportedDate,
                 RightsHolder = verbatim.RightsHolder,
                 Taxon = taxon
+            };
+        }
+
+        private static ProcessedFieldMapValue GetOrganizationIdFromString(string institutionCode)
+        {
+            if (string.IsNullOrEmpty(institutionCode)) return null;
+
+            // todo - map values to Organization ids
+            return new ProcessedFieldMapValue
+            {
+                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                Value = institutionCode
             };
         }
 

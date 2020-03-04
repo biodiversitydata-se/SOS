@@ -29,6 +29,7 @@ namespace SOS.Import.Factories
         private readonly IBiotopeFieldMappingFactory _biotopeFieldMappingFactory;
         private readonly ISubstrateFieldMappingFactory _substrateFieldMappingFactory;
         private readonly IValidationStatusFieldMappingFactory _validationStatusFieldMappingFactory;
+        private readonly IOrganizationFieldMappingFactory _organizationFieldMappingFactory;
         private readonly ILogger<FieldMappingFactory> _logger;
         private readonly Dictionary<FieldMappingFieldId, IFieldMappingCreatorFactory> _fieldMappingFactoryById;
 
@@ -38,9 +39,13 @@ namespace SOS.Import.Factories
         /// <param name="fieldMappingRepository"></param>
         /// <param name="genderFieldMappingFactory"></param>
         /// <param name="lifeStageFieldMappingFactory"></param>
+        /// <param name="validationStatusFieldMappingFactory"></param>
+        /// <param name="organizationFieldMappingFactory"></param>
         /// <param name="logger"></param>
         /// <param name="geoRegionFieldMappingFactory"></param>
         /// <param name="activityFieldMappingFactory"></param>
+        /// <param name="biotopeFieldMappingFactory"></param>
+        /// <param name="substrateFieldMappingFactory"></param>
         public FieldMappingFactory(
             IFieldMappingRepository fieldMappingRepository,
             IGeoRegionFieldMappingFactory geoRegionFieldMappingFactory,
@@ -50,6 +55,7 @@ namespace SOS.Import.Factories
             IBiotopeFieldMappingFactory biotopeFieldMappingFactory,
             ISubstrateFieldMappingFactory substrateFieldMappingFactory,
             IValidationStatusFieldMappingFactory validationStatusFieldMappingFactory,
+            IOrganizationFieldMappingFactory organizationFieldMappingFactory,
             ILogger<FieldMappingFactory> logger)
         {
             _fieldMappingRepository = fieldMappingRepository ?? throw new ArgumentNullException(nameof(fieldMappingRepository));
@@ -60,6 +66,7 @@ namespace SOS.Import.Factories
             _biotopeFieldMappingFactory = biotopeFieldMappingFactory ?? throw new ArgumentNullException(nameof(biotopeFieldMappingFactory));
             _substrateFieldMappingFactory = substrateFieldMappingFactory ?? throw new ArgumentNullException(nameof(substrateFieldMappingFactory));
             _validationStatusFieldMappingFactory = validationStatusFieldMappingFactory ?? throw new ArgumentNullException(nameof(validationStatusFieldMappingFactory));
+            _organizationFieldMappingFactory = organizationFieldMappingFactory ?? throw new ArgumentNullException(nameof(organizationFieldMappingFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _fieldMappingFactoryById = new Dictionary<FieldMappingFieldId, IFieldMappingCreatorFactory>
@@ -69,7 +76,8 @@ namespace SOS.Import.Factories
                 {FieldMappingFieldId.Gender, _genderFieldMappingFactory},
                 {FieldMappingFieldId.Biotope, _biotopeFieldMappingFactory},
                 {FieldMappingFieldId.Substrate, _substrateFieldMappingFactory},
-                {FieldMappingFieldId.ValidationStatus, _validationStatusFieldMappingFactory}
+                {FieldMappingFieldId.ValidationStatus, _validationStatusFieldMappingFactory},
+                {FieldMappingFieldId.Organization, _organizationFieldMappingFactory}
             };
 
         }
@@ -147,6 +155,7 @@ namespace SOS.Import.Factories
                 case FieldMappingFieldId.Biotope:
                 case FieldMappingFieldId.Substrate:
                 case FieldMappingFieldId.ValidationStatus:
+                case FieldMappingFieldId.Organization:
                     var fieldMappingFactory = _fieldMappingFactoryById[fieldMappingFieldId];
                     return await fieldMappingFactory.CreateFieldMappingAsync();
 
