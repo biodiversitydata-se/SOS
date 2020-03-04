@@ -32,7 +32,7 @@ namespace SOS.Search.Service.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunExportJob([FromBody]AdvancedFilter filter, [FromQuery]string email)
+        public IActionResult RunExportJob([FromBody]ExportFilter filter, [FromQuery]string email)
         {
             try
             {

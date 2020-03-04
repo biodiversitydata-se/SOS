@@ -16,7 +16,7 @@ namespace SOS.Search.Service.Controllers.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IActionResult> GetChunkAsync(AdvancedFilter filter, int skip, int take);
+        Task<IActionResult> GetChunkAsync(SearchFilter filter, int skip, int take);
 
         /// <summary>
         /// Get field mappings.

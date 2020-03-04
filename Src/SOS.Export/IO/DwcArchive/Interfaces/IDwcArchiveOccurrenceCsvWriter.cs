@@ -20,7 +20,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<bool> CreateOccurrenceCsvFileAsync(
-            AdvancedFilter filter,
+            FilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedSightingRepository processedSightingRepository,

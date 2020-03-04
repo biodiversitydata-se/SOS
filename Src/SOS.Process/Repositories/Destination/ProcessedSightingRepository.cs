@@ -124,7 +124,7 @@ namespace SOS.Process.Repositories.Destination
 
         /// <inheritdoc />
         public async Task CreateIndexAsync()
-        {
+        {/*
             var indexModels = new List<CreateIndexModel<ProcessedSighting>>()
             {
                 new CreateIndexModel<ProcessedSighting>(
@@ -155,11 +155,78 @@ namespace SOS.Process.Repositories.Destination
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory))
             };
 
+            await MongoCollection.Indexes.CreateManyAsync(indexModels);*/
+
             /*   indexModels.Add(new CreateIndexModel<DarwinCore>(Builders<DarwinCore>.IndexKeys.Combine(
                    Builders<DarwinCore>.IndexKeys.Ascending(x => x.ParentIds),
                    Builders<ImageADarwinCoreggregate>.IndexKeys.Ascending(x => x.Class))));
                    */
-            await MongoCollection.Indexes.CreateManyAsync(indexModels);
+
+
+            Logger.LogDebug("Start creating End date index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.EndDate)));
+            Logger.LogDebug("Finish creating End date index");
+
+            Logger.LogDebug("Start creating Start date index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.StartDate)));
+            Logger.LogDebug("Finish creating Start date index");
+
+            Logger.LogDebug("Start creating Validated index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Identification.Validated)));
+            Logger.LogDebug("Finish creating Validated index");
+
+            Logger.LogDebug("Start creating County index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.CountyId.Id)));
+            Logger.LogDebug("Finish creating County index");
+
+            Logger.LogDebug("Start creating Point index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.Point)));
+            Logger.LogDebug("Finish creating Point index");
+
+            Logger.LogDebug("Start creating Point with buffer index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.PointWithBuffer)));
+            Logger.LogDebug("Finish creating Point with buffer index");
+
+            Logger.LogDebug("Start creating Province index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.ProvinceId.Id)));
+            Logger.LogDebug("Finish creating Province index");
+
+            Logger.LogDebug("Start creating Municipality index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.MunicipalityId.Id)));
+            Logger.LogDebug("Finish creating Municipality index");
+
+            Logger.LogDebug("Start creating Is Positive Observation index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation)));
+            Logger.LogDebug("Finish creating Is Positive Observation index");
+
+            Logger.LogDebug("Start creating Gender index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.GenderId.Id)));
+            Logger.LogDebug("Finish creating Gender index");
+
+            Logger.LogDebug("Start creating Provider index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Provider)));
+            Logger.LogDebug("Finish creating Provider index");
+
+            Logger.LogDebug("Start creating Taxon id index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.Id)));
+            Logger.LogDebug("Finish creating Taxon id index");
+
+            Logger.LogDebug("Start creating Taxon Redlist Category index");
+            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
+                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory)));
+            Logger.LogDebug("Finish creating Taxon Redlist Category index");
         }
 
         /// <inheritdoc />

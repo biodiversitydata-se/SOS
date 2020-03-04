@@ -39,7 +39,7 @@ namespace SOS.Search.Service.Repositories
             _taxonFactory = taxonFactory ?? throw new ArgumentNullException(nameof(taxonFactory));
         }
 
-        private AdvancedFilter PrepareFilter(AdvancedFilter filter)
+        private SearchFilter PrepareFilter(SearchFilter filter)
         {
             var preparedFilter = filter.Clone();
 
@@ -66,7 +66,7 @@ namespace SOS.Search.Service.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<dynamic>> GetChunkAsync(AdvancedFilter filter, int skip, int take)
+        public async Task<IEnumerable<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
         {
            // var sorting = PrepareSorting(sortBy, sortOrder);
             filter = PrepareFilter(filter);

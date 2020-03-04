@@ -23,7 +23,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
         Task<string> CreateDwcArchiveFileAsync(
-            AdvancedFilter filter,
+            FilterBase filter,
             string fileName,
             IProcessedSightingRepository processedSightingRepository,
             ProcessInfo processInfo,
@@ -44,7 +44,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
         Task<string> CreateDwcArchiveFileAsync(
-            AdvancedFilter filter,
+            FilterBase filter,
             string fileName,
             IProcessedSightingRepository processedSightingRepository,
             IEnumerable<FieldDescription> fieldDescriptions,

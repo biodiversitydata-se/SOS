@@ -44,7 +44,7 @@ namespace SOS.Export.IO.DwcArchive
 
         /// <inheritdoc />
         public async Task<string> CreateDwcArchiveFileAsync(
-            AdvancedFilter filter,
+            FilterBase filter,
             string fileName,
             IProcessedSightingRepository processedSightingRepository,
             ProcessInfo processInfo,
@@ -63,7 +63,7 @@ namespace SOS.Export.IO.DwcArchive
 
         /// <inheritdoc />
         public async Task<string> CreateDwcArchiveFileAsync(
-            AdvancedFilter filter,
+            FilterBase filter,
             string fileName,
             IProcessedSightingRepository processedSightingRepository,
             IEnumerable<FieldDescription> fieldDescriptions,

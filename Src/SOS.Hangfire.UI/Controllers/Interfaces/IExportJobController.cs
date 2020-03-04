@@ -13,7 +13,7 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        IActionResult RunDarwinCoreExportJob(AdvancedFilter filter);
+        IActionResult RunDarwinCoreExportJob(ExportFilter filter);
 
         /// <summary>
         /// Schedule daily export job
@@ -22,6 +22,6 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult ScheduleDailyDarwinCoreExportJob(AdvancedFilter filter, int hour, int minute);
+        IActionResult ScheduleDailyDarwinCoreExportJob(ExportFilter filter, int hour, int minute);
     }
 }

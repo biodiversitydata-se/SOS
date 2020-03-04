@@ -14,7 +14,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        private static List<FilterDefinition<ProcessedSighting>> CreateFilterDefinitions(AdvancedFilter filter)
+        private static List<FilterDefinition<ProcessedSighting>> CreateFilterDefinitions(FilterBase filter)
         {
             var filters = new List<FilterDefinition<ProcessedSighting>>();
 
@@ -98,7 +98,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static FilterDefinition<ProcessedSighting> ToProjectParameteFilterDefinition(this AdvancedFilter filter)
+        public static FilterDefinition<ProcessedSighting> ToProjectParameteFilterDefinition(this FilterBase filter)
         {
             var filters = CreateFilterDefinitions(filter);
             filters.Add(Builders<ProcessedSighting>.Filter.ElemMatch(
@@ -112,7 +112,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static FilterDefinition<ProcessedSighting> ToFilterDefinition(this AdvancedFilter filter)
+        public static FilterDefinition<ProcessedSighting> ToFilterDefinition(this FilterBase filter)
         {
             if (!filter.IsFilterActive)
             {

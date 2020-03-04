@@ -34,7 +34,7 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(AdvancedFilter filter, string email, IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(ExportFilter filter, string email, IJobCancellationToken cancellationToken)
         {
             try
             {

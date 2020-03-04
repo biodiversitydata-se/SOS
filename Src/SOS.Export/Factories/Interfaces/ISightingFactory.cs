@@ -17,7 +17,7 @@ namespace SOS.Export.Factories.Interfaces
         /// <param name="filter"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<string> ExportDWCAsync(AdvancedFilter filter, IJobCancellationToken cancellationToken);
+        Task<string> ExportDWCAsync(ExportFilter filter, IJobCancellationToken cancellationToken);
 
         /// <summary>
         /// Export all sightings as DwC-A.

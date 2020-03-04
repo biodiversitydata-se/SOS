@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
+using MongoDB.Driver;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
@@ -88,39 +88,34 @@ namespace SOS.Process.Factories
             {
                 Logger.LogDebug("Start processing clams verbatim");
 
-                var verbatim = await _clamObservationVerbatimRepository.GetBatchAsync(ObjectId.Empty);
-
-                if (!verbatim.Any())
-                {
-                    Logger.LogError("No clams verbatim data to process");
-                    runInfo.Status = RunStatus.Failed;
-                    return;
-                }
-
-                var successCount = 0;
                 var verbatimCount = 0;
-                var count = verbatim.Count();
-                while (count != 0)
+                using var cursor = await _clamObservationVerbatimRepository.GetAllAsync();
+
+                ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
+                await cursor.ForEachAsync(c =>
                 {
-                    cancellationToken?.ThrowIfCancellationRequested();
+                    sightings.Add(c.ToProcessed(taxa));
 
-                    var processed = verbatim.ToProcessed(taxa).ToArray();
+                    if (sightings.Count % ProcessRepository.BatchSize == 0)
+                    {
+                        verbatimCount += ProcessRepository.BatchSize;
+                        Logger.LogDebug($"Clam Portal sightings processed: {verbatimCount}");
+                        ProcessRepository.AddManyAsync(sightings);
+                        sightings.Clear();
+                    }
+                });
 
-                    // Add area related data to models
-                    _areaHelper.AddAreaDataToProcessed(processed);
-
-                    successCount += await ProcessRepository.AddManyAsync(processed);
-                    verbatimCount += count;
-                    Logger.LogInformation($"Clam observations being processed, totalCount: {verbatimCount}");
-
-                    // Fetch next batch
-                    verbatim = await _clamObservationVerbatimRepository.GetBatchAsync(verbatim.Last().Id);
-                    count = verbatim.Count();
+                if (sightings.Any())
+                {
+                    verbatimCount += sightings.Count;
+                    Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
+                    await ProcessRepository.AddManyAsync(sightings);
+                    sightings.Clear();
                 }
-                Logger.LogDebug("Finish processing clams verbatim");
+                Logger.LogDebug($"Finish processing Clam Portal data. ");
 
-                runInfo.Count = successCount;
                 runInfo.End = DateTime.Now;
+                runInfo.Count = verbatimCount;
                 runInfo.Status = RunStatus.Success;
             }
             catch (JobAbortedException)

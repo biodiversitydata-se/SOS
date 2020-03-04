@@ -11,6 +11,13 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     public interface IProcessBaseRepository<TEntity, in TKey> : IDisposable where TEntity : IEntity<TKey>
     {
         /// <summary>
+        /// Add one item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        Task<bool> AddAsync(TEntity item);
+
+        /// <summary>
         /// Add collection if not exists
         /// </summary>
         /// <returns></returns>
@@ -29,6 +36,8 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// <param name="item"></param>
         /// <returns></returns>
         Task<bool> AddOrUpdateAsync(TEntity item);
+
+        int BatchSize { get; }
 
         /// <summary>
         /// Remove collection

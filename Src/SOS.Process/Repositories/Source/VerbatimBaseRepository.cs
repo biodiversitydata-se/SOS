@@ -61,11 +61,16 @@ namespace SOS.Process.Repositories.Source
         protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName);
 
         /// <inheritdoc />
+        public async Task<IAsyncCursor<TEntity>> GetAllAsync()
+        {
+            return await MongoCollection.FindAsync(FilterDefinition<TEntity>.Empty);
+        }
+
+        /// <inheritdoc />
         public async Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId)
         {
             try
             {
-                
                 var res = await MongoCollection
                     .Find(Builders<TEntity>.Filter.Gt(e => e.Id, startId))
                     .Sort(Builders<TEntity>.Sort.Ascending(e => e.Id))

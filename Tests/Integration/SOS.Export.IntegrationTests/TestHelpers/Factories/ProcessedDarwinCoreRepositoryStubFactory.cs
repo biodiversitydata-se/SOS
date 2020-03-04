@@ -20,7 +20,7 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
             var stub = new Mock<IProcessedSightingRepository>();
             var observations = LoadObservations(fileName);
             stub
-                .Setup(pdcr => pdcr.GetChunkAsync(It.IsAny<AdvancedFilter>(), 0, It.IsAny<int>()))
+                .Setup(pdcr => pdcr.GetChunkAsync(It.IsAny<SearchFilter>(), 0, It.IsAny<int>()))
                 .ReturnsAsync(observations);
 
             return stub;
@@ -30,7 +30,7 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
         {
             var stub = new Mock<IProcessedSightingRepository>();
             stub
-                .Setup(pdcr => pdcr.GetChunkAsync(It.IsAny<AdvancedFilter>(), 0, It.IsAny<int>()))
+                .Setup(pdcr => pdcr.GetChunkAsync(It.IsAny<SearchFilter>(), 0, It.IsAny<int>()))
                 .ReturnsAsync(new[] { observation });
 
             return stub;
