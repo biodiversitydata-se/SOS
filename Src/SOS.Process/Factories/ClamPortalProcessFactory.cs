@@ -89,7 +89,6 @@ namespace SOS.Process.Factories
                 Logger.LogDebug("Start processing clams verbatim");
 
                 var verbatimCount = 0;
-                var successCount = 0;
                 using var cursor = await _clamObservationVerbatimRepository.GetAllAsync();
 
                 ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
@@ -101,7 +100,7 @@ namespace SOS.Process.Factories
                     {
                         verbatimCount += ProcessRepository.BatchSize;
                         Logger.LogDebug($"Clam Portal sightings processed: {verbatimCount}");
-                        successCount += ProcessRepository.AddManyAsync(sightings).Result;
+                        ProcessRepository.AddManyAsync(sightings);
                         sightings.Clear();
                     }
                 });
@@ -110,13 +109,13 @@ namespace SOS.Process.Factories
                 {
                     verbatimCount += sightings.Count;
                     Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
-                    successCount += await ProcessRepository.AddManyAsync(sightings);
+                    await ProcessRepository.AddManyAsync(sightings);
                     sightings.Clear();
                 }
-                Logger.LogDebug($"Finish processing Clam Portal data. {successCount} successful of {verbatimCount} verbatims");
+                Logger.LogDebug($"Finish processing Clam Portal data. ");
 
                 runInfo.End = DateTime.Now;
-                runInfo.Count = successCount;
+                runInfo.Count = verbatimCount;
                 runInfo.Status = RunStatus.Success;
             }
             catch (JobAbortedException)

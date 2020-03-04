@@ -68,7 +68,6 @@ namespace SOS.Process.Factories
 
                 Logger.LogDebug("Start getting KUL Verbatim observations");
                 var verbatimCount = 0;
-                var successCount = 0;
                 using var cursor = await _kulObservationVerbatimRepository.GetAllAsync();
 
                 ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
@@ -80,7 +79,7 @@ namespace SOS.Process.Factories
                     {
                         verbatimCount += ProcessRepository.BatchSize;
                         Logger.LogDebug($"KUL sightings processed: {verbatimCount}");
-                        successCount += ProcessRepository.AddManyAsync(sightings).Result;
+                        ProcessRepository.AddManyAsync(sightings);
                         sightings.Clear();
                     }
                 });
@@ -89,13 +88,13 @@ namespace SOS.Process.Factories
                 {
                     verbatimCount += sightings.Count;
                     Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
-                    successCount += await ProcessRepository.AddManyAsync(sightings);
+                    await ProcessRepository.AddManyAsync(sightings);
                     sightings.Clear();
                 }
-                Logger.LogDebug($"Finish Processing KUL Verbatim observations. {successCount} successful of {verbatimCount} verbatims");
+                Logger.LogDebug($"Finish Processing KUL Verbatim observations.");
 
                 runInfo.End = DateTime.Now;
-                runInfo.Count = successCount;
+                runInfo.Count = verbatimCount;
                 runInfo.Status = RunStatus.Success;
             }
             catch (JobAbortedException)

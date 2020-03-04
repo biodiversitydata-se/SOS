@@ -69,7 +69,6 @@ namespace SOS.Process.Factories
                 Logger.LogDebug("Start processing Species Portal data");
 
                 var verbatimCount = 0;
-                var successCount = 0;
                 using var cursor = await _speciesPortalVerbatimRepository.GetAllAsync();
 
                 ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
@@ -81,7 +80,7 @@ namespace SOS.Process.Factories
                     {
                         verbatimCount += ProcessRepository.BatchSize;
                         Logger.LogDebug($"Species Portal Sightings processed: {verbatimCount}");
-                        successCount += ProcessRepository.AddManyAsync(sightings).Result;
+                        ProcessRepository.AddManyAsync(sightings);
                         sightings.Clear();
                     }
                 });
@@ -90,13 +89,13 @@ namespace SOS.Process.Factories
                 {
                     verbatimCount += sightings.Count;
                     Logger.LogDebug($"Species Portal Sightings processed: {verbatimCount}");
-                    successCount += await ProcessRepository.AddManyAsync(sightings);
+                    await ProcessRepository.AddManyAsync(sightings);
                     sightings.Clear();
                 }
-                Logger.LogDebug($"Finish processing Species Portal data. {successCount} successful of {verbatimCount} verbatims");
+                Logger.LogDebug($"Finish processing Species Portal data.");
 
                 runInfo.End = DateTime.Now;
-                runInfo.Count = successCount;
+                runInfo.Count = verbatimCount;
                 runInfo.Status = RunStatus.Success;
             }
             catch (JobAbortedException)
