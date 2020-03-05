@@ -15,6 +15,7 @@
         Biotope = 7,
         Substrate = 8,
         ValidationStatus = 9,
-        Organization = 10
+        Organization = 10,
+        Unit = 11
     }
 }

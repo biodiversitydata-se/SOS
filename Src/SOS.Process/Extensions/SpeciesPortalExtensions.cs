@@ -133,7 +133,6 @@ namespace SOS.Process.Extensions
                     IsNotRediscoveredObservation = verbatim.NotRecovered,
                     IsPositiveObservation = !(verbatim.NotPresent || verbatim.NotRecovered),
                     OrganismQuantity = verbatim.Quantity,
-                    OrganismQuantityType = verbatim.Unit,
                     RecordedBy = verbatim.Observers,
                     RecordNumber = verbatim.Label,
                     Remarks = verbatim.Comment,
@@ -164,6 +163,7 @@ namespace SOS.Process.Extensions
             obs.Identification.ValidationStatusId = GetSosId(verbatim?.ValidationStatus?.Id, fieldMappings[FieldMappingFieldId.ValidationStatus]);
             obs.Occurrence.LifeStageId = GetSosId(verbatim?.Stage?.Id, fieldMappings[FieldMappingFieldId.LifeStage]);
             obs.OrganizationId = GetSosId(verbatim?.OwnerOrganization?.Id, fieldMappings[FieldMappingFieldId.Organization]);
+            obs.Occurrence.OrganismQuantityUnitId = GetSosId(verbatim?.Unit?.Id, fieldMappings[FieldMappingFieldId.Unit]);
             return obs;
         }
 

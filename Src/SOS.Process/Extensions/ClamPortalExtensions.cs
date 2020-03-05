@@ -90,8 +90,7 @@ namespace SOS.Process.Extensions
                     IsPositiveObservation = verbatim.IsPositiveObservation,
                     LifeStageId = GetLifeStageIdFromString(verbatim.LifeStage),
                     OrganismQuantity = verbatim.Quantity,
-                    OrganismQuantityType = string.IsNullOrEmpty(verbatim.QuantityUnit) ? null :
-                        new Metadata(0) { Translations = new[] { new MetadataTranslation { Culture = Cultures.sv_SE, Value = verbatim.QuantityUnit } } },
+                    OrganismQuantityUnitId = GetOrganismQuantityUnitIdFromString(verbatim.QuantityUnit),
                     RecordedBy = verbatim.RecordedBy,
                     Remarks = verbatim.OccurrenceRemarks,
                     Status = verbatim.OccurrenceStatus
@@ -107,6 +106,18 @@ namespace SOS.Process.Extensions
                 ReportedDate = verbatim.ReportedDate,
                 RightsHolder = verbatim.RightsHolder,
                 Taxon = taxon
+            };
+        }
+
+        private static ProcessedFieldMapValue GetOrganismQuantityUnitIdFromString(string verbatimQuantityUnit)
+        {
+            if (string.IsNullOrEmpty(verbatimQuantityUnit)) return null;
+
+            // todo - map values to Unit ids
+            return new ProcessedFieldMapValue
+            {
+                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                Value = verbatimQuantityUnit
             };
         }
 

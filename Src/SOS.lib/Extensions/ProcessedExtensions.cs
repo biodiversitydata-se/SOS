@@ -142,7 +142,7 @@ namespace SOS.Lib.Extensions
                 OccurrenceRemarks = source.Remarks,
                 OccurrenceStatus = source.Status,
                 OrganismQuantity = source.OrganismQuantity?.ToString(),
-                OrganismQuantityType = source.OrganismQuantity.HasValue ? source.OrganismQuantityType?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Individuals" : null,
+                OrganismQuantityType = source.OrganismQuantity.HasValue ? source.OrganismQuantityUnitId?.Value ?? "Individuals" : null,
                 OtherCatalogNumbers = source.OtherCatalogNumbers,
                 RecordedBy = source.RecordedBy,
                 ReproductiveCondition = source.ActivityId?.Value,
