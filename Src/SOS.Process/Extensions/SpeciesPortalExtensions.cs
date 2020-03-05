@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
@@ -97,7 +98,7 @@ namespace SOS.Process.Extensions
                 Language = Language.Swedish,
                 Location = new ProcessedLocation
                 {
-                    Continent = Continent.Europe,
+                    ContinentId = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
                     CoordinateUncertaintyInMeters = verbatim.Site?.Accuracy,
                     Country = Country.Sweden,
                     CountryCode = CountryCode.Sweden,

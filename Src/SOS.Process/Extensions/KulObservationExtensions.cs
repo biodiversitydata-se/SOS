@@ -4,6 +4,7 @@ using System.Linq;
 using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
+using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Sighting;
@@ -58,7 +59,7 @@ namespace SOS.Process.Extensions
                     DecimalLatitude = verbatim.DecimalLatitude,
                     DecimalLongitude = verbatim.DecimalLongitude,
                     GeodeticDatum = GeodeticDatum.Wgs84,
-                    Continent = Continent.Europe,
+                    ContinentId = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
                     Country = Country.Sweden,
                     Locality = verbatim.Locality,
                     Point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry(),

@@ -13,9 +13,12 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// Recommended best practice is to use a controlled
         /// vocabulary such as the Getty Thesaurus of Geographi
         /// Names or the ISO 3166 Continent code.
-        /// This property is currently not used.
+        /// ('län' in swedish).
         /// </summary>
-        public string Continent { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue ContinentId { get; set; }
 
         /// <summary>
         /// A decimal representation of the precision of the coordinates
@@ -56,9 +59,6 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// This property is currently not used.
         /// </summary>
         public string CountryCode { get; set; }
-
-        
-        //public ProcessedArea County { get; set; }
 
         /// <summary>
         /// The full, unabbreviated name of the next smaller

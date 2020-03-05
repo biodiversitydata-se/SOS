@@ -88,6 +88,7 @@ namespace SOS.Export.IO.DwcArchive
                 ResolveFieldMappedValue(processedSighting.Occurrence?.GenderId, valueMappingDictionaries[FieldMappingFieldId.Gender]);
                 ResolveFieldMappedValue(processedSighting.Occurrence?.OrganismQuantityUnitId, valueMappingDictionaries[FieldMappingFieldId.Unit]);
                 ResolveFieldMappedValue(processedSighting.OrganizationId, valueMappingDictionaries[FieldMappingFieldId.Organization]);
+                ResolveFieldMappedValue(processedSighting.Location?.ContinentId, valueMappingDictionaries[FieldMappingFieldId.Continent]);
             }
         }
 
