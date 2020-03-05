@@ -11,7 +11,7 @@ using SOS.Lib.Models.Shared;
 
 namespace SOS.Import.Factories.FieldMappings
 {
-    public abstract class FieldMappingFactoryBase : IFieldMappingCreatorFactory
+    public abstract class ArtportalenFieldMappingFactoryBase : IFieldMappingCreatorFactory
     {
         protected abstract FieldMappingFieldId FieldId { get; }
         protected abstract bool Localized { get; }

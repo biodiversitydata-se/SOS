@@ -85,14 +85,18 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingFactory>().As<IFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<GeoRegionFieldMappingFactory>().As<IGeoRegionFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ActivityFieldMappingFactory>().As<IActivityFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<GenderFieldMappingFactory>().As<IGenderFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<LifeStageFieldMappingFactory>().As<ILifeStageFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<BiotopeFieldMappingFactory>().As<IBiotopeFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<SubstrateFieldMappingFactory>().As<ISubstrateFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ValidationStatusFieldMappingFactory>().As<IValidationStatusFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<OrganizationFieldMappingFactory>().As<IOrganizationFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<UnitFieldMappingFactory>().As<IUnitFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ActivityArtportalenFieldMappingFactory>().As<IActivityFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<GenderArtportalenFieldMappingFactory>().As<IGenderFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<LifeStageArtportalenFieldMappingFactory>().As<ILifeStageFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<BiotopeArtportalenFieldMappingFactory>().As<IBiotopeFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<SubstrateArtportalenFieldMappingFactory>().As<ISubstrateFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ValidationStatusArtportalenFieldMappingFactory>().As<IValidationStatusFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<OrganizationArtportalenFieldMappingFactory>().As<IOrganizationFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<UnitArtportalenFieldMappingFactory>().As<IUnitFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<BasisOfRecordFieldMappingFactory>().As<IBasisOfRecordFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ContinentFieldMappingFactory>().As<IContinentFieldMappingFactory>().InstancePerLifetimeScope();
+
+
 
             // Add Services
             builder.RegisterType<ClamObservationService>().As<IClamObservationService>().InstancePerLifetimeScope();

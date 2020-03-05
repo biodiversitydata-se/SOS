@@ -31,6 +31,8 @@ namespace SOS.Import.Factories
         private readonly IValidationStatusFieldMappingFactory _validationStatusFieldMappingFactory;
         private readonly IOrganizationFieldMappingFactory _organizationFieldMappingFactory;
         private readonly IUnitFieldMappingFactory _unitFieldMappingFactory;
+        private readonly IBasisOfRecordFieldMappingFactory _basisOfRecordFieldMappingFactory;
+        private readonly IContinentFieldMappingFactory _continentFieldMappingFactory;
         private readonly ILogger<FieldMappingFactory> _logger;
         private readonly Dictionary<FieldMappingFieldId, IFieldMappingCreatorFactory> _fieldMappingFactoryById;
 
@@ -43,6 +45,7 @@ namespace SOS.Import.Factories
         /// <param name="validationStatusFieldMappingFactory"></param>
         /// <param name="organizationFieldMappingFactory"></param>
         /// <param name="unitFieldMappingFactory"></param>
+        /// <param name="basisOfRecordFieldMappingFactory"></param>
         /// <param name="logger"></param>
         /// <param name="geoRegionFieldMappingFactory"></param>
         /// <param name="activityFieldMappingFactory"></param>
@@ -59,6 +62,8 @@ namespace SOS.Import.Factories
             IValidationStatusFieldMappingFactory validationStatusFieldMappingFactory,
             IOrganizationFieldMappingFactory organizationFieldMappingFactory,
             IUnitFieldMappingFactory unitFieldMappingFactory,
+            IBasisOfRecordFieldMappingFactory basisOfRecordFieldMappingFactory,
+            IContinentFieldMappingFactory continentFieldMappingFactory,
             ILogger<FieldMappingFactory> logger)
         {
             _fieldMappingRepository = fieldMappingRepository ?? throw new ArgumentNullException(nameof(fieldMappingRepository));
@@ -71,6 +76,8 @@ namespace SOS.Import.Factories
             _validationStatusFieldMappingFactory = validationStatusFieldMappingFactory ?? throw new ArgumentNullException(nameof(validationStatusFieldMappingFactory));
             _organizationFieldMappingFactory = organizationFieldMappingFactory ?? throw new ArgumentNullException(nameof(organizationFieldMappingFactory));
             _unitFieldMappingFactory = unitFieldMappingFactory ?? throw new ArgumentNullException(nameof(unitFieldMappingFactory));
+            _basisOfRecordFieldMappingFactory = basisOfRecordFieldMappingFactory ?? throw new ArgumentNullException(nameof(basisOfRecordFieldMappingFactory));
+            _continentFieldMappingFactory = continentFieldMappingFactory ?? throw new ArgumentNullException(nameof(continentFieldMappingFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _fieldMappingFactoryById = new Dictionary<FieldMappingFieldId, IFieldMappingCreatorFactory>
@@ -82,7 +89,9 @@ namespace SOS.Import.Factories
                 {FieldMappingFieldId.Substrate, _substrateFieldMappingFactory},
                 {FieldMappingFieldId.ValidationStatus, _validationStatusFieldMappingFactory},
                 {FieldMappingFieldId.Organization, _organizationFieldMappingFactory},
-                {FieldMappingFieldId.Unit, _unitFieldMappingFactory}
+                {FieldMappingFieldId.Unit, _unitFieldMappingFactory},
+                {FieldMappingFieldId.BasisOfRecord, _basisOfRecordFieldMappingFactory},
+                {FieldMappingFieldId.Continent, _continentFieldMappingFactory}
             };
 
         }
@@ -162,6 +171,8 @@ namespace SOS.Import.Factories
                 case FieldMappingFieldId.ValidationStatus:
                 case FieldMappingFieldId.Organization:
                 case FieldMappingFieldId.Unit:
+                case FieldMappingFieldId.BasisOfRecord:
+                case FieldMappingFieldId.Continent:
                     var fieldMappingFactory = _fieldMappingFactoryById[fieldMappingFieldId];
                     return await fieldMappingFactory.CreateFieldMappingAsync();
 

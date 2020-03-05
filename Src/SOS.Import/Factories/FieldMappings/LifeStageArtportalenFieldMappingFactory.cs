@@ -19,10 +19,10 @@ namespace SOS.Import.Factories.FieldMappings
     /// <summary>
     /// Class for creating life stage field mapping.
     /// </summary>
-    public class LifeStageFieldMappingFactory : FieldMappingFactoryBase, ILifeStageFieldMappingFactory
+    public class LifeStageArtportalenFieldMappingFactory : ArtportalenFieldMappingFactoryBase, ILifeStageFieldMappingFactory
     {
         private readonly IMetadataRepository _metadataRepository;
-        private readonly ILogger<LifeStageFieldMappingFactory> _logger;
+        private readonly ILogger<LifeStageArtportalenFieldMappingFactory> _logger;
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.LifeStage;
         protected override bool Localized => true;
 
@@ -31,9 +31,9 @@ namespace SOS.Import.Factories.FieldMappings
         /// </summary>
         /// <param name="metadataRepository"></param>
         /// <param name="logger"></param>
-        public LifeStageFieldMappingFactory(
+        public LifeStageArtportalenFieldMappingFactory(
             IMetadataRepository metadataRepository,
-            ILogger<LifeStageFieldMappingFactory> logger)
+            ILogger<LifeStageArtportalenFieldMappingFactory> logger)
         {
             _metadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

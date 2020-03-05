@@ -1,28 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using SOS.Import.Entities;
 using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
-using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Import.Factories.FieldMappings
 {
     /// <summary>
-    /// Class for creating biotope field mapping.
+    /// Class for creating verification status field mapping.
     /// </summary>
-    public class BiotopeFieldMappingFactory : FieldMappingFactoryBase, Interfaces.IBiotopeFieldMappingFactory
+    public class ValidationStatusArtportalenFieldMappingFactory : ArtportalenFieldMappingFactoryBase, Interfaces.IValidationStatusFieldMappingFactory
     {
         private readonly IMetadataRepository _artportalenMetadataRepository;
-        private readonly ILogger<BiotopeFieldMappingFactory> _logger;
-        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Biotope;
+        private readonly ILogger<ValidationStatusArtportalenFieldMappingFactory> _logger;
+        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.ValidationStatus;
         protected override bool Localized => true;
 
         /// <summary>
@@ -30,9 +25,9 @@ namespace SOS.Import.Factories.FieldMappings
         /// </summary>
         /// <param name="artportalenMetadataRepository"></param>
         /// <param name="logger"></param>
-        public BiotopeFieldMappingFactory(
+        public ValidationStatusArtportalenFieldMappingFactory(
             IMetadataRepository artportalenMetadataRepository,
-            ILogger<BiotopeFieldMappingFactory> logger)
+            ILogger<ValidationStatusArtportalenFieldMappingFactory> logger)
         {
             _artportalenMetadataRepository = artportalenMetadataRepository ?? throw new ArgumentNullException(nameof(artportalenMetadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -40,8 +35,8 @@ namespace SOS.Import.Factories.FieldMappings
 
         protected override async Task<ICollection<FieldMappingValue>> GetFieldMappingValues()
         {
-            var biotopes = await _artportalenMetadataRepository.GetBiotopesAsync();
-            var fieldMappingValues = ConvertToLocalizedFieldMappingValues(biotopes.ToArray());
+            var validationStatusList = await _artportalenMetadataRepository.GetValidationStatusAsync();
+            var fieldMappingValues = base.ConvertToLocalizedFieldMappingValues(validationStatusList.ToArray());
             return fieldMappingValues;
         }
     }

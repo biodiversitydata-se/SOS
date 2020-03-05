@@ -16,6 +16,8 @@
         Substrate = 8,
         ValidationStatus = 9,
         Organization = 10,
-        Unit = 11
+        Unit = 11,
+        BasisOfRecord = 12,
+        Continent = 13
     }
 }
