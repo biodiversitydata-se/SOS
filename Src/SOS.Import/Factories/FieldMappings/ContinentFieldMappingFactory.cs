@@ -13,7 +13,7 @@ namespace SOS.Import.Factories.FieldMappings
     /// <summary>
     /// Class for creating Continent field mapping.
     /// </summary>
-    public class ContinentFieldMappingFactory : DwcFieldMappingFactoryBase, Interfaces.IContinentFieldMappingFactory
+    public class ContinentFieldMappingFactory : DwcFieldMappingFactoryBase
     {
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Continent;
         protected override bool Localized => false;

@@ -15,7 +15,7 @@ namespace SOS.Import.Factories.FieldMappings
     /// <summary>
     /// Class for creating geographical region field mappings.
     /// </summary>
-    public class GeoRegionFieldMappingFactory : Interfaces.IGeoRegionFieldMappingFactory
+    public class GeoRegionFieldMappingFactory
     {
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
         private readonly ILogger<GeoRegionFieldMappingFactory> _logger;

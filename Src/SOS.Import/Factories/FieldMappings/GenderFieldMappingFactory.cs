@@ -23,10 +23,10 @@ namespace SOS.Import.Factories.FieldMappings
     /// <summary>
     /// Class for creating Gender field mapping.
     /// </summary>
-    public class GenderArtportalenFieldMappingFactory : ArtportalenFieldMappingFactoryBase, Interfaces.IGenderFieldMappingFactory
+    public class GenderFieldMappingFactory : ArtportalenFieldMappingFactoryBase
     {
         private readonly IMetadataRepository _artportalenMetadataRepository;
-        private readonly ILogger<GenderArtportalenFieldMappingFactory> _logger;
+        private readonly ILogger<GenderFieldMappingFactory> _logger;
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Gender;
         protected override bool Localized => true;
 
@@ -35,9 +35,9 @@ namespace SOS.Import.Factories.FieldMappings
         /// </summary>
         /// <param name="metadataRepository"></param>
         /// <param name="logger"></param>
-        public GenderArtportalenFieldMappingFactory(
+        public GenderFieldMappingFactory(
             IMetadataRepository metadataRepository,
-            ILogger<GenderArtportalenFieldMappingFactory> logger)
+            ILogger<GenderFieldMappingFactory> logger)
         {
             _artportalenMetadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

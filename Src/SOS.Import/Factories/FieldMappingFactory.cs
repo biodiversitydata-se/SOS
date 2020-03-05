@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProjNet.CoordinateSystems;
+using SOS.Import.Factories.FieldMappings;
 using SOS.Import.Factories.FieldMappings.Interfaces;
 using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;
 using SOS.Lib.Enums;
@@ -22,17 +23,17 @@ namespace SOS.Import.Factories
     public class FieldMappingFactory : Interfaces.IFieldMappingFactory { 
 
         private readonly IFieldMappingRepository _fieldMappingRepository;
-        private readonly IGeoRegionFieldMappingFactory _geoRegionFieldMappingFactory;
-        private readonly IActivityFieldMappingFactory _activityFieldMappingFactory;
-        private readonly IGenderFieldMappingFactory _genderFieldMappingFactory;
-        private readonly ILifeStageFieldMappingFactory _lifeStageFieldMappingFactory;
-        private readonly IBiotopeFieldMappingFactory _biotopeFieldMappingFactory;
-        private readonly ISubstrateFieldMappingFactory _substrateFieldMappingFactory;
-        private readonly IValidationStatusFieldMappingFactory _validationStatusFieldMappingFactory;
-        private readonly IOrganizationFieldMappingFactory _organizationFieldMappingFactory;
-        private readonly IUnitFieldMappingFactory _unitFieldMappingFactory;
-        private readonly IBasisOfRecordFieldMappingFactory _basisOfRecordFieldMappingFactory;
-        private readonly IContinentFieldMappingFactory _continentFieldMappingFactory;
+        private readonly GeoRegionFieldMappingFactory _geoRegionFieldMappingFactory;
+        private readonly ActivityFieldMappingFactory _activityFieldMappingFactory;
+        private readonly GenderFieldMappingFactory _genderFieldMappingFactory;
+        private readonly LifeStageFieldMappingFactory _lifeStageFieldMappingFactory;
+        private readonly BiotopeFieldMappingFactory _biotopeFieldMappingFactory;
+        private readonly SubstrateFieldMappingFactory _substrateFieldMappingFactory;
+        private readonly ValidationStatusFieldMappingFactory _validationStatusFieldMappingFactory;
+        private readonly OrganizationFieldMappingFactory _organizationFieldMappingFactory;
+        private readonly UnitFieldMappingFactory _unitFieldMappingFactory;
+        private readonly BasisOfRecordFieldMappingFactory _basisOfRecordFieldMappingFactory;
+        private readonly ContinentFieldMappingFactory _continentFieldMappingFactory;
         private readonly ILogger<FieldMappingFactory> _logger;
         private readonly Dictionary<FieldMappingFieldId, IFieldMappingCreatorFactory> _fieldMappingFactoryById;
 
@@ -46,6 +47,7 @@ namespace SOS.Import.Factories
         /// <param name="organizationFieldMappingFactory"></param>
         /// <param name="unitFieldMappingFactory"></param>
         /// <param name="basisOfRecordFieldMappingFactory"></param>
+        /// <param name="continentFieldMappingFactory"></param>
         /// <param name="logger"></param>
         /// <param name="geoRegionFieldMappingFactory"></param>
         /// <param name="activityFieldMappingFactory"></param>
@@ -53,17 +55,17 @@ namespace SOS.Import.Factories
         /// <param name="substrateFieldMappingFactory"></param>
         public FieldMappingFactory(
             IFieldMappingRepository fieldMappingRepository,
-            IGeoRegionFieldMappingFactory geoRegionFieldMappingFactory,
-            IActivityFieldMappingFactory activityFieldMappingFactory,
-            IGenderFieldMappingFactory genderFieldMappingFactory,
-            ILifeStageFieldMappingFactory lifeStageFieldMappingFactory,
-            IBiotopeFieldMappingFactory biotopeFieldMappingFactory,
-            ISubstrateFieldMappingFactory substrateFieldMappingFactory,
-            IValidationStatusFieldMappingFactory validationStatusFieldMappingFactory,
-            IOrganizationFieldMappingFactory organizationFieldMappingFactory,
-            IUnitFieldMappingFactory unitFieldMappingFactory,
-            IBasisOfRecordFieldMappingFactory basisOfRecordFieldMappingFactory,
-            IContinentFieldMappingFactory continentFieldMappingFactory,
+            GeoRegionFieldMappingFactory geoRegionFieldMappingFactory,
+            ActivityFieldMappingFactory activityFieldMappingFactory,
+            GenderFieldMappingFactory genderFieldMappingFactory,
+            LifeStageFieldMappingFactory lifeStageFieldMappingFactory,
+            BiotopeFieldMappingFactory biotopeFieldMappingFactory,
+            SubstrateFieldMappingFactory substrateFieldMappingFactory,
+            ValidationStatusFieldMappingFactory validationStatusFieldMappingFactory,
+            OrganizationFieldMappingFactory organizationFieldMappingFactory,
+            UnitFieldMappingFactory unitFieldMappingFactory,
+            BasisOfRecordFieldMappingFactory basisOfRecordFieldMappingFactory,
+            ContinentFieldMappingFactory continentFieldMappingFactory,
             ILogger<FieldMappingFactory> logger)
         {
             _fieldMappingRepository = fieldMappingRepository ?? throw new ArgumentNullException(nameof(fieldMappingRepository));

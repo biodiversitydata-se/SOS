@@ -13,7 +13,7 @@ namespace SOS.Import.Factories.FieldMappings
     /// <summary>
     /// Class for creating BasisOfRecord field mapping.
     /// </summary>
-    public class BasisOfRecordFieldMappingFactory : DwcFieldMappingFactoryBase, Interfaces.IBasisOfRecordFieldMappingFactory
+    public class BasisOfRecordFieldMappingFactory : DwcFieldMappingFactoryBase
     {
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.BasisOfRecord;
         protected override bool Localized => false;

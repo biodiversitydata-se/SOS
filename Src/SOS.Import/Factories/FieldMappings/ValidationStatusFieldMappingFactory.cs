@@ -13,30 +13,25 @@ namespace SOS.Import.Factories.FieldMappings
     /// <summary>
     /// Class for creating verification status field mapping.
     /// </summary>
-    public class OrganizationArtportalenFieldMappingFactory : ArtportalenFieldMappingFactoryBase, Interfaces.IOrganizationFieldMappingFactory
+    public class ValidationStatusFieldMappingFactory : ArtportalenFieldMappingFactoryBase
     {
         private readonly IMetadataRepository _artportalenMetadataRepository;
-        private readonly ILogger<OrganizationArtportalenFieldMappingFactory> _logger;
-        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Organization;
-        protected override bool Localized => false;
+        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.ValidationStatus;
+        protected override bool Localized => true;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="artportalenMetadataRepository"></param>
-        /// <param name="logger"></param>
-        public OrganizationArtportalenFieldMappingFactory(
-            IMetadataRepository artportalenMetadataRepository,
-            ILogger<OrganizationArtportalenFieldMappingFactory> logger)
+        public ValidationStatusFieldMappingFactory(IMetadataRepository artportalenMetadataRepository)
         {
             _artportalenMetadataRepository = artportalenMetadataRepository ?? throw new ArgumentNullException(nameof(artportalenMetadataRepository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         protected override async Task<ICollection<FieldMappingValue>> GetFieldMappingValues()
         {
-            var organizations = await _artportalenMetadataRepository.GetOrganizationsAsync();
-            var fieldMappingValues = base.ConvertToNonLocalizedFieldMappingValues(organizations.ToArray());
+            var validationStatusList = await _artportalenMetadataRepository.GetValidationStatusAsync();
+            var fieldMappingValues = base.ConvertToLocalizedFieldMappingValues(validationStatusList.ToArray());
             return fieldMappingValues;
         }
     }

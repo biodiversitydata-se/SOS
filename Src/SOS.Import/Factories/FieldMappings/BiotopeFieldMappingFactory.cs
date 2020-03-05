@@ -15,24 +15,24 @@ using SOS.Lib.Models.Shared;
 
 namespace SOS.Import.Factories.FieldMappings
 {
-
     /// <summary>
-    /// Class for creating Activity field mapping.
+    /// Class for creating biotope field mapping.
     /// </summary>
-    public class ActivityArtportalenFieldMappingFactory : ArtportalenFieldMappingFactoryBase, Interfaces.IActivityFieldMappingFactory
+    public class BiotopeFieldMappingFactory : ArtportalenFieldMappingFactoryBase
     {
         private readonly IMetadataRepository _artportalenMetadataRepository;
-        private readonly ILogger<ActivityArtportalenFieldMappingFactory> _logger;
-        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Activity;
+        private readonly ILogger<BiotopeFieldMappingFactory> _logger;
+        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Biotope;
         protected override bool Localized => true;
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="artportalenMetadataRepository"></param>
         /// <param name="logger"></param>
-        public ActivityArtportalenFieldMappingFactory(
+        public BiotopeFieldMappingFactory(
             IMetadataRepository artportalenMetadataRepository,
-            ILogger<ActivityArtportalenFieldMappingFactory> logger)
+            ILogger<BiotopeFieldMappingFactory> logger)
         {
             _artportalenMetadataRepository = artportalenMetadataRepository ?? throw new ArgumentNullException(nameof(artportalenMetadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -40,8 +40,8 @@ namespace SOS.Import.Factories.FieldMappings
 
         protected override async Task<ICollection<FieldMappingValue>> GetFieldMappingValues()
         {
-            IEnumerable<MetadataWithCategoryEntity> activities = await _artportalenMetadataRepository.GetActivitiesAsync();
-            var fieldMappingValues = ConvertToFieldMappingValuesWithCategory(activities.ToArray());
+            var biotopes = await _artportalenMetadataRepository.GetBiotopesAsync();
+            var fieldMappingValues = ConvertToLocalizedFieldMappingValues(biotopes.ToArray());
             return fieldMappingValues;
         }
     }
