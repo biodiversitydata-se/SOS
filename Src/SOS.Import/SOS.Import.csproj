@@ -40,7 +40,13 @@
     <None Update="Resources\FieldMappings\ActivityFieldMapping.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\FieldMappings\BasisOfRecordFieldMapping.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\FieldMappings\BiotopeFieldMapping.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\FieldMappings\ContinentFieldMapping.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\FieldMappings\CountyFieldMapping.json">

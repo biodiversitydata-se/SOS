@@ -19,7 +19,7 @@ namespace SOS.Import.Factories.FieldMappings
         protected override bool Localized => false;
         protected override ICollection<FieldMappingValue> GetFieldMappingValues()
         {
-            // Vocabulary from https://dwc.tdwg.org/terms/#dwc:basisOfRecord
+            // Vocabulary from https://dwc.tdwg.org/terms/#dwc:basisOfRecord and GBIF website.
             var fieldMappingValues = new List<FieldMappingValue>
             {
                 new FieldMappingValue {Id = 0, Name = "HumanObservation"},
@@ -31,7 +31,8 @@ namespace SOS.Import.Factories.FieldMappings
                 new FieldMappingValue {Id = 6, Name = "MachineObservation"},
                 new FieldMappingValue {Id = 7, Name = "Taxon"},
                 new FieldMappingValue {Id = 8, Name = "Occurrence"},
-                new FieldMappingValue {Id = 9, Name = "Literature"}
+                new FieldMappingValue {Id = 9, Name = "Literature"},
+                new FieldMappingValue {Id = 10, Name = "Unknown"}
             };
 
             return fieldMappingValues;

@@ -84,7 +84,6 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SpeciesPortalSightingFactory>().As<ISpeciesPortalSightingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingFactory>().As<IFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<GeoRegionFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ActivityFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<GenderFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<LifeStageFieldMappingFactory>().InstancePerLifetimeScope();
@@ -95,6 +94,10 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<UnitFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<BasisOfRecordFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ContinentFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<CountyFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<MunicipalityFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ParishFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ProvinceFieldMappingFactory>().InstancePerLifetimeScope();
 
 
 

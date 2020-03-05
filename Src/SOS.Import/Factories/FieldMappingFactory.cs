@@ -23,17 +23,6 @@ namespace SOS.Import.Factories
     public class FieldMappingFactory : Interfaces.IFieldMappingFactory { 
 
         private readonly IFieldMappingRepository _fieldMappingRepository;
-        private readonly GeoRegionFieldMappingFactory _geoRegionFieldMappingFactory;
-        private readonly ActivityFieldMappingFactory _activityFieldMappingFactory;
-        private readonly GenderFieldMappingFactory _genderFieldMappingFactory;
-        private readonly LifeStageFieldMappingFactory _lifeStageFieldMappingFactory;
-        private readonly BiotopeFieldMappingFactory _biotopeFieldMappingFactory;
-        private readonly SubstrateFieldMappingFactory _substrateFieldMappingFactory;
-        private readonly ValidationStatusFieldMappingFactory _validationStatusFieldMappingFactory;
-        private readonly OrganizationFieldMappingFactory _organizationFieldMappingFactory;
-        private readonly UnitFieldMappingFactory _unitFieldMappingFactory;
-        private readonly BasisOfRecordFieldMappingFactory _basisOfRecordFieldMappingFactory;
-        private readonly ContinentFieldMappingFactory _continentFieldMappingFactory;
         private readonly ILogger<FieldMappingFactory> _logger;
         private readonly Dictionary<FieldMappingFieldId, IFieldMappingCreatorFactory> _fieldMappingFactoryById;
 
@@ -48,14 +37,16 @@ namespace SOS.Import.Factories
         /// <param name="unitFieldMappingFactory"></param>
         /// <param name="basisOfRecordFieldMappingFactory"></param>
         /// <param name="continentFieldMappingFactory"></param>
+        /// <param name="parishFieldMappingFactory"></param>
         /// <param name="logger"></param>
-        /// <param name="geoRegionFieldMappingFactory"></param>
         /// <param name="activityFieldMappingFactory"></param>
         /// <param name="biotopeFieldMappingFactory"></param>
         /// <param name="substrateFieldMappingFactory"></param>
+        /// <param name="countyFieldMappingFactory"></param>
+        /// <param name="municipalityFieldMappingFactory"></param>
+        /// <param name="provinceFieldMappingFactory"></param>
         public FieldMappingFactory(
             IFieldMappingRepository fieldMappingRepository,
-            GeoRegionFieldMappingFactory geoRegionFieldMappingFactory,
             ActivityFieldMappingFactory activityFieldMappingFactory,
             GenderFieldMappingFactory genderFieldMappingFactory,
             LifeStageFieldMappingFactory lifeStageFieldMappingFactory,
@@ -66,36 +57,32 @@ namespace SOS.Import.Factories
             UnitFieldMappingFactory unitFieldMappingFactory,
             BasisOfRecordFieldMappingFactory basisOfRecordFieldMappingFactory,
             ContinentFieldMappingFactory continentFieldMappingFactory,
+            CountyFieldMappingFactory countyFieldMappingFactory,
+            MunicipalityFieldMappingFactory municipalityFieldMappingFactory,
+            ProvinceFieldMappingFactory provinceFieldMappingFactory,
+            ParishFieldMappingFactory parishFieldMappingFactory,
             ILogger<FieldMappingFactory> logger)
         {
             _fieldMappingRepository = fieldMappingRepository ?? throw new ArgumentNullException(nameof(fieldMappingRepository));
-            _geoRegionFieldMappingFactory = geoRegionFieldMappingFactory ?? throw new ArgumentNullException(nameof(geoRegionFieldMappingFactory));
-            _activityFieldMappingFactory = activityFieldMappingFactory ?? throw new ArgumentNullException(nameof(activityFieldMappingFactory));
-            _genderFieldMappingFactory = genderFieldMappingFactory ?? throw new ArgumentNullException(nameof(genderFieldMappingFactory));
-            _lifeStageFieldMappingFactory = lifeStageFieldMappingFactory ?? throw new ArgumentNullException(nameof(lifeStageFieldMappingFactory));
-            _biotopeFieldMappingFactory = biotopeFieldMappingFactory ?? throw new ArgumentNullException(nameof(biotopeFieldMappingFactory));
-            _substrateFieldMappingFactory = substrateFieldMappingFactory ?? throw new ArgumentNullException(nameof(substrateFieldMappingFactory));
-            _validationStatusFieldMappingFactory = validationStatusFieldMappingFactory ?? throw new ArgumentNullException(nameof(validationStatusFieldMappingFactory));
-            _organizationFieldMappingFactory = organizationFieldMappingFactory ?? throw new ArgumentNullException(nameof(organizationFieldMappingFactory));
-            _unitFieldMappingFactory = unitFieldMappingFactory ?? throw new ArgumentNullException(nameof(unitFieldMappingFactory));
-            _basisOfRecordFieldMappingFactory = basisOfRecordFieldMappingFactory ?? throw new ArgumentNullException(nameof(basisOfRecordFieldMappingFactory));
-            _continentFieldMappingFactory = continentFieldMappingFactory ?? throw new ArgumentNullException(nameof(continentFieldMappingFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _fieldMappingFactoryById = new Dictionary<FieldMappingFieldId, IFieldMappingCreatorFactory>
             {
-                {FieldMappingFieldId.LifeStage, _lifeStageFieldMappingFactory},
-                {FieldMappingFieldId.Activity, _activityFieldMappingFactory},
-                {FieldMappingFieldId.Gender, _genderFieldMappingFactory},
-                {FieldMappingFieldId.Biotope, _biotopeFieldMappingFactory},
-                {FieldMappingFieldId.Substrate, _substrateFieldMappingFactory},
-                {FieldMappingFieldId.ValidationStatus, _validationStatusFieldMappingFactory},
-                {FieldMappingFieldId.Organization, _organizationFieldMappingFactory},
-                {FieldMappingFieldId.Unit, _unitFieldMappingFactory},
-                {FieldMappingFieldId.BasisOfRecord, _basisOfRecordFieldMappingFactory},
-                {FieldMappingFieldId.Continent, _continentFieldMappingFactory}
+                {FieldMappingFieldId.LifeStage, lifeStageFieldMappingFactory},
+                {FieldMappingFieldId.Activity, activityFieldMappingFactory},
+                {FieldMappingFieldId.Gender, genderFieldMappingFactory},
+                {FieldMappingFieldId.Biotope, biotopeFieldMappingFactory},
+                {FieldMappingFieldId.Substrate, substrateFieldMappingFactory},
+                {FieldMappingFieldId.ValidationStatus, validationStatusFieldMappingFactory},
+                {FieldMappingFieldId.Organization, organizationFieldMappingFactory},
+                {FieldMappingFieldId.Unit, unitFieldMappingFactory},
+                {FieldMappingFieldId.BasisOfRecord, basisOfRecordFieldMappingFactory},
+                {FieldMappingFieldId.Continent, continentFieldMappingFactory},
+                {FieldMappingFieldId.County, countyFieldMappingFactory},
+                {FieldMappingFieldId.Municipality, municipalityFieldMappingFactory},
+                {FieldMappingFieldId.Province, provinceFieldMappingFactory},
+                {FieldMappingFieldId.Parish, parishFieldMappingFactory}
             };
-
         }
 
         /// <summary>
@@ -163,32 +150,8 @@ namespace SOS.Import.Factories
 
         private async Task<FieldMapping> CreateFieldMappingAsync(FieldMappingFieldId fieldMappingFieldId)
         {
-            switch (fieldMappingFieldId)
-            {
-                case FieldMappingFieldId.Activity:
-                case FieldMappingFieldId.LifeStage:
-                case FieldMappingFieldId.Gender:
-                case FieldMappingFieldId.Biotope:
-                case FieldMappingFieldId.Substrate:
-                case FieldMappingFieldId.ValidationStatus:
-                case FieldMappingFieldId.Organization:
-                case FieldMappingFieldId.Unit:
-                case FieldMappingFieldId.BasisOfRecord:
-                case FieldMappingFieldId.Continent:
-                    var fieldMappingFactory = _fieldMappingFactoryById[fieldMappingFieldId];
-                    return await fieldMappingFactory.CreateFieldMappingAsync();
-
-                case FieldMappingFieldId.County:
-                case FieldMappingFieldId.Municipality:
-                case FieldMappingFieldId.Province:
-                case FieldMappingFieldId.Parish:
-                    var fieldMappingDictionary = await _geoRegionFieldMappingFactory.CreateFieldMappingsAsync();
-                    return fieldMappingDictionary[fieldMappingFieldId];
-
-                default:
-                    throw new ArgumentException(
-                        $"{MethodBase.GetCurrentMethod().Name}() does not support the value {fieldMappingFieldId}", nameof(fieldMappingFieldId));
-            }
+            var fieldMappingFactory = _fieldMappingFactoryById[fieldMappingFieldId];
+            return await fieldMappingFactory.CreateFieldMappingAsync();
         }
 
         private FieldMapping CreateFieldMappingFromJsonFile(string filename)

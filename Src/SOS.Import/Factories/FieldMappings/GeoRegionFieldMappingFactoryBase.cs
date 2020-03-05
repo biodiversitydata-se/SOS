@@ -15,43 +15,30 @@ namespace SOS.Import.Factories.FieldMappings
     /// <summary>
     /// Class for creating geographical region field mappings.
     /// </summary>
-    public class GeoRegionFieldMappingFactory
+    public abstract class GeoRegionFieldMappingFactoryBase
     {
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
-        private readonly ILogger<GeoRegionFieldMappingFactory> _logger;
+        private readonly ILogger<GeoRegionFieldMappingFactoryBase> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="areaRepository"></param>
         /// <param name="areaVerbatimRepository"></param>
         /// <param name="logger"></param>
-        public GeoRegionFieldMappingFactory(
-            IAreaRepository areaRepository,
+        protected GeoRegionFieldMappingFactoryBase(
             IAreaVerbatimRepository areaVerbatimRepository,
-            ILogger<GeoRegionFieldMappingFactory> logger)
+            ILogger<GeoRegionFieldMappingFactoryBase> logger)
         {
             _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
-        public async Task<Dictionary<FieldMappingFieldId, FieldMapping>> CreateFieldMappingsAsync()
+
+        protected async Task<FieldMapping> CreateFieldMappingAsync(FieldMappingFieldId fieldMappingFieldId, AreaType areaType)
         {
             var areas = (await _areaVerbatimRepository.GetAllAsync()).ToArray();
-            var countyFieldMapping = CreateFieldMapping(areas, FieldMappingFieldId.County, AreaType.County);
-            var municipalityFieldMapping = CreateFieldMapping(areas, FieldMappingFieldId.Municipality, AreaType.Municipality);
-            var provinceFieldMapping = CreateFieldMapping(areas, FieldMappingFieldId.Province, AreaType.Province);
-            var parishFieldMapping = CreateFieldMapping(areas, FieldMappingFieldId.Parish, AreaType.Parish);
-            var dictionary = new Dictionary<FieldMappingFieldId, FieldMapping>
-            {
-                { FieldMappingFieldId.County, countyFieldMapping },
-                { FieldMappingFieldId.Municipality, municipalityFieldMapping },
-                { FieldMappingFieldId.Province, provinceFieldMapping },
-                { FieldMappingFieldId.Parish, parishFieldMapping }
-            };
-
-            return dictionary;
+            var fieldMapping = CreateFieldMapping(areas, fieldMappingFieldId, areaType);
+            return fieldMapping;
         }
 
         private FieldMapping CreateFieldMapping(ICollection<Area> areas, FieldMappingFieldId fieldMappingFieldId, AreaType areaType)
