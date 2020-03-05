@@ -21,5 +21,11 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// <param name="fieldMappingFieldId"></param>
         /// <returns></returns>
         Task<IActionResult> CreateFieldMappingFileAsync(FieldMappingFieldId fieldMappingFieldId);
+
+        /// <summary>
+        /// Get diff between generated, verbatim and processed field mappings.
+        /// </summary>
+        /// <returns></returns>
+        Task<IActionResult> GetDiffZipFile();
     }
 }

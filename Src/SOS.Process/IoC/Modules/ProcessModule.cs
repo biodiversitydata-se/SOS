@@ -38,6 +38,7 @@ namespace SOS.Process.IoC.Modules
             // Helpers
             builder.RegisterType<AreaNameMapper>().As<IAreaNameMapper>().SingleInstance();
             builder.RegisterType<AreaHelper>().As<IAreaHelper>().SingleInstance();
+            builder.RegisterType<FieldMappingDiffHelper>().As<IFieldMappingDiffHelper>().SingleInstance();
 
             // Repositories source
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();

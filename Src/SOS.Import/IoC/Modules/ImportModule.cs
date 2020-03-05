@@ -84,13 +84,22 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SpeciesPortalSightingFactory>().As<ISpeciesPortalSightingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingFactory>().As<IFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<GeoRegionFieldMappingFactory>().As<IGeoRegionFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ActivityFieldMappingFactory>().As<IActivityFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<GenderFieldMappingFactory>().As<IGenderFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<LifeStageFieldMappingFactory>().As<ILifeStageFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<BiotopeFieldMappingFactory>().As<IBiotopeFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<SubstrateFieldMappingFactory>().As<ISubstrateFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ValidationStatusFieldMappingFactory>().As<IValidationStatusFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ActivityFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<GenderFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<LifeStageFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<BiotopeFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<SubstrateFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ValidationStatusFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<OrganizationFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<UnitFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<BasisOfRecordFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ContinentFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<CountyFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<MunicipalityFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ParishFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ProvinceFieldMappingFactory>().InstancePerLifetimeScope();
+
+
 
             // Add Services
             builder.RegisterType<ClamObservationService>().As<IClamObservationService>().InstancePerLifetimeScope();

@@ -1,0 +1,3963 @@
+{
+  "Id": 10,
+  "Name": "Organization",
+  "Localized": false,
+  "Values": [
+    {
+      "Id": 165,
+      "Name": "ArtDatabanken",
+      "Localized": false
+    },
+    {
+      "Id": 166,
+      "Name": "Nationella rapportkommittén",
+      "Localized": false
+    },
+    {
+      "Id": 167,
+      "Name": "Raritetskommittén ",
+      "Localized": false
+    },
+    {
+      "Id": 168,
+      "Name": "Blekinge rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 169,
+      "Name": "Bohuslän rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 170,
+      "Name": "Dalarnas rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 171,
+      "Name": "Dalslands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 172,
+      "Name": "Lokala rapportkommittén Vänersborg",
+      "Localized": false
+    },
+    {
+      "Id": 173,
+      "Name": "Sveriges ornitologiska förening (SOF)",
+      "Localized": false
+    },
+    {
+      "Id": 174,
+      "Name": "Lokala rapportkommittén Lerum",
+      "Localized": false
+    },
+    {
+      "Id": 175,
+      "Name": "Lokala rapportkommittén Skara",
+      "Localized": false
+    },
+    {
+      "Id": 176,
+      "Name": "Lokala rapportkommittén Svenljunga",
+      "Localized": false
+    },
+    {
+      "Id": 177,
+      "Name": "Lokala rapportkommittén Tidaholm",
+      "Localized": false
+    },
+    {
+      "Id": 178,
+      "Name": "Lokala rapportkommittén Vara",
+      "Localized": false
+    },
+    {
+      "Id": 179,
+      "Name": "Lokala rapportkommittén Vbgviken",
+      "Localized": false
+    },
+    {
+      "Id": 180,
+      "Name": "Lokala rapportkommittén Essunga",
+      "Localized": false
+    },
+    {
+      "Id": 181,
+      "Name": "Lokala rapportkommittén Gullspång",
+      "Localized": false
+    },
+    {
+      "Id": 182,
+      "Name": "Lokala rapportkommittén Götene",
+      "Localized": false
+    },
+    {
+      "Id": 183,
+      "Name": "Lokala rapportkommittén Habo-Mullsjö",
+      "Localized": false
+    },
+    {
+      "Id": 184,
+      "Name": "Lokala rapportkommittén Herrljunga",
+      "Localized": false
+    },
+    {
+      "Id": 185,
+      "Name": "Lokala rapportkommittén Hullsjön",
+      "Localized": false
+    },
+    {
+      "Id": 186,
+      "Name": "Östergötlands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 187,
+      "Name": "Östra Smålands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 188,
+      "Name": "Lokala rapportkommittén Ale",
+      "Localized": false
+    },
+    {
+      "Id": 189,
+      "Name": "Lokala rapportkommittén Alingsås",
+      "Localized": false
+    },
+    {
+      "Id": 190,
+      "Name": "Lokala rapportkommittén Bollebygd",
+      "Localized": false
+    },
+    {
+      "Id": 191,
+      "Name": "Lokala rapportkommittén Dettern",
+      "Localized": false
+    },
+    {
+      "Id": 192,
+      "Name": "Värmlands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 193,
+      "Name": "Västerbottens rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 194,
+      "Name": "Västergötlands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 195,
+      "Name": "Västmanlands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 196,
+      "Name": "Ångermanlands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 197,
+      "Name": "Ölands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 198,
+      "Name": "Närkes rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 199,
+      "Name": "Skånes rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 200,
+      "Name": "Stockholms rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 201,
+      "Name": "Södermanlands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 202,
+      "Name": "Södra lapplands rapporteringskommitté",
+      "Localized": false
+    },
+    {
+      "Id": 203,
+      "Name": "Upplands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 204,
+      "Name": "Jämtlands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 205,
+      "Name": "Jönköpings rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 206,
+      "Name": "Kronobergs rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 207,
+      "Name": "Medelpads rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 208,
+      "Name": "Norra lapplands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 209,
+      "Name": "Norrbottens rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 210,
+      "Name": "Gotlands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 211,
+      "Name": "Gästriklands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 212,
+      "Name": "Göteborgs rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 213,
+      "Name": "Hallands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 214,
+      "Name": "Hälsinglands rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 215,
+      "Name": "Härjedalens rapportkommitté",
+      "Localized": false
+    },
+    {
+      "Id": 216,
+      "Name": "Länsstyrelsen Gävleborg",
+      "Localized": false
+    },
+    {
+      "Id": 217,
+      "Name": "Länsstyrelsen Halland",
+      "Localized": false
+    },
+    {
+      "Id": 218,
+      "Name": "Länsstyrelsen Södermanland",
+      "Localized": false
+    },
+    {
+      "Id": 219,
+      "Name": "Länsstyrelsen Uppsala",
+      "Localized": false
+    },
+    {
+      "Id": 220,
+      "Name": "Länsstyrelsen Blekinge",
+      "Localized": false
+    },
+    {
+      "Id": 221,
+      "Name": "Länsstyrelsen Gotland",
+      "Localized": false
+    },
+    {
+      "Id": 222,
+      "Name": "Länsstyrelsen Dalarna",
+      "Localized": false
+    },
+    {
+      "Id": 223,
+      "Name": "Länsstyrelsen Kronoberg",
+      "Localized": false
+    },
+    {
+      "Id": 224,
+      "Name": "Länsstyrelsen Norrbotten",
+      "Localized": false
+    },
+    {
+      "Id": 225,
+      "Name": "Länsstyrelsen Västerbotten",
+      "Localized": false
+    },
+    {
+      "Id": 226,
+      "Name": "Länsstyrelsen Västernorrland",
+      "Localized": false
+    },
+    {
+      "Id": 227,
+      "Name": "Länsstyrelsen Västmanland",
+      "Localized": false
+    },
+    {
+      "Id": 228,
+      "Name": "Länsstyrelsen Västra Götaland",
+      "Localized": false
+    },
+    {
+      "Id": 229,
+      "Name": "Länsstyrelsen Örebro",
+      "Localized": false
+    },
+    {
+      "Id": 230,
+      "Name": "Länsstyrelsen Östergötland",
+      "Localized": false
+    },
+    {
+      "Id": 231,
+      "Name": "Länsstyrelsen Jämtland",
+      "Localized": false
+    },
+    {
+      "Id": 232,
+      "Name": "Länsstyrelsen Jönköping",
+      "Localized": false
+    },
+    {
+      "Id": 233,
+      "Name": "Länsstyrelsen Kalmar",
+      "Localized": false
+    },
+    {
+      "Id": 234,
+      "Name": "Länsstyrelsen Skåne",
+      "Localized": false
+    },
+    {
+      "Id": 235,
+      "Name": "Länsstyrelsen Stockholm",
+      "Localized": false
+    },
+    {
+      "Id": 236,
+      "Name": "Länsstyrelsen Värmland",
+      "Localized": false
+    },
+    {
+      "Id": 237,
+      "Name": "Borgholms kommun",
+      "Localized": false
+    },
+    {
+      "Id": 238,
+      "Name": "Eskilstuna kommun",
+      "Localized": false
+    },
+    {
+      "Id": 239,
+      "Name": "Falkenbergs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 240,
+      "Name": "Falu kommun",
+      "Localized": false
+    },
+    {
+      "Id": 241,
+      "Name": "Gävle kommun",
+      "Localized": false
+    },
+    {
+      "Id": 242,
+      "Name": "Hagfors kommun",
+      "Localized": false
+    },
+    {
+      "Id": 243,
+      "Name": "Lycksele kommun",
+      "Localized": false
+    },
+    {
+      "Id": 244,
+      "Name": "Skurups kommun",
+      "Localized": false
+    },
+    {
+      "Id": 245,
+      "Name": "Lunds kommun",
+      "Localized": false
+    },
+    {
+      "Id": 246,
+      "Name": "Örebro kommun",
+      "Localized": false
+    },
+    {
+      "Id": 247,
+      "Name": "Partille kommun",
+      "Localized": false
+    },
+    {
+      "Id": 248,
+      "Name": "Gotlands region",
+      "Localized": false
+    },
+    {
+      "Id": 249,
+      "Name": "Halmstads kommun",
+      "Localized": false
+    },
+    {
+      "Id": 250,
+      "Name": "Lomma kommun",
+      "Localized": false
+    },
+    {
+      "Id": 251,
+      "Name": "Bräcke kommun",
+      "Localized": false
+    },
+    {
+      "Id": 252,
+      "Name": "Nyköpings kommun",
+      "Localized": false
+    },
+    {
+      "Id": 253,
+      "Name": "Eda kommun",
+      "Localized": false
+    },
+    {
+      "Id": 254,
+      "Name": "Säffle kommun",
+      "Localized": false
+    },
+    {
+      "Id": 255,
+      "Name": "Uppsala kommun",
+      "Localized": false
+    },
+    {
+      "Id": 256,
+      "Name": "Varbergs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 257,
+      "Name": "Svenljunga kommun",
+      "Localized": false
+    },
+    {
+      "Id": 258,
+      "Name": "Södertälje kommun",
+      "Localized": false
+    },
+    {
+      "Id": 259,
+      "Name": "Tyresö kommun",
+      "Localized": false
+    },
+    {
+      "Id": 260,
+      "Name": "Upplands-Bro kommun",
+      "Localized": false
+    },
+    {
+      "Id": 261,
+      "Name": "Göteborgs Stad",
+      "Localized": false
+    },
+    {
+      "Id": 262,
+      "Name": "Stockholms Stad",
+      "Localized": false
+    },
+    {
+      "Id": 263,
+      "Name": "Munkedals kommun",
+      "Localized": false
+    },
+    {
+      "Id": 264,
+      "Name": "Norrköpings kommun",
+      "Localized": false
+    },
+    {
+      "Id": 265,
+      "Name": "Norrtälje kommun",
+      "Localized": false
+    },
+    {
+      "Id": 266,
+      "Name": "Nybro kommun",
+      "Localized": false
+    },
+    {
+      "Id": 267,
+      "Name": "Nykvarn kommun",
+      "Localized": false
+    },
+    {
+      "Id": 268,
+      "Name": "Strängnäs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 269,
+      "Name": "Laxå kommun",
+      "Localized": false
+    },
+    {
+      "Id": 270,
+      "Name": "Lindesbergs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 271,
+      "Name": "Linköpings kommun",
+      "Localized": false
+    },
+    {
+      "Id": 272,
+      "Name": "Ludvika kommun",
+      "Localized": false
+    },
+    {
+      "Id": 273,
+      "Name": "Marks kommun",
+      "Localized": false
+    },
+    {
+      "Id": 274,
+      "Name": "Motala kommun",
+      "Localized": false
+    },
+    {
+      "Id": 275,
+      "Name": "Jönköpings kommun",
+      "Localized": false
+    },
+    {
+      "Id": 276,
+      "Name": "Kalix kommun",
+      "Localized": false
+    },
+    {
+      "Id": 277,
+      "Name": "Karlstads kommun",
+      "Localized": false
+    },
+    {
+      "Id": 278,
+      "Name": "Katrineholms kommun",
+      "Localized": false
+    },
+    {
+      "Id": 279,
+      "Name": "Kävlinge kommun",
+      "Localized": false
+    },
+    {
+      "Id": 280,
+      "Name": "Laholms kommun",
+      "Localized": false
+    },
+    {
+      "Id": 281,
+      "Name": "Haninge Kommun",
+      "Localized": false
+    },
+    {
+      "Id": 282,
+      "Name": "Huddinge kommun",
+      "Localized": false
+    },
+    {
+      "Id": 283,
+      "Name": "Hultsfred kommun",
+      "Localized": false
+    },
+    {
+      "Id": 284,
+      "Name": "Härryda kommun",
+      "Localized": false
+    },
+    {
+      "Id": 285,
+      "Name": "Höörs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 286,
+      "Name": "Järfälla kommun",
+      "Localized": false
+    },
+    {
+      "Id": 287,
+      "Name": "Norrtälje naturvårdsstiftelse",
+      "Localized": false
+    },
+    {
+      "Id": 288,
+      "Name": "Skogsstyrelsen Jönköping",
+      "Localized": false
+    },
+    {
+      "Id": 289,
+      "Name": "Skogsstyrelsen Kronoberg",
+      "Localized": false
+    },
+    {
+      "Id": 291,
+      "Name": "Sveaskog (Västerbotten)",
+      "Localized": false
+    },
+    {
+      "Id": 292,
+      "Name": "Calluna AB",
+      "Localized": false
+    },
+    {
+      "Id": 293,
+      "Name": "Medins Biologi AB",
+      "Localized": false
+    },
+    {
+      "Id": 294,
+      "Name": "Naturcentrum AB",
+      "Localized": false
+    },
+    {
+      "Id": 295,
+      "Name": "Pro Natura",
+      "Localized": false
+    },
+    {
+      "Id": 296,
+      "Name": "Regionmuseet Kristianstad",
+      "Localized": false
+    },
+    {
+      "Id": 297,
+      "Name": "Lund-Botaniska/Zoologiska museet",
+      "Localized": false
+    },
+    {
+      "Id": 298,
+      "Name": "Göteborgs naturhistoriska museum (GNM)",
+      "Localized": false
+    },
+    {
+      "Id": 299,
+      "Name": "Göteborg-Herbarium GB",
+      "Localized": false
+    },
+    {
+      "Id": 300,
+      "Name": "Stockholm-Naturhistoriska riksmuseet",
+      "Localized": false
+    },
+    {
+      "Id": 301,
+      "Name": "Uppsala-Evolutionsmuseet",
+      "Localized": false
+    },
+    {
+      "Id": 302,
+      "Name": "Köpenhamn",
+      "Localized": false
+    },
+    {
+      "Id": 303,
+      "Name": "Helsingfors",
+      "Localized": false
+    },
+    {
+      "Id": 304,
+      "Name": "Lycksele skogsmuseum",
+      "Localized": false
+    },
+    {
+      "Id": 305,
+      "Name": "Limnodata HB",
+      "Localized": false
+    },
+    {
+      "Id": 306,
+      "Name": "Uppsala-SLU",
+      "Localized": false
+    },
+    {
+      "Id": 307,
+      "Name": "Umeå-Herbarium UME",
+      "Localized": false
+    },
+    {
+      "Id": 308,
+      "Name": "Oskarshamn-Herbarium OHN",
+      "Localized": false
+    },
+    {
+      "Id": 309,
+      "Name": "Visby-Herbarium VI",
+      "Localized": false
+    },
+    {
+      "Id": 310,
+      "Name": "Örebro-Herbarium OREB",
+      "Localized": false
+    },
+    {
+      "Id": 311,
+      "Name": "Oslo",
+      "Localized": false
+    },
+    {
+      "Id": 312,
+      "Name": "Åtgärdsprogram för fjällgås",
+      "Localized": false
+    },
+    {
+      "Id": 313,
+      "Name": "Berguvsprojektet i Dalarnas län",
+      "Localized": false
+    },
+    {
+      "Id": 314,
+      "Name": "Berguvsprojektet i Stockholms län",
+      "Localized": false
+    },
+    {
+      "Id": 315,
+      "Name": "Duvhöksprojektet i Stockholms län",
+      "Localized": false
+    },
+    {
+      "Id": 316,
+      "Name": "Havsörnsprojektet i Gotlands Län",
+      "Localized": false
+    },
+    {
+      "Id": 317,
+      "Name": "Kungsörnsprojektet i Gotlands lan",
+      "Localized": false
+    },
+    {
+      "Id": 318,
+      "Name": "Kungsörnsprojketet i Uppsala län",
+      "Localized": false
+    },
+    {
+      "Id": 319,
+      "Name": "Projekt Vitryggig hackspett",
+      "Localized": false
+    },
+    {
+      "Id": 320,
+      "Name": "Projekt Ängshök",
+      "Localized": false
+    },
+    {
+      "Id": 321,
+      "Name": "Projekt Vitryggig hackspett (Västerbotten)",
+      "Localized": false
+    },
+    {
+      "Id": 322,
+      "Name": "Sparhöksprojktet (Stockholm)",
+      "Localized": false
+    },
+    {
+      "Id": 323,
+      "Name": "Kungsörnsprojektet i Västerbottens län",
+      "Localized": false
+    },
+    {
+      "Id": 324,
+      "Name": "Kungsörnsprojketet i Västmanlands län",
+      "Localized": false
+    },
+    {
+      "Id": 325,
+      "Name": "Projekt Jaktfalk",
+      "Localized": false
+    },
+    {
+      "Id": 326,
+      "Name": "Projekt Lom",
+      "Localized": false
+    },
+    {
+      "Id": 327,
+      "Name": "Projekt Skräntärna",
+      "Localized": false
+    },
+    {
+      "Id": 328,
+      "Name": "Projekt Tornuggla (Öland)",
+      "Localized": false
+    },
+    {
+      "Id": 329,
+      "Name": "Torsås kommun",
+      "Localized": false
+    },
+    {
+      "Id": 330,
+      "Name": "Kungsbacka kommun",
+      "Localized": false
+    },
+    {
+      "Id": 331,
+      "Name": "Uddevalla kommun",
+      "Localized": false
+    },
+    {
+      "Id": 332,
+      "Name": "Sydnärkes Miljöförvaltning",
+      "Localized": false
+    },
+    {
+      "Id": 333,
+      "Name": "Miljönämnden i mellersta Bohuslän",
+      "Localized": false
+    },
+    {
+      "Id": 334,
+      "Name": "Ekerö kommun",
+      "Localized": false
+    },
+    {
+      "Id": 335,
+      "Name": "Trosa kommun",
+      "Localized": false
+    },
+    {
+      "Id": 336,
+      "Name": "Västerviks kommun",
+      "Localized": false
+    },
+    {
+      "Id": 337,
+      "Name": "Gislaveds kommun",
+      "Localized": false
+    },
+    {
+      "Id": 338,
+      "Name": "Sportfiskarna",
+      "Localized": false
+    },
+    {
+      "Id": 339,
+      "Name": "Hallands botaniska förening",
+      "Localized": false
+    },
+    {
+      "Id": 340,
+      "Name": "Västgötabergens Svampklubb",
+      "Localized": false
+    },
+    {
+      "Id": 341,
+      "Name": "Sveriges mykologiska förening",
+      "Localized": false
+    },
+    {
+      "Id": 342,
+      "Name": "Trollhättans stad",
+      "Localized": false
+    },
+    {
+      "Id": 343,
+      "Name": "Floraväkteri-Uppsala län",
+      "Localized": false
+    },
+    {
+      "Id": 344,
+      "Name": "Jämtlands botaniska sällskap",
+      "Localized": false
+    },
+    {
+      "Id": 345,
+      "Name": "Floraväkteri-Jönköpings län",
+      "Localized": false
+    },
+    {
+      "Id": 346,
+      "Name": "Östergötlands flora",
+      "Localized": false
+    },
+    {
+      "Id": 347,
+      "Name": "Sveriges ornitologiska förening (SOF)",
+      "Localized": false
+    },
+    {
+      "Id": 348,
+      "Name": "Örnborg Kyrkander Biologi & miljö",
+      "Localized": false
+    },
+    {
+      "Id": 349,
+      "Name": "Floraväkteri-Skåne län",
+      "Localized": false
+    },
+    {
+      "Id": 350,
+      "Name": "Fungus Info",
+      "Localized": false
+    },
+    {
+      "Id": 351,
+      "Name": "Floraväkteri-Västmanlands län",
+      "Localized": false
+    },
+    {
+      "Id": 352,
+      "Name": "Floraväkteri-Blekinge län",
+      "Localized": false
+    },
+    {
+      "Id": 353,
+      "Name": "Floraväkteri-Stockholms län",
+      "Localized": false
+    },
+    {
+      "Id": 354,
+      "Name": "Pite lappmarks flora – herbarium FPLF",
+      "Localized": false
+    },
+    {
+      "Id": 355,
+      "Name": "Norrköpings herbarium",
+      "Localized": false
+    },
+    {
+      "Id": 356,
+      "Name": "Floraväkteri-Kronobergs län",
+      "Localized": false
+    },
+    {
+      "Id": 357,
+      "Name": "Floraväkteri-Jämtlands län",
+      "Localized": false
+    },
+    {
+      "Id": 358,
+      "Name": "Floraväkteri-Östergötlands län",
+      "Localized": false
+    },
+    {
+      "Id": 359,
+      "Name": "SCA Skog AB",
+      "Localized": false
+    },
+    {
+      "Id": 360,
+      "Name": "Floraväkteri-Torne lappmark BD-län",
+      "Localized": false
+    },
+    {
+      "Id": 361,
+      "Name": "Floraväkteri-Pite lappmark BD-län",
+      "Localized": false
+    },
+    {
+      "Id": 362,
+      "Name": "Floraväkteri-Lule lappmark BD-län",
+      "Localized": false
+    },
+    {
+      "Id": 363,
+      "Name": "Trafikverket",
+      "Localized": false
+    },
+    {
+      "Id": 364,
+      "Name": "Floraväkteri-Öland",
+      "Localized": false
+    },
+    {
+      "Id": 365,
+      "Name": "Älmhults kommun",
+      "Localized": false
+    },
+    {
+      "Id": 366,
+      "Name": "Floraväkteri-Södermanlands län",
+      "Localized": false
+    },
+    {
+      "Id": 367,
+      "Name": "Lilla Edets kommun",
+      "Localized": false
+    },
+    {
+      "Id": 368,
+      "Name": "Ale kommun",
+      "Localized": false
+    },
+    {
+      "Id": 369,
+      "Name": "Floraväkteri-Kalmar län (fastl.)",
+      "Localized": false
+    },
+    {
+      "Id": 370,
+      "Name": "Floraväkteri-Västernorrlands län",
+      "Localized": false
+    },
+    {
+      "Id": 371,
+      "Name": "Floraväkteri-Dalsland O-län",
+      "Localized": false
+    },
+    {
+      "Id": 372,
+      "Name": "Floraväkteri-Bohuslän O-län",
+      "Localized": false
+    },
+    {
+      "Id": 373,
+      "Name": "Floraväkteri-Värmlands län",
+      "Localized": false
+    },
+    {
+      "Id": 374,
+      "Name": "Floraväkteri-Dalarnas län",
+      "Localized": false
+    },
+    {
+      "Id": 375,
+      "Name": "Svenska Botaniska Föreningen (SBF)",
+      "Localized": false
+    },
+    {
+      "Id": 376,
+      "Name": "Floraväkteri-Hälsingland X-län",
+      "Localized": false
+    },
+    {
+      "Id": 377,
+      "Name": "Floraväkteri-Gästrikland X-län",
+      "Localized": false
+    },
+    {
+      "Id": 378,
+      "Name": "Floraväkteri-Västergötland O-län",
+      "Localized": false
+    },
+    {
+      "Id": 379,
+      "Name": "Floraväkteri-Örebro län",
+      "Localized": false
+    },
+    {
+      "Id": 380,
+      "Name": "Floraväkteri-Hallands län",
+      "Localized": false
+    },
+    {
+      "Id": 381,
+      "Name": "Knivsta kommun",
+      "Localized": false
+    },
+    {
+      "Id": 382,
+      "Name": "Floraväkteri-Norrbotten BD-län",
+      "Localized": false
+    },
+    {
+      "Id": 383,
+      "Name": "Vaggeryds kommun",
+      "Localized": false
+    },
+    {
+      "Id": 384,
+      "Name": "Lerums kommun",
+      "Localized": false
+    },
+    {
+      "Id": 385,
+      "Name": "Floraväkteri-Västerbottens län",
+      "Localized": false
+    },
+    {
+      "Id": 386,
+      "Name": "Sjöbo kommun",
+      "Localized": false
+    },
+    {
+      "Id": 387,
+      "Name": "Falköpings kommun",
+      "Localized": false
+    },
+    {
+      "Id": 388,
+      "Name": "Botaniska Föreningen i Västmanlands län",
+      "Localized": false
+    },
+    {
+      "Id": 389,
+      "Name": "Strömstad kommun",
+      "Localized": false
+    },
+    {
+      "Id": 390,
+      "Name": "Floraväkteri-Gotland",
+      "Localized": false
+    },
+    {
+      "Id": 391,
+      "Name": "Floraväkteri-Lycksele lappmark BD-län",
+      "Localized": false
+    },
+    {
+      "Id": 392,
+      "Name": "Arvika kommun",
+      "Localized": false
+    },
+    {
+      "Id": 393,
+      "Name": "Lunds Botaniska förening",
+      "Localized": false
+    },
+    {
+      "Id": 394,
+      "Name": "Jordbruksverket",
+      "Localized": false
+    },
+    {
+      "Id": 395,
+      "Name": "Simrishamns kommun",
+      "Localized": false
+    },
+    {
+      "Id": 396,
+      "Name": "Timrå kommun",
+      "Localized": false
+    },
+    {
+      "Id": 397,
+      "Name": "Piteå kommun",
+      "Localized": false
+    },
+    {
+      "Id": 398,
+      "Name": "Föreningen Smålands flora",
+      "Localized": false
+    },
+    {
+      "Id": 399,
+      "Name": "Ölands botaniska förening",
+      "Localized": false
+    },
+    {
+      "Id": 400,
+      "Name": "Skövde kommun",
+      "Localized": false
+    },
+    {
+      "Id": 401,
+      "Name": "Borås Stad",
+      "Localized": false
+    },
+    {
+      "Id": 402,
+      "Name": "Kristianstad kommun",
+      "Localized": false
+    },
+    {
+      "Id": 403,
+      "Name": "Kristianstads Vattenrike",
+      "Localized": false
+    },
+    {
+      "Id": 404,
+      "Name": "Rio Göteborg Natur- och kulturkooperativ",
+      "Localized": false
+    },
+    {
+      "Id": 405,
+      "Name": "Gnesta kommun",
+      "Localized": false
+    },
+    {
+      "Id": 406,
+      "Name": "Sölvesborgs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 407,
+      "Name": "Sweco",
+      "Localized": false
+    },
+    {
+      "Id": 408,
+      "Name": "Sveriges Entomologiska förening (SEF)",
+      "Localized": false
+    },
+    {
+      "Id": 409,
+      "Name": "Eggegrunds fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 410,
+      "Name": "Hammarö fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 411,
+      "Name": "Sotenäs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 412,
+      "Name": "Lekebergs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 413,
+      "Name": "Lysekils kommun",
+      "Localized": false
+    },
+    {
+      "Id": 414,
+      "Name": "Askersunds kommun",
+      "Localized": false
+    },
+    {
+      "Id": 415,
+      "Name": "Tomelilla kommun",
+      "Localized": false
+    },
+    {
+      "Id": 416,
+      "Name": "Stora Fjäderäggs fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 417,
+      "Name": "Botkyrka kommun",
+      "Localized": false
+    },
+    {
+      "Id": 418,
+      "Name": "Alingsås kommun",
+      "Localized": false
+    },
+    {
+      "Id": 419,
+      "Name": "Östhammars kommun",
+      "Localized": false
+    },
+    {
+      "Id": 420,
+      "Name": "Bjuvs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 421,
+      "Name": "Perstorps kommun",
+      "Localized": false
+    },
+    {
+      "Id": 422,
+      "Name": "Svalövs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 423,
+      "Name": "Lokala rapportkommittén Falköping",
+      "Localized": false
+    },
+    {
+      "Id": 424,
+      "Name": "Lokala rapportkommittén Mark",
+      "Localized": false
+    },
+    {
+      "Id": 425,
+      "Name": "Lokala rapportkommittén Trollhättan",
+      "Localized": false
+    },
+    {
+      "Id": 426,
+      "Name": "Lokala rapportkommittén Ulricehamn",
+      "Localized": false
+    },
+    {
+      "Id": 427,
+      "Name": "Lokala rapportkommittén Grästorp",
+      "Localized": false
+    },
+    {
+      "Id": 428,
+      "Name": "Lokala rapportkommittén Hjo",
+      "Localized": false
+    },
+    {
+      "Id": 429,
+      "Name": "Lokala rapportkommittén Töreboda",
+      "Localized": false
+    },
+    {
+      "Id": 430,
+      "Name": "Lokala rapportkommittén Mariestad",
+      "Localized": false
+    },
+    {
+      "Id": 431,
+      "Name": "Umedeltats fältstation",
+      "Localized": false
+    },
+    {
+      "Id": 432,
+      "Name": "Ånnsjöns fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 433,
+      "Name": "Landsorts fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 434,
+      "Name": "PG Water Conservation & Engineering",
+      "Localized": false
+    },
+    {
+      "Id": 435,
+      "Name": "Karlskrona kommun",
+      "Localized": false
+    },
+    {
+      "Id": 436,
+      "Name": "Nynäshamns ornitologer (NOF)",
+      "Localized": false
+    },
+    {
+      "Id": 437,
+      "Name": "Lokala rapportkommittén Vårgårda",
+      "Localized": false
+    },
+    {
+      "Id": 438,
+      "Name": "Götene kommun",
+      "Localized": false
+    },
+    {
+      "Id": 439,
+      "Name": "Rördrommen fältstation",
+      "Localized": false
+    },
+    {
+      "Id": 440,
+      "Name": "Mönsterås kommun",
+      "Localized": false
+    },
+    {
+      "Id": 441,
+      "Name": "Skara kommun",
+      "Localized": false
+    },
+    {
+      "Id": 442,
+      "Name": "Sollentuna kommun",
+      "Localized": false
+    },
+    {
+      "Id": 443,
+      "Name": "Sunne kommun",
+      "Localized": false
+    },
+    {
+      "Id": 444,
+      "Name": "Vimmerby kommun",
+      "Localized": false
+    },
+    {
+      "Id": 445,
+      "Name": "Västerås kommun",
+      "Localized": false
+    },
+    {
+      "Id": 446,
+      "Name": "Ystad kommun",
+      "Localized": false
+    },
+    {
+      "Id": 447,
+      "Name": "Bollebygd kommun",
+      "Localized": false
+    },
+    {
+      "Id": 448,
+      "Name": "Bromölla kommun",
+      "Localized": false
+    },
+    {
+      "Id": 449,
+      "Name": "Båstad kommun",
+      "Localized": false
+    },
+    {
+      "Id": 450,
+      "Name": "Höganäs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 451,
+      "Name": "Högsby kommun",
+      "Localized": false
+    },
+    {
+      "Id": 452,
+      "Name": "Klippans kommun",
+      "Localized": false
+    },
+    {
+      "Id": 453,
+      "Name": "Mörbylånga kommun",
+      "Localized": false
+    },
+    {
+      "Id": 454,
+      "Name": "Sala kommun",
+      "Localized": false
+    },
+    {
+      "Id": 455,
+      "Name": "Tibro kommun",
+      "Localized": false
+    },
+    {
+      "Id": 456,
+      "Name": "Tjörns kommun",
+      "Localized": false
+    },
+    {
+      "Id": 457,
+      "Name": "Vallentuna kommun",
+      "Localized": false
+    },
+    {
+      "Id": 458,
+      "Name": "Emmaboda kommun",
+      "Localized": false
+    },
+    {
+      "Id": 459,
+      "Name": "Eslöv kommun",
+      "Localized": false
+    },
+    {
+      "Id": 460,
+      "Name": "Hörby kommun",
+      "Localized": false
+    },
+    {
+      "Id": 461,
+      "Name": "Luleå kommun",
+      "Localized": false
+    },
+    {
+      "Id": 462,
+      "Name": "Ockelbo kommun",
+      "Localized": false
+    },
+    {
+      "Id": 463,
+      "Name": "Osby kommun",
+      "Localized": false
+    },
+    {
+      "Id": 464,
+      "Name": "Tanums kommun",
+      "Localized": false
+    },
+    {
+      "Id": 465,
+      "Name": "Tranemo kommun",
+      "Localized": false
+    },
+    {
+      "Id": 466,
+      "Name": "Trelleborgs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 467,
+      "Name": "Österåkers kommun",
+      "Localized": false
+    },
+    {
+      "Id": 468,
+      "Name": "Forshaga kommun",
+      "Localized": false
+    },
+    {
+      "Id": 469,
+      "Name": "Malmö stad",
+      "Localized": false
+    },
+    {
+      "Id": 470,
+      "Name": "Munkfors kommun",
+      "Localized": false
+    },
+    {
+      "Id": 471,
+      "Name": "Kils kommun",
+      "Localized": false
+    },
+    {
+      "Id": 472,
+      "Name": "Karlshamns kommun",
+      "Localized": false
+    },
+    {
+      "Id": 473,
+      "Name": "Olofströms kommun",
+      "Localized": false
+    },
+    {
+      "Id": 474,
+      "Name": "Valdemarsviks kommun",
+      "Localized": false
+    },
+    {
+      "Id": 475,
+      "Name": "Gällivare kommun",
+      "Localized": false
+    },
+    {
+      "Id": 476,
+      "Name": "Leksands kommun",
+      "Localized": false
+    },
+    {
+      "Id": 477,
+      "Name": "Habo kommun",
+      "Localized": false
+    },
+    {
+      "Id": 478,
+      "Name": "Medelpads Botaniska Förening",
+      "Localized": false
+    },
+    {
+      "Id": 479,
+      "Name": "Entomologiska Föreningen i Östergötland",
+      "Localized": false
+    },
+    {
+      "Id": 480,
+      "Name": "Falsterbo fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 481,
+      "Name": "Getteröns fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 482,
+      "Name": "Haparanda Sandskär fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 483,
+      "Name": "Hartsö-Enskär fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 484,
+      "Name": "Kvismare fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 485,
+      "Name": "Landsjöns fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 486,
+      "Name": "Nidingens fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 487,
+      "Name": "Ottenby fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 488,
+      "Name": "Ralångens fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 489,
+      "Name": "Sundre fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 490,
+      "Name": "Torhamns fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 491,
+      "Name": "Utklippans fågelstation",
+      "Localized": false
+    },
+    {
+      "Id": 492,
+      "Name": "Grötviks fältstation",
+      "Localized": false
+    },
+    {
+      "Id": 493,
+      "Name": "Hornborgasjöns fältstation",
+      "Localized": false
+    },
+    {
+      "Id": 494,
+      "Name": "Stubbhults fältstation",
+      "Localized": false
+    },
+    {
+      "Id": 495,
+      "Name": "Tåkerns fältstation",
+      "Localized": false
+    },
+    {
+      "Id": 496,
+      "Name": "Örkelljunga kommun",
+      "Localized": false
+    },
+    {
+      "Id": 497,
+      "Name": "Lokala rapportkommittén Tranemo",
+      "Localized": false
+    },
+    {
+      "Id": 498,
+      "Name": "Lokala rapportkommittén Skövde",
+      "Localized": false
+    },
+    {
+      "Id": 499,
+      "Name": "Södertälje Ornitologiska förening",
+      "Localized": false
+    },
+    {
+      "Id": 500,
+      "Name": "Medins Havs- och Vattenkonsulter AB",
+      "Localized": false
+    },
+    {
+      "Id": 501,
+      "Name": "Skogsstyrelsen",
+      "Localized": false
+    },
+    {
+      "Id": 502,
+      "Name": "Tierps kommun",
+      "Localized": false
+    },
+    {
+      "Id": 503,
+      "Name": "Stenungsunds kommun",
+      "Localized": false
+    },
+    {
+      "Id": 504,
+      "Name": "Vingåker kommun",
+      "Localized": false
+    },
+    {
+      "Id": 505,
+      "Name": "Ronneby kommun",
+      "Localized": false
+    },
+    {
+      "Id": 506,
+      "Name": "Strängnäs kommu",
+      "Localized": false
+    },
+    {
+      "Id": 507,
+      "Name": "Helsingborgs stad",
+      "Localized": false
+    },
+    {
+      "Id": 508,
+      "Name": "Ulricehamns kommun",
+      "Localized": false
+    },
+    {
+      "Id": 509,
+      "Name": "Mora kommun",
+      "Localized": false
+    },
+    {
+      "Id": 510,
+      "Name": "Orsa kommun",
+      "Localized": false
+    },
+    {
+      "Id": 511,
+      "Name": "Hässleholms kommun",
+      "Localized": false
+    },
+    {
+      "Id": 512,
+      "Name": "Övertorneå kommun",
+      "Localized": false
+    },
+    {
+      "Id": 513,
+      "Name": "Köpings kommun",
+      "Localized": false
+    },
+    {
+      "Id": 514,
+      "Name": "Växjö kommun",
+      "Localized": false
+    },
+    {
+      "Id": 515,
+      "Name": "Enköpings kommun",
+      "Localized": false
+    },
+    {
+      "Id": 516,
+      "Name": "Mölndals kommun",
+      "Localized": false
+    },
+    {
+      "Id": 517,
+      "Name": "Sundbybergs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 518,
+      "Name": "Upplands Väsby kommun",
+      "Localized": false
+    },
+    {
+      "Id": 519,
+      "Name": "Flens kommun",
+      "Localized": false
+    },
+    {
+      "Id": 520,
+      "Name": "Burlövs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 521,
+      "Name": "Ajtte - Svenskt Fjäll- och Samemuseum",
+      "Localized": false
+    },
+    {
+      "Id": 522,
+      "Name": "Angarngruppen",
+      "Localized": false
+    },
+    {
+      "Id": 523,
+      "Name": "Skogsstyrelsen - Stockholm/Gotland",
+      "Localized": false
+    },
+    {
+      "Id": 524,
+      "Name": "Floraväkteri-Gävleborgs län",
+      "Localized": false
+    },
+    {
+      "Id": 525,
+      "Name": "Mossornas vänner",
+      "Localized": false
+    },
+    {
+      "Id": 526,
+      "Name": "Skogsstyrelsen - Södra Lappland",
+      "Localized": false
+    },
+    {
+      "Id": 527,
+      "Name": "Skogsstyrelsen - Skellefteå",
+      "Localized": false
+    },
+    {
+      "Id": 528,
+      "Name": "Skogsstyrelsen - Södra Dalarna",
+      "Localized": false
+    },
+    {
+      "Id": 529,
+      "Name": "Skogsstyrelsen - Södra Jämtland",
+      "Localized": false
+    },
+    {
+      "Id": 530,
+      "Name": "Skogsstyrelsen - Kronoberg",
+      "Localized": false
+    },
+    {
+      "Id": 531,
+      "Name": "Skogsstyrelsen - Göteborg",
+      "Localized": false
+    },
+    {
+      "Id": 532,
+      "Name": "Skogsstyrelsen - Sörmland/Örebro",
+      "Localized": false
+    },
+    {
+      "Id": 533,
+      "Name": "Skogsstyrelsen - Umeå",
+      "Localized": false
+    },
+    {
+      "Id": 534,
+      "Name": "Skogsstyrelsen - Kalmar",
+      "Localized": false
+    },
+    {
+      "Id": 535,
+      "Name": "Skogsstyrelsen - Skaraborg/Fyrbodal",
+      "Localized": false
+    },
+    {
+      "Id": 536,
+      "Name": "Skogsstyrelsen - Halland",
+      "Localized": false
+    },
+    {
+      "Id": 537,
+      "Name": "Skogsstyrelsen - Värmland",
+      "Localized": false
+    },
+    {
+      "Id": 538,
+      "Name": "Våtmarksinventeringen (VMI)",
+      "Localized": false
+    },
+    {
+      "Id": 539,
+      "Name": "Våtmarksinventeringen (VMI) BD län",
+      "Localized": false
+    },
+    {
+      "Id": 540,
+      "Name": "Ecocom",
+      "Localized": false
+    },
+    {
+      "Id": 541,
+      "Name": "Skogsstyrelsen - Gävleborg",
+      "Localized": false
+    },
+    {
+      "Id": 542,
+      "Name": "Skogsstyrelsen - Jönköping/Höglandet",
+      "Localized": false
+    },
+    {
+      "Id": 543,
+      "Name": "Skogsstyrelsen - Norra Jämtland",
+      "Localized": false
+    },
+    {
+      "Id": 544,
+      "Name": "Skogsstyrelsen - Uppsala/Västmanland",
+      "Localized": false
+    },
+    {
+      "Id": 545,
+      "Name": "Skogsstyrelsen - Västernorrland",
+      "Localized": false
+    },
+    {
+      "Id": 546,
+      "Name": "Skogsstyrelsen - Blekinge",
+      "Localized": false
+    },
+    {
+      "Id": 547,
+      "Name": "Surahammars kommun",
+      "Localized": false
+    },
+    {
+      "Id": 548,
+      "Name": "Skogsstyrelsen - Skåne",
+      "Localized": false
+    },
+    {
+      "Id": 549,
+      "Name": "Skogsstyrelsen - Norra Dalarna",
+      "Localized": false
+    },
+    {
+      "Id": 550,
+      "Name": "Skogsstyrelsen - Norra Norrbotten",
+      "Localized": false
+    },
+    {
+      "Id": 551,
+      "Name": "Sigtuna kommun",
+      "Localized": false
+    },
+    {
+      "Id": 552,
+      "Name": "Skogsstyrelsen - Östergötland",
+      "Localized": false
+    },
+    {
+      "Id": 553,
+      "Name": "Södertälje kommun - Naturcentrum",
+      "Localized": false
+    },
+    {
+      "Id": 554,
+      "Name": "Skogsstyrelsen - Södra Norrbotten",
+      "Localized": false
+    },
+    {
+      "Id": 555,
+      "Name": "Aneby kommun",
+      "Localized": false
+    },
+    {
+      "Id": 556,
+      "Name": "Värmdö Fågelklubb",
+      "Localized": false
+    },
+    {
+      "Id": 557,
+      "Name": "Botaniska sällskapet i Stockholm",
+      "Localized": false
+    },
+    {
+      "Id": 558,
+      "Name": "Göteborgs Ornitologiska Förening",
+      "Localized": false
+    },
+    {
+      "Id": 559,
+      "Name": "Örebro läns botaniska sällskap",
+      "Localized": false
+    },
+    {
+      "Id": 560,
+      "Name": "Flens Ornitologiska Förening",
+      "Localized": false
+    },
+    {
+      "Id": 561,
+      "Name": "Upplandsstiftelsen",
+      "Localized": false
+    },
+    {
+      "Id": 562,
+      "Name": "Biogeografisk uppföljning - Mossor",
+      "Localized": false
+    },
+    {
+      "Id": 563,
+      "Name": "Vänersborgs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 564,
+      "Name": "Föreningen Bohusläns Flora",
+      "Localized": false
+    },
+    {
+      "Id": 565,
+      "Name": "Vetlanda kommun",
+      "Localized": false
+    },
+    {
+      "Id": 566,
+      "Name": "Nordens Ark",
+      "Localized": false
+    },
+    {
+      "Id": 567,
+      "Name": "Söderköpings kommun",
+      "Localized": false
+    },
+    {
+      "Id": 568,
+      "Name": "Nynäshamns kommun",
+      "Localized": false
+    },
+    {
+      "Id": 569,
+      "Name": "Hällefors kommun",
+      "Localized": false
+    },
+    {
+      "Id": 570,
+      "Name": "Ljusnarsbergs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 571,
+      "Name": "Dalarnas Botaniska Sällskap (DABS)",
+      "Localized": false
+    },
+    {
+      "Id": 572,
+      "Name": "Svenska fenologinätverket",
+      "Localized": false
+    },
+    {
+      "Id": 573,
+      "Name": "Föreningen Pite Lappmarks flora",
+      "Localized": false
+    },
+    {
+      "Id": 574,
+      "Name": "Upplands Botaniska Förening",
+      "Localized": false
+    },
+    {
+      "Id": 575,
+      "Name": "Västerbottens läns Botaniska Förening",
+      "Localized": false
+    },
+    {
+      "Id": 576,
+      "Name": "Gotlands botaniska förening",
+      "Localized": false
+    },
+    {
+      "Id": 577,
+      "Name": "Föreningen Blekinges flora",
+      "Localized": false
+    },
+    {
+      "Id": 578,
+      "Name": "Gävleborgs Botaniska Sällskap",
+      "Localized": false
+    },
+    {
+      "Id": 579,
+      "Name": "Naturskyddsföreningen - riksföreningen",
+      "Localized": false
+    },
+    {
+      "Id": 580,
+      "Name": "Nora kommun",
+      "Localized": false
+    },
+    {
+      "Id": 581,
+      "Name": "Dalslands botaniska förening",
+      "Localized": false
+    },
+    {
+      "Id": 582,
+      "Name": "Håbo kommun",
+      "Localized": false
+    },
+    {
+      "Id": 583,
+      "Name": "Fågelkalendern",
+      "Localized": false
+    },
+    {
+      "Id": 584,
+      "Name": "Finspångs kommun",
+      "Localized": false
+    },
+    {
+      "Id": 585,
+      "Name": "Skogsstyrelsen - Dalarna",
+      "Localized": false
+    },
+    {
+      "Id": 586,
+      "Name": "Åmåls kommun",
+      "Localized": false
+    },
+    {
+      "Id": 587,
+      "Name": "Nationell valideringsgrupp (NVG) spindeldjur",
+      "Localized": false
+    },
+    {
+      "Id": 588,
+      "Name": "Nationell valideringsgrupp (NVG) fjärilar",
+      "Localized": false
+    },
+    {
+      "Id": 589,
+      "Name": "Tingsryds kommun",
+      "Localized": false
+    },
+    {
+      "Id": 590,
+      "Name": "Skellefteå kommun",
+      "Localized": false
+    },
+    {
+      "Id": 591,
+      "Name": "Mjölby kommun",
+      "Localized": false
+    },
+    {
+      "Id": 592,
+      "Name": "Boxholms kommun",
+      "Localized": false
+    },
+    {
+      "Id": 593,
+      "Name": "Havs och Vatten myndigheten (HaV)",
+      "Localized": false
+    },
+    {
+      "Id": 594,
+      "Name": "Sundsvalls kommun",
+      "Localized": false
+    },
+    {
+      "Id": 595,
+      "Name": "SLU Aqua",
+      "Localized": false
+    },
+    {
+      "Id": 596,
+      "Name": "Nässjö kommun",
+      "Localized": false
+    },
+    {
+      "Id": 597,
+      "Name": "Mullsjö kommun",
+      "Localized": false
+    },
+    {
+      "Id": 598,
+      "Name": "Nationell valideringsgrupp (NVG) fladdermöss",
+      "Localized": false
+    },
+    {
+      "Id": 599,
+      "Name": "Projekt trollsländor i Närke",
+      "Localized": false
+    },
+    {
+      "Id": 600,
+      "Name": "Svensk kärnbränslehantering (SKB)",
+      "Localized": false
+    },
+    {
+      "Id": 601,
+      "Name": "Floraväktarna",
+      "Localized": false
+    },
+    {
+      "Id": 602,
+      "Name": "Nationell valideringsgrupp (NVG) tvåvingar",
+      "Localized": false
+    },
+    {
+      "Id": 603,
+      "Name": "IAS",
+      "Localized": false
+    }
+  ],
+  "ExternalSystemsMapping": [
+    {
+      "Id": 0,
+      "Name": "Artportalen",
+      "Mappings": [
+        {
+          "Key": "Id",
+          "Description": "Id field mapping",
+          "Values": [
+            {
+              "Value": 165,
+              "SosId": 165
+            },
+            {
+              "Value": 166,
+              "SosId": 166
+            },
+            {
+              "Value": 167,
+              "SosId": 167
+            },
+            {
+              "Value": 168,
+              "SosId": 168
+            },
+            {
+              "Value": 169,
+              "SosId": 169
+            },
+            {
+              "Value": 170,
+              "SosId": 170
+            },
+            {
+              "Value": 171,
+              "SosId": 171
+            },
+            {
+              "Value": 172,
+              "SosId": 172
+            },
+            {
+              "Value": 173,
+              "SosId": 173
+            },
+            {
+              "Value": 174,
+              "SosId": 174
+            },
+            {
+              "Value": 175,
+              "SosId": 175
+            },
+            {
+              "Value": 176,
+              "SosId": 176
+            },
+            {
+              "Value": 177,
+              "SosId": 177
+            },
+            {
+              "Value": 178,
+              "SosId": 178
+            },
+            {
+              "Value": 179,
+              "SosId": 179
+            },
+            {
+              "Value": 180,
+              "SosId": 180
+            },
+            {
+              "Value": 181,
+              "SosId": 181
+            },
+            {
+              "Value": 182,
+              "SosId": 182
+            },
+            {
+              "Value": 183,
+              "SosId": 183
+            },
+            {
+              "Value": 184,
+              "SosId": 184
+            },
+            {
+              "Value": 185,
+              "SosId": 185
+            },
+            {
+              "Value": 186,
+              "SosId": 186
+            },
+            {
+              "Value": 187,
+              "SosId": 187
+            },
+            {
+              "Value": 188,
+              "SosId": 188
+            },
+            {
+              "Value": 189,
+              "SosId": 189
+            },
+            {
+              "Value": 190,
+              "SosId": 190
+            },
+            {
+              "Value": 191,
+              "SosId": 191
+            },
+            {
+              "Value": 192,
+              "SosId": 192
+            },
+            {
+              "Value": 193,
+              "SosId": 193
+            },
+            {
+              "Value": 194,
+              "SosId": 194
+            },
+            {
+              "Value": 195,
+              "SosId": 195
+            },
+            {
+              "Value": 196,
+              "SosId": 196
+            },
+            {
+              "Value": 197,
+              "SosId": 197
+            },
+            {
+              "Value": 198,
+              "SosId": 198
+            },
+            {
+              "Value": 199,
+              "SosId": 199
+            },
+            {
+              "Value": 200,
+              "SosId": 200
+            },
+            {
+              "Value": 201,
+              "SosId": 201
+            },
+            {
+              "Value": 202,
+              "SosId": 202
+            },
+            {
+              "Value": 203,
+              "SosId": 203
+            },
+            {
+              "Value": 204,
+              "SosId": 204
+            },
+            {
+              "Value": 205,
+              "SosId": 205
+            },
+            {
+              "Value": 206,
+              "SosId": 206
+            },
+            {
+              "Value": 207,
+              "SosId": 207
+            },
+            {
+              "Value": 208,
+              "SosId": 208
+            },
+            {
+              "Value": 209,
+              "SosId": 209
+            },
+            {
+              "Value": 210,
+              "SosId": 210
+            },
+            {
+              "Value": 211,
+              "SosId": 211
+            },
+            {
+              "Value": 212,
+              "SosId": 212
+            },
+            {
+              "Value": 213,
+              "SosId": 213
+            },
+            {
+              "Value": 214,
+              "SosId": 214
+            },
+            {
+              "Value": 215,
+              "SosId": 215
+            },
+            {
+              "Value": 216,
+              "SosId": 216
+            },
+            {
+              "Value": 217,
+              "SosId": 217
+            },
+            {
+              "Value": 218,
+              "SosId": 218
+            },
+            {
+              "Value": 219,
+              "SosId": 219
+            },
+            {
+              "Value": 220,
+              "SosId": 220
+            },
+            {
+              "Value": 221,
+              "SosId": 221
+            },
+            {
+              "Value": 222,
+              "SosId": 222
+            },
+            {
+              "Value": 223,
+              "SosId": 223
+            },
+            {
+              "Value": 224,
+              "SosId": 224
+            },
+            {
+              "Value": 225,
+              "SosId": 225
+            },
+            {
+              "Value": 226,
+              "SosId": 226
+            },
+            {
+              "Value": 227,
+              "SosId": 227
+            },
+            {
+              "Value": 228,
+              "SosId": 228
+            },
+            {
+              "Value": 229,
+              "SosId": 229
+            },
+            {
+              "Value": 230,
+              "SosId": 230
+            },
+            {
+              "Value": 231,
+              "SosId": 231
+            },
+            {
+              "Value": 232,
+              "SosId": 232
+            },
+            {
+              "Value": 233,
+              "SosId": 233
+            },
+            {
+              "Value": 234,
+              "SosId": 234
+            },
+            {
+              "Value": 235,
+              "SosId": 235
+            },
+            {
+              "Value": 236,
+              "SosId": 236
+            },
+            {
+              "Value": 237,
+              "SosId": 237
+            },
+            {
+              "Value": 238,
+              "SosId": 238
+            },
+            {
+              "Value": 239,
+              "SosId": 239
+            },
+            {
+              "Value": 240,
+              "SosId": 240
+            },
+            {
+              "Value": 241,
+              "SosId": 241
+            },
+            {
+              "Value": 242,
+              "SosId": 242
+            },
+            {
+              "Value": 243,
+              "SosId": 243
+            },
+            {
+              "Value": 244,
+              "SosId": 244
+            },
+            {
+              "Value": 245,
+              "SosId": 245
+            },
+            {
+              "Value": 246,
+              "SosId": 246
+            },
+            {
+              "Value": 247,
+              "SosId": 247
+            },
+            {
+              "Value": 248,
+              "SosId": 248
+            },
+            {
+              "Value": 249,
+              "SosId": 249
+            },
+            {
+              "Value": 250,
+              "SosId": 250
+            },
+            {
+              "Value": 251,
+              "SosId": 251
+            },
+            {
+              "Value": 252,
+              "SosId": 252
+            },
+            {
+              "Value": 253,
+              "SosId": 253
+            },
+            {
+              "Value": 254,
+              "SosId": 254
+            },
+            {
+              "Value": 255,
+              "SosId": 255
+            },
+            {
+              "Value": 256,
+              "SosId": 256
+            },
+            {
+              "Value": 257,
+              "SosId": 257
+            },
+            {
+              "Value": 258,
+              "SosId": 258
+            },
+            {
+              "Value": 259,
+              "SosId": 259
+            },
+            {
+              "Value": 260,
+              "SosId": 260
+            },
+            {
+              "Value": 261,
+              "SosId": 261
+            },
+            {
+              "Value": 262,
+              "SosId": 262
+            },
+            {
+              "Value": 263,
+              "SosId": 263
+            },
+            {
+              "Value": 264,
+              "SosId": 264
+            },
+            {
+              "Value": 265,
+              "SosId": 265
+            },
+            {
+              "Value": 266,
+              "SosId": 266
+            },
+            {
+              "Value": 267,
+              "SosId": 267
+            },
+            {
+              "Value": 268,
+              "SosId": 268
+            },
+            {
+              "Value": 269,
+              "SosId": 269
+            },
+            {
+              "Value": 270,
+              "SosId": 270
+            },
+            {
+              "Value": 271,
+              "SosId": 271
+            },
+            {
+              "Value": 272,
+              "SosId": 272
+            },
+            {
+              "Value": 273,
+              "SosId": 273
+            },
+            {
+              "Value": 274,
+              "SosId": 274
+            },
+            {
+              "Value": 275,
+              "SosId": 275
+            },
+            {
+              "Value": 276,
+              "SosId": 276
+            },
+            {
+              "Value": 277,
+              "SosId": 277
+            },
+            {
+              "Value": 278,
+              "SosId": 278
+            },
+            {
+              "Value": 279,
+              "SosId": 279
+            },
+            {
+              "Value": 280,
+              "SosId": 280
+            },
+            {
+              "Value": 281,
+              "SosId": 281
+            },
+            {
+              "Value": 282,
+              "SosId": 282
+            },
+            {
+              "Value": 283,
+              "SosId": 283
+            },
+            {
+              "Value": 284,
+              "SosId": 284
+            },
+            {
+              "Value": 285,
+              "SosId": 285
+            },
+            {
+              "Value": 286,
+              "SosId": 286
+            },
+            {
+              "Value": 287,
+              "SosId": 287
+            },
+            {
+              "Value": 288,
+              "SosId": 288
+            },
+            {
+              "Value": 289,
+              "SosId": 289
+            },
+            {
+              "Value": 291,
+              "SosId": 291
+            },
+            {
+              "Value": 292,
+              "SosId": 292
+            },
+            {
+              "Value": 293,
+              "SosId": 293
+            },
+            {
+              "Value": 294,
+              "SosId": 294
+            },
+            {
+              "Value": 295,
+              "SosId": 295
+            },
+            {
+              "Value": 296,
+              "SosId": 296
+            },
+            {
+              "Value": 297,
+              "SosId": 297
+            },
+            {
+              "Value": 298,
+              "SosId": 298
+            },
+            {
+              "Value": 299,
+              "SosId": 299
+            },
+            {
+              "Value": 300,
+              "SosId": 300
+            },
+            {
+              "Value": 301,
+              "SosId": 301
+            },
+            {
+              "Value": 302,
+              "SosId": 302
+            },
+            {
+              "Value": 303,
+              "SosId": 303
+            },
+            {
+              "Value": 304,
+              "SosId": 304
+            },
+            {
+              "Value": 305,
+              "SosId": 305
+            },
+            {
+              "Value": 306,
+              "SosId": 306
+            },
+            {
+              "Value": 307,
+              "SosId": 307
+            },
+            {
+              "Value": 308,
+              "SosId": 308
+            },
+            {
+              "Value": 309,
+              "SosId": 309
+            },
+            {
+              "Value": 310,
+              "SosId": 310
+            },
+            {
+              "Value": 311,
+              "SosId": 311
+            },
+            {
+              "Value": 312,
+              "SosId": 312
+            },
+            {
+              "Value": 313,
+              "SosId": 313
+            },
+            {
+              "Value": 314,
+              "SosId": 314
+            },
+            {
+              "Value": 315,
+              "SosId": 315
+            },
+            {
+              "Value": 316,
+              "SosId": 316
+            },
+            {
+              "Value": 317,
+              "SosId": 317
+            },
+            {
+              "Value": 318,
+              "SosId": 318
+            },
+            {
+              "Value": 319,
+              "SosId": 319
+            },
+            {
+              "Value": 320,
+              "SosId": 320
+            },
+            {
+              "Value": 321,
+              "SosId": 321
+            },
+            {
+              "Value": 322,
+              "SosId": 322
+            },
+            {
+              "Value": 323,
+              "SosId": 323
+            },
+            {
+              "Value": 324,
+              "SosId": 324
+            },
+            {
+              "Value": 325,
+              "SosId": 325
+            },
+            {
+              "Value": 326,
+              "SosId": 326
+            },
+            {
+              "Value": 327,
+              "SosId": 327
+            },
+            {
+              "Value": 328,
+              "SosId": 328
+            },
+            {
+              "Value": 329,
+              "SosId": 329
+            },
+            {
+              "Value": 330,
+              "SosId": 330
+            },
+            {
+              "Value": 331,
+              "SosId": 331
+            },
+            {
+              "Value": 332,
+              "SosId": 332
+            },
+            {
+              "Value": 333,
+              "SosId": 333
+            },
+            {
+              "Value": 334,
+              "SosId": 334
+            },
+            {
+              "Value": 335,
+              "SosId": 335
+            },
+            {
+              "Value": 336,
+              "SosId": 336
+            },
+            {
+              "Value": 337,
+              "SosId": 337
+            },
+            {
+              "Value": 338,
+              "SosId": 338
+            },
+            {
+              "Value": 339,
+              "SosId": 339
+            },
+            {
+              "Value": 340,
+              "SosId": 340
+            },
+            {
+              "Value": 341,
+              "SosId": 341
+            },
+            {
+              "Value": 342,
+              "SosId": 342
+            },
+            {
+              "Value": 343,
+              "SosId": 343
+            },
+            {
+              "Value": 344,
+              "SosId": 344
+            },
+            {
+              "Value": 345,
+              "SosId": 345
+            },
+            {
+              "Value": 346,
+              "SosId": 346
+            },
+            {
+              "Value": 347,
+              "SosId": 347
+            },
+            {
+              "Value": 348,
+              "SosId": 348
+            },
+            {
+              "Value": 349,
+              "SosId": 349
+            },
+            {
+              "Value": 350,
+              "SosId": 350
+            },
+            {
+              "Value": 351,
+              "SosId": 351
+            },
+            {
+              "Value": 352,
+              "SosId": 352
+            },
+            {
+              "Value": 353,
+              "SosId": 353
+            },
+            {
+              "Value": 354,
+              "SosId": 354
+            },
+            {
+              "Value": 355,
+              "SosId": 355
+            },
+            {
+              "Value": 356,
+              "SosId": 356
+            },
+            {
+              "Value": 357,
+              "SosId": 357
+            },
+            {
+              "Value": 358,
+              "SosId": 358
+            },
+            {
+              "Value": 359,
+              "SosId": 359
+            },
+            {
+              "Value": 360,
+              "SosId": 360
+            },
+            {
+              "Value": 361,
+              "SosId": 361
+            },
+            {
+              "Value": 362,
+              "SosId": 362
+            },
+            {
+              "Value": 363,
+              "SosId": 363
+            },
+            {
+              "Value": 364,
+              "SosId": 364
+            },
+            {
+              "Value": 365,
+              "SosId": 365
+            },
+            {
+              "Value": 366,
+              "SosId": 366
+            },
+            {
+              "Value": 367,
+              "SosId": 367
+            },
+            {
+              "Value": 368,
+              "SosId": 368
+            },
+            {
+              "Value": 369,
+              "SosId": 369
+            },
+            {
+              "Value": 370,
+              "SosId": 370
+            },
+            {
+              "Value": 371,
+              "SosId": 371
+            },
+            {
+              "Value": 372,
+              "SosId": 372
+            },
+            {
+              "Value": 373,
+              "SosId": 373
+            },
+            {
+              "Value": 374,
+              "SosId": 374
+            },
+            {
+              "Value": 375,
+              "SosId": 375
+            },
+            {
+              "Value": 376,
+              "SosId": 376
+            },
+            {
+              "Value": 377,
+              "SosId": 377
+            },
+            {
+              "Value": 378,
+              "SosId": 378
+            },
+            {
+              "Value": 379,
+              "SosId": 379
+            },
+            {
+              "Value": 380,
+              "SosId": 380
+            },
+            {
+              "Value": 381,
+              "SosId": 381
+            },
+            {
+              "Value": 382,
+              "SosId": 382
+            },
+            {
+              "Value": 383,
+              "SosId": 383
+            },
+            {
+              "Value": 384,
+              "SosId": 384
+            },
+            {
+              "Value": 385,
+              "SosId": 385
+            },
+            {
+              "Value": 386,
+              "SosId": 386
+            },
+            {
+              "Value": 387,
+              "SosId": 387
+            },
+            {
+              "Value": 388,
+              "SosId": 388
+            },
+            {
+              "Value": 389,
+              "SosId": 389
+            },
+            {
+              "Value": 390,
+              "SosId": 390
+            },
+            {
+              "Value": 391,
+              "SosId": 391
+            },
+            {
+              "Value": 392,
+              "SosId": 392
+            },
+            {
+              "Value": 393,
+              "SosId": 393
+            },
+            {
+              "Value": 394,
+              "SosId": 394
+            },
+            {
+              "Value": 395,
+              "SosId": 395
+            },
+            {
+              "Value": 396,
+              "SosId": 396
+            },
+            {
+              "Value": 397,
+              "SosId": 397
+            },
+            {
+              "Value": 398,
+              "SosId": 398
+            },
+            {
+              "Value": 399,
+              "SosId": 399
+            },
+            {
+              "Value": 400,
+              "SosId": 400
+            },
+            {
+              "Value": 401,
+              "SosId": 401
+            },
+            {
+              "Value": 402,
+              "SosId": 402
+            },
+            {
+              "Value": 403,
+              "SosId": 403
+            },
+            {
+              "Value": 404,
+              "SosId": 404
+            },
+            {
+              "Value": 405,
+              "SosId": 405
+            },
+            {
+              "Value": 406,
+              "SosId": 406
+            },
+            {
+              "Value": 407,
+              "SosId": 407
+            },
+            {
+              "Value": 408,
+              "SosId": 408
+            },
+            {
+              "Value": 409,
+              "SosId": 409
+            },
+            {
+              "Value": 410,
+              "SosId": 410
+            },
+            {
+              "Value": 411,
+              "SosId": 411
+            },
+            {
+              "Value": 412,
+              "SosId": 412
+            },
+            {
+              "Value": 413,
+              "SosId": 413
+            },
+            {
+              "Value": 414,
+              "SosId": 414
+            },
+            {
+              "Value": 415,
+              "SosId": 415
+            },
+            {
+              "Value": 416,
+              "SosId": 416
+            },
+            {
+              "Value": 417,
+              "SosId": 417
+            },
+            {
+              "Value": 418,
+              "SosId": 418
+            },
+            {
+              "Value": 419,
+              "SosId": 419
+            },
+            {
+              "Value": 420,
+              "SosId": 420
+            },
+            {
+              "Value": 421,
+              "SosId": 421
+            },
+            {
+              "Value": 422,
+              "SosId": 422
+            },
+            {
+              "Value": 423,
+              "SosId": 423
+            },
+            {
+              "Value": 424,
+              "SosId": 424
+            },
+            {
+              "Value": 425,
+              "SosId": 425
+            },
+            {
+              "Value": 426,
+              "SosId": 426
+            },
+            {
+              "Value": 427,
+              "SosId": 427
+            },
+            {
+              "Value": 428,
+              "SosId": 428
+            },
+            {
+              "Value": 429,
+              "SosId": 429
+            },
+            {
+              "Value": 430,
+              "SosId": 430
+            },
+            {
+              "Value": 431,
+              "SosId": 431
+            },
+            {
+              "Value": 432,
+              "SosId": 432
+            },
+            {
+              "Value": 433,
+              "SosId": 433
+            },
+            {
+              "Value": 434,
+              "SosId": 434
+            },
+            {
+              "Value": 435,
+              "SosId": 435
+            },
+            {
+              "Value": 436,
+              "SosId": 436
+            },
+            {
+              "Value": 437,
+              "SosId": 437
+            },
+            {
+              "Value": 438,
+              "SosId": 438
+            },
+            {
+              "Value": 439,
+              "SosId": 439
+            },
+            {
+              "Value": 440,
+              "SosId": 440
+            },
+            {
+              "Value": 441,
+              "SosId": 441
+            },
+            {
+              "Value": 442,
+              "SosId": 442
+            },
+            {
+              "Value": 443,
+              "SosId": 443
+            },
+            {
+              "Value": 444,
+              "SosId": 444
+            },
+            {
+              "Value": 445,
+              "SosId": 445
+            },
+            {
+              "Value": 446,
+              "SosId": 446
+            },
+            {
+              "Value": 447,
+              "SosId": 447
+            },
+            {
+              "Value": 448,
+              "SosId": 448
+            },
+            {
+              "Value": 449,
+              "SosId": 449
+            },
+            {
+              "Value": 450,
+              "SosId": 450
+            },
+            {
+              "Value": 451,
+              "SosId": 451
+            },
+            {
+              "Value": 452,
+              "SosId": 452
+            },
+            {
+              "Value": 453,
+              "SosId": 453
+            },
+            {
+              "Value": 454,
+              "SosId": 454
+            },
+            {
+              "Value": 455,
+              "SosId": 455
+            },
+            {
+              "Value": 456,
+              "SosId": 456
+            },
+            {
+              "Value": 457,
+              "SosId": 457
+            },
+            {
+              "Value": 458,
+              "SosId": 458
+            },
+            {
+              "Value": 459,
+              "SosId": 459
+            },
+            {
+              "Value": 460,
+              "SosId": 460
+            },
+            {
+              "Value": 461,
+              "SosId": 461
+            },
+            {
+              "Value": 462,
+              "SosId": 462
+            },
+            {
+              "Value": 463,
+              "SosId": 463
+            },
+            {
+              "Value": 464,
+              "SosId": 464
+            },
+            {
+              "Value": 465,
+              "SosId": 465
+            },
+            {
+              "Value": 466,
+              "SosId": 466
+            },
+            {
+              "Value": 467,
+              "SosId": 467
+            },
+            {
+              "Value": 468,
+              "SosId": 468
+            },
+            {
+              "Value": 469,
+              "SosId": 469
+            },
+            {
+              "Value": 470,
+              "SosId": 470
+            },
+            {
+              "Value": 471,
+              "SosId": 471
+            },
+            {
+              "Value": 472,
+              "SosId": 472
+            },
+            {
+              "Value": 473,
+              "SosId": 473
+            },
+            {
+              "Value": 474,
+              "SosId": 474
+            },
+            {
+              "Value": 475,
+              "SosId": 475
+            },
+            {
+              "Value": 476,
+              "SosId": 476
+            },
+            {
+              "Value": 477,
+              "SosId": 477
+            },
+            {
+              "Value": 478,
+              "SosId": 478
+            },
+            {
+              "Value": 479,
+              "SosId": 479
+            },
+            {
+              "Value": 480,
+              "SosId": 480
+            },
+            {
+              "Value": 481,
+              "SosId": 481
+            },
+            {
+              "Value": 482,
+              "SosId": 482
+            },
+            {
+              "Value": 483,
+              "SosId": 483
+            },
+            {
+              "Value": 484,
+              "SosId": 484
+            },
+            {
+              "Value": 485,
+              "SosId": 485
+            },
+            {
+              "Value": 486,
+              "SosId": 486
+            },
+            {
+              "Value": 487,
+              "SosId": 487
+            },
+            {
+              "Value": 488,
+              "SosId": 488
+            },
+            {
+              "Value": 489,
+              "SosId": 489
+            },
+            {
+              "Value": 490,
+              "SosId": 490
+            },
+            {
+              "Value": 491,
+              "SosId": 491
+            },
+            {
+              "Value": 492,
+              "SosId": 492
+            },
+            {
+              "Value": 493,
+              "SosId": 493
+            },
+            {
+              "Value": 494,
+              "SosId": 494
+            },
+            {
+              "Value": 495,
+              "SosId": 495
+            },
+            {
+              "Value": 496,
+              "SosId": 496
+            },
+            {
+              "Value": 497,
+              "SosId": 497
+            },
+            {
+              "Value": 498,
+              "SosId": 498
+            },
+            {
+              "Value": 499,
+              "SosId": 499
+            },
+            {
+              "Value": 500,
+              "SosId": 500
+            },
+            {
+              "Value": 501,
+              "SosId": 501
+            },
+            {
+              "Value": 502,
+              "SosId": 502
+            },
+            {
+              "Value": 503,
+              "SosId": 503
+            },
+            {
+              "Value": 504,
+              "SosId": 504
+            },
+            {
+              "Value": 505,
+              "SosId": 505
+            },
+            {
+              "Value": 506,
+              "SosId": 506
+            },
+            {
+              "Value": 507,
+              "SosId": 507
+            },
+            {
+              "Value": 508,
+              "SosId": 508
+            },
+            {
+              "Value": 509,
+              "SosId": 509
+            },
+            {
+              "Value": 510,
+              "SosId": 510
+            },
+            {
+              "Value": 511,
+              "SosId": 511
+            },
+            {
+              "Value": 512,
+              "SosId": 512
+            },
+            {
+              "Value": 513,
+              "SosId": 513
+            },
+            {
+              "Value": 514,
+              "SosId": 514
+            },
+            {
+              "Value": 515,
+              "SosId": 515
+            },
+            {
+              "Value": 516,
+              "SosId": 516
+            },
+            {
+              "Value": 517,
+              "SosId": 517
+            },
+            {
+              "Value": 518,
+              "SosId": 518
+            },
+            {
+              "Value": 519,
+              "SosId": 519
+            },
+            {
+              "Value": 520,
+              "SosId": 520
+            },
+            {
+              "Value": 521,
+              "SosId": 521
+            },
+            {
+              "Value": 522,
+              "SosId": 522
+            },
+            {
+              "Value": 523,
+              "SosId": 523
+            },
+            {
+              "Value": 524,
+              "SosId": 524
+            },
+            {
+              "Value": 525,
+              "SosId": 525
+            },
+            {
+              "Value": 526,
+              "SosId": 526
+            },
+            {
+              "Value": 527,
+              "SosId": 527
+            },
+            {
+              "Value": 528,
+              "SosId": 528
+            },
+            {
+              "Value": 529,
+              "SosId": 529
+            },
+            {
+              "Value": 530,
+              "SosId": 530
+            },
+            {
+              "Value": 531,
+              "SosId": 531
+            },
+            {
+              "Value": 532,
+              "SosId": 532
+            },
+            {
+              "Value": 533,
+              "SosId": 533
+            },
+            {
+              "Value": 534,
+              "SosId": 534
+            },
+            {
+              "Value": 535,
+              "SosId": 535
+            },
+            {
+              "Value": 536,
+              "SosId": 536
+            },
+            {
+              "Value": 537,
+              "SosId": 537
+            },
+            {
+              "Value": 538,
+              "SosId": 538
+            },
+            {
+              "Value": 539,
+              "SosId": 539
+            },
+            {
+              "Value": 540,
+              "SosId": 540
+            },
+            {
+              "Value": 541,
+              "SosId": 541
+            },
+            {
+              "Value": 542,
+              "SosId": 542
+            },
+            {
+              "Value": 543,
+              "SosId": 543
+            },
+            {
+              "Value": 544,
+              "SosId": 544
+            },
+            {
+              "Value": 545,
+              "SosId": 545
+            },
+            {
+              "Value": 546,
+              "SosId": 546
+            },
+            {
+              "Value": 547,
+              "SosId": 547
+            },
+            {
+              "Value": 548,
+              "SosId": 548
+            },
+            {
+              "Value": 549,
+              "SosId": 549
+            },
+            {
+              "Value": 550,
+              "SosId": 550
+            },
+            {
+              "Value": 551,
+              "SosId": 551
+            },
+            {
+              "Value": 552,
+              "SosId": 552
+            },
+            {
+              "Value": 553,
+              "SosId": 553
+            },
+            {
+              "Value": 554,
+              "SosId": 554
+            },
+            {
+              "Value": 555,
+              "SosId": 555
+            },
+            {
+              "Value": 556,
+              "SosId": 556
+            },
+            {
+              "Value": 557,
+              "SosId": 557
+            },
+            {
+              "Value": 558,
+              "SosId": 558
+            },
+            {
+              "Value": 559,
+              "SosId": 559
+            },
+            {
+              "Value": 560,
+              "SosId": 560
+            },
+            {
+              "Value": 561,
+              "SosId": 561
+            },
+            {
+              "Value": 562,
+              "SosId": 562
+            },
+            {
+              "Value": 563,
+              "SosId": 563
+            },
+            {
+              "Value": 564,
+              "SosId": 564
+            },
+            {
+              "Value": 565,
+              "SosId": 565
+            },
+            {
+              "Value": 566,
+              "SosId": 566
+            },
+            {
+              "Value": 567,
+              "SosId": 567
+            },
+            {
+              "Value": 568,
+              "SosId": 568
+            },
+            {
+              "Value": 569,
+              "SosId": 569
+            },
+            {
+              "Value": 570,
+              "SosId": 570
+            },
+            {
+              "Value": 571,
+              "SosId": 571
+            },
+            {
+              "Value": 572,
+              "SosId": 572
+            },
+            {
+              "Value": 573,
+              "SosId": 573
+            },
+            {
+              "Value": 574,
+              "SosId": 574
+            },
+            {
+              "Value": 575,
+              "SosId": 575
+            },
+            {
+              "Value": 576,
+              "SosId": 576
+            },
+            {
+              "Value": 577,
+              "SosId": 577
+            },
+            {
+              "Value": 578,
+              "SosId": 578
+            },
+            {
+              "Value": 579,
+              "SosId": 579
+            },
+            {
+              "Value": 580,
+              "SosId": 580
+            },
+            {
+              "Value": 581,
+              "SosId": 581
+            },
+            {
+              "Value": 582,
+              "SosId": 582
+            },
+            {
+              "Value": 583,
+              "SosId": 583
+            },
+            {
+              "Value": 584,
+              "SosId": 584
+            },
+            {
+              "Value": 585,
+              "SosId": 585
+            },
+            {
+              "Value": 586,
+              "SosId": 586
+            },
+            {
+              "Value": 587,
+              "SosId": 587
+            },
+            {
+              "Value": 588,
+              "SosId": 588
+            },
+            {
+              "Value": 589,
+              "SosId": 589
+            },
+            {
+              "Value": 590,
+              "SosId": 590
+            },
+            {
+              "Value": 591,
+              "SosId": 591
+            },
+            {
+              "Value": 592,
+              "SosId": 592
+            },
+            {
+              "Value": 593,
+              "SosId": 593
+            },
+            {
+              "Value": 594,
+              "SosId": 594
+            },
+            {
+              "Value": 595,
+              "SosId": 595
+            },
+            {
+              "Value": 596,
+              "SosId": 596
+            },
+            {
+              "Value": 597,
+              "SosId": 597
+            },
+            {
+              "Value": 598,
+              "SosId": 598
+            },
+            {
+              "Value": 599,
+              "SosId": 599
+            },
+            {
+              "Value": 600,
+              "SosId": 600
+            },
+            {
+              "Value": 601,
+              "SosId": 601
+            },
+            {
+              "Value": 602,
+              "SosId": 602
+            },
+            {
+              "Value": 603,
+              "SosId": 603
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

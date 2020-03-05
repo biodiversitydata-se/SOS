@@ -19,11 +19,12 @@ namespace SOS.Import.Factories.FieldMappings
     /// <summary>
     /// Class for creating life stage field mapping.
     /// </summary>
-    public class LifeStageFieldMappingFactory : FieldMappingFactoryBase, ILifeStageFieldMappingFactory
+    public class LifeStageFieldMappingFactory : ArtportalenFieldMappingFactoryBase
     {
         private readonly IMetadataRepository _metadataRepository;
         private readonly ILogger<LifeStageFieldMappingFactory> _logger;
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.LifeStage;
+        protected override bool Localized => true;
 
         /// <summary>
         /// Constructor
@@ -41,7 +42,7 @@ namespace SOS.Import.Factories.FieldMappings
         protected override async Task<ICollection<FieldMappingValue>> GetFieldMappingValues()
         {
             var stages = await _metadataRepository.GetStagesAsync();
-            var fieldMappingValues = base.ConvertToFieldMappingValues(stages.ToArray());
+            var fieldMappingValues = base.ConvertToLocalizedFieldMappingValues(stages.ToArray());
             return fieldMappingValues;
         }
     }

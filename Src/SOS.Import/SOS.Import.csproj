@@ -40,7 +40,13 @@
     <None Update="Resources\FieldMappings\ActivityFieldMapping.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\FieldMappings\BasisOfRecordFieldMapping.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\FieldMappings\BiotopeFieldMapping.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\FieldMappings\ContinentFieldMapping.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\FieldMappings\CountyFieldMapping.json">
@@ -55,6 +61,9 @@
     <None Update="Resources\FieldMappings\MunicipalityFieldMapping.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\FieldMappings\OrganizationFieldMapping.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\FieldMappings\ParishFieldMapping.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -62,6 +71,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\FieldMappings\SubstrateFieldMapping.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\FieldMappings\UnitFieldMapping.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\FieldMappings\ValidationStatusFieldMapping.json">

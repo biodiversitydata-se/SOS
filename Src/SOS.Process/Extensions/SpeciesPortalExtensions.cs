@@ -93,7 +93,6 @@ namespace SOS.Process.Extensions
                     UncertainDetermination = verbatim.UnsureDetermination
                 },
                 InformationWithheld = "More information can be obtained from the Data Provider",
-                Institution = verbatim.OwnerOrganization,
                 IsInEconomicZoneOfSweden = hasPosition, // Species portal validate all sightings, we rely on that validation as long it has coordinates
                 Language = Language.Swedish,
                 Location = new ProcessedLocation
@@ -134,7 +133,6 @@ namespace SOS.Process.Extensions
                     IsNotRediscoveredObservation = verbatim.NotRecovered,
                     IsPositiveObservation = !(verbatim.NotPresent || verbatim.NotRecovered),
                     OrganismQuantity = verbatim.Quantity,
-                    OrganismQuantityType = verbatim.Unit,
                     RecordedBy = verbatim.Observers,
                     RecordNumber = verbatim.Label,
                     Remarks = verbatim.Comment,
@@ -164,6 +162,8 @@ namespace SOS.Process.Extensions
             obs.Event.SubstrateId = GetSosId(verbatim?.Bioptope?.Id, fieldMappings[FieldMappingFieldId.Substrate]);
             obs.Identification.ValidationStatusId = GetSosId(verbatim?.ValidationStatus?.Id, fieldMappings[FieldMappingFieldId.ValidationStatus]);
             obs.Occurrence.LifeStageId = GetSosId(verbatim?.Stage?.Id, fieldMappings[FieldMappingFieldId.LifeStage]);
+            obs.OrganizationId = GetSosId(verbatim?.OwnerOrganization?.Id, fieldMappings[FieldMappingFieldId.Organization]);
+            obs.Occurrence.OrganismQuantityUnitId = GetSosId(verbatim?.Unit?.Id, fieldMappings[FieldMappingFieldId.Unit]);
             return obs;
         }
 

@@ -205,7 +205,10 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// 12.5 (organismQuantity) with %biomass (organismQuantityType).
         /// r (organismQuantity) with BraunBlanquetScale (organismQuantityType).
         /// </example>
-        public Metadata OrganismQuantityType { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue OrganismQuantityUnitId { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of preparations

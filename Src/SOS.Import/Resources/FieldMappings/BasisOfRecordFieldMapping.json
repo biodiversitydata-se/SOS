@@ -1,0 +1,136 @@
+{
+  "Id": 12,
+  "Name": "BasisOfRecord",
+  "Localized": false,
+  "Values": [
+    {
+      "Id": 0,
+      "Name": "HumanObservation",
+      "Localized": false
+    },
+    {
+      "Id": 1,
+      "Name": "PreservedSpecimen",
+      "Localized": false
+    },
+    {
+      "Id": 2,
+      "Name": "FossilSpecimen",
+      "Localized": false
+    },
+    {
+      "Id": 3,
+      "Name": "LivingSpecimen",
+      "Localized": false
+    },
+    {
+      "Id": 4,
+      "Name": "MaterialSample",
+      "Localized": false
+    },
+    {
+      "Id": 5,
+      "Name": "Event",
+      "Localized": false
+    },
+    {
+      "Id": 6,
+      "Name": "MachineObservation",
+      "Localized": false
+    },
+    {
+      "Id": 7,
+      "Name": "Taxon",
+      "Localized": false
+    },
+    {
+      "Id": 8,
+      "Name": "Occurrence",
+      "Localized": false
+    },
+    {
+      "Id": 9,
+      "Name": "Literature",
+      "Localized": false
+    }
+  ],
+  "ExternalSystemsMapping": [
+    {
+      "Id": 1,
+      "Name": "DarwinCore",
+      "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
+      "Mappings": [
+        {
+          "Key": "basisOfRecord",
+          "Description": "The basisOfRecord term (http://rs.tdwg.org/dwc/terms/basisOfRecord)",
+          "Values": [
+            {
+              "Value": "HumanObservation",
+              "SosId": 0
+            },
+            {
+              "Value": "Human Observation",
+              "SosId": 0
+            },
+            {
+              "Value": "PreservedSpecimen",
+              "SosId": 1
+            },
+            {
+              "Value": "Preserved Specimen",
+              "SosId": 1
+            },
+            {
+              "Value": "FossilSpecimen",
+              "SosId": 2
+            },
+            {
+              "Value": "Fossil Specimen",
+              "SosId": 2
+            },
+            {
+              "Value": "LivingSpecimen",
+              "SosId": 3
+            },
+            {
+              "Value": "Living Specimen",
+              "SosId": 3
+            },
+            {
+              "Value": "MaterialSample",
+              "SosId": 4
+            },
+            {
+              "Value": "Material Sample",
+              "SosId": 4
+            },
+            {
+              "Value": "Event",
+              "SosId": 5
+            },
+            {
+              "Value": "MachineObservation",
+              "SosId": 6
+            },
+            {
+              "Value": "Machine Observation",
+              "SosId": 6
+            },
+            {
+              "Value": "Taxon",
+              "SosId": 7
+            },
+            {
+              "Value": "Occurrence",
+              "SosId": 8
+            },
+            {
+              "Value": "Literature",
+              "SosId": 9
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

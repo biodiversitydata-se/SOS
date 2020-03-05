@@ -31,6 +31,19 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
+        /// Converts first char to lower case.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string ToLowerFirstChar(this string input)
+        {
+            string newString = input;
+            if (!String.IsNullOrEmpty(newString) && Char.IsUpper(newString[0]))
+                newString = Char.ToLower(newString[0]) + newString.Substring(1);
+            return newString;
+        }
+
+        /// <summary>
         /// Validates a Boolean value that has been
         /// received over the internet.
         /// </summary>
