@@ -167,6 +167,8 @@ namespace SOS.Import.Factories
                 // Release semaphore in order to let next thread start getting data from source db 
                 _semaphore.Release();
             }
+
+            return 0;
         }
 
         /// <inheritdoc />
