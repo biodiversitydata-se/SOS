@@ -73,7 +73,7 @@ namespace SOS.Import.Factories
             _speciesCollectionRepository = speciesCollectionItemRepository ?? throw new ArgumentNullException(nameof(speciesCollectionItemRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _semaphore = new SemaphoreSlim(1,_speciesPortalConfiguration.NoOfThreads);
+            _semaphore = new SemaphoreSlim(_speciesPortalConfiguration.NoOfThreads);
         }
 
         /// <inheritdoc />
@@ -159,10 +159,10 @@ namespace SOS.Import.Factories
                     harvestBatchTasks.Add(Task.Run(async () => {
                         try
                         {
-                            _logger.LogDebug($"Start getting species portal sightings from id: { minId } to id: { minId + _speciesPortalConfiguration.ChunkSize - 1 }");
+                            _logger.LogDebug($"Start getting species portal sightings from id: { currentId } to id: { currentId + _speciesPortalConfiguration.ChunkSize - 1 }");
                             // Get chunk of sightings
-                            var sightings = (await _sightingRepository.GetChunkAsync(minId, _speciesPortalConfiguration.ChunkSize)).ToArray();
-                            _logger.LogDebug($"Finish getting species portal sightings from id: { minId } to id: { minId + _speciesPortalConfiguration.ChunkSize - 1 }");
+                            var sightings = (await _sightingRepository.GetChunkAsync(currentId, _speciesPortalConfiguration.ChunkSize)).ToArray();
+                            _logger.LogDebug($"Finish getting species portal sightings from id: { currentId } to id: { currentId + _speciesPortalConfiguration.ChunkSize - 1 }");
 
                             /* if (_speciesPortalConfiguration.AddTestSightings && !hasAddedTestSightings)
                              {
