@@ -74,7 +74,7 @@ namespace SOS.Import.Factories
             _speciesCollectionRepository = speciesCollectionItemRepository ?? throw new ArgumentNullException(nameof(speciesCollectionItemRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _semaphore = new SemaphoreSlim(1, speciesPortalConfiguration.NoOfThreads);
+            _semaphore = new SemaphoreSlim(speciesPortalConfiguration.NoOfThreads);
         }
 
         private async Task<int> HarvestBatchAsync(
