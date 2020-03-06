@@ -16,5 +16,10 @@ namespace SOS.Lib.Configuration.Process
         /// Host
         /// </summary>
         public MongoDbConfiguration ProcessedDbConfiguration { get; set; }
+
+        /// <summary>
+        /// Field mapping
+        /// </summary>
+        public FieldMappingConfiguration FieldMapping { get; set; }
     }
 }

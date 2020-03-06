@@ -10,6 +10,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Extensions;
+using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
@@ -22,6 +23,7 @@ namespace SOS.Process.Factories
     {
         private readonly ISpeciesPortalVerbatimRepository _speciesPortalVerbatimRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
+        private readonly IFieldMappingResolverHelper _fieldMappingResolverHelper;
 
         /// <summary>
         /// Constructor
@@ -29,15 +31,18 @@ namespace SOS.Process.Factories
         /// <param name="speciesPortalVerbatimRepository"></param>
         /// <param name="processedSightingRepository"></param>
         /// <param name="processedFieldMappingRepository"></param>
+        /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="logger"></param>
         public SpeciesPortalProcessFactory(
             ISpeciesPortalVerbatimRepository speciesPortalVerbatimRepository,
             IProcessedSightingRepository processedSightingRepository,
             IProcessedFieldMappingRepository processedFieldMappingRepository,
+            IFieldMappingResolverHelper fieldMappingResolverHelper,
             ILogger<SpeciesPortalProcessFactory> logger) : base(processedSightingRepository, logger)
         {
             _speciesPortalVerbatimRepository = speciesPortalVerbatimRepository ?? throw new ArgumentNullException(nameof(speciesPortalVerbatimRepository));
             _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _fieldMappingResolverHelper = fieldMappingResolverHelper ?? throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
         }
 
         /// <inheritdoc />
@@ -75,7 +80,6 @@ namespace SOS.Process.Factories
                 await cursor.ForEachAsync(c =>
                 {
                     sightings.Add(c.ToProcessed(taxa, fieldMappings));
-                    
                     if (sightings.Count % ProcessRepository.BatchSize == 0)
                     {
                         verbatimCount += ProcessRepository.BatchSize;
@@ -89,6 +93,7 @@ namespace SOS.Process.Factories
                 {
                     verbatimCount += sightings.Count;
                     Logger.LogDebug($"Species Portal Sightings processed: {verbatimCount}");
+                    _fieldMappingResolverHelper.ResolveFieldMappedValues(sightings);
                     await ProcessRepository.AddManyAsync(sightings);
                     sightings.Clear();
                 }

@@ -7,6 +7,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Process.Database;
@@ -73,10 +74,12 @@ namespace SOS.Process.IntegrationTests.Jobs
                 areaHelper,
                 processedSightingRepository,
                 new NullLogger<KulProcessFactory>());
+            var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
             var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
                 new SpeciesPortalVerbatimRepository(verbatimClient, new NullLogger<SpeciesPortalVerbatimRepository>()),
                 processedSightingRepository,
-                new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>()), 
+                processedFieldMappingRepository, 
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
                 new NullLogger<SpeciesPortalProcessFactory>());
 
             var processTaxaJob = new ProcessJob(
