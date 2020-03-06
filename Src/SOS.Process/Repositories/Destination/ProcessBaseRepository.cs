@@ -158,7 +158,9 @@ namespace SOS.Process.Repositories.Destination
         /// <summary>
         /// Configuration collection
         /// </summary>
-        private IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration => Database.GetCollection<ProcessedConfiguration>(_collectionNameConfiguration);
+        private IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration => Database
+            .GetCollection<ProcessedConfiguration>(_collectionNameConfiguration)
+            .WithWriteConcern(new WriteConcern(w:0, journal: false ));
 
         /// <summary>
         /// 

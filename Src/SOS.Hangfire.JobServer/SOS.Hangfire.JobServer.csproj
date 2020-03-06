@@ -71,6 +71,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appsettings - Copy.dev.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="appsettings.prod.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
