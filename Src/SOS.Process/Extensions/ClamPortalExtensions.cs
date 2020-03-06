@@ -39,8 +39,8 @@ namespace SOS.Process.Extensions
 
             return new ProcessedSighting(DataProvider.ClamPortal)
             {
-                AccessRights = verbatim.AccessRights,
-                BasisOfRecord = verbatim.BasisOfRecord,
+                AccessRightsId = GetAccessRightsIdFromString(verbatim.AccessRights),
+                BasisOfRecordId = GetBasisOfRecordIdFromString(verbatim.BasisOfRecord),
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.ClamPortal.ToString()}",
                 DatasetName = "Träd och musselportalen",
                 Event = new ProcessedEvent
@@ -93,7 +93,7 @@ namespace SOS.Process.Extensions
                     OrganismQuantityUnitId = GetOrganismQuantityUnitIdFromString(verbatim.QuantityUnit),
                     RecordedBy = verbatim.RecordedBy,
                     Remarks = verbatim.OccurrenceRemarks,
-                    Status = verbatim.OccurrenceStatus
+                    OccurrenceStatusId = GetOccurrenceStatusIdFromString(verbatim.OccurrenceStatus)
                 },
                 Projects = string.IsNullOrEmpty(verbatim.ProjectName) ? null : new[]
                 {
@@ -109,15 +109,51 @@ namespace SOS.Process.Extensions
             };
         }
 
-        private static ProcessedFieldMapValue GetOrganismQuantityUnitIdFromString(string verbatimQuantityUnit)
+        private static ProcessedFieldMapValue GetBasisOfRecordIdFromString(string basisOfRecord)
         {
-            if (string.IsNullOrEmpty(verbatimQuantityUnit)) return null;
+            if (string.IsNullOrEmpty(basisOfRecord)) return null;
+
+            // todo - map values to BasisOfRecordId enum
+            return new ProcessedFieldMapValue
+            {
+                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                Value = basisOfRecord
+            };
+        }
+
+        private static ProcessedFieldMapValue GetAccessRightsIdFromString(string accessRights)
+        {
+            if (string.IsNullOrEmpty(accessRights)) return null;
+
+            // todo - map values to AccessRightsId enum
+            return new ProcessedFieldMapValue
+            {
+                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                Value = accessRights
+            };
+        }
+
+        private static ProcessedFieldMapValue GetOccurrenceStatusIdFromString(string occurrenceStatus)
+        {
+            if (string.IsNullOrEmpty(occurrenceStatus)) return null;
+
+            // todo - map values to OccurrenceStatusId enum
+            return new ProcessedFieldMapValue
+            {
+                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                Value = occurrenceStatus
+            };
+        }
+
+        private static ProcessedFieldMapValue GetOrganismQuantityUnitIdFromString(string quantityUnit)
+        {
+            if (string.IsNullOrEmpty(quantityUnit)) return null;
 
             // todo - map values to Unit ids
             return new ProcessedFieldMapValue
             {
                 Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
-                Value = verbatimQuantityUnit
+                Value = quantityUnit
             };
         }
 

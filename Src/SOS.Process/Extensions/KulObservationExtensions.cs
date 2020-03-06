@@ -37,7 +37,7 @@ namespace SOS.Process.Extensions
 
             var obs = new ProcessedSighting(DataProvider.KUL)
             {
-                BasisOfRecord = BasisOfRecord.HumanObservation,
+                BasisOfRecordId = new ProcessedFieldMapValue { Id=(int)BasisOfRecordId.Humanobservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.KUL.ToString()}",
                 DatasetName = "KUL",
                 Event = new ProcessedEvent
@@ -60,7 +60,7 @@ namespace SOS.Process.Extensions
                     DecimalLongitude = verbatim.DecimalLongitude,
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     ContinentId = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
-                    Country = Country.Sweden,
+                    CountryId = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
                     Locality = verbatim.Locality,
                     Point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry(),
                     PointWithBuffer = wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoJsonGeometry(),
@@ -78,7 +78,7 @@ namespace SOS.Process.Extensions
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
                     RecordedBy = verbatim.RecordedBy,
-                    Status = GetOccurrenceStatus(verbatim.DyntaxaTaxonId)
+                    OccurrenceStatusId = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
                 },
                 OwnerInstitutionCode = verbatim.Owner,
                 ProtectionLevel = GetProtectionLevel(),
@@ -117,9 +117,14 @@ namespace SOS.Process.Extensions
         /// <summary>
         /// Gets the occurrence status. Set to Present if DyntaxaTaxonId from provider is greater than 0 and Absent if DyntaxaTaxonId is 0
         /// </summary>
-        private static string GetOccurrenceStatus(int dyntaxaTaxonId)
+        private static ProcessedFieldMapValue GetOccurrenceStatusId(int dyntaxaTaxonId)
         {
-            return dyntaxaTaxonId == 0 ? OccurrenceStatus.Absent : OccurrenceStatus.Present;
+            if (dyntaxaTaxonId == 0)
+            {
+                return new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Absent };
+            }
+
+            return new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Present };
         }
 
         /// <summary>

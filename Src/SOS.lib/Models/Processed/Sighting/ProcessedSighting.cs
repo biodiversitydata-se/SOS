@@ -34,7 +34,10 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// access or restrictions based on privacy, security,
         /// or other policies.
         /// </summary>
-        public string AccessRights { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue AccessRightsId { get; set; }
 
         /// <summary>
         /// The specific nature of the data record -
@@ -42,10 +45,11 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// Recommended best practice is to use a controlled
         /// vocabulary such as the Darwin Core Type Vocabulary
         /// (http://rs.tdwg.org/dwc/terms/type-vocabulary/index.htm).
-        /// In Species Gateway this property has the value
-        /// HumanObservation.
         /// </summary>
-        public string BasisOfRecord { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue BasisOfRecordId { get; set; }
 
         /// <summary>
         /// A bibliographic reference for the resource as a statement
@@ -252,6 +256,9 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// root of the record.
         /// This property is currently not used.
         /// </summary>
-        public string Type { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue TypeId { get; set; }
     }
 }

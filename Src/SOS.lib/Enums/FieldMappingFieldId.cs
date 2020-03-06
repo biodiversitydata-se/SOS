@@ -18,6 +18,11 @@
         Organization = 10,
         Unit = 11,
         BasisOfRecord = 12,
-        Continent = 13
+        Continent = 13,
+        EstablishmentMeans = 14,
+        OccurrenceStatus = 15,
+        AccessRights = 16,
+        Country = 17,
+        Type = 18
     }
 }
