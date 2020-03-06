@@ -52,6 +52,11 @@
       "Id": 9,
       "Name": "Literature",
       "Localized": false
+    },
+    {
+      "Id": 10,
+      "Name": "Unknown",
+      "Localized": false
     }
   ],
   "ExternalSystemsMapping": [
@@ -127,6 +132,10 @@
             {
               "Value": "Literature",
               "SosId": 9
+            },
+            {
+              "Value": "Unknown",
+              "SosId": 10
             }
           ]
         }

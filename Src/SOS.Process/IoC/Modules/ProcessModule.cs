@@ -35,10 +35,15 @@ namespace SOS.Process.IoC.Modules
             var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName, processedDbConfiguration.BatchSize);
             builder.RegisterInstance(processClient).As<IProcessClient>().SingleInstance();
 
+            // Field mapping processing configuration
+            if (Configuration.FieldMapping != null)
+                builder.RegisterInstance(Configuration.FieldMapping).As<FieldMappingConfiguration>().SingleInstance();
+
             // Helpers
             builder.RegisterType<AreaNameMapper>().As<IAreaNameMapper>().SingleInstance();
             builder.RegisterType<AreaHelper>().As<IAreaHelper>().SingleInstance();
             builder.RegisterType<FieldMappingDiffHelper>().As<IFieldMappingDiffHelper>().SingleInstance();
+            builder.RegisterType<FieldMappingResolverHelper>().As<IFieldMappingResolverHelper>().SingleInstance();
 
             // Repositories source
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();

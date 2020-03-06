@@ -61,7 +61,7 @@ namespace SOS.Process.Extensions
                 Language = verbatim.Language,
                 Location = new ProcessedLocation
                 {
-                    Continent = "Europa",
+                    ContinentId = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
                     CoordinatePrecision = verbatim.CoordinateUncertaintyInMeters,
                     CountryCode = verbatim.CountryCode,
                     DecimalLatitude = verbatim.DecimalLatitude,

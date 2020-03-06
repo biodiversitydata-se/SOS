@@ -73,7 +73,9 @@ namespace SOS.Export.IO.DwcArchive
             }
         }
 
-        private void ResolveFieldMappedValues(ProcessedSighting[] processedSightings, Dictionary<FieldMappingFieldId, Dictionary<int, string>> valueMappingDictionaries)
+        private void ResolveFieldMappedValues(
+            ProcessedSighting[] processedSightings, 
+            Dictionary<FieldMappingFieldId, Dictionary<int, string>> valueMappingDictionaries)
         {
             foreach (var processedSighting in processedSightings)
             {
@@ -88,6 +90,7 @@ namespace SOS.Export.IO.DwcArchive
                 ResolveFieldMappedValue(processedSighting.Occurrence?.GenderId, valueMappingDictionaries[FieldMappingFieldId.Gender]);
                 ResolveFieldMappedValue(processedSighting.Occurrence?.OrganismQuantityUnitId, valueMappingDictionaries[FieldMappingFieldId.Unit]);
                 ResolveFieldMappedValue(processedSighting.OrganizationId, valueMappingDictionaries[FieldMappingFieldId.Organization]);
+                ResolveFieldMappedValue(processedSighting.Location?.ContinentId, valueMappingDictionaries[FieldMappingFieldId.Continent]);
             }
         }
 
@@ -102,6 +105,7 @@ namespace SOS.Export.IO.DwcArchive
                 fieldMapValue.Value = translatedValue;
             }
         }
+
         private async Task WriteOccurrenceCsvAsync<T>(Stream stream, IEnumerable<T> records, ClassMap<T> map)
         {
             if (!records?.Any() ?? true)

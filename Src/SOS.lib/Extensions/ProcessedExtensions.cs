@@ -68,7 +68,7 @@ namespace SOS.Lib.Extensions
             // todo - initialize the Value property for field mapped types.
             return new DarwinCoreLocation
             {
-                Continent = source.Continent,
+                Continent = source.ContinentId?.Value,
                 CoordinatePrecision = source.CoordinatePrecision?.ToString(),
                 CoordinateUncertaintyInMeters = source.CoordinateUncertaintyInMeters,
                 Country = source.Country,

@@ -11,6 +11,7 @@ using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 using SOS.Process.Factories;
+using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
@@ -25,6 +26,7 @@ namespace SOS.Process.UnitTests.Factories
         private readonly Mock<ISpeciesPortalVerbatimRepository> _speciesPortalVerbatimRepository;
         private readonly Mock<IProcessedSightingRepository> _processedSightingRepositoryMock;
         private readonly Mock<IProcessedFieldMappingRepository> _processedFieldMappingRepositoryMock;
+        private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
         private readonly Mock<ILogger<SpeciesPortalProcessFactory>> _loggerMock;
 
         /// <summary>
@@ -35,6 +37,7 @@ namespace SOS.Process.UnitTests.Factories
             _speciesPortalVerbatimRepository = new Mock<ISpeciesPortalVerbatimRepository>();
             _processedSightingRepositoryMock = new Mock<IProcessedSightingRepository>();
             _processedFieldMappingRepositoryMock = new Mock<IProcessedFieldMappingRepository>();
+            _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
             _loggerMock = new Mock<ILogger<SpeciesPortalProcessFactory>>();
         }
 
@@ -48,12 +51,14 @@ namespace SOS.Process.UnitTests.Factories
                 _speciesPortalVerbatimRepository.Object,
                 _processedSightingRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
+                _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new SpeciesPortalProcessFactory(
                 null,
                 _processedSightingRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
+                _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesPortalVerbatimRepository");
 
@@ -61,6 +66,7 @@ namespace SOS.Process.UnitTests.Factories
                 _speciesPortalVerbatimRepository.Object,
                 null,
                 _processedFieldMappingRepositoryMock.Object,
+                _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("DarwinCoreRepository");
 
@@ -68,6 +74,7 @@ namespace SOS.Process.UnitTests.Factories
                 _speciesPortalVerbatimRepository.Object,
                 _processedSightingRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
+                _fieldMappingResolverHelperMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -109,6 +116,7 @@ namespace SOS.Process.UnitTests.Factories
                 _speciesPortalVerbatimRepository.Object,
                 _processedSightingRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
+                _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
 
             var result = await speciesPortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
@@ -137,6 +145,7 @@ namespace SOS.Process.UnitTests.Factories
                 _speciesPortalVerbatimRepository.Object,
                 _processedSightingRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
+                _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
 
             var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
@@ -167,6 +176,7 @@ namespace SOS.Process.UnitTests.Factories
                 _speciesPortalVerbatimRepository.Object,
                 _processedSightingRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
+                _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
 
             var result = await speciesPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
