@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace SOS.Lib.Configuration.Import
 {
@@ -21,6 +19,8 @@ namespace SOS.Lib.Configuration.Import
         /// If set to null all sightings will be fetched.
         /// </summary>
         public int? MaxNumberOfSightingsHarvested { get; set; } = null;
+
+        public int NoOfThreads { get; set; } = 2;
 
         /// <summary>
         /// Set to true to add sightings for testing purpose.

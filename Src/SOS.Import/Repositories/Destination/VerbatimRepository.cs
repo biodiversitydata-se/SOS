@@ -103,22 +103,24 @@ namespace SOS.Import.Repositories.Destination
                 switch (e.Code)
                 {
                     case 16500: //Request Rate too Large
-                        // If first atempt failed, try add items one in a time
- 
-                        var success = true;
+                        // If attempt failed, try split items in half and try again
+                        var batchCount = batch.Count() / 2;
 
-                        foreach (var item in items)
+                        // If we are down to less than 10 items something must be wrong
+                        if (batchCount > 5)
                         {
-                            success = success && await AddAsync(item);
+                            var addTasks = new List<Task<bool>>
+                            {
+                                AddBatchAsync(batch.Take(batchCount)),
+                                AddBatchAsync(batch.Skip(batchCount))
+                            };
+
+                            // Run all tasks async
+                            await Task.WhenAll(addTasks);
+                            return addTasks.All(t => t.Result);
                         }
 
-                        if (!success)
-                        {
-                            Logger.LogError(e.ToString());
-                            return false;
-                        }
-
-                        return true;
+                        break;
                 }
 
                 Logger.LogError(e.ToString());

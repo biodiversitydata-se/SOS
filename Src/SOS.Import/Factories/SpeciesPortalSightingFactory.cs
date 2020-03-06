@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -32,7 +33,7 @@ namespace SOS.Import.Factories
         private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly IOrganizationRepository _organizationRepository;
         private readonly ILogger<SpeciesPortalSightingFactory> _logger;
-
+        private readonly SemaphoreSlim _semaphore;
         /// <summary>
         /// Constructor
         /// </summary>///
@@ -71,6 +72,8 @@ namespace SOS.Import.Factories
             _sightingRelationRepository = sightingRelationRepository ?? throw new ArgumentNullException(nameof(sightingRelationRepository));
             _speciesCollectionRepository = speciesCollectionItemRepository ?? throw new ArgumentNullException(nameof(speciesCollectionItemRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _semaphore = new SemaphoreSlim(_speciesPortalConfiguration.NoOfThreads);
         }
 
         /// <inheritdoc />
@@ -136,78 +139,96 @@ namespace SOS.Import.Factories
                 await _sightingVerbatimRepository.AddCollectionAsync();
 
                 var (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
-                _logger.LogDebug("Start getting species portal sightings");
-                var nrSightingsHarvested = 0;
-                var hasAddedTestSightings = false;
+                var currentId = minId;
+                var harvestBatchTasks = new List<Task<int>>();
+
+                _logger.LogDebug("Start harvest species portal sightings");
 
                 // Loop until all sightings are fetched
-                while (minId <= maxId)
+                while (currentId <= maxId)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     if (_speciesPortalConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        nrSightingsHarvested >= _speciesPortalConfiguration.MaxNumberOfSightingsHarvested)
+                        currentId - minId >= _speciesPortalConfiguration.MaxNumberOfSightingsHarvested)
                     {
                         break;
                     }
 
-                    _logger.LogDebug($"Start getting species portal sightings from id: { minId } to id: { minId + _speciesPortalConfiguration.ChunkSize -1 }");
-                    
-                    // Get chunk of sightings
-                    var sightings = (await _sightingRepository.GetChunkAsync(minId, _speciesPortalConfiguration.ChunkSize)).ToArray();
-                    _logger.LogDebug($"Finish getting species portal sightings from id: { minId } to id: { minId + _speciesPortalConfiguration.ChunkSize - 1 }");
+                    await _semaphore.WaitAsync();
 
-                    if (_speciesPortalConfiguration.AddTestSightings && !hasAddedTestSightings)
-                    {
-                        _logger.LogDebug("Start adding test sightings");
-                        AddTestSightings(_sightingRepository, ref sightings, _speciesPortalConfiguration.AddTestSightingIds);
-                        hasAddedTestSightings = true;
-                        _logger.LogDebug("Finish adding test sightings");
-                    }
+                    harvestBatchTasks.Add(Task.Run(async () => {
+                        try
+                        {
+                            _logger.LogDebug($"Start getting species portal sightings from id: { currentId } to id: { currentId + _speciesPortalConfiguration.ChunkSize - 1 }");
+                            // Get chunk of sightings
+                            var sightings = (await _sightingRepository.GetChunkAsync(currentId, _speciesPortalConfiguration.ChunkSize)).ToArray();
+                            _logger.LogDebug($"Finish getting species portal sightings from id: { currentId } to id: { currentId + _speciesPortalConfiguration.ChunkSize - 1 }");
 
-                    var sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
-                    nrSightingsHarvested += sightings.Length;
+                            /* if (_speciesPortalConfiguration.AddTestSightings && !hasAddedTestSightings)
+                             {
+                                 _logger.LogDebug("Start adding test sightings");
+                                 AddTestSightings(_sightingRepository, ref sightings, _speciesPortalConfiguration.AddTestSightingIds);
+                                 hasAddedTestSightings = true;
+                                 _logger.LogDebug("Finish adding test sightings");
+                             }*/
 
-                    _logger.LogDebug("Start calculating person sighting directory");
-                    // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
-                    var sightingRelations = (await _sightingRelationRepository.GetAsync(sightingIds)).ToVerbatims().ToArray();
-                    var personSightingBySightingId = PersonSightingFactory.CalculatePersonSightingDictionary(
-                        sightingIds,
-                        personByUserId,
-                        organizationById,
-                        speciesCollections,
-                        sightingRelations);
-                    _logger.LogDebug("Finsih calculating person sighting directory");
+                            var sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
 
-                    _logger.LogDebug("Start getting projects and parameters");
-                    // Get projects & project parameters
-                    var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, sightingProjectIds, projectEntityById, projectParameterEntities);
-                    _logger.LogDebug("Finsish getting projects and parameters");
+                            _logger.LogDebug("Start calculating person sighting directory");
+                            // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
+                            var sightingRelations = (await _sightingRelationRepository.GetAsync(sightingIds)).ToVerbatims().ToArray();
+                            var personSightingBySightingId = PersonSightingFactory.CalculatePersonSightingDictionary(
+                                sightingIds,
+                                personByUserId,
+                                organizationById,
+                                speciesCollections,
+                                sightingRelations);
+                            _logger.LogDebug("Finsih calculating person sighting directory");
 
-                    _logger.LogDebug("Start casting entities to verbatim");
-                    // Cast sightings to aggregates
-                    IEnumerable<APSightingVerbatim> aggregates = sightings.ToVerbatims(
-                        activities, 
-                        biotopes,
-                        genders,
-                        organizations,
-                        personSightingBySightingId,
-                        sites,
-                        stages,
-                        substrates,
-                        validationStatus,
-                        units,
-                        projectEntityDictionaries);
-                    _logger.LogDebug("Finsih casting entities to verbatim");
+                            _logger.LogDebug("Start getting projects and parameters");
+                            // Get projects & project parameters
+                            var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, sightingProjectIds, projectEntityById, projectParameterEntities);
+                            _logger.LogDebug("Finsish getting projects and parameters");
 
-                    _logger.LogDebug("Start storing batch");
-                    // Add sightings to mongodb
-                    await _sightingVerbatimRepository.AddManyAsync(aggregates);
-                    _logger.LogDebug("Finish storing batch");
+                            _logger.LogDebug("Start casting entities to verbatim");
+                            // Cast sightings to aggregates
+                            IEnumerable<APSightingVerbatim> aggregates = sightings.ToVerbatims(
+                                activities,
+                                biotopes,
+                                genders,
+                                organizations,
+                                personSightingBySightingId,
+                                sites,
+                                stages,
+                                substrates,
+                                validationStatus,
+                                units,
+                                projectEntityDictionaries);
+                            _logger.LogDebug("Finsih casting entities to verbatim");
+
+                            _logger.LogDebug("Start storing batch");
+                            // Add sightings to mongodb
+                            await _sightingVerbatimRepository.AddManyAsync(aggregates);
+                            _logger.LogDebug("Finish storing batch");
+
+                            return sightings.Length;
+                        }
+                        finally
+                        {
+                            // Release semaphore in order to let next thread start getting data from source db 
+                            _semaphore.Release();
+                        }
+                    }));
 
                     // Calculate start of next chunk
-                    minId += _speciesPortalConfiguration.ChunkSize;
+                    currentId += _speciesPortalConfiguration.ChunkSize;
                 }
-                _logger.LogDebug("Finish getting species portal sightings");
+
+                await Task.WhenAll(harvestBatchTasks);
+     
+                var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
+
+                _logger.LogDebug("Finish harvest species portal sightings");
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;
@@ -243,7 +264,7 @@ namespace SOS.Import.Factories
         private static ProjectEntityDictionaries GetProjectEntityDictionaries(
             HashSet<int> sightingIds,
             IEnumerable<(int SightingId, int ProjectId)> sightingProjectIds,
-            Dictionary<int, ProjectEntity> projectEntityById,
+            IDictionary<int, ProjectEntity> projectEntityById,
             IEnumerable<ProjectParameterEntity> projectParameterEntities)
         {
             Dictionary<int, IEnumerable<ProjectEntity>> projectEntitiesBySightingId = sightingProjectIds
