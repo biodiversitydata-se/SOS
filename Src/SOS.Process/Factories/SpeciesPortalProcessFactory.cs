@@ -75,16 +75,19 @@ namespace SOS.Process.Factories
 
                 var verbatimCount = 0;
                 using var cursor = await _speciesPortalVerbatimRepository.GetAllAsync();
-
+ 
                 ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
+                
                 await cursor.ForEachAsync(c =>
                 {
                     sightings.Add(c.ToProcessed(taxa, fieldMappings));
+
                     if (sightings.Count % ProcessRepository.BatchSize == 0)
                     {
                         verbatimCount += ProcessRepository.BatchSize;
                         Logger.LogDebug($"Species Portal Sightings processed: {verbatimCount}");
                         ProcessRepository.AddManyAsync(sightings);
+      
                         sightings.Clear();
                     }
                 });

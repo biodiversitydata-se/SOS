@@ -62,7 +62,8 @@ namespace SOS.Import.Repositories.Destination
         /// Get client
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName);
+        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName)
+            .WithWriteConcern(new WriteConcern(w: 0, journal: false));
 
         /// <inheritdoc />
         public async Task<bool> AddAsync(TEntity item)

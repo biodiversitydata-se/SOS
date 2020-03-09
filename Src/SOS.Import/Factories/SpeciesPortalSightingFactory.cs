@@ -233,6 +233,7 @@ namespace SOS.Import.Factories
                 await _sightingVerbatimRepository.DeleteCollectionAsync();
                 await _sightingVerbatimRepository.AddCollectionAsync();
 
+                // Get source min and max id
                 var (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
                 var currentId = minId;
                 var harvestBatchTasks = new List<Task<int>>();
@@ -251,6 +252,7 @@ namespace SOS.Import.Factories
 
                     await _semaphore.WaitAsync();
 
+                    // Add batch task to list
                     harvestBatchTasks.Add(HarvestBatchAsync(currentId, activities, biotopes, genders, organizations, sites, stages, substrates,
                         validationStatus, units,
                         personByUserId, organizationById, speciesCollections, sightingProjectIds, projectEntityById,
@@ -260,8 +262,10 @@ namespace SOS.Import.Factories
                     currentId += _speciesPortalConfiguration.ChunkSize;
                 }
 
+                // Execute harvest tasks, no of parallel threads running is handled by semaphore
                 await Task.WhenAll(harvestBatchTasks);
 
+                // Sum each batch harvested
                 var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
                 _logger.LogDebug("Finish getting species portal sightings");

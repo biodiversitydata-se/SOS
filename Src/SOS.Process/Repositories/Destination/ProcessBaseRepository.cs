@@ -160,7 +160,7 @@ namespace SOS.Process.Repositories.Destination
         /// </summary>
         private IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration => Database
             .GetCollection<ProcessedConfiguration>(_collectionNameConfiguration)
-            .WithWriteConcern(new WriteConcern(w:0, journal: false ));
+            .WithWriteConcern(new WriteConcern(w:0, journal: false));
 
         /// <summary>
         /// 
