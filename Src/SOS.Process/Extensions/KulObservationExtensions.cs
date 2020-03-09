@@ -37,7 +37,7 @@ namespace SOS.Process.Extensions
 
             var obs = new ProcessedSighting(DataProvider.KUL)
             {
-                BasisOfRecordId = new ProcessedFieldMapValue { Id=(int)BasisOfRecordId.Humanobservation },
+                BasisOfRecordId = new ProcessedFieldMapValue { Id=(int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.KUL.ToString()}",
                 DatasetName = "KUL",
                 Event = new ProcessedEvent

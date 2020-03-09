@@ -1,13 +1,13 @@
 ﻿namespace SOS.Lib.Enums.FieldMappingValues
 {
     /// <summary>
-    /// Enumeration of Country.
+    /// Enumeration of Organization.
     /// </summary>
-    public enum CountryId
+    public enum OrganizationId
     {
         /// <summary>
-        /// Sweden.
+        /// ArtDatabanken.
         /// </summary>
-        Sweden = 0
+        ArtDatabanken = 165
     }
 }

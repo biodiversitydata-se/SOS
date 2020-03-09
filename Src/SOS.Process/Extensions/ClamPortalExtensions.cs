@@ -113,72 +113,127 @@ namespace SOS.Process.Extensions
         {
             if (string.IsNullOrEmpty(basisOfRecord)) return null;
 
-            // todo - map values to BasisOfRecordId enum
-            return new ProcessedFieldMapValue
+            switch (basisOfRecord)
             {
-                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
-                Value = basisOfRecord
-            };
+                case "Human observation":
+                    return new ProcessedFieldMapValue
+                    {
+                        Id = (int)BasisOfRecordId.HumanObservation
+                    };
+
+                default:
+                    return new ProcessedFieldMapValue
+                    {
+                        Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                        Value = basisOfRecord
+                    };
+            }
         }
 
         private static ProcessedFieldMapValue GetAccessRightsIdFromString(string accessRights)
         {
             if (string.IsNullOrEmpty(accessRights)) return null;
 
-            // todo - map values to AccessRightsId enum
-            return new ProcessedFieldMapValue
+            switch (accessRights)
             {
-                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
-                Value = accessRights
-            };
+                case "FreeUsage":
+                    return new ProcessedFieldMapValue
+                    {
+                        Id = (int)AccessRightsId.FreeUsage
+                    };
+
+                default:
+                    return new ProcessedFieldMapValue
+                    {
+                        Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                        Value = accessRights
+                    };
+            }
         }
 
         private static ProcessedFieldMapValue GetOccurrenceStatusIdFromString(string occurrenceStatus)
         {
             if (string.IsNullOrEmpty(occurrenceStatus)) return null;
 
-            // todo - map values to OccurrenceStatusId enum
-            return new ProcessedFieldMapValue
+            switch (occurrenceStatus)
             {
-                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
-                Value = occurrenceStatus
-            };
+                case "Present":
+                    return new ProcessedFieldMapValue
+                    {
+                        Id = (int)OccurrenceStatusId.Present
+                    };
+
+                case "Not rediscovered":
+                    return new ProcessedFieldMapValue
+                    {
+                        Id = (int)OccurrenceStatusId.Absent
+                    };
+
+                default:
+                    return new ProcessedFieldMapValue
+                    {
+                        Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                        Value = occurrenceStatus
+                    };
+            }
         }
 
         private static ProcessedFieldMapValue GetOrganismQuantityUnitIdFromString(string quantityUnit)
         {
             if (string.IsNullOrEmpty(quantityUnit)) return null;
 
-            // todo - map values to Unit ids
-            return new ProcessedFieldMapValue
+            switch (quantityUnit)
             {
-                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
-                Value = quantityUnit
-            };
+                case "Antal individer":
+                    return new ProcessedFieldMapValue
+                    {
+                        Id = (int)UnitId.Individuals
+                    };
+
+                default:
+                    return new ProcessedFieldMapValue
+                    {
+                        Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                        Value = quantityUnit
+                    };
+            }
         }
 
         private static ProcessedFieldMapValue GetOrganizationIdFromString(string institutionCode)
         {
             if (string.IsNullOrEmpty(institutionCode)) return null;
 
-            // todo - map values to Organization ids
-            return new ProcessedFieldMapValue
+            switch (institutionCode)
             {
-                Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
-                Value = institutionCode
-            };
+                case "ArtDatabanken":
+                    return new ProcessedFieldMapValue
+                    {
+                        Id = (int)OrganizationId.ArtDatabanken
+                    };
+
+                default:
+                    return new ProcessedFieldMapValue
+                    {
+                        Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
+                        Value = institutionCode
+                    };
+            }
         }
 
         private static ProcessedFieldMapValue GetLifeStageIdFromString(string lifeStage)
         {
             if (string.IsNullOrEmpty(lifeStage)) return null;
+            // Sample values from ClamPortal web service for LifeStage field:
+            // "Ant. lev:31,död:1"
+            // "Ant. lev:13,död:12"
 
-            // todo - map values to LifeStageId enum
+            // todo - should we return null or NoMappingFoundCustomValueIsUsedId?
             return new ProcessedFieldMapValue
             {
                 Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
                 Value = lifeStage
             };
+            //return null; // no valid values for LifeStage
         }
 
         private static ProcessedFieldMapValue GetValidationStatusIdFromString(string validationStatus)

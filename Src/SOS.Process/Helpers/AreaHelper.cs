@@ -151,6 +151,7 @@ namespace SOS.Process.Helpers
                             var area = new ProcessedArea
                             {
                                 Id = (int)feature.Attributes.GetOptionalValue("featureId"),
+                                FeatureId = (int)feature.Attributes.GetOptionalValue("featureId"),
                                 Name = (string)feature.Attributes.GetOptionalValue("name")
                             };
                             switch ((AreaType)feature.Attributes.GetOptionalValue("areaType"))

@@ -8,27 +8,27 @@
         /// <summary>
         /// HumanObservation.
         /// </summary>
-        Humanobservation = 0,
+        HumanObservation = 0,
 
         /// <summary>
         /// PreservedSpecimen.
         /// </summary>
-        Preservedspecimen = 1,
+        PreservedSpecimen = 1,
 
         /// <summary>
         /// FossilSpecimen.
         /// </summary>
-        Fossilspecimen = 2,
+        FossilSpecimen = 2,
 
         /// <summary>
         /// LivingSpecimen.
         /// </summary>
-        Livingspecimen = 3,
+        LivingSpecimen = 3,
 
         /// <summary>
         /// MaterialSample.
         /// </summary>
-        Materialsample = 4,
+        MaterialSample = 4,
 
         /// <summary>
         /// Event.
@@ -38,7 +38,7 @@
         /// <summary>
         /// MachineObservation.
         /// </summary>
-        Machineobservation = 6,
+        MachineObservation = 6,
 
         /// <summary>
         /// Taxon.

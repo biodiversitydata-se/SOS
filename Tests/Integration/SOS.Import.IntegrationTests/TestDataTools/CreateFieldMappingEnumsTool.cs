@@ -53,10 +53,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             foreach (var fieldMapping in fieldMappings)
             {
                 if (fieldMapping.Id == FieldMappingFieldId.Municipality ||
-                    fieldMapping.Id == FieldMappingFieldId.Parish ||
-                    fieldMapping.Id == FieldMappingFieldId.Organization)
+                    fieldMapping.Id == FieldMappingFieldId.Parish)
                     continue;
-
                 sb.Append(CreateEnum(fieldMapping));
                 sb.AppendLine();
             }
@@ -74,6 +72,9 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             sb.AppendLine("{");
             foreach (var fieldMappingValue in fieldMapping.Values)
             {
+                if (fieldMappingValue.Name == "")
+                    continue;
+
                 sb.AppendLine("    /// <summary>");
                 sb.AppendLine($"   /// {CapitalizeFirstChar(fieldMappingValue.Name)}.");
                 if (fieldMappingValue.Localized)
@@ -92,7 +93,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
         {
             var textInfo = System.Globalization.CultureInfo.InvariantCulture.TextInfo;
             var str = ReplaceInvalidChars(name);
-            str = textInfo.ToTitleCase(str);
+            if (str.Split(" ").Length > 1)
+            {
+                str = textInfo.ToTitleCase(str);
+            }
             str = RemoveWhitespace(str);
             str = CapitalizeFirstChar(str);
             return str;
@@ -100,7 +104,15 @@ namespace SOS.Import.IntegrationTests.TestDataTools
 
         private string CapitalizeFirstChar(string input)
         {
-            return input.First().ToString().ToUpper() + input.Substring(1);
+            try
+            {
+                return input.First().ToString().ToUpper() + input.Substring(1);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
         public string ReplaceInvalidChars(string input)
         {

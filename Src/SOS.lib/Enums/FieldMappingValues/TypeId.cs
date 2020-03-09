@@ -28,17 +28,17 @@
         /// <summary>
         /// InteractiveResource.
         /// </summary>
-        Interactiveresource = 4,
+        InteractiveResource = 4,
 
         /// <summary>
         /// MovingImage.
         /// </summary>
-        Movingimage = 5,
+        MovingImage = 5,
 
         /// <summary>
         /// PhysicalObject.
         /// </summary>
-        Physicalobject = 6,
+        PhysicalObject = 6,
 
         /// <summary>
         /// Service.
@@ -58,12 +58,11 @@
         /// <summary>
         /// StillImage.
         /// </summary>
-        Stillimage = 10,
+        StillImage = 10,
 
         /// <summary>
         /// Text.
         /// </summary>
-        Text = 11,
-
+        Text = 11
     }
 }

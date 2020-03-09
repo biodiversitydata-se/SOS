@@ -67,8 +67,8 @@ namespace SOS.Process.Extensions
                     ? new ProcessedFieldMapValue { Id = (int)AccessRightsId.FreeUsage }
                     : new ProcessedFieldMapValue { Id = (int)AccessRightsId.NotForPublicUsage },
                 BasisOfRecordId = string.IsNullOrEmpty(verbatim.SpeciesCollection)
-                ? new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.Humanobservation }
-                : new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.Preservedspecimen },
+                ? new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation }
+                : new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.PreservedSpecimen },
                 CollectionCode = string.IsNullOrEmpty(verbatim.SpeciesCollection)
                 ? "Artportalen"
                 : verbatim.SpeciesCollection,
