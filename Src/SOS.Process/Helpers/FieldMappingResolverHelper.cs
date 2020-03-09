@@ -54,18 +54,25 @@ namespace SOS.Process.Helpers
 
             foreach (var processedSighting in processedSightings)
             {
+                ResolveFieldMappedValue(processedSighting.BasisOfRecordId, valueMappingDictionaries[FieldMappingFieldId.BasisOfRecord]);
+                ResolveFieldMappedValue(processedSighting.TypeId, valueMappingDictionaries[FieldMappingFieldId.Type]);
+                ResolveFieldMappedValue(processedSighting.AccessRightsId, valueMappingDictionaries[FieldMappingFieldId.AccessRights]);
+                ResolveFieldMappedValue(processedSighting.OrganizationId, valueMappingDictionaries[FieldMappingFieldId.Organization]);
                 ResolveFieldMappedValue(processedSighting.Location?.CountyId, valueMappingDictionaries[FieldMappingFieldId.County]);
                 ResolveFieldMappedValue(processedSighting.Location?.MunicipalityId, valueMappingDictionaries[FieldMappingFieldId.Municipality]);
                 ResolveFieldMappedValue(processedSighting.Location?.ParishId, valueMappingDictionaries[FieldMappingFieldId.Parish]);
                 ResolveFieldMappedValue(processedSighting.Location?.ProvinceId, valueMappingDictionaries[FieldMappingFieldId.Province]);
+                ResolveFieldMappedValue(processedSighting.Location?.CountryId, valueMappingDictionaries[FieldMappingFieldId.Country]);
+                ResolveFieldMappedValue(processedSighting.Location?.ContinentId, valueMappingDictionaries[FieldMappingFieldId.Continent]);
                 ResolveFieldMappedValue(processedSighting.Event?.BiotopeId, valueMappingDictionaries[FieldMappingFieldId.Biotope]);
+                ResolveFieldMappedValue(processedSighting.Event?.SubstrateId, valueMappingDictionaries[FieldMappingFieldId.Substrate]);
                 ResolveFieldMappedValue(processedSighting.Identification?.ValidationStatusId, valueMappingDictionaries[FieldMappingFieldId.ValidationStatus]);
                 ResolveFieldMappedValue(processedSighting.Occurrence?.LifeStageId, valueMappingDictionaries[FieldMappingFieldId.LifeStage]);
                 ResolveFieldMappedValue(processedSighting.Occurrence?.ActivityId, valueMappingDictionaries[FieldMappingFieldId.Activity]);
                 ResolveFieldMappedValue(processedSighting.Occurrence?.GenderId, valueMappingDictionaries[FieldMappingFieldId.Gender]);
                 ResolveFieldMappedValue(processedSighting.Occurrence?.OrganismQuantityUnitId, valueMappingDictionaries[FieldMappingFieldId.Unit]);
-                ResolveFieldMappedValue(processedSighting.OrganizationId, valueMappingDictionaries[FieldMappingFieldId.Organization]);
-                ResolveFieldMappedValue(processedSighting.Location?.ContinentId, valueMappingDictionaries[FieldMappingFieldId.Continent]);
+                ResolveFieldMappedValue(processedSighting.Occurrence?.EstablishmentMeansId, valueMappingDictionaries[FieldMappingFieldId.EstablishmentMeans]);
+                ResolveFieldMappedValue(processedSighting.Occurrence?.OccurrenceStatusId, valueMappingDictionaries[FieldMappingFieldId.OccurrenceStatus]);
             }
         }
 

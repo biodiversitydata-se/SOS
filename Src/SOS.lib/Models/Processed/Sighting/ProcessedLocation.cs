@@ -44,7 +44,10 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// vocabulary such as the Getty Thesaurus of Geographic Names.
         /// This property is currently not used.
         /// </summary>
-        public string Country { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue CountryId { get; set; }
 
         /// <summary>
         /// Special handling of Kalmar/Öland

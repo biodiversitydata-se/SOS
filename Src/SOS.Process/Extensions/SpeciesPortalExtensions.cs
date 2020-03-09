@@ -61,14 +61,14 @@ namespace SOS.Process.Extensions
 
             var obs = new ProcessedSighting(DataProvider.Artdatabanken)
             {
-                AccessRights =
+                AccessRightsId =
                 !verbatim.ProtectedBySystem && verbatim.HiddenByProvider.HasValue &&
                 verbatim.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now
-                    ? AccessRights.FreeUsage
-                    : AccessRights.NotForPublicUsage,
-                BasisOfRecord = string.IsNullOrEmpty(verbatim.SpeciesCollection)
-                ? BasisOfRecord.HumanObservation
-                : BasisOfRecord.PreservedSpecimen,
+                    ? new ProcessedFieldMapValue { Id = (int)AccessRightsId.FreeUsage }
+                    : new ProcessedFieldMapValue { Id = (int)AccessRightsId.NotForPublicUsage },
+                BasisOfRecordId = string.IsNullOrEmpty(verbatim.SpeciesCollection)
+                ? new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.Humanobservation }
+                : new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.Preservedspecimen },
                 CollectionCode = string.IsNullOrEmpty(verbatim.SpeciesCollection)
                 ? "Artportalen"
                 : verbatim.SpeciesCollection,
@@ -93,14 +93,14 @@ namespace SOS.Process.Extensions
                     Validated = new[] { 60, 61, 62, 63, 64, 65 }.Contains(verbatim.ValidationStatus?.Id ?? 0),
                     UncertainDetermination = verbatim.UnsureDetermination
                 },
-                InformationWithheld = "More information can be obtained from the Data Provider",
+                InformationWithheld = null,
                 IsInEconomicZoneOfSweden = hasPosition, // Species portal validate all sightings, we rely on that validation as long it has coordinates
                 Language = Language.Swedish,
                 Location = new ProcessedLocation
                 {
                     ContinentId = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
                     CoordinateUncertaintyInMeters = verbatim.Site?.Accuracy,
-                    Country = Country.Sweden,
+                    CountryId = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
                     CountryCode = CountryCode.Sweden,
                     DecimalLatitude = verbatim.Site?.Point?.Coordinates?.Latitude ?? 0,
                     DecimalLongitude = verbatim.Site?.Point?.Coordinates?.Longitude ?? 0,
@@ -126,7 +126,7 @@ namespace SOS.Process.Extensions
                     AssociatedReferences = GetAssociatedReferences(verbatim),
                     BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon),
                     CatalogNumber = verbatim.Id.ToString(),
-                    EstablishmentMeans = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
+                    //EstablishmentMeansId = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
                     Id = $"urn:lsid:artportalen.se:Sighting:{verbatim.Id}",
                     IndividualCount = verbatim.Quantity?.ToString() ?? "",
                     IsNaturalOccurrence = !verbatim.Unspontaneous,
@@ -137,19 +137,19 @@ namespace SOS.Process.Extensions
                     RecordedBy = verbatim.Observers,
                     RecordNumber = verbatim.Label,
                     Remarks = verbatim.Comment,
-                    Status = verbatim.NotPresent || verbatim.NotRecovered
-                    ? OccurrenceStatus.Absent
-                    : OccurrenceStatus.Present,
+                    OccurrenceStatusId = verbatim.NotPresent || verbatim.NotRecovered
+                    ? new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Absent }
+                    : new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Present },
                     URL = $"http://www.artportalen.se/sighting/{verbatim.Id}"
                 },
-                OwnerInstitutionCode = verbatim.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "ArtDatabanken",
+                OwnerInstitutionCode = verbatim.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken",
                 Projects = verbatim.Projects?.ToProcessedProjects(),
                 ProtectionLevel = CalculateProtectionLevel(taxon, verbatim.HiddenByProvider, verbatim.ProtectedBySystem),
                 ReportedBy = verbatim.ReportedBy,
                 ReportedDate = verbatim.ReportedDate,
                 RightsHolder = verbatim.RightsHolder ?? verbatim.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas",
                 Taxon = taxon,
-                Type = "Occurrence"
+                TypeId = null
             };
 
             // Get field mapping values

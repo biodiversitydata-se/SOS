@@ -38,6 +38,7 @@ namespace SOS.Import.Factories
         /// <param name="basisOfRecordFieldMappingFactory"></param>
         /// <param name="continentFieldMappingFactory"></param>
         /// <param name="parishFieldMappingFactory"></param>
+        /// <param name="establishmentMeansFieldMappingFactory"></param>
         /// <param name="logger"></param>
         /// <param name="activityFieldMappingFactory"></param>
         /// <param name="biotopeFieldMappingFactory"></param>
@@ -45,6 +46,10 @@ namespace SOS.Import.Factories
         /// <param name="countyFieldMappingFactory"></param>
         /// <param name="municipalityFieldMappingFactory"></param>
         /// <param name="provinceFieldMappingFactory"></param>
+        /// <param name="typeFieldMappingFactory"></param>
+        /// <param name="countryFieldMappingFactory"></param>
+        /// <param name="accessRightsFieldMappingFactory"></param>
+        /// <param name="occurrenceStatusFieldMappingFactory"></param>
         public FieldMappingFactory(
             IFieldMappingRepository fieldMappingRepository,
             ActivityFieldMappingFactory activityFieldMappingFactory,
@@ -61,11 +66,15 @@ namespace SOS.Import.Factories
             MunicipalityFieldMappingFactory municipalityFieldMappingFactory,
             ProvinceFieldMappingFactory provinceFieldMappingFactory,
             ParishFieldMappingFactory parishFieldMappingFactory,
+            TypeFieldMappingFactory typeFieldMappingFactory,
+            CountryFieldMappingFactory countryFieldMappingFactory,
+            AccessRightsFieldMappingFactory accessRightsFieldMappingFactory,
+            OccurrenceStatusFieldMappingFactory occurrenceStatusFieldMappingFactory,
+            EstablishmentMeansFieldMappingFactory establishmentMeansFieldMappingFactory,
             ILogger<FieldMappingFactory> logger)
         {
             _fieldMappingRepository = fieldMappingRepository ?? throw new ArgumentNullException(nameof(fieldMappingRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
             _fieldMappingFactoryById = new Dictionary<FieldMappingFieldId, IFieldMappingCreatorFactory>
             {
                 {FieldMappingFieldId.LifeStage, lifeStageFieldMappingFactory},
@@ -81,7 +90,12 @@ namespace SOS.Import.Factories
                 {FieldMappingFieldId.County, countyFieldMappingFactory},
                 {FieldMappingFieldId.Municipality, municipalityFieldMappingFactory},
                 {FieldMappingFieldId.Province, provinceFieldMappingFactory},
-                {FieldMappingFieldId.Parish, parishFieldMappingFactory}
+                {FieldMappingFieldId.Parish, parishFieldMappingFactory},
+                {FieldMappingFieldId.Type, typeFieldMappingFactory},
+                {FieldMappingFieldId.Country, countryFieldMappingFactory},
+                {FieldMappingFieldId.AccessRights, accessRightsFieldMappingFactory},
+                {FieldMappingFieldId.OccurrenceStatus, occurrenceStatusFieldMappingFactory},
+                {FieldMappingFieldId.EstablishmentMeans, establishmentMeansFieldMappingFactory}
             };
         }
 

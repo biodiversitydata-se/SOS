@@ -98,8 +98,11 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<MunicipalityFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ParishFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ProvinceFieldMappingFactory>().InstancePerLifetimeScope();
-
-
+            builder.RegisterType<TypeFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<CountryFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<AccessRightsFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<OccurrenceStatusFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<EstablishmentMeansFieldMappingFactory>().InstancePerLifetimeScope();
 
             // Add Services
             builder.RegisterType<ClamObservationService>().As<IClamObservationService>().InstancePerLifetimeScope();

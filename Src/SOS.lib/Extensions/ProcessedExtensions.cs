@@ -71,7 +71,7 @@ namespace SOS.Lib.Extensions
                 Continent = source.ContinentId?.Value,
                 CoordinatePrecision = source.CoordinatePrecision?.ToString(),
                 CoordinateUncertaintyInMeters = source.CoordinateUncertaintyInMeters,
-                Country = source.Country,
+                Country = source.CountryId?.Value,
                 CountryCode = source.CountryCode,
                 County = source.CountyId?.Value,
                 DecimalLatitude = source.DecimalLatitude,
@@ -134,13 +134,13 @@ namespace SOS.Lib.Extensions
                 Behavior = source.ActivityId?.Value,
                 CatalogNumber = source.CatalogNumber,
                 Disposition = source.Disposition,
-                EstablishmentMeans = source.EstablishmentMeans,
+                EstablishmentMeans = source.EstablishmentMeansId?.Value,
                 IndividualCount = source.IndividualCount,
                 IndividualID = source.IndividualID,
                 LifeStage = source.LifeStageId?.Value,
                 OccurrenceID = source.Id,
                 OccurrenceRemarks = source.Remarks,
-                OccurrenceStatus = source.Status,
+                OccurrenceStatus = source.OccurrenceStatusId?.Value,
                 OrganismQuantity = source.OrganismQuantity?.ToString(),
                 OrganismQuantityType = source.OrganismQuantity.HasValue ? source.OrganismQuantityUnitId?.Value ?? "Individuals" : null,
                 OtherCatalogNumbers = source.OtherCatalogNumbers,
@@ -166,9 +166,9 @@ namespace SOS.Lib.Extensions
 
             return new DarwinCore
             {
-                AccessRights = processedSighting.AccessRights,
-                BasisOfRecord = processedSighting.BasisOfRecord,
-                BibliographicCitation = processedSighting.BasisOfRecord,
+                AccessRights = processedSighting.AccessRightsId?.Value,
+                BasisOfRecord = processedSighting.BasisOfRecordId?.Value,
+                BibliographicCitation = processedSighting.BasisOfRecordId?.Value,
                 CollectionCode = processedSighting.CollectionCode,
                 CollectionID = processedSighting.CollectionId,
                 DataGeneralizations = processedSighting.DataGeneralizations,
@@ -189,7 +189,7 @@ namespace SOS.Lib.Extensions
                 Rights = processedSighting.Rights,
                 RightsHolder = processedSighting.RightsHolder,
                 Taxon = processedSighting.Taxon.ToDarwinCore(),
-                Type = processedSighting.Type
+                Type = processedSighting.TypeId?.Value
             };
         }
 

@@ -89,9 +89,11 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// represented in the Occurrence became established at the
         /// location.
         /// Recommended best practice is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
-        public string EstablishmentMeans { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue EstablishmentMeansId { get; set; }
 
         /// <summary>
         /// The number of individuals represented present
@@ -257,7 +259,10 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// Recommended best practice is to use a controlled vocabulary.
         /// This property is currently not used.
         /// </summary>
-        public string Status { get; set; }
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        public ProcessedFieldMapValue OccurrenceStatusId { get; set; }
 
         /// <summary>
         /// URL to occurrence
