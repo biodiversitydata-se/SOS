@@ -44,42 +44,7 @@ namespace SOS.Process.Factories
             _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
         }
 
-        /// <inheritdoc />
-        public async Task<RunInfo> ProcessAsync(
-            IDictionary<int, ProcessedTaxon> taxa,
-            IJobCancellationToken cancellationToken)
-        {
-            Logger.LogDebug("Start Processing Species Portal Verbatim");
-            var startTime = DateTime.Now;
-            try
-            {
-                Logger.LogDebug("Start deleting Species Portal data");
-                if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider))
-                {
-                    Logger.LogError("Failed to delete Species Portal data");
-                    return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
-                }
-                Logger.LogDebug("Finish deleting Species Portal data");
-
-                Logger.LogDebug("Start processing Species Portal data");
-                var verbatimCount = await ProcessObservations(taxa, cancellationToken);
-                Logger.LogDebug($"Finish processing Species Portal data.");
-                
-                return RunInfo.Success(DataProvider, startTime, DateTime.Now, verbatimCount);
-            }
-            catch (JobAbortedException)
-            {
-                Logger.LogInformation("Species Portal observation processing was canceled.");
-                return RunInfo.Cancelled(DataProvider, startTime, DateTime.Now);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to process sightings");
-                return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
-            }
-        }
-
-        private async Task<int> ProcessObservations(
+        protected override async Task<int> ProcessObservations(
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
@@ -87,10 +52,9 @@ namespace SOS.Process.Factories
             ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
             var allFieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
             var fieldMappings = GetFieldMappingsDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
-            
-            using var cursor = await _speciesPortalVerbatimRepository.GetAllAsync();
-            
+
             // Process and commit in batches.
+            using var cursor = await _speciesPortalVerbatimRepository.GetAllAsync();
             await cursor.ForEachAsync(c =>
             {
                 sightings.Add(c.ToProcessed(taxa, fieldMappings));

@@ -44,50 +44,14 @@ namespace SOS.Process.Factories
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
 
-        /// <inheritdoc />
-        public async Task<RunInfo> ProcessAsync(
-            IDictionary<int, ProcessedTaxon> taxa,
-            IJobCancellationToken cancellationToken)
-        {
-            var startTime = DateTime.Now;
-            Logger.LogDebug("Start clam portal process job");
-            try
-            {
-                Logger.LogDebug("Start deleting clam portal data");
-                if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider))
-                {
-                    Logger.LogError("Failed to delete clam portal data");
-                    return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
-                }
-                Logger.LogDebug("Finish deleting clam portal data");
-
-                Logger.LogDebug("Start processing Clam Portal data");
-                var verbatimCount = await ProcessObservations(taxa, cancellationToken);
-                Logger.LogDebug($"Finish processing Clam Portal data.");
-                
-                return RunInfo.Success(DataProvider, startTime, DateTime.Now, verbatimCount);
-            }
-            catch (JobAbortedException)
-            {
-                Logger.LogInformation("Clam observation processing was canceled.");
-                return RunInfo.Cancelled(DataProvider, startTime, DateTime.Now);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to process clams verbatim");
-                return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
-            }
-        }
-
-        private async Task<int> ProcessObservations(IDictionary<int, ProcessedTaxon> taxa,
+        protected override async Task<int> ProcessObservations(IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
             ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
-            
-            using var cursor = await _clamObservationVerbatimRepository.GetAllAsync();
 
             // Process and commit in batches.
+            using var cursor = await _clamObservationVerbatimRepository.GetAllAsync();
             await cursor.ForEachAsync(c =>
             {
                 ProcessedSighting processedSighting = c.ToProcessed(taxa);
