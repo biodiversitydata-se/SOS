@@ -94,8 +94,9 @@ namespace SOS.Process.Factories
                 ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
                 await cursor.ForEachAsync(c =>
                 {
-                    sightings.Add(c.ToProcessed(taxa));
-
+                    ProcessedSighting processedSighting = c.ToProcessed(taxa);
+                    _areaHelper.AddAreaDataToProcessedSighting(processedSighting);
+                    sightings.Add(processedSighting);
                     if (sightings.Count % ProcessRepository.BatchSize == 0)
                     {
                         verbatimCount += ProcessRepository.BatchSize;

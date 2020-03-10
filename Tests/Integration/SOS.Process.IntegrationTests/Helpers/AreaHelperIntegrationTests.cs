@@ -25,7 +25,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             var areaHelper = CreateAreaHelper();
             var observations = new List<ProcessedSighting>();
-            var observation = new ProcessedSighting(DataProvider.Artdatabanken)
+            var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
             {
                 Location = new ProcessedLocation
                 {
@@ -38,7 +38,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            areaHelper.AddAreaDataToProcessed(observations);
+            areaHelper.AddAreaDataToProcessedSightings(observations);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

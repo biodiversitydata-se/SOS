@@ -30,7 +30,7 @@ namespace SOS.Process.UnitTests.Helpers
                 AreaVerbatimRepositoryStubFactory.Create(areaTypes) .Object,
                 ProcessedFieldMappingRepositoryStubFactory.Create().Object);
             var observations = new List<ProcessedSighting>();
-            var observation = new ProcessedSighting(DataProvider.Artdatabanken)
+            var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
             {
                 Location = new ProcessedLocation
                 {
@@ -43,7 +43,7 @@ namespace SOS.Process.UnitTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            areaHelper.AddAreaDataToProcessed(observations);
+            areaHelper.AddAreaDataToProcessedSightings(observations);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -64,7 +64,7 @@ namespace SOS.Process.UnitTests.Helpers
                 AreaVerbatimRepositoryStubFactory.Create(areaTypes).Object,
                 ProcessedFieldMappingRepositoryStubFactory.Create().Object);
             var observations = new List<ProcessedSighting>();
-            var observation = new ProcessedSighting(DataProvider.Artdatabanken)
+            var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
             {
                 Location = new ProcessedLocation
                 {
@@ -77,7 +77,7 @@ namespace SOS.Process.UnitTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            areaHelper.AddAreaDataToProcessed(observations);
+            areaHelper.AddAreaDataToProcessedSightings(observations);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -98,7 +98,7 @@ namespace SOS.Process.UnitTests.Helpers
                 AreaVerbatimRepositoryStubFactory.Create(areaTypes).Object,
                 ProcessedFieldMappingRepositoryStubFactory.Create().Object);
             var observations = new List<ProcessedSighting>();
-            var observation = new ProcessedSighting(DataProvider.Artdatabanken)
+            var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
             {
                 Location = new ProcessedLocation
                 {
@@ -111,7 +111,7 @@ namespace SOS.Process.UnitTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            areaHelper.AddAreaDataToProcessed(observations);
+            areaHelper.AddAreaDataToProcessedSightings(observations);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

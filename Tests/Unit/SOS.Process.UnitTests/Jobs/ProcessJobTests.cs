@@ -200,11 +200,11 @@ namespace SOS.Process.UnitTests.Jobs
             _harvestInfoRepository.Setup(r => r.GetAllAsync())
                 .ReturnsAsync(new []
                 {
-                    new HarvestInfo("0", DataProvider.Artdatabanken, DateTime.Now)
+                    new HarvestInfo("0", DataProvider.SpeciesPortal, DateTime.Now)
                 });
 
             _speciesPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(new RunInfo(DataProvider.Artdatabanken) {Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now});
+                .ReturnsAsync(new RunInfo(DataProvider.SpeciesPortal) {Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now});
 
             _clamPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(new RunInfo(DataProvider.ClamPortal) { Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now });
@@ -240,7 +240,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _areaHelper.Object,
                 _loggerMock.Object);
 
-            var sources = (byte) DataProvider.Artdatabanken + (byte) DataProvider.ClamPortal + (byte) DataProvider.KUL;
+            var sources = (byte) DataProvider.SpeciesPortal + (byte) DataProvider.ClamPortal + (byte) DataProvider.KUL;
             var result = await job.RunAsync(sources, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert

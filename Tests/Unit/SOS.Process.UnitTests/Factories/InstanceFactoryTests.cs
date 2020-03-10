@@ -87,7 +87,7 @@ namespace SOS.Process.UnitTests.Factories
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await factory.CopyProviderDataAsync(DataProvider.Artdatabanken);
+            var result = await factory.CopyProviderDataAsync(DataProvider.SpeciesPortal);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ namespace SOS.Process.UnitTests.Factories
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await factory.CopyProviderDataAsync(DataProvider.Artdatabanken);
+            var result = await factory.CopyProviderDataAsync(DataProvider.SpeciesPortal);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -144,7 +144,7 @@ namespace SOS.Process.UnitTests.Factories
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await factory.CopyProviderDataAsync(DataProvider.Artdatabanken);
+            var result = await factory.CopyProviderDataAsync(DataProvider.SpeciesPortal);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

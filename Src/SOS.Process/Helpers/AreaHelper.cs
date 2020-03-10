@@ -120,98 +120,111 @@ namespace SOS.Process.Helpers
             return featuresContainingPoint;
         }
 
+
         /// <inheritdoc />
-        public void AddAreaDataToProcessed(IEnumerable<ProcessedSighting> processedSightings)
+        public void AddAreaDataToProcessedSightings(IEnumerable<ProcessedSighting> processedSightings)
         {
-            if (!processedSightings?.Any() ?? true)
+            foreach (var processedSighting in processedSightings)
+            {
+                AddAreaDataToProcessedSighting(processedSighting);
+            }
+        }
+
+        /// <inheritdoc />
+        public void AddAreaDataToProcessedSighting(ProcessedSighting processedSighting)
+        {
+            if (processedSighting.Location == null || 
+                processedSighting.Location.DecimalLatitude.Equals(0) && processedSighting.Location.DecimalLongitude.Equals(0))
             {
                 return;
             }
 
-            foreach (var processedSighting in processedSightings)
+            // Round coordinates to 5 decimals (roughly 1m)
+            var key = $"{Math.Round(processedSighting.Location.DecimalLongitude, 5)}-{Math.Round(processedSighting.Location.DecimalLatitude, 5)}";
+
+            // Try to get areas from cache. If areas not found for that position, try to get from repository
+            if (!_featureCache.TryGetValue(key, out var positionLocation))
             {
-                if (processedSighting.Location == null || (processedSighting.Location.DecimalLatitude.Equals(0) && processedSighting.Location.DecimalLongitude.Equals(0)))
+                var features = GetPointFeatures(processedSighting.Location.DecimalLongitude, processedSighting.Location.DecimalLatitude);
+                positionLocation = new PositionLocation();
+
+                if (features != null)
                 {
-                    continue;
-                }
-
-                // Round coordinates to 5 decimals (roughly 1m)
-                var key = $"{Math.Round(processedSighting.Location.DecimalLongitude, 5)}-{Math.Round(processedSighting.Location.DecimalLatitude, 5)}";
-
-                // Try to get areas from cache. If areas not found for that position, try to get from repository
-                if (!_featureCache.TryGetValue(key, out var positionLocation))
-                {
-                    var features = GetPointFeatures(processedSighting.Location.DecimalLongitude, processedSighting.Location.DecimalLatitude);
-                    positionLocation = new PositionLocation();
-
-                    if (features != null)
+                    foreach (var feature in features)
                     {
-                        foreach (var feature in features)
+                        var area = new ProcessedArea
                         {
-                            var area = new ProcessedArea
-                            {
-                                Id = (int)feature.Attributes.GetOptionalValue("featureId"),
-                                FeatureId = (int)feature.Attributes.GetOptionalValue("featureId"),
-                                Name = (string)feature.Attributes.GetOptionalValue("name")
-                            };
-                            switch ((AreaType)feature.Attributes.GetOptionalValue("areaType"))
-                            {
-                                case AreaType.County:
-                                    positionLocation.County = area;
-                                    break;
-                                case AreaType.Municipality:
-                                    positionLocation.Municipality = area;
-                                    break;
-                                case AreaType.Parish:
-                                    positionLocation.Parish = area;
-                                    break;
-                                case AreaType.Province:
-                                    positionLocation.Province = area;
-                                    break;
-                                case AreaType.EconomicZoneOfSweden:
-                                    positionLocation.EconomicZoneOfSweden = true;
-                                    break;
-                            }
+                            Id = (int)feature.Attributes.GetOptionalValue("id"),
+                            FeatureId = (int)feature.Attributes.GetOptionalValue("featureId"),
+                            Name = (string)feature.Attributes.GetOptionalValue("name")
+                        };
+                        switch ((AreaType)feature.Attributes.GetOptionalValue("areaType"))
+                        {
+                            case AreaType.County:
+                                positionLocation.County = area;
+                                break;
+                            case AreaType.Municipality:
+                                positionLocation.Municipality = area;
+                                break;
+                            case AreaType.Parish:
+                                positionLocation.Parish = area;
+                                break;
+                            case AreaType.Province:
+                                positionLocation.Province = area;
+                                break;
+                            case AreaType.EconomicZoneOfSweden:
+                                positionLocation.EconomicZoneOfSweden = true;
+                                break;
                         }
                     }
-
-                    _featureCache.Add(key, positionLocation);
                 }
 
-                processedSighting.Location.CountyId = GetSosId(positionLocation.County?.Id, _fieldMappingsByFeatureId[FieldMappingFieldId.County]);
-                processedSighting.Location.MunicipalityId = GetSosId(positionLocation.Municipality?.Id, _fieldMappingsByFeatureId[FieldMappingFieldId.Municipality]);
-                processedSighting.Location.ParishId = GetSosId(positionLocation.Parish?.Id, _fieldMappingsByFeatureId[FieldMappingFieldId.Parish]);
-                processedSighting.Location.ProvinceId = GetSosId(positionLocation.Province?.Id, _fieldMappingsByFeatureId[FieldMappingFieldId.Province]);
-                processedSighting.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
+                _featureCache.Add(key, positionLocation);
+            }
 
-                // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
-                processedSighting.Location.CountyPartIdByCoordinate = processedSighting.Location.CountyId?.Id;
-                if (processedSighting.Location.CountyId?.Id == (int)CountyFeatureId.Kalmar)
+            
+            processedSighting.Location.CountyId = GetSosId(positionLocation.County?.Id);
+            processedSighting.Location.MunicipalityId = GetSosId(positionLocation.Municipality?.Id);
+            processedSighting.Location.ParishId = GetSosId(positionLocation.Parish?.Id);
+            processedSighting.Location.ProvinceId = GetSosId(positionLocation.Province?.Id);
+            //processedSighting.Location.CountyId = GetSosId(positionLocation.County?.Id, _fieldMappingsByFeatureId[FieldMappingFieldId.County]);
+            //processedSighting.Location.MunicipalityId = GetSosId(positionLocation.Municipality?.Id, _fieldMappingsByFeatureId[FieldMappingFieldId.Municipality]);
+            //processedSighting.Location.ParishId = GetSosId(positionLocation.Parish?.Id, _fieldMappingsByFeatureId[FieldMappingFieldId.Parish]);
+            //processedSighting.Location.ProvinceId = GetSosId(positionLocation.Province?.Id, _fieldMappingsByFeatureId[FieldMappingFieldId.Province]);
+            processedSighting.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
+
+            // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
+            processedSighting.Location.CountyPartIdByCoordinate = processedSighting.Location.CountyId?.Id;
+            if (processedSighting.Location.CountyId?.Id == (int)CountyFeatureId.Kalmar)
+            {
+                if (processedSighting.Location.ProvinceId?.Id == (int)ProvinceFeatureId.Oland)
                 {
-                    if (processedSighting.Location.ProvinceId?.Id == (int)ProvinceFeatureId.Oland)
-                    {
-                        processedSighting.Location.CountyPartIdByCoordinate = (int)CountyFeatureId.Oland;
-                    }
-                    else
-                    {
-                        processedSighting.Location.CountyPartIdByCoordinate = (int)CountyFeatureId.KalmarFastland;
-                    }
+                    processedSighting.Location.CountyPartIdByCoordinate = (int)CountyFeatureId.Oland;
                 }
-
-                // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
-                processedSighting.Location.ProvincePartIdByCoordinate = processedSighting.Location.ProvinceId?.Id;
-                if (new []
+                else
                 {
+                    processedSighting.Location.CountyPartIdByCoordinate = (int)CountyFeatureId.KalmarFastland;
+                }
+            }
+
+            // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
+            processedSighting.Location.ProvincePartIdByCoordinate = processedSighting.Location.ProvinceId?.Id;
+            if (new[]
+            {
                     (int)ProvinceFeatureId.LuleLappmark,
                     (int)ProvinceFeatureId.LyckseleLappmark,
                     (int)ProvinceFeatureId.PiteLappmark,
                     (int)ProvinceFeatureId.TorneLappmark,
                     (int)ProvinceFeatureId.AseleLappmark
                 }.Contains(processedSighting.Location.ProvinceId?.Id ?? 0))
-                {
-                    processedSighting.Location.ProvincePartIdByCoordinate = (int) ProvinceFeatureId.Lappland;
-                }
+            {
+                processedSighting.Location.ProvincePartIdByCoordinate = (int)ProvinceFeatureId.Lappland;
             }
+        }
+
+        private static ProcessedFieldMapValue GetSosId(int? val)
+        {
+            return !val.HasValue ? null : new ProcessedFieldMapValue { Id = val.Value };
         }
 
         /// <summary>

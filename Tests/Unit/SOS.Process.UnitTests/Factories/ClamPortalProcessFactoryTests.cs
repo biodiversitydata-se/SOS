@@ -98,7 +98,7 @@ namespace SOS.Process.UnitTests.Factories
                     DyntaxaTaxonId = 0
                 } });
 
-            _areaHelper.Setup(r => r.AddAreaDataToProcessed(It.IsAny<IEnumerable<ProcessedSighting>>()));
+            _areaHelper.Setup(r => r.AddAreaDataToProcessedSightings(It.IsAny<IEnumerable<ProcessedSighting>>()));
 
             _processedSightingRepository.Setup(r => r.AddManyAsync(It.IsAny<ICollection<ProcessedSighting>>()))
                 .ReturnsAsync(1);

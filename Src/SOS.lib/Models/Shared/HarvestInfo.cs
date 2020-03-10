@@ -38,5 +38,48 @@ namespace SOS.Lib.Models.Shared
         /// Running status
         /// </summary>
         public RunStatus Status { get; set; }
+
+
+        public static RunInfo Success(
+            DataProvider dataProvider,
+            DateTime start,
+            DateTime end,
+            int count)
+        {
+            return new RunInfo(dataProvider)
+            {
+                Status = RunStatus.Success,
+                Start = start,
+                End = end,
+                Count = count
+            };
+        }
+
+        public static RunInfo Failed(
+            DataProvider dataProvider,
+            DateTime start,
+            DateTime end)
+        {
+            return new RunInfo(dataProvider)
+            {
+                Status = RunStatus.Failed,
+                Start = start,
+                End = end
+            };
+        }
+
+        public static RunInfo Cancelled(
+            DataProvider dataProvider,
+            DateTime start,
+            DateTime end)
+        {
+            return new RunInfo(dataProvider)
+            {
+                Status = RunStatus.Canceled,
+                Start = start,
+                End = end
+            };
+        }
+
     }
 }
