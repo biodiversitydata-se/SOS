@@ -37,7 +37,7 @@ namespace SOS.Import.Repositories.Source.SpeciesPortal
 	                s.GenderId,
                     s.HasImages,
 	                s.HiddenByProvider,
-	                s.Id, 
+	                s.SightingId AS Id, 
 	                ssc.Label,
 	                s.[Length],
                     s.MaxDepth,

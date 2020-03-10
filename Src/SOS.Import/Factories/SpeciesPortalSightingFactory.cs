@@ -127,13 +127,13 @@ namespace SOS.Import.Factories
                     organizationById,
                     speciesCollections,
                     sightingRelations);
-                _logger.LogDebug("Finsih calculating person sighting directory");
+                _logger.LogDebug("Finish calculating person sighting directory");
 
                 _logger.LogDebug("Start getting projects and parameters");
                 // Get projects & project parameters
                 var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, sightingProjectIds,
                     projectEntityById, projectParameterEntities);
-                _logger.LogDebug("Finsish getting projects and parameters");
+                _logger.LogDebug("Finish getting projects and parameters");
 
                 _logger.LogDebug("Start casting entities to verbatim");
                 // Cast sightings to aggregates
