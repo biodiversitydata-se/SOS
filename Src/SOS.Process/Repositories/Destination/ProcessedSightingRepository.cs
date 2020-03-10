@@ -128,9 +128,11 @@ namespace SOS.Process.Repositories.Destination
             var indexModels = new List<CreateIndexModel<ProcessedSighting>>()
             {
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.EndDate)),
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.EndDate), 
+                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true } ),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.StartDate)),
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.StartDate),
+                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true }),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Identification.Validated)),
                 new CreateIndexModel<ProcessedSighting>(
@@ -144,15 +146,18 @@ namespace SOS.Process.Repositories.Destination
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.MunicipalityId.Id)),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation)),
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation),
+                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true }),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.GenderId.Id)),
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.GenderId.Id),
+                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true }),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Provider)),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.Id)),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory))
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory),
+                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true })
             };
 
             await MongoCollection.Indexes.CreateManyAsync(indexModels);
