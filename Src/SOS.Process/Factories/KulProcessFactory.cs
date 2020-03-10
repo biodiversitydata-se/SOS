@@ -19,10 +19,11 @@ namespace SOS.Process.Factories
     /// <summary>
     /// Process factory class
     /// </summary>
-    public class KulProcessFactory : ProcessBaseFactory<KulProcessFactory>, Interfaces.IKulProcessFactory
+    public class KulProcessFactory : DataProviderProcessorBase<KulProcessFactory>, Interfaces.IKulProcessFactory
     {
         private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
+        public override DataProvider DataProvider => DataProvider.KUL;
 
         /// <summary>
         /// Constructor
@@ -30,12 +31,14 @@ namespace SOS.Process.Factories
         /// <param name="kulObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processedSightingRepository"></param>
+        /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="logger"></param>
         public KulProcessFactory(
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedSightingRepository processedSightingRepository,
-            ILogger<KulProcessFactory> logger) : base(processedSightingRepository, logger)
+            IFieldMappingResolverHelper fieldMappingResolverHelper,
+            ILogger<KulProcessFactory> logger) : base(processedSightingRepository, fieldMappingResolverHelper,logger)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -46,71 +49,69 @@ namespace SOS.Process.Factories
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
-            var runInfo = new RunInfo(DataProvider.KUL)
-            {
-                Start = DateTime.Now
-            };
-
+            Logger.LogDebug("Start Processing KUL Verbatim observations");
+            var startTime = DateTime.Now;
             try
             {
-                Logger.LogDebug("Start Processing KUL Verbatim observations");
-
-                Logger.LogDebug("Start deleting KUL Verbatim observations");
-                if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider.KUL))
+                Logger.LogDebug("Start deleting KUL data");
+                if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider))
                 {
                     Logger.LogError("Failed to delete KUL data");
-
-                    runInfo.End = DateTime.Now;
-                    runInfo.Status = RunStatus.Failed;
-                    return runInfo;
+                    return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
                 }
-                Logger.LogDebug("Finsih deleting KUL Verbatim observations");
+                Logger.LogDebug("Finish deleting KUL data");
 
-                Logger.LogDebug("Start getting KUL Verbatim observations");
-                var verbatimCount = 0;
-                using var cursor = await _kulObservationVerbatimRepository.GetAllAsync();
+                Logger.LogDebug("Start processing KUL data");
+                var verbatimCount = await ProcessObservations(taxa, cancellationToken);
+                Logger.LogDebug($"Finish processing KUL data.");
 
-                ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
-                await cursor.ForEachAsync(c =>
-                {
-                    sightings.Add(c.ToProcessed(taxa));
-
-                    if (sightings.Count % ProcessRepository.BatchSize == 0)
-                    {
-                        verbatimCount += ProcessRepository.BatchSize;
-                        Logger.LogDebug($"KUL sightings processed: {verbatimCount}");
-                        ProcessRepository.AddManyAsync(sightings);
-                        sightings.Clear();
-                    }
-                });
-
-                if (sightings.Any())
-                {
-                    verbatimCount += sightings.Count;
-                    Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
-                    await ProcessRepository.AddManyAsync(sightings);
-                    sightings.Clear();
-                }
-                Logger.LogDebug($"Finish Processing KUL Verbatim observations.");
-
-                runInfo.End = DateTime.Now;
-                runInfo.Count = verbatimCount;
-                runInfo.Status = RunStatus.Success;
+                return RunInfo.Success(DataProvider, startTime, DateTime.Now, verbatimCount);
             }
             catch (JobAbortedException)
             {
                 Logger.LogInformation("KUL observation processing was canceled.");
-                runInfo.End = DateTime.Now;
-                runInfo.Status = RunStatus.Canceled;
+                return RunInfo.Cancelled(DataProvider, startTime, DateTime.Now);
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Failed to process KUL Verbatim observations");
-                runInfo.End = DateTime.Now;
-                runInfo.Status = RunStatus.Failed;
+                Logger.LogError(e, "Failed to process sightings");
+                return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
             }
 
-            return runInfo;
+        }
+
+        private async Task<int> ProcessObservations(
+                    IDictionary<int, ProcessedTaxon> taxa,
+                    IJobCancellationToken cancellationToken)
+        {
+            var verbatimCount = 0;
+            ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
+
+            using var cursor = await _kulObservationVerbatimRepository.GetAllAsync();
+
+            // Process and commit in batches.
+            await cursor.ForEachAsync(c =>
+            {
+                ProcessedSighting processedSighting = c.ToProcessed(taxa);
+                _areaHelper.AddAreaDataToProcessedSighting(processedSighting);
+                sightings.Add(processedSighting);
+                if (IsBatchFilledToLimit(sightings.Count))
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    verbatimCount += CommitBatch(sightings);
+                    Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
+                }
+            });
+
+            // Commit remaining batch (not filled to limit).
+            if (sightings.Any())
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
+                verbatimCount += CommitBatch(sightings);
+                Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
+            }
+
+            return verbatimCount;
         }
     }
 }

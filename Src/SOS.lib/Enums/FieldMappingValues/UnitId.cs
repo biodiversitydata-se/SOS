@@ -60,10 +60,10 @@
         Cm2 = 8,
 
         /// <summary>
-        /// Ind..
+        /// Individuals.
         /// (Ex.)
         /// </summary>
-        Ind = 9,
+        Individuals = 9,
 
         /// <summary>
         /// Colonies.

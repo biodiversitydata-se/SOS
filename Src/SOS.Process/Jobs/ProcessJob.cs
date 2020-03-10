@@ -119,14 +119,14 @@ namespace SOS.Process.Jobs
                 var processTasks = new Dictionary<DataProvider, Task<RunInfo>>();
 
                 // Add species portal import if first bit is set
-                if ((sources & (int)DataProvider.Artdatabanken) > 0)
+                if ((sources & (int)DataProvider.SpeciesPortal) > 0)
                 {
-                    processTasks.Add(DataProvider.Artdatabanken, _speciesPortalProcessFactory.ProcessAsync(taxonById, cancellationToken));
+                    processTasks.Add(DataProvider.SpeciesPortal, _speciesPortalProcessFactory.ProcessAsync(taxonById, cancellationToken));
 
-                    var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(APSightingVerbatim))) ?? new HarvestInfo(nameof(APSightingVerbatim), DataProvider.Artdatabanken, DateTime.MinValue);
+                    var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(APSightingVerbatim))) ?? new HarvestInfo(nameof(APSightingVerbatim), DataProvider.SpeciesPortal, DateTime.MinValue);
 
                     //Add information about harvest
-                    providerInfo.Add(DataProvider.Artdatabanken, CreateProviderInfo(DataProvider.Artdatabanken, harvestInfo,
+                    providerInfo.Add(DataProvider.SpeciesPortal, CreateProviderInfo(DataProvider.SpeciesPortal, harvestInfo,
                         currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon))).ToArray())
                     );
                 }

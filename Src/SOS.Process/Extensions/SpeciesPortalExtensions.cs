@@ -59,7 +59,7 @@ namespace SOS.Process.Extensions
                 taxon.IndividualId = verbatim.URL;
             }
 
-            var obs = new ProcessedSighting(DataProvider.Artdatabanken)
+            var obs = new ProcessedSighting(DataProvider.SpeciesPortal)
             {
                 AccessRightsId =
                 !verbatim.ProtectedBySystem && verbatim.HiddenByProvider.HasValue &&
@@ -67,13 +67,13 @@ namespace SOS.Process.Extensions
                     ? new ProcessedFieldMapValue { Id = (int)AccessRightsId.FreeUsage }
                     : new ProcessedFieldMapValue { Id = (int)AccessRightsId.NotForPublicUsage },
                 BasisOfRecordId = string.IsNullOrEmpty(verbatim.SpeciesCollection)
-                ? new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.Humanobservation }
-                : new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.Preservedspecimen },
+                ? new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation }
+                : new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.PreservedSpecimen },
                 CollectionCode = string.IsNullOrEmpty(verbatim.SpeciesCollection)
                 ? "Artportalen"
                 : verbatim.SpeciesCollection,
                 CollectionId = verbatim.CollectionID,
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.Artdatabanken.ToString()}",
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.SpeciesPortal.ToString()}",
                 DatasetName = "Artportalen",
                 Event = new ProcessedEvent
                 {

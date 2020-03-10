@@ -40,7 +40,7 @@ namespace SOS.Import.Factories
         /// <inheritdoc />
         public async Task<HarvestInfo> HarvestAreasAsync()
         {
-            var harvestInfo = new HarvestInfo(nameof(Area), DataProvider.Artdatabanken, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(Area), DataProvider.SpeciesPortal, DateTime.Now);
             try
             {
                 var start = DateTime.Now;

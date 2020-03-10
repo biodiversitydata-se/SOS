@@ -33,7 +33,6 @@
         /// <summary>
         /// Uncertain.
         /// </summary>
-        Uncertain = 5,
-
+        Uncertain = 5
     }
 }

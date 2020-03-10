@@ -200,17 +200,17 @@ namespace SOS.Process.UnitTests.Jobs
             _harvestInfoRepository.Setup(r => r.GetAllAsync())
                 .ReturnsAsync(new []
                 {
-                    new HarvestInfo("0", DataProvider.Artdatabanken, DateTime.Now)
+                    new HarvestInfo("0", DataProvider.SpeciesPortal, DateTime.Now)
                 });
 
             _speciesPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(new RunInfo(DataProvider.Artdatabanken) {Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now});
+                .ReturnsAsync(RunInfo.Success(DataProvider.SpeciesPortal, DateTime.Now, DateTime.Now, 1));
 
             _clamPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(new RunInfo(DataProvider.ClamPortal) { Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now });
+                .ReturnsAsync(RunInfo.Success(DataProvider.ClamPortal, DateTime.Now, DateTime.Now, 1));
 
             _kulProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(new RunInfo(DataProvider.KUL) { Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now });
+                .ReturnsAsync(RunInfo.Success(DataProvider.KUL, DateTime.Now, DateTime.Now, 1));
 
             _darwinCoreRepository.Setup(r => r.DropIndexAsync());
             _darwinCoreRepository.Setup(r => r.CreateIndexAsync());
@@ -240,7 +240,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _areaHelper.Object,
                 _loggerMock.Object);
 
-            var sources = (byte) DataProvider.Artdatabanken + (byte) DataProvider.ClamPortal + (byte) DataProvider.KUL;
+            var sources = (byte) DataProvider.SpeciesPortal + (byte) DataProvider.ClamPortal + (byte) DataProvider.KUL;
             var result = await job.RunAsync(sources, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert

@@ -13,7 +13,6 @@
         /// <summary>
         /// Absent.
         /// </summary>
-        Absent = 1,
-
+        Absent = 1
     }
 }

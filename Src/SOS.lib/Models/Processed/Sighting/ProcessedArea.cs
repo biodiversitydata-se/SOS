@@ -11,6 +11,11 @@
         public int Id { get; set; }
 
         /// <summary>
+        /// Feature Id of area
+        /// </summary>
+        public int FeatureId { get; set; }
+
+        /// <summary>
         /// Name of area
         /// </summary>
         public string Name { get; set; }

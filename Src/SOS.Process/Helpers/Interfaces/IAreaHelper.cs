@@ -11,7 +11,13 @@ namespace SOS.Process.Helpers.Interfaces
         /// </summary>
         /// <param name="processedSightings"></param>
         /// <returns></returns>
-        void AddAreaDataToProcessed(IEnumerable<ProcessedSighting> processedSightings);
+        void AddAreaDataToProcessedSightings(IEnumerable<ProcessedSighting> processedSightings);
+
+        /// <summary>
+        /// Add area data to processed sighting model
+        /// </summary>
+        /// <param name="processedSighting"></param>
+        void AddAreaDataToProcessedSighting(ProcessedSighting processedSighting);
 
         /// <summary>
         /// Save cache so we can use it after restart
