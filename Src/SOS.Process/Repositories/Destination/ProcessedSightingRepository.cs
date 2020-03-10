@@ -30,7 +30,7 @@ namespace SOS.Process.Repositories.Destination
             IProcessClient client,
             IInadequateItemRepository darwinCoreInadequateRepository,
             ILogger<ProcessedSightingRepository> logger
-        ):base(client, true, logger)
+        ) : base(client, true, logger)
         {
             _inadequateItemRepository = darwinCoreInadequateRepository ?? throw new ArgumentNullException(nameof(darwinCoreInadequateRepository));
         }
@@ -59,7 +59,7 @@ namespace SOS.Process.Repositories.Destination
                 {
                     inadequateItem.Defects.Add("CoordinateUncertaintyInMeters exceeds max value 100 km");
                 }
-                
+
                 if (!item.IsInEconomicZoneOfSweden)
                 {
                     inadequateItem.Defects.Add("Sighting outside Swedish economic zone");
@@ -95,7 +95,7 @@ namespace SOS.Process.Repositories.Destination
 
             // Save adequate processed data
             var success = await base.AddManyAsync(items);
-            
+
             // No inadequate items, we are done here
             if (success && (inadequateItems?.Any() ?? false))
             {
@@ -111,7 +111,7 @@ namespace SOS.Process.Repositories.Destination
         {
             // Get data from active instance
             SetCollectionName(ActiveInstance);
-            
+
             var source = await
                 MongoCollection.FindAsync(
                     Builders<ProcessedSighting>.Filter.Eq(dwc => dwc.Provider, provider));
@@ -124,13 +124,15 @@ namespace SOS.Process.Repositories.Destination
 
         /// <inheritdoc />
         public async Task CreateIndexAsync()
-        {/*
+        {
             var indexModels = new List<CreateIndexModel<ProcessedSighting>>()
             {
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.EndDate)),
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.EndDate), 
+                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true } ),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.StartDate)),
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.StartDate),
+                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true }),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Identification.Validated)),
                 new CreateIndexModel<ProcessedSighting>(
@@ -144,25 +146,28 @@ namespace SOS.Process.Repositories.Destination
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.MunicipalityId.Id)),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation)),
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation),
+                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true }),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.GenderId.Id)),
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.GenderId.Id),
+                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true }),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Provider)),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.Id)),
                 new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory))
+                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory),
+                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true })
             };
 
-            await MongoCollection.Indexes.CreateManyAsync(indexModels);*/
+            await MongoCollection.Indexes.CreateManyAsync(indexModels);
 
             /*   indexModels.Add(new CreateIndexModel<DarwinCore>(Builders<DarwinCore>.IndexKeys.Combine(
                    Builders<DarwinCore>.IndexKeys.Ascending(x => x.ParentIds),
                    Builders<ImageADarwinCoreggregate>.IndexKeys.Ascending(x => x.Class))));
                    */
 
-
+            /*
             Logger.LogDebug("Start creating End date index");
             await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
                 Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.EndDate)));
@@ -226,7 +231,7 @@ namespace SOS.Process.Repositories.Destination
             Logger.LogDebug("Start creating Taxon Redlist Category index");
             await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
                 Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory)));
-            Logger.LogDebug("Finish creating Taxon Redlist Category index");
+            Logger.LogDebug("Finish creating Taxon Redlist Category index");*/
         }
 
         /// <inheritdoc />

@@ -43,15 +43,18 @@ namespace SOS.Process.Jobs
             var taxa = dwcTaxa.Select(m => m.ToProcessedTaxon()).ToList();
             CalculateHigherClassificationField(taxa);
 
-            _logger.LogDebug("Start deleting processed taxa from inactive instance");
+            _logger.LogDebug("Start deleting processed taxa");
             if (!await _taxonProcessedRepository.DeleteCollectionAsync())
             {
                 _logger.LogError("Failed to delete processed taxa");
                 return false;
             }
-            _logger.LogDebug("Finish deleting processed taxa from inactive instance");
+            _logger.LogDebug("Finish deleting processed taxa");
 
+            _logger.LogDebug("Start copy processed taxa");
             var success = await _taxonProcessedRepository.AddManyAsync(taxa);
+            _logger.LogDebug("Finish copy processed taxa");
+
             return success ? true : throw new Exception("Process taxa job failed");
         }
 

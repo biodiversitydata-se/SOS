@@ -34,15 +34,17 @@ namespace SOS.Process.Jobs
                 return false;
             }
 
-            _logger.LogDebug("Start deleting field mappings from inactive instance");
+            _logger.LogDebug("Start deleting field mappings");
             if (!await _fieldMappingProcessedRepository.DeleteCollectionAsync())
             {
                 _logger.LogError("Failed to delete field mappings data");
                 return false;
             }
-            _logger.LogDebug("Finish deleting field mappings from inactive instance");
+            _logger.LogDebug("Finish deleting field mappings");
 
+            _logger.LogDebug("Start copy field mappings");
             var success = await _fieldMappingProcessedRepository.AddManyAsync(fieldMappings);
+            _logger.LogDebug("Finish copy field mappings");
 
             return success ? true : throw new Exception("Copy field mappings job failed");
         }

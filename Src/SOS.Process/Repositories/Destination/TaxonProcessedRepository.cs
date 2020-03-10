@@ -27,7 +27,7 @@ namespace SOS.Process.Repositories.Destination
         public TaxonProcessedRepository(
             IProcessClient client, 
             ILogger<TaxonProcessedRepository> logger) 
-            : base(client, true, logger)
+            : base(client, false, logger)
         {
 
         }

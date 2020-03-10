@@ -127,13 +127,13 @@ namespace SOS.Import.Factories
                     organizationById,
                     speciesCollections,
                     sightingRelations);
-                _logger.LogDebug("Finsih calculating person sighting directory");
+                _logger.LogDebug("Finish calculating person sighting directory");
 
                 _logger.LogDebug("Start getting projects and parameters");
                 // Get projects & project parameters
                 var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, sightingProjectIds,
                     projectEntityById, projectParameterEntities);
-                _logger.LogDebug("Finsish getting projects and parameters");
+                _logger.LogDebug("Finish getting projects and parameters");
 
                 _logger.LogDebug("Start casting entities to verbatim");
                 // Cast sightings to aggregates
@@ -233,6 +233,7 @@ namespace SOS.Import.Factories
                 await _sightingVerbatimRepository.DeleteCollectionAsync();
                 await _sightingVerbatimRepository.AddCollectionAsync();
 
+                // Get source min and max id
                 var (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
                 var currentId = minId;
                 var harvestBatchTasks = new List<Task<int>>();
@@ -251,6 +252,7 @@ namespace SOS.Import.Factories
 
                     await _semaphore.WaitAsync();
 
+                    // Add batch task to list
                     harvestBatchTasks.Add(HarvestBatchAsync(currentId, activities, biotopes, genders, organizations, sites, stages, substrates,
                         validationStatus, units,
                         personByUserId, organizationById, speciesCollections, sightingProjectIds, projectEntityById,
@@ -260,8 +262,10 @@ namespace SOS.Import.Factories
                     currentId += _speciesPortalConfiguration.ChunkSize;
                 }
 
+                // Execute harvest tasks, no of parallel threads running is handled by semaphore
                 await Task.WhenAll(harvestBatchTasks);
 
+                // Sum each batch harvested
                 var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
                 _logger.LogDebug("Finish getting species portal sightings");
