@@ -13,6 +13,7 @@ using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
 using Newtonsoft.Json;
 using SOS.Lib.Constants;
+using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
@@ -76,8 +77,9 @@ namespace SOS.Process.Helpers
                 return;
             }
 
-            var areas = await _areaVerbatimRepository.GetBatchBySkipAsync(0);
-            var count = areas.Count();
+            
+            var areas = (await _areaVerbatimRepository.GetBatchBySkipAsync(0)).ToArray();
+            var count = areas.Length;
             var totalCount = count;
 
             while (count != 0)
@@ -88,8 +90,8 @@ namespace SOS.Process.Helpers
                     _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
                 }
                 
-                areas = await _areaVerbatimRepository.GetBatchBySkipAsync(totalCount + 1);
-                count = areas.Count();
+                areas = (await _areaVerbatimRepository.GetBatchBySkipAsync(totalCount + 1)).ToArray();
+                count = areas.Length;
                 totalCount += count;
             }
 
@@ -133,19 +135,30 @@ namespace SOS.Process.Helpers
         /// <inheritdoc />
         public void AddAreaDataToProcessedSighting(ProcessedSighting processedSighting)
         {
-            if (processedSighting.Location == null || 
-                processedSighting.Location.DecimalLatitude.Equals(0) && processedSighting.Location.DecimalLongitude.Equals(0))
+            if (processedSighting.Location == null || processedSighting.Location.DecimalLatitude.Equals(0) && processedSighting.Location.DecimalLongitude.Equals(0))
             {
                 return;
             }
 
+            var positionLocation = GetPositionLocation(processedSighting.Location.DecimalLongitude, processedSighting.Location.DecimalLatitude);
+            processedSighting.Location.CountyId = ProcessedFieldMapValue.Create(positionLocation.County?.Id);
+            processedSighting.Location.MunicipalityId = ProcessedFieldMapValue.Create(positionLocation.Municipality?.Id);
+            processedSighting.Location.ParishId = ProcessedFieldMapValue.Create(positionLocation.Parish?.Id);
+            processedSighting.Location.ProvinceId = ProcessedFieldMapValue.Create(positionLocation.Province?.Id);
+            processedSighting.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
+            SetCountyPartIdByCoordinate(processedSighting);
+            SetProvincePartIdByCoordinate(processedSighting);
+        }
+
+        private PositionLocation GetPositionLocation(double decimalLongitude, double decimalLatitude)
+        {
             // Round coordinates to 5 decimals (roughly 1m)
-            var key = $"{Math.Round(processedSighting.Location.DecimalLongitude, 5)}-{Math.Round(processedSighting.Location.DecimalLatitude, 5)}";
+            var key = $"{Math.Round(decimalLongitude, 5)}-{Math.Round(decimalLatitude, 5)}";
 
             // Try to get areas from cache. If areas not found for that position, try to get from repository
             if (!_featureCache.TryGetValue(key, out var positionLocation))
             {
-                var features = GetPointFeatures(processedSighting.Location.DecimalLongitude, processedSighting.Location.DecimalLatitude);
+                var features = GetPointFeatures(decimalLongitude, decimalLatitude);
                 positionLocation = new PositionLocation();
 
                 if (features != null)
@@ -154,11 +167,11 @@ namespace SOS.Process.Helpers
                     {
                         var area = new ProcessedArea
                         {
-                            Id = (int)feature.Attributes.GetOptionalValue("id"),
-                            FeatureId = (int)feature.Attributes.GetOptionalValue("featureId"),
-                            Name = (string)feature.Attributes.GetOptionalValue("name")
+                            Id = (int) feature.Attributes.GetOptionalValue("id"),
+                            FeatureId = (int) feature.Attributes.GetOptionalValue("featureId"),
+                            Name = (string) feature.Attributes.GetOptionalValue("name")
                         };
-                        switch ((AreaType)feature.Attributes.GetOptionalValue("areaType"))
+                        switch ((AreaType) feature.Attributes.GetOptionalValue("areaType"))
                         {
                             case AreaType.County:
                                 positionLocation.County = area;
@@ -182,68 +195,40 @@ namespace SOS.Process.Helpers
                 _featureCache.Add(key, positionLocation);
             }
 
-            
-            processedSighting.Location.CountyId = GetSosId(positionLocation.County?.Id);
-            processedSighting.Location.MunicipalityId = GetSosId(positionLocation.Municipality?.Id);
-            processedSighting.Location.ParishId = GetSosId(positionLocation.Parish?.Id);
-            processedSighting.Location.ProvinceId = GetSosId(positionLocation.Province?.Id);
-            //processedSighting.Location.CountyId = GetSosId(positionLocation.County?.Id, _fieldMappingsByFeatureId[FieldMappingFieldId.County]);
-            //processedSighting.Location.MunicipalityId = GetSosId(positionLocation.Municipality?.Id, _fieldMappingsByFeatureId[FieldMappingFieldId.Municipality]);
-            //processedSighting.Location.ParishId = GetSosId(positionLocation.Parish?.Id, _fieldMappingsByFeatureId[FieldMappingFieldId.Parish]);
-            //processedSighting.Location.ProvinceId = GetSosId(positionLocation.Province?.Id, _fieldMappingsByFeatureId[FieldMappingFieldId.Province]);
-            processedSighting.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
+            return positionLocation;
+        }
 
-            // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
-            processedSighting.Location.CountyPartIdByCoordinate = processedSighting.Location.CountyId?.Id;
-            if (processedSighting.Location.CountyId?.Id == (int)CountyFeatureId.Kalmar)
-            {
-                if (processedSighting.Location.ProvinceId?.Id == (int)ProvinceFeatureId.Oland)
-                {
-                    processedSighting.Location.CountyPartIdByCoordinate = (int)CountyFeatureId.Oland;
-                }
-                else
-                {
-                    processedSighting.Location.CountyPartIdByCoordinate = (int)CountyFeatureId.KalmarFastland;
-                }
-            }
-
+        private static void SetProvincePartIdByCoordinate(ProcessedSighting processedSighting)
+        {
             // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
             processedSighting.Location.ProvincePartIdByCoordinate = processedSighting.Location.ProvinceId?.Id;
             if (new[]
             {
-                    (int)ProvinceFeatureId.LuleLappmark,
-                    (int)ProvinceFeatureId.LyckseleLappmark,
-                    (int)ProvinceFeatureId.PiteLappmark,
-                    (int)ProvinceFeatureId.TorneLappmark,
-                    (int)ProvinceFeatureId.AseleLappmark
-                }.Contains(processedSighting.Location.ProvinceId?.Id ?? 0))
+                (int) ProvinceId.LuleLappmark,
+                (int) ProvinceId.LyckseleLappmark,
+                (int) ProvinceId.PiteLappmark,
+                (int) ProvinceId.TorneLappmark,
+                (int) ProvinceId.AseleLappmark
+            }.Contains(processedSighting.Location.ProvinceId?.Id ?? 0))
             {
-                processedSighting.Location.ProvincePartIdByCoordinate = (int)ProvinceFeatureId.Lappland;
+                processedSighting.Location.ProvincePartIdByCoordinate = (int) SpecialProvincePartId.Lappland;
             }
         }
 
-        private static ProcessedFieldMapValue GetSosId(int? val)
+        private static void SetCountyPartIdByCoordinate(ProcessedSighting processedSighting)
         {
-            return !val.HasValue ? null : new ProcessedFieldMapValue { Id = val.Value };
-        }
-
-        /// <summary>
-        /// Get SOS internal Id for the id specific for the data provider.
-        /// </summary>
-        /// <param name="val"></param>
-        /// <param name="sosIdByProviderValue"></param>
-        /// <returns></returns>
-        private static ProcessedFieldMapValue GetSosId(int? val, IDictionary<object, int> sosIdByProviderValue)
-        {
-            if (!val.HasValue) return null;
-
-            if (sosIdByProviderValue.TryGetValue(val.Value, out int sosId))
+            // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
+            processedSighting.Location.CountyPartIdByCoordinate = processedSighting.Location.CountyId?.Id;
+            if (processedSighting.Location.CountyId?.Id == (int) CountyId.Kalmar)
             {
-                return new ProcessedFieldMapValue { Id = sosId };
-            }
-            else
-            {
-                return new ProcessedFieldMapValue { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
+                if (processedSighting.Location.ProvinceId?.Id == (int) ProvinceId.Oland)
+                {
+                    processedSighting.Location.CountyPartIdByCoordinate = (int) SpecialCountyPartId.Oland;
+                }
+                else
+                {
+                    processedSighting.Location.CountyPartIdByCoordinate = (int) SpecialCountyPartId.KalmarFastland;
+                }
             }
         }
 
@@ -279,7 +264,6 @@ namespace SOS.Process.Helpers
             SetValue(observation?.Location?.MunicipalityId, _fieldMappingValueById[FieldMappingFieldId.Municipality]);
             SetValue(observation?.Location?.ProvinceId, _fieldMappingValueById[FieldMappingFieldId.Province]);
             SetValue(observation?.Location?.ParishId, _fieldMappingValueById[FieldMappingFieldId.Parish]);
-
         }
 
         private void SetValue(ProcessedFieldMapValue val, IDictionary<int, FieldMappingValue> fieldMappingValueById)
