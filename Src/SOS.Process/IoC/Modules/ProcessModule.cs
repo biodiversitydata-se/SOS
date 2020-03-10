@@ -36,8 +36,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterInstance(processClient).As<IProcessClient>().SingleInstance();
 
             // Field mapping processing configuration
-            if (Configuration.FieldMapping != null)
-                builder.RegisterInstance(Configuration.FieldMapping).As<FieldMappingConfiguration>().SingleInstance();
+            builder.RegisterInstance(Configuration.FieldMapping).As<FieldMappingConfiguration>().SingleInstance();
 
             // Helpers
             builder.RegisterType<AreaNameMapper>().As<IAreaNameMapper>().SingleInstance();
