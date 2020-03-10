@@ -9,7 +9,7 @@ namespace SOS.Lib.Models.Shared
         /// Constructor
         /// </summary>
         /// <param name="provider"></param>
-        public RunInfo(DataProvider provider)
+        protected RunInfo(DataProvider provider)
         {
             DataProvider = provider;
         }

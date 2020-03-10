@@ -64,17 +64,19 @@ namespace SOS.Process.IntegrationTests.Jobs
             var processedSightingRepository = new ProcessedSightingRepository(processClient, inadequateItemRepository, new NullLogger<ProcessedSightingRepository>());
             var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository = new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
+            var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
             var clamPortalProcessFactory = new ClamPortalProcessFactory(
                 new ClamObservationVerbatimRepository(verbatimClient, new NullLogger<ClamObservationVerbatimRepository>()), 
                 areaHelper, 
-                processedSightingRepository, 
+                processedSightingRepository,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
                 new NullLogger<ClamPortalProcessFactory>());
             var kulProcessFactory = new KulProcessFactory(
                 new KulObservationVerbatimRepository(verbatimClient, new NullLogger<KulObservationVerbatimRepository>()), 
                 areaHelper,
                 processedSightingRepository,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<KulProcessFactory>());
-            var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
             var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
                 new SpeciesPortalVerbatimRepository(verbatimClient, new NullLogger<SpeciesPortalVerbatimRepository>()),
                 processedSightingRepository,

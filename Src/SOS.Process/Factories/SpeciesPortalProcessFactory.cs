@@ -19,14 +19,14 @@ namespace SOS.Process.Factories
     /// <summary>
     /// Process factory class
     /// </summary>
-    public class SpeciesPortalProcessFactory : ProcessBaseFactory<SpeciesPortalProcessFactory>, Interfaces.ISpeciesPortalProcessFactory
+    public class SpeciesPortalProcessFactory : DataProviderProcessorBase<SpeciesPortalProcessFactory>, Interfaces.ISpeciesPortalProcessFactory
     {
         private readonly ISpeciesPortalVerbatimRepository _speciesPortalVerbatimRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
-        private readonly IFieldMappingResolverHelper _fieldMappingResolverHelper;
+        public override DataProvider DataProvider => DataProvider.SpeciesPortal;
 
         /// <summary>
-        /// Constructor
+        /// Constructorro
         /// </summary>
         /// <param name="speciesPortalVerbatimRepository"></param>
         /// <param name="processedSightingRepository"></param>
@@ -38,11 +38,10 @@ namespace SOS.Process.Factories
             IProcessedSightingRepository processedSightingRepository,
             IProcessedFieldMappingRepository processedFieldMappingRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<SpeciesPortalProcessFactory> logger) : base(processedSightingRepository, logger)
+            ILogger<SpeciesPortalProcessFactory> logger) : base(processedSightingRepository, fieldMappingResolverHelper, logger)
         {
             _speciesPortalVerbatimRepository = speciesPortalVerbatimRepository ?? throw new ArgumentNullException(nameof(speciesPortalVerbatimRepository));
             _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
-            _fieldMappingResolverHelper = fieldMappingResolverHelper ?? throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
         }
 
         /// <inheritdoc />
@@ -55,32 +54,34 @@ namespace SOS.Process.Factories
             try
             {
                 Logger.LogDebug("Start deleting Species Portal data");
-                if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider.SpeciesPortal))
+                if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider))
                 {
                     Logger.LogError("Failed to delete Species Portal data");
-                    return RunInfo.Failed(DataProvider.SpeciesPortal, startTime, DateTime.Now);
+                    return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
                 }
                 Logger.LogDebug("Finish deleting Species Portal data");
 
                 Logger.LogDebug("Start processing Species Portal data");
-                var verbatimCount = await ProcessObservations(taxa);
+                var verbatimCount = await ProcessObservations(taxa, cancellationToken);
                 Logger.LogDebug($"Finish processing Species Portal data.");
                 
-                return RunInfo.Success(DataProvider.SpeciesPortal, startTime, DateTime.Now, verbatimCount);
+                return RunInfo.Success(DataProvider, startTime, DateTime.Now, verbatimCount);
             }
             catch (JobAbortedException)
             {
                 Logger.LogInformation("Species Portal observation processing was canceled.");
-                return RunInfo.Cancelled(DataProvider.SpeciesPortal, startTime, DateTime.Now);
+                return RunInfo.Cancelled(DataProvider, startTime, DateTime.Now);
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Failed to process sightings");
-                return RunInfo.Failed(DataProvider.SpeciesPortal, startTime, DateTime.Now);
+                return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
             }
         }
 
-        private async Task<int> ProcessObservations(IDictionary<int, ProcessedTaxon> taxa)
+        private async Task<int> ProcessObservations(
+            IDictionary<int, ProcessedTaxon> taxa,
+            IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
             ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
@@ -95,6 +96,7 @@ namespace SOS.Process.Factories
                 sightings.Add(c.ToProcessed(taxa, fieldMappings));
                 if (IsBatchFilledToLimit(sightings.Count))
                 {
+                    cancellationToken?.ThrowIfCancellationRequested();
                     verbatimCount += CommitBatch(sightings);
                     Logger.LogDebug($"Species Portal Sightings processed: {verbatimCount}");
                 }
@@ -103,25 +105,12 @@ namespace SOS.Process.Factories
             // Commit remaining batch (not filled to limit).
             if (sightings.Any())
             {
+                cancellationToken?.ThrowIfCancellationRequested();
                 verbatimCount += CommitBatch(sightings);
                 Logger.LogDebug($"Species Portal Sightings processed: {verbatimCount}");
             }
 
             return verbatimCount;
-        }
-
-        private int CommitBatch(ICollection<ProcessedSighting> sightings)
-        {
-            int sightingsCount = sightings.Count;
-            _fieldMappingResolverHelper.ResolveFieldMappedValues(sightings);
-            ProcessRepository.AddManyAsync(sightings);
-            sightings.Clear();
-            return sightingsCount;
-        }
-
-        private bool IsBatchFilledToLimit(int count)
-        {
-            return count % ProcessRepository.BatchSize == 0;
         }
 
         /// <summary>

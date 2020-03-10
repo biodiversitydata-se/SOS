@@ -204,13 +204,13 @@ namespace SOS.Process.UnitTests.Jobs
                 });
 
             _speciesPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(new RunInfo(DataProvider.SpeciesPortal) {Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now});
+                .ReturnsAsync(RunInfo.Success(DataProvider.SpeciesPortal, DateTime.Now, DateTime.Now, 1));
 
             _clamPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(new RunInfo(DataProvider.ClamPortal) { Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now });
+                .ReturnsAsync(RunInfo.Success(DataProvider.ClamPortal, DateTime.Now, DateTime.Now, 1));
 
             _kulProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(new RunInfo(DataProvider.KUL) { Count = 1, Status = RunStatus.Success, Start = DateTime.Now, End = DateTime.Now });
+                .ReturnsAsync(RunInfo.Success(DataProvider.KUL, DateTime.Now, DateTime.Now, 1));
 
             _darwinCoreRepository.Setup(r => r.DropIndexAsync());
             _darwinCoreRepository.Setup(r => r.CreateIndexAsync());

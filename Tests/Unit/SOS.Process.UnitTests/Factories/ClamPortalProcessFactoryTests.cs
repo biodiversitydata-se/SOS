@@ -27,6 +27,7 @@ namespace SOS.Process.UnitTests.Factories
         private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IProcessedSightingRepository> _processedSightingRepository;
+        private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
         private readonly Mock<ILogger<ClamPortalProcessFactory>> _loggerMock;
 
         /// <summary>
@@ -37,6 +38,7 @@ namespace SOS.Process.UnitTests.Factories
             _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
             _processedSightingRepository = new Mock<IProcessedSightingRepository>();
+            _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
             _loggerMock = new Mock<ILogger<ClamPortalProcessFactory>>();
         }
 
@@ -50,12 +52,14 @@ namespace SOS.Process.UnitTests.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedSightingRepository.Object,
+                _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new ClamPortalProcessFactory(
                 null,
                 _areaHelper.Object,
                 _processedSightingRepository.Object,
+                _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
 
@@ -64,6 +68,7 @@ namespace SOS.Process.UnitTests.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 null,
                 _processedSightingRepository.Object,
+                _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
 
@@ -71,6 +76,7 @@ namespace SOS.Process.UnitTests.Factories
                  _clamObservationVerbatimRepositoryMock.Object,
                  _areaHelper.Object,
                 null,
+                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("DarwinCoreRepository");
 
@@ -78,6 +84,7 @@ namespace SOS.Process.UnitTests.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedSightingRepository.Object,
+                _fieldMappingResolverHelperMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -115,6 +122,7 @@ namespace SOS.Process.UnitTests.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedSightingRepository.Object,
+                _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
 
             var result = await clamPortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
@@ -144,6 +152,7 @@ namespace SOS.Process.UnitTests.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedSightingRepository.Object,
+                _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
 
             var result = await clamPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
@@ -173,6 +182,7 @@ namespace SOS.Process.UnitTests.Factories
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedSightingRepository.Object,
+                _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
 
             var result = await clamPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
