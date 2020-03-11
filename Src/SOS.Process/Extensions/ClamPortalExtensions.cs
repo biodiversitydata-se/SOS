@@ -70,7 +70,7 @@ namespace SOS.Process.Extensions
                     Id = verbatim.LocationId,
                     Locality = verbatim.Locality,
                     Point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry(),
-                    PointWithBuffer = wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoJsonGeometry(),
+                    PointWithBuffer = wgs84Point?.ToSquare(verbatim.CoordinateUncertaintyInMeters)?.ToGeoJsonGeometry(),
                     Remarks = verbatim.LocationRemarks,
                     MaximumDepthInMeters = verbatim.MaximumDepthInMeters,
                     VerbatimLatitude = verbatim.DecimalLatitude,

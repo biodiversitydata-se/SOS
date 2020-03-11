@@ -56,50 +56,13 @@ namespace SOS.Process.Factories
             _semaphore = new SemaphoreSlim(processConfiguration.NoOfThreads);
         }
 
-        /// <inheritdoc />
-        public async Task<RunInfo> ProcessAsync(
-            IDictionary<int, ProcessedTaxon> taxa,
-            IJobCancellationToken cancellationToken)
-        {
-            Logger.LogDebug("Start Processing Species Portal Verbatim");
-            var startTime = DateTime.Now;
-            try
-            {
-                Logger.LogDebug("Start deleting Species Portal data");
-                if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider))
-                {
-                    Logger.LogError("Failed to delete Species Portal data");
-                    return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
-                }
-                Logger.LogDebug("Finish deleting Species Portal data");
-
-                Logger.LogDebug("Start processing Species Portal data");
-
-                var processedCount = await ProcessObservations(taxa, cancellationToken);
-
-                Logger.LogDebug($"Finish processing Species Portal data.");
-
-                return RunInfo.Success(DataProvider, startTime, DateTime.Now, processedCount);
-            }
-            catch (JobAbortedException)
-            {
-                Logger.LogInformation("Species Portal observation processing was canceled.");
-                return RunInfo.Cancelled(DataProvider, startTime, DateTime.Now);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to process sightings");
-                return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
-            }
-        }
-
         /// <summary>
         /// Process all observations
         /// </summary>
         /// <param name="taxa"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<int> ProcessObservations(
+        protected override async Task<int> ProcessObservations(
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
