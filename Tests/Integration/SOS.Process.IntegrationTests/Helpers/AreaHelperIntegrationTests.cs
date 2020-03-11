@@ -1,29 +1,31 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using SOS.Lib.Enums;
+using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Sighting;
-using SOS.Process.Database;
-using SOS.Process.Helpers;
-using SOS.Process.Repositories.Destination;
-using SOS.Process.Repositories.Source;
+using SOS.TestHelpers.Gis;
+using SOS.TestHelpers.Helpers;
 using Xunit;
 
 namespace SOS.Process.IntegrationTests.Helpers
 {
-    public class AreaHelperIntegrationTests : TestBase
+    public class AreaHelperIntegrationTests : IClassFixture<AreaHelperFixture>
     {
+        private readonly AreaHelperFixture _fixture;
+
+        public AreaHelperIntegrationTests(AreaHelperFixture fixture)
+        {
+            _fixture = fixture;
+        }
+
         [Fact]
         [Trait("Category", "Integration")]
-        public void GetAreasFromMongoDb_And_GetRegionBelongingsForTranasMunicipality()
+        public void GetRegionBelongingsForLocationInTranasMunicipality()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var areaHelper = CreateAreaHelper();
             var observations = new List<ProcessedSighting>();
             var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
             {
@@ -38,40 +40,104 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            areaHelper.AddAreaDataToProcessedSightings(observations);
+            _fixture.AreaHelper.AddAreaDataToProcessedSightings(observations);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            areaHelper.AddValueDataToGeographicalFields(observation);
+            _fixture.AreaHelper.AddValueDataToGeographicalFields(observation);
             observation.Location.CountyId.Value.Should().Be("Jönköping");
             observation.Location.MunicipalityId.Value.Should().Be("Tranås");
             observation.Location.ProvinceId.Value.Should().Be("Småland");
             observation.Location.ParishId.Value.Should().Be("Tranås");
         }
 
-        private AreaHelper CreateAreaHelper()
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void ProvincePartIdByCoordinateShouldBeSetToLappland_When_ObservationIsInLappmark()
         {
-            var processConfiguration = GetProcessConfiguration();
-            var verbatimClient = new VerbatimClient(
-                processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.VerbatimDbConfiguration.DatabaseName,
-                processConfiguration.VerbatimDbConfiguration.BatchSize);
-            var processClient = new ProcessClient(
-                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                processConfiguration.ProcessedDbConfiguration.BatchSize);
-            var areaVerbatimRepository = new AreaVerbatimRepository(
-                verbatimClient,
-                new Mock<ILogger<AreaVerbatimRepository>>().Object);
-            var processedFieldMappingRepository = new ProcessedFieldMappingRepository(
-                processClient,
-                new NullLogger<ProcessedFieldMappingRepository>());
-            var areaHelper = new AreaHelper(
-                areaVerbatimRepository,
-                processedFieldMappingRepository);
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
+            {
+                Location = new ProcessedLocation
+                {
+                    DecimalLatitude = Coordinates.KirunaMunicipality.Latitude,
+                    DecimalLongitude = Coordinates.KirunaMunicipality.Longitude
+                }
+            };
 
-            return areaHelper;
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            _fixture.AreaHelper.AddAreaDataToProcessedSighting(observation);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            observation.Location.ProvincePartIdByCoordinate.Should().Be((int)SpecialProvincePartId.Lappland);
+            observation.Location.ProvinceId.Id.Should().Be((int)ProvinceId.TorneLappmark);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void CountyPartIdByCoordinateShouldBeSetToOland_When_ObservationIsOnOland()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var observations = new List<ProcessedSighting>();
+            var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
+            {
+                Location = new ProcessedLocation
+                {
+                    DecimalLatitude = Coordinates.BorgholmMunicipality.Latitude,
+                    DecimalLongitude = Coordinates.BorgholmMunicipality.Longitude
+                }
+            };
+            observations.Add(observation);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            _fixture.AreaHelper.AddAreaDataToProcessedSightings(observations);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            observation.Location.CountyPartIdByCoordinate.Should().Be((int)SpecialCountyPartId.Oland);
+            observation.Location.CountyId.Id.Should().Be((int)CountyId.Kalmar);
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        public void CountyPartIdShouldBeSetToKalmarFastland_When_ObservationIsInKalmar()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var observations = new List<ProcessedSighting>();
+            var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
+            {
+                Location = new ProcessedLocation
+                {
+                    DecimalLatitude = Coordinates.KalmarMunicipality.Latitude,
+                    DecimalLongitude = Coordinates.KalmarMunicipality.Longitude
+                }
+            };
+            observations.Add(observation);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            _fixture.AreaHelper.AddAreaDataToProcessedSightings(observations);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            observation.Location.CountyPartIdByCoordinate.Should().Be((int)SpecialCountyPartId.KalmarFastland);
+            observation.Location.CountyId.Id.Should().Be((int)CountyId.Kalmar);
         }
     }
 }

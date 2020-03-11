@@ -37,7 +37,9 @@ namespace SOS.Process.IoC.Modules
 
             // Field mapping processing configuration
             if (Configuration.FieldMapping != null)
+            {
                 builder.RegisterInstance(Configuration.FieldMapping).As<FieldMappingConfiguration>().SingleInstance();
+            }
 
             builder.RegisterInstance(Configuration).As<ProcessConfiguration>().SingleInstance();
 

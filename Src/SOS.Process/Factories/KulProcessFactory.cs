@@ -43,44 +43,9 @@ namespace SOS.Process.Factories
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
+       
 
-        /// <inheritdoc />
-        public async Task<RunInfo> ProcessAsync(
-            IDictionary<int, ProcessedTaxon> taxa,
-            IJobCancellationToken cancellationToken)
-        {
-            Logger.LogDebug("Start Processing KUL Verbatim observations");
-            var startTime = DateTime.Now;
-            try
-            {
-                Logger.LogDebug("Start deleting KUL data");
-                if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider))
-                {
-                    Logger.LogError("Failed to delete KUL data");
-                    return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
-                }
-                Logger.LogDebug("Finish deleting KUL data");
-
-                Logger.LogDebug("Start processing KUL data");
-                var verbatimCount = await ProcessObservations(taxa, cancellationToken);
-                Logger.LogDebug($"Finish processing KUL data.");
-
-                return RunInfo.Success(DataProvider, startTime, DateTime.Now, verbatimCount);
-            }
-            catch (JobAbortedException)
-            {
-                Logger.LogInformation("KUL observation processing was canceled.");
-                return RunInfo.Cancelled(DataProvider, startTime, DateTime.Now);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to process sightings");
-                return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
-            }
-
-        }
-
-        private async Task<int> ProcessObservations(
+        protected override async Task<int> ProcessObservations(
                     IDictionary<int, ProcessedTaxon> taxa,
                     IJobCancellationToken cancellationToken)
         {
