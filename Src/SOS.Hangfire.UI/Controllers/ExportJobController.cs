@@ -3,8 +3,7 @@ using System.Net;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Export.Jobs;
-using SOS.Export.Jobs.Interfaces;
+using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Hangfire.UI.Controllers
@@ -55,7 +54,7 @@ namespace SOS.Hangfire.UI.Controllers
             try
             {
 
-                RecurringJob.AddOrUpdate<IExportJob>(nameof(ExportJob), job => job.RunAsync(filter, null, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IExportJob>(nameof(IExportJob), job => job.RunAsync(filter, null, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult($"Export Darwin Core Job Scheduled.");
             }
             catch (Exception e)

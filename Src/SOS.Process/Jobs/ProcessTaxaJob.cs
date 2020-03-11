@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Extensions;
+using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.TaxonTree;
-using SOS.Process.Jobs.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 

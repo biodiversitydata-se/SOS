@@ -4,7 +4,6 @@ using SOS.Export.Factories.Interfaces;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Jobs;
-using SOS.Export.Jobs.Interfaces;
 using SOS.Export.MongoDb;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories;
@@ -13,6 +12,7 @@ using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Jobs.Export;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 

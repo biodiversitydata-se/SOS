@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using SOS.Lib.Enums;
 
-namespace SOS.Process.Jobs.Interfaces
+namespace SOS.Lib.Jobs.Process
 {
     public interface ICopyProviderDataJob
     {

@@ -4,7 +4,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Factories.Interfaces;
-using SOS.Export.Jobs.Interfaces;
+using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Email;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Services.Interfaces;

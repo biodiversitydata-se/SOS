@@ -3,8 +3,7 @@ using System.Net;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Jobs;
-using SOS.Import.Jobs.Interfaces;
+using SOS.Lib.Jobs.Import;
 
 namespace SOS.Hangfire.UI.Controllers
 {
@@ -35,7 +34,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<ClamPortalHarvestJob>(nameof(ClamPortalHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IClamPortalHarvestJob>(nameof(IClamPortalHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Clam Portal harvest job added");
             }
             catch (Exception e)
@@ -73,7 +72,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<GeoHarvestJob>(nameof(GeoHarvestJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IGeoHarvestJob>(nameof(IGeoHarvestJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Geo harvest job added");
             }
             catch (Exception e)
@@ -111,7 +110,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<IKulHarvestJob>(nameof(KulHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IKulHarvestJob>(nameof(IKulHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("KUL harvest job added");
             }
             catch (Exception e)
@@ -149,7 +148,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<SpeciesPortalHarvestJob>(nameof(SpeciesPortalHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<ISpeciesPortalHarvestJob>(nameof(ISpeciesPortalHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Species Portal harvest job added");
             }
             catch (Exception e)
@@ -187,7 +186,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<TaxonHarvestJob>(nameof(TaxonHarvestJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<ITaxonHarvestJob>(nameof(ITaxonHarvestJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Taxon harvest job added");
             }
             catch (Exception e)

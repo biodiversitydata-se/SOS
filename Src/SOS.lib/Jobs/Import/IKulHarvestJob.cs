@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
 
-namespace SOS.Import.Jobs.Interfaces
+namespace SOS.Lib.Jobs.Import
 {
-    public interface IClamPortalHarvestJob
+    public interface IKulHarvestJob
     {
         /// <summary>
-        /// Run species portal harvest
+        /// Run KUL harvest.
         /// </summary>
         /// <returns></returns>
         Task<bool> RunAsync(IJobCancellationToken cancellationToken);

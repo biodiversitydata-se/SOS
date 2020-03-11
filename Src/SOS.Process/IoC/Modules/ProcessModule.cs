@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Jobs.Process;
 using SOS.Process.Database;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Factories;
@@ -7,7 +8,6 @@ using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
-using SOS.Process.Jobs.Interfaces;
 using SOS.Process.Mappings;
 using SOS.Process.Mappings.Interfaces;
 using SOS.Process.Repositories.Destination;

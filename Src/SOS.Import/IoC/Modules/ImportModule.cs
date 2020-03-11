@@ -1,11 +1,10 @@
 ﻿using Autofac;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Jobs.Import;
 using SOS.Import.Factories;
 using SOS.Import.Factories.FieldMappings;
-using SOS.Import.Factories.FieldMappings.Interfaces;
 using SOS.Import.Factories.Interfaces;
 using SOS.Import.Jobs;
-using SOS.Import.Jobs.Interfaces;
 using SOS.Import.MongoDb;
 using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination;

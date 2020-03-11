@@ -2,7 +2,7 @@
 using Hangfire;
 using SOS.Lib.Models.Search;
 
-namespace SOS.Export.Jobs.Interfaces
+namespace SOS.Lib.Jobs.Export
 {
     /// <summary>
     /// Interface for DOI export job

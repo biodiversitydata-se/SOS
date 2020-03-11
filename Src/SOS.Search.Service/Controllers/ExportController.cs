@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Export.Jobs.Interfaces;
+using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Search.Service.Controllers

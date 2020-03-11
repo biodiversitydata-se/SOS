@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Factories.Interfaces;
-using SOS.Import.Jobs.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Jobs.Import;
 
 namespace SOS.Import.Jobs
 {
