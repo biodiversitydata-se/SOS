@@ -8,6 +8,11 @@ namespace SOS.Lib.Configuration.Process
     public class ProcessConfiguration
     {
         /// <summary>
+        /// No of threads to run in parallel
+        /// </summary>
+        public int NoOfThreads { get; set; }
+
+        /// <summary>
         /// Host
         /// </summary>
         public MongoDbConfiguration VerbatimDbConfiguration { get; set; }

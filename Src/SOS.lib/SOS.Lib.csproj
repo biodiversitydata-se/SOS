@@ -15,6 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Jobs\Import\" />
+    <Folder Include="Jobs\Export\" />
+    <Folder Include="Jobs\Process\" />
     <Folder Include="JsonConverters\" />
   </ItemGroup>
 

@@ -90,7 +90,7 @@ namespace SOS.Process.Factories
             using var cursor = await _kulObservationVerbatimRepository.GetAllAsync();
 
             // Process and commit in batches.
-            await cursor.ForEachAsync(c =>
+            await cursor.ForEachAsync(async c =>
             {
                 ProcessedSighting processedSighting = c.ToProcessed(taxa);
                 _areaHelper.AddAreaDataToProcessedSighting(processedSighting);
@@ -98,7 +98,7 @@ namespace SOS.Process.Factories
                 if (IsBatchFilledToLimit(sightings.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    verbatimCount += CommitBatch(sightings);
+                    verbatimCount += await CommitBatchAsync(sightings);
                     Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
                 }
             });
@@ -107,7 +107,7 @@ namespace SOS.Process.Factories
             if (sightings.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                verbatimCount += CommitBatch(sightings);
+                verbatimCount += await CommitBatchAsync(sightings);
                 Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
             }
 

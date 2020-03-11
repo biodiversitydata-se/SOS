@@ -32,7 +32,7 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var taxa = await taxonVerbatimRepository.GetBatchAsync(0);
+            var taxa = await taxonVerbatimRepository.GetBatchAsync(0, 0);
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
             byte[] bin = MessagePackSerializer.Serialize(taxa, options);
             System.IO.File.WriteAllBytes(filePath, bin);

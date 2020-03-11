@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Sighting;
@@ -21,13 +22,12 @@ namespace SOS.Process.Factories
             FieldMappingResolverHelper = fieldMappingResolverHelper ?? throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
         }
 
-        protected int CommitBatch(ICollection<ProcessedSighting> sightings)
+        protected async Task<int> CommitBatchAsync(ICollection<ProcessedSighting> sightings)
         {
-            int sightingsCount = sightings.Count;
             FieldMappingResolverHelper.ResolveFieldMappedValues(sightings);
-            ProcessRepository.AddManyAsync(sightings);
-            sightings.Clear();
-            return sightingsCount;
+            var successCount = await ProcessRepository.AddManyAsync(sightings);
+
+            return successCount;
         }
 
         protected bool IsBatchFilledToLimit(int count)

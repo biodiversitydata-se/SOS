@@ -35,6 +35,7 @@ namespace SOS.Import.Factories
         private readonly IOrganizationRepository _organizationRepository;
         private readonly ILogger<SpeciesPortalSightingFactory> _logger;
         private readonly SemaphoreSlim _semaphore;
+
         /// <summary>
         /// Constructor
         /// </summary>///
