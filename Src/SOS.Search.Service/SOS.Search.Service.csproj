@@ -23,7 +23,6 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\SOS.Export\SOS.Export.csproj" />
         <ProjectReference Include="..\SOS.lib\SOS.Lib.csproj" />
     </ItemGroup>
     <ItemGroup>

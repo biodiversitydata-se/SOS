@@ -129,10 +129,10 @@ namespace SOS.Process.Repositories.Destination
             {
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.EndDate), 
-                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true } ),
+                    new CreateIndexOptions<ProcessedSighting>{ PartialFilterExpression = Builders<ProcessedSighting>.Filter.Ne(d => d.Event.EndDate, null) } ),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.StartDate),
-                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true }),
+                    new CreateIndexOptions<ProcessedSighting>{ PartialFilterExpression = Builders<ProcessedSighting>.Filter.Ne(d => d.Event.StartDate, null) }),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Identification.Validated)),
                 new CreateIndexModel<ProcessedSighting>(
@@ -147,17 +147,17 @@ namespace SOS.Process.Repositories.Destination
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.MunicipalityId.Id)),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation),
-                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true }),
+                    new CreateIndexOptions<ProcessedSighting>{ PartialFilterExpression = Builders<ProcessedSighting>.Filter.Ne(d => d.Occurrence.IsPositiveObservation, null) }),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.GenderId.Id),
-                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true }),
+                    new CreateIndexOptions<ProcessedSighting>{ PartialFilterExpression = Builders<ProcessedSighting>.Filter.Ne(d => d.Occurrence.GenderId.Id, 0) }),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Provider)),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.Id)),
                 new CreateIndexModel<ProcessedSighting>(
                     Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory),
-                    new CreateIndexOptions<ProcessedSighting>{ Sparse = true })
+                    new CreateIndexOptions<ProcessedSighting>{ PartialFilterExpression = Builders<ProcessedSighting>.Filter.Ne(d => d.Taxon.RedlistCategory, null) })
             };
 
             await MongoCollection.Indexes.CreateManyAsync(indexModels);
