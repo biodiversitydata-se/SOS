@@ -5,32 +5,32 @@
   "Values": [
     {
       "Id": 0,
-      "Name": "native",
+      "Value": "native",
       "Localized": false
     },
     {
       "Id": 1,
-      "Name": "introduced",
+      "Value": "introduced",
       "Localized": false
     },
     {
       "Id": 2,
-      "Name": "naturalised",
+      "Value": "naturalised",
       "Localized": false
     },
     {
       "Id": 3,
-      "Name": "invasive",
+      "Value": "invasive",
       "Localized": false
     },
     {
       "Id": 4,
-      "Name": "managed",
+      "Value": "managed",
       "Localized": false
     },
     {
       "Id": 5,
-      "Name": "uncertain",
+      "Value": "uncertain",
       "Localized": false
     }
   ],

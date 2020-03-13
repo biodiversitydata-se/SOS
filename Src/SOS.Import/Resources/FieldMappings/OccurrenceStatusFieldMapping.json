@@ -5,12 +5,12 @@
   "Values": [
     {
       "Id": 0,
-      "Name": "present",
+      "Value": "present",
       "Localized": false
     },
     {
       "Id": 1,
-      "Name": "absent",
+      "Value": "absent",
       "Localized": false
     }
   ],

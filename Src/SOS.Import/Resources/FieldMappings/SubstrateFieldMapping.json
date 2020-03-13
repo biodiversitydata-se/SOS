@@ -5,7 +5,7 @@
   "Values": [
     {
       "Id": 1,
-      "Name": "Ground/bottom",
+      "Value": "Ground/bottom",
       "Localized": true,
       "Translations": [
         {
@@ -20,7 +20,7 @@
     },
     {
       "Id": 2,
-      "Name": "Stone/rock on land",
+      "Value": "Stone/rock on land",
       "Localized": true,
       "Translations": [
         {
@@ -35,7 +35,7 @@
     },
     {
       "Id": 3,
-      "Name": "Acidic rock",
+      "Value": "Acidic rock",
       "Localized": true,
       "Translations": [
         {
@@ -50,7 +50,7 @@
     },
     {
       "Id": 4,
-      "Name": "Granite",
+      "Value": "Granite",
       "Localized": true,
       "Translations": [
         {
@@ -65,7 +65,7 @@
     },
     {
       "Id": 5,
-      "Name": "Pegmatite",
+      "Value": "Pegmatite",
       "Localized": true,
       "Translations": [
         {
@@ -80,7 +80,7 @@
     },
     {
       "Id": 6,
-      "Name": "Porphyry",
+      "Value": "Porphyry",
       "Localized": true,
       "Translations": [
         {
@@ -95,7 +95,7 @@
     },
     {
       "Id": 7,
-      "Name": "Quartzite",
+      "Value": "Quartzite",
       "Localized": true,
       "Translations": [
         {
@@ -110,7 +110,7 @@
     },
     {
       "Id": 8,
-      "Name": "Mica slate",
+      "Value": "Mica slate",
       "Localized": true,
       "Translations": [
         {
@@ -125,7 +125,7 @@
     },
     {
       "Id": 9,
-      "Name": "Gneiss",
+      "Value": "Gneiss",
       "Localized": true,
       "Translations": [
         {
@@ -140,7 +140,7 @@
     },
     {
       "Id": 10,
-      "Name": "Sandstone",
+      "Value": "Sandstone",
       "Localized": true,
       "Translations": [
         {
@@ -155,7 +155,7 @@
     },
     {
       "Id": 11,
-      "Name": "Basic rock",
+      "Value": "Basic rock",
       "Localized": true,
       "Translations": [
         {
@@ -170,7 +170,7 @@
     },
     {
       "Id": 12,
-      "Name": "Basalt",
+      "Value": "Basalt",
       "Localized": true,
       "Translations": [
         {
@@ -185,7 +185,7 @@
     },
     {
       "Id": 13,
-      "Name": "Gabbro",
+      "Value": "Gabbro",
       "Localized": true,
       "Translations": [
         {
@@ -200,7 +200,7 @@
     },
     {
       "Id": 14,
-      "Name": "Diabase",
+      "Value": "Diabase",
       "Localized": true,
       "Translations": [
         {
@@ -215,7 +215,7 @@
     },
     {
       "Id": 15,
-      "Name": "Hyperit",
+      "Value": "Hyperit",
       "Localized": true,
       "Translations": [
         {
@@ -230,7 +230,7 @@
     },
     {
       "Id": 16,
-      "Name": "Diorite",
+      "Value": "Diorite",
       "Localized": true,
       "Translations": [
         {
@@ -245,7 +245,7 @@
     },
     {
       "Id": 17,
-      "Name": "Amphibolite",
+      "Value": "Amphibolite",
       "Localized": true,
       "Translations": [
         {
@@ -260,7 +260,7 @@
     },
     {
       "Id": 18,
-      "Name": "Limestone",
+      "Value": "Limestone",
       "Localized": true,
       "Translations": [
         {
@@ -275,7 +275,7 @@
     },
     {
       "Id": 19,
-      "Name": "Hard bottom",
+      "Value": "Hard bottom",
       "Localized": true,
       "Translations": [
         {
@@ -290,7 +290,7 @@
     },
     {
       "Id": 20,
-      "Name": "Ground/soil on land",
+      "Value": "Ground/soil on land",
       "Localized": true,
       "Translations": [
         {
@@ -305,7 +305,7 @@
     },
     {
       "Id": 21,
-      "Name": "Mineral soil",
+      "Value": "Mineral soil",
       "Localized": true,
       "Translations": [
         {
@@ -320,7 +320,7 @@
     },
     {
       "Id": 22,
-      "Name": "Moraine",
+      "Value": "Moraine",
       "Localized": true,
       "Translations": [
         {
@@ -335,7 +335,7 @@
     },
     {
       "Id": 23,
-      "Name": "Rock (> 200 mm)",
+      "Value": "Rock (> 200 mm)",
       "Localized": true,
       "Translations": [
         {
@@ -350,7 +350,7 @@
     },
     {
       "Id": 24,
-      "Name": "Stone (60 - 200 mm)",
+      "Value": "Stone (60 - 200 mm)",
       "Localized": true,
       "Translations": [
         {
@@ -365,7 +365,7 @@
     },
     {
       "Id": 25,
-      "Name": "Gravel (2-60 mm)",
+      "Value": "Gravel (2-60 mm)",
       "Localized": true,
       "Translations": [
         {
@@ -380,7 +380,7 @@
     },
     {
       "Id": 26,
-      "Name": "Sand (0,06-2 mm)",
+      "Value": "Sand (0,06-2 mm)",
       "Localized": true,
       "Translations": [
         {
@@ -395,7 +395,7 @@
     },
     {
       "Id": 27,
-      "Name": "Fine sand/Silt (0,002-0,06 mm)",
+      "Value": "Fine sand/Silt (0,002-0,06 mm)",
       "Localized": true,
       "Translations": [
         {
@@ -410,7 +410,7 @@
     },
     {
       "Id": 28,
-      "Name": "Clay (< 0,002 mm)",
+      "Value": "Clay (< 0,002 mm)",
       "Localized": true,
       "Translations": [
         {
@@ -425,7 +425,7 @@
     },
     {
       "Id": 29,
-      "Name": "Organogen soil",
+      "Value": "Organogen soil",
       "Localized": true,
       "Translations": [
         {
@@ -440,7 +440,7 @@
     },
     {
       "Id": 30,
-      "Name": "Humus",
+      "Value": "Humus",
       "Localized": true,
       "Translations": [
         {
@@ -455,7 +455,7 @@
     },
     {
       "Id": 31,
-      "Name": "Peloid",
+      "Value": "Peloid",
       "Localized": true,
       "Translations": [
         {
@@ -470,7 +470,7 @@
     },
     {
       "Id": 32,
-      "Name": "Mull",
+      "Value": "Mull",
       "Localized": true,
       "Translations": [
         {
@@ -485,7 +485,7 @@
     },
     {
       "Id": 33,
-      "Name": "Mud",
+      "Value": "Mud",
       "Localized": true,
       "Translations": [
         {
@@ -500,7 +500,7 @@
     },
     {
       "Id": 34,
-      "Name": "Peat",
+      "Value": "Peat",
       "Localized": true,
       "Translations": [
         {
@@ -515,7 +515,7 @@
     },
     {
       "Id": 35,
-      "Name": "Litter",
+      "Value": "Litter",
       "Localized": true,
       "Translations": [
         {
@@ -530,7 +530,7 @@
     },
     {
       "Id": 36,
-      "Name": "Seaweed Wall",
+      "Value": "Seaweed Wall",
       "Localized": true,
       "Translations": [
         {
@@ -545,7 +545,7 @@
     },
     {
       "Id": 37,
-      "Name": "Shell gravel",
+      "Value": "Shell gravel",
       "Localized": true,
       "Translations": [
         {
@@ -560,7 +560,7 @@
     },
     {
       "Id": 38,
-      "Name": "Soft bottom",
+      "Value": "Soft bottom",
       "Localized": true,
       "Translations": [
         {
@@ -575,7 +575,7 @@
     },
     {
       "Id": 39,
-      "Name": "Inorganic substrate",
+      "Value": "Inorganic substrate",
       "Localized": true,
       "Translations": [
         {
@@ -590,7 +590,7 @@
     },
     {
       "Id": 40,
-      "Name": "Rock on bottom (> 200 mm)",
+      "Value": "Rock on bottom (> 200 mm)",
       "Localized": true,
       "Translations": [
         {
@@ -605,7 +605,7 @@
     },
     {
       "Id": 41,
-      "Name": "Stone on bottom (60 - 200 mm)",
+      "Value": "Stone on bottom (60 - 200 mm)",
       "Localized": true,
       "Translations": [
         {
@@ -620,7 +620,7 @@
     },
     {
       "Id": 42,
-      "Name": "Gravel on bottom (2-60 mm)",
+      "Value": "Gravel on bottom (2-60 mm)",
       "Localized": true,
       "Translations": [
         {
@@ -635,7 +635,7 @@
     },
     {
       "Id": 43,
-      "Name": "Sand on bottom (0,06-2 mm)",
+      "Value": "Sand on bottom (0,06-2 mm)",
       "Localized": true,
       "Translations": [
         {
@@ -650,7 +650,7 @@
     },
     {
       "Id": 44,
-      "Name": "Fine sediment on bottom",
+      "Value": "Fine sediment on bottom",
       "Localized": true,
       "Translations": [
         {
@@ -665,7 +665,7 @@
     },
     {
       "Id": 45,
-      "Name": "Organic material on bottom",
+      "Value": "Organic material on bottom",
       "Localized": true,
       "Translations": [
         {
@@ -680,7 +680,7 @@
     },
     {
       "Id": 46,
-      "Name": "Fine detritus",
+      "Value": "Fine detritus",
       "Localized": true,
       "Translations": [
         {
@@ -695,7 +695,7 @@
     },
     {
       "Id": 47,
-      "Name": "Coarse detritus",
+      "Value": "Coarse detritus",
       "Localized": true,
       "Translations": [
         {
@@ -710,7 +710,7 @@
     },
     {
       "Id": 48,
-      "Name": "Organisms as a substrate",
+      "Value": "Organisms as a substrate",
       "Localized": true,
       "Translations": [
         {
@@ -725,7 +725,7 @@
     },
     {
       "Id": 49,
-      "Name": "Fungi, fruit bodies, etc.",
+      "Value": "Fungi, fruit bodies, etc.",
       "Localized": true,
       "Translations": [
         {
@@ -740,7 +740,7 @@
     },
     {
       "Id": 50,
-      "Name": "Plant",
+      "Value": "Plant",
       "Localized": true,
       "Translations": [
         {
@@ -755,7 +755,7 @@
     },
     {
       "Id": 51,
-      "Name": "Herb/grass",
+      "Value": "Herb/grass",
       "Localized": true,
       "Translations": [
         {
@@ -770,7 +770,7 @@
     },
     {
       "Id": 52,
-      "Name": "Living part of  herb/grass",
+      "Value": "Living part of  herb/grass",
       "Localized": true,
       "Translations": [
         {
@@ -785,7 +785,7 @@
     },
     {
       "Id": 53,
-      "Name": "Flower on living herb/grass",
+      "Value": "Flower on living herb/grass",
       "Localized": true,
       "Translations": [
         {
@@ -800,7 +800,7 @@
     },
     {
       "Id": 54,
-      "Name": "Fruit on living herb/grass",
+      "Value": "Fruit on living herb/grass",
       "Localized": true,
       "Translations": [
         {
@@ -815,7 +815,7 @@
     },
     {
       "Id": 55,
-      "Name": "Seed on living herb/grass",
+      "Value": "Seed on living herb/grass",
       "Localized": true,
       "Translations": [
         {
@@ -830,7 +830,7 @@
     },
     {
       "Id": 56,
-      "Name": "Leaf on living herb/grass",
+      "Value": "Leaf on living herb/grass",
       "Localized": true,
       "Translations": [
         {
@@ -845,7 +845,7 @@
     },
     {
       "Id": 57,
-      "Name": "Bud on living herb/grass",
+      "Value": "Bud on living herb/grass",
       "Localized": true,
       "Translations": [
         {
@@ -860,7 +860,7 @@
     },
     {
       "Id": 58,
-      "Name": "Stem/straw on living herb/grass",
+      "Value": "Stem/straw on living herb/grass",
       "Localized": true,
       "Translations": [
         {
@@ -875,7 +875,7 @@
     },
     {
       "Id": 59,
-      "Name": "Root of living herb/grass",
+      "Value": "Root of living herb/grass",
       "Localized": true,
       "Translations": [
         {
@@ -890,7 +890,7 @@
     },
     {
       "Id": 60,
-      "Name": "Dead part of  herb/grass",
+      "Value": "Dead part of  herb/grass",
       "Localized": true,
       "Translations": [
         {
@@ -905,7 +905,7 @@
     },
     {
       "Id": 61,
-      "Name": "Woody plant",
+      "Value": "Woody plant",
       "Localized": true,
       "Translations": [
         {
@@ -920,7 +920,7 @@
     },
     {
       "Id": 62,
-      "Name": "Living woody plant",
+      "Value": "Living woody plant",
       "Localized": true,
       "Translations": [
         {
@@ -935,7 +935,7 @@
     },
     {
       "Id": 63,
-      "Name": "Flower on living woody plant",
+      "Value": "Flower on living woody plant",
       "Localized": true,
       "Translations": [
         {
@@ -950,7 +950,7 @@
     },
     {
       "Id": 64,
-      "Name": "Seed on living woody plant",
+      "Value": "Seed on living woody plant",
       "Localized": true,
       "Translations": [
         {
@@ -965,7 +965,7 @@
     },
     {
       "Id": 65,
-      "Name": "Cone on living woody plant",
+      "Value": "Cone on living woody plant",
       "Localized": true,
       "Translations": [
         {
@@ -980,7 +980,7 @@
     },
     {
       "Id": 66,
-      "Name": "Needle/Leaf on living woody plant",
+      "Value": "Needle/Leaf on living woody plant",
       "Localized": true,
       "Translations": [
         {
@@ -995,7 +995,7 @@
     },
     {
       "Id": 67,
-      "Name": "Bark on living woody plant",
+      "Value": "Bark on living woody plant",
       "Localized": true,
       "Translations": [
         {
@@ -1010,7 +1010,7 @@
     },
     {
       "Id": 68,
-      "Name": "Cambium on living woody plant",
+      "Value": "Cambium on living woody plant",
       "Localized": true,
       "Translations": [
         {
@@ -1025,7 +1025,7 @@
     },
     {
       "Id": 69,
-      "Name": "Inside living wood",
+      "Value": "Inside living wood",
       "Localized": true,
       "Translations": [
         {
@@ -1040,7 +1040,7 @@
     },
     {
       "Id": 70,
-      "Name": "Bud on living woody plant",
+      "Value": "Bud on living woody plant",
       "Localized": true,
       "Translations": [
         {
@@ -1055,7 +1055,7 @@
     },
     {
       "Id": 71,
-      "Name": "Branch on living tree",
+      "Value": "Branch on living tree",
       "Localized": true,
       "Translations": [
         {
@@ -1070,7 +1070,7 @@
     },
     {
       "Id": 72,
-      "Name": "Stem on living tree",
+      "Value": "Stem on living tree",
       "Localized": true,
       "Translations": [
         {
@@ -1085,7 +1085,7 @@
     },
     {
       "Id": 73,
-      "Name": "Tree base",
+      "Value": "Tree base",
       "Localized": true,
       "Translations": [
         {
@@ -1100,7 +1100,7 @@
     },
     {
       "Id": 74,
-      "Name": "Tree root",
+      "Value": "Tree root",
       "Localized": true,
       "Translations": [
         {
@@ -1115,7 +1115,7 @@
     },
     {
       "Id": 75,
-      "Name": "Cavity in living tree ",
+      "Value": "Cavity in living tree ",
       "Localized": true,
       "Translations": [
         {
@@ -1130,7 +1130,7 @@
     },
     {
       "Id": 76,
-      "Name": "Sap flow",
+      "Value": "Sap flow",
       "Localized": true,
       "Translations": [
         {
@@ -1145,7 +1145,7 @@
     },
     {
       "Id": 77,
-      "Name": "Fire affected living tree",
+      "Value": "Fire affected living tree",
       "Localized": true,
       "Translations": [
         {
@@ -1160,7 +1160,7 @@
     },
     {
       "Id": 78,
-      "Name": "Dead wood",
+      "Value": "Dead wood",
       "Localized": true,
       "Translations": [
         {
@@ -1175,7 +1175,7 @@
     },
     {
       "Id": 79,
-      "Name": "Bark of dead wood",
+      "Value": "Bark of dead wood",
       "Localized": true,
       "Translations": [
         {
@@ -1190,7 +1190,7 @@
     },
     {
       "Id": 80,
-      "Name": "Under bark of dead wood",
+      "Value": "Under bark of dead wood",
       "Localized": true,
       "Translations": [
         {
@@ -1205,7 +1205,7 @@
     },
     {
       "Id": 81,
-      "Name": "Wood surface of dead wood",
+      "Value": "Wood surface of dead wood",
       "Localized": true,
       "Translations": [
         {
@@ -1220,7 +1220,7 @@
     },
     {
       "Id": 82,
-      "Name": "Inside dead wood",
+      "Value": "Inside dead wood",
       "Localized": true,
       "Translations": [
         {
@@ -1235,7 +1235,7 @@
     },
     {
       "Id": 83,
-      "Name": "Dead branch ",
+      "Value": "Dead branch ",
       "Localized": true,
       "Translations": [
         {
@@ -1250,7 +1250,7 @@
     },
     {
       "Id": 84,
-      "Name": "Dead tree stem",
+      "Value": "Dead tree stem",
       "Localized": true,
       "Translations": [
         {
@@ -1265,7 +1265,7 @@
     },
     {
       "Id": 85,
-      "Name": "Standing dead tree/snags",
+      "Value": "Standing dead tree/snags",
       "Localized": true,
       "Translations": [
         {
@@ -1280,7 +1280,7 @@
     },
     {
       "Id": 86,
-      "Name": "Horizontal, dead without ground contact",
+      "Value": "Horizontal, dead without ground contact",
       "Localized": true,
       "Translations": [
         {
@@ -1295,7 +1295,7 @@
     },
     {
       "Id": 87,
-      "Name": "Horizontal, dead with ground contact",
+      "Value": "Horizontal, dead with ground contact",
       "Localized": true,
       "Translations": [
         {
@@ -1310,7 +1310,7 @@
     },
     {
       "Id": 88,
-      "Name": "Cavity in dead tree",
+      "Value": "Cavity in dead tree",
       "Localized": true,
       "Translations": [
         {
@@ -1325,7 +1325,7 @@
     },
     {
       "Id": 89,
-      "Name": "Stump",
+      "Value": "Stump",
       "Localized": true,
       "Translations": [
         {
@@ -1340,7 +1340,7 @@
     },
     {
       "Id": 90,
-      "Name": "Fire killed tree",
+      "Value": "Fire killed tree",
       "Localized": true,
       "Translations": [
         {
@@ -1355,7 +1355,7 @@
     },
     {
       "Id": 91,
-      "Name": "Wood under water",
+      "Value": "Wood under water",
       "Localized": true,
       "Translations": [
         {
@@ -1370,7 +1370,7 @@
     },
     {
       "Id": 92,
-      "Name": "Animal",
+      "Value": "Animal",
       "Localized": true,
       "Translations": [
         {
@@ -1385,7 +1385,7 @@
     },
     {
       "Id": 93,
-      "Name": "Living animal",
+      "Value": "Living animal",
       "Localized": true,
       "Translations": [
         {
@@ -1400,7 +1400,7 @@
     },
     {
       "Id": 94,
-      "Name": "Adult animal",
+      "Value": "Adult animal",
       "Localized": true,
       "Translations": [
         {
@@ -1415,7 +1415,7 @@
     },
     {
       "Id": 95,
-      "Name": "Pupa",
+      "Value": "Pupa",
       "Localized": true,
       "Translations": [
         {
@@ -1430,7 +1430,7 @@
     },
     {
       "Id": 96,
-      "Name": "Larvae",
+      "Value": "Larvae",
       "Localized": true,
       "Translations": [
         {
@@ -1445,7 +1445,7 @@
     },
     {
       "Id": 97,
-      "Name": "Egg",
+      "Value": "Egg",
       "Localized": true,
       "Translations": [
         {
@@ -1460,7 +1460,7 @@
     },
     {
       "Id": 98,
-      "Name": "Body part of living animal",
+      "Value": "Body part of living animal",
       "Localized": true,
       "Translations": [
         {
@@ -1475,7 +1475,7 @@
     },
     {
       "Id": 99,
-      "Name": "Hair, fur, scale or feather",
+      "Value": "Hair, fur, scale or feather",
       "Localized": true,
       "Translations": [
         {
@@ -1490,7 +1490,7 @@
     },
     {
       "Id": 100,
-      "Name": "Skin/shell",
+      "Value": "Skin/shell",
       "Localized": true,
       "Translations": [
         {
@@ -1505,7 +1505,7 @@
     },
     {
       "Id": 101,
-      "Name": "Dead animal, carcass",
+      "Value": "Dead animal, carcass",
       "Localized": true,
       "Translations": [
         {
@@ -1520,7 +1520,7 @@
     },
     {
       "Id": 102,
-      "Name": "After leaving from animals",
+      "Value": "After leaving from animals",
       "Localized": true,
       "Translations": [
         {
@@ -1535,7 +1535,7 @@
     },
     {
       "Id": 103,
-      "Name": "Exposed nest",
+      "Value": "Exposed nest",
       "Localized": true,
       "Translations": [
         {
@@ -1550,7 +1550,7 @@
     },
     {
       "Id": 104,
-      "Name": "Dug nest in the ground",
+      "Value": "Dug nest in the ground",
       "Localized": true,
       "Translations": [
         {
@@ -1565,7 +1565,7 @@
     },
     {
       "Id": 105,
-      "Name": "Gallery in wood",
+      "Value": "Gallery in wood",
       "Localized": true,
       "Translations": [
         {
@@ -1580,7 +1580,7 @@
     },
     {
       "Id": 106,
-      "Name": "Gall",
+      "Value": "Gall",
       "Localized": true,
       "Translations": [
         {
@@ -1595,7 +1595,7 @@
     },
     {
       "Id": 107,
-      "Name": "Dropping",
+      "Value": "Dropping",
       "Localized": true,
       "Translations": [
         {
@@ -1610,7 +1610,7 @@
     },
     {
       "Id": 108,
-      "Name": "Man-made substrate",
+      "Value": "Man-made substrate",
       "Localized": true,
       "Translations": [
         {
@@ -1625,7 +1625,7 @@
     },
     {
       "Id": 109,
-      "Name": "Post/wooden fences etc.",
+      "Value": "Post/wooden fences etc.",
       "Localized": true,
       "Translations": [
         {
@@ -1640,7 +1640,7 @@
     },
     {
       "Id": 110,
-      "Name": "Stone wall/cairn",
+      "Value": "Stone wall/cairn",
       "Localized": true,
       "Translations": [
         {
@@ -1655,7 +1655,7 @@
     },
     {
       "Id": 111,
-      "Name": "Bridge",
+      "Value": "Bridge",
       "Localized": true,
       "Translations": [
         {
@@ -1670,7 +1670,7 @@
     },
     {
       "Id": 112,
-      "Name": "Jetty",
+      "Value": "Jetty",
       "Localized": true,
       "Translations": [
         {
@@ -1685,7 +1685,7 @@
     },
     {
       "Id": 113,
-      "Name": "Roof tops",
+      "Value": "Roof tops",
       "Localized": true,
       "Translations": [
         {
@@ -1700,7 +1700,7 @@
     },
     {
       "Id": 114,
-      "Name": "House wall",
+      "Value": "House wall",
       "Localized": true,
       "Translations": [
         {
@@ -1715,7 +1715,7 @@
     },
     {
       "Id": 115,
-      "Name": "Manure",
+      "Value": "Manure",
       "Localized": true,
       "Translations": [
         {
@@ -1730,7 +1730,7 @@
     },
     {
       "Id": 116,
-      "Name": "Compost",
+      "Value": "Compost",
       "Localized": true,
       "Translations": [
         {
@@ -1745,7 +1745,7 @@
     },
     {
       "Id": 117,
-      "Name": "Sawdust",
+      "Value": "Sawdust",
       "Localized": true,
       "Translations": [
         {

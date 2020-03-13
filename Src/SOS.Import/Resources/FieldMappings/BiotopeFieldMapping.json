@@ -5,7 +5,7 @@
   "Values": [
     {
       "Id": 1,
-      "Name": "Habitat classification",
+      "Value": "Habitat classification",
       "Localized": true,
       "Translations": [
         {
@@ -20,7 +20,7 @@
     },
     {
       "Id": 2,
-      "Name": "Open ground",
+      "Value": "Open ground",
       "Localized": true,
       "Translations": [
         {
@@ -35,7 +35,7 @@
     },
     {
       "Id": 3,
-      "Name": "Bare ground",
+      "Value": "Bare ground",
       "Localized": true,
       "Translations": [
         {
@@ -50,7 +50,7 @@
     },
     {
       "Id": 4,
-      "Name": "Glacier and glacier foreland",
+      "Value": "Glacier and glacier foreland",
       "Localized": true,
       "Translations": [
         {
@@ -65,7 +65,7 @@
     },
     {
       "Id": 5,
-      "Name": "Glacier",
+      "Value": "Glacier",
       "Localized": true,
       "Translations": [
         {
@@ -80,7 +80,7 @@
     },
     {
       "Id": 6,
-      "Name": "Glacier foreland",
+      "Value": "Glacier foreland",
       "Localized": true,
       "Translations": [
         {
@@ -95,7 +95,7 @@
     },
     {
       "Id": 7,
-      "Name": "Rock and cliff",
+      "Value": "Rock and cliff",
       "Localized": true,
       "Translations": [
         {
@@ -110,7 +110,7 @@
     },
     {
       "Id": 8,
-      "Name": "Coastal rock",
+      "Value": "Coastal rock",
       "Localized": true,
       "Translations": [
         {
@@ -125,7 +125,7 @@
     },
     {
       "Id": 9,
-      "Name": "Coastal pavement",
+      "Value": "Coastal pavement",
       "Localized": true,
       "Translations": [
         {
@@ -140,7 +140,7 @@
     },
     {
       "Id": 10,
-      "Name": "Coastal cliff",
+      "Value": "Coastal cliff",
       "Localized": true,
       "Translations": [
         {
@@ -155,7 +155,7 @@
     },
     {
       "Id": 11,
-      "Name": "Rocky freshwater shore",
+      "Value": "Rocky freshwater shore",
       "Localized": true,
       "Translations": [
         {
@@ -170,7 +170,7 @@
     },
     {
       "Id": 12,
-      "Name": "Riparian rock",
+      "Value": "Riparian rock",
       "Localized": true,
       "Translations": [
         {
@@ -185,7 +185,7 @@
     },
     {
       "Id": 13,
-      "Name": "Open boulder ground",
+      "Value": "Open boulder ground",
       "Localized": true,
       "Translations": [
         {
@@ -200,7 +200,7 @@
     },
     {
       "Id": 14,
-      "Name": "Boulder seashore",
+      "Value": "Boulder seashore",
       "Localized": true,
       "Translations": [
         {
@@ -215,7 +215,7 @@
     },
     {
       "Id": 15,
-      "Name": "Boulder freshwater shore",
+      "Value": "Boulder freshwater shore",
       "Localized": true,
       "Translations": [
         {
@@ -230,7 +230,7 @@
     },
     {
       "Id": 16,
-      "Name": "Bare gravel ground",
+      "Value": "Bare gravel ground",
       "Localized": true,
       "Translations": [
         {
@@ -245,7 +245,7 @@
     },
     {
       "Id": 17,
-      "Name": "Gravel seashore",
+      "Value": "Gravel seashore",
       "Localized": true,
       "Translations": [
         {
@@ -260,7 +260,7 @@
     },
     {
       "Id": 18,
-      "Name": "Gravel freshwater shore",
+      "Value": "Gravel freshwater shore",
       "Localized": true,
       "Translations": [
         {
@@ -275,7 +275,7 @@
     },
     {
       "Id": 19,
-      "Name": "Bare sand",
+      "Value": "Bare sand",
       "Localized": true,
       "Translations": [
         {
@@ -290,7 +290,7 @@
     },
     {
       "Id": 20,
-      "Name": "Active dune",
+      "Value": "Active dune",
       "Localized": true,
       "Translations": [
         {
@@ -305,7 +305,7 @@
     },
     {
       "Id": 21,
-      "Name": "Active coastal dune",
+      "Value": "Active coastal dune",
       "Localized": true,
       "Translations": [
         {
@@ -320,7 +320,7 @@
     },
     {
       "Id": 22,
-      "Name": "Active inland dune",
+      "Value": "Active inland dune",
       "Localized": true,
       "Translations": [
         {
@@ -335,7 +335,7 @@
     },
     {
       "Id": 23,
-      "Name": "Sandy seashore",
+      "Value": "Sandy seashore",
       "Localized": true,
       "Translations": [
         {
@@ -350,7 +350,7 @@
     },
     {
       "Id": 24,
-      "Name": "Sandy freshwater shore",
+      "Value": "Sandy freshwater shore",
       "Localized": true,
       "Translations": [
         {
@@ -365,7 +365,7 @@
     },
     {
       "Id": 25,
-      "Name": "Bare fine soil",
+      "Value": "Bare fine soil",
       "Localized": true,
       "Translations": [
         {
@@ -380,7 +380,7 @@
     },
     {
       "Id": 26,
-      "Name": "Fine soil seashore",
+      "Value": "Fine soil seashore",
       "Localized": true,
       "Translations": [
         {
@@ -395,7 +395,7 @@
     },
     {
       "Id": 27,
-      "Name": "Fine soil freshwater shore",
+      "Value": "Fine soil freshwater shore",
       "Localized": true,
       "Translations": [
         {
@@ -410,7 +410,7 @@
     },
     {
       "Id": 28,
-      "Name": "Bare till ground",
+      "Value": "Bare till ground",
       "Localized": true,
       "Translations": [
         {
@@ -425,7 +425,7 @@
     },
     {
       "Id": 29,
-      "Name": "Till seashore",
+      "Value": "Till seashore",
       "Localized": true,
       "Translations": [
         {
@@ -440,7 +440,7 @@
     },
     {
       "Id": 30,
-      "Name": "Till freshwater shore",
+      "Value": "Till freshwater shore",
       "Localized": true,
       "Translations": [
         {
@@ -455,7 +455,7 @@
     },
     {
       "Id": 31,
-      "Name": "Open scree",
+      "Value": "Open scree",
       "Localized": true,
       "Translations": [
         {
@@ -470,7 +470,7 @@
     },
     {
       "Id": 32,
-      "Name": "Boulder scree",
+      "Value": "Boulder scree",
       "Localized": true,
       "Translations": [
         {
@@ -485,7 +485,7 @@
     },
     {
       "Id": 33,
-      "Name": "Gravel scree",
+      "Value": "Gravel scree",
       "Localized": true,
       "Translations": [
         {
@@ -500,7 +500,7 @@
     },
     {
       "Id": 34,
-      "Name": "Sandy scree",
+      "Value": "Sandy scree",
       "Localized": true,
       "Translations": [
         {
@@ -515,7 +515,7 @@
     },
     {
       "Id": 35,
-      "Name": "Open soil slope",
+      "Value": "Open soil slope",
       "Localized": true,
       "Translations": [
         {
@@ -530,7 +530,7 @@
     },
     {
       "Id": 36,
-      "Name": "Seashore soil slope",
+      "Value": "Seashore soil slope",
       "Localized": true,
       "Translations": [
         {
@@ -545,7 +545,7 @@
     },
     {
       "Id": 37,
-      "Name": "Freshwater shore soil slope",
+      "Value": "Freshwater shore soil slope",
       "Localized": true,
       "Translations": [
         {
@@ -560,7 +560,7 @@
     },
     {
       "Id": 38,
-      "Name": "Cave",
+      "Value": "Cave",
       "Localized": true,
       "Translations": [
         {
@@ -575,7 +575,7 @@
     },
     {
       "Id": 39,
-      "Name": "Bare chemical deposit",
+      "Value": "Bare chemical deposit",
       "Localized": true,
       "Translations": [
         {
@@ -590,7 +590,7 @@
     },
     {
       "Id": 40,
-      "Name": "Marl field",
+      "Value": "Marl field",
       "Localized": true,
       "Translations": [
         {
@@ -605,7 +605,7 @@
     },
     {
       "Id": 41,
-      "Name": "Turfa formation",
+      "Value": "Turfa formation",
       "Localized": true,
       "Translations": [
         {
@@ -620,7 +620,7 @@
     },
     {
       "Id": 42,
-      "Name": "Open organic deposite",
+      "Value": "Open organic deposite",
       "Localized": true,
       "Translations": [
         {
@@ -635,7 +635,7 @@
     },
     {
       "Id": 43,
-      "Name": "Bare peat",
+      "Value": "Bare peat",
       "Localized": true,
       "Translations": [
         {
@@ -650,7 +650,7 @@
     },
     {
       "Id": 44,
-      "Name": "Coastal driftline",
+      "Value": "Coastal driftline",
       "Localized": true,
       "Translations": [
         {
@@ -665,7 +665,7 @@
     },
     {
       "Id": 45,
-      "Name": "Freshwater driftline",
+      "Value": "Freshwater driftline",
       "Localized": true,
       "Translations": [
         {
@@ -680,7 +680,7 @@
     },
     {
       "Id": 46,
-      "Name": "Grasslands and heaths in the lowland",
+      "Value": "Grasslands and heaths in the lowland",
       "Localized": true,
       "Translations": [
         {
@@ -695,7 +695,7 @@
     },
     {
       "Id": 47,
-      "Name": "Pavement",
+      "Value": "Pavement",
       "Localized": true,
       "Translations": [
         {
@@ -710,7 +710,7 @@
     },
     {
       "Id": 48,
-      "Name": "Pavement with pine",
+      "Value": "Pavement with pine",
       "Localized": true,
       "Translations": [
         {
@@ -725,7 +725,7 @@
     },
     {
       "Id": 49,
-      "Name": "Pavement with oak",
+      "Value": "Pavement with oak",
       "Localized": true,
       "Translations": [
         {
@@ -740,7 +740,7 @@
     },
     {
       "Id": 50,
-      "Name": "Pavement with birch",
+      "Value": "Pavement with birch",
       "Localized": true,
       "Translations": [
         {
@@ -755,7 +755,7 @@
     },
     {
       "Id": 51,
-      "Name": "Pavement with juniper",
+      "Value": "Pavement with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -770,7 +770,7 @@
     },
     {
       "Id": 52,
-      "Name": "Rockheath",
+      "Value": "Rockheath",
       "Localized": true,
       "Translations": [
         {
@@ -785,7 +785,7 @@
     },
     {
       "Id": 53,
-      "Name": "Rockheath with pine",
+      "Value": "Rockheath with pine",
       "Localized": true,
       "Translations": [
         {
@@ -800,7 +800,7 @@
     },
     {
       "Id": 54,
-      "Name": "Rockheath with oak",
+      "Value": "Rockheath with oak",
       "Localized": true,
       "Translations": [
         {
@@ -815,7 +815,7 @@
     },
     {
       "Id": 55,
-      "Name": "Rockheath with birch",
+      "Value": "Rockheath with birch",
       "Localized": true,
       "Translations": [
         {
@@ -830,7 +830,7 @@
     },
     {
       "Id": 56,
-      "Name": "Rockheath with juniper",
+      "Value": "Rockheath with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -845,7 +845,7 @@
     },
     {
       "Id": 57,
-      "Name": "Rockmeadow",
+      "Value": "Rockmeadow",
       "Localized": true,
       "Translations": [
         {
@@ -860,7 +860,7 @@
     },
     {
       "Id": 58,
-      "Name": "Rockmeadow with pine",
+      "Value": "Rockmeadow with pine",
       "Localized": true,
       "Translations": [
         {
@@ -875,7 +875,7 @@
     },
     {
       "Id": 59,
-      "Name": "Rockmeadow with oak",
+      "Value": "Rockmeadow with oak",
       "Localized": true,
       "Translations": [
         {
@@ -890,7 +890,7 @@
     },
     {
       "Id": 60,
-      "Name": "Rockmeadow with juniper",
+      "Value": "Rockmeadow with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -905,7 +905,7 @@
     },
     {
       "Id": 61,
-      "Name": "Alvar",
+      "Value": "Alvar",
       "Localized": true,
       "Translations": [
         {
@@ -920,7 +920,7 @@
     },
     {
       "Id": 62,
-      "Name": "Alvar with pine",
+      "Value": "Alvar with pine",
       "Localized": true,
       "Translations": [
         {
@@ -935,7 +935,7 @@
     },
     {
       "Id": 63,
-      "Name": "Alvar with juniper",
+      "Value": "Alvar with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -950,7 +950,7 @@
     },
     {
       "Id": 64,
-      "Name": "Heath",
+      "Value": "Heath",
       "Localized": true,
       "Translations": [
         {
@@ -965,7 +965,7 @@
     },
     {
       "Id": 65,
-      "Name": "Heath with pine",
+      "Value": "Heath with pine",
       "Localized": true,
       "Translations": [
         {
@@ -980,7 +980,7 @@
     },
     {
       "Id": 66,
-      "Name": "Heath with oak",
+      "Value": "Heath with oak",
       "Localized": true,
       "Translations": [
         {
@@ -995,7 +995,7 @@
     },
     {
       "Id": 67,
-      "Name": "Heath with beech",
+      "Value": "Heath with beech",
       "Localized": true,
       "Translations": [
         {
@@ -1010,7 +1010,7 @@
     },
     {
       "Id": 68,
-      "Name": "Heath with birch",
+      "Value": "Heath with birch",
       "Localized": true,
       "Translations": [
         {
@@ -1025,7 +1025,7 @@
     },
     {
       "Id": 69,
-      "Name": "Heath with scrub",
+      "Value": "Heath with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -1040,7 +1040,7 @@
     },
     {
       "Id": 70,
-      "Name": "Heath with juniper",
+      "Value": "Heath with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -1055,7 +1055,7 @@
     },
     {
       "Id": 71,
-      "Name": "Dry heath",
+      "Value": "Dry heath",
       "Localized": true,
       "Translations": [
         {
@@ -1070,7 +1070,7 @@
     },
     {
       "Id": 72,
-      "Name": "Heather moorland",
+      "Value": "Heather moorland",
       "Localized": true,
       "Translations": [
         {
@@ -1085,7 +1085,7 @@
     },
     {
       "Id": 73,
-      "Name": "Lichen heath",
+      "Value": "Lichen heath",
       "Localized": true,
       "Translations": [
         {
@@ -1100,7 +1100,7 @@
     },
     {
       "Id": 74,
-      "Name": "Dry heath with pine",
+      "Value": "Dry heath with pine",
       "Localized": true,
       "Translations": [
         {
@@ -1115,7 +1115,7 @@
     },
     {
       "Id": 75,
-      "Name": "Dry heath with oak",
+      "Value": "Dry heath with oak",
       "Localized": true,
       "Translations": [
         {
@@ -1130,7 +1130,7 @@
     },
     {
       "Id": 76,
-      "Name": "Dry heath with beech",
+      "Value": "Dry heath with beech",
       "Localized": true,
       "Translations": [
         {
@@ -1145,7 +1145,7 @@
     },
     {
       "Id": 77,
-      "Name": "Dry heath with birch",
+      "Value": "Dry heath with birch",
       "Localized": true,
       "Translations": [
         {
@@ -1160,7 +1160,7 @@
     },
     {
       "Id": 78,
-      "Name": "Dry heath with scrub",
+      "Value": "Dry heath with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -1175,7 +1175,7 @@
     },
     {
       "Id": 79,
-      "Name": "Dry heath with juniper",
+      "Value": "Dry heath with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -1190,7 +1190,7 @@
     },
     {
       "Id": 80,
-      "Name": "Moist heath",
+      "Value": "Moist heath",
       "Localized": true,
       "Translations": [
         {
@@ -1205,7 +1205,7 @@
     },
     {
       "Id": 81,
-      "Name": "Moist Erica heath",
+      "Value": "Moist Erica heath",
       "Localized": true,
       "Translations": [
         {
@@ -1220,7 +1220,7 @@
     },
     {
       "Id": 82,
-      "Name": "Wet heath with birch",
+      "Value": "Wet heath with birch",
       "Localized": true,
       "Translations": [
         {
@@ -1235,7 +1235,7 @@
     },
     {
       "Id": 83,
-      "Name": "Wet heath with scrub",
+      "Value": "Wet heath with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -1250,7 +1250,7 @@
     },
     {
       "Id": 84,
-      "Name": "Wet heath with juniper",
+      "Value": "Wet heath with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -1265,7 +1265,7 @@
     },
     {
       "Id": 85,
-      "Name": "Dry grassland",
+      "Value": "Dry grassland",
       "Localized": true,
       "Translations": [
         {
@@ -1280,7 +1280,7 @@
     },
     {
       "Id": 86,
-      "Name": "Dry grassland with pine",
+      "Value": "Dry grassland with pine",
       "Localized": true,
       "Translations": [
         {
@@ -1295,7 +1295,7 @@
     },
     {
       "Id": 87,
-      "Name": "Dry grassland with oak",
+      "Value": "Dry grassland with oak",
       "Localized": true,
       "Translations": [
         {
@@ -1310,7 +1310,7 @@
     },
     {
       "Id": 88,
-      "Name": "Dry grassland with birch",
+      "Value": "Dry grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -1325,7 +1325,7 @@
     },
     {
       "Id": 89,
-      "Name": "Dry grassland with scrub",
+      "Value": "Dry grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -1340,7 +1340,7 @@
     },
     {
       "Id": 90,
-      "Name": "Dry grassland with juniper",
+      "Value": "Dry grassland with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -1355,7 +1355,7 @@
     },
     {
       "Id": 91,
-      "Name": "Sandy grassland",
+      "Value": "Sandy grassland",
       "Localized": true,
       "Translations": [
         {
@@ -1370,7 +1370,7 @@
     },
     {
       "Id": 92,
-      "Name": "Siliceous sandy grassland",
+      "Value": "Siliceous sandy grassland",
       "Localized": true,
       "Translations": [
         {
@@ -1385,7 +1385,7 @@
     },
     {
       "Id": 93,
-      "Name": "Xeric steppe",
+      "Value": "Xeric steppe",
       "Localized": true,
       "Translations": [
         {
@@ -1400,7 +1400,7 @@
     },
     {
       "Id": 94,
-      "Name": "Grey dune",
+      "Value": "Grey dune",
       "Localized": true,
       "Translations": [
         {
@@ -1415,7 +1415,7 @@
     },
     {
       "Id": 95,
-      "Name": "Heath dune",
+      "Value": "Heath dune",
       "Localized": true,
       "Translations": [
         {
@@ -1430,7 +1430,7 @@
     },
     {
       "Id": 96,
-      "Name": "Sandy grassland with pine",
+      "Value": "Sandy grassland with pine",
       "Localized": true,
       "Translations": [
         {
@@ -1445,7 +1445,7 @@
     },
     {
       "Id": 97,
-      "Name": "Sandy grassland with oak",
+      "Value": "Sandy grassland with oak",
       "Localized": true,
       "Translations": [
         {
@@ -1460,7 +1460,7 @@
     },
     {
       "Id": 98,
-      "Name": "Sandy grassland with birch",
+      "Value": "Sandy grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -1475,7 +1475,7 @@
     },
     {
       "Id": 99,
-      "Name": "Sandy grassland with scrub",
+      "Value": "Sandy grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -1490,7 +1490,7 @@
     },
     {
       "Id": 100,
-      "Name": "Sandy grassland with juniper",
+      "Value": "Sandy grassland with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -1505,7 +1505,7 @@
     },
     {
       "Id": 101,
-      "Name": "Dry siliceous grassland",
+      "Value": "Dry siliceous grassland",
       "Localized": true,
       "Translations": [
         {
@@ -1520,7 +1520,7 @@
     },
     {
       "Id": 102,
-      "Name": "Dry siliceous grassland with pine",
+      "Value": "Dry siliceous grassland with pine",
       "Localized": true,
       "Translations": [
         {
@@ -1535,7 +1535,7 @@
     },
     {
       "Id": 103,
-      "Name": "Dry siliceous grassland with oak",
+      "Value": "Dry siliceous grassland with oak",
       "Localized": true,
       "Translations": [
         {
@@ -1550,7 +1550,7 @@
     },
     {
       "Id": 104,
-      "Name": "Dry siliceous grassland with beech",
+      "Value": "Dry siliceous grassland with beech",
       "Localized": true,
       "Translations": [
         {
@@ -1565,7 +1565,7 @@
     },
     {
       "Id": 105,
-      "Name": "Dry siliceous grassland with birch",
+      "Value": "Dry siliceous grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -1580,7 +1580,7 @@
     },
     {
       "Id": 106,
-      "Name": "Dry siliceous grassland with scrub",
+      "Value": "Dry siliceous grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -1595,7 +1595,7 @@
     },
     {
       "Id": 107,
-      "Name": "Dry siliceous grassland with blackthorn",
+      "Value": "Dry siliceous grassland with blackthorn",
       "Localized": true,
       "Translations": [
         {
@@ -1610,7 +1610,7 @@
     },
     {
       "Id": 108,
-      "Name": "Dry siliceous grassland with roses",
+      "Value": "Dry siliceous grassland with roses",
       "Localized": true,
       "Translations": [
         {
@@ -1625,7 +1625,7 @@
     },
     {
       "Id": 109,
-      "Name": "Dry siliceous grassland with juniper",
+      "Value": "Dry siliceous grassland with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -1640,7 +1640,7 @@
     },
     {
       "Id": 110,
-      "Name": "Dry calcareous grassland",
+      "Value": "Dry calcareous grassland",
       "Localized": true,
       "Translations": [
         {
@@ -1655,7 +1655,7 @@
     },
     {
       "Id": 111,
-      "Name": "Dry calcareous grassland with pine",
+      "Value": "Dry calcareous grassland with pine",
       "Localized": true,
       "Translations": [
         {
@@ -1670,7 +1670,7 @@
     },
     {
       "Id": 112,
-      "Name": "Dry calcareous grassland with oak",
+      "Value": "Dry calcareous grassland with oak",
       "Localized": true,
       "Translations": [
         {
@@ -1685,7 +1685,7 @@
     },
     {
       "Id": 113,
-      "Name": "Dry calcareous grassland with scrub",
+      "Value": "Dry calcareous grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -1700,7 +1700,7 @@
     },
     {
       "Id": 114,
-      "Name": "Dry calcareous grassland with blackthorn",
+      "Value": "Dry calcareous grassland with blackthorn",
       "Localized": true,
       "Translations": [
         {
@@ -1715,7 +1715,7 @@
     },
     {
       "Id": 115,
-      "Name": "Dry calcareous grassland with roses",
+      "Value": "Dry calcareous grassland with roses",
       "Localized": true,
       "Translations": [
         {
@@ -1730,7 +1730,7 @@
     },
     {
       "Id": 116,
-      "Name": "Dry calcareous grassland with juniper",
+      "Value": "Dry calcareous grassland with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -1745,7 +1745,7 @@
     },
     {
       "Id": 117,
-      "Name": "Mesic grassland",
+      "Value": "Mesic grassland",
       "Localized": true,
       "Translations": [
         {
@@ -1760,7 +1760,7 @@
     },
     {
       "Id": 118,
-      "Name": "Mesic grassland with spruce",
+      "Value": "Mesic grassland with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -1775,7 +1775,7 @@
     },
     {
       "Id": 119,
-      "Name": "Mesic grassland with deciduous trees",
+      "Value": "Mesic grassland with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -1790,7 +1790,7 @@
     },
     {
       "Id": 120,
-      "Name": "Mesic grassland with broadleaved trees",
+      "Value": "Mesic grassland with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -1805,7 +1805,7 @@
     },
     {
       "Id": 121,
-      "Name": "Mesic grassland with oak",
+      "Value": "Mesic grassland with oak",
       "Localized": true,
       "Translations": [
         {
@@ -1820,7 +1820,7 @@
     },
     {
       "Id": 122,
-      "Name": "Mesic grassland with beech",
+      "Value": "Mesic grassland with beech",
       "Localized": true,
       "Translations": [
         {
@@ -1835,7 +1835,7 @@
     },
     {
       "Id": 123,
-      "Name": "Mesic grassland with trivial deciduous trees",
+      "Value": "Mesic grassland with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -1850,7 +1850,7 @@
     },
     {
       "Id": 124,
-      "Name": "Mesic grassland with birch",
+      "Value": "Mesic grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -1865,7 +1865,7 @@
     },
     {
       "Id": 125,
-      "Name": "Mesic grassland with scrub",
+      "Value": "Mesic grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -1880,7 +1880,7 @@
     },
     {
       "Id": 126,
-      "Name": "Mesic grassland with blackthorn",
+      "Value": "Mesic grassland with blackthorn",
       "Localized": true,
       "Translations": [
         {
@@ -1895,7 +1895,7 @@
     },
     {
       "Id": 127,
-      "Name": "Mesic grassland with roses",
+      "Value": "Mesic grassland with roses",
       "Localized": true,
       "Translations": [
         {
@@ -1910,7 +1910,7 @@
     },
     {
       "Id": 128,
-      "Name": "Mesic grassland with blackberry",
+      "Value": "Mesic grassland with blackberry",
       "Localized": true,
       "Translations": [
         {
@@ -1925,7 +1925,7 @@
     },
     {
       "Id": 129,
-      "Name": "Mesic grassland with juniper",
+      "Value": "Mesic grassland with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -1940,7 +1940,7 @@
     },
     {
       "Id": 130,
-      "Name": "Mesic siliceous grassland",
+      "Value": "Mesic siliceous grassland",
       "Localized": true,
       "Translations": [
         {
@@ -1955,7 +1955,7 @@
     },
     {
       "Id": 131,
-      "Name": "Mesic siliceous grassland with spruce",
+      "Value": "Mesic siliceous grassland with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -1970,7 +1970,7 @@
     },
     {
       "Id": 132,
-      "Name": "Mesic siliceous grassland with deciduous trees",
+      "Value": "Mesic siliceous grassland with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -1985,7 +1985,7 @@
     },
     {
       "Id": 133,
-      "Name": "Mesic siliceous grassland with broadleaved trees",
+      "Value": "Mesic siliceous grassland with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -2000,7 +2000,7 @@
     },
     {
       "Id": 134,
-      "Name": "Mesic siliceous grassland with oak",
+      "Value": "Mesic siliceous grassland with oak",
       "Localized": true,
       "Translations": [
         {
@@ -2015,7 +2015,7 @@
     },
     {
       "Id": 135,
-      "Name": "Mesic siliceous grassland with beech",
+      "Value": "Mesic siliceous grassland with beech",
       "Localized": true,
       "Translations": [
         {
@@ -2030,7 +2030,7 @@
     },
     {
       "Id": 136,
-      "Name": "Mesic siliceous grassland with hazel",
+      "Value": "Mesic siliceous grassland with hazel",
       "Localized": true,
       "Translations": [
         {
@@ -2045,7 +2045,7 @@
     },
     {
       "Id": 137,
-      "Name": "Mesic siliceous grassland with trivial deciduous trees",
+      "Value": "Mesic siliceous grassland with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -2060,7 +2060,7 @@
     },
     {
       "Id": 138,
-      "Name": "Mesic siliceous grassland with birch",
+      "Value": "Mesic siliceous grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -2075,7 +2075,7 @@
     },
     {
       "Id": 139,
-      "Name": "Mesic siliceous grassland with scrub",
+      "Value": "Mesic siliceous grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -2090,7 +2090,7 @@
     },
     {
       "Id": 140,
-      "Name": "Mesic siliceous grassland with blackthorn",
+      "Value": "Mesic siliceous grassland with blackthorn",
       "Localized": true,
       "Translations": [
         {
@@ -2105,7 +2105,7 @@
     },
     {
       "Id": 141,
-      "Name": "Mesic siliceous grassland with roses",
+      "Value": "Mesic siliceous grassland with roses",
       "Localized": true,
       "Translations": [
         {
@@ -2120,7 +2120,7 @@
     },
     {
       "Id": 142,
-      "Name": "Mesic siliceous grassland with blackberry",
+      "Value": "Mesic siliceous grassland with blackberry",
       "Localized": true,
       "Translations": [
         {
@@ -2135,7 +2135,7 @@
     },
     {
       "Id": 143,
-      "Name": "Mesic siliceous grassland with juniper",
+      "Value": "Mesic siliceous grassland with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -2150,7 +2150,7 @@
     },
     {
       "Id": 144,
-      "Name": "Mesic calcareous grassland",
+      "Value": "Mesic calcareous grassland",
       "Localized": true,
       "Translations": [
         {
@@ -2165,7 +2165,7 @@
     },
     {
       "Id": 145,
-      "Name": "Mesic calcareous grassland with spruce",
+      "Value": "Mesic calcareous grassland with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -2180,7 +2180,7 @@
     },
     {
       "Id": 146,
-      "Name": "Mesic calcareous grassland with deciduous trees",
+      "Value": "Mesic calcareous grassland with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -2195,7 +2195,7 @@
     },
     {
       "Id": 147,
-      "Name": "Mesic calcareous grassland with broadleaved trees",
+      "Value": "Mesic calcareous grassland with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -2210,7 +2210,7 @@
     },
     {
       "Id": 148,
-      "Name": "Mesic calcareous grassland with oak",
+      "Value": "Mesic calcareous grassland with oak",
       "Localized": true,
       "Translations": [
         {
@@ -2225,7 +2225,7 @@
     },
     {
       "Id": 149,
-      "Name": "Mesic calcareous grassland with ash",
+      "Value": "Mesic calcareous grassland with ash",
       "Localized": true,
       "Translations": [
         {
@@ -2240,7 +2240,7 @@
     },
     {
       "Id": 150,
-      "Name": "Mesic calcareous grassland with elm",
+      "Value": "Mesic calcareous grassland with elm",
       "Localized": true,
       "Translations": [
         {
@@ -2255,7 +2255,7 @@
     },
     {
       "Id": 151,
-      "Name": "Mesic calcareous grassland with hazel",
+      "Value": "Mesic calcareous grassland with hazel",
       "Localized": true,
       "Translations": [
         {
@@ -2270,7 +2270,7 @@
     },
     {
       "Id": 152,
-      "Name": "Mesic calcareous grassland with trivial deciduous trees",
+      "Value": "Mesic calcareous grassland with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -2285,7 +2285,7 @@
     },
     {
       "Id": 153,
-      "Name": "Mesic calcareous grassland with birch",
+      "Value": "Mesic calcareous grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -2300,7 +2300,7 @@
     },
     {
       "Id": 154,
-      "Name": "Mesic calcareous grassland with scrub",
+      "Value": "Mesic calcareous grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -2315,7 +2315,7 @@
     },
     {
       "Id": 155,
-      "Name": "Mesic calcareous grassland with blackthorn",
+      "Value": "Mesic calcareous grassland with blackthorn",
       "Localized": true,
       "Translations": [
         {
@@ -2330,7 +2330,7 @@
     },
     {
       "Id": 156,
-      "Name": "Mesic calcareous grassland with roses",
+      "Value": "Mesic calcareous grassland with roses",
       "Localized": true,
       "Translations": [
         {
@@ -2345,7 +2345,7 @@
     },
     {
       "Id": 157,
-      "Name": "Mesic calcareous grassland with blackberry",
+      "Value": "Mesic calcareous grassland with blackberry",
       "Localized": true,
       "Translations": [
         {
@@ -2360,7 +2360,7 @@
     },
     {
       "Id": 158,
-      "Name": "Mesic calcareous grassland with juniper",
+      "Value": "Mesic calcareous grassland with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -2375,7 +2375,7 @@
     },
     {
       "Id": 159,
-      "Name": "Moist grassland",
+      "Value": "Moist grassland",
       "Localized": true,
       "Translations": [
         {
@@ -2390,7 +2390,7 @@
     },
     {
       "Id": 160,
-      "Name": "Moist grassland with spruce",
+      "Value": "Moist grassland with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -2405,7 +2405,7 @@
     },
     {
       "Id": 161,
-      "Name": "Moist grassland with deciduous trees",
+      "Value": "Moist grassland with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -2420,7 +2420,7 @@
     },
     {
       "Id": 162,
-      "Name": "Moist grassland with broadleaved trees",
+      "Value": "Moist grassland with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -2435,7 +2435,7 @@
     },
     {
       "Id": 163,
-      "Name": "Moist grassland with trivial deciduous trees",
+      "Value": "Moist grassland with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -2450,7 +2450,7 @@
     },
     {
       "Id": 164,
-      "Name": "Moist grassland with birch",
+      "Value": "Moist grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -2465,7 +2465,7 @@
     },
     {
       "Id": 165,
-      "Name": "Moist grassland with alder",
+      "Value": "Moist grassland with alder",
       "Localized": true,
       "Translations": [
         {
@@ -2480,7 +2480,7 @@
     },
     {
       "Id": 166,
-      "Name": "Moist grassland with scrub",
+      "Value": "Moist grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -2495,7 +2495,7 @@
     },
     {
       "Id": 167,
-      "Name": "Moist grassland with willow",
+      "Value": "Moist grassland with willow",
       "Localized": true,
       "Translations": [
         {
@@ -2510,7 +2510,7 @@
     },
     {
       "Id": 168,
-      "Name": "Sandy moist grassland",
+      "Value": "Sandy moist grassland",
       "Localized": true,
       "Translations": [
         {
@@ -2525,7 +2525,7 @@
     },
     {
       "Id": 169,
-      "Name": "Sandy moist siliceous grassland",
+      "Value": "Sandy moist siliceous grassland",
       "Localized": true,
       "Translations": [
         {
@@ -2540,7 +2540,7 @@
     },
     {
       "Id": 170,
-      "Name": "Sandy moist calcareous grassland",
+      "Value": "Sandy moist calcareous grassland",
       "Localized": true,
       "Translations": [
         {
@@ -2555,7 +2555,7 @@
     },
     {
       "Id": 171,
-      "Name": "Sandy moist grassland with pine",
+      "Value": "Sandy moist grassland with pine",
       "Localized": true,
       "Translations": [
         {
@@ -2570,7 +2570,7 @@
     },
     {
       "Id": 172,
-      "Name": "Sandy moist grassland with deciduous trees",
+      "Value": "Sandy moist grassland with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -2585,7 +2585,7 @@
     },
     {
       "Id": 173,
-      "Name": "Sandy moist grassland with broadleaved trees",
+      "Value": "Sandy moist grassland with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -2600,7 +2600,7 @@
     },
     {
       "Id": 174,
-      "Name": "Sandy moist grassland with trivial deciduous trees",
+      "Value": "Sandy moist grassland with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -2615,7 +2615,7 @@
     },
     {
       "Id": 175,
-      "Name": "Sandy moist grassland with birch",
+      "Value": "Sandy moist grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -2630,7 +2630,7 @@
     },
     {
       "Id": 176,
-      "Name": "Sandy moist grassland with alder",
+      "Value": "Sandy moist grassland with alder",
       "Localized": true,
       "Translations": [
         {
@@ -2645,7 +2645,7 @@
     },
     {
       "Id": 177,
-      "Name": "Sandy moist grassland with scrub",
+      "Value": "Sandy moist grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -2660,7 +2660,7 @@
     },
     {
       "Id": 178,
-      "Name": "Sandy moist grassland with willow",
+      "Value": "Sandy moist grassland with willow",
       "Localized": true,
       "Translations": [
         {
@@ -2675,7 +2675,7 @@
     },
     {
       "Id": 179,
-      "Name": "Moist siliceous grassland",
+      "Value": "Moist siliceous grassland",
       "Localized": true,
       "Translations": [
         {
@@ -2690,7 +2690,7 @@
     },
     {
       "Id": 180,
-      "Name": "Moist siliceous grassland with deciduous trees",
+      "Value": "Moist siliceous grassland with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -2705,7 +2705,7 @@
     },
     {
       "Id": 181,
-      "Name": "Moist siliceous grassland with broadleaved trees",
+      "Value": "Moist siliceous grassland with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -2720,7 +2720,7 @@
     },
     {
       "Id": 182,
-      "Name": "Moist siliceous grassland with trivial deciduous trees",
+      "Value": "Moist siliceous grassland with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -2735,7 +2735,7 @@
     },
     {
       "Id": 183,
-      "Name": "Moist siliceous grassland with birch",
+      "Value": "Moist siliceous grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -2750,7 +2750,7 @@
     },
     {
       "Id": 184,
-      "Name": "Moist siliceous grassland with alder",
+      "Value": "Moist siliceous grassland with alder",
       "Localized": true,
       "Translations": [
         {
@@ -2765,7 +2765,7 @@
     },
     {
       "Id": 185,
-      "Name": "Moist siliceous grassland with scrub",
+      "Value": "Moist siliceous grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -2780,7 +2780,7 @@
     },
     {
       "Id": 186,
-      "Name": "Moist siliceous grassland with blackberry",
+      "Value": "Moist siliceous grassland with blackberry",
       "Localized": true,
       "Translations": [
         {
@@ -2795,7 +2795,7 @@
     },
     {
       "Id": 187,
-      "Name": "Moist siliceous grassland with willow",
+      "Value": "Moist siliceous grassland with willow",
       "Localized": true,
       "Translations": [
         {
@@ -2810,7 +2810,7 @@
     },
     {
       "Id": 188,
-      "Name": "Moist calcareous grassland",
+      "Value": "Moist calcareous grassland",
       "Localized": true,
       "Translations": [
         {
@@ -2825,7 +2825,7 @@
     },
     {
       "Id": 189,
-      "Name": "Moist calcareous grassland with spruce",
+      "Value": "Moist calcareous grassland with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -2840,7 +2840,7 @@
     },
     {
       "Id": 190,
-      "Name": "Moist calcareous grassland with deciduous trees",
+      "Value": "Moist calcareous grassland with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -2855,7 +2855,7 @@
     },
     {
       "Id": 191,
-      "Name": "Moist calcareous grassland with broadleaved trees",
+      "Value": "Moist calcareous grassland with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -2870,7 +2870,7 @@
     },
     {
       "Id": 192,
-      "Name": "Moist calcareous grassland with trivial deciduous trees",
+      "Value": "Moist calcareous grassland with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -2885,7 +2885,7 @@
     },
     {
       "Id": 193,
-      "Name": "Moist calcareous grassland with birch",
+      "Value": "Moist calcareous grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -2900,7 +2900,7 @@
     },
     {
       "Id": 194,
-      "Name": "Moist calcareous grassland with alder",
+      "Value": "Moist calcareous grassland with alder",
       "Localized": true,
       "Translations": [
         {
@@ -2915,7 +2915,7 @@
     },
     {
       "Id": 195,
-      "Name": "Moist calcareous grassland with scrub",
+      "Value": "Moist calcareous grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -2930,7 +2930,7 @@
     },
     {
       "Id": 196,
-      "Name": "Moist calcareous grassland with blackberry",
+      "Value": "Moist calcareous grassland with blackberry",
       "Localized": true,
       "Translations": [
         {
@@ -2945,7 +2945,7 @@
     },
     {
       "Id": 197,
-      "Name": "Moist calcareous grassland with willow",
+      "Value": "Moist calcareous grassland with willow",
       "Localized": true,
       "Translations": [
         {
@@ -2960,7 +2960,7 @@
     },
     {
       "Id": 198,
-      "Name": "Lowland tall herb meadow",
+      "Value": "Lowland tall herb meadow",
       "Localized": true,
       "Translations": [
         {
@@ -2975,7 +2975,7 @@
     },
     {
       "Id": 199,
-      "Name": "Lowland tall herb meadow with scrub",
+      "Value": "Lowland tall herb meadow with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -2990,7 +2990,7 @@
     },
     {
       "Id": 200,
-      "Name": "Lowland tall herb meadow with willow",
+      "Value": "Lowland tall herb meadow with willow",
       "Localized": true,
       "Translations": [
         {
@@ -3005,7 +3005,7 @@
     },
     {
       "Id": 201,
-      "Name": "Alluvial meadow",
+      "Value": "Alluvial meadow",
       "Localized": true,
       "Translations": [
         {
@@ -3020,7 +3020,7 @@
     },
     {
       "Id": 202,
-      "Name": "Alluvial coastal meadow",
+      "Value": "Alluvial coastal meadow",
       "Localized": true,
       "Translations": [
         {
@@ -3035,7 +3035,7 @@
     },
     {
       "Id": 203,
-      "Name": "Alluvial freshwater meadow",
+      "Value": "Alluvial freshwater meadow",
       "Localized": true,
       "Translations": [
         {
@@ -3050,7 +3050,7 @@
     },
     {
       "Id": 204,
-      "Name": "Alpine heath and grassland",
+      "Value": "Alpine heath and grassland",
       "Localized": true,
       "Translations": [
         {
@@ -3065,7 +3065,7 @@
     },
     {
       "Id": 205,
-      "Name": "Alpine heath",
+      "Value": "Alpine heath",
       "Localized": true,
       "Translations": [
         {
@@ -3080,7 +3080,7 @@
     },
     {
       "Id": 206,
-      "Name": "Alpine heath with birch",
+      "Value": "Alpine heath with birch",
       "Localized": true,
       "Translations": [
         {
@@ -3095,7 +3095,7 @@
     },
     {
       "Id": 207,
-      "Name": "Alpine heath with scrub",
+      "Value": "Alpine heath with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -3110,7 +3110,7 @@
     },
     {
       "Id": 208,
-      "Name": "Alpine heath with juniper",
+      "Value": "Alpine heath with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -3125,7 +3125,7 @@
     },
     {
       "Id": 209,
-      "Name": "Alpine heath with Birch scrub",
+      "Value": "Alpine heath with Birch scrub",
       "Localized": true,
       "Translations": [
         {
@@ -3140,7 +3140,7 @@
     },
     {
       "Id": 210,
-      "Name": "Alpine lichen heath",
+      "Value": "Alpine lichen heath",
       "Localized": true,
       "Translations": [
         {
@@ -3155,7 +3155,7 @@
     },
     {
       "Id": 211,
-      "Name": "Alpine lichen heath with birch",
+      "Value": "Alpine lichen heath with birch",
       "Localized": true,
       "Translations": [
         {
@@ -3170,7 +3170,7 @@
     },
     {
       "Id": 212,
-      "Name": "Alpine dwarf scrub heath",
+      "Value": "Alpine dwarf scrub heath",
       "Localized": true,
       "Translations": [
         {
@@ -3185,7 +3185,7 @@
     },
     {
       "Id": 213,
-      "Name": "Alpine calcareous heath",
+      "Value": "Alpine calcareous heath",
       "Localized": true,
       "Translations": [
         {
@@ -3200,7 +3200,7 @@
     },
     {
       "Id": 214,
-      "Name": "Alpine blueberry heath",
+      "Value": "Alpine blueberry heath",
       "Localized": true,
       "Translations": [
         {
@@ -3215,7 +3215,7 @@
     },
     {
       "Id": 215,
-      "Name": "Alpine dwarf scrub heath with birch",
+      "Value": "Alpine dwarf scrub heath with birch",
       "Localized": true,
       "Translations": [
         {
@@ -3230,7 +3230,7 @@
     },
     {
       "Id": 216,
-      "Name": "Alpine dwarf scrub heath with scrub",
+      "Value": "Alpine dwarf scrub heath with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -3245,7 +3245,7 @@
     },
     {
       "Id": 217,
-      "Name": "Alpine dwarf scrub heath with juniper",
+      "Value": "Alpine dwarf scrub heath with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -3260,7 +3260,7 @@
     },
     {
       "Id": 218,
-      "Name": "Alpine dwarf scrub heath with birch scrub",
+      "Value": "Alpine dwarf scrub heath with birch scrub",
       "Localized": true,
       "Translations": [
         {
@@ -3275,7 +3275,7 @@
     },
     {
       "Id": 219,
-      "Name": "Alpine willow heath",
+      "Value": "Alpine willow heath",
       "Localized": true,
       "Translations": [
         {
@@ -3290,7 +3290,7 @@
     },
     {
       "Id": 220,
-      "Name": "Alpine willow heath with birch",
+      "Value": "Alpine willow heath with birch",
       "Localized": true,
       "Translations": [
         {
@@ -3305,7 +3305,7 @@
     },
     {
       "Id": 221,
-      "Name": "Alpine willowheath with scrub",
+      "Value": "Alpine willowheath with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -3320,7 +3320,7 @@
     },
     {
       "Id": 222,
-      "Name": "Alpine willowheath with juniper",
+      "Value": "Alpine willowheath with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -3335,7 +3335,7 @@
     },
     {
       "Id": 223,
-      "Name": "Alpine willow heath with birchscrub",
+      "Value": "Alpine willow heath with birchscrub",
       "Localized": true,
       "Translations": [
         {
@@ -3350,7 +3350,7 @@
     },
     {
       "Id": 224,
-      "Name": "Alpine grassland",
+      "Value": "Alpine grassland",
       "Localized": true,
       "Translations": [
         {
@@ -3365,7 +3365,7 @@
     },
     {
       "Id": 225,
-      "Name": "Alpine grassland with birch",
+      "Value": "Alpine grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -3380,7 +3380,7 @@
     },
     {
       "Id": 226,
-      "Name": "Alpine grassland with scrub",
+      "Value": "Alpine grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -3395,7 +3395,7 @@
     },
     {
       "Id": 227,
-      "Name": "Alpine grassland with juniper",
+      "Value": "Alpine grassland with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -3410,7 +3410,7 @@
     },
     {
       "Id": 228,
-      "Name": "Alpine grassland with birchscrub",
+      "Value": "Alpine grassland with birchscrub",
       "Localized": true,
       "Translations": [
         {
@@ -3425,7 +3425,7 @@
     },
     {
       "Id": 229,
-      "Name": "Alpine grassland with willow",
+      "Value": "Alpine grassland with willow",
       "Localized": true,
       "Translations": [
         {
@@ -3440,7 +3440,7 @@
     },
     {
       "Id": 230,
-      "Name": "Siliceous alpine grassland",
+      "Value": "Siliceous alpine grassland",
       "Localized": true,
       "Translations": [
         {
@@ -3455,7 +3455,7 @@
     },
     {
       "Id": 231,
-      "Name": "Siliceous alpine grassland with birch",
+      "Value": "Siliceous alpine grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -3470,7 +3470,7 @@
     },
     {
       "Id": 232,
-      "Name": "Siliceous alpine grassland with scrub",
+      "Value": "Siliceous alpine grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -3485,7 +3485,7 @@
     },
     {
       "Id": 233,
-      "Name": "Siliceous alpine grassland with juniper",
+      "Value": "Siliceous alpine grassland with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -3500,7 +3500,7 @@
     },
     {
       "Id": 234,
-      "Name": "Siliceous alpine grassland with birchscrub",
+      "Value": "Siliceous alpine grassland with birchscrub",
       "Localized": true,
       "Translations": [
         {
@@ -3515,7 +3515,7 @@
     },
     {
       "Id": 235,
-      "Name": "Siliceous alpine grassland with willow",
+      "Value": "Siliceous alpine grassland with willow",
       "Localized": true,
       "Translations": [
         {
@@ -3530,7 +3530,7 @@
     },
     {
       "Id": 236,
-      "Name": "Calcareous alpine grassland",
+      "Value": "Calcareous alpine grassland",
       "Localized": true,
       "Translations": [
         {
@@ -3545,7 +3545,7 @@
     },
     {
       "Id": 237,
-      "Name": "Calcareous alpine grassland with birch",
+      "Value": "Calcareous alpine grassland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -3560,7 +3560,7 @@
     },
     {
       "Id": 238,
-      "Name": "Calcareous alpine grassland with scrub",
+      "Value": "Calcareous alpine grassland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -3575,7 +3575,7 @@
     },
     {
       "Id": 239,
-      "Name": "Calcareous alpine grassland with juniper",
+      "Value": "Calcareous alpine grassland with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -3590,7 +3590,7 @@
     },
     {
       "Id": 240,
-      "Name": "Calcareous alpine grassland with birch scrub",
+      "Value": "Calcareous alpine grassland with birch scrub",
       "Localized": true,
       "Translations": [
         {
@@ -3605,7 +3605,7 @@
     },
     {
       "Id": 241,
-      "Name": "Calcareous alpine grassland with willow",
+      "Value": "Calcareous alpine grassland with willow",
       "Localized": true,
       "Translations": [
         {
@@ -3620,7 +3620,7 @@
     },
     {
       "Id": 242,
-      "Name": "Alpine tall herb meadow",
+      "Value": "Alpine tall herb meadow",
       "Localized": true,
       "Translations": [
         {
@@ -3635,7 +3635,7 @@
     },
     {
       "Id": 243,
-      "Name": "Alpine tall herb meadow with birch",
+      "Value": "Alpine tall herb meadow with birch",
       "Localized": true,
       "Translations": [
         {
@@ -3650,7 +3650,7 @@
     },
     {
       "Id": 244,
-      "Name": "Alpine tall herb meadow with scrub",
+      "Value": "Alpine tall herb meadow with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -3665,7 +3665,7 @@
     },
     {
       "Id": 245,
-      "Name": "Alpine tall herb meadow with Birch scrub",
+      "Value": "Alpine tall herb meadow with Birch scrub",
       "Localized": true,
       "Translations": [
         {
@@ -3680,7 +3680,7 @@
     },
     {
       "Id": 246,
-      "Name": "Alpine tall herb meadow with willow",
+      "Value": "Alpine tall herb meadow with willow",
       "Localized": true,
       "Translations": [
         {
@@ -3695,7 +3695,7 @@
     },
     {
       "Id": 247,
-      "Name": "Alpine pattern ground",
+      "Value": "Alpine pattern ground",
       "Localized": true,
       "Translations": [
         {
@@ -3710,7 +3710,7 @@
     },
     {
       "Id": 248,
-      "Name": "Snowpatch",
+      "Value": "Snowpatch",
       "Localized": true,
       "Translations": [
         {
@@ -3725,7 +3725,7 @@
     },
     {
       "Id": 249,
-      "Name": "Early snowbed",
+      "Value": "Early snowbed",
       "Localized": true,
       "Translations": [
         {
@@ -3740,7 +3740,7 @@
     },
     {
       "Id": 250,
-      "Name": "Intermediate snowbed",
+      "Value": "Intermediate snowbed",
       "Localized": true,
       "Translations": [
         {
@@ -3755,7 +3755,7 @@
     },
     {
       "Id": 251,
-      "Name": "Late snowbed",
+      "Value": "Late snowbed",
       "Localized": true,
       "Translations": [
         {
@@ -3770,7 +3770,7 @@
     },
     {
       "Id": 252,
-      "Name": "Forest",
+      "Value": "Forest",
       "Localized": true,
       "Translations": [
         {
@@ -3785,7 +3785,7 @@
     },
     {
       "Id": 253,
-      "Name": "Rock ledge and boulder forest",
+      "Value": "Rock ledge and boulder forest",
       "Localized": true,
       "Translations": [
         {
@@ -3800,7 +3800,7 @@
     },
     {
       "Id": 254,
-      "Name": "Rock ledge forest",
+      "Value": "Rock ledge forest",
       "Localized": true,
       "Translations": [
         {
@@ -3815,7 +3815,7 @@
     },
     {
       "Id": 255,
-      "Name": "Rock ledge coniferous forest",
+      "Value": "Rock ledge coniferous forest",
       "Localized": true,
       "Translations": [
         {
@@ -3830,7 +3830,7 @@
     },
     {
       "Id": 256,
-      "Name": "Rock ledge pine forest",
+      "Value": "Rock ledge pine forest",
       "Localized": true,
       "Translations": [
         {
@@ -3845,7 +3845,7 @@
     },
     {
       "Id": 257,
-      "Name": "Rock ledge mixed forest",
+      "Value": "Rock ledge mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -3860,7 +3860,7 @@
     },
     {
       "Id": 258,
-      "Name": "Rock ledge deciduous forest",
+      "Value": "Rock ledge deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -3875,7 +3875,7 @@
     },
     {
       "Id": 259,
-      "Name": "Rock ledge oak forest",
+      "Value": "Rock ledge oak forest",
       "Localized": true,
       "Translations": [
         {
@@ -3890,7 +3890,7 @@
     },
     {
       "Id": 260,
-      "Name": "Rock ledge birch forest",
+      "Value": "Rock ledge birch forest",
       "Localized": true,
       "Translations": [
         {
@@ -3905,7 +3905,7 @@
     },
     {
       "Id": 261,
-      "Name": "Rock ledge aspen forest",
+      "Value": "Rock ledge aspen forest",
       "Localized": true,
       "Translations": [
         {
@@ -3920,7 +3920,7 @@
     },
     {
       "Id": 262,
-      "Name": "Calcareous rock ledge forest",
+      "Value": "Calcareous rock ledge forest",
       "Localized": true,
       "Translations": [
         {
@@ -3935,7 +3935,7 @@
     },
     {
       "Id": 263,
-      "Name": "Calcareous rock ledge coniferous forest",
+      "Value": "Calcareous rock ledge coniferous forest",
       "Localized": true,
       "Translations": [
         {
@@ -3950,7 +3950,7 @@
     },
     {
       "Id": 264,
-      "Name": "Calcareous rock ledge pine forest",
+      "Value": "Calcareous rock ledge pine forest",
       "Localized": true,
       "Translations": [
         {
@@ -3965,7 +3965,7 @@
     },
     {
       "Id": 265,
-      "Name": "Calcareous rock ledge mixed forest",
+      "Value": "Calcareous rock ledge mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -3980,7 +3980,7 @@
     },
     {
       "Id": 266,
-      "Name": "Calcareous rock ledge deciduous forest",
+      "Value": "Calcareous rock ledge deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -3995,7 +3995,7 @@
     },
     {
       "Id": 267,
-      "Name": "Calcareous rock ledge broad-leaved forest",
+      "Value": "Calcareous rock ledge broad-leaved forest",
       "Localized": true,
       "Translations": [
         {
@@ -4010,7 +4010,7 @@
     },
     {
       "Id": 268,
-      "Name": "Calcareous rock ledge trivial deciduous forest",
+      "Value": "Calcareous rock ledge trivial deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -4025,7 +4025,7 @@
     },
     {
       "Id": 269,
-      "Name": "Boulder forest",
+      "Value": "Boulder forest",
       "Localized": true,
       "Translations": [
         {
@@ -4040,7 +4040,7 @@
     },
     {
       "Id": 270,
-      "Name": "Boulder coniferous forest",
+      "Value": "Boulder coniferous forest",
       "Localized": true,
       "Translations": [
         {
@@ -4055,7 +4055,7 @@
     },
     {
       "Id": 271,
-      "Name": "Boulder pine forest",
+      "Value": "Boulder pine forest",
       "Localized": true,
       "Translations": [
         {
@@ -4070,7 +4070,7 @@
     },
     {
       "Id": 272,
-      "Name": "Boulder mixed forest",
+      "Value": "Boulder mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -4085,7 +4085,7 @@
     },
     {
       "Id": 273,
-      "Name": "Boulder deciduous forest",
+      "Value": "Boulder deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -4100,7 +4100,7 @@
     },
     {
       "Id": 274,
-      "Name": "Forest on sand",
+      "Value": "Forest on sand",
       "Localized": true,
       "Translations": [
         {
@@ -4115,7 +4115,7 @@
     },
     {
       "Id": 275,
-      "Name": "Coniferous forest on sand",
+      "Value": "Coniferous forest on sand",
       "Localized": true,
       "Translations": [
         {
@@ -4130,7 +4130,7 @@
     },
     {
       "Id": 276,
-      "Name": "Spruce forest on sand",
+      "Value": "Spruce forest on sand",
       "Localized": true,
       "Translations": [
         {
@@ -4145,7 +4145,7 @@
     },
     {
       "Id": 277,
-      "Name": "Pine forest on sand",
+      "Value": "Pine forest on sand",
       "Localized": true,
       "Translations": [
         {
@@ -4160,7 +4160,7 @@
     },
     {
       "Id": 278,
-      "Name": "Mixed forest on sand",
+      "Value": "Mixed forest on sand",
       "Localized": true,
       "Translations": [
         {
@@ -4175,7 +4175,7 @@
     },
     {
       "Id": 279,
-      "Name": "Deciduous forest on sand",
+      "Value": "Deciduous forest on sand",
       "Localized": true,
       "Translations": [
         {
@@ -4190,7 +4190,7 @@
     },
     {
       "Id": 280,
-      "Name": "Broad-leaved forest on sand",
+      "Value": "Broad-leaved forest on sand",
       "Localized": true,
       "Translations": [
         {
@@ -4205,7 +4205,7 @@
     },
     {
       "Id": 281,
-      "Name": "Oak forest on sand",
+      "Value": "Oak forest on sand",
       "Localized": true,
       "Translations": [
         {
@@ -4220,7 +4220,7 @@
     },
     {
       "Id": 282,
-      "Name": "Trivial deciduous forest on sand",
+      "Value": "Trivial deciduous forest on sand",
       "Localized": true,
       "Translations": [
         {
@@ -4235,7 +4235,7 @@
     },
     {
       "Id": 283,
-      "Name": "Birch forest on sand",
+      "Value": "Birch forest on sand",
       "Localized": true,
       "Translations": [
         {
@@ -4250,7 +4250,7 @@
     },
     {
       "Id": 284,
-      "Name": "Alder forest on sand",
+      "Value": "Alder forest on sand",
       "Localized": true,
       "Translations": [
         {
@@ -4265,7 +4265,7 @@
     },
     {
       "Id": 285,
-      "Name": "Dune forest",
+      "Value": "Dune forest",
       "Localized": true,
       "Translations": [
         {
@@ -4280,7 +4280,7 @@
     },
     {
       "Id": 286,
-      "Name": "Coniferous dune forest",
+      "Value": "Coniferous dune forest",
       "Localized": true,
       "Translations": [
         {
@@ -4295,7 +4295,7 @@
     },
     {
       "Id": 287,
-      "Name": "Pine dune forest",
+      "Value": "Pine dune forest",
       "Localized": true,
       "Translations": [
         {
@@ -4310,7 +4310,7 @@
     },
     {
       "Id": 288,
-      "Name": "Mixed dune forest",
+      "Value": "Mixed dune forest",
       "Localized": true,
       "Translations": [
         {
@@ -4325,7 +4325,7 @@
     },
     {
       "Id": 289,
-      "Name": "Deciduous dune forest",
+      "Value": "Deciduous dune forest",
       "Localized": true,
       "Translations": [
         {
@@ -4340,7 +4340,7 @@
     },
     {
       "Id": 290,
-      "Name": "Oak dune forest",
+      "Value": "Oak dune forest",
       "Localized": true,
       "Translations": [
         {
@@ -4355,7 +4355,7 @@
     },
     {
       "Id": 291,
-      "Name": "Trivial deciduous dune forest",
+      "Value": "Trivial deciduous dune forest",
       "Localized": true,
       "Translations": [
         {
@@ -4370,7 +4370,7 @@
     },
     {
       "Id": 292,
-      "Name": "Birch dune forest",
+      "Value": "Birch dune forest",
       "Localized": true,
       "Translations": [
         {
@@ -4385,7 +4385,7 @@
     },
     {
       "Id": 293,
-      "Name": "Forest on slopes",
+      "Value": "Forest on slopes",
       "Localized": true,
       "Translations": [
         {
@@ -4400,7 +4400,7 @@
     },
     {
       "Id": 294,
-      "Name": "Coniferous forest on slopes",
+      "Value": "Coniferous forest on slopes",
       "Localized": true,
       "Translations": [
         {
@@ -4415,7 +4415,7 @@
     },
     {
       "Id": 295,
-      "Name": "Spruce forest on slopes",
+      "Value": "Spruce forest on slopes",
       "Localized": true,
       "Translations": [
         {
@@ -4430,7 +4430,7 @@
     },
     {
       "Id": 296,
-      "Name": "Pine forest on slopes",
+      "Value": "Pine forest on slopes",
       "Localized": true,
       "Translations": [
         {
@@ -4445,7 +4445,7 @@
     },
     {
       "Id": 297,
-      "Name": "Mixed forest on slopes",
+      "Value": "Mixed forest on slopes",
       "Localized": true,
       "Translations": [
         {
@@ -4460,7 +4460,7 @@
     },
     {
       "Id": 298,
-      "Name": "Deciduous forest on slopes",
+      "Value": "Deciduous forest on slopes",
       "Localized": true,
       "Translations": [
         {
@@ -4475,7 +4475,7 @@
     },
     {
       "Id": 299,
-      "Name": "Broad-leaved forest on slopes",
+      "Value": "Broad-leaved forest on slopes",
       "Localized": true,
       "Translations": [
         {
@@ -4490,7 +4490,7 @@
     },
     {
       "Id": 300,
-      "Name": "Oak forest on slopes",
+      "Value": "Oak forest on slopes",
       "Localized": true,
       "Translations": [
         {
@@ -4505,7 +4505,7 @@
     },
     {
       "Id": 301,
-      "Name": "Beech forest on slopes",
+      "Value": "Beech forest on slopes",
       "Localized": true,
       "Translations": [
         {
@@ -4520,7 +4520,7 @@
     },
     {
       "Id": 302,
-      "Name": "Trivial deciduous forest on slopes",
+      "Value": "Trivial deciduous forest on slopes",
       "Localized": true,
       "Translations": [
         {
@@ -4535,7 +4535,7 @@
     },
     {
       "Id": 303,
-      "Name": "Heath forest",
+      "Value": "Heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4550,7 +4550,7 @@
     },
     {
       "Id": 304,
-      "Name": "Coniferous heath forest",
+      "Value": "Coniferous heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4565,7 +4565,7 @@
     },
     {
       "Id": 305,
-      "Name": "Spruce heath forest",
+      "Value": "Spruce heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4580,7 +4580,7 @@
     },
     {
       "Id": 306,
-      "Name": "Pine heath forest",
+      "Value": "Pine heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4595,7 +4595,7 @@
     },
     {
       "Id": 307,
-      "Name": "Mixed heath forest",
+      "Value": "Mixed heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4610,7 +4610,7 @@
     },
     {
       "Id": 308,
-      "Name": "Deciduous heath forest",
+      "Value": "Deciduous heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4625,7 +4625,7 @@
     },
     {
       "Id": 309,
-      "Name": "Oak heath forest",
+      "Value": "Oak heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4640,7 +4640,7 @@
     },
     {
       "Id": 310,
-      "Name": "Beech heath forest",
+      "Value": "Beech heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4655,7 +4655,7 @@
     },
     {
       "Id": 311,
-      "Name": "Trivial deciduous heath forest",
+      "Value": "Trivial deciduous heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4670,7 +4670,7 @@
     },
     {
       "Id": 312,
-      "Name": "Birch heath forest",
+      "Value": "Birch heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4685,7 +4685,7 @@
     },
     {
       "Id": 313,
-      "Name": "Aspen heath forest",
+      "Value": "Aspen heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4700,7 +4700,7 @@
     },
     {
       "Id": 314,
-      "Name": "Lichen heath forest",
+      "Value": "Lichen heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4715,7 +4715,7 @@
     },
     {
       "Id": 315,
-      "Name": "Lichen pine heath forest",
+      "Value": "Lichen pine heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4730,7 +4730,7 @@
     },
     {
       "Id": 316,
-      "Name": "Grass heath forest",
+      "Value": "Grass heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4745,7 +4745,7 @@
     },
     {
       "Id": 317,
-      "Name": "Grass coniferous heath forest",
+      "Value": "Grass coniferous heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4760,7 +4760,7 @@
     },
     {
       "Id": 318,
-      "Name": "Grass spuce heath forest",
+      "Value": "Grass spuce heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4775,7 +4775,7 @@
     },
     {
       "Id": 319,
-      "Name": "Grass pine heath forest",
+      "Value": "Grass pine heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4790,7 +4790,7 @@
     },
     {
       "Id": 320,
-      "Name": "Grass mixed heath forest",
+      "Value": "Grass mixed heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4805,7 +4805,7 @@
     },
     {
       "Id": 321,
-      "Name": "Grass deciduous heath forest",
+      "Value": "Grass deciduous heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4820,7 +4820,7 @@
     },
     {
       "Id": 322,
-      "Name": "Grass oak heath forest",
+      "Value": "Grass oak heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4835,7 +4835,7 @@
     },
     {
       "Id": 323,
-      "Name": "Grass beech heath forest",
+      "Value": "Grass beech heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4850,7 +4850,7 @@
     },
     {
       "Id": 324,
-      "Name": "Grass trivial deciduous heath forest",
+      "Value": "Grass trivial deciduous heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4865,7 +4865,7 @@
     },
     {
       "Id": 325,
-      "Name": "Grass birch heath forest",
+      "Value": "Grass birch heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4880,7 +4880,7 @@
     },
     {
       "Id": 326,
-      "Name": "Grass aspen heath forest",
+      "Value": "Grass aspen heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4895,7 +4895,7 @@
     },
     {
       "Id": 327,
-      "Name": "Blueberry/heather heath forest",
+      "Value": "Blueberry/heather heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4910,7 +4910,7 @@
     },
     {
       "Id": 328,
-      "Name": "Blueberry coniferous forest",
+      "Value": "Blueberry coniferous forest",
       "Localized": true,
       "Translations": [
         {
@@ -4925,7 +4925,7 @@
     },
     {
       "Id": 329,
-      "Name": "Blueberry spruce forest",
+      "Value": "Blueberry spruce forest",
       "Localized": true,
       "Translations": [
         {
@@ -4940,7 +4940,7 @@
     },
     {
       "Id": 330,
-      "Name": "Lingonberry pine forest",
+      "Value": "Lingonberry pine forest",
       "Localized": true,
       "Translations": [
         {
@@ -4955,7 +4955,7 @@
     },
     {
       "Id": 331,
-      "Name": "Blueberry mixed forest",
+      "Value": "Blueberry mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -4970,7 +4970,7 @@
     },
     {
       "Id": 332,
-      "Name": "Blueberry deciduous heath forest",
+      "Value": "Blueberry deciduous heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -4985,7 +4985,7 @@
     },
     {
       "Id": 333,
-      "Name": "Blueberry oak heath forest",
+      "Value": "Blueberry oak heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -5000,7 +5000,7 @@
     },
     {
       "Id": 334,
-      "Name": "Blueberry beech heath forest",
+      "Value": "Blueberry beech heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -5015,7 +5015,7 @@
     },
     {
       "Id": 335,
-      "Name": "Blueberry trivial deciduous heath forest",
+      "Value": "Blueberry trivial deciduous heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -5030,7 +5030,7 @@
     },
     {
       "Id": 336,
-      "Name": "Blueberry/heather birch heath forest",
+      "Value": "Blueberry/heather birch heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -5045,7 +5045,7 @@
     },
     {
       "Id": 337,
-      "Name": "Blueberry/heather aspen heath forest",
+      "Value": "Blueberry/heather aspen heath forest",
       "Localized": true,
       "Translations": [
         {
@@ -5060,7 +5060,7 @@
     },
     {
       "Id": 338,
-      "Name": "Herb-rich forest",
+      "Value": "Herb-rich forest",
       "Localized": true,
       "Translations": [
         {
@@ -5075,7 +5075,7 @@
     },
     {
       "Id": 339,
-      "Name": "Herb-rich coniferous forest",
+      "Value": "Herb-rich coniferous forest",
       "Localized": true,
       "Translations": [
         {
@@ -5090,7 +5090,7 @@
     },
     {
       "Id": 340,
-      "Name": "Herb-rich spruce forest",
+      "Value": "Herb-rich spruce forest",
       "Localized": true,
       "Translations": [
         {
@@ -5105,7 +5105,7 @@
     },
     {
       "Id": 341,
-      "Name": "Herb-rich pine forest",
+      "Value": "Herb-rich pine forest",
       "Localized": true,
       "Translations": [
         {
@@ -5120,7 +5120,7 @@
     },
     {
       "Id": 342,
-      "Name": "Herb-rich mixed forest",
+      "Value": "Herb-rich mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -5135,7 +5135,7 @@
     },
     {
       "Id": 343,
-      "Name": "Herb-rich deciduous forest",
+      "Value": "Herb-rich deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -5150,7 +5150,7 @@
     },
     {
       "Id": 344,
-      "Name": "Herb-rich broadleaved forest",
+      "Value": "Herb-rich broadleaved forest",
       "Localized": true,
       "Translations": [
         {
@@ -5165,7 +5165,7 @@
     },
     {
       "Id": 345,
-      "Name": "Herb-rich oak forest",
+      "Value": "Herb-rich oak forest",
       "Localized": true,
       "Translations": [
         {
@@ -5180,7 +5180,7 @@
     },
     {
       "Id": 346,
-      "Name": "Herb-rich beech forest",
+      "Value": "Herb-rich beech forest",
       "Localized": true,
       "Translations": [
         {
@@ -5195,7 +5195,7 @@
     },
     {
       "Id": 347,
-      "Name": "Herb-rich ash forest",
+      "Value": "Herb-rich ash forest",
       "Localized": true,
       "Translations": [
         {
@@ -5210,7 +5210,7 @@
     },
     {
       "Id": 348,
-      "Name": "Herb-rich elm forest",
+      "Value": "Herb-rich elm forest",
       "Localized": true,
       "Translations": [
         {
@@ -5225,7 +5225,7 @@
     },
     {
       "Id": 349,
-      "Name": "Herb-rich tivial deciduous forest",
+      "Value": "Herb-rich tivial deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -5240,7 +5240,7 @@
     },
     {
       "Id": 350,
-      "Name": "Herb-rich birch forest",
+      "Value": "Herb-rich birch forest",
       "Localized": true,
       "Translations": [
         {
@@ -5255,7 +5255,7 @@
     },
     {
       "Id": 351,
-      "Name": "Herb-rich alder forest",
+      "Value": "Herb-rich alder forest",
       "Localized": true,
       "Translations": [
         {
@@ -5270,7 +5270,7 @@
     },
     {
       "Id": 352,
-      "Name": "Herb-rich aspen forest",
+      "Value": "Herb-rich aspen forest",
       "Localized": true,
       "Translations": [
         {
@@ -5285,7 +5285,7 @@
     },
     {
       "Id": 353,
-      "Name": "Low-herb forest",
+      "Value": "Low-herb forest",
       "Localized": true,
       "Translations": [
         {
@@ -5300,7 +5300,7 @@
     },
     {
       "Id": 354,
-      "Name": "Low-herb coniferous forest",
+      "Value": "Low-herb coniferous forest",
       "Localized": true,
       "Translations": [
         {
@@ -5315,7 +5315,7 @@
     },
     {
       "Id": 355,
-      "Name": "Low-herb spruce forest",
+      "Value": "Low-herb spruce forest",
       "Localized": true,
       "Translations": [
         {
@@ -5330,7 +5330,7 @@
     },
     {
       "Id": 356,
-      "Name": "Low-herb pine forest",
+      "Value": "Low-herb pine forest",
       "Localized": true,
       "Translations": [
         {
@@ -5345,7 +5345,7 @@
     },
     {
       "Id": 357,
-      "Name": "Low-herb mixed forest",
+      "Value": "Low-herb mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -5360,7 +5360,7 @@
     },
     {
       "Id": 358,
-      "Name": "Low-herb deciduous forest",
+      "Value": "Low-herb deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -5375,7 +5375,7 @@
     },
     {
       "Id": 359,
-      "Name": "Low-herb broadleaved forest",
+      "Value": "Low-herb broadleaved forest",
       "Localized": true,
       "Translations": [
         {
@@ -5390,7 +5390,7 @@
     },
     {
       "Id": 360,
-      "Name": "Low-herb oak forest",
+      "Value": "Low-herb oak forest",
       "Localized": true,
       "Translations": [
         {
@@ -5405,7 +5405,7 @@
     },
     {
       "Id": 361,
-      "Name": "Low-herb beech forest",
+      "Value": "Low-herb beech forest",
       "Localized": true,
       "Translations": [
         {
@@ -5420,7 +5420,7 @@
     },
     {
       "Id": 362,
-      "Name": "Low-herb ash forest",
+      "Value": "Low-herb ash forest",
       "Localized": true,
       "Translations": [
         {
@@ -5435,7 +5435,7 @@
     },
     {
       "Id": 363,
-      "Name": "Low-herb elm forest",
+      "Value": "Low-herb elm forest",
       "Localized": true,
       "Translations": [
         {
@@ -5450,7 +5450,7 @@
     },
     {
       "Id": 364,
-      "Name": "Tall-herb forest",
+      "Value": "Tall-herb forest",
       "Localized": true,
       "Translations": [
         {
@@ -5465,7 +5465,7 @@
     },
     {
       "Id": 365,
-      "Name": "Tall-herb coniferous forest",
+      "Value": "Tall-herb coniferous forest",
       "Localized": true,
       "Translations": [
         {
@@ -5480,7 +5480,7 @@
     },
     {
       "Id": 366,
-      "Name": "Tall-herb spruce forest",
+      "Value": "Tall-herb spruce forest",
       "Localized": true,
       "Translations": [
         {
@@ -5495,7 +5495,7 @@
     },
     {
       "Id": 367,
-      "Name": "Tall-herb pine forest",
+      "Value": "Tall-herb pine forest",
       "Localized": true,
       "Translations": [
         {
@@ -5510,7 +5510,7 @@
     },
     {
       "Id": 368,
-      "Name": "Tall-herb mixed forest",
+      "Value": "Tall-herb mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -5525,7 +5525,7 @@
     },
     {
       "Id": 369,
-      "Name": "Tall-herb deciduous forest",
+      "Value": "Tall-herb deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -5540,7 +5540,7 @@
     },
     {
       "Id": 370,
-      "Name": "Tall-herb broadleaved forest",
+      "Value": "Tall-herb broadleaved forest",
       "Localized": true,
       "Translations": [
         {
@@ -5555,7 +5555,7 @@
     },
     {
       "Id": 371,
-      "Name": "Tall-herb oak forest",
+      "Value": "Tall-herb oak forest",
       "Localized": true,
       "Translations": [
         {
@@ -5570,7 +5570,7 @@
     },
     {
       "Id": 372,
-      "Name": "Tall-herb beech forest",
+      "Value": "Tall-herb beech forest",
       "Localized": true,
       "Translations": [
         {
@@ -5585,7 +5585,7 @@
     },
     {
       "Id": 373,
-      "Name": "Tall-herb ash forest",
+      "Value": "Tall-herb ash forest",
       "Localized": true,
       "Translations": [
         {
@@ -5600,7 +5600,7 @@
     },
     {
       "Id": 374,
-      "Name": "Tall-herb elm forest",
+      "Value": "Tall-herb elm forest",
       "Localized": true,
       "Translations": [
         {
@@ -5615,7 +5615,7 @@
     },
     {
       "Id": 375,
-      "Name": "Subalpine forest",
+      "Value": "Subalpine forest",
       "Localized": true,
       "Translations": [
         {
@@ -5630,7 +5630,7 @@
     },
     {
       "Id": 376,
-      "Name": "Mixed subalpine forest",
+      "Value": "Mixed subalpine forest",
       "Localized": true,
       "Translations": [
         {
@@ -5645,7 +5645,7 @@
     },
     {
       "Id": 377,
-      "Name": "Mountain birch forest",
+      "Value": "Mountain birch forest",
       "Localized": true,
       "Translations": [
         {
@@ -5660,7 +5660,7 @@
     },
     {
       "Id": 378,
-      "Name": "Dry subalpine forest",
+      "Value": "Dry subalpine forest",
       "Localized": true,
       "Translations": [
         {
@@ -5675,7 +5675,7 @@
     },
     {
       "Id": 379,
-      "Name": "Dry subalpine mixed forest",
+      "Value": "Dry subalpine mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -5690,7 +5690,7 @@
     },
     {
       "Id": 380,
-      "Name": "Dry subalpine birch forest",
+      "Value": "Dry subalpine birch forest",
       "Localized": true,
       "Translations": [
         {
@@ -5705,7 +5705,7 @@
     },
     {
       "Id": 381,
-      "Name": "Low-herb subalpine forest",
+      "Value": "Low-herb subalpine forest",
       "Localized": true,
       "Translations": [
         {
@@ -5720,7 +5720,7 @@
     },
     {
       "Id": 382,
-      "Name": "Low-herb subalpine mixed forest",
+      "Value": "Low-herb subalpine mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -5735,7 +5735,7 @@
     },
     {
       "Id": 383,
-      "Name": "Low-herb subalpine birch forest",
+      "Value": "Low-herb subalpine birch forest",
       "Localized": true,
       "Translations": [
         {
@@ -5750,7 +5750,7 @@
     },
     {
       "Id": 384,
-      "Name": "Tall herb subalpine forest",
+      "Value": "Tall herb subalpine forest",
       "Localized": true,
       "Translations": [
         {
@@ -5765,7 +5765,7 @@
     },
     {
       "Id": 385,
-      "Name": "Tall-herb subalpine mixed forest",
+      "Value": "Tall-herb subalpine mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -5780,7 +5780,7 @@
     },
     {
       "Id": 386,
-      "Name": "Tall herb subalpine birch forest",
+      "Value": "Tall herb subalpine birch forest",
       "Localized": true,
       "Translations": [
         {
@@ -5795,7 +5795,7 @@
     },
     {
       "Id": 387,
-      "Name": "Swamp forest",
+      "Value": "Swamp forest",
       "Localized": true,
       "Translations": [
         {
@@ -5810,7 +5810,7 @@
     },
     {
       "Id": 388,
-      "Name": "Coniferous swamp forest",
+      "Value": "Coniferous swamp forest",
       "Localized": true,
       "Translations": [
         {
@@ -5825,7 +5825,7 @@
     },
     {
       "Id": 389,
-      "Name": "Spruce swamp forest",
+      "Value": "Spruce swamp forest",
       "Localized": true,
       "Translations": [
         {
@@ -5840,7 +5840,7 @@
     },
     {
       "Id": 390,
-      "Name": "Pine swamp forest",
+      "Value": "Pine swamp forest",
       "Localized": true,
       "Translations": [
         {
@@ -5855,7 +5855,7 @@
     },
     {
       "Id": 391,
-      "Name": "Mixed swamp forest",
+      "Value": "Mixed swamp forest",
       "Localized": true,
       "Translations": [
         {
@@ -5870,7 +5870,7 @@
     },
     {
       "Id": 392,
-      "Name": "Deciduous swamp forest",
+      "Value": "Deciduous swamp forest",
       "Localized": true,
       "Translations": [
         {
@@ -5885,7 +5885,7 @@
     },
     {
       "Id": 393,
-      "Name": "Broad-leaved swamp forest",
+      "Value": "Broad-leaved swamp forest",
       "Localized": true,
       "Translations": [
         {
@@ -5900,7 +5900,7 @@
     },
     {
       "Id": 394,
-      "Name": "Ash swamp forest",
+      "Value": "Ash swamp forest",
       "Localized": true,
       "Translations": [
         {
@@ -5915,7 +5915,7 @@
     },
     {
       "Id": 395,
-      "Name": "Birch swamp forest",
+      "Value": "Birch swamp forest",
       "Localized": true,
       "Translations": [
         {
@@ -5930,7 +5930,7 @@
     },
     {
       "Id": 396,
-      "Name": "Alder swamp forest",
+      "Value": "Alder swamp forest",
       "Localized": true,
       "Translations": [
         {
@@ -5945,7 +5945,7 @@
     },
     {
       "Id": 397,
-      "Name": "Land-upheavel forest",
+      "Value": "Land-upheavel forest",
       "Localized": true,
       "Translations": [
         {
@@ -5960,7 +5960,7 @@
     },
     {
       "Id": 398,
-      "Name": "Landupheavel mixed forest",
+      "Value": "Landupheavel mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -5975,7 +5975,7 @@
     },
     {
       "Id": 399,
-      "Name": "Land-upheaval deciduous forest",
+      "Value": "Land-upheaval deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -5990,7 +5990,7 @@
     },
     {
       "Id": 400,
-      "Name": "Land-upheaval trivial deciduous forest",
+      "Value": "Land-upheaval trivial deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -6005,7 +6005,7 @@
     },
     {
       "Id": 401,
-      "Name": "Land-upheaval birch forest",
+      "Value": "Land-upheaval birch forest",
       "Localized": true,
       "Translations": [
         {
@@ -6020,7 +6020,7 @@
     },
     {
       "Id": 402,
-      "Name": "Land-upheaval alder forest",
+      "Value": "Land-upheaval alder forest",
       "Localized": true,
       "Translations": [
         {
@@ -6035,7 +6035,7 @@
     },
     {
       "Id": 403,
-      "Name": "Flooded forest",
+      "Value": "Flooded forest",
       "Localized": true,
       "Translations": [
         {
@@ -6050,7 +6050,7 @@
     },
     {
       "Id": 404,
-      "Name": "Flooded spruce forest",
+      "Value": "Flooded spruce forest",
       "Localized": true,
       "Translations": [
         {
@@ -6065,7 +6065,7 @@
     },
     {
       "Id": 405,
-      "Name": "Flooded mixed forest",
+      "Value": "Flooded mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -6080,7 +6080,7 @@
     },
     {
       "Id": 406,
-      "Name": "Flooded deciduous forest",
+      "Value": "Flooded deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -6095,7 +6095,7 @@
     },
     {
       "Id": 407,
-      "Name": "Flooded broadleaved forest",
+      "Value": "Flooded broadleaved forest",
       "Localized": true,
       "Translations": [
         {
@@ -6110,7 +6110,7 @@
     },
     {
       "Id": 408,
-      "Name": "Flooded oak forest",
+      "Value": "Flooded oak forest",
       "Localized": true,
       "Translations": [
         {
@@ -6125,7 +6125,7 @@
     },
     {
       "Id": 409,
-      "Name": "Flooded ash forest",
+      "Value": "Flooded ash forest",
       "Localized": true,
       "Translations": [
         {
@@ -6140,7 +6140,7 @@
     },
     {
       "Id": 410,
-      "Name": "Flooded trivial deciduous forest",
+      "Value": "Flooded trivial deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -6155,7 +6155,7 @@
     },
     {
       "Id": 411,
-      "Name": "Flooded birch forest",
+      "Value": "Flooded birch forest",
       "Localized": true,
       "Translations": [
         {
@@ -6170,7 +6170,7 @@
     },
     {
       "Id": 412,
-      "Name": "Flooded alder forest",
+      "Value": "Flooded alder forest",
       "Localized": true,
       "Translations": [
         {
@@ -6185,7 +6185,7 @@
     },
     {
       "Id": 413,
-      "Name": "Wetland",
+      "Value": "Wetland",
       "Localized": true,
       "Translations": [
         {
@@ -6200,7 +6200,7 @@
     },
     {
       "Id": 414,
-      "Name": "Mire",
+      "Value": "Mire",
       "Localized": true,
       "Translations": [
         {
@@ -6215,7 +6215,7 @@
     },
     {
       "Id": 415,
-      "Name": "Raised bog",
+      "Value": "Raised bog",
       "Localized": true,
       "Translations": [
         {
@@ -6230,7 +6230,7 @@
     },
     {
       "Id": 416,
-      "Name": "Raised bog with pine",
+      "Value": "Raised bog with pine",
       "Localized": true,
       "Translations": [
         {
@@ -6245,7 +6245,7 @@
     },
     {
       "Id": 417,
-      "Name": "Raised bog with birch",
+      "Value": "Raised bog with birch",
       "Localized": true,
       "Translations": [
         {
@@ -6260,7 +6260,7 @@
     },
     {
       "Id": 418,
-      "Name": "Fen",
+      "Value": "Fen",
       "Localized": true,
       "Translations": [
         {
@@ -6275,7 +6275,7 @@
     },
     {
       "Id": 419,
-      "Name": "Fen with conifers",
+      "Value": "Fen with conifers",
       "Localized": true,
       "Translations": [
         {
@@ -6290,7 +6290,7 @@
     },
     {
       "Id": 420,
-      "Name": "Fen with spruce",
+      "Value": "Fen with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -6305,7 +6305,7 @@
     },
     {
       "Id": 421,
-      "Name": "Fen with pine",
+      "Value": "Fen with pine",
       "Localized": true,
       "Translations": [
         {
@@ -6320,7 +6320,7 @@
     },
     {
       "Id": 422,
-      "Name": "Fen with deciduous trees",
+      "Value": "Fen with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -6335,7 +6335,7 @@
     },
     {
       "Id": 423,
-      "Name": "Fen with broad-leaved trees",
+      "Value": "Fen with broad-leaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -6350,7 +6350,7 @@
     },
     {
       "Id": 424,
-      "Name": "Fen with ash",
+      "Value": "Fen with ash",
       "Localized": true,
       "Translations": [
         {
@@ -6365,7 +6365,7 @@
     },
     {
       "Id": 425,
-      "Name": "Fen with trivial deciduous trees",
+      "Value": "Fen with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -6380,7 +6380,7 @@
     },
     {
       "Id": 426,
-      "Name": "Fen with birch",
+      "Value": "Fen with birch",
       "Localized": true,
       "Translations": [
         {
@@ -6395,7 +6395,7 @@
     },
     {
       "Id": 427,
-      "Name": "Fen with alder",
+      "Value": "Fen with alder",
       "Localized": true,
       "Translations": [
         {
@@ -6410,7 +6410,7 @@
     },
     {
       "Id": 428,
-      "Name": "Fen with scrub",
+      "Value": "Fen with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -6425,7 +6425,7 @@
     },
     {
       "Id": 429,
-      "Name": "Fen with willow",
+      "Value": "Fen with willow",
       "Localized": true,
       "Translations": [
         {
@@ -6440,7 +6440,7 @@
     },
     {
       "Id": 430,
-      "Name": "Poor fen",
+      "Value": "Poor fen",
       "Localized": true,
       "Translations": [
         {
@@ -6455,7 +6455,7 @@
     },
     {
       "Id": 431,
-      "Name": "Poor fen with conifers",
+      "Value": "Poor fen with conifers",
       "Localized": true,
       "Translations": [
         {
@@ -6470,7 +6470,7 @@
     },
     {
       "Id": 432,
-      "Name": "Poor fen with spruce",
+      "Value": "Poor fen with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -6485,7 +6485,7 @@
     },
     {
       "Id": 433,
-      "Name": "Poor fen with pine",
+      "Value": "Poor fen with pine",
       "Localized": true,
       "Translations": [
         {
@@ -6500,7 +6500,7 @@
     },
     {
       "Id": 434,
-      "Name": "Poor fen with deciduous trees",
+      "Value": "Poor fen with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -6515,7 +6515,7 @@
     },
     {
       "Id": 435,
-      "Name": "Poor fen with trivial deciduous trees",
+      "Value": "Poor fen with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -6530,7 +6530,7 @@
     },
     {
       "Id": 436,
-      "Name": "Poor fen with birch",
+      "Value": "Poor fen with birch",
       "Localized": true,
       "Translations": [
         {
@@ -6545,7 +6545,7 @@
     },
     {
       "Id": 437,
-      "Name": "Poor fen with alder",
+      "Value": "Poor fen with alder",
       "Localized": true,
       "Translations": [
         {
@@ -6560,7 +6560,7 @@
     },
     {
       "Id": 438,
-      "Name": "Poor fen with scrub",
+      "Value": "Poor fen with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -6575,7 +6575,7 @@
     },
     {
       "Id": 439,
-      "Name": "Poor fen with willow",
+      "Value": "Poor fen with willow",
       "Localized": true,
       "Translations": [
         {
@@ -6590,7 +6590,7 @@
     },
     {
       "Id": 440,
-      "Name": "Intermediate fen",
+      "Value": "Intermediate fen",
       "Localized": true,
       "Translations": [
         {
@@ -6605,7 +6605,7 @@
     },
     {
       "Id": 441,
-      "Name": "Intermediate fen with conifers",
+      "Value": "Intermediate fen with conifers",
       "Localized": true,
       "Translations": [
         {
@@ -6620,7 +6620,7 @@
     },
     {
       "Id": 442,
-      "Name": "Intermediate fen with spruce",
+      "Value": "Intermediate fen with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -6635,7 +6635,7 @@
     },
     {
       "Id": 443,
-      "Name": "Intermediate fen with pine",
+      "Value": "Intermediate fen with pine",
       "Localized": true,
       "Translations": [
         {
@@ -6650,7 +6650,7 @@
     },
     {
       "Id": 444,
-      "Name": "Intermediate fen with deciduous trees",
+      "Value": "Intermediate fen with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -6665,7 +6665,7 @@
     },
     {
       "Id": 445,
-      "Name": "Intermediate fen with broadleaved trees",
+      "Value": "Intermediate fen with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -6680,7 +6680,7 @@
     },
     {
       "Id": 446,
-      "Name": "Intermediate fen with trivial deciduous trees",
+      "Value": "Intermediate fen with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -6695,7 +6695,7 @@
     },
     {
       "Id": 447,
-      "Name": "Intermediate fen with birch",
+      "Value": "Intermediate fen with birch",
       "Localized": true,
       "Translations": [
         {
@@ -6710,7 +6710,7 @@
     },
     {
       "Id": 448,
-      "Name": "Intermediate fen with alder",
+      "Value": "Intermediate fen with alder",
       "Localized": true,
       "Translations": [
         {
@@ -6725,7 +6725,7 @@
     },
     {
       "Id": 449,
-      "Name": "Intermediate fen with scrub",
+      "Value": "Intermediate fen with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -6740,7 +6740,7 @@
     },
     {
       "Id": 450,
-      "Name": "Intermediate fen with willow",
+      "Value": "Intermediate fen with willow",
       "Localized": true,
       "Translations": [
         {
@@ -6755,7 +6755,7 @@
     },
     {
       "Id": 451,
-      "Name": "Rich fen",
+      "Value": "Rich fen",
       "Localized": true,
       "Translations": [
         {
@@ -6770,7 +6770,7 @@
     },
     {
       "Id": 452,
-      "Name": "Rich fen with conifers",
+      "Value": "Rich fen with conifers",
       "Localized": true,
       "Translations": [
         {
@@ -6785,7 +6785,7 @@
     },
     {
       "Id": 453,
-      "Name": "Rich fen with spruce",
+      "Value": "Rich fen with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -6800,7 +6800,7 @@
     },
     {
       "Id": 454,
-      "Name": "Rich fen with pine",
+      "Value": "Rich fen with pine",
       "Localized": true,
       "Translations": [
         {
@@ -6815,7 +6815,7 @@
     },
     {
       "Id": 455,
-      "Name": "Rich fen with deciduous trees",
+      "Value": "Rich fen with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -6830,7 +6830,7 @@
     },
     {
       "Id": 456,
-      "Name": "Rich fen with broadleaved trees",
+      "Value": "Rich fen with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -6845,7 +6845,7 @@
     },
     {
       "Id": 457,
-      "Name": "Rich fen with trivial deciduous trees",
+      "Value": "Rich fen with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -6860,7 +6860,7 @@
     },
     {
       "Id": 458,
-      "Name": "Rich fen with birch",
+      "Value": "Rich fen with birch",
       "Localized": true,
       "Translations": [
         {
@@ -6875,7 +6875,7 @@
     },
     {
       "Id": 459,
-      "Name": "Rich fen with alder",
+      "Value": "Rich fen with alder",
       "Localized": true,
       "Translations": [
         {
@@ -6890,7 +6890,7 @@
     },
     {
       "Id": 460,
-      "Name": "Rich fen with scrub",
+      "Value": "Rich fen with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -6905,7 +6905,7 @@
     },
     {
       "Id": 461,
-      "Name": "Rich fen with willow",
+      "Value": "Rich fen with willow",
       "Localized": true,
       "Translations": [
         {
@@ -6920,7 +6920,7 @@
     },
     {
       "Id": 462,
-      "Name": "Extreme-rich fen",
+      "Value": "Extreme-rich fen",
       "Localized": true,
       "Translations": [
         {
@@ -6935,7 +6935,7 @@
     },
     {
       "Id": 463,
-      "Name": "Extreme-rich fen with conifers",
+      "Value": "Extreme-rich fen with conifers",
       "Localized": true,
       "Translations": [
         {
@@ -6950,7 +6950,7 @@
     },
     {
       "Id": 464,
-      "Name": "Extreme-rich fen with spruce",
+      "Value": "Extreme-rich fen with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -6965,7 +6965,7 @@
     },
     {
       "Id": 465,
-      "Name": "Extreme-rich fen with pine",
+      "Value": "Extreme-rich fen with pine",
       "Localized": true,
       "Translations": [
         {
@@ -6980,7 +6980,7 @@
     },
     {
       "Id": 466,
-      "Name": "Extreme-rich fen with deciduous trees",
+      "Value": "Extreme-rich fen with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -6995,7 +6995,7 @@
     },
     {
       "Id": 467,
-      "Name": "Extreme-rich fen with broadleaved trees",
+      "Value": "Extreme-rich fen with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -7010,7 +7010,7 @@
     },
     {
       "Id": 468,
-      "Name": "Extreme-rich fen with trivial deciduous trees",
+      "Value": "Extreme-rich fen with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -7025,7 +7025,7 @@
     },
     {
       "Id": 469,
-      "Name": "Extreme-rich fen with birch",
+      "Value": "Extreme-rich fen with birch",
       "Localized": true,
       "Translations": [
         {
@@ -7040,7 +7040,7 @@
     },
     {
       "Id": 470,
-      "Name": "Extreme-rich fen with alder",
+      "Value": "Extreme-rich fen with alder",
       "Localized": true,
       "Translations": [
         {
@@ -7055,7 +7055,7 @@
     },
     {
       "Id": 471,
-      "Name": "Extreme-rich fen with scrub",
+      "Value": "Extreme-rich fen with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -7070,7 +7070,7 @@
     },
     {
       "Id": 472,
-      "Name": "Extreme-rich fen with willow",
+      "Value": "Extreme-rich fen with willow",
       "Localized": true,
       "Translations": [
         {
@@ -7085,7 +7085,7 @@
     },
     {
       "Id": 473,
-      "Name": "Springfen",
+      "Value": "Springfen",
       "Localized": true,
       "Translations": [
         {
@@ -7100,7 +7100,7 @@
     },
     {
       "Id": 474,
-      "Name": "Aapa mire",
+      "Value": "Aapa mire",
       "Localized": true,
       "Translations": [
         {
@@ -7115,7 +7115,7 @@
     },
     {
       "Id": 475,
-      "Name": "Aapa mire with conifers",
+      "Value": "Aapa mire with conifers",
       "Localized": true,
       "Translations": [
         {
@@ -7130,7 +7130,7 @@
     },
     {
       "Id": 476,
-      "Name": "Aapa mire with spruce",
+      "Value": "Aapa mire with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -7145,7 +7145,7 @@
     },
     {
       "Id": 477,
-      "Name": "Aapa mire with pine",
+      "Value": "Aapa mire with pine",
       "Localized": true,
       "Translations": [
         {
@@ -7160,7 +7160,7 @@
     },
     {
       "Id": 478,
-      "Name": "Aapa mire with trivial deciduous trees",
+      "Value": "Aapa mire with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -7175,7 +7175,7 @@
     },
     {
       "Id": 479,
-      "Name": "Aapa mire with birch",
+      "Value": "Aapa mire with birch",
       "Localized": true,
       "Translations": [
         {
@@ -7190,7 +7190,7 @@
     },
     {
       "Id": 480,
-      "Name": "Aapa mire with alder",
+      "Value": "Aapa mire with alder",
       "Localized": true,
       "Translations": [
         {
@@ -7205,7 +7205,7 @@
     },
     {
       "Id": 481,
-      "Name": "Aapa mire with scrub",
+      "Value": "Aapa mire with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -7220,7 +7220,7 @@
     },
     {
       "Id": 482,
-      "Name": "Aapa mire with villow",
+      "Value": "Aapa mire with villow",
       "Localized": true,
       "Translations": [
         {
@@ -7235,7 +7235,7 @@
     },
     {
       "Id": 483,
-      "Name": "Mixed mire",
+      "Value": "Mixed mire",
       "Localized": true,
       "Translations": [
         {
@@ -7250,7 +7250,7 @@
     },
     {
       "Id": 484,
-      "Name": "Mixed mire with conifers",
+      "Value": "Mixed mire with conifers",
       "Localized": true,
       "Translations": [
         {
@@ -7265,7 +7265,7 @@
     },
     {
       "Id": 485,
-      "Name": "Mixed mire with spruce",
+      "Value": "Mixed mire with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -7280,7 +7280,7 @@
     },
     {
       "Id": 486,
-      "Name": "Mixed mire with pine",
+      "Value": "Mixed mire with pine",
       "Localized": true,
       "Translations": [
         {
@@ -7295,7 +7295,7 @@
     },
     {
       "Id": 487,
-      "Name": "Mixed mire with trivial deciduous trees",
+      "Value": "Mixed mire with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -7310,7 +7310,7 @@
     },
     {
       "Id": 488,
-      "Name": "Mixed mire with birch",
+      "Value": "Mixed mire with birch",
       "Localized": true,
       "Translations": [
         {
@@ -7325,7 +7325,7 @@
     },
     {
       "Id": 489,
-      "Name": "Mixed mire with alder",
+      "Value": "Mixed mire with alder",
       "Localized": true,
       "Translations": [
         {
@@ -7340,7 +7340,7 @@
     },
     {
       "Id": 490,
-      "Name": "Palsa mire",
+      "Value": "Palsa mire",
       "Localized": true,
       "Translations": [
         {
@@ -7355,7 +7355,7 @@
     },
     {
       "Id": 491,
-      "Name": "Shore wetland",
+      "Value": "Shore wetland",
       "Localized": true,
       "Translations": [
         {
@@ -7370,7 +7370,7 @@
     },
     {
       "Id": 492,
-      "Name": "Freshwater shore wetland",
+      "Value": "Freshwater shore wetland",
       "Localized": true,
       "Translations": [
         {
@@ -7385,7 +7385,7 @@
     },
     {
       "Id": 493,
-      "Name": "Freshwater shore fen",
+      "Value": "Freshwater shore fen",
       "Localized": true,
       "Translations": [
         {
@@ -7400,7 +7400,7 @@
     },
     {
       "Id": 494,
-      "Name": "Quagmire",
+      "Value": "Quagmire",
       "Localized": true,
       "Translations": [
         {
@@ -7415,7 +7415,7 @@
     },
     {
       "Id": 495,
-      "Name": "Marine shore wetland",
+      "Value": "Marine shore wetland",
       "Localized": true,
       "Translations": [
         {
@@ -7430,7 +7430,7 @@
     },
     {
       "Id": 496,
-      "Name": "Non shore wetland",
+      "Value": "Non shore wetland",
       "Localized": true,
       "Translations": [
         {
@@ -7445,7 +7445,7 @@
     },
     {
       "Id": 497,
-      "Name": "Alpine wetland",
+      "Value": "Alpine wetland",
       "Localized": true,
       "Translations": [
         {
@@ -7460,7 +7460,7 @@
     },
     {
       "Id": 498,
-      "Name": "Alpine slope fen",
+      "Value": "Alpine slope fen",
       "Localized": true,
       "Translations": [
         {
@@ -7475,7 +7475,7 @@
     },
     {
       "Id": 499,
-      "Name": "Ponds",
+      "Value": "Ponds",
       "Localized": true,
       "Translations": [
         {
@@ -7490,7 +7490,7 @@
     },
     {
       "Id": 500,
-      "Name": "Ponds in agricultural landscape",
+      "Value": "Ponds in agricultural landscape",
       "Localized": true,
       "Translations": [
         {
@@ -7505,7 +7505,7 @@
     },
     {
       "Id": 501,
-      "Name": "Ponds in forest",
+      "Value": "Ponds in forest",
       "Localized": true,
       "Translations": [
         {
@@ -7520,7 +7520,7 @@
     },
     {
       "Id": 502,
-      "Name": "Mountain ponds",
+      "Value": "Mountain ponds",
       "Localized": true,
       "Translations": [
         {
@@ -7535,7 +7535,7 @@
     },
     {
       "Id": 503,
-      "Name": "Spring",
+      "Value": "Spring",
       "Localized": true,
       "Translations": [
         {
@@ -7550,7 +7550,7 @@
     },
     {
       "Id": 504,
-      "Name": "Rock pool",
+      "Value": "Rock pool",
       "Localized": true,
       "Translations": [
         {
@@ -7565,7 +7565,7 @@
     },
     {
       "Id": 505,
-      "Name": "Temporary forest pond",
+      "Value": "Temporary forest pond",
       "Localized": true,
       "Translations": [
         {
@@ -7580,7 +7580,7 @@
     },
     {
       "Id": 506,
-      "Name": "Temporary calcareous pond",
+      "Value": "Temporary calcareous pond",
       "Localized": true,
       "Translations": [
         {
@@ -7595,7 +7595,7 @@
     },
     {
       "Id": 507,
-      "Name": "Lake",
+      "Value": "Lake",
       "Localized": true,
       "Translations": [
         {
@@ -7610,7 +7610,7 @@
     },
     {
       "Id": 508,
-      "Name": "Lake bottom",
+      "Value": "Lake bottom",
       "Localized": true,
       "Translations": [
         {
@@ -7625,7 +7625,7 @@
     },
     {
       "Id": 509,
-      "Name": "Lake shore bottom",
+      "Value": "Lake shore bottom",
       "Localized": true,
       "Translations": [
         {
@@ -7640,7 +7640,7 @@
     },
     {
       "Id": 510,
-      "Name": "Hard bottom shore in lakes",
+      "Value": "Hard bottom shore in lakes",
       "Localized": true,
       "Translations": [
         {
@@ -7655,7 +7655,7 @@
     },
     {
       "Id": 511,
-      "Name": "Hard bottom shore in oligotrophic lake",
+      "Value": "Hard bottom shore in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -7670,7 +7670,7 @@
     },
     {
       "Id": 512,
-      "Name": "Hard bottom shore in clear water lake",
+      "Value": "Hard bottom shore in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -7685,7 +7685,7 @@
     },
     {
       "Id": 513,
-      "Name": "Hard bottom shore in brown water lake",
+      "Value": "Hard bottom shore in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -7700,7 +7700,7 @@
     },
     {
       "Id": 514,
-      "Name": "Hard bottom shore in marl lake",
+      "Value": "Hard bottom shore in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -7715,7 +7715,7 @@
     },
     {
       "Id": 515,
-      "Name": "Hard bottom shore in Chara lake",
+      "Value": "Hard bottom shore in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -7730,7 +7730,7 @@
     },
     {
       "Id": 516,
-      "Name": "Hard bottom shore in mesotrophic lake",
+      "Value": "Hard bottom shore in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -7745,7 +7745,7 @@
     },
     {
       "Id": 517,
-      "Name": "Hard bottom shore in eutrophic lake",
+      "Value": "Hard bottom shore in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -7760,7 +7760,7 @@
     },
     {
       "Id": 518,
-      "Name": "Sandy bottom shore lakes",
+      "Value": "Sandy bottom shore lakes",
       "Localized": true,
       "Translations": [
         {
@@ -7775,7 +7775,7 @@
     },
     {
       "Id": 519,
-      "Name": "Sand/gravel bottom shore in oligotrophic lake",
+      "Value": "Sand/gravel bottom shore in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -7790,7 +7790,7 @@
     },
     {
       "Id": 520,
-      "Name": "Sand/gravel bottom shore in clear water lake",
+      "Value": "Sand/gravel bottom shore in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -7805,7 +7805,7 @@
     },
     {
       "Id": 521,
-      "Name": "Sand/gravel bottom shore in brown water lake",
+      "Value": "Sand/gravel bottom shore in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -7820,7 +7820,7 @@
     },
     {
       "Id": 522,
-      "Name": "Sand/gravle bottom shore in marl lake",
+      "Value": "Sand/gravle bottom shore in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -7835,7 +7835,7 @@
     },
     {
       "Id": 523,
-      "Name": "Sand/gravel bottom shore in Chara lake",
+      "Value": "Sand/gravel bottom shore in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -7850,7 +7850,7 @@
     },
     {
       "Id": 524,
-      "Name": "Sand/gravel bottom shore in mesotrophic lake",
+      "Value": "Sand/gravel bottom shore in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -7865,7 +7865,7 @@
     },
     {
       "Id": 525,
-      "Name": "Sand/gravel bottom shore in eutrophic lake",
+      "Value": "Sand/gravel bottom shore in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -7880,7 +7880,7 @@
     },
     {
       "Id": 526,
-      "Name": "Soft bottom shore in lakes",
+      "Value": "Soft bottom shore in lakes",
       "Localized": true,
       "Translations": [
         {
@@ -7895,7 +7895,7 @@
     },
     {
       "Id": 527,
-      "Name": "Soft bottom shore in oligotrophic lake",
+      "Value": "Soft bottom shore in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -7910,7 +7910,7 @@
     },
     {
       "Id": 528,
-      "Name": "Soft bottom shore in clear water lake",
+      "Value": "Soft bottom shore in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -7925,7 +7925,7 @@
     },
     {
       "Id": 529,
-      "Name": "Soft bottom shore in brown water lake",
+      "Value": "Soft bottom shore in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -7940,7 +7940,7 @@
     },
     {
       "Id": 530,
-      "Name": "Soft bottom shore in marl lake",
+      "Value": "Soft bottom shore in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -7955,7 +7955,7 @@
     },
     {
       "Id": 531,
-      "Name": "Soft bottom shore in Chara lake",
+      "Value": "Soft bottom shore in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -7970,7 +7970,7 @@
     },
     {
       "Id": 532,
-      "Name": "Soft bottom shore in mesotrophic lake",
+      "Value": "Soft bottom shore in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -7985,7 +7985,7 @@
     },
     {
       "Id": 533,
-      "Name": "Soft bottom shore in eutrophic lake",
+      "Value": "Soft bottom shore in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8000,7 +8000,7 @@
     },
     {
       "Id": 534,
-      "Name": "Shallow lake bottom",
+      "Value": "Shallow lake bottom",
       "Localized": true,
       "Translations": [
         {
@@ -8015,7 +8015,7 @@
     },
     {
       "Id": 535,
-      "Name": "Shallow lake hard bottom",
+      "Value": "Shallow lake hard bottom",
       "Localized": true,
       "Translations": [
         {
@@ -8030,7 +8030,7 @@
     },
     {
       "Id": 536,
-      "Name": "Shallow hard bottom in oligotrophic lake",
+      "Value": "Shallow hard bottom in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8045,7 +8045,7 @@
     },
     {
       "Id": 537,
-      "Name": "Shallow hard bottom in clear water lake",
+      "Value": "Shallow hard bottom in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8060,7 +8060,7 @@
     },
     {
       "Id": 538,
-      "Name": "Shallow hard bottom in brown water lake",
+      "Value": "Shallow hard bottom in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8075,7 +8075,7 @@
     },
     {
       "Id": 539,
-      "Name": "Shallow hard bottom in marl lake",
+      "Value": "Shallow hard bottom in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -8090,7 +8090,7 @@
     },
     {
       "Id": 540,
-      "Name": "Shallow hard bottom in Chara lake",
+      "Value": "Shallow hard bottom in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -8105,7 +8105,7 @@
     },
     {
       "Id": 541,
-      "Name": "Shallow hard bottom in mesotrophic lake",
+      "Value": "Shallow hard bottom in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8120,7 +8120,7 @@
     },
     {
       "Id": 542,
-      "Name": "Shallow hard bottom in eutrophic lake",
+      "Value": "Shallow hard bottom in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8135,7 +8135,7 @@
     },
     {
       "Id": 543,
-      "Name": "Shallow lake gravel bottom",
+      "Value": "Shallow lake gravel bottom",
       "Localized": true,
       "Translations": [
         {
@@ -8150,7 +8150,7 @@
     },
     {
       "Id": 544,
-      "Name": "Shallow sand/gravel bottom in oligotrophic lake",
+      "Value": "Shallow sand/gravel bottom in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8165,7 +8165,7 @@
     },
     {
       "Id": 545,
-      "Name": "Shallow sand/gravel bottom in clear water lake",
+      "Value": "Shallow sand/gravel bottom in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8180,7 +8180,7 @@
     },
     {
       "Id": 546,
-      "Name": "Shallow sand/gravel bottom in brown water lake",
+      "Value": "Shallow sand/gravel bottom in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8195,7 +8195,7 @@
     },
     {
       "Id": 547,
-      "Name": "Shallow sand/gravel bottom in marl lake",
+      "Value": "Shallow sand/gravel bottom in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -8210,7 +8210,7 @@
     },
     {
       "Id": 548,
-      "Name": "Shallow sand/gravel bottom in Chara lake",
+      "Value": "Shallow sand/gravel bottom in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -8225,7 +8225,7 @@
     },
     {
       "Id": 549,
-      "Name": "Shallow sand/gravel bottom in mesotrophic lake",
+      "Value": "Shallow sand/gravel bottom in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8240,7 +8240,7 @@
     },
     {
       "Id": 550,
-      "Name": "Shallow sand/gravel bottom in eutrophic lake",
+      "Value": "Shallow sand/gravel bottom in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8255,7 +8255,7 @@
     },
     {
       "Id": 551,
-      "Name": "Shallow lake soft bottom",
+      "Value": "Shallow lake soft bottom",
       "Localized": true,
       "Translations": [
         {
@@ -8270,7 +8270,7 @@
     },
     {
       "Id": 552,
-      "Name": "Shallow soft bottom in oligotrophic lake",
+      "Value": "Shallow soft bottom in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8285,7 +8285,7 @@
     },
     {
       "Id": 553,
-      "Name": "Shallow soft bottom in clear water lake",
+      "Value": "Shallow soft bottom in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8300,7 +8300,7 @@
     },
     {
       "Id": 554,
-      "Name": "Shallow soft bottom in brown water lake",
+      "Value": "Shallow soft bottom in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8315,7 +8315,7 @@
     },
     {
       "Id": 555,
-      "Name": "Shallow soft bottom in marl lake",
+      "Value": "Shallow soft bottom in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -8330,7 +8330,7 @@
     },
     {
       "Id": 556,
-      "Name": "Shallow soft bottom in Chara lake",
+      "Value": "Shallow soft bottom in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -8345,7 +8345,7 @@
     },
     {
       "Id": 557,
-      "Name": "Shallow soft bottom in mesotrophic lake",
+      "Value": "Shallow soft bottom in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8360,7 +8360,7 @@
     },
     {
       "Id": 558,
-      "Name": "Shallow soft bottom in eutrophic lake",
+      "Value": "Shallow soft bottom in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8375,7 +8375,7 @@
     },
     {
       "Id": 559,
-      "Name": "Deep lake bottom",
+      "Value": "Deep lake bottom",
       "Localized": true,
       "Translations": [
         {
@@ -8390,7 +8390,7 @@
     },
     {
       "Id": 560,
-      "Name": "Deep lake hard bottom",
+      "Value": "Deep lake hard bottom",
       "Localized": true,
       "Translations": [
         {
@@ -8405,7 +8405,7 @@
     },
     {
       "Id": 561,
-      "Name": "Deep hard bottom in oligotrophic lake",
+      "Value": "Deep hard bottom in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8420,7 +8420,7 @@
     },
     {
       "Id": 562,
-      "Name": "Deep hard bottom in clear water lake",
+      "Value": "Deep hard bottom in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8435,7 +8435,7 @@
     },
     {
       "Id": 563,
-      "Name": "Deep hard bottom in brown water lake",
+      "Value": "Deep hard bottom in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8450,7 +8450,7 @@
     },
     {
       "Id": 564,
-      "Name": "Deep hard bottom in marl lake",
+      "Value": "Deep hard bottom in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -8465,7 +8465,7 @@
     },
     {
       "Id": 565,
-      "Name": "Deep hard bottom in Chara lake",
+      "Value": "Deep hard bottom in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -8480,7 +8480,7 @@
     },
     {
       "Id": 566,
-      "Name": "Deep hard bottom in mesotrophic lake",
+      "Value": "Deep hard bottom in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8495,7 +8495,7 @@
     },
     {
       "Id": 567,
-      "Name": "Deep hard bottom in eutrophic lake",
+      "Value": "Deep hard bottom in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8510,7 +8510,7 @@
     },
     {
       "Id": 568,
-      "Name": "Deep lake gravel bottom",
+      "Value": "Deep lake gravel bottom",
       "Localized": true,
       "Translations": [
         {
@@ -8525,7 +8525,7 @@
     },
     {
       "Id": 569,
-      "Name": "Deep sand/gravel bottom in oligotrophic lake",
+      "Value": "Deep sand/gravel bottom in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8540,7 +8540,7 @@
     },
     {
       "Id": 570,
-      "Name": "Deep sand/gravel bottom in clear water lake",
+      "Value": "Deep sand/gravel bottom in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8555,7 +8555,7 @@
     },
     {
       "Id": 571,
-      "Name": "Deep sand/gravel bottom in brown water lake",
+      "Value": "Deep sand/gravel bottom in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8570,7 +8570,7 @@
     },
     {
       "Id": 572,
-      "Name": "Deep sand/gravel bottom in marl lake",
+      "Value": "Deep sand/gravel bottom in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -8585,7 +8585,7 @@
     },
     {
       "Id": 573,
-      "Name": "Deep sand/gravel bottom in Chara lake",
+      "Value": "Deep sand/gravel bottom in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -8600,7 +8600,7 @@
     },
     {
       "Id": 574,
-      "Name": "Deep sand/gravel bottom in mesotrophic lake",
+      "Value": "Deep sand/gravel bottom in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8615,7 +8615,7 @@
     },
     {
       "Id": 575,
-      "Name": "Deep sand/gravel bottom in eutrophic lake",
+      "Value": "Deep sand/gravel bottom in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8630,7 +8630,7 @@
     },
     {
       "Id": 576,
-      "Name": "Deep lake soft bottom",
+      "Value": "Deep lake soft bottom",
       "Localized": true,
       "Translations": [
         {
@@ -8645,7 +8645,7 @@
     },
     {
       "Id": 577,
-      "Name": "Deep soft bottom in oligotrophic lake",
+      "Value": "Deep soft bottom in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8660,7 +8660,7 @@
     },
     {
       "Id": 578,
-      "Name": "Deep soft bottom in clear water lake",
+      "Value": "Deep soft bottom in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8675,7 +8675,7 @@
     },
     {
       "Id": 579,
-      "Name": "Deep soft bottom in brown water lake",
+      "Value": "Deep soft bottom in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8690,7 +8690,7 @@
     },
     {
       "Id": 580,
-      "Name": "Deep soft bottom in marl lake",
+      "Value": "Deep soft bottom in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -8705,7 +8705,7 @@
     },
     {
       "Id": 581,
-      "Name": "Deep soft bottom in Chara lake",
+      "Value": "Deep soft bottom in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -8720,7 +8720,7 @@
     },
     {
       "Id": 582,
-      "Name": "Deep soft bottom in mesotrophic lake",
+      "Value": "Deep soft bottom in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8735,7 +8735,7 @@
     },
     {
       "Id": 583,
-      "Name": "Deep soft bottom in eutrophic lake",
+      "Value": "Deep soft bottom in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8750,7 +8750,7 @@
     },
     {
       "Id": 584,
-      "Name": "Lake water",
+      "Value": "Lake water",
       "Localized": true,
       "Translations": [
         {
@@ -8765,7 +8765,7 @@
     },
     {
       "Id": 585,
-      "Name": "Shallow lake water",
+      "Value": "Shallow lake water",
       "Localized": true,
       "Translations": [
         {
@@ -8780,7 +8780,7 @@
     },
     {
       "Id": 586,
-      "Name": "Shallow water in oligotrophic lake",
+      "Value": "Shallow water in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8795,7 +8795,7 @@
     },
     {
       "Id": 587,
-      "Name": "Shallow water in clear water lake",
+      "Value": "Shallow water in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8810,7 +8810,7 @@
     },
     {
       "Id": 588,
-      "Name": "Shallow water in brown water lake",
+      "Value": "Shallow water in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8825,7 +8825,7 @@
     },
     {
       "Id": 589,
-      "Name": "Shallow water in marl lake",
+      "Value": "Shallow water in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -8840,7 +8840,7 @@
     },
     {
       "Id": 590,
-      "Name": "Shallow water in Chara lake",
+      "Value": "Shallow water in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -8855,7 +8855,7 @@
     },
     {
       "Id": 591,
-      "Name": "Shallow water in mesotrophic lake",
+      "Value": "Shallow water in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8870,7 +8870,7 @@
     },
     {
       "Id": 592,
-      "Name": "Shallow water in eutrophic lake",
+      "Value": "Shallow water in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8885,7 +8885,7 @@
     },
     {
       "Id": 593,
-      "Name": "Deep lake water",
+      "Value": "Deep lake water",
       "Localized": true,
       "Translations": [
         {
@@ -8900,7 +8900,7 @@
     },
     {
       "Id": 594,
-      "Name": "Deep water in oligotrophic lake",
+      "Value": "Deep water in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8915,7 +8915,7 @@
     },
     {
       "Id": 595,
-      "Name": "Deep water in clear water lake",
+      "Value": "Deep water in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8930,7 +8930,7 @@
     },
     {
       "Id": 596,
-      "Name": "Deep water in brown water lake",
+      "Value": "Deep water in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -8945,7 +8945,7 @@
     },
     {
       "Id": 597,
-      "Name": "Deep water in marl lake",
+      "Value": "Deep water in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -8960,7 +8960,7 @@
     },
     {
       "Id": 598,
-      "Name": "Deep water in Chara lake",
+      "Value": "Deep water in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -8975,7 +8975,7 @@
     },
     {
       "Id": 599,
-      "Name": "Deep water in mesotrophic lake",
+      "Value": "Deep water in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -8990,7 +8990,7 @@
     },
     {
       "Id": 600,
-      "Name": "Deep water in eutrophic lake",
+      "Value": "Deep water in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -9005,7 +9005,7 @@
     },
     {
       "Id": 601,
-      "Name": "Lake surface",
+      "Value": "Lake surface",
       "Localized": true,
       "Translations": [
         {
@@ -9020,7 +9020,7 @@
     },
     {
       "Id": 602,
-      "Name": "Surface of oligotrophic lake",
+      "Value": "Surface of oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -9035,7 +9035,7 @@
     },
     {
       "Id": 603,
-      "Name": "Surface of clear water lake",
+      "Value": "Surface of clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -9050,7 +9050,7 @@
     },
     {
       "Id": 604,
-      "Name": "Surface of brown water lake",
+      "Value": "Surface of brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -9065,7 +9065,7 @@
     },
     {
       "Id": 605,
-      "Name": "Surface of marl lake",
+      "Value": "Surface of marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -9080,7 +9080,7 @@
     },
     {
       "Id": 606,
-      "Name": "Surface of Chara lake",
+      "Value": "Surface of Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -9095,7 +9095,7 @@
     },
     {
       "Id": 607,
-      "Name": "Surface of mesotrophic lake",
+      "Value": "Surface of mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -9110,7 +9110,7 @@
     },
     {
       "Id": 608,
-      "Name": "Surface of eutrophic lake",
+      "Value": "Surface of eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -9125,7 +9125,7 @@
     },
     {
       "Id": 609,
-      "Name": "Water course",
+      "Value": "Water course",
       "Localized": true,
       "Translations": [
         {
@@ -9140,7 +9140,7 @@
     },
     {
       "Id": 610,
-      "Name": "Bottom in water course",
+      "Value": "Bottom in water course",
       "Localized": true,
       "Translations": [
         {
@@ -9155,7 +9155,7 @@
     },
     {
       "Id": 611,
-      "Name": "Rock bottom in water course",
+      "Value": "Rock bottom in water course",
       "Localized": true,
       "Translations": [
         {
@@ -9170,7 +9170,7 @@
     },
     {
       "Id": 612,
-      "Name": "Rock bottom in river",
+      "Value": "Rock bottom in river",
       "Localized": true,
       "Translations": [
         {
@@ -9185,7 +9185,7 @@
     },
     {
       "Id": 613,
-      "Name": "Rock bottom in stream",
+      "Value": "Rock bottom in stream",
       "Localized": true,
       "Translations": [
         {
@@ -9200,7 +9200,7 @@
     },
     {
       "Id": 614,
-      "Name": "Rock bottom in brook",
+      "Value": "Rock bottom in brook",
       "Localized": true,
       "Translations": [
         {
@@ -9215,7 +9215,7 @@
     },
     {
       "Id": 615,
-      "Name": "Pebbly bottom in water course",
+      "Value": "Pebbly bottom in water course",
       "Localized": true,
       "Translations": [
         {
@@ -9230,7 +9230,7 @@
     },
     {
       "Id": 616,
-      "Name": "Pebbly bottom in river",
+      "Value": "Pebbly bottom in river",
       "Localized": true,
       "Translations": [
         {
@@ -9245,7 +9245,7 @@
     },
     {
       "Id": 617,
-      "Name": "Pebbly bottom in stream",
+      "Value": "Pebbly bottom in stream",
       "Localized": true,
       "Translations": [
         {
@@ -9260,7 +9260,7 @@
     },
     {
       "Id": 618,
-      "Name": "Pebbly bottom in brook",
+      "Value": "Pebbly bottom in brook",
       "Localized": true,
       "Translations": [
         {
@@ -9275,7 +9275,7 @@
     },
     {
       "Id": 619,
-      "Name": "Sandy bottom in water course",
+      "Value": "Sandy bottom in water course",
       "Localized": true,
       "Translations": [
         {
@@ -9290,7 +9290,7 @@
     },
     {
       "Id": 620,
-      "Name": "Sand/gravel bottom in river",
+      "Value": "Sand/gravel bottom in river",
       "Localized": true,
       "Translations": [
         {
@@ -9305,7 +9305,7 @@
     },
     {
       "Id": 621,
-      "Name": "Sand/gravel bottom in stream",
+      "Value": "Sand/gravel bottom in stream",
       "Localized": true,
       "Translations": [
         {
@@ -9320,7 +9320,7 @@
     },
     {
       "Id": 622,
-      "Name": "Sand/gravel bottom in brook",
+      "Value": "Sand/gravel bottom in brook",
       "Localized": true,
       "Translations": [
         {
@@ -9335,7 +9335,7 @@
     },
     {
       "Id": 623,
-      "Name": "Soft bottom in water course",
+      "Value": "Soft bottom in water course",
       "Localized": true,
       "Translations": [
         {
@@ -9350,7 +9350,7 @@
     },
     {
       "Id": 624,
-      "Name": "Soft bottom in river",
+      "Value": "Soft bottom in river",
       "Localized": true,
       "Translations": [
         {
@@ -9365,7 +9365,7 @@
     },
     {
       "Id": 625,
-      "Name": "Soft bottom in stream",
+      "Value": "Soft bottom in stream",
       "Localized": true,
       "Translations": [
         {
@@ -9380,7 +9380,7 @@
     },
     {
       "Id": 626,
-      "Name": "Soft bottom in brook",
+      "Value": "Soft bottom in brook",
       "Localized": true,
       "Translations": [
         {
@@ -9395,7 +9395,7 @@
     },
     {
       "Id": 627,
-      "Name": "Water in water course",
+      "Value": "Water in water course",
       "Localized": true,
       "Translations": [
         {
@@ -9410,7 +9410,7 @@
     },
     {
       "Id": 628,
-      "Name": "Water in river",
+      "Value": "Water in river",
       "Localized": true,
       "Translations": [
         {
@@ -9425,7 +9425,7 @@
     },
     {
       "Id": 629,
-      "Name": "Water in stream",
+      "Value": "Water in stream",
       "Localized": true,
       "Translations": [
         {
@@ -9440,7 +9440,7 @@
     },
     {
       "Id": 630,
-      "Name": "Water in brook",
+      "Value": "Water in brook",
       "Localized": true,
       "Translations": [
         {
@@ -9455,7 +9455,7 @@
     },
     {
       "Id": 631,
-      "Name": "Surface of water course",
+      "Value": "Surface of water course",
       "Localized": true,
       "Translations": [
         {
@@ -9470,7 +9470,7 @@
     },
     {
       "Id": 632,
-      "Name": "Surface of river",
+      "Value": "Surface of river",
       "Localized": true,
       "Translations": [
         {
@@ -9485,7 +9485,7 @@
     },
     {
       "Id": 633,
-      "Name": "Surface of stream",
+      "Value": "Surface of stream",
       "Localized": true,
       "Translations": [
         {
@@ -9500,7 +9500,7 @@
     },
     {
       "Id": 634,
-      "Name": "Surface of brook",
+      "Value": "Surface of brook",
       "Localized": true,
       "Translations": [
         {
@@ -9515,7 +9515,7 @@
     },
     {
       "Id": 635,
-      "Name": "Sea",
+      "Value": "Sea",
       "Localized": true,
       "Translations": [
         {
@@ -9530,7 +9530,7 @@
     },
     {
       "Id": 636,
-      "Name": "Sea bottom",
+      "Value": "Sea bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9545,7 +9545,7 @@
     },
     {
       "Id": 637,
-      "Name": "Shallow sea bottom",
+      "Value": "Shallow sea bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9560,7 +9560,7 @@
     },
     {
       "Id": 638,
-      "Name": "Shallow sea hard bottom",
+      "Value": "Shallow sea hard bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9575,7 +9575,7 @@
     },
     {
       "Id": 639,
-      "Name": "Shallow sea rock bottom",
+      "Value": "Shallow sea rock bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9590,7 +9590,7 @@
     },
     {
       "Id": 640,
-      "Name": "Shallow sea boulder bottom",
+      "Value": "Shallow sea boulder bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9605,7 +9605,7 @@
     },
     {
       "Id": 641,
-      "Name": "Shallow sea hard clay bottom",
+      "Value": "Shallow sea hard clay bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9620,7 +9620,7 @@
     },
     {
       "Id": 642,
-      "Name": "Shallow sea hard organic bottom",
+      "Value": "Shallow sea hard organic bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9635,7 +9635,7 @@
     },
     {
       "Id": 643,
-      "Name": "Shallow sea hard artificial bottom",
+      "Value": "Shallow sea hard artificial bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9650,7 +9650,7 @@
     },
     {
       "Id": 644,
-      "Name": "Shallow sea soft bottom",
+      "Value": "Shallow sea soft bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9665,7 +9665,7 @@
     },
     {
       "Id": 645,
-      "Name": "Shallow sea gravel bottom",
+      "Value": "Shallow sea gravel bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9680,7 +9680,7 @@
     },
     {
       "Id": 646,
-      "Name": "Shallow sea sandy bottom",
+      "Value": "Shallow sea sandy bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9695,7 +9695,7 @@
     },
     {
       "Id": 647,
-      "Name": "Shallow sea soft clay bottom",
+      "Value": "Shallow sea soft clay bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9710,7 +9710,7 @@
     },
     {
       "Id": 648,
-      "Name": "Shallow sea mixed bottom",
+      "Value": "Shallow sea mixed bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9725,7 +9725,7 @@
     },
     {
       "Id": 649,
-      "Name": "Shallow sea mud bottom",
+      "Value": "Shallow sea mud bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9740,7 +9740,7 @@
     },
     {
       "Id": 650,
-      "Name": "Shallow sea shell gravel bottom",
+      "Value": "Shallow sea shell gravel bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9755,7 +9755,7 @@
     },
     {
       "Id": 651,
-      "Name": "Shallow gas features",
+      "Value": "Shallow gas features",
       "Localized": true,
       "Translations": [
         {
@@ -9770,7 +9770,7 @@
     },
     {
       "Id": 652,
-      "Name": "Deep sea bottom",
+      "Value": "Deep sea bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9785,7 +9785,7 @@
     },
     {
       "Id": 653,
-      "Name": "Deep sea hard bottom",
+      "Value": "Deep sea hard bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9800,7 +9800,7 @@
     },
     {
       "Id": 654,
-      "Name": "Deep sea rock bottom",
+      "Value": "Deep sea rock bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9815,7 +9815,7 @@
     },
     {
       "Id": 655,
-      "Name": "Deep sea boulder bottom",
+      "Value": "Deep sea boulder bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9830,7 +9830,7 @@
     },
     {
       "Id": 656,
-      "Name": "Deep sea hard clay bottom",
+      "Value": "Deep sea hard clay bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9845,7 +9845,7 @@
     },
     {
       "Id": 657,
-      "Name": "Deep sea hard organic bottom",
+      "Value": "Deep sea hard organic bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9860,7 +9860,7 @@
     },
     {
       "Id": 658,
-      "Name": "Deep sea hard artificial bottom",
+      "Value": "Deep sea hard artificial bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9875,7 +9875,7 @@
     },
     {
       "Id": 659,
-      "Name": "Deep sea soft bottom",
+      "Value": "Deep sea soft bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9890,7 +9890,7 @@
     },
     {
       "Id": 660,
-      "Name": "Deep sea gravel bottom",
+      "Value": "Deep sea gravel bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9905,7 +9905,7 @@
     },
     {
       "Id": 661,
-      "Name": "Deep sea sandy bottom",
+      "Value": "Deep sea sandy bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9920,7 +9920,7 @@
     },
     {
       "Id": 662,
-      "Name": "Deep sea soft clay bottom",
+      "Value": "Deep sea soft clay bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9935,7 +9935,7 @@
     },
     {
       "Id": 663,
-      "Name": "Deepea mixed bottom",
+      "Value": "Deepea mixed bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9950,7 +9950,7 @@
     },
     {
       "Id": 664,
-      "Name": "Deep sea mud bottom",
+      "Value": "Deep sea mud bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9965,7 +9965,7 @@
     },
     {
       "Id": 665,
-      "Name": "Deep sea shell gravel bottom",
+      "Value": "Deep sea shell gravel bottom",
       "Localized": true,
       "Translations": [
         {
@@ -9980,7 +9980,7 @@
     },
     {
       "Id": 666,
-      "Name": "Deep gas features",
+      "Value": "Deep gas features",
       "Localized": true,
       "Translations": [
         {
@@ -9995,7 +9995,7 @@
     },
     {
       "Id": 667,
-      "Name": "Sea cave",
+      "Value": "Sea cave",
       "Localized": true,
       "Translations": [
         {
@@ -10010,7 +10010,7 @@
     },
     {
       "Id": 668,
-      "Name": "Sea water",
+      "Value": "Sea water",
       "Localized": true,
       "Translations": [
         {
@@ -10025,7 +10025,7 @@
     },
     {
       "Id": 669,
-      "Name": "Shallow sea water",
+      "Value": "Shallow sea water",
       "Localized": true,
       "Translations": [
         {
@@ -10040,7 +10040,7 @@
     },
     {
       "Id": 670,
-      "Name": "Deep sea water",
+      "Value": "Deep sea water",
       "Localized": true,
       "Translations": [
         {
@@ -10055,7 +10055,7 @@
     },
     {
       "Id": 671,
-      "Name": "Sea surface",
+      "Value": "Sea surface",
       "Localized": true,
       "Translations": [
         {
@@ -10070,7 +10070,7 @@
     },
     {
       "Id": 672,
-      "Name": "Artificial habitats",
+      "Value": "Artificial habitats",
       "Localized": true,
       "Translations": [
         {
@@ -10085,7 +10085,7 @@
     },
     {
       "Id": 673,
-      "Name": "Cultivated ground",
+      "Value": "Cultivated ground",
       "Localized": true,
       "Translations": [
         {
@@ -10100,7 +10100,7 @@
     },
     {
       "Id": 674,
-      "Name": "Open cultivation",
+      "Value": "Open cultivation",
       "Localized": true,
       "Translations": [
         {
@@ -10115,7 +10115,7 @@
     },
     {
       "Id": 675,
-      "Name": "Arable field",
+      "Value": "Arable field",
       "Localized": true,
       "Translations": [
         {
@@ -10130,7 +10130,7 @@
     },
     {
       "Id": 676,
-      "Name": "Ley",
+      "Value": "Ley",
       "Localized": true,
       "Translations": [
         {
@@ -10145,7 +10145,7 @@
     },
     {
       "Id": 677,
-      "Name": "Cultivated grassland",
+      "Value": "Cultivated grassland",
       "Localized": true,
       "Translations": [
         {
@@ -10160,7 +10160,7 @@
     },
     {
       "Id": 678,
-      "Name": "Tree/shrub plantation",
+      "Value": "Tree/shrub plantation",
       "Localized": true,
       "Translations": [
         {
@@ -10175,7 +10175,7 @@
     },
     {
       "Id": 679,
-      "Name": "Christmas tree plantation",
+      "Value": "Christmas tree plantation",
       "Localized": true,
       "Translations": [
         {
@@ -10190,7 +10190,7 @@
     },
     {
       "Id": 681,
-      "Name": "Energy scrub plantation",
+      "Value": "Energy scrub plantation",
       "Localized": true,
       "Translations": [
         {
@@ -10205,7 +10205,7 @@
     },
     {
       "Id": 682,
-      "Name": "Scrub plantation",
+      "Value": "Scrub plantation",
       "Localized": true,
       "Translations": [
         {
@@ -10220,7 +10220,7 @@
     },
     {
       "Id": 683,
-      "Name": "Willow plantation",
+      "Value": "Willow plantation",
       "Localized": true,
       "Translations": [
         {
@@ -10235,7 +10235,7 @@
     },
     {
       "Id": 684,
-      "Name": "Constructed ground / Construction site",
+      "Value": "Constructed ground / Construction site",
       "Localized": true,
       "Translations": [
         {
@@ -10250,7 +10250,7 @@
     },
     {
       "Id": 685,
-      "Name": "Terrestrial construction",
+      "Value": "Terrestrial construction",
       "Localized": true,
       "Translations": [
         {
@@ -10265,7 +10265,7 @@
     },
     {
       "Id": 686,
-      "Name": "Park",
+      "Value": "Park",
       "Localized": true,
       "Translations": [
         {
@@ -10280,7 +10280,7 @@
     },
     {
       "Id": 687,
-      "Name": "Park with conifers",
+      "Value": "Park with conifers",
       "Localized": true,
       "Translations": [
         {
@@ -10295,7 +10295,7 @@
     },
     {
       "Id": 688,
-      "Name": "Park with mixed trees",
+      "Value": "Park with mixed trees",
       "Localized": true,
       "Translations": [
         {
@@ -10310,7 +10310,7 @@
     },
     {
       "Id": 689,
-      "Name": "Park with deciduous trees",
+      "Value": "Park with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -10325,7 +10325,7 @@
     },
     {
       "Id": 690,
-      "Name": "Park with broadleaved trees",
+      "Value": "Park with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -10340,7 +10340,7 @@
     },
     {
       "Id": 691,
-      "Name": "Park with trivial deciduous trees",
+      "Value": "Park with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -10355,7 +10355,7 @@
     },
     {
       "Id": 692,
-      "Name": "Garden",
+      "Value": "Garden",
       "Localized": true,
       "Translations": [
         {
@@ -10370,7 +10370,7 @@
     },
     {
       "Id": 693,
-      "Name": "Alley",
+      "Value": "Alley",
       "Localized": true,
       "Translations": [
         {
@@ -10385,7 +10385,7 @@
     },
     {
       "Id": 694,
-      "Name": "Alley with conifers",
+      "Value": "Alley with conifers",
       "Localized": true,
       "Translations": [
         {
@@ -10400,7 +10400,7 @@
     },
     {
       "Id": 695,
-      "Name": "Alley with broadleaved trees",
+      "Value": "Alley with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -10415,7 +10415,7 @@
     },
     {
       "Id": 696,
-      "Name": "Alley with oak",
+      "Value": "Alley with oak",
       "Localized": true,
       "Translations": [
         {
@@ -10430,7 +10430,7 @@
     },
     {
       "Id": 697,
-      "Name": "Alley with beech",
+      "Value": "Alley with beech",
       "Localized": true,
       "Translations": [
         {
@@ -10445,7 +10445,7 @@
     },
     {
       "Id": 698,
-      "Name": "Alley with ash",
+      "Value": "Alley with ash",
       "Localized": true,
       "Translations": [
         {
@@ -10460,7 +10460,7 @@
     },
     {
       "Id": 699,
-      "Name": "Alley with elm",
+      "Value": "Alley with elm",
       "Localized": true,
       "Translations": [
         {
@@ -10475,7 +10475,7 @@
     },
     {
       "Id": 700,
-      "Name": "Alley with linden",
+      "Value": "Alley with linden",
       "Localized": true,
       "Translations": [
         {
@@ -10490,7 +10490,7 @@
     },
     {
       "Id": 701,
-      "Name": "Alley with trivial deciduoud trees",
+      "Value": "Alley with trivial deciduoud trees",
       "Localized": true,
       "Translations": [
         {
@@ -10505,7 +10505,7 @@
     },
     {
       "Id": 702,
-      "Name": "Alley with birch",
+      "Value": "Alley with birch",
       "Localized": true,
       "Translations": [
         {
@@ -10520,7 +10520,7 @@
     },
     {
       "Id": 703,
-      "Name": "Cemetery",
+      "Value": "Cemetery",
       "Localized": true,
       "Translations": [
         {
@@ -10535,7 +10535,7 @@
     },
     {
       "Id": 704,
-      "Name": "Cemetery with conifers",
+      "Value": "Cemetery with conifers",
       "Localized": true,
       "Translations": [
         {
@@ -10550,7 +10550,7 @@
     },
     {
       "Id": 705,
-      "Name": "Cemetery with mixed trees",
+      "Value": "Cemetery with mixed trees",
       "Localized": true,
       "Translations": [
         {
@@ -10565,7 +10565,7 @@
     },
     {
       "Id": 706,
-      "Name": "Cemetery with deciduous trees",
+      "Value": "Cemetery with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -10580,7 +10580,7 @@
     },
     {
       "Id": 707,
-      "Name": "Cemetery with broadleaved trees",
+      "Value": "Cemetery with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -10595,7 +10595,7 @@
     },
     {
       "Id": 708,
-      "Name": "Cemetery with trivial deciduous trees",
+      "Value": "Cemetery with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -10610,7 +10610,7 @@
     },
     {
       "Id": 709,
-      "Name": "Urban area",
+      "Value": "Urban area",
       "Localized": true,
       "Translations": [
         {
@@ -10625,7 +10625,7 @@
     },
     {
       "Id": 710,
-      "Name": "Alpine crowberry heath",
+      "Value": "Alpine crowberry heath",
       "Localized": true,
       "Translations": [
         {
@@ -10640,7 +10640,7 @@
     },
     {
       "Id": 711,
-      "Name": "Wetland ponds",
+      "Value": "Wetland ponds",
       "Localized": true,
       "Translations": [
         {
@@ -10655,7 +10655,7 @@
     },
     {
       "Id": 712,
-      "Name": "Industrial area",
+      "Value": "Industrial area",
       "Localized": true,
       "Translations": [
         {
@@ -10670,7 +10670,7 @@
     },
     {
       "Id": 713,
-      "Name": "Harbour",
+      "Value": "Harbour",
       "Localized": true,
       "Translations": [
         {
@@ -10685,7 +10685,7 @@
     },
     {
       "Id": 714,
-      "Name": "Factory",
+      "Value": "Factory",
       "Localized": true,
       "Translations": [
         {
@@ -10700,7 +10700,7 @@
     },
     {
       "Id": 715,
-      "Name": "Building",
+      "Value": "Building",
       "Localized": true,
       "Translations": [
         {
@@ -10715,7 +10715,7 @@
     },
     {
       "Id": 716,
-      "Name": "Gravel pit",
+      "Value": "Gravel pit",
       "Localized": true,
       "Translations": [
         {
@@ -10730,7 +10730,7 @@
     },
     {
       "Id": 717,
-      "Name": "Peat excavation",
+      "Value": "Peat excavation",
       "Localized": true,
       "Translations": [
         {
@@ -10745,7 +10745,7 @@
     },
     {
       "Id": 718,
-      "Name": "Mine",
+      "Value": "Mine",
       "Localized": true,
       "Translations": [
         {
@@ -10760,7 +10760,7 @@
     },
     {
       "Id": 719,
-      "Name": "Stone wall",
+      "Value": "Stone wall",
       "Localized": true,
       "Translations": [
         {
@@ -10775,7 +10775,7 @@
     },
     {
       "Id": 720,
-      "Name": "Ditch",
+      "Value": "Ditch",
       "Localized": true,
       "Translations": [
         {
@@ -10790,7 +10790,7 @@
     },
     {
       "Id": 721,
-      "Name": "Artificial pond",
+      "Value": "Artificial pond",
       "Localized": true,
       "Translations": [
         {
@@ -10805,7 +10805,7 @@
     },
     {
       "Id": 722,
-      "Name": "Channel",
+      "Value": "Channel",
       "Localized": true,
       "Translations": [
         {
@@ -10820,7 +10820,7 @@
     },
     {
       "Id": 723,
-      "Name": "Dam",
+      "Value": "Dam",
       "Localized": true,
       "Translations": [
         {
@@ -10835,7 +10835,7 @@
     },
     {
       "Id": 724,
-      "Name": "Road",
+      "Value": "Road",
       "Localized": true,
       "Translations": [
         {
@@ -10850,7 +10850,7 @@
     },
     {
       "Id": 725,
-      "Name": "Roadside",
+      "Value": "Roadside",
       "Localized": true,
       "Translations": [
         {
@@ -10865,7 +10865,7 @@
     },
     {
       "Id": 726,
-      "Name": "Embankment",
+      "Value": "Embankment",
       "Localized": true,
       "Translations": [
         {
@@ -10880,7 +10880,7 @@
     },
     {
       "Id": 727,
-      "Name": "Railway yard",
+      "Value": "Railway yard",
       "Localized": true,
       "Translations": [
         {
@@ -10895,7 +10895,7 @@
     },
     {
       "Id": 728,
-      "Name": "Dump",
+      "Value": "Dump",
       "Localized": true,
       "Translations": [
         {
@@ -10910,7 +10910,7 @@
     },
     {
       "Id": 729,
-      "Name": "Dross deposit",
+      "Value": "Dross deposit",
       "Localized": true,
       "Translations": [
         {
@@ -10925,7 +10925,7 @@
     },
     {
       "Id": 730,
-      "Name": "Garden waste",
+      "Value": "Garden waste",
       "Localized": true,
       "Translations": [
         {
@@ -10940,7 +10940,7 @@
     },
     {
       "Id": 731,
-      "Name": "Freshwater contruction",
+      "Value": "Freshwater contruction",
       "Localized": true,
       "Translations": [
         {
@@ -10955,7 +10955,7 @@
     },
     {
       "Id": 732,
-      "Name": "Artificial lake hard bottom",
+      "Value": "Artificial lake hard bottom",
       "Localized": true,
       "Translations": [
         {
@@ -10970,7 +10970,7 @@
     },
     {
       "Id": 733,
-      "Name": "Artificial riparian hard bottom",
+      "Value": "Artificial riparian hard bottom",
       "Localized": true,
       "Translations": [
         {
@@ -10985,7 +10985,7 @@
     },
     {
       "Id": 734,
-      "Name": "Marine construction",
+      "Value": "Marine construction",
       "Localized": true,
       "Translations": [
         {
@@ -11000,7 +11000,7 @@
     },
     {
       "Id": 735,
-      "Name": "Artificial marin hard bottom",
+      "Value": "Artificial marin hard bottom",
       "Localized": true,
       "Translations": [
         {
@@ -11015,7 +11015,7 @@
     },
     {
       "Id": 736,
-      "Name": "Residue ground",
+      "Value": "Residue ground",
       "Localized": true,
       "Translations": [
         {
@@ -11030,7 +11030,7 @@
     },
     {
       "Id": 737,
-      "Name": "Ruderal ground",
+      "Value": "Ruderal ground",
       "Localized": true,
       "Translations": [
         {
@@ -11045,7 +11045,7 @@
     },
     {
       "Id": 738,
-      "Name": "Abandoned industrial area",
+      "Value": "Abandoned industrial area",
       "Localized": true,
       "Translations": [
         {
@@ -11060,7 +11060,7 @@
     },
     {
       "Id": 739,
-      "Name": "Abandoned garden",
+      "Value": "Abandoned garden",
       "Localized": true,
       "Translations": [
         {
@@ -11075,7 +11075,7 @@
     },
     {
       "Id": 740,
-      "Name": "Infill",
+      "Value": "Infill",
       "Localized": true,
       "Translations": [
         {
@@ -11090,7 +11090,7 @@
     },
     {
       "Id": 741,
-      "Name": "Peat grave",
+      "Value": "Peat grave",
       "Localized": true,
       "Translations": [
         {
@@ -11105,7 +11105,7 @@
     },
     {
       "Id": 742,
-      "Name": "Lake classification",
+      "Value": "Lake classification",
       "Localized": true,
       "Translations": [
         {
@@ -11120,7 +11120,7 @@
     },
     {
       "Id": 743,
-      "Name": "Oligotrophic lake",
+      "Value": "Oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11135,7 +11135,7 @@
     },
     {
       "Id": 744,
-      "Name": "Lake shore in oligotrophic lake",
+      "Value": "Lake shore in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11150,7 +11150,7 @@
     },
     {
       "Id": 745,
-      "Name": "Shallow bottom in oligotrophic lake",
+      "Value": "Shallow bottom in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11165,7 +11165,7 @@
     },
     {
       "Id": 746,
-      "Name": "Deep bottom in oligotrophic lake",
+      "Value": "Deep bottom in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11180,7 +11180,7 @@
     },
     {
       "Id": 747,
-      "Name": "Water in oligotrophic lake",
+      "Value": "Water in oligotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11195,7 +11195,7 @@
     },
     {
       "Id": 749,
-      "Name": "Clear water lake",
+      "Value": "Clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -11210,7 +11210,7 @@
     },
     {
       "Id": 750,
-      "Name": "Lake shore in clear water lake",
+      "Value": "Lake shore in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -11225,7 +11225,7 @@
     },
     {
       "Id": 751,
-      "Name": "Shallow bottom in clear water lake",
+      "Value": "Shallow bottom in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -11240,7 +11240,7 @@
     },
     {
       "Id": 752,
-      "Name": "Deep bottom in clear water lake",
+      "Value": "Deep bottom in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -11255,7 +11255,7 @@
     },
     {
       "Id": 753,
-      "Name": "Water in clear water lake",
+      "Value": "Water in clear water lake",
       "Localized": true,
       "Translations": [
         {
@@ -11270,7 +11270,7 @@
     },
     {
       "Id": 755,
-      "Name": "Brown water lake",
+      "Value": "Brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -11285,7 +11285,7 @@
     },
     {
       "Id": 756,
-      "Name": "Lake shore in brown water lake",
+      "Value": "Lake shore in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -11300,7 +11300,7 @@
     },
     {
       "Id": 757,
-      "Name": "Shallow bottom in brown water lake",
+      "Value": "Shallow bottom in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -11315,7 +11315,7 @@
     },
     {
       "Id": 759,
-      "Name": "Deep bottom in brown water lake",
+      "Value": "Deep bottom in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -11330,7 +11330,7 @@
     },
     {
       "Id": 760,
-      "Name": "Water in brown water lake",
+      "Value": "Water in brown water lake",
       "Localized": true,
       "Translations": [
         {
@@ -11345,7 +11345,7 @@
     },
     {
       "Id": 762,
-      "Name": "Marl lake",
+      "Value": "Marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -11360,7 +11360,7 @@
     },
     {
       "Id": 763,
-      "Name": "Lake shore in marl lake",
+      "Value": "Lake shore in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -11375,7 +11375,7 @@
     },
     {
       "Id": 764,
-      "Name": "Shallow bottom in marl lake",
+      "Value": "Shallow bottom in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -11390,7 +11390,7 @@
     },
     {
       "Id": 765,
-      "Name": "Deep bottom in marl lake",
+      "Value": "Deep bottom in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -11405,7 +11405,7 @@
     },
     {
       "Id": 766,
-      "Name": "Water in marl lake",
+      "Value": "Water in marl lake",
       "Localized": true,
       "Translations": [
         {
@@ -11420,7 +11420,7 @@
     },
     {
       "Id": 768,
-      "Name": "Chara lake",
+      "Value": "Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -11435,7 +11435,7 @@
     },
     {
       "Id": 769,
-      "Name": "Lake shore in Chara lake",
+      "Value": "Lake shore in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -11450,7 +11450,7 @@
     },
     {
       "Id": 770,
-      "Name": "Shallow bottom in Chara lake",
+      "Value": "Shallow bottom in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -11465,7 +11465,7 @@
     },
     {
       "Id": 771,
-      "Name": "Deep bottom in Chara lake",
+      "Value": "Deep bottom in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -11480,7 +11480,7 @@
     },
     {
       "Id": 772,
-      "Name": "Water in Chara lake",
+      "Value": "Water in Chara lake",
       "Localized": true,
       "Translations": [
         {
@@ -11495,7 +11495,7 @@
     },
     {
       "Id": 774,
-      "Name": "Mesotrophic lake",
+      "Value": "Mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11510,7 +11510,7 @@
     },
     {
       "Id": 775,
-      "Name": "Lake shore in mesotrophic lake",
+      "Value": "Lake shore in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11525,7 +11525,7 @@
     },
     {
       "Id": 776,
-      "Name": "Shallow bottom in mesotrophic lake",
+      "Value": "Shallow bottom in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11540,7 +11540,7 @@
     },
     {
       "Id": 777,
-      "Name": "Deep bottom in mesotrophic lake",
+      "Value": "Deep bottom in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11555,7 +11555,7 @@
     },
     {
       "Id": 778,
-      "Name": "Water in mesotrophic lake",
+      "Value": "Water in mesotrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11570,7 +11570,7 @@
     },
     {
       "Id": 780,
-      "Name": "Eutrophic lake",
+      "Value": "Eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11585,7 +11585,7 @@
     },
     {
       "Id": 781,
-      "Name": "Lake shore in eutrophic lake",
+      "Value": "Lake shore in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11600,7 +11600,7 @@
     },
     {
       "Id": 782,
-      "Name": "Shallow bottom in eutrophic lake",
+      "Value": "Shallow bottom in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11615,7 +11615,7 @@
     },
     {
       "Id": 783,
-      "Name": "Deep bottom in eutrophic lake",
+      "Value": "Deep bottom in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11630,7 +11630,7 @@
     },
     {
       "Id": 784,
-      "Name": "Water in eutrophic lake",
+      "Value": "Water in eutrophic lake",
       "Localized": true,
       "Translations": [
         {
@@ -11645,7 +11645,7 @@
     },
     {
       "Id": 786,
-      "Name": "Water course classification",
+      "Value": "Water course classification",
       "Localized": true,
       "Translations": [
         {
@@ -11660,7 +11660,7 @@
     },
     {
       "Id": 787,
-      "Name": "River",
+      "Value": "River",
       "Localized": true,
       "Translations": [
         {
@@ -11675,7 +11675,7 @@
     },
     {
       "Id": 788,
-      "Name": "River bottom",
+      "Value": "River bottom",
       "Localized": true,
       "Translations": [
         {
@@ -11690,7 +11690,7 @@
     },
     {
       "Id": 791,
-      "Name": "Stream",
+      "Value": "Stream",
       "Localized": true,
       "Translations": [
         {
@@ -11705,7 +11705,7 @@
     },
     {
       "Id": 792,
-      "Name": "Stream bottom",
+      "Value": "Stream bottom",
       "Localized": true,
       "Translations": [
         {
@@ -11720,7 +11720,7 @@
     },
     {
       "Id": 795,
-      "Name": "Brook",
+      "Value": "Brook",
       "Localized": true,
       "Translations": [
         {
@@ -11735,7 +11735,7 @@
     },
     {
       "Id": 796,
-      "Name": "Brook bottom",
+      "Value": "Brook bottom",
       "Localized": true,
       "Translations": [
         {
@@ -11750,7 +11750,7 @@
     },
     {
       "Id": 799,
-      "Name": "Tree/Scrub",
+      "Value": "Tree/Scrub",
       "Localized": true,
       "Translations": [
         {
@@ -11765,7 +11765,7 @@
     },
     {
       "Id": 800,
-      "Name": "Conifers",
+      "Value": "Conifers",
       "Localized": true,
       "Translations": [
         {
@@ -11780,7 +11780,7 @@
     },
     {
       "Id": 801,
-      "Name": "Conifer forest",
+      "Value": "Conifer forest",
       "Localized": true,
       "Translations": [
         {
@@ -11795,7 +11795,7 @@
     },
     {
       "Id": 802,
-      "Name": "Wetland with conifers",
+      "Value": "Wetland with conifers",
       "Localized": true,
       "Translations": [
         {
@@ -11810,7 +11810,7 @@
     },
     {
       "Id": 803,
-      "Name": "Artificial ground with conifers",
+      "Value": "Artificial ground with conifers",
       "Localized": true,
       "Translations": [
         {
@@ -11825,7 +11825,7 @@
     },
     {
       "Id": 804,
-      "Name": "Spruce",
+      "Value": "Spruce",
       "Localized": true,
       "Translations": [
         {
@@ -11840,7 +11840,7 @@
     },
     {
       "Id": 805,
-      "Name": "Spruce forest",
+      "Value": "Spruce forest",
       "Localized": true,
       "Translations": [
         {
@@ -11855,7 +11855,7 @@
     },
     {
       "Id": 806,
-      "Name": "Open ground with spruce",
+      "Value": "Open ground with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -11870,7 +11870,7 @@
     },
     {
       "Id": 807,
-      "Name": "Wetland with spruce",
+      "Value": "Wetland with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -11885,7 +11885,7 @@
     },
     {
       "Id": 808,
-      "Name": "Artificial ground with spruce",
+      "Value": "Artificial ground with spruce",
       "Localized": true,
       "Translations": [
         {
@@ -11900,7 +11900,7 @@
     },
     {
       "Id": 809,
-      "Name": "Pine",
+      "Value": "Pine",
       "Localized": true,
       "Translations": [
         {
@@ -11915,7 +11915,7 @@
     },
     {
       "Id": 810,
-      "Name": "Pine forest",
+      "Value": "Pine forest",
       "Localized": true,
       "Translations": [
         {
@@ -11930,7 +11930,7 @@
     },
     {
       "Id": 811,
-      "Name": "Open ground with pine",
+      "Value": "Open ground with pine",
       "Localized": true,
       "Translations": [
         {
@@ -11945,7 +11945,7 @@
     },
     {
       "Id": 812,
-      "Name": "Wetland with pine",
+      "Value": "Wetland with pine",
       "Localized": true,
       "Translations": [
         {
@@ -11960,7 +11960,7 @@
     },
     {
       "Id": 813,
-      "Name": "Mixed trees",
+      "Value": "Mixed trees",
       "Localized": true,
       "Translations": [
         {
@@ -11975,7 +11975,7 @@
     },
     {
       "Id": 814,
-      "Name": "Mixed forest",
+      "Value": "Mixed forest",
       "Localized": true,
       "Translations": [
         {
@@ -11990,7 +11990,7 @@
     },
     {
       "Id": 815,
-      "Name": "Artificial ground with mixed trees",
+      "Value": "Artificial ground with mixed trees",
       "Localized": true,
       "Translations": [
         {
@@ -12005,7 +12005,7 @@
     },
     {
       "Id": 816,
-      "Name": "Deciduous trees",
+      "Value": "Deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -12020,7 +12020,7 @@
     },
     {
       "Id": 817,
-      "Name": "Deciduoud forest",
+      "Value": "Deciduoud forest",
       "Localized": true,
       "Translations": [
         {
@@ -12035,7 +12035,7 @@
     },
     {
       "Id": 818,
-      "Name": "Open ground with deciduous trees",
+      "Value": "Open ground with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -12050,7 +12050,7 @@
     },
     {
       "Id": 819,
-      "Name": "Wetland with deciduous trees",
+      "Value": "Wetland with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -12065,7 +12065,7 @@
     },
     {
       "Id": 820,
-      "Name": "Artificial ground with deciduous trees",
+      "Value": "Artificial ground with deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -12080,7 +12080,7 @@
     },
     {
       "Id": 822,
-      "Name": "Broad-leaved trees",
+      "Value": "Broad-leaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -12095,7 +12095,7 @@
     },
     {
       "Id": 823,
-      "Name": "Broad-leaved forest",
+      "Value": "Broad-leaved forest",
       "Localized": true,
       "Translations": [
         {
@@ -12110,7 +12110,7 @@
     },
     {
       "Id": 824,
-      "Name": "Open ground with broadleaved trees",
+      "Value": "Open ground with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -12125,7 +12125,7 @@
     },
     {
       "Id": 825,
-      "Name": "Wetland with broadleaved trees",
+      "Value": "Wetland with broadleaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -12140,7 +12140,7 @@
     },
     {
       "Id": 826,
-      "Name": "Artificial ground with broad-leaved trees",
+      "Value": "Artificial ground with broad-leaved trees",
       "Localized": true,
       "Translations": [
         {
@@ -12155,7 +12155,7 @@
     },
     {
       "Id": 827,
-      "Name": "Oak",
+      "Value": "Oak",
       "Localized": true,
       "Translations": [
         {
@@ -12170,7 +12170,7 @@
     },
     {
       "Id": 828,
-      "Name": "Oak forest",
+      "Value": "Oak forest",
       "Localized": true,
       "Translations": [
         {
@@ -12185,7 +12185,7 @@
     },
     {
       "Id": 829,
-      "Name": "Open ground with oak",
+      "Value": "Open ground with oak",
       "Localized": true,
       "Translations": [
         {
@@ -12200,7 +12200,7 @@
     },
     {
       "Id": 830,
-      "Name": "Artificial ground with oak",
+      "Value": "Artificial ground with oak",
       "Localized": true,
       "Translations": [
         {
@@ -12215,7 +12215,7 @@
     },
     {
       "Id": 831,
-      "Name": "Beech",
+      "Value": "Beech",
       "Localized": true,
       "Translations": [
         {
@@ -12230,7 +12230,7 @@
     },
     {
       "Id": 832,
-      "Name": "Beech forest",
+      "Value": "Beech forest",
       "Localized": true,
       "Translations": [
         {
@@ -12245,7 +12245,7 @@
     },
     {
       "Id": 833,
-      "Name": "Open ground with beech",
+      "Value": "Open ground with beech",
       "Localized": true,
       "Translations": [
         {
@@ -12260,7 +12260,7 @@
     },
     {
       "Id": 834,
-      "Name": "Artificial ground with beech",
+      "Value": "Artificial ground with beech",
       "Localized": true,
       "Translations": [
         {
@@ -12275,7 +12275,7 @@
     },
     {
       "Id": 835,
-      "Name": "Ash",
+      "Value": "Ash",
       "Localized": true,
       "Translations": [
         {
@@ -12290,7 +12290,7 @@
     },
     {
       "Id": 836,
-      "Name": "Ash forest",
+      "Value": "Ash forest",
       "Localized": true,
       "Translations": [
         {
@@ -12305,7 +12305,7 @@
     },
     {
       "Id": 837,
-      "Name": "Open ground with ash",
+      "Value": "Open ground with ash",
       "Localized": true,
       "Translations": [
         {
@@ -12320,7 +12320,7 @@
     },
     {
       "Id": 838,
-      "Name": "Wetland with ash",
+      "Value": "Wetland with ash",
       "Localized": true,
       "Translations": [
         {
@@ -12335,7 +12335,7 @@
     },
     {
       "Id": 839,
-      "Name": "Artificial ground with ash",
+      "Value": "Artificial ground with ash",
       "Localized": true,
       "Translations": [
         {
@@ -12350,7 +12350,7 @@
     },
     {
       "Id": 840,
-      "Name": "Elm",
+      "Value": "Elm",
       "Localized": true,
       "Translations": [
         {
@@ -12365,7 +12365,7 @@
     },
     {
       "Id": 841,
-      "Name": "Elm forest",
+      "Value": "Elm forest",
       "Localized": true,
       "Translations": [
         {
@@ -12380,7 +12380,7 @@
     },
     {
       "Id": 842,
-      "Name": "Open ground with elm",
+      "Value": "Open ground with elm",
       "Localized": true,
       "Translations": [
         {
@@ -12395,7 +12395,7 @@
     },
     {
       "Id": 843,
-      "Name": "Artificial ground with elm",
+      "Value": "Artificial ground with elm",
       "Localized": true,
       "Translations": [
         {
@@ -12410,7 +12410,7 @@
     },
     {
       "Id": 844,
-      "Name": "Linden",
+      "Value": "Linden",
       "Localized": true,
       "Translations": [
         {
@@ -12425,7 +12425,7 @@
     },
     {
       "Id": 845,
-      "Name": "Artificial ground with linden",
+      "Value": "Artificial ground with linden",
       "Localized": true,
       "Translations": [
         {
@@ -12440,7 +12440,7 @@
     },
     {
       "Id": 846,
-      "Name": "Hazel",
+      "Value": "Hazel",
       "Localized": true,
       "Translations": [
         {
@@ -12455,7 +12455,7 @@
     },
     {
       "Id": 847,
-      "Name": "Open ground with hazel",
+      "Value": "Open ground with hazel",
       "Localized": true,
       "Translations": [
         {
@@ -12470,7 +12470,7 @@
     },
     {
       "Id": 848,
-      "Name": "Trival deciduous trees",
+      "Value": "Trival deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -12485,7 +12485,7 @@
     },
     {
       "Id": 849,
-      "Name": "Trivial deciduous forest",
+      "Value": "Trivial deciduous forest",
       "Localized": true,
       "Translations": [
         {
@@ -12500,7 +12500,7 @@
     },
     {
       "Id": 850,
-      "Name": "Open ground with trivial deciduous trees",
+      "Value": "Open ground with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -12515,7 +12515,7 @@
     },
     {
       "Id": 851,
-      "Name": "Wetland with trivial deciduous trees",
+      "Value": "Wetland with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -12530,7 +12530,7 @@
     },
     {
       "Id": 852,
-      "Name": "Artificial ground with trivial deciduous trees",
+      "Value": "Artificial ground with trivial deciduous trees",
       "Localized": true,
       "Translations": [
         {
@@ -12545,7 +12545,7 @@
     },
     {
       "Id": 853,
-      "Name": "Birch",
+      "Value": "Birch",
       "Localized": true,
       "Translations": [
         {
@@ -12560,7 +12560,7 @@
     },
     {
       "Id": 854,
-      "Name": "Birch forest",
+      "Value": "Birch forest",
       "Localized": true,
       "Translations": [
         {
@@ -12575,7 +12575,7 @@
     },
     {
       "Id": 855,
-      "Name": "Open ground with birch",
+      "Value": "Open ground with birch",
       "Localized": true,
       "Translations": [
         {
@@ -12590,7 +12590,7 @@
     },
     {
       "Id": 856,
-      "Name": "Wetland with birch",
+      "Value": "Wetland with birch",
       "Localized": true,
       "Translations": [
         {
@@ -12605,7 +12605,7 @@
     },
     {
       "Id": 857,
-      "Name": "Artificial ground with birch",
+      "Value": "Artificial ground with birch",
       "Localized": true,
       "Translations": [
         {
@@ -12620,7 +12620,7 @@
     },
     {
       "Id": 858,
-      "Name": "Alder",
+      "Value": "Alder",
       "Localized": true,
       "Translations": [
         {
@@ -12635,7 +12635,7 @@
     },
     {
       "Id": 859,
-      "Name": "Alder forest",
+      "Value": "Alder forest",
       "Localized": true,
       "Translations": [
         {
@@ -12650,7 +12650,7 @@
     },
     {
       "Id": 860,
-      "Name": "Open ground with alder",
+      "Value": "Open ground with alder",
       "Localized": true,
       "Translations": [
         {
@@ -12665,7 +12665,7 @@
     },
     {
       "Id": 861,
-      "Name": "Wetland with alder",
+      "Value": "Wetland with alder",
       "Localized": true,
       "Translations": [
         {
@@ -12680,7 +12680,7 @@
     },
     {
       "Id": 862,
-      "Name": "Aspen",
+      "Value": "Aspen",
       "Localized": true,
       "Translations": [
         {
@@ -12695,7 +12695,7 @@
     },
     {
       "Id": 863,
-      "Name": "Aspen forest",
+      "Value": "Aspen forest",
       "Localized": true,
       "Translations": [
         {
@@ -12710,7 +12710,7 @@
     },
     {
       "Id": 864,
-      "Name": "Scrub",
+      "Value": "Scrub",
       "Localized": true,
       "Translations": [
         {
@@ -12725,7 +12725,7 @@
     },
     {
       "Id": 865,
-      "Name": "Open ground with scrub",
+      "Value": "Open ground with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -12740,7 +12740,7 @@
     },
     {
       "Id": 866,
-      "Name": "Wetland with scrub",
+      "Value": "Wetland with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -12755,7 +12755,7 @@
     },
     {
       "Id": 867,
-      "Name": "Artificial ground with scrub",
+      "Value": "Artificial ground with scrub",
       "Localized": true,
       "Translations": [
         {
@@ -12770,7 +12770,7 @@
     },
     {
       "Id": 868,
-      "Name": "Blackthorn",
+      "Value": "Blackthorn",
       "Localized": true,
       "Translations": [
         {
@@ -12785,7 +12785,7 @@
     },
     {
       "Id": 869,
-      "Name": "Open ground with blackthorn",
+      "Value": "Open ground with blackthorn",
       "Localized": true,
       "Translations": [
         {
@@ -12800,7 +12800,7 @@
     },
     {
       "Id": 870,
-      "Name": "Roses",
+      "Value": "Roses",
       "Localized": true,
       "Translations": [
         {
@@ -12815,7 +12815,7 @@
     },
     {
       "Id": 871,
-      "Name": "Open ground with roses",
+      "Value": "Open ground with roses",
       "Localized": true,
       "Translations": [
         {
@@ -12830,7 +12830,7 @@
     },
     {
       "Id": 872,
-      "Name": "Blackberry",
+      "Value": "Blackberry",
       "Localized": true,
       "Translations": [
         {
@@ -12845,7 +12845,7 @@
     },
     {
       "Id": 873,
-      "Name": "Open ground with blackberry",
+      "Value": "Open ground with blackberry",
       "Localized": true,
       "Translations": [
         {
@@ -12860,7 +12860,7 @@
     },
     {
       "Id": 874,
-      "Name": "Juniper",
+      "Value": "Juniper",
       "Localized": true,
       "Translations": [
         {
@@ -12875,7 +12875,7 @@
     },
     {
       "Id": 875,
-      "Name": "Open ground with juniper",
+      "Value": "Open ground with juniper",
       "Localized": true,
       "Translations": [
         {
@@ -12890,7 +12890,7 @@
     },
     {
       "Id": 876,
-      "Name": "Birchscrub",
+      "Value": "Birchscrub",
       "Localized": true,
       "Translations": [
         {
@@ -12905,7 +12905,7 @@
     },
     {
       "Id": 877,
-      "Name": "Open ground with birchscrub",
+      "Value": "Open ground with birchscrub",
       "Localized": true,
       "Translations": [
         {
@@ -12920,7 +12920,7 @@
     },
     {
       "Id": 878,
-      "Name": "Willow",
+      "Value": "Willow",
       "Localized": true,
       "Translations": [
         {
@@ -12935,7 +12935,7 @@
     },
     {
       "Id": 879,
-      "Name": "Open ground with willow",
+      "Value": "Open ground with willow",
       "Localized": true,
       "Translations": [
         {
@@ -12950,7 +12950,7 @@
     },
     {
       "Id": 880,
-      "Name": "Wetland with willow",
+      "Value": "Wetland with willow",
       "Localized": true,
       "Translations": [
         {
@@ -12965,7 +12965,7 @@
     },
     {
       "Id": 881,
-      "Name": "Artificial ground with willow",
+      "Value": "Artificial ground with willow",
       "Localized": true,
       "Translations": [
         {

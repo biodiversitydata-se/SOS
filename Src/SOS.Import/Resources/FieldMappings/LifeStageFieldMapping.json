@@ -5,7 +5,7 @@
   "Values": [
     {
       "Id": 0,
-      "Name": "empty",
+      "Value": "empty",
       "Localized": true,
       "Translations": [
         {
@@ -20,7 +20,7 @@
     },
     {
       "Id": 1,
-      "Name": "egg",
+      "Value": "egg",
       "Localized": true,
       "Translations": [
         {
@@ -35,7 +35,7 @@
     },
     {
       "Id": 2,
-      "Name": "nestling",
+      "Value": "nestling",
       "Localized": true,
       "Translations": [
         {
@@ -50,7 +50,7 @@
     },
     {
       "Id": 3,
-      "Name": "1st calendar year",
+      "Value": "1st calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -65,7 +65,7 @@
     },
     {
       "Id": 4,
-      "Name": "at least 1st calendar year",
+      "Value": "at least 1st calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -80,7 +80,7 @@
     },
     {
       "Id": 5,
-      "Name": "2nd calendar year",
+      "Value": "2nd calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -95,7 +95,7 @@
     },
     {
       "Id": 6,
-      "Name": "at least 2nd calendar year",
+      "Value": "at least 2nd calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -110,7 +110,7 @@
     },
     {
       "Id": 7,
-      "Name": "2nd calendar year or younger",
+      "Value": "2nd calendar year or younger",
       "Localized": true,
       "Translations": [
         {
@@ -125,7 +125,7 @@
     },
     {
       "Id": 8,
-      "Name": "3rd calendar year",
+      "Value": "3rd calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -140,7 +140,7 @@
     },
     {
       "Id": 9,
-      "Name": "at least 3rd calendar year",
+      "Value": "at least 3rd calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -155,7 +155,7 @@
     },
     {
       "Id": 10,
-      "Name": "3rd calendar year or younger",
+      "Value": "3rd calendar year or younger",
       "Localized": true,
       "Translations": [
         {
@@ -170,7 +170,7 @@
     },
     {
       "Id": 11,
-      "Name": "4th calendar year",
+      "Value": "4th calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -185,7 +185,7 @@
     },
     {
       "Id": 12,
-      "Name": "at least 4th calendar year",
+      "Value": "at least 4th calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -200,7 +200,7 @@
     },
     {
       "Id": 13,
-      "Name": "4th calendar year or younger",
+      "Value": "4th calendar year or younger",
       "Localized": true,
       "Translations": [
         {
@@ -215,7 +215,7 @@
     },
     {
       "Id": 14,
-      "Name": "5th calendar year",
+      "Value": "5th calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -230,7 +230,7 @@
     },
     {
       "Id": 15,
-      "Name": "at least 5th calendar year",
+      "Value": "at least 5th calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -245,7 +245,7 @@
     },
     {
       "Id": 16,
-      "Name": "5th calendar year or younger",
+      "Value": "5th calendar year or younger",
       "Localized": true,
       "Translations": [
         {
@@ -260,7 +260,7 @@
     },
     {
       "Id": 17,
-      "Name": "6th calendar year",
+      "Value": "6th calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -275,7 +275,7 @@
     },
     {
       "Id": 18,
-      "Name": "at least 6th calendar year",
+      "Value": "at least 6th calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -290,7 +290,7 @@
     },
     {
       "Id": 19,
-      "Name": "6th calendar year or younger",
+      "Value": "6th calendar year or younger",
       "Localized": true,
       "Translations": [
         {
@@ -305,7 +305,7 @@
     },
     {
       "Id": 20,
-      "Name": "7th calendar year",
+      "Value": "7th calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -320,7 +320,7 @@
     },
     {
       "Id": 21,
-      "Name": "at least 7th calendar year",
+      "Value": "at least 7th calendar year",
       "Localized": true,
       "Translations": [
         {
@@ -335,7 +335,7 @@
     },
     {
       "Id": 22,
-      "Name": "7th calendar year or younger",
+      "Value": "7th calendar year or younger",
       "Localized": true,
       "Translations": [
         {
@@ -350,7 +350,7 @@
     },
     {
       "Id": 23,
-      "Name": "adult",
+      "Value": "adult",
       "Localized": true,
       "Translations": [
         {
@@ -365,7 +365,7 @@
     },
     {
       "Id": 24,
-      "Name": "larva/nymph ",
+      "Value": "larva/nymph ",
       "Localized": true,
       "Translations": [
         {
@@ -380,7 +380,7 @@
     },
     {
       "Id": 25,
-      "Name": "pupa",
+      "Value": "pupa",
       "Localized": true,
       "Translations": [
         {
@@ -395,7 +395,7 @@
     },
     {
       "Id": 26,
-      "Name": "juvenile",
+      "Value": "juvenile",
       "Localized": true,
       "Translations": [
         {
@@ -410,7 +410,7 @@
     },
     {
       "Id": 27,
-      "Name": "imago/adult",
+      "Value": "imago/adult",
       "Localized": true,
       "Translations": [
         {
@@ -425,7 +425,7 @@
     },
     {
       "Id": 28,
-      "Name": "rom",
+      "Value": "rom",
       "Localized": true,
       "Translations": [
         {
@@ -440,7 +440,7 @@
     },
     {
       "Id": 29,
-      "Name": "0+",
+      "Value": "0+",
       "Localized": true,
       "Translations": [
         {
@@ -455,7 +455,7 @@
     },
     {
       "Id": 30,
-      "Name": "1+",
+      "Value": "1+",
       "Localized": true,
       "Translations": [
         {
@@ -470,7 +470,7 @@
     },
     {
       "Id": 31,
-      "Name": "larvae",
+      "Value": "larvae",
       "Localized": true,
       "Translations": [
         {
@@ -485,7 +485,7 @@
     },
     {
       "Id": 32,
-      "Name": "cub",
+      "Value": "cub",
       "Localized": true,
       "Translations": [
         {
@@ -500,7 +500,7 @@
     },
     {
       "Id": 33,
-      "Name": "yearling",
+      "Value": "yearling",
       "Localized": true,
       "Translations": [
         {
@@ -515,7 +515,7 @@
     },
     {
       "Id": 34,
-      "Name": "rest",
+      "Value": "rest",
       "Localized": true,
       "Translations": [
         {
@@ -530,7 +530,7 @@
     },
     {
       "Id": 35,
-      "Name": "bud burst",
+      "Value": "bud burst",
       "Localized": true,
       "Translations": [
         {
@@ -545,7 +545,7 @@
     },
     {
       "Id": 36,
-      "Name": "fully developed leaf",
+      "Value": "fully developed leaf",
       "Localized": true,
       "Translations": [
         {
@@ -560,7 +560,7 @@
     },
     {
       "Id": 37,
-      "Name": "flower bud",
+      "Value": "flower bud",
       "Localized": true,
       "Translations": [
         {
@@ -575,7 +575,7 @@
     },
     {
       "Id": 38,
-      "Name": "flowering",
+      "Value": "flowering",
       "Localized": true,
       "Translations": [
         {
@@ -590,7 +590,7 @@
     },
     {
       "Id": 39,
-      "Name": "overblown",
+      "Value": "overblown",
       "Localized": true,
       "Translations": [
         {
@@ -605,7 +605,7 @@
     },
     {
       "Id": 40,
-      "Name": "in fruit",
+      "Value": "in fruit",
       "Localized": true,
       "Translations": [
         {
@@ -620,7 +620,7 @@
     },
     {
       "Id": 41,
-      "Name": "yellowing leaves",
+      "Value": "yellowing leaves",
       "Localized": true,
       "Translations": [
         {
@@ -635,7 +635,7 @@
     },
     {
       "Id": 42,
-      "Name": "leaf cutting",
+      "Value": "leaf cutting",
       "Localized": true,
       "Translations": [
         {
@@ -650,7 +650,7 @@
     },
     {
       "Id": 43,
-      "Name": "winter stamen",
+      "Value": "winter stamen",
       "Localized": true,
       "Translations": [
         {
@@ -665,7 +665,7 @@
     },
     {
       "Id": 44,
-      "Name": "with capsule",
+      "Value": "with capsule",
       "Localized": true,
       "Translations": [
         {
@@ -680,7 +680,7 @@
     },
     {
       "Id": 45,
-      "Name": "without capsule",
+      "Value": "without capsule",
       "Localized": true,
       "Translations": [
         {
@@ -695,7 +695,7 @@
     },
     {
       "Id": 46,
-      "Name": "sprout",
+      "Value": "sprout",
       "Localized": true,
       "Translations": [
         {
@@ -710,7 +710,7 @@
     },
     {
       "Id": 47,
-      "Name": "with female parts",
+      "Value": "with female parts",
       "Localized": true,
       "Translations": [
         {
@@ -725,7 +725,7 @@
     },
     {
       "Id": 48,
-      "Name": "with male parts",
+      "Value": "with male parts",
       "Localized": true,
       "Translations": [
         {
@@ -740,7 +740,7 @@
     },
     {
       "Id": 49,
-      "Name": "with apothecies",
+      "Value": "with apothecies",
       "Localized": true,
       "Translations": [
         {
@@ -755,7 +755,7 @@
     },
     {
       "Id": 50,
-      "Name": "with perithecies",
+      "Value": "with perithecies",
       "Localized": true,
       "Translations": [
         {
@@ -770,7 +770,7 @@
     },
     {
       "Id": 51,
-      "Name": "with soral",
+      "Value": "with soral",
       "Localized": true,
       "Translations": [
         {
@@ -785,7 +785,7 @@
     },
     {
       "Id": 52,
-      "Name": "with isidies",
+      "Value": "with isidies",
       "Localized": true,
       "Translations": [
         {
@@ -800,7 +800,7 @@
     },
     {
       "Id": 53,
-      "Name": "with schistidies",
+      "Value": "with schistidies",
       "Localized": true,
       "Translations": [
         {
@@ -815,7 +815,7 @@
     },
     {
       "Id": 54,
-      "Name": "fruit/seed dispersal",
+      "Value": "fruit/seed dispersal",
       "Localized": true,
       "Translations": [
         {
@@ -830,7 +830,7 @@
     },
     {
       "Id": 55,
-      "Name": "anamorph",
+      "Value": "anamorph",
       "Localized": true,
       "Translations": [
         {
@@ -845,7 +845,7 @@
     },
     {
       "Id": 56,
-      "Name": "juvenile2",
+      "Value": "juvenile2",
       "Localized": true,
       "Translations": [
         {
@@ -860,7 +860,7 @@
     },
     {
       "Id": 57,
-      "Name": "teleomorph (perfect)",
+      "Value": "teleomorph (perfect)",
       "Localized": true,
       "Translations": [
         {

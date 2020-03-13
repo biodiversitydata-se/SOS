@@ -60,11 +60,11 @@ namespace SOS.Import.Factories.FieldMappings
             {
                 mappingField.Values.Add(new ExternalSystemMappingValue
                 {
-                    Value = fieldMappingValue.Name,
+                    Value = fieldMappingValue.Value,
                     SosId = fieldMappingValue.Id
                 });
 
-                var stringVariations = GetStringVariations(fieldMappingValue.Name);
+                var stringVariations = GetStringVariations(fieldMappingValue.Value);
                 foreach (var stringVariation in stringVariations)
                 {
                     mappingField.Values.Add(new ExternalSystemMappingValue

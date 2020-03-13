@@ -5,7 +5,7 @@
   "Values": [
     {
       "Id": 8058,
-      "Name": "Skåne",
+      "Value": "Skåne",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -14,7 +14,7 @@
     },
     {
       "Id": 8059,
-      "Name": "Blekinge",
+      "Value": "Blekinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -23,7 +23,7 @@
     },
     {
       "Id": 8060,
-      "Name": "Småland",
+      "Value": "Småland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -32,7 +32,7 @@
     },
     {
       "Id": 8061,
-      "Name": "Öland",
+      "Value": "Öland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -41,7 +41,7 @@
     },
     {
       "Id": 8062,
-      "Name": "Gotland",
+      "Value": "Gotland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -50,7 +50,7 @@
     },
     {
       "Id": 8063,
-      "Name": "Halland",
+      "Value": "Halland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -59,7 +59,7 @@
     },
     {
       "Id": 8064,
-      "Name": "Bohuslän",
+      "Value": "Bohuslän",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -68,7 +68,7 @@
     },
     {
       "Id": 8065,
-      "Name": "Dalsland",
+      "Value": "Dalsland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -77,7 +77,7 @@
     },
     {
       "Id": 8066,
-      "Name": "Västergötland",
+      "Value": "Västergötland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -86,7 +86,7 @@
     },
     {
       "Id": 8067,
-      "Name": "Närke",
+      "Value": "Närke",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -95,7 +95,7 @@
     },
     {
       "Id": 8068,
-      "Name": "Östergötland",
+      "Value": "Östergötland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -104,7 +104,7 @@
     },
     {
       "Id": 8069,
-      "Name": "Södermanland",
+      "Value": "Södermanland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -113,7 +113,7 @@
     },
     {
       "Id": 8070,
-      "Name": "Uppland",
+      "Value": "Uppland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -122,7 +122,7 @@
     },
     {
       "Id": 8071,
-      "Name": "Västmanland",
+      "Value": "Västmanland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -131,7 +131,7 @@
     },
     {
       "Id": 8072,
-      "Name": "Värmland",
+      "Value": "Värmland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -140,7 +140,7 @@
     },
     {
       "Id": 8073,
-      "Name": "Dalarna",
+      "Value": "Dalarna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -149,7 +149,7 @@
     },
     {
       "Id": 8074,
-      "Name": "Gästrikland",
+      "Value": "Gästrikland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -158,7 +158,7 @@
     },
     {
       "Id": 8075,
-      "Name": "Hälsingland",
+      "Value": "Hälsingland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -167,7 +167,7 @@
     },
     {
       "Id": 8076,
-      "Name": "Medelpad",
+      "Value": "Medelpad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -176,7 +176,7 @@
     },
     {
       "Id": 8077,
-      "Name": "Ångermanland",
+      "Value": "Ångermanland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -185,7 +185,7 @@
     },
     {
       "Id": 8078,
-      "Name": "Västerbotten",
+      "Value": "Västerbotten",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -194,7 +194,7 @@
     },
     {
       "Id": 8079,
-      "Name": "Norrbotten",
+      "Value": "Norrbotten",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -203,7 +203,7 @@
     },
     {
       "Id": 8080,
-      "Name": "Härjedalen",
+      "Value": "Härjedalen",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -212,7 +212,7 @@
     },
     {
       "Id": 8081,
-      "Name": "Jämtland",
+      "Value": "Jämtland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -221,7 +221,7 @@
     },
     {
       "Id": 8082,
-      "Name": "Åsele lappmark",
+      "Value": "Åsele lappmark",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -230,7 +230,7 @@
     },
     {
       "Id": 8083,
-      "Name": "Lycksele lappmark",
+      "Value": "Lycksele lappmark",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -239,7 +239,7 @@
     },
     {
       "Id": 8084,
-      "Name": "Pite lappmark",
+      "Value": "Pite lappmark",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -248,7 +248,7 @@
     },
     {
       "Id": 8085,
-      "Name": "Lule lappmark",
+      "Value": "Lule lappmark",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -257,7 +257,7 @@
     },
     {
       "Id": 8086,
-      "Name": "Torne lappmark",
+      "Value": "Torne lappmark",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -266,7 +266,7 @@
     },
     {
       "Id": 55235,
-      "Name": "Bottenviken",
+      "Value": "Bottenviken",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -275,7 +275,7 @@
     },
     {
       "Id": 55236,
-      "Name": "Bottenhavet",
+      "Value": "Bottenhavet",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -284,7 +284,7 @@
     },
     {
       "Id": 55237,
-      "Name": "Östersjön",
+      "Value": "Östersjön",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -293,7 +293,7 @@
     },
     {
       "Id": 55238,
-      "Name": "Kattegatt",
+      "Value": "Kattegatt",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,
@@ -302,7 +302,7 @@
     },
     {
       "Id": 55239,
-      "Name": "Skagerrak",
+      "Value": "Skagerrak",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 16,

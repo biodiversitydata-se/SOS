@@ -5,7 +5,7 @@
   "Values": [
     {
       "Id": 0,
-      "Name": "empty",
+      "Value": "empty",
       "Localized": true,
       "Translations": [
         {
@@ -20,7 +20,7 @@
     },
     {
       "Id": 1,
-      "Name": "plants",
+      "Value": "plants",
       "Localized": true,
       "Translations": [
         {
@@ -35,7 +35,7 @@
     },
     {
       "Id": 2,
-      "Name": "stems",
+      "Value": "stems",
       "Localized": true,
       "Translations": [
         {
@@ -50,7 +50,7 @@
     },
     {
       "Id": 3,
-      "Name": "skudd/stilker/strå",
+      "Value": "skudd/stilker/strå",
       "Localized": true,
       "Translations": [
         {
@@ -65,7 +65,7 @@
     },
     {
       "Id": 4,
-      "Name": "mycels",
+      "Value": "mycels",
       "Localized": true,
       "Translations": [
         {
@@ -80,7 +80,7 @@
     },
     {
       "Id": 5,
-      "Name": "fruit-bodies",
+      "Value": "fruit-bodies",
       "Localized": true,
       "Translations": [
         {
@@ -95,7 +95,7 @@
     },
     {
       "Id": 6,
-      "Name": "m²",
+      "Value": "m²",
       "Localized": true,
       "Translations": [
         {
@@ -110,7 +110,7 @@
     },
     {
       "Id": 7,
-      "Name": "dm²",
+      "Value": "dm²",
       "Localized": true,
       "Translations": [
         {
@@ -125,7 +125,7 @@
     },
     {
       "Id": 8,
-      "Name": "cm²",
+      "Value": "cm²",
       "Localized": true,
       "Translations": [
         {
@@ -140,7 +140,7 @@
     },
     {
       "Id": 9,
-      "Name": "ind.",
+      "Value": "ind.",
       "Localized": true,
       "Translations": [
         {
@@ -155,7 +155,7 @@
     },
     {
       "Id": 10,
-      "Name": "colonies",
+      "Value": "colonies",
       "Localized": true,
       "Translations": [
         {
@@ -170,7 +170,7 @@
     },
     {
       "Id": 11,
-      "Name": "lek scrape",
+      "Value": "lek scrape",
       "Localized": true,
       "Translations": [
         {
@@ -185,7 +185,7 @@
     },
     {
       "Id": 12,
-      "Name": "egg clusters",
+      "Value": "egg clusters",
       "Localized": true,
       "Translations": [
         {
@@ -200,7 +200,7 @@
     },
     {
       "Id": 13,
-      "Name": "nests",
+      "Value": "nests",
       "Localized": true,
       "Translations": [
         {
@@ -215,7 +215,7 @@
     },
     {
       "Id": 14,
-      "Name": "nest/den",
+      "Value": "nest/den",
       "Localized": true,
       "Translations": [
         {
@@ -230,7 +230,7 @@
     },
     {
       "Id": 15,
-      "Name": "bushes",
+      "Value": "bushes",
       "Localized": true,
       "Translations": [
         {
@@ -245,7 +245,7 @@
     },
     {
       "Id": 16,
-      "Name": "bat box",
+      "Value": "bat box",
       "Localized": true,
       "Translations": [
         {
@@ -260,7 +260,7 @@
     },
     {
       "Id": 17,
-      "Name": "capsules",
+      "Value": "capsules",
       "Localized": true,
       "Translations": [
         {
@@ -275,7 +275,7 @@
     },
     {
       "Id": 18,
-      "Name": "trees",
+      "Value": "trees",
       "Localized": true,
       "Translations": [
         {
@@ -290,7 +290,7 @@
     },
     {
       "Id": 19,
-      "Name": "tussocks",
+      "Value": "tussocks",
       "Localized": true,
       "Translations": [
         {
@@ -305,7 +305,7 @@
     },
     {
       "Id": 20,
-      "Name": "observations",
+      "Value": "observations",
       "Localized": true,
       "Translations": [
         {
@@ -320,7 +320,7 @@
     },
     {
       "Id": 21,
-      "Name": "registrations",
+      "Value": "registrations",
       "Localized": true,
       "Translations": [
         {

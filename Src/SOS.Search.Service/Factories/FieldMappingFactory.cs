@@ -66,7 +66,7 @@ namespace SOS.Search.Service.Factories
                 dic.Add(fieldMappingFieldId, new Dictionary<int, string>());
                 foreach (var fieldMappingValue in fieldMapping.Values)
                 {
-                    dic[fieldMappingFieldId].Add(fieldMappingValue.Id, fieldMappingValue.Name);
+                    dic[fieldMappingFieldId].Add(fieldMappingValue.Id, fieldMappingValue.Value);
                 }
             }
 

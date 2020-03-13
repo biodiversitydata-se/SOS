@@ -42,7 +42,7 @@ namespace SOS.Import.Factories.FieldMappings
                 var val = new FieldMappingValue
                 {
                     Id = group.Key,
-                    Name = string.IsNullOrWhiteSpace(englishRecord.Translation) ? "empty" : englishRecord.Translation,
+                    Value = string.IsNullOrWhiteSpace(englishRecord.Translation) ? "empty" : englishRecord.Translation,
                     Localized = true,
                     Translations = new List<FieldMappingTranslation>
                     {
@@ -71,7 +71,7 @@ namespace SOS.Import.Factories.FieldMappings
                 fieldMappingValues.Add(new FieldMappingValue
                 {
                     Id = metadataEntity.Id,
-                    Name = metadataEntity.Translation,
+                    Value = metadataEntity.Translation,
                     Localized = false
                 });
             }
@@ -90,7 +90,7 @@ namespace SOS.Import.Factories.FieldMappings
                 var val = new FieldMappingValue
                 {
                     Id = group.Key,
-                    Name = string.IsNullOrWhiteSpace(englishRecord.Translation) ? "empty" : englishRecord.Translation,
+                    Value = string.IsNullOrWhiteSpace(englishRecord.Translation) ? "empty" : englishRecord.Translation,
                     Localized = true,
                     Translations =
                         new List<FieldMappingTranslation>

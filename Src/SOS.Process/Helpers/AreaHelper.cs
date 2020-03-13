@@ -271,7 +271,7 @@ namespace SOS.Process.Helpers
             if (val == null) return;
             if (fieldMappingValueById.TryGetValue(val.Id, out FieldMappingValue fieldMappingValue))
             {
-                val.Value = fieldMappingValue.Name;
+                val.Value = fieldMappingValue.Value;
             }
         }
     }

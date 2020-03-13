@@ -16,12 +16,12 @@ namespace SOS.Import.Factories.FieldMappings
             // Vocabulary from http://rs.gbif.org/vocabulary/gbif/establishment_means.xml.
             var fieldMappingValues = new List<FieldMappingValue>
             {
-                new FieldMappingValue {Id = 0, Name = "native"},
-                new FieldMappingValue {Id = 1, Name = "introduced"},
-                new FieldMappingValue {Id = 2, Name = "naturalised"},
-                new FieldMappingValue {Id = 3, Name = "invasive"},
-                new FieldMappingValue {Id = 4, Name = "managed"},
-                new FieldMappingValue {Id = 5, Name = "uncertain"}
+                new FieldMappingValue {Id = 0, Value = "native"},
+                new FieldMappingValue {Id = 1, Value = "introduced"},
+                new FieldMappingValue {Id = 2, Value = "naturalised"},
+                new FieldMappingValue {Id = 3, Value = "invasive"},
+                new FieldMappingValue {Id = 4, Value = "managed"},
+                new FieldMappingValue {Id = 5, Value = "uncertain"}
             };
 
             return fieldMappingValues;

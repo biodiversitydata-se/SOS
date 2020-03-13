@@ -5,7 +5,7 @@
   "Values": [
     {
       "Id": 53,
-      "Name": "Ale",
+      "Value": "Ale",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -14,7 +14,7 @@
     },
     {
       "Id": 54,
-      "Name": "Alingsås",
+      "Value": "Alingsås",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -23,7 +23,7 @@
     },
     {
       "Id": 55,
-      "Name": "Alvesta",
+      "Value": "Alvesta",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -32,7 +32,7 @@
     },
     {
       "Id": 56,
-      "Name": "Aneby",
+      "Value": "Aneby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -41,7 +41,7 @@
     },
     {
       "Id": 57,
-      "Name": "Arboga",
+      "Value": "Arboga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -50,7 +50,7 @@
     },
     {
       "Id": 58,
-      "Name": "Arjeplog",
+      "Value": "Arjeplog",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -59,7 +59,7 @@
     },
     {
       "Id": 59,
-      "Name": "Bjurholm",
+      "Value": "Bjurholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -68,7 +68,7 @@
     },
     {
       "Id": 60,
-      "Name": "Arvidsjaur",
+      "Value": "Arvidsjaur",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -77,7 +77,7 @@
     },
     {
       "Id": 61,
-      "Name": "Arvika",
+      "Value": "Arvika",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -86,7 +86,7 @@
     },
     {
       "Id": 62,
-      "Name": "Askersund",
+      "Value": "Askersund",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -95,7 +95,7 @@
     },
     {
       "Id": 63,
-      "Name": "Avesta",
+      "Value": "Avesta",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -104,7 +104,7 @@
     },
     {
       "Id": 64,
-      "Name": "Bengtsfors",
+      "Value": "Bengtsfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -113,7 +113,7 @@
     },
     {
       "Id": 65,
-      "Name": "Berg",
+      "Value": "Berg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -122,7 +122,7 @@
     },
     {
       "Id": 66,
-      "Name": "Bjuv",
+      "Value": "Bjuv",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -131,7 +131,7 @@
     },
     {
       "Id": 67,
-      "Name": "Boden",
+      "Value": "Boden",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -140,7 +140,7 @@
     },
     {
       "Id": 68,
-      "Name": "Bollebygd",
+      "Value": "Bollebygd",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -149,7 +149,7 @@
     },
     {
       "Id": 69,
-      "Name": "Bollnäs",
+      "Value": "Bollnäs",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -158,7 +158,7 @@
     },
     {
       "Id": 70,
-      "Name": "Lycksele",
+      "Value": "Lycksele",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -167,7 +167,7 @@
     },
     {
       "Id": 71,
-      "Name": "Lysekil",
+      "Value": "Lysekil",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -176,7 +176,7 @@
     },
     {
       "Id": 72,
-      "Name": "Malmö",
+      "Value": "Malmö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -185,7 +185,7 @@
     },
     {
       "Id": 73,
-      "Name": "Malung-Sälen",
+      "Value": "Malung-Sälen",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -194,7 +194,7 @@
     },
     {
       "Id": 74,
-      "Name": "Malå",
+      "Value": "Malå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -203,7 +203,7 @@
     },
     {
       "Id": 75,
-      "Name": "Mariestad",
+      "Value": "Mariestad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -212,7 +212,7 @@
     },
     {
       "Id": 76,
-      "Name": "Mark",
+      "Value": "Mark",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -221,7 +221,7 @@
     },
     {
       "Id": 77,
-      "Name": "Markaryd",
+      "Value": "Markaryd",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -230,7 +230,7 @@
     },
     {
       "Id": 78,
-      "Name": "Mellerud",
+      "Value": "Mellerud",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -239,7 +239,7 @@
     },
     {
       "Id": 79,
-      "Name": "Mjölby",
+      "Value": "Mjölby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -248,7 +248,7 @@
     },
     {
       "Id": 80,
-      "Name": "Mora",
+      "Value": "Mora",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -257,7 +257,7 @@
     },
     {
       "Id": 81,
-      "Name": "Motala",
+      "Value": "Motala",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -266,7 +266,7 @@
     },
     {
       "Id": 82,
-      "Name": "Mullsjö",
+      "Value": "Mullsjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -275,7 +275,7 @@
     },
     {
       "Id": 83,
-      "Name": "Munkedal",
+      "Value": "Munkedal",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -284,7 +284,7 @@
     },
     {
       "Id": 84,
-      "Name": "Munkfors",
+      "Value": "Munkfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -293,7 +293,7 @@
     },
     {
       "Id": 85,
-      "Name": "Mölndal",
+      "Value": "Mölndal",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -302,7 +302,7 @@
     },
     {
       "Id": 86,
-      "Name": "Mönsterås",
+      "Value": "Mönsterås",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -311,7 +311,7 @@
     },
     {
       "Id": 87,
-      "Name": "Mörbylånga",
+      "Value": "Mörbylånga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -320,7 +320,7 @@
     },
     {
       "Id": 88,
-      "Name": "Nacka",
+      "Value": "Nacka",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -329,7 +329,7 @@
     },
     {
       "Id": 89,
-      "Name": "Nordmaling",
+      "Value": "Nordmaling",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -338,7 +338,7 @@
     },
     {
       "Id": 90,
-      "Name": "Norrköping",
+      "Value": "Norrköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -347,7 +347,7 @@
     },
     {
       "Id": 91,
-      "Name": "Norrtälje",
+      "Value": "Norrtälje",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -356,7 +356,7 @@
     },
     {
       "Id": 92,
-      "Name": "Norsjö",
+      "Value": "Norsjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -365,7 +365,7 @@
     },
     {
       "Id": 93,
-      "Name": "Nora",
+      "Value": "Nora",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -374,7 +374,7 @@
     },
     {
       "Id": 94,
-      "Name": "Norberg",
+      "Value": "Norberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -383,7 +383,7 @@
     },
     {
       "Id": 95,
-      "Name": "Nordanstig",
+      "Value": "Nordanstig",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -392,7 +392,7 @@
     },
     {
       "Id": 96,
-      "Name": "Nykvarn",
+      "Value": "Nykvarn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -401,7 +401,7 @@
     },
     {
       "Id": 97,
-      "Name": "Nyköping",
+      "Value": "Nyköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -410,7 +410,7 @@
     },
     {
       "Id": 98,
-      "Name": "Nynäshamn",
+      "Value": "Nynäshamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -419,7 +419,7 @@
     },
     {
       "Id": 99,
-      "Name": "Nässjö",
+      "Value": "Nässjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -428,7 +428,7 @@
     },
     {
       "Id": 100,
-      "Name": "Ockelbo",
+      "Value": "Ockelbo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -437,7 +437,7 @@
     },
     {
       "Id": 101,
-      "Name": "Olofström",
+      "Value": "Olofström",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -446,7 +446,7 @@
     },
     {
       "Id": 102,
-      "Name": "Orsa",
+      "Value": "Orsa",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -455,7 +455,7 @@
     },
     {
       "Id": 103,
-      "Name": "Orust",
+      "Value": "Orust",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -464,7 +464,7 @@
     },
     {
       "Id": 104,
-      "Name": "Osby",
+      "Value": "Osby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -473,7 +473,7 @@
     },
     {
       "Id": 105,
-      "Name": "Oskarshamn",
+      "Value": "Oskarshamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -482,7 +482,7 @@
     },
     {
       "Id": 106,
-      "Name": "Ovanåker",
+      "Value": "Ovanåker",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -491,7 +491,7 @@
     },
     {
       "Id": 107,
-      "Name": "Oxelösund",
+      "Value": "Oxelösund",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -500,7 +500,7 @@
     },
     {
       "Id": 108,
-      "Name": "Pajala",
+      "Value": "Pajala",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -509,7 +509,7 @@
     },
     {
       "Id": 109,
-      "Name": "Partille",
+      "Value": "Partille",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -518,7 +518,7 @@
     },
     {
       "Id": 110,
-      "Name": "Perstorp",
+      "Value": "Perstorp",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -527,7 +527,7 @@
     },
     {
       "Id": 111,
-      "Name": "Piteå",
+      "Value": "Piteå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -536,7 +536,7 @@
     },
     {
       "Id": 112,
-      "Name": "Ragunda",
+      "Value": "Ragunda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -545,7 +545,7 @@
     },
     {
       "Id": 113,
-      "Name": "Robertsfors",
+      "Value": "Robertsfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -554,7 +554,7 @@
     },
     {
       "Id": 114,
-      "Name": "Ronneby",
+      "Value": "Ronneby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -563,7 +563,7 @@
     },
     {
       "Id": 115,
-      "Name": "Rättvik",
+      "Value": "Rättvik",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -572,7 +572,7 @@
     },
     {
       "Id": 116,
-      "Name": "Sala",
+      "Value": "Sala",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -581,7 +581,7 @@
     },
     {
       "Id": 117,
-      "Name": "Salem",
+      "Value": "Salem",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -590,7 +590,7 @@
     },
     {
       "Id": 118,
-      "Name": "Sandviken",
+      "Value": "Sandviken",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -599,7 +599,7 @@
     },
     {
       "Id": 119,
-      "Name": "Sigtuna",
+      "Value": "Sigtuna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -608,7 +608,7 @@
     },
     {
       "Id": 120,
-      "Name": "Simrishamn",
+      "Value": "Simrishamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -617,7 +617,7 @@
     },
     {
       "Id": 121,
-      "Name": "Sjöbo",
+      "Value": "Sjöbo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -626,7 +626,7 @@
     },
     {
       "Id": 122,
-      "Name": "Skara",
+      "Value": "Skara",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -635,7 +635,7 @@
     },
     {
       "Id": 123,
-      "Name": "Skellefteå",
+      "Value": "Skellefteå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -644,7 +644,7 @@
     },
     {
       "Id": 124,
-      "Name": "Tingsryd",
+      "Value": "Tingsryd",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -653,7 +653,7 @@
     },
     {
       "Id": 125,
-      "Name": "Tjörn",
+      "Value": "Tjörn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -662,7 +662,7 @@
     },
     {
       "Id": 126,
-      "Name": "Tomelilla",
+      "Value": "Tomelilla",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -671,7 +671,7 @@
     },
     {
       "Id": 127,
-      "Name": "Skinnskatteberg",
+      "Value": "Skinnskatteberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -680,7 +680,7 @@
     },
     {
       "Id": 128,
-      "Name": "Sorsele",
+      "Value": "Sorsele",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -689,7 +689,7 @@
     },
     {
       "Id": 129,
-      "Name": "Sotenäs",
+      "Value": "Sotenäs",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -698,7 +698,7 @@
     },
     {
       "Id": 130,
-      "Name": "Skurup",
+      "Value": "Skurup",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -707,7 +707,7 @@
     },
     {
       "Id": 131,
-      "Name": "Skövde",
+      "Value": "Skövde",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -716,7 +716,7 @@
     },
     {
       "Id": 132,
-      "Name": "Smedjebacken",
+      "Value": "Smedjebacken",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -725,7 +725,7 @@
     },
     {
       "Id": 133,
-      "Name": "Sollefteå",
+      "Value": "Sollefteå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -734,7 +734,7 @@
     },
     {
       "Id": 134,
-      "Name": "Sollentuna",
+      "Value": "Sollentuna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -743,7 +743,7 @@
     },
     {
       "Id": 135,
-      "Name": "Solna",
+      "Value": "Solna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -752,7 +752,7 @@
     },
     {
       "Id": 136,
-      "Name": "Staffanstorp",
+      "Value": "Staffanstorp",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -761,7 +761,7 @@
     },
     {
       "Id": 137,
-      "Name": "Stenungsund",
+      "Value": "Stenungsund",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -770,7 +770,7 @@
     },
     {
       "Id": 138,
-      "Name": "Stockholm",
+      "Value": "Stockholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -779,7 +779,7 @@
     },
     {
       "Id": 139,
-      "Name": "Storfors",
+      "Value": "Storfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -788,7 +788,7 @@
     },
     {
       "Id": 140,
-      "Name": "Storuman",
+      "Value": "Storuman",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -797,7 +797,7 @@
     },
     {
       "Id": 141,
-      "Name": "Strängnäs",
+      "Value": "Strängnäs",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -806,7 +806,7 @@
     },
     {
       "Id": 142,
-      "Name": "Strömstad",
+      "Value": "Strömstad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -815,7 +815,7 @@
     },
     {
       "Id": 143,
-      "Name": "Strömsund",
+      "Value": "Strömsund",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -824,7 +824,7 @@
     },
     {
       "Id": 144,
-      "Name": "Sundbyberg",
+      "Value": "Sundbyberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -833,7 +833,7 @@
     },
     {
       "Id": 145,
-      "Name": "Sundsvall",
+      "Value": "Sundsvall",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -842,7 +842,7 @@
     },
     {
       "Id": 146,
-      "Name": "Sunne",
+      "Value": "Sunne",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -851,7 +851,7 @@
     },
     {
       "Id": 147,
-      "Name": "Borgholm",
+      "Value": "Borgholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -860,7 +860,7 @@
     },
     {
       "Id": 148,
-      "Name": "Borlänge",
+      "Value": "Borlänge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -869,7 +869,7 @@
     },
     {
       "Id": 149,
-      "Name": "Borås",
+      "Value": "Borås",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -878,7 +878,7 @@
     },
     {
       "Id": 150,
-      "Name": "Botkyrka",
+      "Value": "Botkyrka",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -887,7 +887,7 @@
     },
     {
       "Id": 151,
-      "Name": "Boxholm",
+      "Value": "Boxholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -896,7 +896,7 @@
     },
     {
       "Id": 152,
-      "Name": "Bromölla",
+      "Value": "Bromölla",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -905,7 +905,7 @@
     },
     {
       "Id": 153,
-      "Name": "Bräcke",
+      "Value": "Bräcke",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -914,7 +914,7 @@
     },
     {
       "Id": 154,
-      "Name": "Burlöv",
+      "Value": "Burlöv",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -923,7 +923,7 @@
     },
     {
       "Id": 155,
-      "Name": "Båstad",
+      "Value": "Båstad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -932,7 +932,7 @@
     },
     {
       "Id": 156,
-      "Name": "Dals-Ed",
+      "Value": "Dals-Ed",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -941,7 +941,7 @@
     },
     {
       "Id": 157,
-      "Name": "Danderyd",
+      "Value": "Danderyd",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -950,7 +950,7 @@
     },
     {
       "Id": 158,
-      "Name": "Degerfors",
+      "Value": "Degerfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -959,7 +959,7 @@
     },
     {
       "Id": 159,
-      "Name": "Dorotea",
+      "Value": "Dorotea",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -968,7 +968,7 @@
     },
     {
       "Id": 160,
-      "Name": "Eda",
+      "Value": "Eda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -977,7 +977,7 @@
     },
     {
       "Id": 161,
-      "Name": "Ekerö",
+      "Value": "Ekerö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -986,7 +986,7 @@
     },
     {
       "Id": 162,
-      "Name": "Eksjö",
+      "Value": "Eksjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -995,7 +995,7 @@
     },
     {
       "Id": 163,
-      "Name": "Emmaboda",
+      "Value": "Emmaboda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1004,7 +1004,7 @@
     },
     {
       "Id": 164,
-      "Name": "Enköping",
+      "Value": "Enköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1013,7 +1013,7 @@
     },
     {
       "Id": 165,
-      "Name": "Eskilstuna",
+      "Value": "Eskilstuna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1022,7 +1022,7 @@
     },
     {
       "Id": 166,
-      "Name": "Eslöv",
+      "Value": "Eslöv",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1031,7 +1031,7 @@
     },
     {
       "Id": 167,
-      "Name": "Essunga",
+      "Value": "Essunga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1040,7 +1040,7 @@
     },
     {
       "Id": 168,
-      "Name": "Fagersta",
+      "Value": "Fagersta",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1049,7 +1049,7 @@
     },
     {
       "Id": 169,
-      "Name": "Falkenberg",
+      "Value": "Falkenberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1058,7 +1058,7 @@
     },
     {
       "Id": 170,
-      "Name": "Falköping",
+      "Value": "Falköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1067,7 +1067,7 @@
     },
     {
       "Id": 171,
-      "Name": "Falun",
+      "Value": "Falun",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1076,7 +1076,7 @@
     },
     {
       "Id": 172,
-      "Name": "Gagnef",
+      "Value": "Gagnef",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1085,7 +1085,7 @@
     },
     {
       "Id": 173,
-      "Name": "Gislaved",
+      "Value": "Gislaved",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1094,7 +1094,7 @@
     },
     {
       "Id": 174,
-      "Name": "Filipstad",
+      "Value": "Filipstad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1103,7 +1103,7 @@
     },
     {
       "Id": 175,
-      "Name": "Finspång",
+      "Value": "Finspång",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1112,7 +1112,7 @@
     },
     {
       "Id": 176,
-      "Name": "Flen",
+      "Value": "Flen",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1121,7 +1121,7 @@
     },
     {
       "Id": 177,
-      "Name": "Forshaga",
+      "Value": "Forshaga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1130,7 +1130,7 @@
     },
     {
       "Id": 178,
-      "Name": "Färgelanda",
+      "Value": "Färgelanda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1139,7 +1139,7 @@
     },
     {
       "Id": 179,
-      "Name": "Gnesta",
+      "Value": "Gnesta",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1148,7 +1148,7 @@
     },
     {
       "Id": 180,
-      "Name": "Gnosjö",
+      "Value": "Gnosjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1157,7 +1157,7 @@
     },
     {
       "Id": 181,
-      "Name": "Gotland",
+      "Value": "Gotland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1166,7 +1166,7 @@
     },
     {
       "Id": 182,
-      "Name": "Grums",
+      "Value": "Grums",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1175,7 +1175,7 @@
     },
     {
       "Id": 183,
-      "Name": "Grästorp",
+      "Value": "Grästorp",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1184,7 +1184,7 @@
     },
     {
       "Id": 184,
-      "Name": "Gullspång",
+      "Value": "Gullspång",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1193,7 +1193,7 @@
     },
     {
       "Id": 185,
-      "Name": "Gällivare",
+      "Value": "Gällivare",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1202,7 +1202,7 @@
     },
     {
       "Id": 186,
-      "Name": "Gävle",
+      "Value": "Gävle",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1211,7 +1211,7 @@
     },
     {
       "Id": 187,
-      "Name": "Hallstahammar",
+      "Value": "Hallstahammar",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1220,7 +1220,7 @@
     },
     {
       "Id": 188,
-      "Name": "Halmstad",
+      "Value": "Halmstad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1229,7 +1229,7 @@
     },
     {
       "Id": 189,
-      "Name": "Göteborg",
+      "Value": "Göteborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1238,7 +1238,7 @@
     },
     {
       "Id": 190,
-      "Name": "Hammarö",
+      "Value": "Hammarö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1247,7 +1247,7 @@
     },
     {
       "Id": 191,
-      "Name": "Krokom",
+      "Value": "Krokom",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1256,7 +1256,7 @@
     },
     {
       "Id": 192,
-      "Name": "Götene",
+      "Value": "Götene",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1265,7 +1265,7 @@
     },
     {
       "Id": 193,
-      "Name": "Habo",
+      "Value": "Habo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1274,7 +1274,7 @@
     },
     {
       "Id": 194,
-      "Name": "Hagfors",
+      "Value": "Hagfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1283,7 +1283,7 @@
     },
     {
       "Id": 195,
-      "Name": "Hallsberg",
+      "Value": "Hallsberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1292,7 +1292,7 @@
     },
     {
       "Id": 196,
-      "Name": "Haninge",
+      "Value": "Haninge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1301,7 +1301,7 @@
     },
     {
       "Id": 197,
-      "Name": "Haparanda",
+      "Value": "Haparanda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1310,7 +1310,7 @@
     },
     {
       "Id": 198,
-      "Name": "Hedemora",
+      "Value": "Hedemora",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1319,7 +1319,7 @@
     },
     {
       "Id": 199,
-      "Name": "Heby",
+      "Value": "Heby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1328,7 +1328,7 @@
     },
     {
       "Id": 200,
-      "Name": "Helsingborg",
+      "Value": "Helsingborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1337,7 +1337,7 @@
     },
     {
       "Id": 201,
-      "Name": "Herrljunga",
+      "Value": "Herrljunga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1346,7 +1346,7 @@
     },
     {
       "Id": 202,
-      "Name": "Hjo",
+      "Value": "Hjo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1355,7 +1355,7 @@
     },
     {
       "Id": 203,
-      "Name": "Hofors",
+      "Value": "Hofors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1364,7 +1364,7 @@
     },
     {
       "Id": 204,
-      "Name": "Huddinge",
+      "Value": "Huddinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1373,7 +1373,7 @@
     },
     {
       "Id": 205,
-      "Name": "Hudiksvall",
+      "Value": "Hudiksvall",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1382,7 +1382,7 @@
     },
     {
       "Id": 206,
-      "Name": "Hultsfred",
+      "Value": "Hultsfred",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1391,7 +1391,7 @@
     },
     {
       "Id": 207,
-      "Name": "Hylte",
+      "Value": "Hylte",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1400,7 +1400,7 @@
     },
     {
       "Id": 208,
-      "Name": "Hällefors",
+      "Value": "Hällefors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1409,7 +1409,7 @@
     },
     {
       "Id": 209,
-      "Name": "Härjedalen",
+      "Value": "Härjedalen",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1418,7 +1418,7 @@
     },
     {
       "Id": 210,
-      "Name": "Härnösand",
+      "Value": "Härnösand",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1427,7 +1427,7 @@
     },
     {
       "Id": 211,
-      "Name": "Härryda",
+      "Value": "Härryda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1436,7 +1436,7 @@
     },
     {
       "Id": 212,
-      "Name": "Hässleholm",
+      "Value": "Hässleholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1445,7 +1445,7 @@
     },
     {
       "Id": 213,
-      "Name": "Håbo",
+      "Value": "Håbo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1454,7 +1454,7 @@
     },
     {
       "Id": 214,
-      "Name": "Höganäs",
+      "Value": "Höganäs",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1463,7 +1463,7 @@
     },
     {
       "Id": 215,
-      "Name": "Högsby",
+      "Value": "Högsby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1472,7 +1472,7 @@
     },
     {
       "Id": 216,
-      "Name": "Hörby",
+      "Value": "Hörby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1481,7 +1481,7 @@
     },
     {
       "Id": 217,
-      "Name": "Höör",
+      "Value": "Höör",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1490,7 +1490,7 @@
     },
     {
       "Id": 218,
-      "Name": "Jokkmokk",
+      "Value": "Jokkmokk",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1499,7 +1499,7 @@
     },
     {
       "Id": 219,
-      "Name": "Järfälla",
+      "Value": "Järfälla",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1508,7 +1508,7 @@
     },
     {
       "Id": 220,
-      "Name": "Jönköping",
+      "Value": "Jönköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1517,7 +1517,7 @@
     },
     {
       "Id": 221,
-      "Name": "Kalix",
+      "Value": "Kalix",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1526,7 +1526,7 @@
     },
     {
       "Id": 222,
-      "Name": "Kalmar",
+      "Value": "Kalmar",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1535,7 +1535,7 @@
     },
     {
       "Id": 223,
-      "Name": "Karlsborg",
+      "Value": "Karlsborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1544,7 +1544,7 @@
     },
     {
       "Id": 224,
-      "Name": "Karlshamn",
+      "Value": "Karlshamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1553,7 +1553,7 @@
     },
     {
       "Id": 225,
-      "Name": "Karlskoga",
+      "Value": "Karlskoga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1562,7 +1562,7 @@
     },
     {
       "Id": 226,
-      "Name": "Karlskrona",
+      "Value": "Karlskrona",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1571,7 +1571,7 @@
     },
     {
       "Id": 227,
-      "Name": "Karlstad",
+      "Value": "Karlstad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1580,7 +1580,7 @@
     },
     {
       "Id": 228,
-      "Name": "Katrineholm",
+      "Value": "Katrineholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1589,7 +1589,7 @@
     },
     {
       "Id": 229,
-      "Name": "Kil",
+      "Value": "Kil",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1598,7 +1598,7 @@
     },
     {
       "Id": 230,
-      "Name": "Kinda",
+      "Value": "Kinda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1607,7 +1607,7 @@
     },
     {
       "Id": 231,
-      "Name": "Kiruna",
+      "Value": "Kiruna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1616,7 +1616,7 @@
     },
     {
       "Id": 232,
-      "Name": "Klippan",
+      "Value": "Klippan",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1625,7 +1625,7 @@
     },
     {
       "Id": 233,
-      "Name": "Knivsta",
+      "Value": "Knivsta",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1634,7 +1634,7 @@
     },
     {
       "Id": 234,
-      "Name": "Kramfors",
+      "Value": "Kramfors",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1643,7 +1643,7 @@
     },
     {
       "Id": 235,
-      "Name": "Kristianstad",
+      "Value": "Kristianstad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1652,7 +1652,7 @@
     },
     {
       "Id": 236,
-      "Name": "Kristinehamn",
+      "Value": "Kristinehamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1661,7 +1661,7 @@
     },
     {
       "Id": 237,
-      "Name": "Kumla",
+      "Value": "Kumla",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1670,7 +1670,7 @@
     },
     {
       "Id": 238,
-      "Name": "Kungsbacka",
+      "Value": "Kungsbacka",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1679,7 +1679,7 @@
     },
     {
       "Id": 239,
-      "Name": "Nybro",
+      "Value": "Nybro",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1688,7 +1688,7 @@
     },
     {
       "Id": 240,
-      "Name": "Kungsör",
+      "Value": "Kungsör",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1697,7 +1697,7 @@
     },
     {
       "Id": 241,
-      "Name": "Kungälv",
+      "Value": "Kungälv",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1706,7 +1706,7 @@
     },
     {
       "Id": 242,
-      "Name": "Kävlinge",
+      "Value": "Kävlinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1715,7 +1715,7 @@
     },
     {
       "Id": 243,
-      "Name": "Landskrona",
+      "Value": "Landskrona",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1724,7 +1724,7 @@
     },
     {
       "Id": 244,
-      "Name": "Laxå",
+      "Value": "Laxå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1733,7 +1733,7 @@
     },
     {
       "Id": 245,
-      "Name": "Lekeberg",
+      "Value": "Lekeberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1742,7 +1742,7 @@
     },
     {
       "Id": 246,
-      "Name": "Leksand",
+      "Value": "Leksand",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1751,7 +1751,7 @@
     },
     {
       "Id": 247,
-      "Name": "Köping",
+      "Value": "Köping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1760,7 +1760,7 @@
     },
     {
       "Id": 248,
-      "Name": "Laholm",
+      "Value": "Laholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1769,7 +1769,7 @@
     },
     {
       "Id": 249,
-      "Name": "Lerum",
+      "Value": "Lerum",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1778,7 +1778,7 @@
     },
     {
       "Id": 250,
-      "Name": "Ljusnarsberg",
+      "Value": "Ljusnarsberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1787,7 +1787,7 @@
     },
     {
       "Id": 251,
-      "Name": "Lomma",
+      "Value": "Lomma",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1796,7 +1796,7 @@
     },
     {
       "Id": 252,
-      "Name": "Lessebo",
+      "Value": "Lessebo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1805,7 +1805,7 @@
     },
     {
       "Id": 253,
-      "Name": "Lidingö",
+      "Value": "Lidingö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1814,7 +1814,7 @@
     },
     {
       "Id": 254,
-      "Name": "Lidköping",
+      "Value": "Lidköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1823,7 +1823,7 @@
     },
     {
       "Id": 255,
-      "Name": "Lilla Edet",
+      "Value": "Lilla Edet",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1832,7 +1832,7 @@
     },
     {
       "Id": 256,
-      "Name": "Lindesberg",
+      "Value": "Lindesberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1841,7 +1841,7 @@
     },
     {
       "Id": 257,
-      "Name": "Linköping",
+      "Value": "Linköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1850,7 +1850,7 @@
     },
     {
       "Id": 258,
-      "Name": "Ljungby",
+      "Value": "Ljungby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1859,7 +1859,7 @@
     },
     {
       "Id": 259,
-      "Name": "Ljusdal",
+      "Value": "Ljusdal",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1868,7 +1868,7 @@
     },
     {
       "Id": 260,
-      "Name": "Ludvika",
+      "Value": "Ludvika",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1877,7 +1877,7 @@
     },
     {
       "Id": 261,
-      "Name": "Luleå",
+      "Value": "Luleå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1886,7 +1886,7 @@
     },
     {
       "Id": 262,
-      "Name": "Lund",
+      "Value": "Lund",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1895,7 +1895,7 @@
     },
     {
       "Id": 263,
-      "Name": "Surahammar",
+      "Value": "Surahammar",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1904,7 +1904,7 @@
     },
     {
       "Id": 264,
-      "Name": "Svalöv",
+      "Value": "Svalöv",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1913,7 +1913,7 @@
     },
     {
       "Id": 265,
-      "Name": "Svedala",
+      "Value": "Svedala",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1922,7 +1922,7 @@
     },
     {
       "Id": 266,
-      "Name": "Svenljunga",
+      "Value": "Svenljunga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1931,7 +1931,7 @@
     },
     {
       "Id": 267,
-      "Name": "Säffle",
+      "Value": "Säffle",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1940,7 +1940,7 @@
     },
     {
       "Id": 268,
-      "Name": "Säter",
+      "Value": "Säter",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1949,7 +1949,7 @@
     },
     {
       "Id": 269,
-      "Name": "Sävsjö",
+      "Value": "Sävsjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1958,7 +1958,7 @@
     },
     {
       "Id": 270,
-      "Name": "Söderhamn",
+      "Value": "Söderhamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1967,7 +1967,7 @@
     },
     {
       "Id": 271,
-      "Name": "Söderköping",
+      "Value": "Söderköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1976,7 +1976,7 @@
     },
     {
       "Id": 272,
-      "Name": "Södertälje",
+      "Value": "Södertälje",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1985,7 +1985,7 @@
     },
     {
       "Id": 273,
-      "Name": "Sölvesborg",
+      "Value": "Sölvesborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -1994,7 +1994,7 @@
     },
     {
       "Id": 274,
-      "Name": "Tanum",
+      "Value": "Tanum",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2003,7 +2003,7 @@
     },
     {
       "Id": 275,
-      "Name": "Tibro",
+      "Value": "Tibro",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2012,7 +2012,7 @@
     },
     {
       "Id": 276,
-      "Name": "Tidaholm",
+      "Value": "Tidaholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2021,7 +2021,7 @@
     },
     {
       "Id": 277,
-      "Name": "Tierp",
+      "Value": "Tierp",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2030,7 +2030,7 @@
     },
     {
       "Id": 278,
-      "Name": "Timrå",
+      "Value": "Timrå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2039,7 +2039,7 @@
     },
     {
       "Id": 279,
-      "Name": "Torsby",
+      "Value": "Torsby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2048,7 +2048,7 @@
     },
     {
       "Id": 280,
-      "Name": "Torsås",
+      "Value": "Torsås",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2057,7 +2057,7 @@
     },
     {
       "Id": 281,
-      "Name": "Älvsbyn",
+      "Value": "Älvsbyn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2066,7 +2066,7 @@
     },
     {
       "Id": 282,
-      "Name": "Tranemo",
+      "Value": "Tranemo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2075,7 +2075,7 @@
     },
     {
       "Id": 283,
-      "Name": "Tranås",
+      "Value": "Tranås",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2084,7 +2084,7 @@
     },
     {
       "Id": 284,
-      "Name": "Trelleborg",
+      "Value": "Trelleborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2093,7 +2093,7 @@
     },
     {
       "Id": 285,
-      "Name": "Trollhättan",
+      "Value": "Trollhättan",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2102,7 +2102,7 @@
     },
     {
       "Id": 286,
-      "Name": "Trosa",
+      "Value": "Trosa",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2111,7 +2111,7 @@
     },
     {
       "Id": 287,
-      "Name": "Tyresö",
+      "Value": "Tyresö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2120,7 +2120,7 @@
     },
     {
       "Id": 288,
-      "Name": "Täby",
+      "Value": "Täby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2129,7 +2129,7 @@
     },
     {
       "Id": 289,
-      "Name": "Töreboda",
+      "Value": "Töreboda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2138,7 +2138,7 @@
     },
     {
       "Id": 290,
-      "Name": "Upplands Väsby",
+      "Value": "Upplands Väsby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2147,7 +2147,7 @@
     },
     {
       "Id": 291,
-      "Name": "Uppsala",
+      "Value": "Uppsala",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2156,7 +2156,7 @@
     },
     {
       "Id": 292,
-      "Name": "Uppvidinge",
+      "Value": "Uppvidinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2165,7 +2165,7 @@
     },
     {
       "Id": 293,
-      "Name": "Uddevalla",
+      "Value": "Uddevalla",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2174,7 +2174,7 @@
     },
     {
       "Id": 294,
-      "Name": "Ulricehamn",
+      "Value": "Ulricehamn",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2183,7 +2183,7 @@
     },
     {
       "Id": 295,
-      "Name": "Umeå",
+      "Value": "Umeå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2192,7 +2192,7 @@
     },
     {
       "Id": 296,
-      "Name": "Upplands-Bro",
+      "Value": "Upplands-Bro",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2201,7 +2201,7 @@
     },
     {
       "Id": 297,
-      "Name": "Vadstena",
+      "Value": "Vadstena",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2210,7 +2210,7 @@
     },
     {
       "Id": 298,
-      "Name": "Vaggeryd",
+      "Value": "Vaggeryd",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2219,7 +2219,7 @@
     },
     {
       "Id": 299,
-      "Name": "Valdemarsvik",
+      "Value": "Valdemarsvik",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2228,7 +2228,7 @@
     },
     {
       "Id": 300,
-      "Name": "Vallentuna",
+      "Value": "Vallentuna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2237,7 +2237,7 @@
     },
     {
       "Id": 301,
-      "Name": "Vansbro",
+      "Value": "Vansbro",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2246,7 +2246,7 @@
     },
     {
       "Id": 302,
-      "Name": "Vara",
+      "Value": "Vara",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2255,7 +2255,7 @@
     },
     {
       "Id": 303,
-      "Name": "Varberg",
+      "Value": "Varberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2264,7 +2264,7 @@
     },
     {
       "Id": 304,
-      "Name": "Vaxholm",
+      "Value": "Vaxholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2273,7 +2273,7 @@
     },
     {
       "Id": 305,
-      "Name": "Vellinge",
+      "Value": "Vellinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2282,7 +2282,7 @@
     },
     {
       "Id": 306,
-      "Name": "Vetlanda",
+      "Value": "Vetlanda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2291,7 +2291,7 @@
     },
     {
       "Id": 307,
-      "Name": "Vilhelmina",
+      "Value": "Vilhelmina",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2300,7 +2300,7 @@
     },
     {
       "Id": 308,
-      "Name": "Vimmerby",
+      "Value": "Vimmerby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2309,7 +2309,7 @@
     },
     {
       "Id": 309,
-      "Name": "Vindeln",
+      "Value": "Vindeln",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2318,7 +2318,7 @@
     },
     {
       "Id": 310,
-      "Name": "Vingåker",
+      "Value": "Vingåker",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2327,7 +2327,7 @@
     },
     {
       "Id": 311,
-      "Name": "Vänersborg",
+      "Value": "Vänersborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2336,7 +2336,7 @@
     },
     {
       "Id": 312,
-      "Name": "Vännäs",
+      "Value": "Vännäs",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2345,7 +2345,7 @@
     },
     {
       "Id": 313,
-      "Name": "Älvdalen",
+      "Value": "Älvdalen",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2354,7 +2354,7 @@
     },
     {
       "Id": 314,
-      "Name": "Älvkarleby",
+      "Value": "Älvkarleby",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2363,7 +2363,7 @@
     },
     {
       "Id": 315,
-      "Name": "Värmdö",
+      "Value": "Värmdö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2372,7 +2372,7 @@
     },
     {
       "Id": 316,
-      "Name": "Värnamo",
+      "Value": "Värnamo",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2381,7 +2381,7 @@
     },
     {
       "Id": 317,
-      "Name": "Västervik",
+      "Value": "Västervik",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2390,7 +2390,7 @@
     },
     {
       "Id": 318,
-      "Name": "Västerås",
+      "Value": "Västerås",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2399,7 +2399,7 @@
     },
     {
       "Id": 319,
-      "Name": "Växjö",
+      "Value": "Växjö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2408,7 +2408,7 @@
     },
     {
       "Id": 320,
-      "Name": "Vårgårda",
+      "Value": "Vårgårda",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2417,7 +2417,7 @@
     },
     {
       "Id": 321,
-      "Name": "Ydre",
+      "Value": "Ydre",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2426,7 +2426,7 @@
     },
     {
       "Id": 322,
-      "Name": "Ystad",
+      "Value": "Ystad",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2435,7 +2435,7 @@
     },
     {
       "Id": 323,
-      "Name": "Älmhult",
+      "Value": "Älmhult",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2444,7 +2444,7 @@
     },
     {
       "Id": 324,
-      "Name": "Ängelholm",
+      "Value": "Ängelholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2453,7 +2453,7 @@
     },
     {
       "Id": 325,
-      "Name": "Åmål",
+      "Value": "Åmål",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2462,7 +2462,7 @@
     },
     {
       "Id": 326,
-      "Name": "Ånge",
+      "Value": "Ånge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2471,7 +2471,7 @@
     },
     {
       "Id": 327,
-      "Name": "Åre",
+      "Value": "Åre",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2480,7 +2480,7 @@
     },
     {
       "Id": 328,
-      "Name": "Årjäng",
+      "Value": "Årjäng",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2489,7 +2489,7 @@
     },
     {
       "Id": 329,
-      "Name": "Åsele",
+      "Value": "Åsele",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2498,7 +2498,7 @@
     },
     {
       "Id": 330,
-      "Name": "Åstorp",
+      "Value": "Åstorp",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2507,7 +2507,7 @@
     },
     {
       "Id": 331,
-      "Name": "Åtvidaberg",
+      "Value": "Åtvidaberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2516,7 +2516,7 @@
     },
     {
       "Id": 332,
-      "Name": "Öckerö",
+      "Value": "Öckerö",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2525,7 +2525,7 @@
     },
     {
       "Id": 333,
-      "Name": "Ödeshög",
+      "Value": "Ödeshög",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2534,7 +2534,7 @@
     },
     {
       "Id": 334,
-      "Name": "Örebro",
+      "Value": "Örebro",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2543,7 +2543,7 @@
     },
     {
       "Id": 335,
-      "Name": "Örkelljunga",
+      "Value": "Örkelljunga",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2552,7 +2552,7 @@
     },
     {
       "Id": 336,
-      "Name": "Örnsköldsvik",
+      "Value": "Örnsköldsvik",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2561,7 +2561,7 @@
     },
     {
       "Id": 337,
-      "Name": "Östersund",
+      "Value": "Östersund",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2570,7 +2570,7 @@
     },
     {
       "Id": 338,
-      "Name": "Österåker",
+      "Value": "Österåker",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2579,7 +2579,7 @@
     },
     {
       "Id": 339,
-      "Name": "Östhammar",
+      "Value": "Östhammar",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2588,7 +2588,7 @@
     },
     {
       "Id": 340,
-      "Name": "Östra Göinge",
+      "Value": "Östra Göinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2597,7 +2597,7 @@
     },
     {
       "Id": 341,
-      "Name": "Överkalix",
+      "Value": "Överkalix",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,
@@ -2606,7 +2606,7 @@
     },
     {
       "Id": 342,
-      "Name": "Övertorneå",
+      "Value": "Övertorneå",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 1,

@@ -5,2192 +5,2192 @@
   "Values": [
     {
       "Id": 165,
-      "Name": "ArtDatabanken",
+      "Value": "ArtDatabanken",
       "Localized": false
     },
     {
       "Id": 166,
-      "Name": "Nationella rapportkommittén",
+      "Value": "Nationella rapportkommittén",
       "Localized": false
     },
     {
       "Id": 167,
-      "Name": "Raritetskommittén ",
+      "Value": "Raritetskommittén ",
       "Localized": false
     },
     {
       "Id": 168,
-      "Name": "Blekinge rapportkommitté",
+      "Value": "Blekinge rapportkommitté",
       "Localized": false
     },
     {
       "Id": 169,
-      "Name": "Bohuslän rapportkommitté",
+      "Value": "Bohuslän rapportkommitté",
       "Localized": false
     },
     {
       "Id": 170,
-      "Name": "Dalarnas rapportkommitté",
+      "Value": "Dalarnas rapportkommitté",
       "Localized": false
     },
     {
       "Id": 171,
-      "Name": "Dalslands rapportkommitté",
+      "Value": "Dalslands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 172,
-      "Name": "Lokala rapportkommittén Vänersborg",
+      "Value": "Lokala rapportkommittén Vänersborg",
       "Localized": false
     },
     {
       "Id": 173,
-      "Name": "Sveriges ornitologiska förening (SOF)",
+      "Value": "Sveriges ornitologiska förening (SOF)",
       "Localized": false
     },
     {
       "Id": 174,
-      "Name": "Lokala rapportkommittén Lerum",
+      "Value": "Lokala rapportkommittén Lerum",
       "Localized": false
     },
     {
       "Id": 175,
-      "Name": "Lokala rapportkommittén Skara",
+      "Value": "Lokala rapportkommittén Skara",
       "Localized": false
     },
     {
       "Id": 176,
-      "Name": "Lokala rapportkommittén Svenljunga",
+      "Value": "Lokala rapportkommittén Svenljunga",
       "Localized": false
     },
     {
       "Id": 177,
-      "Name": "Lokala rapportkommittén Tidaholm",
+      "Value": "Lokala rapportkommittén Tidaholm",
       "Localized": false
     },
     {
       "Id": 178,
-      "Name": "Lokala rapportkommittén Vara",
+      "Value": "Lokala rapportkommittén Vara",
       "Localized": false
     },
     {
       "Id": 179,
-      "Name": "Lokala rapportkommittén Vbgviken",
+      "Value": "Lokala rapportkommittén Vbgviken",
       "Localized": false
     },
     {
       "Id": 180,
-      "Name": "Lokala rapportkommittén Essunga",
+      "Value": "Lokala rapportkommittén Essunga",
       "Localized": false
     },
     {
       "Id": 181,
-      "Name": "Lokala rapportkommittén Gullspång",
+      "Value": "Lokala rapportkommittén Gullspång",
       "Localized": false
     },
     {
       "Id": 182,
-      "Name": "Lokala rapportkommittén Götene",
+      "Value": "Lokala rapportkommittén Götene",
       "Localized": false
     },
     {
       "Id": 183,
-      "Name": "Lokala rapportkommittén Habo-Mullsjö",
+      "Value": "Lokala rapportkommittén Habo-Mullsjö",
       "Localized": false
     },
     {
       "Id": 184,
-      "Name": "Lokala rapportkommittén Herrljunga",
+      "Value": "Lokala rapportkommittén Herrljunga",
       "Localized": false
     },
     {
       "Id": 185,
-      "Name": "Lokala rapportkommittén Hullsjön",
+      "Value": "Lokala rapportkommittén Hullsjön",
       "Localized": false
     },
     {
       "Id": 186,
-      "Name": "Östergötlands rapportkommitté",
+      "Value": "Östergötlands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 187,
-      "Name": "Östra Smålands rapportkommitté",
+      "Value": "Östra Smålands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 188,
-      "Name": "Lokala rapportkommittén Ale",
+      "Value": "Lokala rapportkommittén Ale",
       "Localized": false
     },
     {
       "Id": 189,
-      "Name": "Lokala rapportkommittén Alingsås",
+      "Value": "Lokala rapportkommittén Alingsås",
       "Localized": false
     },
     {
       "Id": 190,
-      "Name": "Lokala rapportkommittén Bollebygd",
+      "Value": "Lokala rapportkommittén Bollebygd",
       "Localized": false
     },
     {
       "Id": 191,
-      "Name": "Lokala rapportkommittén Dettern",
+      "Value": "Lokala rapportkommittén Dettern",
       "Localized": false
     },
     {
       "Id": 192,
-      "Name": "Värmlands rapportkommitté",
+      "Value": "Värmlands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 193,
-      "Name": "Västerbottens rapportkommitté",
+      "Value": "Västerbottens rapportkommitté",
       "Localized": false
     },
     {
       "Id": 194,
-      "Name": "Västergötlands rapportkommitté",
+      "Value": "Västergötlands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 195,
-      "Name": "Västmanlands rapportkommitté",
+      "Value": "Västmanlands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 196,
-      "Name": "Ångermanlands rapportkommitté",
+      "Value": "Ångermanlands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 197,
-      "Name": "Ölands rapportkommitté",
+      "Value": "Ölands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 198,
-      "Name": "Närkes rapportkommitté",
+      "Value": "Närkes rapportkommitté",
       "Localized": false
     },
     {
       "Id": 199,
-      "Name": "Skånes rapportkommitté",
+      "Value": "Skånes rapportkommitté",
       "Localized": false
     },
     {
       "Id": 200,
-      "Name": "Stockholms rapportkommitté",
+      "Value": "Stockholms rapportkommitté",
       "Localized": false
     },
     {
       "Id": 201,
-      "Name": "Södermanlands rapportkommitté",
+      "Value": "Södermanlands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 202,
-      "Name": "Södra lapplands rapporteringskommitté",
+      "Value": "Södra lapplands rapporteringskommitté",
       "Localized": false
     },
     {
       "Id": 203,
-      "Name": "Upplands rapportkommitté",
+      "Value": "Upplands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 204,
-      "Name": "Jämtlands rapportkommitté",
+      "Value": "Jämtlands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 205,
-      "Name": "Jönköpings rapportkommitté",
+      "Value": "Jönköpings rapportkommitté",
       "Localized": false
     },
     {
       "Id": 206,
-      "Name": "Kronobergs rapportkommitté",
+      "Value": "Kronobergs rapportkommitté",
       "Localized": false
     },
     {
       "Id": 207,
-      "Name": "Medelpads rapportkommitté",
+      "Value": "Medelpads rapportkommitté",
       "Localized": false
     },
     {
       "Id": 208,
-      "Name": "Norra lapplands rapportkommitté",
+      "Value": "Norra lapplands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 209,
-      "Name": "Norrbottens rapportkommitté",
+      "Value": "Norrbottens rapportkommitté",
       "Localized": false
     },
     {
       "Id": 210,
-      "Name": "Gotlands rapportkommitté",
+      "Value": "Gotlands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 211,
-      "Name": "Gästriklands rapportkommitté",
+      "Value": "Gästriklands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 212,
-      "Name": "Göteborgs rapportkommitté",
+      "Value": "Göteborgs rapportkommitté",
       "Localized": false
     },
     {
       "Id": 213,
-      "Name": "Hallands rapportkommitté",
+      "Value": "Hallands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 214,
-      "Name": "Hälsinglands rapportkommitté",
+      "Value": "Hälsinglands rapportkommitté",
       "Localized": false
     },
     {
       "Id": 215,
-      "Name": "Härjedalens rapportkommitté",
+      "Value": "Härjedalens rapportkommitté",
       "Localized": false
     },
     {
       "Id": 216,
-      "Name": "Länsstyrelsen Gävleborg",
+      "Value": "Länsstyrelsen Gävleborg",
       "Localized": false
     },
     {
       "Id": 217,
-      "Name": "Länsstyrelsen Halland",
+      "Value": "Länsstyrelsen Halland",
       "Localized": false
     },
     {
       "Id": 218,
-      "Name": "Länsstyrelsen Södermanland",
+      "Value": "Länsstyrelsen Södermanland",
       "Localized": false
     },
     {
       "Id": 219,
-      "Name": "Länsstyrelsen Uppsala",
+      "Value": "Länsstyrelsen Uppsala",
       "Localized": false
     },
     {
       "Id": 220,
-      "Name": "Länsstyrelsen Blekinge",
+      "Value": "Länsstyrelsen Blekinge",
       "Localized": false
     },
     {
       "Id": 221,
-      "Name": "Länsstyrelsen Gotland",
+      "Value": "Länsstyrelsen Gotland",
       "Localized": false
     },
     {
       "Id": 222,
-      "Name": "Länsstyrelsen Dalarna",
+      "Value": "Länsstyrelsen Dalarna",
       "Localized": false
     },
     {
       "Id": 223,
-      "Name": "Länsstyrelsen Kronoberg",
+      "Value": "Länsstyrelsen Kronoberg",
       "Localized": false
     },
     {
       "Id": 224,
-      "Name": "Länsstyrelsen Norrbotten",
+      "Value": "Länsstyrelsen Norrbotten",
       "Localized": false
     },
     {
       "Id": 225,
-      "Name": "Länsstyrelsen Västerbotten",
+      "Value": "Länsstyrelsen Västerbotten",
       "Localized": false
     },
     {
       "Id": 226,
-      "Name": "Länsstyrelsen Västernorrland",
+      "Value": "Länsstyrelsen Västernorrland",
       "Localized": false
     },
     {
       "Id": 227,
-      "Name": "Länsstyrelsen Västmanland",
+      "Value": "Länsstyrelsen Västmanland",
       "Localized": false
     },
     {
       "Id": 228,
-      "Name": "Länsstyrelsen Västra Götaland",
+      "Value": "Länsstyrelsen Västra Götaland",
       "Localized": false
     },
     {
       "Id": 229,
-      "Name": "Länsstyrelsen Örebro",
+      "Value": "Länsstyrelsen Örebro",
       "Localized": false
     },
     {
       "Id": 230,
-      "Name": "Länsstyrelsen Östergötland",
+      "Value": "Länsstyrelsen Östergötland",
       "Localized": false
     },
     {
       "Id": 231,
-      "Name": "Länsstyrelsen Jämtland",
+      "Value": "Länsstyrelsen Jämtland",
       "Localized": false
     },
     {
       "Id": 232,
-      "Name": "Länsstyrelsen Jönköping",
+      "Value": "Länsstyrelsen Jönköping",
       "Localized": false
     },
     {
       "Id": 233,
-      "Name": "Länsstyrelsen Kalmar",
+      "Value": "Länsstyrelsen Kalmar",
       "Localized": false
     },
     {
       "Id": 234,
-      "Name": "Länsstyrelsen Skåne",
+      "Value": "Länsstyrelsen Skåne",
       "Localized": false
     },
     {
       "Id": 235,
-      "Name": "Länsstyrelsen Stockholm",
+      "Value": "Länsstyrelsen Stockholm",
       "Localized": false
     },
     {
       "Id": 236,
-      "Name": "Länsstyrelsen Värmland",
+      "Value": "Länsstyrelsen Värmland",
       "Localized": false
     },
     {
       "Id": 237,
-      "Name": "Borgholms kommun",
+      "Value": "Borgholms kommun",
       "Localized": false
     },
     {
       "Id": 238,
-      "Name": "Eskilstuna kommun",
+      "Value": "Eskilstuna kommun",
       "Localized": false
     },
     {
       "Id": 239,
-      "Name": "Falkenbergs kommun",
+      "Value": "Falkenbergs kommun",
       "Localized": false
     },
     {
       "Id": 240,
-      "Name": "Falu kommun",
+      "Value": "Falu kommun",
       "Localized": false
     },
     {
       "Id": 241,
-      "Name": "Gävle kommun",
+      "Value": "Gävle kommun",
       "Localized": false
     },
     {
       "Id": 242,
-      "Name": "Hagfors kommun",
+      "Value": "Hagfors kommun",
       "Localized": false
     },
     {
       "Id": 243,
-      "Name": "Lycksele kommun",
+      "Value": "Lycksele kommun",
       "Localized": false
     },
     {
       "Id": 244,
-      "Name": "Skurups kommun",
+      "Value": "Skurups kommun",
       "Localized": false
     },
     {
       "Id": 245,
-      "Name": "Lunds kommun",
+      "Value": "Lunds kommun",
       "Localized": false
     },
     {
       "Id": 246,
-      "Name": "Örebro kommun",
+      "Value": "Örebro kommun",
       "Localized": false
     },
     {
       "Id": 247,
-      "Name": "Partille kommun",
+      "Value": "Partille kommun",
       "Localized": false
     },
     {
       "Id": 248,
-      "Name": "Gotlands region",
+      "Value": "Gotlands region",
       "Localized": false
     },
     {
       "Id": 249,
-      "Name": "Halmstads kommun",
+      "Value": "Halmstads kommun",
       "Localized": false
     },
     {
       "Id": 250,
-      "Name": "Lomma kommun",
+      "Value": "Lomma kommun",
       "Localized": false
     },
     {
       "Id": 251,
-      "Name": "Bräcke kommun",
+      "Value": "Bräcke kommun",
       "Localized": false
     },
     {
       "Id": 252,
-      "Name": "Nyköpings kommun",
+      "Value": "Nyköpings kommun",
       "Localized": false
     },
     {
       "Id": 253,
-      "Name": "Eda kommun",
+      "Value": "Eda kommun",
       "Localized": false
     },
     {
       "Id": 254,
-      "Name": "Säffle kommun",
+      "Value": "Säffle kommun",
       "Localized": false
     },
     {
       "Id": 255,
-      "Name": "Uppsala kommun",
+      "Value": "Uppsala kommun",
       "Localized": false
     },
     {
       "Id": 256,
-      "Name": "Varbergs kommun",
+      "Value": "Varbergs kommun",
       "Localized": false
     },
     {
       "Id": 257,
-      "Name": "Svenljunga kommun",
+      "Value": "Svenljunga kommun",
       "Localized": false
     },
     {
       "Id": 258,
-      "Name": "Södertälje kommun",
+      "Value": "Södertälje kommun",
       "Localized": false
     },
     {
       "Id": 259,
-      "Name": "Tyresö kommun",
+      "Value": "Tyresö kommun",
       "Localized": false
     },
     {
       "Id": 260,
-      "Name": "Upplands-Bro kommun",
+      "Value": "Upplands-Bro kommun",
       "Localized": false
     },
     {
       "Id": 261,
-      "Name": "Göteborgs Stad",
+      "Value": "Göteborgs Stad",
       "Localized": false
     },
     {
       "Id": 262,
-      "Name": "Stockholms Stad",
+      "Value": "Stockholms Stad",
       "Localized": false
     },
     {
       "Id": 263,
-      "Name": "Munkedals kommun",
+      "Value": "Munkedals kommun",
       "Localized": false
     },
     {
       "Id": 264,
-      "Name": "Norrköpings kommun",
+      "Value": "Norrköpings kommun",
       "Localized": false
     },
     {
       "Id": 265,
-      "Name": "Norrtälje kommun",
+      "Value": "Norrtälje kommun",
       "Localized": false
     },
     {
       "Id": 266,
-      "Name": "Nybro kommun",
+      "Value": "Nybro kommun",
       "Localized": false
     },
     {
       "Id": 267,
-      "Name": "Nykvarn kommun",
+      "Value": "Nykvarn kommun",
       "Localized": false
     },
     {
       "Id": 268,
-      "Name": "Strängnäs kommun",
+      "Value": "Strängnäs kommun",
       "Localized": false
     },
     {
       "Id": 269,
-      "Name": "Laxå kommun",
+      "Value": "Laxå kommun",
       "Localized": false
     },
     {
       "Id": 270,
-      "Name": "Lindesbergs kommun",
+      "Value": "Lindesbergs kommun",
       "Localized": false
     },
     {
       "Id": 271,
-      "Name": "Linköpings kommun",
+      "Value": "Linköpings kommun",
       "Localized": false
     },
     {
       "Id": 272,
-      "Name": "Ludvika kommun",
+      "Value": "Ludvika kommun",
       "Localized": false
     },
     {
       "Id": 273,
-      "Name": "Marks kommun",
+      "Value": "Marks kommun",
       "Localized": false
     },
     {
       "Id": 274,
-      "Name": "Motala kommun",
+      "Value": "Motala kommun",
       "Localized": false
     },
     {
       "Id": 275,
-      "Name": "Jönköpings kommun",
+      "Value": "Jönköpings kommun",
       "Localized": false
     },
     {
       "Id": 276,
-      "Name": "Kalix kommun",
+      "Value": "Kalix kommun",
       "Localized": false
     },
     {
       "Id": 277,
-      "Name": "Karlstads kommun",
+      "Value": "Karlstads kommun",
       "Localized": false
     },
     {
       "Id": 278,
-      "Name": "Katrineholms kommun",
+      "Value": "Katrineholms kommun",
       "Localized": false
     },
     {
       "Id": 279,
-      "Name": "Kävlinge kommun",
+      "Value": "Kävlinge kommun",
       "Localized": false
     },
     {
       "Id": 280,
-      "Name": "Laholms kommun",
+      "Value": "Laholms kommun",
       "Localized": false
     },
     {
       "Id": 281,
-      "Name": "Haninge Kommun",
+      "Value": "Haninge Kommun",
       "Localized": false
     },
     {
       "Id": 282,
-      "Name": "Huddinge kommun",
+      "Value": "Huddinge kommun",
       "Localized": false
     },
     {
       "Id": 283,
-      "Name": "Hultsfred kommun",
+      "Value": "Hultsfred kommun",
       "Localized": false
     },
     {
       "Id": 284,
-      "Name": "Härryda kommun",
+      "Value": "Härryda kommun",
       "Localized": false
     },
     {
       "Id": 285,
-      "Name": "Höörs kommun",
+      "Value": "Höörs kommun",
       "Localized": false
     },
     {
       "Id": 286,
-      "Name": "Järfälla kommun",
+      "Value": "Järfälla kommun",
       "Localized": false
     },
     {
       "Id": 287,
-      "Name": "Norrtälje naturvårdsstiftelse",
+      "Value": "Norrtälje naturvårdsstiftelse",
       "Localized": false
     },
     {
       "Id": 288,
-      "Name": "Skogsstyrelsen Jönköping",
+      "Value": "Skogsstyrelsen Jönköping",
       "Localized": false
     },
     {
       "Id": 289,
-      "Name": "Skogsstyrelsen Kronoberg",
+      "Value": "Skogsstyrelsen Kronoberg",
       "Localized": false
     },
     {
       "Id": 291,
-      "Name": "Sveaskog (Västerbotten)",
+      "Value": "Sveaskog (Västerbotten)",
       "Localized": false
     },
     {
       "Id": 292,
-      "Name": "Calluna AB",
+      "Value": "Calluna AB",
       "Localized": false
     },
     {
       "Id": 293,
-      "Name": "Medins Biologi AB",
+      "Value": "Medins Biologi AB",
       "Localized": false
     },
     {
       "Id": 294,
-      "Name": "Naturcentrum AB",
+      "Value": "Naturcentrum AB",
       "Localized": false
     },
     {
       "Id": 295,
-      "Name": "Pro Natura",
+      "Value": "Pro Natura",
       "Localized": false
     },
     {
       "Id": 296,
-      "Name": "Regionmuseet Kristianstad",
+      "Value": "Regionmuseet Kristianstad",
       "Localized": false
     },
     {
       "Id": 297,
-      "Name": "Lund-Botaniska/Zoologiska museet",
+      "Value": "Lund-Botaniska/Zoologiska museet",
       "Localized": false
     },
     {
       "Id": 298,
-      "Name": "Göteborgs naturhistoriska museum (GNM)",
+      "Value": "Göteborgs naturhistoriska museum (GNM)",
       "Localized": false
     },
     {
       "Id": 299,
-      "Name": "Göteborg-Herbarium GB",
+      "Value": "Göteborg-Herbarium GB",
       "Localized": false
     },
     {
       "Id": 300,
-      "Name": "Stockholm-Naturhistoriska riksmuseet",
+      "Value": "Stockholm-Naturhistoriska riksmuseet",
       "Localized": false
     },
     {
       "Id": 301,
-      "Name": "Uppsala-Evolutionsmuseet",
+      "Value": "Uppsala-Evolutionsmuseet",
       "Localized": false
     },
     {
       "Id": 302,
-      "Name": "Köpenhamn",
+      "Value": "Köpenhamn",
       "Localized": false
     },
     {
       "Id": 303,
-      "Name": "Helsingfors",
+      "Value": "Helsingfors",
       "Localized": false
     },
     {
       "Id": 304,
-      "Name": "Lycksele skogsmuseum",
+      "Value": "Lycksele skogsmuseum",
       "Localized": false
     },
     {
       "Id": 305,
-      "Name": "Limnodata HB",
+      "Value": "Limnodata HB",
       "Localized": false
     },
     {
       "Id": 306,
-      "Name": "Uppsala-SLU",
+      "Value": "Uppsala-SLU",
       "Localized": false
     },
     {
       "Id": 307,
-      "Name": "Umeå-Herbarium UME",
+      "Value": "Umeå-Herbarium UME",
       "Localized": false
     },
     {
       "Id": 308,
-      "Name": "Oskarshamn-Herbarium OHN",
+      "Value": "Oskarshamn-Herbarium OHN",
       "Localized": false
     },
     {
       "Id": 309,
-      "Name": "Visby-Herbarium VI",
+      "Value": "Visby-Herbarium VI",
       "Localized": false
     },
     {
       "Id": 310,
-      "Name": "Örebro-Herbarium OREB",
+      "Value": "Örebro-Herbarium OREB",
       "Localized": false
     },
     {
       "Id": 311,
-      "Name": "Oslo",
+      "Value": "Oslo",
       "Localized": false
     },
     {
       "Id": 312,
-      "Name": "Åtgärdsprogram för fjällgås",
+      "Value": "Åtgärdsprogram för fjällgås",
       "Localized": false
     },
     {
       "Id": 313,
-      "Name": "Berguvsprojektet i Dalarnas län",
+      "Value": "Berguvsprojektet i Dalarnas län",
       "Localized": false
     },
     {
       "Id": 314,
-      "Name": "Berguvsprojektet i Stockholms län",
+      "Value": "Berguvsprojektet i Stockholms län",
       "Localized": false
     },
     {
       "Id": 315,
-      "Name": "Duvhöksprojektet i Stockholms län",
+      "Value": "Duvhöksprojektet i Stockholms län",
       "Localized": false
     },
     {
       "Id": 316,
-      "Name": "Havsörnsprojektet i Gotlands Län",
+      "Value": "Havsörnsprojektet i Gotlands Län",
       "Localized": false
     },
     {
       "Id": 317,
-      "Name": "Kungsörnsprojektet i Gotlands lan",
+      "Value": "Kungsörnsprojektet i Gotlands lan",
       "Localized": false
     },
     {
       "Id": 318,
-      "Name": "Kungsörnsprojketet i Uppsala län",
+      "Value": "Kungsörnsprojketet i Uppsala län",
       "Localized": false
     },
     {
       "Id": 319,
-      "Name": "Projekt Vitryggig hackspett",
+      "Value": "Projekt Vitryggig hackspett",
       "Localized": false
     },
     {
       "Id": 320,
-      "Name": "Projekt Ängshök",
+      "Value": "Projekt Ängshök",
       "Localized": false
     },
     {
       "Id": 321,
-      "Name": "Projekt Vitryggig hackspett (Västerbotten)",
+      "Value": "Projekt Vitryggig hackspett (Västerbotten)",
       "Localized": false
     },
     {
       "Id": 322,
-      "Name": "Sparhöksprojktet (Stockholm)",
+      "Value": "Sparhöksprojktet (Stockholm)",
       "Localized": false
     },
     {
       "Id": 323,
-      "Name": "Kungsörnsprojektet i Västerbottens län",
+      "Value": "Kungsörnsprojektet i Västerbottens län",
       "Localized": false
     },
     {
       "Id": 324,
-      "Name": "Kungsörnsprojketet i Västmanlands län",
+      "Value": "Kungsörnsprojketet i Västmanlands län",
       "Localized": false
     },
     {
       "Id": 325,
-      "Name": "Projekt Jaktfalk",
+      "Value": "Projekt Jaktfalk",
       "Localized": false
     },
     {
       "Id": 326,
-      "Name": "Projekt Lom",
+      "Value": "Projekt Lom",
       "Localized": false
     },
     {
       "Id": 327,
-      "Name": "Projekt Skräntärna",
+      "Value": "Projekt Skräntärna",
       "Localized": false
     },
     {
       "Id": 328,
-      "Name": "Projekt Tornuggla (Öland)",
+      "Value": "Projekt Tornuggla (Öland)",
       "Localized": false
     },
     {
       "Id": 329,
-      "Name": "Torsås kommun",
+      "Value": "Torsås kommun",
       "Localized": false
     },
     {
       "Id": 330,
-      "Name": "Kungsbacka kommun",
+      "Value": "Kungsbacka kommun",
       "Localized": false
     },
     {
       "Id": 331,
-      "Name": "Uddevalla kommun",
+      "Value": "Uddevalla kommun",
       "Localized": false
     },
     {
       "Id": 332,
-      "Name": "Sydnärkes Miljöförvaltning",
+      "Value": "Sydnärkes Miljöförvaltning",
       "Localized": false
     },
     {
       "Id": 333,
-      "Name": "Miljönämnden i mellersta Bohuslän",
+      "Value": "Miljönämnden i mellersta Bohuslän",
       "Localized": false
     },
     {
       "Id": 334,
-      "Name": "Ekerö kommun",
+      "Value": "Ekerö kommun",
       "Localized": false
     },
     {
       "Id": 335,
-      "Name": "Trosa kommun",
+      "Value": "Trosa kommun",
       "Localized": false
     },
     {
       "Id": 336,
-      "Name": "Västerviks kommun",
+      "Value": "Västerviks kommun",
       "Localized": false
     },
     {
       "Id": 337,
-      "Name": "Gislaveds kommun",
+      "Value": "Gislaveds kommun",
       "Localized": false
     },
     {
       "Id": 338,
-      "Name": "Sportfiskarna",
+      "Value": "Sportfiskarna",
       "Localized": false
     },
     {
       "Id": 339,
-      "Name": "Hallands botaniska förening",
+      "Value": "Hallands botaniska förening",
       "Localized": false
     },
     {
       "Id": 340,
-      "Name": "Västgötabergens Svampklubb",
+      "Value": "Västgötabergens Svampklubb",
       "Localized": false
     },
     {
       "Id": 341,
-      "Name": "Sveriges mykologiska förening",
+      "Value": "Sveriges mykologiska förening",
       "Localized": false
     },
     {
       "Id": 342,
-      "Name": "Trollhättans stad",
+      "Value": "Trollhättans stad",
       "Localized": false
     },
     {
       "Id": 343,
-      "Name": "Floraväkteri-Uppsala län",
+      "Value": "Floraväkteri-Uppsala län",
       "Localized": false
     },
     {
       "Id": 344,
-      "Name": "Jämtlands botaniska sällskap",
+      "Value": "Jämtlands botaniska sällskap",
       "Localized": false
     },
     {
       "Id": 345,
-      "Name": "Floraväkteri-Jönköpings län",
+      "Value": "Floraväkteri-Jönköpings län",
       "Localized": false
     },
     {
       "Id": 346,
-      "Name": "Östergötlands flora",
+      "Value": "Östergötlands flora",
       "Localized": false
     },
     {
       "Id": 347,
-      "Name": "Sveriges ornitologiska förening (SOF)",
+      "Value": "Sveriges ornitologiska förening (SOF)",
       "Localized": false
     },
     {
       "Id": 348,
-      "Name": "Örnborg Kyrkander Biologi & miljö",
+      "Value": "Örnborg Kyrkander Biologi & miljö",
       "Localized": false
     },
     {
       "Id": 349,
-      "Name": "Floraväkteri-Skåne län",
+      "Value": "Floraväkteri-Skåne län",
       "Localized": false
     },
     {
       "Id": 350,
-      "Name": "Fungus Info",
+      "Value": "Fungus Info",
       "Localized": false
     },
     {
       "Id": 351,
-      "Name": "Floraväkteri-Västmanlands län",
+      "Value": "Floraväkteri-Västmanlands län",
       "Localized": false
     },
     {
       "Id": 352,
-      "Name": "Floraväkteri-Blekinge län",
+      "Value": "Floraväkteri-Blekinge län",
       "Localized": false
     },
     {
       "Id": 353,
-      "Name": "Floraväkteri-Stockholms län",
+      "Value": "Floraväkteri-Stockholms län",
       "Localized": false
     },
     {
       "Id": 354,
-      "Name": "Pite lappmarks flora – herbarium FPLF",
+      "Value": "Pite lappmarks flora – herbarium FPLF",
       "Localized": false
     },
     {
       "Id": 355,
-      "Name": "Norrköpings herbarium",
+      "Value": "Norrköpings herbarium",
       "Localized": false
     },
     {
       "Id": 356,
-      "Name": "Floraväkteri-Kronobergs län",
+      "Value": "Floraväkteri-Kronobergs län",
       "Localized": false
     },
     {
       "Id": 357,
-      "Name": "Floraväkteri-Jämtlands län",
+      "Value": "Floraväkteri-Jämtlands län",
       "Localized": false
     },
     {
       "Id": 358,
-      "Name": "Floraväkteri-Östergötlands län",
+      "Value": "Floraväkteri-Östergötlands län",
       "Localized": false
     },
     {
       "Id": 359,
-      "Name": "SCA Skog AB",
+      "Value": "SCA Skog AB",
       "Localized": false
     },
     {
       "Id": 360,
-      "Name": "Floraväkteri-Torne lappmark BD-län",
+      "Value": "Floraväkteri-Torne lappmark BD-län",
       "Localized": false
     },
     {
       "Id": 361,
-      "Name": "Floraväkteri-Pite lappmark BD-län",
+      "Value": "Floraväkteri-Pite lappmark BD-län",
       "Localized": false
     },
     {
       "Id": 362,
-      "Name": "Floraväkteri-Lule lappmark BD-län",
+      "Value": "Floraväkteri-Lule lappmark BD-län",
       "Localized": false
     },
     {
       "Id": 363,
-      "Name": "Trafikverket",
+      "Value": "Trafikverket",
       "Localized": false
     },
     {
       "Id": 364,
-      "Name": "Floraväkteri-Öland",
+      "Value": "Floraväkteri-Öland",
       "Localized": false
     },
     {
       "Id": 365,
-      "Name": "Älmhults kommun",
+      "Value": "Älmhults kommun",
       "Localized": false
     },
     {
       "Id": 366,
-      "Name": "Floraväkteri-Södermanlands län",
+      "Value": "Floraväkteri-Södermanlands län",
       "Localized": false
     },
     {
       "Id": 367,
-      "Name": "Lilla Edets kommun",
+      "Value": "Lilla Edets kommun",
       "Localized": false
     },
     {
       "Id": 368,
-      "Name": "Ale kommun",
+      "Value": "Ale kommun",
       "Localized": false
     },
     {
       "Id": 369,
-      "Name": "Floraväkteri-Kalmar län (fastl.)",
+      "Value": "Floraväkteri-Kalmar län (fastl.)",
       "Localized": false
     },
     {
       "Id": 370,
-      "Name": "Floraväkteri-Västernorrlands län",
+      "Value": "Floraväkteri-Västernorrlands län",
       "Localized": false
     },
     {
       "Id": 371,
-      "Name": "Floraväkteri-Dalsland O-län",
+      "Value": "Floraväkteri-Dalsland O-län",
       "Localized": false
     },
     {
       "Id": 372,
-      "Name": "Floraväkteri-Bohuslän O-län",
+      "Value": "Floraväkteri-Bohuslän O-län",
       "Localized": false
     },
     {
       "Id": 373,
-      "Name": "Floraväkteri-Värmlands län",
+      "Value": "Floraväkteri-Värmlands län",
       "Localized": false
     },
     {
       "Id": 374,
-      "Name": "Floraväkteri-Dalarnas län",
+      "Value": "Floraväkteri-Dalarnas län",
       "Localized": false
     },
     {
       "Id": 375,
-      "Name": "Svenska Botaniska Föreningen (SBF)",
+      "Value": "Svenska Botaniska Föreningen (SBF)",
       "Localized": false
     },
     {
       "Id": 376,
-      "Name": "Floraväkteri-Hälsingland X-län",
+      "Value": "Floraväkteri-Hälsingland X-län",
       "Localized": false
     },
     {
       "Id": 377,
-      "Name": "Floraväkteri-Gästrikland X-län",
+      "Value": "Floraväkteri-Gästrikland X-län",
       "Localized": false
     },
     {
       "Id": 378,
-      "Name": "Floraväkteri-Västergötland O-län",
+      "Value": "Floraväkteri-Västergötland O-län",
       "Localized": false
     },
     {
       "Id": 379,
-      "Name": "Floraväkteri-Örebro län",
+      "Value": "Floraväkteri-Örebro län",
       "Localized": false
     },
     {
       "Id": 380,
-      "Name": "Floraväkteri-Hallands län",
+      "Value": "Floraväkteri-Hallands län",
       "Localized": false
     },
     {
       "Id": 381,
-      "Name": "Knivsta kommun",
+      "Value": "Knivsta kommun",
       "Localized": false
     },
     {
       "Id": 382,
-      "Name": "Floraväkteri-Norrbotten BD-län",
+      "Value": "Floraväkteri-Norrbotten BD-län",
       "Localized": false
     },
     {
       "Id": 383,
-      "Name": "Vaggeryds kommun",
+      "Value": "Vaggeryds kommun",
       "Localized": false
     },
     {
       "Id": 384,
-      "Name": "Lerums kommun",
+      "Value": "Lerums kommun",
       "Localized": false
     },
     {
       "Id": 385,
-      "Name": "Floraväkteri-Västerbottens län",
+      "Value": "Floraväkteri-Västerbottens län",
       "Localized": false
     },
     {
       "Id": 386,
-      "Name": "Sjöbo kommun",
+      "Value": "Sjöbo kommun",
       "Localized": false
     },
     {
       "Id": 387,
-      "Name": "Falköpings kommun",
+      "Value": "Falköpings kommun",
       "Localized": false
     },
     {
       "Id": 388,
-      "Name": "Botaniska Föreningen i Västmanlands län",
+      "Value": "Botaniska Föreningen i Västmanlands län",
       "Localized": false
     },
     {
       "Id": 389,
-      "Name": "Strömstad kommun",
+      "Value": "Strömstad kommun",
       "Localized": false
     },
     {
       "Id": 390,
-      "Name": "Floraväkteri-Gotland",
+      "Value": "Floraväkteri-Gotland",
       "Localized": false
     },
     {
       "Id": 391,
-      "Name": "Floraväkteri-Lycksele lappmark BD-län",
+      "Value": "Floraväkteri-Lycksele lappmark BD-län",
       "Localized": false
     },
     {
       "Id": 392,
-      "Name": "Arvika kommun",
+      "Value": "Arvika kommun",
       "Localized": false
     },
     {
       "Id": 393,
-      "Name": "Lunds Botaniska förening",
+      "Value": "Lunds Botaniska förening",
       "Localized": false
     },
     {
       "Id": 394,
-      "Name": "Jordbruksverket",
+      "Value": "Jordbruksverket",
       "Localized": false
     },
     {
       "Id": 395,
-      "Name": "Simrishamns kommun",
+      "Value": "Simrishamns kommun",
       "Localized": false
     },
     {
       "Id": 396,
-      "Name": "Timrå kommun",
+      "Value": "Timrå kommun",
       "Localized": false
     },
     {
       "Id": 397,
-      "Name": "Piteå kommun",
+      "Value": "Piteå kommun",
       "Localized": false
     },
     {
       "Id": 398,
-      "Name": "Föreningen Smålands flora",
+      "Value": "Föreningen Smålands flora",
       "Localized": false
     },
     {
       "Id": 399,
-      "Name": "Ölands botaniska förening",
+      "Value": "Ölands botaniska förening",
       "Localized": false
     },
     {
       "Id": 400,
-      "Name": "Skövde kommun",
+      "Value": "Skövde kommun",
       "Localized": false
     },
     {
       "Id": 401,
-      "Name": "Borås Stad",
+      "Value": "Borås Stad",
       "Localized": false
     },
     {
       "Id": 402,
-      "Name": "Kristianstad kommun",
+      "Value": "Kristianstad kommun",
       "Localized": false
     },
     {
       "Id": 403,
-      "Name": "Kristianstads Vattenrike",
+      "Value": "Kristianstads Vattenrike",
       "Localized": false
     },
     {
       "Id": 404,
-      "Name": "Rio Göteborg Natur- och kulturkooperativ",
+      "Value": "Rio Göteborg Natur- och kulturkooperativ",
       "Localized": false
     },
     {
       "Id": 405,
-      "Name": "Gnesta kommun",
+      "Value": "Gnesta kommun",
       "Localized": false
     },
     {
       "Id": 406,
-      "Name": "Sölvesborgs kommun",
+      "Value": "Sölvesborgs kommun",
       "Localized": false
     },
     {
       "Id": 407,
-      "Name": "Sweco",
+      "Value": "Sweco",
       "Localized": false
     },
     {
       "Id": 408,
-      "Name": "Sveriges Entomologiska förening (SEF)",
+      "Value": "Sveriges Entomologiska förening (SEF)",
       "Localized": false
     },
     {
       "Id": 409,
-      "Name": "Eggegrunds fågelstation",
+      "Value": "Eggegrunds fågelstation",
       "Localized": false
     },
     {
       "Id": 410,
-      "Name": "Hammarö fågelstation",
+      "Value": "Hammarö fågelstation",
       "Localized": false
     },
     {
       "Id": 411,
-      "Name": "Sotenäs kommun",
+      "Value": "Sotenäs kommun",
       "Localized": false
     },
     {
       "Id": 412,
-      "Name": "Lekebergs kommun",
+      "Value": "Lekebergs kommun",
       "Localized": false
     },
     {
       "Id": 413,
-      "Name": "Lysekils kommun",
+      "Value": "Lysekils kommun",
       "Localized": false
     },
     {
       "Id": 414,
-      "Name": "Askersunds kommun",
+      "Value": "Askersunds kommun",
       "Localized": false
     },
     {
       "Id": 415,
-      "Name": "Tomelilla kommun",
+      "Value": "Tomelilla kommun",
       "Localized": false
     },
     {
       "Id": 416,
-      "Name": "Stora Fjäderäggs fågelstation",
+      "Value": "Stora Fjäderäggs fågelstation",
       "Localized": false
     },
     {
       "Id": 417,
-      "Name": "Botkyrka kommun",
+      "Value": "Botkyrka kommun",
       "Localized": false
     },
     {
       "Id": 418,
-      "Name": "Alingsås kommun",
+      "Value": "Alingsås kommun",
       "Localized": false
     },
     {
       "Id": 419,
-      "Name": "Östhammars kommun",
+      "Value": "Östhammars kommun",
       "Localized": false
     },
     {
       "Id": 420,
-      "Name": "Bjuvs kommun",
+      "Value": "Bjuvs kommun",
       "Localized": false
     },
     {
       "Id": 421,
-      "Name": "Perstorps kommun",
+      "Value": "Perstorps kommun",
       "Localized": false
     },
     {
       "Id": 422,
-      "Name": "Svalövs kommun",
+      "Value": "Svalövs kommun",
       "Localized": false
     },
     {
       "Id": 423,
-      "Name": "Lokala rapportkommittén Falköping",
+      "Value": "Lokala rapportkommittén Falköping",
       "Localized": false
     },
     {
       "Id": 424,
-      "Name": "Lokala rapportkommittén Mark",
+      "Value": "Lokala rapportkommittén Mark",
       "Localized": false
     },
     {
       "Id": 425,
-      "Name": "Lokala rapportkommittén Trollhättan",
+      "Value": "Lokala rapportkommittén Trollhättan",
       "Localized": false
     },
     {
       "Id": 426,
-      "Name": "Lokala rapportkommittén Ulricehamn",
+      "Value": "Lokala rapportkommittén Ulricehamn",
       "Localized": false
     },
     {
       "Id": 427,
-      "Name": "Lokala rapportkommittén Grästorp",
+      "Value": "Lokala rapportkommittén Grästorp",
       "Localized": false
     },
     {
       "Id": 428,
-      "Name": "Lokala rapportkommittén Hjo",
+      "Value": "Lokala rapportkommittén Hjo",
       "Localized": false
     },
     {
       "Id": 429,
-      "Name": "Lokala rapportkommittén Töreboda",
+      "Value": "Lokala rapportkommittén Töreboda",
       "Localized": false
     },
     {
       "Id": 430,
-      "Name": "Lokala rapportkommittén Mariestad",
+      "Value": "Lokala rapportkommittén Mariestad",
       "Localized": false
     },
     {
       "Id": 431,
-      "Name": "Umedeltats fältstation",
+      "Value": "Umedeltats fältstation",
       "Localized": false
     },
     {
       "Id": 432,
-      "Name": "Ånnsjöns fågelstation",
+      "Value": "Ånnsjöns fågelstation",
       "Localized": false
     },
     {
       "Id": 433,
-      "Name": "Landsorts fågelstation",
+      "Value": "Landsorts fågelstation",
       "Localized": false
     },
     {
       "Id": 434,
-      "Name": "PG Water Conservation & Engineering",
+      "Value": "PG Water Conservation & Engineering",
       "Localized": false
     },
     {
       "Id": 435,
-      "Name": "Karlskrona kommun",
+      "Value": "Karlskrona kommun",
       "Localized": false
     },
     {
       "Id": 436,
-      "Name": "Nynäshamns ornitologer (NOF)",
+      "Value": "Nynäshamns ornitologer (NOF)",
       "Localized": false
     },
     {
       "Id": 437,
-      "Name": "Lokala rapportkommittén Vårgårda",
+      "Value": "Lokala rapportkommittén Vårgårda",
       "Localized": false
     },
     {
       "Id": 438,
-      "Name": "Götene kommun",
+      "Value": "Götene kommun",
       "Localized": false
     },
     {
       "Id": 439,
-      "Name": "Rördrommen fältstation",
+      "Value": "Rördrommen fältstation",
       "Localized": false
     },
     {
       "Id": 440,
-      "Name": "Mönsterås kommun",
+      "Value": "Mönsterås kommun",
       "Localized": false
     },
     {
       "Id": 441,
-      "Name": "Skara kommun",
+      "Value": "Skara kommun",
       "Localized": false
     },
     {
       "Id": 442,
-      "Name": "Sollentuna kommun",
+      "Value": "Sollentuna kommun",
       "Localized": false
     },
     {
       "Id": 443,
-      "Name": "Sunne kommun",
+      "Value": "Sunne kommun",
       "Localized": false
     },
     {
       "Id": 444,
-      "Name": "Vimmerby kommun",
+      "Value": "Vimmerby kommun",
       "Localized": false
     },
     {
       "Id": 445,
-      "Name": "Västerås kommun",
+      "Value": "Västerås kommun",
       "Localized": false
     },
     {
       "Id": 446,
-      "Name": "Ystad kommun",
+      "Value": "Ystad kommun",
       "Localized": false
     },
     {
       "Id": 447,
-      "Name": "Bollebygd kommun",
+      "Value": "Bollebygd kommun",
       "Localized": false
     },
     {
       "Id": 448,
-      "Name": "Bromölla kommun",
+      "Value": "Bromölla kommun",
       "Localized": false
     },
     {
       "Id": 449,
-      "Name": "Båstad kommun",
+      "Value": "Båstad kommun",
       "Localized": false
     },
     {
       "Id": 450,
-      "Name": "Höganäs kommun",
+      "Value": "Höganäs kommun",
       "Localized": false
     },
     {
       "Id": 451,
-      "Name": "Högsby kommun",
+      "Value": "Högsby kommun",
       "Localized": false
     },
     {
       "Id": 452,
-      "Name": "Klippans kommun",
+      "Value": "Klippans kommun",
       "Localized": false
     },
     {
       "Id": 453,
-      "Name": "Mörbylånga kommun",
+      "Value": "Mörbylånga kommun",
       "Localized": false
     },
     {
       "Id": 454,
-      "Name": "Sala kommun",
+      "Value": "Sala kommun",
       "Localized": false
     },
     {
       "Id": 455,
-      "Name": "Tibro kommun",
+      "Value": "Tibro kommun",
       "Localized": false
     },
     {
       "Id": 456,
-      "Name": "Tjörns kommun",
+      "Value": "Tjörns kommun",
       "Localized": false
     },
     {
       "Id": 457,
-      "Name": "Vallentuna kommun",
+      "Value": "Vallentuna kommun",
       "Localized": false
     },
     {
       "Id": 458,
-      "Name": "Emmaboda kommun",
+      "Value": "Emmaboda kommun",
       "Localized": false
     },
     {
       "Id": 459,
-      "Name": "Eslöv kommun",
+      "Value": "Eslöv kommun",
       "Localized": false
     },
     {
       "Id": 460,
-      "Name": "Hörby kommun",
+      "Value": "Hörby kommun",
       "Localized": false
     },
     {
       "Id": 461,
-      "Name": "Luleå kommun",
+      "Value": "Luleå kommun",
       "Localized": false
     },
     {
       "Id": 462,
-      "Name": "Ockelbo kommun",
+      "Value": "Ockelbo kommun",
       "Localized": false
     },
     {
       "Id": 463,
-      "Name": "Osby kommun",
+      "Value": "Osby kommun",
       "Localized": false
     },
     {
       "Id": 464,
-      "Name": "Tanums kommun",
+      "Value": "Tanums kommun",
       "Localized": false
     },
     {
       "Id": 465,
-      "Name": "Tranemo kommun",
+      "Value": "Tranemo kommun",
       "Localized": false
     },
     {
       "Id": 466,
-      "Name": "Trelleborgs kommun",
+      "Value": "Trelleborgs kommun",
       "Localized": false
     },
     {
       "Id": 467,
-      "Name": "Österåkers kommun",
+      "Value": "Österåkers kommun",
       "Localized": false
     },
     {
       "Id": 468,
-      "Name": "Forshaga kommun",
+      "Value": "Forshaga kommun",
       "Localized": false
     },
     {
       "Id": 469,
-      "Name": "Malmö stad",
+      "Value": "Malmö stad",
       "Localized": false
     },
     {
       "Id": 470,
-      "Name": "Munkfors kommun",
+      "Value": "Munkfors kommun",
       "Localized": false
     },
     {
       "Id": 471,
-      "Name": "Kils kommun",
+      "Value": "Kils kommun",
       "Localized": false
     },
     {
       "Id": 472,
-      "Name": "Karlshamns kommun",
+      "Value": "Karlshamns kommun",
       "Localized": false
     },
     {
       "Id": 473,
-      "Name": "Olofströms kommun",
+      "Value": "Olofströms kommun",
       "Localized": false
     },
     {
       "Id": 474,
-      "Name": "Valdemarsviks kommun",
+      "Value": "Valdemarsviks kommun",
       "Localized": false
     },
     {
       "Id": 475,
-      "Name": "Gällivare kommun",
+      "Value": "Gällivare kommun",
       "Localized": false
     },
     {
       "Id": 476,
-      "Name": "Leksands kommun",
+      "Value": "Leksands kommun",
       "Localized": false
     },
     {
       "Id": 477,
-      "Name": "Habo kommun",
+      "Value": "Habo kommun",
       "Localized": false
     },
     {
       "Id": 478,
-      "Name": "Medelpads Botaniska Förening",
+      "Value": "Medelpads Botaniska Förening",
       "Localized": false
     },
     {
       "Id": 479,
-      "Name": "Entomologiska Föreningen i Östergötland",
+      "Value": "Entomologiska Föreningen i Östergötland",
       "Localized": false
     },
     {
       "Id": 480,
-      "Name": "Falsterbo fågelstation",
+      "Value": "Falsterbo fågelstation",
       "Localized": false
     },
     {
       "Id": 481,
-      "Name": "Getteröns fågelstation",
+      "Value": "Getteröns fågelstation",
       "Localized": false
     },
     {
       "Id": 482,
-      "Name": "Haparanda Sandskär fågelstation",
+      "Value": "Haparanda Sandskär fågelstation",
       "Localized": false
     },
     {
       "Id": 483,
-      "Name": "Hartsö-Enskär fågelstation",
+      "Value": "Hartsö-Enskär fågelstation",
       "Localized": false
     },
     {
       "Id": 484,
-      "Name": "Kvismare fågelstation",
+      "Value": "Kvismare fågelstation",
       "Localized": false
     },
     {
       "Id": 485,
-      "Name": "Landsjöns fågelstation",
+      "Value": "Landsjöns fågelstation",
       "Localized": false
     },
     {
       "Id": 486,
-      "Name": "Nidingens fågelstation",
+      "Value": "Nidingens fågelstation",
       "Localized": false
     },
     {
       "Id": 487,
-      "Name": "Ottenby fågelstation",
+      "Value": "Ottenby fågelstation",
       "Localized": false
     },
     {
       "Id": 488,
-      "Name": "Ralångens fågelstation",
+      "Value": "Ralångens fågelstation",
       "Localized": false
     },
     {
       "Id": 489,
-      "Name": "Sundre fågelstation",
+      "Value": "Sundre fågelstation",
       "Localized": false
     },
     {
       "Id": 490,
-      "Name": "Torhamns fågelstation",
+      "Value": "Torhamns fågelstation",
       "Localized": false
     },
     {
       "Id": 491,
-      "Name": "Utklippans fågelstation",
+      "Value": "Utklippans fågelstation",
       "Localized": false
     },
     {
       "Id": 492,
-      "Name": "Grötviks fältstation",
+      "Value": "Grötviks fältstation",
       "Localized": false
     },
     {
       "Id": 493,
-      "Name": "Hornborgasjöns fältstation",
+      "Value": "Hornborgasjöns fältstation",
       "Localized": false
     },
     {
       "Id": 494,
-      "Name": "Stubbhults fältstation",
+      "Value": "Stubbhults fältstation",
       "Localized": false
     },
     {
       "Id": 495,
-      "Name": "Tåkerns fältstation",
+      "Value": "Tåkerns fältstation",
       "Localized": false
     },
     {
       "Id": 496,
-      "Name": "Örkelljunga kommun",
+      "Value": "Örkelljunga kommun",
       "Localized": false
     },
     {
       "Id": 497,
-      "Name": "Lokala rapportkommittén Tranemo",
+      "Value": "Lokala rapportkommittén Tranemo",
       "Localized": false
     },
     {
       "Id": 498,
-      "Name": "Lokala rapportkommittén Skövde",
+      "Value": "Lokala rapportkommittén Skövde",
       "Localized": false
     },
     {
       "Id": 499,
-      "Name": "Södertälje Ornitologiska förening",
+      "Value": "Södertälje Ornitologiska förening",
       "Localized": false
     },
     {
       "Id": 500,
-      "Name": "Medins Havs- och Vattenkonsulter AB",
+      "Value": "Medins Havs- och Vattenkonsulter AB",
       "Localized": false
     },
     {
       "Id": 501,
-      "Name": "Skogsstyrelsen",
+      "Value": "Skogsstyrelsen",
       "Localized": false
     },
     {
       "Id": 502,
-      "Name": "Tierps kommun",
+      "Value": "Tierps kommun",
       "Localized": false
     },
     {
       "Id": 503,
-      "Name": "Stenungsunds kommun",
+      "Value": "Stenungsunds kommun",
       "Localized": false
     },
     {
       "Id": 504,
-      "Name": "Vingåker kommun",
+      "Value": "Vingåker kommun",
       "Localized": false
     },
     {
       "Id": 505,
-      "Name": "Ronneby kommun",
+      "Value": "Ronneby kommun",
       "Localized": false
     },
     {
       "Id": 506,
-      "Name": "Strängnäs kommu",
+      "Value": "Strängnäs kommu",
       "Localized": false
     },
     {
       "Id": 507,
-      "Name": "Helsingborgs stad",
+      "Value": "Helsingborgs stad",
       "Localized": false
     },
     {
       "Id": 508,
-      "Name": "Ulricehamns kommun",
+      "Value": "Ulricehamns kommun",
       "Localized": false
     },
     {
       "Id": 509,
-      "Name": "Mora kommun",
+      "Value": "Mora kommun",
       "Localized": false
     },
     {
       "Id": 510,
-      "Name": "Orsa kommun",
+      "Value": "Orsa kommun",
       "Localized": false
     },
     {
       "Id": 511,
-      "Name": "Hässleholms kommun",
+      "Value": "Hässleholms kommun",
       "Localized": false
     },
     {
       "Id": 512,
-      "Name": "Övertorneå kommun",
+      "Value": "Övertorneå kommun",
       "Localized": false
     },
     {
       "Id": 513,
-      "Name": "Köpings kommun",
+      "Value": "Köpings kommun",
       "Localized": false
     },
     {
       "Id": 514,
-      "Name": "Växjö kommun",
+      "Value": "Växjö kommun",
       "Localized": false
     },
     {
       "Id": 515,
-      "Name": "Enköpings kommun",
+      "Value": "Enköpings kommun",
       "Localized": false
     },
     {
       "Id": 516,
-      "Name": "Mölndals kommun",
+      "Value": "Mölndals kommun",
       "Localized": false
     },
     {
       "Id": 517,
-      "Name": "Sundbybergs kommun",
+      "Value": "Sundbybergs kommun",
       "Localized": false
     },
     {
       "Id": 518,
-      "Name": "Upplands Väsby kommun",
+      "Value": "Upplands Väsby kommun",
       "Localized": false
     },
     {
       "Id": 519,
-      "Name": "Flens kommun",
+      "Value": "Flens kommun",
       "Localized": false
     },
     {
       "Id": 520,
-      "Name": "Burlövs kommun",
+      "Value": "Burlövs kommun",
       "Localized": false
     },
     {
       "Id": 521,
-      "Name": "Ajtte - Svenskt Fjäll- och Samemuseum",
+      "Value": "Ajtte - Svenskt Fjäll- och Samemuseum",
       "Localized": false
     },
     {
       "Id": 522,
-      "Name": "Angarngruppen",
+      "Value": "Angarngruppen",
       "Localized": false
     },
     {
       "Id": 523,
-      "Name": "Skogsstyrelsen - Stockholm/Gotland",
+      "Value": "Skogsstyrelsen - Stockholm/Gotland",
       "Localized": false
     },
     {
       "Id": 524,
-      "Name": "Floraväkteri-Gävleborgs län",
+      "Value": "Floraväkteri-Gävleborgs län",
       "Localized": false
     },
     {
       "Id": 525,
-      "Name": "Mossornas vänner",
+      "Value": "Mossornas vänner",
       "Localized": false
     },
     {
       "Id": 526,
-      "Name": "Skogsstyrelsen - Södra Lappland",
+      "Value": "Skogsstyrelsen - Södra Lappland",
       "Localized": false
     },
     {
       "Id": 527,
-      "Name": "Skogsstyrelsen - Skellefteå",
+      "Value": "Skogsstyrelsen - Skellefteå",
       "Localized": false
     },
     {
       "Id": 528,
-      "Name": "Skogsstyrelsen - Södra Dalarna",
+      "Value": "Skogsstyrelsen - Södra Dalarna",
       "Localized": false
     },
     {
       "Id": 529,
-      "Name": "Skogsstyrelsen - Södra Jämtland",
+      "Value": "Skogsstyrelsen - Södra Jämtland",
       "Localized": false
     },
     {
       "Id": 530,
-      "Name": "Skogsstyrelsen - Kronoberg",
+      "Value": "Skogsstyrelsen - Kronoberg",
       "Localized": false
     },
     {
       "Id": 531,
-      "Name": "Skogsstyrelsen - Göteborg",
+      "Value": "Skogsstyrelsen - Göteborg",
       "Localized": false
     },
     {
       "Id": 532,
-      "Name": "Skogsstyrelsen - Sörmland/Örebro",
+      "Value": "Skogsstyrelsen - Sörmland/Örebro",
       "Localized": false
     },
     {
       "Id": 533,
-      "Name": "Skogsstyrelsen - Umeå",
+      "Value": "Skogsstyrelsen - Umeå",
       "Localized": false
     },
     {
       "Id": 534,
-      "Name": "Skogsstyrelsen - Kalmar",
+      "Value": "Skogsstyrelsen - Kalmar",
       "Localized": false
     },
     {
       "Id": 535,
-      "Name": "Skogsstyrelsen - Skaraborg/Fyrbodal",
+      "Value": "Skogsstyrelsen - Skaraborg/Fyrbodal",
       "Localized": false
     },
     {
       "Id": 536,
-      "Name": "Skogsstyrelsen - Halland",
+      "Value": "Skogsstyrelsen - Halland",
       "Localized": false
     },
     {
       "Id": 537,
-      "Name": "Skogsstyrelsen - Värmland",
+      "Value": "Skogsstyrelsen - Värmland",
       "Localized": false
     },
     {
       "Id": 538,
-      "Name": "Våtmarksinventeringen (VMI)",
+      "Value": "Våtmarksinventeringen (VMI)",
       "Localized": false
     },
     {
       "Id": 539,
-      "Name": "Våtmarksinventeringen (VMI) BD län",
+      "Value": "Våtmarksinventeringen (VMI) BD län",
       "Localized": false
     },
     {
       "Id": 540,
-      "Name": "Ecocom",
+      "Value": "Ecocom",
       "Localized": false
     },
     {
       "Id": 541,
-      "Name": "Skogsstyrelsen - Gävleborg",
+      "Value": "Skogsstyrelsen - Gävleborg",
       "Localized": false
     },
     {
       "Id": 542,
-      "Name": "Skogsstyrelsen - Jönköping/Höglandet",
+      "Value": "Skogsstyrelsen - Jönköping/Höglandet",
       "Localized": false
     },
     {
       "Id": 543,
-      "Name": "Skogsstyrelsen - Norra Jämtland",
+      "Value": "Skogsstyrelsen - Norra Jämtland",
       "Localized": false
     },
     {
       "Id": 544,
-      "Name": "Skogsstyrelsen - Uppsala/Västmanland",
+      "Value": "Skogsstyrelsen - Uppsala/Västmanland",
       "Localized": false
     },
     {
       "Id": 545,
-      "Name": "Skogsstyrelsen - Västernorrland",
+      "Value": "Skogsstyrelsen - Västernorrland",
       "Localized": false
     },
     {
       "Id": 546,
-      "Name": "Skogsstyrelsen - Blekinge",
+      "Value": "Skogsstyrelsen - Blekinge",
       "Localized": false
     },
     {
       "Id": 547,
-      "Name": "Surahammars kommun",
+      "Value": "Surahammars kommun",
       "Localized": false
     },
     {
       "Id": 548,
-      "Name": "Skogsstyrelsen - Skåne",
+      "Value": "Skogsstyrelsen - Skåne",
       "Localized": false
     },
     {
       "Id": 549,
-      "Name": "Skogsstyrelsen - Norra Dalarna",
+      "Value": "Skogsstyrelsen - Norra Dalarna",
       "Localized": false
     },
     {
       "Id": 550,
-      "Name": "Skogsstyrelsen - Norra Norrbotten",
+      "Value": "Skogsstyrelsen - Norra Norrbotten",
       "Localized": false
     },
     {
       "Id": 551,
-      "Name": "Sigtuna kommun",
+      "Value": "Sigtuna kommun",
       "Localized": false
     },
     {
       "Id": 552,
-      "Name": "Skogsstyrelsen - Östergötland",
+      "Value": "Skogsstyrelsen - Östergötland",
       "Localized": false
     },
     {
       "Id": 553,
-      "Name": "Södertälje kommun - Naturcentrum",
+      "Value": "Södertälje kommun - Naturcentrum",
       "Localized": false
     },
     {
       "Id": 554,
-      "Name": "Skogsstyrelsen - Södra Norrbotten",
+      "Value": "Skogsstyrelsen - Södra Norrbotten",
       "Localized": false
     },
     {
       "Id": 555,
-      "Name": "Aneby kommun",
+      "Value": "Aneby kommun",
       "Localized": false
     },
     {
       "Id": 556,
-      "Name": "Värmdö Fågelklubb",
+      "Value": "Värmdö Fågelklubb",
       "Localized": false
     },
     {
       "Id": 557,
-      "Name": "Botaniska sällskapet i Stockholm",
+      "Value": "Botaniska sällskapet i Stockholm",
       "Localized": false
     },
     {
       "Id": 558,
-      "Name": "Göteborgs Ornitologiska Förening",
+      "Value": "Göteborgs Ornitologiska Förening",
       "Localized": false
     },
     {
       "Id": 559,
-      "Name": "Örebro läns botaniska sällskap",
+      "Value": "Örebro läns botaniska sällskap",
       "Localized": false
     },
     {
       "Id": 560,
-      "Name": "Flens Ornitologiska Förening",
+      "Value": "Flens Ornitologiska Förening",
       "Localized": false
     },
     {
       "Id": 561,
-      "Name": "Upplandsstiftelsen",
+      "Value": "Upplandsstiftelsen",
       "Localized": false
     },
     {
       "Id": 562,
-      "Name": "Biogeografisk uppföljning - Mossor",
+      "Value": "Biogeografisk uppföljning - Mossor",
       "Localized": false
     },
     {
       "Id": 563,
-      "Name": "Vänersborgs kommun",
+      "Value": "Vänersborgs kommun",
       "Localized": false
     },
     {
       "Id": 564,
-      "Name": "Föreningen Bohusläns Flora",
+      "Value": "Föreningen Bohusläns Flora",
       "Localized": false
     },
     {
       "Id": 565,
-      "Name": "Vetlanda kommun",
+      "Value": "Vetlanda kommun",
       "Localized": false
     },
     {
       "Id": 566,
-      "Name": "Nordens Ark",
+      "Value": "Nordens Ark",
       "Localized": false
     },
     {
       "Id": 567,
-      "Name": "Söderköpings kommun",
+      "Value": "Söderköpings kommun",
       "Localized": false
     },
     {
       "Id": 568,
-      "Name": "Nynäshamns kommun",
+      "Value": "Nynäshamns kommun",
       "Localized": false
     },
     {
       "Id": 569,
-      "Name": "Hällefors kommun",
+      "Value": "Hällefors kommun",
       "Localized": false
     },
     {
       "Id": 570,
-      "Name": "Ljusnarsbergs kommun",
+      "Value": "Ljusnarsbergs kommun",
       "Localized": false
     },
     {
       "Id": 571,
-      "Name": "Dalarnas Botaniska Sällskap (DABS)",
+      "Value": "Dalarnas Botaniska Sällskap (DABS)",
       "Localized": false
     },
     {
       "Id": 572,
-      "Name": "Svenska fenologinätverket",
+      "Value": "Svenska fenologinätverket",
       "Localized": false
     },
     {
       "Id": 573,
-      "Name": "Föreningen Pite Lappmarks flora",
+      "Value": "Föreningen Pite Lappmarks flora",
       "Localized": false
     },
     {
       "Id": 574,
-      "Name": "Upplands Botaniska Förening",
+      "Value": "Upplands Botaniska Förening",
       "Localized": false
     },
     {
       "Id": 575,
-      "Name": "Västerbottens läns Botaniska Förening",
+      "Value": "Västerbottens läns Botaniska Förening",
       "Localized": false
     },
     {
       "Id": 576,
-      "Name": "Gotlands botaniska förening",
+      "Value": "Gotlands botaniska förening",
       "Localized": false
     },
     {
       "Id": 577,
-      "Name": "Föreningen Blekinges flora",
+      "Value": "Föreningen Blekinges flora",
       "Localized": false
     },
     {
       "Id": 578,
-      "Name": "Gävleborgs Botaniska Sällskap",
+      "Value": "Gävleborgs Botaniska Sällskap",
       "Localized": false
     },
     {
       "Id": 579,
-      "Name": "Naturskyddsföreningen - riksföreningen",
+      "Value": "Naturskyddsföreningen - riksföreningen",
       "Localized": false
     },
     {
       "Id": 580,
-      "Name": "Nora kommun",
+      "Value": "Nora kommun",
       "Localized": false
     },
     {
       "Id": 581,
-      "Name": "Dalslands botaniska förening",
+      "Value": "Dalslands botaniska förening",
       "Localized": false
     },
     {
       "Id": 582,
-      "Name": "Håbo kommun",
+      "Value": "Håbo kommun",
       "Localized": false
     },
     {
       "Id": 583,
-      "Name": "Fågelkalendern",
+      "Value": "Fågelkalendern",
       "Localized": false
     },
     {
       "Id": 584,
-      "Name": "Finspångs kommun",
+      "Value": "Finspångs kommun",
       "Localized": false
     },
     {
       "Id": 585,
-      "Name": "Skogsstyrelsen - Dalarna",
+      "Value": "Skogsstyrelsen - Dalarna",
       "Localized": false
     },
     {
       "Id": 586,
-      "Name": "Åmåls kommun",
+      "Value": "Åmåls kommun",
       "Localized": false
     },
     {
       "Id": 587,
-      "Name": "Nationell valideringsgrupp (NVG) spindeldjur",
+      "Value": "Nationell valideringsgrupp (NVG) spindeldjur",
       "Localized": false
     },
     {
       "Id": 588,
-      "Name": "Nationell valideringsgrupp (NVG) fjärilar",
+      "Value": "Nationell valideringsgrupp (NVG) fjärilar",
       "Localized": false
     },
     {
       "Id": 589,
-      "Name": "Tingsryds kommun",
+      "Value": "Tingsryds kommun",
       "Localized": false
     },
     {
       "Id": 590,
-      "Name": "Skellefteå kommun",
+      "Value": "Skellefteå kommun",
       "Localized": false
     },
     {
       "Id": 591,
-      "Name": "Mjölby kommun",
+      "Value": "Mjölby kommun",
       "Localized": false
     },
     {
       "Id": 592,
-      "Name": "Boxholms kommun",
+      "Value": "Boxholms kommun",
       "Localized": false
     },
     {
       "Id": 593,
-      "Name": "Havs och Vatten myndigheten (HaV)",
+      "Value": "Havs och Vatten myndigheten (HaV)",
       "Localized": false
     },
     {
       "Id": 594,
-      "Name": "Sundsvalls kommun",
+      "Value": "Sundsvalls kommun",
       "Localized": false
     },
     {
       "Id": 595,
-      "Name": "SLU Aqua",
+      "Value": "SLU Aqua",
       "Localized": false
     },
     {
       "Id": 596,
-      "Name": "Nässjö kommun",
+      "Value": "Nässjö kommun",
       "Localized": false
     },
     {
       "Id": 597,
-      "Name": "Mullsjö kommun",
+      "Value": "Mullsjö kommun",
       "Localized": false
     },
     {
       "Id": 598,
-      "Name": "Nationell valideringsgrupp (NVG) fladdermöss",
+      "Value": "Nationell valideringsgrupp (NVG) fladdermöss",
       "Localized": false
     },
     {
       "Id": 599,
-      "Name": "Projekt trollsländor i Närke",
+      "Value": "Projekt trollsländor i Närke",
       "Localized": false
     },
     {
       "Id": 600,
-      "Name": "Svensk kärnbränslehantering (SKB)",
+      "Value": "Svensk kärnbränslehantering (SKB)",
       "Localized": false
     },
     {
       "Id": 601,
-      "Name": "Floraväktarna",
+      "Value": "Floraväktarna",
       "Localized": false
     },
     {
       "Id": 602,
-      "Name": "Nationell valideringsgrupp (NVG) tvåvingar",
+      "Value": "Nationell valideringsgrupp (NVG) tvåvingar",
       "Localized": false
     },
     {
       "Id": 603,
-      "Name": "IAS",
+      "Value": "IAS",
       "Localized": false
     }
   ],

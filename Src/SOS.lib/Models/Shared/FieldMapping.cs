@@ -24,7 +24,7 @@ namespace SOS.Lib.Models.Shared
                 return Values.ToDictionary(m => m.Id, m => m.Translations.Single(t => t.CultureCode == cultureCode).Value);
             }
 
-            return Values.ToDictionary(m => m.Id, m => m.Name);
+            return Values.ToDictionary(m => m.Id, m => m.Value);
         }
 
         public override string ToString()
