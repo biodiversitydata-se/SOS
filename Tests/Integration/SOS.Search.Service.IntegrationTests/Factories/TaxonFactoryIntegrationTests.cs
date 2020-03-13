@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Microsoft.Extensions.Configuration;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using SOS.Export.Repositories;
-using SOS.Lib.Configuration.Export;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.Search.Service.Database;
 using SOS.Search.Service.Factories;

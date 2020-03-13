@@ -11,7 +11,6 @@ using SOS.Export.Repositories;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
-using SOS.TestHelpers.IO;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.Factories
@@ -62,7 +61,7 @@ namespace SOS.Export.IntegrationTests.Factories
                     new Mock<ILogger<ProcessedSightingRepository>>().Object),
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),
-                new Mock<IBlobStorageService>().Object,
+                new Mock<IZendToService>().Object,
                 new FileDestination { Path = exportConfiguration.FileDestination.Path },
                 new Mock<ILogger<SightingFactory>>().Object);
 

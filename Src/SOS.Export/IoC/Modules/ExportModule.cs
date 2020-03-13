@@ -58,6 +58,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().InstancePerLifetimeScope();
             builder.RegisterType<EmailService>().As<IEmailService>().InstancePerLifetimeScope();
             builder.RegisterType<FileService>().As<IFileService>().InstancePerLifetimeScope();
+            builder.RegisterType<ZendToService>().As<IZendToService>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ExportJob>().As<IExportJob>().InstancePerLifetimeScope();

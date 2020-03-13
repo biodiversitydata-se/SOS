@@ -44,7 +44,7 @@ namespace SOS.Export.Jobs
 
                 if (success && !string.IsNullOrEmpty(email))
                 {
-                    _emailService.Send(new EmailMessage { Content = "Hej,</br>Din fil är nu skapad. Klicka på länken nedan för att hämta den...", Subject = "Exportfil skapad", To = new[] { email } });
+             //       _emailService.Send(new EmailMessage { Content = "Hej,</br>Din fil är nu skapad. Klicka på länken nedan för att hämta den...", Subject = "Exportfil skapad", To = new[] { email } });
                 }
 
                 _logger.LogDebug($"End DOI job. Success: {success}");
