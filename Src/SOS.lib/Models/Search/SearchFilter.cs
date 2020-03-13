@@ -14,8 +14,8 @@ namespace SOS.Lib.Models.Search
 
         public new SearchFilter Clone()
         {
-            var advancedFilter = (SearchFilter)MemberwiseClone();
-            return advancedFilter;
+            var searchFilter = (SearchFilter)MemberwiseClone();
+            return searchFilter;
         }
     }
 }
