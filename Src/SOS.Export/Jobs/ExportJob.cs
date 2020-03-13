@@ -4,7 +4,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Factories.Interfaces;
-using SOS.Export.Jobs.Interfaces;
+using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Email;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Services.Interfaces;
@@ -44,7 +44,7 @@ namespace SOS.Export.Jobs
 
                 if (success && !string.IsNullOrEmpty(email))
                 {
-                    _emailService.Send(new EmailMessage { Content = "Hej,</br>Din fil är nu skapad. Klicka på länken nedan för att hämta den...", Subject = "Exportfil skapad", To = new[] { email } });
+             //       _emailService.Send(new EmailMessage { Content = "Hej,</br>Din fil är nu skapad. Klicka på länken nedan för att hämta den...", Subject = "Exportfil skapad", To = new[] { email } });
                 }
 
                 _logger.LogDebug($"End DOI job. Success: {success}");

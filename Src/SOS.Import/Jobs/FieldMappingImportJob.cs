@@ -2,16 +2,14 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Factories.Interfaces;
-using SOS.Import.Jobs.Interfaces;
-using SOS.Import.Repositories.Destination.Interfaces;
-using SOS.Lib.Enums;
+using SOS.Lib.Jobs.Import;
 
 namespace SOS.Import.Jobs
 {
     /// <summary>
     /// Field mapping import job.
     /// </summary>
-    public class FieldMappingImportJob : Interfaces.IFieldMappingImportJob
+    public class FieldMappingImportJob : IFieldMappingImportJob
     {
         private readonly IFieldMappingFactory _fieldMappingFactory;
         private readonly ILogger<FieldMappingImportJob> _logger;

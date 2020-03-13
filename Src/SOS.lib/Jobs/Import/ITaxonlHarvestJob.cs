@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 
-namespace SOS.Import.Jobs.Interfaces
+namespace SOS.Lib.Jobs.Import
 {
-    public interface IFieldMappingImportJob
+    public interface ITaxonHarvestJob
     {
         /// <summary>
-        /// Run field mapping import.
+        /// Run taxon harvest
         /// </summary>
         /// <returns></returns>
         Task<bool> RunAsync();

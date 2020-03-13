@@ -4,8 +4,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Process.Jobs;
-using SOS.Process.Jobs.Interfaces;
+using SOS.Lib.Jobs.Process;
 
 namespace SOS.Hangfire.UI.Controllers
 {
@@ -35,7 +34,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<IProcessJob>(nameof(ProcessJob), job => job.RunAsync(sources, cleanStart, toggleInstanceOnSuccess, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IProcessJob>(nameof(IProcessJob), job => job.RunAsync(sources, cleanStart, toggleInstanceOnSuccess, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Process job added");
             }
             catch (Exception e)
@@ -71,7 +70,7 @@ namespace SOS.Hangfire.UI.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<IProcessTaxaJob>(nameof(ProcessTaxaJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IProcessTaxaJob>(nameof(IProcessTaxaJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Process job added");
             }
             catch (Exception e)

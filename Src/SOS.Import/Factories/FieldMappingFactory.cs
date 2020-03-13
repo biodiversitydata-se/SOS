@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using ProjNet.CoordinateSystems;
 using SOS.Import.Factories.FieldMappings;
 using SOS.Import.Factories.FieldMappings.Interfaces;
 using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;

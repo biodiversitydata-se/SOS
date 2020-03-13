@@ -67,14 +67,18 @@ namespace SOS.Process.Repositories.Source
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId)
+        public async Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId)
         {
             try
             {
+                var filters = new List<FilterDefinition<TEntity>>
+                {
+                    Builders<TEntity>.Filter.Gte(d => d.Id, startId),
+                    Builders<TEntity>.Filter.Lte(d => d.Id, endId)
+                };
+
                 var res = await MongoCollection
-                    .Find(Builders<TEntity>.Filter.Gt(e => e.Id, startId))
-                    .Sort(Builders<TEntity>.Sort.Ascending(e => e.Id))
-                    .Limit(_batchSize)
+                    .Find(Builders<TEntity>.Filter.And(filters))
                     .ToListAsync();
 
                 return res;
@@ -100,6 +104,35 @@ namespace SOS.Process.Repositories.Source
                     .ToListAsync();
 
                 return res;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+
+                return default;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<Tuple<TKey, TKey>> GetIdSpanAsync()
+        {
+            try
+            {
+                var min = await MongoCollection
+                    .Find(FilterDefinition<TEntity>.Empty)
+                    .Project(d => d.Id)
+                    .Sort(Builders<TEntity>.Sort.Ascending("_id"))
+                    .Limit(1)
+                    .FirstOrDefaultAsync();
+
+                var max = await MongoCollection
+                    .Find(FilterDefinition<TEntity>.Empty)
+                    .Project(d => d.Id)
+                    .Sort(Builders<TEntity>.Sort.Descending("_id"))
+                    .Limit(1)
+                    .FirstOrDefaultAsync();
+                
+                return new Tuple<TKey, TKey>(min, max);
             }
             catch (Exception e)
             {

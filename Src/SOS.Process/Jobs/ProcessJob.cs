@@ -6,6 +6,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
+using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
@@ -15,7 +16,6 @@ using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Verbatim.SpeciesPortal;
 using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers.Interfaces;
-using SOS.Process.Jobs.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 

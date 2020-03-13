@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
-using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Sighting;
-using SOS.Lib.Models.Shared;
 using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -52,9 +50,10 @@ namespace SOS.Process.Factories
             var verbatimCount = 0;
             ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
 
-            // Process and commit in batches.
             using var cursor = await _kulObservationVerbatimRepository.GetAllAsync();
-            await cursor.ForEachAsync(c =>
+
+            // Process and commit in batches.
+            await cursor.ForEachAsync(async c =>
             {
                 ProcessedSighting processedSighting = c.ToProcessed(taxa);
                 _areaHelper.AddAreaDataToProcessedSighting(processedSighting);
@@ -62,7 +61,7 @@ namespace SOS.Process.Factories
                 if (IsBatchFilledToLimit(sightings.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    verbatimCount += CommitBatch(sightings);
+                    verbatimCount += await CommitBatchAsync(sightings);
                     Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
                 }
             });
@@ -71,7 +70,7 @@ namespace SOS.Process.Factories
             if (sightings.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                verbatimCount += CommitBatch(sightings);
+                verbatimCount += await CommitBatchAsync(sightings);
                 Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
             }
 

@@ -22,7 +22,7 @@ namespace SOS.Export.Factories
         private readonly IProcessedSightingRepository _processedSightingRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IFileService _fileService;
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IZendToService _zendToService;
         private readonly string _exportPath;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
         private readonly ILogger<SightingFactory> _logger;
@@ -34,7 +34,7 @@ namespace SOS.Export.Factories
         /// <param name="processedSightingRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="fileService"></param>
-        /// <param name="blobStorageService"></param>
+        /// <param name="zendToService"></param>
         /// <param name="fileDestination"></param>
         /// <param name="logger"></param>
         public SightingFactory(
@@ -42,7 +42,7 @@ namespace SOS.Export.Factories
             IProcessedSightingRepository processedSightingRepository,
             IProcessInfoRepository processInfoRepository,
             IFileService fileService,
-            IBlobStorageService blobStorageService,
+            IZendToService zendToService,
             FileDestination fileDestination,
 
             ILogger<SightingFactory> logger)
@@ -50,7 +50,7 @@ namespace SOS.Export.Factories
             _processedSightingRepository = processedSightingRepository ?? throw new ArgumentNullException(nameof(processedSightingRepository));
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-            _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
+            _zendToService = zendToService ?? throw new ArgumentNullException(nameof(zendToService));
             _exportPath = fileDestination?.Path ?? throw new ArgumentNullException(nameof(fileDestination));
             _dwcArchiveFileWriter = dwcArchiveFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriter));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -76,16 +76,9 @@ namespace SOS.Export.Factories
                     cancellationToken);
                 cancellationToken?.ThrowIfCancellationRequested();
 
-                // Make sure container exists
-                var container = $"sos-{DateTime.Now.Year}";
-                await _blobStorageService.CreateContainerAsync(container);
-
-                // Upload file to blob storage
-                if (await _blobStorageService.UploadBlobAsync(zipFilePath, container))
+                // zend file to user
+                if (await _zendToService.SendFile(zipFilePath))
                 {
-                    // Remove local file
-                    _fileService.DeleteFile(zipFilePath);
-
                     return $"{fileName}.zip";
                 }
 

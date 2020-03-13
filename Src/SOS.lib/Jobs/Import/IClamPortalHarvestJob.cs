@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
 
-namespace SOS.Import.Jobs.Interfaces
+namespace SOS.Lib.Jobs.Import
 {
-    public interface ISpeciesPortalHarvestJob
+    public interface IClamPortalHarvestJob
     {
         /// <summary>
         /// Run species portal harvest

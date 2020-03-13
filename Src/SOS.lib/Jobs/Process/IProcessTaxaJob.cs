@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using SOS.Lib.Enums;
+﻿using System.Threading.Tasks;
 
-namespace SOS.Process.Jobs.Interfaces
+namespace SOS.Lib.Jobs.Process
 {
     public interface IProcessTaxaJob
     {

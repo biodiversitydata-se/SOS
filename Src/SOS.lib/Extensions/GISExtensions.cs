@@ -231,6 +231,44 @@ namespace SOS.Lib.Extensions
             return circle;
         }
 
+        public static Geometry ToSquare(this Point point, int? accuracy)
+        {
+            if (accuracy == null || accuracy < 0.0)
+            {
+                return null;
+            }
+
+            var shapeFactory = new GeometricShapeFactory();
+            var diameterInMeters = (double)(accuracy == 0 ? 1 : accuracy * 2);
+            switch ((CoordinateSys)point.SRID)
+            {
+                // Metric systems, add buffer to create a circle
+                case CoordinateSys.SWEREF99:
+                case CoordinateSys.SWEREF99_TM:
+                case CoordinateSys.Rt90_25_gon_v:
+                    // Height in meters
+                    shapeFactory.Height = diameterInMeters;
+
+                    // Length in meters 
+                    shapeFactory.Width = diameterInMeters;
+                    break;
+                case CoordinateSys.WebMercator:
+                case CoordinateSys.WGS84:
+                    // Length in meters of 1° of latitude = always 111.32 km
+                    shapeFactory.Height = diameterInMeters / 111320d;
+
+                    // Length in meters of 1° of longitude = 40075 km * cos( latitude radian ) / 360
+                    shapeFactory.Width = diameterInMeters / (40075000 * Math.Cos(point.Y.ToRadians()) / 360);
+                    break;
+            }
+            shapeFactory.NumPoints = 4;
+            shapeFactory.Centre = point.Coordinate;
+
+            var square = shapeFactory.CreateRectangle();
+
+            return square;
+        }
+
         /// <summary>
         /// Cast input geometry to geojson geometry
         /// </summary>

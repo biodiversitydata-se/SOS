@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace SOS.Import.Jobs.Interfaces
+namespace SOS.Lib.Jobs.Import
 {
     public interface IGeoHarvestJob
     {

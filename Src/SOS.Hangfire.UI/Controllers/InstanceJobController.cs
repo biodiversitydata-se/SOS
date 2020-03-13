@@ -4,7 +4,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Process.Jobs.Interfaces;
+using SOS.Lib.Jobs.Process;
 
 namespace SOS.Hangfire.UI.Controllers
 {

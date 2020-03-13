@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace SOS.Process.Jobs.Interfaces
+namespace SOS.Lib.Jobs.Process
 {
     public interface IActivateInstanceJob
     {

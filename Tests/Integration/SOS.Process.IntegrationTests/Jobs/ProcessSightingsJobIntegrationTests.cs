@@ -81,7 +81,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new SpeciesPortalVerbatimRepository(verbatimClient, new NullLogger<SpeciesPortalVerbatimRepository>()),
                 processedSightingRepository,
                 processedFieldMappingRepository, 
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                processConfiguration,
                 new NullLogger<SpeciesPortalProcessFactory>());
 
             var processTaxaJob = new ProcessJob(

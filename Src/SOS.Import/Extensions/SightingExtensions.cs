@@ -445,7 +445,7 @@ namespace SOS.Import.Extensions
                 Province = entity.ProvinceId.HasValue ? new GeographicalArea { Id = entity.ProvinceId.Value, Name = entity.ProvinceName } : null,
                 Parish = entity.ParishId.HasValue ? new GeographicalArea { Id = entity.ParishId.Value, Name = entity.ParishName } : null,
                 Point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry(),
-                PointWithBuffer = wgs84Point?.ToCircle(entity.Accuracy)?.ToGeoJsonGeometry(),
+                PointWithBuffer = wgs84Point?.ToSquare(entity.Accuracy)?.ToGeoJsonGeometry(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,

@@ -35,6 +35,8 @@ namespace SOS.Import.Factories
         private readonly IOrganizationRepository _organizationRepository;
         private readonly ILogger<SpeciesPortalSightingFactory> _logger;
         private readonly SemaphoreSlim _semaphore;
+        private bool _hasAddedTestSightings;
+
         /// <summary>
         /// Constructor
         /// </summary>///
@@ -107,13 +109,13 @@ namespace SOS.Import.Factories
                 _logger.LogDebug(
                     $"Finish getting species portal sightings from id: {currentId} to id: {currentId + _speciesPortalConfiguration.ChunkSize - 1}");
 
-                /* if (_speciesPortalConfiguration.AddTestSightings && !hasAddedTestSightings)
+                 if (_speciesPortalConfiguration.AddTestSightings && !_hasAddedTestSightings)
                  {
                      _logger.LogDebug("Start adding test sightings");
                      AddTestSightings(_sightingRepository, ref sightings, _speciesPortalConfiguration.AddTestSightingIds);
-                     hasAddedTestSightings = true;
+                     _hasAddedTestSightings = true;
                      _logger.LogDebug("Finish adding test sightings");
-                 }*/
+                 }
 
                 var sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
 
@@ -237,6 +239,7 @@ namespace SOS.Import.Factories
                 var (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
                 var currentId = minId;
                 var harvestBatchTasks = new List<Task<int>>();
+                _hasAddedTestSightings = false;
 
                 _logger.LogDebug("Start getting species portal sightings");
 

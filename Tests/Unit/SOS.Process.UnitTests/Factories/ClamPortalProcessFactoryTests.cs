@@ -99,7 +99,7 @@ namespace SOS.Process.UnitTests.Factories
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty))
+            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty, ObjectId.Empty))
                 .ReturnsAsync(new[] { new ClamObservationVerbatim
                 {
                     DyntaxaTaxonId = 0
@@ -173,7 +173,7 @@ namespace SOS.Process.UnitTests.Factories
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty))
+            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty, ObjectId.Empty))
                 .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
             // Act

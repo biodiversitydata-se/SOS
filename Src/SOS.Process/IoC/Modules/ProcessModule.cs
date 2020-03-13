@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Jobs.Process;
 using SOS.Process.Database;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Factories;
@@ -7,7 +8,6 @@ using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
-using SOS.Process.Jobs.Interfaces;
 using SOS.Process.Mappings;
 using SOS.Process.Mappings.Interfaces;
 using SOS.Process.Repositories.Destination;
@@ -40,6 +40,8 @@ namespace SOS.Process.IoC.Modules
             {
                 builder.RegisterInstance(Configuration.FieldMapping).As<FieldMappingConfiguration>().SingleInstance();
             }
+
+            builder.RegisterInstance(Configuration).As<ProcessConfiguration>().SingleInstance();
 
             // Helpers
             builder.RegisterType<AreaNameMapper>().As<IAreaNameMapper>().SingleInstance();

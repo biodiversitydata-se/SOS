@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Jobs.Process;
 using SOS.Process.Factories.Interfaces;
-using SOS.Process.Jobs.Interfaces;
 
 namespace SOS.Process.Jobs
 {
