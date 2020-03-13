@@ -6,7 +6,7 @@ namespace SOS.Import.Factories.Interfaces
     /// <summary>
     /// Geo related factory
     /// </summary>
-    public interface IGeoFactory
+    public interface IAreaFactory
     {
         /// <summary>
         /// Aggregate all areas

@@ -60,7 +60,7 @@ namespace SOS.Hangfire.UI.Controllers
         }
 
         /// <inheritdoc />
-        [HttpPost("Field/Create")]
+        [HttpPost("SingleField/Create")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> CreateFieldMappingFileAsync(FieldMappingFieldId fieldMappingFieldId)
@@ -81,7 +81,7 @@ namespace SOS.Hangfire.UI.Controllers
         /// Get diff between generated, verbatim and processed field mappings.
         /// </summary>
         /// <returns></returns>
-        [HttpPost("GetDiffZipFile")]
+        [HttpPost("DiffAsZipFile")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetDiffZipFile()

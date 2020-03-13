@@ -15,22 +15,22 @@ using Xunit;
 namespace SOS.Import.UnitTests.Factories
 {
     /// <summary>
-    /// Tests for sighting factory
+    /// Tests for area factory
     /// </summary>
-    public class GeoFactoryTests
+    public class AreaFactoryTests
     {
         private readonly Mock<IAreaRepository> _areaRepositoryMock;
         private readonly Mock<AreaVerbatimRepository> _areaVerbatimRepository;
-        private readonly Mock<ILogger<GeoFactory>> _loggerMock;
+        private readonly Mock<ILogger<AreaFactory>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public GeoFactoryTests()
+        public AreaFactoryTests()
         {
             _areaRepositoryMock = new Mock<IAreaRepository>();
             _areaVerbatimRepository = new Mock<AreaVerbatimRepository>();
-            _loggerMock = new Mock<ILogger<GeoFactory>>();
+            _loggerMock = new Mock<ILogger<AreaFactory>>();
         }
 
         /// <summary>
@@ -39,24 +39,24 @@ namespace SOS.Import.UnitTests.Factories
         [Fact]
         public void ConstructorTest()
         {
-            new GeoFactory(
+            new AreaFactory(
                 _areaRepositoryMock.Object,
                 _areaVerbatimRepository.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new GeoFactory(
+            Action create = () => new AreaFactory(
                 null,
                 _areaVerbatimRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaRepository");
 
-            create = () => new GeoFactory(
+            create = () => new AreaFactory(
                 _areaRepositoryMock.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaVerbatimRepository");
 
-            create = () => new GeoFactory(
+            create = () => new AreaFactory(
                 _areaRepositoryMock.Object,
                 _areaVerbatimRepository.Object,
                 null);
@@ -87,12 +87,12 @@ namespace SOS.Import.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var geoFactory = new GeoFactory(
+            var areaFactory = new AreaFactory(
                 _areaRepositoryMock.Object,
                 _areaVerbatimRepository.Object,
                 _loggerMock.Object);
 
-            var result = await geoFactory.HarvestAreasAsync();
+            var result = await areaFactory.HarvestAreasAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ namespace SOS.Import.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var geoFactory = new GeoFactory(
+            var geoFactory = new AreaFactory(
                 _areaRepositoryMock.Object,
                 _areaVerbatimRepository.Object,
                 _loggerMock.Object);

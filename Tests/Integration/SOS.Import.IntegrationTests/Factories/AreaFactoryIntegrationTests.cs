@@ -13,7 +13,7 @@ using Xunit;
 
 namespace SOS.Import.IntegrationTests.Factories
 {
-    public class GeoFactoryIntegrationTests : TestBase
+    public class AreaFactoryIntegrationTests : TestBase
     {
         [Fact]
         [Trait("Category", "Integration")]
@@ -31,15 +31,15 @@ namespace SOS.Import.IntegrationTests.Factories
                     importConfiguration.VerbatimDbConfiguration.BatchSize),
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
 
-            var geoFactory = new GeoFactory(
+            var areaFactory = new AreaFactory(
                 new AreaRepository(speciesPortalDataService, new Mock<ILogger<AreaRepository>>().Object),
                 areaVerbatimRepository,
-                new Mock<ILogger<GeoFactory>>().Object);
+                new Mock<ILogger<AreaFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await geoFactory.HarvestAreasAsync();
+            var result = await areaFactory.HarvestAreasAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -63,15 +63,15 @@ namespace SOS.Import.IntegrationTests.Factories
                     importConfiguration.VerbatimDbConfiguration.BatchSize),
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
 
-            var geoFactory = new GeoFactory(
+            var areaFactory = new AreaFactory(
                 new AreaRepository(speciesPortalDataService, new Mock<ILogger<AreaRepository>>().Object),
                 areaVerbatimRepository,
-                new Mock<ILogger<GeoFactory>>().Object);
+                new Mock<ILogger<AreaFactory>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await geoFactory.HarvestAreasAsync();
+            var result = await areaFactory.HarvestAreasAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

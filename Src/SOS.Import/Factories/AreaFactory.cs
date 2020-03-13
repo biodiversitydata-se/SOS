@@ -13,13 +13,13 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Factories
 {
     /// <summary>
-    /// Geo factory class
+    /// Area factory class
     /// </summary>
-    public class GeoFactory : Interfaces.IGeoFactory
+    public class AreaFactory : Interfaces.IAreaFactory
     {
         private readonly IAreaRepository _areaRepository;
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
-        private readonly ILogger<GeoFactory> _logger;
+        private readonly ILogger<AreaFactory> _logger;
 
         /// <summary>
         /// Constructor
@@ -27,10 +27,10 @@ namespace SOS.Import.Factories
         /// <param name="areaRepository"></param>
         /// <param name="areaVerbatimRepository"></param>
         /// <param name="logger"></param>
-        public GeoFactory(
+        public AreaFactory(
             IAreaRepository areaRepository,
             IAreaVerbatimRepository areaVerbatimRepository,
-            ILogger<GeoFactory> logger)
+            ILogger<AreaFactory> logger)
         {
             _areaRepository = areaRepository ?? throw new ArgumentNullException(nameof(areaRepository));
             _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));

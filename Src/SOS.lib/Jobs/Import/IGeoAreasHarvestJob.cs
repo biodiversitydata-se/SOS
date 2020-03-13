@@ -2,7 +2,7 @@
 
 namespace SOS.Lib.Jobs.Import
 {
-    public interface IGeoHarvestJob
+    public interface IGeoAreasHarvestJob
     {
         /// <summary>
         /// Run geo harvest

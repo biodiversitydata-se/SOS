@@ -78,7 +78,7 @@ namespace SOS.Import.IoC.Modules
 
             // Add factories
             builder.RegisterType<ClamPortalObservationFactory>().As<IClamPortalObservationFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<GeoFactory>().As<IGeoFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<AreaFactory>().As<IAreaFactory>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationFactory>().As<IKulObservationFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalSightingFactory>().As<ISpeciesPortalSightingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
@@ -113,7 +113,7 @@ namespace SOS.Import.IoC.Modules
 
             // Add jobs
             builder.RegisterType<ClamPortalHarvestJob>().As<IClamPortalHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<GeoHarvestJob>().As<IGeoHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<GeoAreasHarvestJob>().As<IGeoAreasHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<KulHarvestJob>().As<IKulHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesPortalHarvestJob>().As<ISpeciesPortalHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonHarvestJob>().As<ITaxonHarvestJob>().InstancePerLifetimeScope();

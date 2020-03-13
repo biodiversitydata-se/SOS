@@ -11,23 +11,23 @@ namespace SOS.Import.Jobs
     /// <summary>
     /// Species portal harvest
     /// </summary>
-    public class GeoHarvestJob : IGeoHarvestJob
+    public class GeoAreasHarvestJob : IGeoAreasHarvestJob
     {
-        private readonly IGeoFactory _geoFactory;
+        private readonly IAreaFactory _areaFactory;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
-        private readonly ILogger<GeoHarvestJob> _logger;
+        private readonly ILogger<GeoAreasHarvestJob> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="geoFactory"></param>
+        /// <param name="areaFactory"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="logger"></param>
-        public GeoHarvestJob(IGeoFactory geoFactory,
+        public GeoAreasHarvestJob(IAreaFactory areaFactory,
             IHarvestInfoRepository harvestInfoRepository,
-            ILogger<GeoHarvestJob> logger)
+            ILogger<GeoAreasHarvestJob> logger)
         {
-            _geoFactory = geoFactory ?? throw new ArgumentNullException(nameof(geoFactory));
+            _areaFactory = areaFactory ?? throw new ArgumentNullException(nameof(areaFactory));
             _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -37,7 +37,7 @@ namespace SOS.Import.Jobs
         {
             _logger.LogDebug("Start Geo Harvest Job");
            
-            var result = await _geoFactory.HarvestAreasAsync();
+            var result = await _areaFactory.HarvestAreasAsync();
 
             _logger.LogDebug($"End Geo Harvest Job. Status: {result.Status}");
 
