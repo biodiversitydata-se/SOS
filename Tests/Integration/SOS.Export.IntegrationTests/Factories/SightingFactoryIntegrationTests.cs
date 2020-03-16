@@ -61,6 +61,7 @@ namespace SOS.Export.IntegrationTests.Factories
                     new Mock<ILogger<ProcessedSightingRepository>>().Object),
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),
+                new Mock<IBlobStorageService>().Object,
                 new Mock<IZendToService>().Object,
                 new FileDestination { Path = exportConfiguration.FileDestination.Path },
                 new Mock<ILogger<SightingFactory>>().Object);

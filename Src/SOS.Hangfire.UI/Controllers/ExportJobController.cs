@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Text.RegularExpressions;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -29,32 +30,45 @@ namespace SOS.Hangfire.UI.Controllers
         /// <inheritdoc />
         [HttpPost("DarwinCore/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunDarwinCoreExportJob([FromBody]ExportFilter filter)
+        public IActionResult RunDarwinCoreExportJob([FromBody]ExportFilter filter, [FromQuery]string email)
         {
             try
             {
-                BackgroundJob.Enqueue<IExportJob>(job => job.RunAsync(filter, null, JobCancellationToken.Null));
+                var emailRegex = new Regex(@"^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
 
-                return new OkObjectResult($"Running Darwin Core export");
+                if (string.IsNullOrEmpty(email))
+                {
+                    return BadRequest("You must provide a e-mail address");
+                }
+
+                if (!emailRegex.IsMatch(email))
+                {
+                    return BadRequest("Not a valid e-mail");
+                }
+
+                return new OkObjectResult(BackgroundJob.Enqueue<IExportJob>(job => job.RunAsync(filter, email, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running Darwin Core export failed");
+                _logger.LogError(e, "Running export failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
+
 
         /// <inheritdoc />
         [HttpPost("DarwinCore/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult ScheduleDailyDarwinCoreExportJob([FromBody]ExportFilter filter, [FromQuery]int hour, [FromQuery]int minute)
+        public IActionResult ScheduleDailyDarwinCoreExportJob([FromBody]ExportFilter filter, [FromQuery]string email, [FromQuery]int hour, [FromQuery]int minute)
         {
             try
             {
 
-                RecurringJob.AddOrUpdate<IExportJob>(nameof(IExportJob), job => job.RunAsync(filter, null, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IExportJob>(nameof(IExportJob), job => job.RunAsync(filter, email, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult($"Export Darwin Core Job Scheduled.");
             }
             catch (Exception e)

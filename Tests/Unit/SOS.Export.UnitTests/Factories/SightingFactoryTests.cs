@@ -22,6 +22,7 @@ namespace SOS.Export.UnitTests.Factories
         private readonly Mock<IProcessedSightingRepository> _processedSightingRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
         private readonly Mock<IFileService> _fileServiceMock;
+        private readonly Mock<IBlobStorageService> _blobStorageService;
         private readonly Mock<IZendToService> _zendToServiceMock;
         private readonly Mock<ILogger<SightingFactory>> _loggerMock;
 
@@ -34,6 +35,7 @@ namespace SOS.Export.UnitTests.Factories
             _processedSightingRepositoryMock = new Mock<IProcessedSightingRepository>();
             _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
             _fileServiceMock = new Mock<IFileService>();
+            _blobStorageService = new Mock<IBlobStorageService>();
             _zendToServiceMock = new Mock<IZendToService>();
             _loggerMock = new Mock<ILogger<SightingFactory>>();
         }
@@ -50,6 +52,7 @@ namespace SOS.Export.UnitTests.Factories
                 _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
+                _blobStorageService.Object,
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object).Should().NotBeNull();
@@ -59,6 +62,7 @@ namespace SOS.Export.UnitTests.Factories
                 _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
+                _blobStorageService.Object,
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
@@ -69,6 +73,7 @@ namespace SOS.Export.UnitTests.Factories
                 null,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
+                _blobStorageService.Object,
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
@@ -79,6 +84,7 @@ namespace SOS.Export.UnitTests.Factories
                 _processedSightingRepositoryMock.Object,
                 null,
                 _fileServiceMock.Object,
+                _blobStorageService.Object,
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
@@ -89,6 +95,7 @@ namespace SOS.Export.UnitTests.Factories
                 _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 null,
+                _blobStorageService.Object,
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
@@ -100,15 +107,29 @@ namespace SOS.Export.UnitTests.Factories
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 null,
+                _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("blobStorageService");
+
 
             create = () => new SightingFactory(
                 _dwcArchiveFileWriterMock.Object,
                 _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
+                _blobStorageService.Object,
+                null,
+                new FileDestination { Path = "test" },
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("zendToService");
+
+            create = () => new SightingFactory(
+                _dwcArchiveFileWriterMock.Object,
+                _processedSightingRepositoryMock.Object,
+                _processInfoRepositoryMock.Object,
+                _fileServiceMock.Object,
+                _blobStorageService.Object,
                 _zendToServiceMock.Object,
                 null,
                 _loggerMock.Object);
@@ -119,6 +140,7 @@ namespace SOS.Export.UnitTests.Factories
                 _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
+                _blobStorageService.Object,
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 null);
@@ -141,7 +163,7 @@ namespace SOS.Export.UnitTests.Factories
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>())).Throws(new Exception());
+            _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Throws(new Exception());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -151,6 +173,7 @@ namespace SOS.Export.UnitTests.Factories
                 _processedSightingRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
+                _blobStorageService.Object,
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);

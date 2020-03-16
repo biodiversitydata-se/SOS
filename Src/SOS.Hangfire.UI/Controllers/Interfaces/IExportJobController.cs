@@ -12,16 +12,18 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// Run export job
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="email"></param>
         /// <returns></returns>
-        IActionResult RunDarwinCoreExportJob(ExportFilter filter);
+        IActionResult RunDarwinCoreExportJob(ExportFilter filter, string email);
 
         /// <summary>
         /// Schedule daily export job
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="email"></param>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult ScheduleDailyDarwinCoreExportJob(ExportFilter filter, int hour, int minute);
+        IActionResult ScheduleDailyDarwinCoreExportJob(ExportFilter filter, string email, int hour, int minute);
     }
 }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
@@ -22,6 +23,7 @@ namespace SOS.Export.Factories
         private readonly IProcessedSightingRepository _processedSightingRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IFileService _fileService;
+        private readonly IBlobStorageService _blobStorageService;
         private readonly IZendToService _zendToService;
         private readonly string _exportPath;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
@@ -42,6 +44,7 @@ namespace SOS.Export.Factories
             IProcessedSightingRepository processedSightingRepository,
             IProcessInfoRepository processInfoRepository,
             IFileService fileService,
+            IBlobStorageService blobStorageService,
             IZendToService zendToService,
             FileDestination fileDestination,
 
@@ -50,23 +53,20 @@ namespace SOS.Export.Factories
             _processedSightingRepository = processedSightingRepository ?? throw new ArgumentNullException(nameof(processedSightingRepository));
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
             _zendToService = zendToService ?? throw new ArgumentNullException(nameof(zendToService));
             _exportPath = fileDestination?.Path ?? throw new ArgumentNullException(nameof(fileDestination));
             _dwcArchiveFileWriter = dwcArchiveFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriter));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
-        public async Task<string> ExportDWCAsync(ExportFilter filter, IJobCancellationToken cancellationToken)
+        private async Task<string> CreateDWCExportAsync(ExportFilter filter, string fileName, IJobCancellationToken cancellationToken)
         {
-            string zipFilePath = null;
-
             try
             {
                 var processInfo = await _processInfoRepository.GetAsync(_processInfoRepository.ActiveInstance);
-                var fileName = Guid.NewGuid().ToString();
-
-                zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                
+                var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     filter,
                     fileName,
                     _processedSightingRepository,
@@ -76,13 +76,7 @@ namespace SOS.Export.Factories
                     cancellationToken);
                 cancellationToken?.ThrowIfCancellationRequested();
 
-                // zend file to user
-                if (await _zendToService.SendFile(zipFilePath))
-                {
-                    return $"{fileName}.zip";
-                }
-
-                return null;
+                return zipFilePath;
             }
             catch (JobAbortedException)
             {
@@ -93,6 +87,53 @@ namespace SOS.Export.Factories
             {
                 _logger.LogError(e, "Failed to export sightings");
                 return null;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> ExportDWCAsync(ExportFilter filter, IJobCancellationToken cancellationToken)
+        {
+            var zipFilePath = "";
+            try
+            {
+                var fileName = Guid.NewGuid().ToString();
+                zipFilePath = await CreateDWCExportAsync(filter, fileName, cancellationToken);
+
+                // Make sure container exists
+                var container = $"sos-{DateTime.Now.Year}";
+                await _blobStorageService.CreateContainerAsync(container);
+
+                // Upload file to blob storage
+                return await _blobStorageService.UploadBlobAsync(zipFilePath, container);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export sightings");
+                return false;
+            }
+            finally
+            {
+                // Remove local file
+                _fileService.DeleteFile(zipFilePath);
+            }
+        }
+
+        public async Task<bool> ExportDWCAsync(ExportFilter filter, string emailAddress,
+            IJobCancellationToken cancellationToken)
+        {
+            var zipFilePath = "";
+            try
+            {
+                var fileName = Guid.NewGuid().ToString();
+                zipFilePath = await CreateDWCExportAsync(filter, fileName, cancellationToken);
+
+                // zend file to user
+                return await _zendToService.SendFile(emailAddress, JsonConvert.SerializeObject(filter), zipFilePath);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export sightings");
+                return false;
             }
             finally
             {
@@ -113,9 +154,7 @@ namespace SOS.Export.Factories
             IEnumerable<FieldDescription> fieldDescriptions, 
             IJobCancellationToken cancellationToken)
         {
-            var fileName = await ExportDWCAsync(new ExportFilter(), cancellationToken);
-           
-            return !string.IsNullOrEmpty(fileName);
+            return await ExportDWCAsync(new ExportFilter(), cancellationToken);
         }
     }
 }
