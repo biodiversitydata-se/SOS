@@ -10,7 +10,7 @@ using SOS.Lib.Models.Search;
 namespace SOS.Export.Jobs
 {
     /// <summary>
-    /// Species portal harvest
+    /// Artportalen harvest
     /// </summary>
     public class ExportJob : IExportJob
     {

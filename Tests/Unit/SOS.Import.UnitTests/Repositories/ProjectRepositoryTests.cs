@@ -5,7 +5,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities;
-using SOS.Import.Repositories.Source.SpeciesPortal;
+using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services.Interfaces;
 using Xunit;
 
@@ -16,7 +16,7 @@ namespace SOS.Import.UnitTests.Repositories
     /// </summary>
     public class ProjectRepositoryTests
     {
-        private readonly Mock<ISpeciesPortalDataService> _speciesPortalDataServiceMock;
+        private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
         private readonly Mock<ILogger<ProjectRepository>> _loggerMock;
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace SOS.Import.UnitTests.Repositories
         /// </summary>
         public ProjectRepositoryTests()
         {
-            _speciesPortalDataServiceMock = new Mock<ISpeciesPortalDataService>();
+            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
             _loggerMock = new Mock<ILogger<ProjectRepository>>();
         }
 
@@ -35,16 +35,16 @@ namespace SOS.Import.UnitTests.Repositories
         public void ConstructorTest()
         {
             new ProjectRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new ProjectRepository(
                 null,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesPortalDataService");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenDataService");
 
             create = () => new ProjectRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -63,14 +63,14 @@ namespace SOS.Import.UnitTests.Repositories
                     new ProjectEntity { Id = 2, Name = "Project 2" }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<ProjectEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<ProjectEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(projects);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var ProjectRepository = new ProjectRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await ProjectRepository.GetProjectsAsync();
@@ -88,14 +88,14 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<ProjectEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<ProjectEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var ProjectRepository = new ProjectRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await ProjectRepository.GetProjectsAsync();

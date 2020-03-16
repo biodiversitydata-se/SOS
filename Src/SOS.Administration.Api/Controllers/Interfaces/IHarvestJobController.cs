@@ -55,13 +55,13 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult AddDailySpeciesPortalHarvestJob(int hour, int minute);
+        IActionResult AddDailyArtportalenHarvestJob(int hour, int minute);
 
         /// <summary>
-        /// Run species portal sightings harvest
+        /// Run Artportalen sightings harvest
         /// </summary>
         /// <returns></returns>
-        IActionResult RunSpeciesPortalHarvestJob();
+        IActionResult RunArtportalenHarvestJob();
 
         /// <summary>
         /// Schedule daily taxon harvest job

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Factories.FieldMappings.Interfaces;
-using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
+using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 

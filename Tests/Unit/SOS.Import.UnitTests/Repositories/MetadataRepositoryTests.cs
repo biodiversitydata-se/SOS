@@ -5,7 +5,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities;
-using SOS.Import.Repositories.Source.SpeciesPortal;
+using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Constants;
 using Xunit;
@@ -17,7 +17,7 @@ namespace SOS.Import.UnitTests.Repositories
     /// </summary>
     public class MetadataRepositoryTests
     {
-        private readonly Mock<ISpeciesPortalDataService> _speciesPortalDataServiceMock;
+        private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
         private readonly Mock<ILogger<MetadataRepository>> _loggerMock;
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace SOS.Import.UnitTests.Repositories
         /// </summary>
         public MetadataRepositoryTests()
         {
-            _speciesPortalDataServiceMock = new Mock<ISpeciesPortalDataService>();
+            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
             _loggerMock = new Mock<ILogger<MetadataRepository>>();
         }
 
@@ -36,16 +36,16 @@ namespace SOS.Import.UnitTests.Repositories
         public void ConstructorTest()
         {
             new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new MetadataRepository(
                 null,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesPortalDataService");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenDataService");
 
             create = () => new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -64,14 +64,14 @@ namespace SOS.Import.UnitTests.Repositories
                 new MetadataWithCategoryEntity { Id = 2, CategoryId = 1, CategoryName = "Category", Translation = "Activity 2", CultureCode = "sv-GB" }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataWithCategoryEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataWithCategoryEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetActivitiesAsync();
@@ -89,14 +89,14 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetActivitiesAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetActivitiesAsync();
@@ -122,14 +122,14 @@ namespace SOS.Import.UnitTests.Repositories
                 new MetadataEntity { Id = 2, Translation = "Biotope 2", CultureCode = Cultures.en_GB }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(biotopes);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetBiotopesAsync();
@@ -147,14 +147,14 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetBiotopesAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetBiotopesAsync();
@@ -180,14 +180,14 @@ namespace SOS.Import.UnitTests.Repositories
                 new MetadataEntity { Id = 2, Translation = "Gender 2", CultureCode = Cultures.en_GB }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetGendersAsync();
@@ -205,14 +205,14 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetGendersAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetGendersAsync();
@@ -238,14 +238,14 @@ namespace SOS.Import.UnitTests.Repositories
                 new MetadataEntity { Id = 2, Translation = "Stage 2", CultureCode = Cultures.en_GB }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetStagesAsync();
@@ -263,14 +263,14 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetStagesAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetStagesAsync();
@@ -296,14 +296,14 @@ namespace SOS.Import.UnitTests.Repositories
                 new MetadataEntity { Id = 2, Translation = "Substrate 2", CultureCode = Cultures.en_GB }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(substrates);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetSubstratesAsync();
@@ -321,14 +321,14 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetSubstratesAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetSubstratesAsync();
@@ -354,14 +354,14 @@ namespace SOS.Import.UnitTests.Repositories
                 new MetadataEntity { Id = 2, Translation = "Unit 2", CultureCode = Cultures.en_GB }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetUnitsAsync();
@@ -379,14 +379,14 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetUnitsAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetUnitsAsync();
@@ -412,14 +412,14 @@ namespace SOS.Import.UnitTests.Repositories
                 new MetadataEntity { Id = 2, Translation = "ValidationStatus 2", CultureCode = Cultures.en_GB }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .ReturnsAsync(validationStatus);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetValidationStatusAsync();
@@ -437,14 +437,14 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetValidationStatusAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var metadataRepository = new MetadataRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await metadataRepository.GetValidationStatusAsync();

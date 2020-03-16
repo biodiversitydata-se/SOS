@@ -139,43 +139,43 @@ namespace SOS.Administration.Api.Controllers
         }
         #endregion KUL
 
-        #region Species Portal
+        #region Artportalen
         /// <inheritdoc />
-        [HttpPost("SpeciesPortal/Schedule/Daily")]
+        [HttpPost("Artportalen/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailySpeciesPortalHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        public IActionResult AddDailyArtportalenHarvestJob([FromQuery]int hour, [FromQuery]int minute)
         {
             try
             {
-                RecurringJob.AddOrUpdate<ISpeciesPortalHarvestJob>(nameof(ISpeciesPortalHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
-                return new OkObjectResult("Species Portal harvest job added");
+                RecurringJob.AddOrUpdate<IArtportalenHarvestJob>(nameof(IArtportalenHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("Artportalen harvest job added");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Adding Species Portal harvest job failed");
+                _logger.LogError(e, "Adding Artportalen harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
-        [HttpPost("SpeciesPortal/Run")]
+        [HttpPost("Artportalen/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunSpeciesPortalHarvestJob()
+        public IActionResult RunArtportalenHarvestJob()
         {
             try
             {
-                BackgroundJob.Enqueue<ISpeciesPortalHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Started Species Portal harvest job");
+                BackgroundJob.Enqueue<IArtportalenHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
+                return new OkObjectResult("Started Artportalen harvest job");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running Species Portal harvest job failed");
+                _logger.LogError(e, "Running Artportalen harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
-        #endregion Species Portal
+        #endregion Artportalen
 
         #region Taxon
         /// <inheritdoc />

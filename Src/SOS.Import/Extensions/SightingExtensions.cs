@@ -6,7 +6,7 @@ using SOS.Import.Entities;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.SpeciesPortal;
+using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Extensions
@@ -59,7 +59,7 @@ namespace SOS.Import.Extensions
         /// <param name="units"></param>
         /// <param name="projectEntityDictionaries"></param>
         /// <returns></returns>
-        public static IEnumerable<APSightingVerbatim> ToVerbatims(this IEnumerable<SightingEntity> entities,
+        public static IEnumerable<ArtportalenVerbatimObservation> ToVerbatims(this IEnumerable<SightingEntity> entities,
             IDictionary<int, MetadataWithCategory> activities,
             IDictionary<int, Metadata> biotopes,
             IDictionary<int, Metadata> genders,
@@ -102,7 +102,7 @@ namespace SOS.Import.Extensions
         /// <param name="units"></param>
         /// <param name="projectEntityDictionaries"></param>
         /// <returns></returns>
-        public static APSightingVerbatim ToVerbatim(this SightingEntity entity,
+        public static ArtportalenVerbatimObservation ToVerbatim(this SightingEntity entity,
             IDictionary<int, MetadataWithCategory> activities,
             IDictionary<int, Metadata> biotopes,
             IDictionary<int, Metadata> genders,
@@ -115,7 +115,7 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> units, 
             ProjectEntityDictionaries projectEntityDictionaries)
         {
-            var observation = new APSightingVerbatim
+            var observation = new ArtportalenVerbatimObservation
             {
                 Activity = entity.ActivityId.HasValue && activities.ContainsKey(entity.ActivityId.Value)
                     ? activities[entity.ActivityId.Value]

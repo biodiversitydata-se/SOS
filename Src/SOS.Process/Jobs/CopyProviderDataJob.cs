@@ -8,7 +8,7 @@ using SOS.Process.Factories.Interfaces;
 namespace SOS.Process.Jobs
 {
     /// <summary>
-    /// Species portal harvest
+    /// Artportalen harvest
     /// </summary>
     public class CopyProviderDataJob : ICopyProviderDataJob
     {

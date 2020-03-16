@@ -46,11 +46,5 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         IActionResult RunCopyFieldMappingJob();
-
-        /// <summary>
-        /// Run KUL process job.
-        /// </summary>
-        /// <returns></returns>
-        IActionResult RunKulProcessJob();
     }
 }

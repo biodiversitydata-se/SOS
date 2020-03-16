@@ -13,9 +13,9 @@ namespace SOS.Lib.Configuration.Import
         public ClamServiceConfiguration ClamServiceConfiguration { get; set; }
 
         /// <summary>
-        /// Configuration for Species Portal
+        /// Configuration for Artportalen
         /// </summary>
-        public SpeciesPortalConfiguration SpeciesPortalConfiguration { get; set; }
+        public ArtportalenConfiguration ArtportalenConfiguration { get; set; }
 
         /// <summary>
         /// Host

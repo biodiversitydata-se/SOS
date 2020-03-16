@@ -10,10 +10,10 @@ using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Lib.Models.Verbatim.SpeciesPortal;
 using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -22,14 +22,14 @@ using SOS.Process.Repositories.Source.Interfaces;
 namespace SOS.Process.Jobs
 {
     /// <summary>
-    /// Species portal harvest
+    /// Artportalen harvest
     /// </summary>
     public class ProcessJob : IProcessJob
     {
         private readonly IProcessedSightingRepository _darwinCoreRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
-        private readonly ISpeciesPortalProcessFactory _speciesPortalProcessFactory;
+        private readonly IArtportalenProcessFactory _artportalenProcessFactory;
         private readonly IClamPortalProcessFactory _clamPortalProcessFactory;
         private readonly IKulProcessFactory _kulProcessFactory;
         private readonly ITaxonProcessedRepository _taxonProcessedRepository;
@@ -44,7 +44,7 @@ namespace SOS.Process.Jobs
         /// <param name="harvestInfoRepository"></param>
         /// <param name="clamPortalProcessFactory"></param>
         /// <param name="kulProcessFactory"></param>
-        /// <param name="speciesPortalProcessFactory"></param>
+        /// <param name="artportalenProcessFactory"></param>
         /// <param name="taxonProcessedRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
@@ -54,7 +54,7 @@ namespace SOS.Process.Jobs
             IHarvestInfoRepository harvestInfoRepository,
             IClamPortalProcessFactory clamPortalProcessFactory,
             IKulProcessFactory kulProcessFactory,
-            ISpeciesPortalProcessFactory speciesPortalProcessFactory,
+            IArtportalenProcessFactory artportalenProcessFactory,
             ITaxonProcessedRepository taxonProcessedRepository,
             IAreaHelper areaHelper,
             ILogger<ProcessJob> logger)
@@ -64,7 +64,7 @@ namespace SOS.Process.Jobs
             _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _clamPortalProcessFactory = clamPortalProcessFactory ?? throw new ArgumentNullException(nameof(clamPortalProcessFactory));
             _kulProcessFactory = kulProcessFactory ?? throw new ArgumentNullException(nameof(kulProcessFactory));
-            _speciesPortalProcessFactory = speciesPortalProcessFactory ?? throw new ArgumentNullException(nameof(speciesPortalProcessFactory));
+            _artportalenProcessFactory = artportalenProcessFactory ?? throw new ArgumentNullException(nameof(artportalenProcessFactory));
             _taxonProcessedRepository = taxonProcessedRepository ?? throw new ArgumentNullException(nameof(taxonProcessedRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -118,15 +118,15 @@ namespace SOS.Process.Jobs
                 var providerInfo = new Dictionary<DataProvider, ProviderInfo>();
                 var processTasks = new Dictionary<DataProvider, Task<RunInfo>>();
 
-                // Add species portal import if first bit is set
-                if ((sources & (int)DataProvider.SpeciesPortal) > 0)
+                // Add Artportalen import if first bit is set
+                if ((sources & (int)DataProvider.Artportalen) > 0)
                 {
-                    processTasks.Add(DataProvider.SpeciesPortal, _speciesPortalProcessFactory.ProcessAsync(taxonById, cancellationToken));
+                    processTasks.Add(DataProvider.Artportalen, _artportalenProcessFactory.ProcessAsync(taxonById, cancellationToken));
 
-                    var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(APSightingVerbatim))) ?? new HarvestInfo(nameof(APSightingVerbatim), DataProvider.SpeciesPortal, DateTime.MinValue);
+                    var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(ArtportalenVerbatimObservation))) ?? new HarvestInfo(nameof(ArtportalenVerbatimObservation), DataProvider.Artportalen, DateTime.MinValue);
 
                     //Add information about harvest
-                    providerInfo.Add(DataProvider.SpeciesPortal, CreateProviderInfo(DataProvider.SpeciesPortal, harvestInfo,
+                    providerInfo.Add(DataProvider.Artportalen, CreateProviderInfo(DataProvider.Artportalen, harvestInfo,
                         currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon))).ToArray())
                     );
                 }

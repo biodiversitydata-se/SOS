@@ -126,9 +126,9 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine("================");
             sb.AppendLine($"[KULSettings].[StartHarvestYear]: { _importConfiguration.KulServiceConfiguration.StartHarvestYear}");
             sb.AppendLine($"[KULSettings].[MaxNumberOfSightingsHarvested]: { _importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            sb.AppendLine($"[SpeciesPortalSettings].[MaxNumberOfSightingsHarvested]: {_importConfiguration.SpeciesPortalConfiguration.MaxNumberOfSightingsHarvested}");
-            sb.AppendLine($"[SpeciesPortalSettings].[ChunkSize]: {_importConfiguration.SpeciesPortalConfiguration.ChunkSize}");
-            sb.AppendLine($"[SpeciesPortalSettings].[ConnectionString]: {_importConfiguration.SpeciesPortalConfiguration.ConnectionString}");
+            sb.AppendLine($"[ArtportalenSettings].[MaxNumberOfSightingsHarvested]: {_importConfiguration.ArtportalenConfiguration.MaxNumberOfSightingsHarvested}");
+            sb.AppendLine($"[ArtportalenSettings].[ChunkSize]: {_importConfiguration.ArtportalenConfiguration.ChunkSize}");
+            sb.AppendLine($"[ArtportalenSettings].[ConnectionString]: {_importConfiguration.ArtportalenConfiguration.ConnectionString}");
             sb.AppendLine($"[ClamService].[Address]: {_importConfiguration.ClamServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[TaxonAttributeService].[Address]: {_importConfiguration.TaxonAttributeServiceConfiguration.BaseAddress}");
             sb.AppendLine($"[TaxonService].[Address]: {_importConfiguration.TaxonServiceConfiguration.BaseAddress}");

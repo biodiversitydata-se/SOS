@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using SOS.Import.Entities;
-using SOS.Import.Repositories.Source.SpeciesPortal.Enums;
+using SOS.Import.Repositories.Source.Artportalen.Enums;
 
 namespace SOS.Import.UnitTests.TestData
 {

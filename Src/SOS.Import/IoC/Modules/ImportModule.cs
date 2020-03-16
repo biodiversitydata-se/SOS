@@ -8,6 +8,8 @@ using SOS.Import.Jobs;
 using SOS.Import.MongoDb;
 using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination;
+using SOS.Import.Repositories.Destination.Artportalen;
+using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Destination.ClamPortal;
 using SOS.Import.Repositories.Destination.ClamPortal.Interfaces;
 using SOS.Import.Repositories.Destination.FieldMappings;
@@ -15,12 +17,10 @@ using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.Kul;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
-using SOS.Import.Repositories.Destination.SpeciesPortal;
-using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
 using SOS.Import.Repositories.Destination.Taxon;
 using SOS.Import.Repositories.Destination.Taxon.Interfaces;
-using SOS.Import.Repositories.Source.SpeciesPortal;
-using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
+using SOS.Import.Repositories.Source.Artportalen;
+using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services;
 using SOS.Import.Services.Interfaces;
 
@@ -37,8 +37,8 @@ namespace SOS.Import.IoC.Modules
                 builder.RegisterInstance(Configuration.ClamServiceConfiguration).As<ClamServiceConfiguration>().SingleInstance();
             if (Configuration.KulServiceConfiguration != null)
                 builder.RegisterInstance(Configuration.KulServiceConfiguration).As<KulServiceConfiguration>().SingleInstance();
-            if (Configuration.SpeciesPortalConfiguration != null)
-                builder.RegisterInstance(Configuration.SpeciesPortalConfiguration).As<SpeciesPortalConfiguration>().SingleInstance();
+            if (Configuration.ArtportalenConfiguration != null)
+                builder.RegisterInstance(Configuration.ArtportalenConfiguration).As<ArtportalenConfiguration>().SingleInstance();
             if (Configuration.TaxonAttributeServiceConfiguration != null)
                 builder.RegisterInstance(Configuration.TaxonAttributeServiceConfiguration).As<TaxonAttributeServiceConfiguration>().SingleInstance();
             if (Configuration.TaxonServiceConfiguration != null)
@@ -80,7 +80,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ClamPortalObservationFactory>().As<IClamPortalObservationFactory>().InstancePerLifetimeScope();
             builder.RegisterType<AreaFactory>().As<IAreaFactory>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationFactory>().As<IKulObservationFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<SpeciesPortalSightingFactory>().As<ISpeciesPortalSightingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenObservationFactory>().As<IArtportalenObservationFactory>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingFactory>().As<IFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ActivityFieldMappingFactory>().InstancePerLifetimeScope();
@@ -106,7 +106,7 @@ namespace SOS.Import.IoC.Modules
             // Add Services
             builder.RegisterType<ClamObservationService>().As<IClamObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<HttpClientService>().As<IHttpClientService>().InstancePerLifetimeScope();
-            builder.RegisterType<SpeciesPortalDataService>().As<ISpeciesPortalDataService>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenDataService>().As<IArtportalenDataService>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonServiceProxy>().As<ITaxonServiceProxy>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonService>().As<ITaxonService>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonAttributeService>().As<ITaxonAttributeService>().InstancePerLifetimeScope();
@@ -115,7 +115,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ClamPortalHarvestJob>().As<IClamPortalHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<GeoAreasHarvestJob>().As<IGeoAreasHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<KulHarvestJob>().As<IKulHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<SpeciesPortalHarvestJob>().As<ISpeciesPortalHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenHarvestJob>().As<IArtportalenHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonHarvestJob>().As<ITaxonHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingImportJob>().As<IFieldMappingImportJob>().InstancePerLifetimeScope();
         }

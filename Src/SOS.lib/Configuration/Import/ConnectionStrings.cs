@@ -6,8 +6,8 @@
     public class ConnectionStrings
     {
         /// <summary>
-        /// Species portal connection settings
+        /// Artportalen connection settings
         /// </summary>
-        public string SpeciesPortal { get; set; }
+        public string Artportalen { get; set; }
     }
 }

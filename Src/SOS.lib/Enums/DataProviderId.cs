@@ -5,7 +5,7 @@
     /// </summary>
     public enum DataProvider
     {
-        SpeciesPortal = 1,
+        Artportalen = 1,
         ClamPortal = 2,
         KUL = 4,
         Dwc = 8,

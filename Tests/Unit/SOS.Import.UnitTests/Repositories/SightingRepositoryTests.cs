@@ -5,7 +5,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities;
-using SOS.Import.Repositories.Source.SpeciesPortal;
+using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services.Interfaces;
 using Xunit;
 
@@ -16,7 +16,7 @@ namespace SOS.Import.UnitTests.Repositories
     /// </summary>
     public class SightingRepositoryTests
     {
-        private readonly Mock<ISpeciesPortalDataService> _speciesPortalDataServiceMock;
+        private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
         private readonly Mock<ILogger<SightingRepository>> _loggerMock;
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace SOS.Import.UnitTests.Repositories
         /// </summary>
         public SightingRepositoryTests()
         {
-            _speciesPortalDataServiceMock = new Mock<ISpeciesPortalDataService>();
+            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
             _loggerMock = new Mock<ILogger<SightingRepository>>();
         }
 
@@ -35,16 +35,16 @@ namespace SOS.Import.UnitTests.Repositories
         public void ConstructorTest()
         {
             new SightingRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new SightingRepository(
                 null,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesPortalDataService");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenDataService");
 
             create = () => new SightingRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -62,14 +62,14 @@ namespace SOS.Import.UnitTests.Repositories
                     new SightingEntity { Id = 2 }
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>()))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>()))
                 .ReturnsAsync(projects);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var SightingRepository = new SightingRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await SightingRepository.GetChunkAsync(0, 10);
@@ -87,14 +87,14 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetChunkAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>()))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>()))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var SightingRepository = new SightingRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await SightingRepository.GetChunkAsync(0, 10);
@@ -118,14 +118,14 @@ namespace SOS.Import.UnitTests.Repositories
                 new Tuple<int, int>(1, 2)
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
                 .ReturnsAsync(projectIds);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var SightingRepository = new SightingRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await SightingRepository.GetProjectIdsAsync();
@@ -143,14 +143,14 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetProjectIdsAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var SightingRepository = new SightingRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await SightingRepository.GetProjectIdsAsync();
@@ -173,14 +173,14 @@ namespace SOS.Import.UnitTests.Repositories
                 new Tuple<int, int>(1, 2)
             };
 
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
                 .ReturnsAsync(span);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var SightingRepository = new SightingRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await SightingRepository.GetIdSpanAsync();
@@ -198,14 +198,14 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetIdSpanAsyncException()
         {
-            _speciesPortalDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var SightingRepository = new SightingRepository(
-                _speciesPortalDataServiceMock.Object,
+                _artportalenDataServiceMock.Object,
                 _loggerMock.Object);
 
             var result = await SightingRepository.GetIdSpanAsync();

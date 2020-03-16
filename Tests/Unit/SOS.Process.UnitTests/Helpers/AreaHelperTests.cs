@@ -32,7 +32,7 @@ namespace SOS.Process.UnitTests.Helpers
         //    var areaHelper = new AreaHelper(
         //        AreaVerbatimRepositoryStubFactory.Create(areaTypes) .Object,
         //        ProcessedFieldMappingRepositoryStubFactory.Create().Object);
-        //    var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
+        //    var observation = new ProcessedSighting(DataProvider.Artportalen)
         //    {
         //        Location = new ProcessedLocation
         //        {
@@ -65,7 +65,7 @@ namespace SOS.Process.UnitTests.Helpers
         //        AreaVerbatimRepositoryStubFactory.Create(areaTypes).Object,
         //        ProcessedFieldMappingRepositoryStubFactory.Create().Object);
         //    var observations = new List<ProcessedSighting>();
-        //    var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
+        //    var observation = new ProcessedSighting(DataProvider.Artportalen)
         //    {
         //        Location = new ProcessedLocation
         //        {
@@ -99,7 +99,7 @@ namespace SOS.Process.UnitTests.Helpers
         //        AreaVerbatimRepositoryStubFactory.Create(areaTypes).Object,
         //        ProcessedFieldMappingRepositoryStubFactory.Create().Object);
         //    var observations = new List<ProcessedSighting>();
-        //    var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
+        //    var observation = new ProcessedSighting(DataProvider.Artportalen)
         //    {
         //        Location = new ProcessedLocation
         //        {

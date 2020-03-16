@@ -34,7 +34,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result = await processJob.RunAsync(
-                (int)DataProvider.SpeciesPortal, 
+                (int)DataProvider.Artportalen, 
                 false,
                 false, 
                 JobCancellationToken.Null);
@@ -77,13 +77,13 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedSightingRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<KulProcessFactory>());
-            var speciesPortalProcessFactory = new SpeciesPortalProcessFactory(
-                new SpeciesPortalVerbatimRepository(verbatimClient, new NullLogger<SpeciesPortalVerbatimRepository>()),
+            var artportalenProcessFactory = new ArtportalenProcessFactory(
+                new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
                 processedSightingRepository,
                 processedFieldMappingRepository, 
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 processConfiguration,
-                new NullLogger<SpeciesPortalProcessFactory>());
+                new NullLogger<ArtportalenProcessFactory>());
 
             var processTaxaJob = new ProcessJob(
                 processedSightingRepository,
@@ -91,7 +91,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 harvestInfoRepository,
                 clamPortalProcessFactory,
                 kulProcessFactory,
-                speciesPortalProcessFactory,
+                artportalenProcessFactory,
                 taxonProcessedRepository,
                 areaHelper,
                 new NullLogger<ProcessJob>());

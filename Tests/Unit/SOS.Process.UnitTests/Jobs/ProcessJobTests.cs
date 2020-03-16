@@ -30,7 +30,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
         private readonly Mock<IClamPortalProcessFactory> _clamPortalProcessFactory;
         private readonly Mock<IKulProcessFactory> _kulProcessFactory;
-        private readonly Mock<ISpeciesPortalProcessFactory> _speciesPortalProcessFactory;
+        private readonly Mock<IArtportalenProcessFactory> _artportalenProcessFactory;
         private readonly Mock<ITaxonProcessedRepository> _taxonProcessedRepository;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<ILogger<ProcessJob>> _loggerMock;
@@ -47,7 +47,7 @@ namespace SOS.Process.UnitTests.Jobs
             _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
             _clamPortalProcessFactory = new Mock<IClamPortalProcessFactory>();
             _kulProcessFactory = new Mock<IKulProcessFactory>();
-            _speciesPortalProcessFactory = new Mock<ISpeciesPortalProcessFactory>();
+            _artportalenProcessFactory = new Mock<IArtportalenProcessFactory>();
             _taxonProcessedRepository = new Mock<ITaxonProcessedRepository>();
             _areaHelper = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<ProcessJob>>();
@@ -65,7 +65,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
-                _speciesPortalProcessFactory.Object,
+                _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object).Should().NotBeNull();
@@ -76,7 +76,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
-                _speciesPortalProcessFactory.Object,
+                _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
@@ -88,7 +88,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
-                _speciesPortalProcessFactory.Object,
+                _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
@@ -100,7 +100,7 @@ namespace SOS.Process.UnitTests.Jobs
                 null,
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
-                _speciesPortalProcessFactory.Object,
+                _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
@@ -112,7 +112,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 null,
                 _kulProcessFactory.Object,
-                _speciesPortalProcessFactory.Object,
+                _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
@@ -124,7 +124,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessFactory.Object,
                 null,
-                _speciesPortalProcessFactory.Object,
+                _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
@@ -140,7 +140,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesPortalProcessFactory");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenProcessFactory");
 
             create = () => new ProcessJob(
                 _darwinCoreRepository.Object,
@@ -148,7 +148,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
-                _speciesPortalProcessFactory.Object,
+                _artportalenProcessFactory.Object,
                 null,
                 _areaHelper.Object,
                 _loggerMock.Object);
@@ -160,7 +160,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
-                _speciesPortalProcessFactory.Object,
+                _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
                 null,
                 _loggerMock.Object);
@@ -172,7 +172,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
-                _speciesPortalProcessFactory.Object,
+                _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 null);
@@ -200,11 +200,11 @@ namespace SOS.Process.UnitTests.Jobs
             _harvestInfoRepository.Setup(r => r.GetAllAsync())
                 .ReturnsAsync(new []
                 {
-                    new HarvestInfo("0", DataProvider.SpeciesPortal, DateTime.Now)
+                    new HarvestInfo("0", DataProvider.Artportalen, DateTime.Now)
                 });
 
-            _speciesPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(RunInfo.Success(DataProvider.SpeciesPortal, DateTime.Now, DateTime.Now, 1));
+            _artportalenProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+                .ReturnsAsync(RunInfo.Success(DataProvider.Artportalen, DateTime.Now, DateTime.Now, 1));
 
             _clamPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(RunInfo.Success(DataProvider.ClamPortal, DateTime.Now, DateTime.Now, 1));
@@ -235,12 +235,12 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
-                _speciesPortalProcessFactory.Object,
+                _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
 
-            var sources = (byte) DataProvider.SpeciesPortal + (byte) DataProvider.ClamPortal + (byte) DataProvider.KUL;
+            var sources = (byte) DataProvider.Artportalen + (byte) DataProvider.ClamPortal + (byte) DataProvider.KUL;
             var result = await job.RunAsync(sources, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -270,7 +270,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
-                _speciesPortalProcessFactory.Object,
+                _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
@@ -304,7 +304,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessFactory.Object,
                 _kulProcessFactory.Object,
-                _speciesPortalProcessFactory.Object,
+                _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);

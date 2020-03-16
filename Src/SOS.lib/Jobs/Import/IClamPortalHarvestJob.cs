@@ -6,7 +6,7 @@ namespace SOS.Lib.Jobs.Import
     public interface IClamPortalHarvestJob
     {
         /// <summary>
-        /// Run species portal harvest
+        /// Run Artportalen harvest
         /// </summary>
         /// <returns></returns>
         Task<bool> RunAsync(IJobCancellationToken cancellationToken);

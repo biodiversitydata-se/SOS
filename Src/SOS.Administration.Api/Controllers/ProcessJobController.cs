@@ -115,24 +115,5 @@ namespace SOS.Administration.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
-
-        /// <inheritdoc />
-        [HttpPost("Kul/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunKulProcessJob()
-        {
-            try
-            {
-                int sources = (int)DataProvider.KUL;
-                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(sources, false,true, JobCancellationToken.Null));
-                return new OkObjectResult("Started process KUL job");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Starting process KUL job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
     }
 }

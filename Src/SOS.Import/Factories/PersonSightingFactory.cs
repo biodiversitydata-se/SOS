@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SOS.Import.Extensions;
-using SOS.Import.Repositories.Source.SpeciesPortal.Enums;
-using SOS.Lib.Models.Verbatim.SpeciesPortal;
+using SOS.Import.Repositories.Source.Artportalen.Enums;
+using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Factories
 {

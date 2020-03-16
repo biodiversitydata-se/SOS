@@ -27,7 +27,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var observations = new List<ProcessedSighting>();
-            var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
+            var observation = new ProcessedSighting(DataProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -59,7 +59,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
+            var observation = new ProcessedSighting(DataProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -88,7 +88,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var observations = new List<ProcessedSighting>();
-            var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
+            var observation = new ProcessedSighting(DataProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -118,7 +118,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var observations = new List<ProcessedSighting>();
-            var observation = new ProcessedSighting(DataProvider.SpeciesPortal)
+            var observation = new ProcessedSighting(DataProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {

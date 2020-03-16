@@ -9,7 +9,7 @@ using SOS.Lib.Jobs.Import;
 namespace SOS.Import.Jobs
 {
     /// <summary>
-    /// Species portal harvest
+    /// Artportalen harvest
     /// </summary>
     public class GeoAreasHarvestJob : IGeoAreasHarvestJob
     {

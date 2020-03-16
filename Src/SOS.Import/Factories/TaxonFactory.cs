@@ -47,7 +47,7 @@ namespace SOS.Import.Factories
         /// <returns></returns>
         public async Task<HarvestInfo> HarvestAsync()
         {
-            var harvestInfo = new HarvestInfo(nameof(DarwinCoreTaxon), DataProvider.SpeciesPortal, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(DarwinCoreTaxon), DataProvider.Artportalen, DateTime.Now);
             try
             {
                 _logger.LogDebug("Start storing taxa verbatim");

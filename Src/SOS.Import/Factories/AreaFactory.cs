@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
-using SOS.Import.Repositories.Destination.SpeciesPortal.Interfaces;
-using SOS.Import.Repositories.Source.SpeciesPortal.Interfaces;
+using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
+using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
@@ -40,7 +40,7 @@ namespace SOS.Import.Factories
         /// <inheritdoc />
         public async Task<HarvestInfo> HarvestAreasAsync()
         {
-            var harvestInfo = new HarvestInfo(nameof(Area), DataProvider.SpeciesPortal, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(Area), DataProvider.Artportalen, DateTime.Now);
             try
             {
                 var start = DateTime.Now;

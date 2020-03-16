@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Factories;
 using SOS.Import.MongoDb;
-using SOS.Import.Repositories.Destination.SpeciesPortal;
-using SOS.Import.Repositories.Source.SpeciesPortal;
+using SOS.Import.Repositories.Destination.Artportalen;
+using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
@@ -23,7 +23,7 @@ namespace SOS.Import.IntegrationTests.Factories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             ImportConfiguration importConfiguration = GetImportConfiguration();
-            var speciesPortalDataService = new SpeciesPortalDataService(importConfiguration.SpeciesPortalConfiguration);
+            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
             var areaVerbatimRepository = new AreaVerbatimRepository(
                 new ImportClient(
                     importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
@@ -32,7 +32,7 @@ namespace SOS.Import.IntegrationTests.Factories
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
 
             var areaFactory = new AreaFactory(
-                new AreaRepository(speciesPortalDataService, new Mock<ILogger<AreaRepository>>().Object),
+                new AreaRepository(artportalenDataService, new Mock<ILogger<AreaRepository>>().Object),
                 areaVerbatimRepository,
                 new Mock<ILogger<AreaFactory>>().Object);
 
@@ -55,7 +55,7 @@ namespace SOS.Import.IntegrationTests.Factories
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             ImportConfiguration importConfiguration = GetImportConfiguration();
-            var speciesPortalDataService = new SpeciesPortalDataService(importConfiguration.SpeciesPortalConfiguration);
+            var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
             var areaVerbatimRepository = new AreaVerbatimRepository(
                 new ImportClient(
                     importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
@@ -64,7 +64,7 @@ namespace SOS.Import.IntegrationTests.Factories
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
 
             var areaFactory = new AreaFactory(
-                new AreaRepository(speciesPortalDataService, new Mock<ILogger<AreaRepository>>().Object),
+                new AreaRepository(artportalenDataService, new Mock<ILogger<AreaRepository>>().Object),
                 areaVerbatimRepository,
                 new Mock<ILogger<AreaFactory>>().Object);
 
