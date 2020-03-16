@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Lib.Models.DarwinCore
 {

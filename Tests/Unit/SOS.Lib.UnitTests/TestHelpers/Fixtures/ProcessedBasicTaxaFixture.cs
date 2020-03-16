@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Processed.Sighting;
 using SOS.TestHelpers.Helpers;
 

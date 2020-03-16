@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.DarwinCore;
 
 namespace SOS.Lib.Models.Processed.Sighting
 {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.Processed.Sighting;
 
 namespace SOS.Lib.Models.TaxonTree

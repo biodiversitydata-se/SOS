@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SOS.Lib.Models.Processed.DarwinCore
+﻿namespace SOS.Lib.Models.Processed.Sighting
 {
     /// <summary>
     /// Taxon tree relation.

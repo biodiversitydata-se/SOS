@@ -11,7 +11,6 @@ using SOS.Import.Repositories.Destination.Taxon;
 using SOS.Import.Services;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.DarwinCore;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.Verbatim.Shared;
 using Xunit;

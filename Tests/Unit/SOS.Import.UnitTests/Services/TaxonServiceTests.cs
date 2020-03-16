@@ -11,7 +11,6 @@ using SOS.Import.Services.Interfaces;
 using SOS.Import.UnitTests.TestHelpers.Factories;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.DarwinCore;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Services
