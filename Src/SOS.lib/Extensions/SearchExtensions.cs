@@ -18,23 +18,23 @@ namespace SOS.Lib.Extensions
         {
             var filters = new List<FilterDefinition<ProcessedSighting>>();
 
-            if (filter.Counties?.Any() ?? false)
+            if (filter.CountyIds?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.CountyId.Id, filter.Counties));
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.CountyId.Id, filter.CountyIds));
             }
 
-            if (filter.Delimitation?.IsValid ?? false)
+            if (filter.GeometryFilter?.IsValid ?? false)
             {
-                var geoJsonGeometry = filter.Delimitation.Geometry.ToGeoJsonGeometry(); ;
+                var geoJsonGeometry = filter.GeometryFilter.Geometry.ToGeoJsonGeometry(); ;
 
                 switch (geoJsonGeometry.Type)
                 {
                     case GeoJsonObjectType.Point:
-                        filters.Add(Builders<ProcessedSighting>.Filter.Near(m => m.Location.Point, (GeoJsonPoint<GeoJson2DGeographicCoordinates>)geoJsonGeometry, filter.Delimitation.MaxDistanceFromPoint, 0.0 ));
+                        filters.Add(Builders<ProcessedSighting>.Filter.Near(m => m.Location.Point, (GeoJsonPoint<GeoJson2DGeographicCoordinates>)geoJsonGeometry, filter.GeometryFilter.MaxDistanceFromPoint, 0.0 ));
                         break;
                     case GeoJsonObjectType.Polygon:
                     case GeoJsonObjectType.MultiPolygon:
-                        filters.Add(filter.Delimitation.UsePointAccuracy ? 
+                        filters.Add(filter.GeometryFilter.UsePointAccuracy ? 
                             Builders<ProcessedSighting>.Filter.GeoIntersects(m => m.Location.PointWithBuffer, geoJsonGeometry)
                             :
                             Builders<ProcessedSighting>.Filter.GeoWithin(m => m.Location.Point, geoJsonGeometry));
@@ -54,10 +54,10 @@ namespace SOS.Lib.Extensions
                     Builders<ProcessedSighting>.Filter.Eq(m => m.Identification.Validated, true));
             }
 
-            if (filter.Municipalities?.Any() ?? false)
+            if (filter.MunicipalityIds?.Any() ?? false)
             {
                 filters.Add(
-                    Builders<ProcessedSighting>.Filter.In(m => m.Location.MunicipalityId.Id, filter.Municipalities));
+                    Builders<ProcessedSighting>.Filter.In(m => m.Location.MunicipalityId.Id, filter.MunicipalityIds));
             }
 
             if (filter.PositiveSightings.HasValue)
@@ -65,9 +65,9 @@ namespace SOS.Lib.Extensions
                 filters.Add(Builders<ProcessedSighting>.Filter.Eq(m => m.Occurrence.IsPositiveObservation, filter.PositiveSightings.Value));
             }
 
-            if (filter.Provinces?.Any() ?? false)
+            if (filter.ProvinceIds?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.ProvinceId.Id, filter.Provinces));
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.ProvinceId.Id, filter.ProvinceIds));
             }
 
             if (filter.RedListCategories?.Any() ?? false)

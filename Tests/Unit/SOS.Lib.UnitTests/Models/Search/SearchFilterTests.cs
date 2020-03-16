@@ -10,7 +10,7 @@ using Xunit;
 
 namespace SOS.Lib.UnitTests.Models.Search
 {
-    public class AdvancedFilterTests
+    public class SearchFilterTests
     {
         [Fact]
         [Trait("Category", "Unit")]
@@ -22,8 +22,8 @@ namespace SOS.Lib.UnitTests.Models.Search
             var currentDate = DateTime.Now;
             var filter = new SearchFilter
             {
-                Counties = new[] {1, 2, 3},
-                Delimitation = new GeometryFilter
+                CountyIds = new[] {1, 2, 3},
+                GeometryFilter = new GeometryFilter
                 {
                     MaxDistanceFromPoint = 50,
                     UsePointAccuracy = true,
@@ -56,8 +56,8 @@ namespace SOS.Lib.UnitTests.Models.Search
             var currentDate = DateTime.Now;
             var filter = new SearchFilter
             {
-                Counties = new[] { 1, 2, 3 },
-                Delimitation = new GeometryFilter
+                CountyIds = new[] { 1, 2, 3 },
+                GeometryFilter = new GeometryFilter
                 {
                     MaxDistanceFromPoint = 50,
                     UsePointAccuracy = true,

@@ -38,7 +38,7 @@ namespace SOS.Export.Repositories
         {
             var preparedFilter = filter.Clone();
 
-            if (preparedFilter.SearchUnderlyingTaxa && preparedFilter.TaxonIds != null && preparedFilter.TaxonIds.Any())
+            if (preparedFilter.IncludeUnderlyingTaxa && preparedFilter.TaxonIds != null && preparedFilter.TaxonIds.Any())
             {
                 if (preparedFilter.TaxonIds.Contains(0)) // If Biota, then clear taxon filter
                 {

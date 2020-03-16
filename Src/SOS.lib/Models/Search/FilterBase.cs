@@ -12,10 +12,10 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Counties to match
         /// </summary>
-        public IEnumerable<int> Counties { get; set; }
+        public IEnumerable<int> CountyIds { get; set; }
 
 
-        public GeometryFilter Delimitation { get; set; }
+        public GeometryFilter GeometryFilter { get; set; }
 
         /// <summary>
         /// Sighting last date
@@ -26,13 +26,13 @@ namespace SOS.Lib.Models.Search
         /// True if any filter property is set
         /// </summary>
         public bool IsFilterActive =>
-            (Counties?.Any() ?? false) ||
-            (Delimitation?.IsValid ?? false) ||
+            (CountyIds?.Any() ?? false) ||
+            (GeometryFilter?.IsValid ?? false) ||
             EndDate != null ||
-            (Municipalities?.Any() ?? false) ||
+            (MunicipalityIds?.Any() ?? false) ||
             OnlyValidated.HasValue ||
             PositiveSightings.HasValue ||
-            (Provinces?.Any() ?? false) ||
+            (ProvinceIds?.Any() ?? false) ||
             (RedListCategories?.Any() ?? false) ||
             (Gender?.Any() ?? false) ||
             (StartDate != null) ||
@@ -41,7 +41,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Municipalities to match
         /// </summary>
-        public IEnumerable<int> Municipalities { get; set; }
+        public IEnumerable<int> MunicipalityIds { get; set; }
 
         /// <summary>
         /// True to return only validated sightings
@@ -56,7 +56,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Provinces to match
         /// </summary>
-        public IEnumerable<int> Provinces { get; set; }
+        public IEnumerable<int> ProvinceIds { get; set; }
 
         /// <summary>
         /// Redlist categories to match
@@ -82,7 +82,7 @@ namespace SOS.Lib.Models.Search
         /// Decides whether to search for exact taxonIds or
         /// for the hierarchical underlying taxa.
         /// </summary>
-        public bool SearchUnderlyingTaxa { get; set; }
+        public bool IncludeUnderlyingTaxa { get; set; }
 
         /// <summary>
         /// Decides whether field mapped fields, in addition to its Id value, also should return its associated value.
