@@ -60,8 +60,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new AreaVerbatimRepository(verbatimClient, new NullLogger<AreaVerbatimRepository>()), 
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>()));
             var taxonProcessedRepository = new TaxonProcessedRepository(processClient, new NullLogger<TaxonProcessedRepository>());
-            var inadequateItemRepository = new InadequateItemRepository(processClient, new NullLogger<InadequateItemRepository>());
-            var processedSightingRepository = new ProcessedSightingRepository(processClient, inadequateItemRepository, new NullLogger<ProcessedSightingRepository>());
+            var invalidObservationRepository = new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
+            var processedSightingRepository = new ProcessedSightingRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedSightingRepository>());
             var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository = new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
             var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());

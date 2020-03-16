@@ -18,21 +18,21 @@ namespace SOS.Process.Repositories.Destination
     /// </summary>
     public class ProcessedSightingRepository : ProcessBaseRepository<ProcessedSighting, ObjectId>, IProcessedSightingRepository
     {
-        private readonly IInadequateItemRepository _inadequateItemRepository;
+        private readonly IInvalidObservationRepository _invalidObservationRepository;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="darwinCoreInadequateRepository"></param>
+        /// <param name="invalidObservationRepository"></param>
         /// <param name="logger"></param>
         public ProcessedSightingRepository(
             IProcessClient client,
-            IInadequateItemRepository darwinCoreInadequateRepository,
+            IInvalidObservationRepository invalidObservationRepository,
             ILogger<ProcessedSightingRepository> logger
         ) : base(client, true, logger)
         {
-            _inadequateItemRepository = darwinCoreInadequateRepository ?? throw new ArgumentNullException(nameof(darwinCoreInadequateRepository));
+            _invalidObservationRepository = invalidObservationRepository ?? throw new ArgumentNullException(nameof(invalidObservationRepository));
         }
 
         /// <summary>
@@ -40,39 +40,39 @@ namespace SOS.Process.Repositories.Destination
         /// </summary>
         /// <param name="items"></param>
         /// <returns>Invalid items</returns>
-        private IEnumerable<InadequateItem> Validate(
+        private IEnumerable<InvalidObservation> Validate(
            ref IEnumerable<ProcessedSighting> items)
         {
             var validItems = new List<ProcessedSighting>();
-            var invalidItems = new List<InadequateItem>();
+            var invalidItems = new List<InvalidObservation>();
 
             foreach (var item in items)
             {
-                var inadequateItem = new InadequateItem(item.DatasetId, item.DatasetName, item.Occurrence.Id);
+                var invalidObservation = new InvalidObservation(item.DatasetId, item.DatasetName, item.Occurrence.Id);
 
                 if (item.Taxon == null)
                 {
-                    inadequateItem.Defects.Add("Taxon not found");
+                    invalidObservation.Defects.Add("Taxon not found");
                 }
 
                 if ((item.Location?.CoordinateUncertaintyInMeters ?? 0) > 100000)
                 {
-                    inadequateItem.Defects.Add("CoordinateUncertaintyInMeters exceeds max value 100 km");
+                    invalidObservation.Defects.Add("CoordinateUncertaintyInMeters exceeds max value 100 km");
                 }
 
                 if (!item.IsInEconomicZoneOfSweden)
                 {
-                    inadequateItem.Defects.Add("Sighting outside Swedish economic zone");
+                    invalidObservation.Defects.Add("Sighting outside Swedish economic zone");
                 }
 
                 if (string.IsNullOrEmpty(item?.Occurrence.CatalogNumber))
                 {
-                    inadequateItem.Defects.Add("CatalogNumber is missing");
+                    invalidObservation.Defects.Add("CatalogNumber is missing");
                 }
 
-                if (inadequateItem.Defects.Any())
+                if (invalidObservation.Defects.Any())
                 {
-                    invalidItems.Add(inadequateItem);
+                    invalidItems.Add(invalidObservation);
                 }
                 else
                 {
@@ -90,19 +90,18 @@ namespace SOS.Process.Repositories.Destination
         /// <inheritdoc />
         public new async Task<int> AddManyAsync(IEnumerable<ProcessedSighting> items)
         {
-            // Separate adequate and inadequate data
-            var inadequateItems = Validate(ref items);
+            // Separate valid and invalid data
+            var invalidObservations = Validate(ref items);
 
-            // Save adequate processed data
+            // Save valid processed data
             var success = await base.AddManyAsync(items);
 
-            // No inadequate items, we are done here
-            if (success && (inadequateItems?.Any() ?? false))
+            // No invalid observations, we are done here
+            if (success && (invalidObservations?.Any() ?? false))
             {
-                await _inadequateItemRepository.AddManyAsync(inadequateItems);
+                await _invalidObservationRepository.AddManyAsync(invalidObservations);
             }
 
-            // Save inadequate items 
             return success ? items.Count() : 0;
         }
 
@@ -258,9 +257,9 @@ namespace SOS.Process.Repositories.Destination
         {
             var newCreated = await base.VerifyCollectionAsync();
 
-            // Make sure inadequate collection is empty 
-            await _inadequateItemRepository.DeleteCollectionAsync();
-            await _inadequateItemRepository.AddCollectionAsync();
+            // Make sure invalid collection is empty 
+            await _invalidObservationRepository.DeleteCollectionAsync();
+            await _invalidObservationRepository.AddCollectionAsync();
 
             return newCreated;
         }

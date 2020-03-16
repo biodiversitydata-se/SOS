@@ -8,18 +8,18 @@ using Xunit;
 
 namespace SOS.Process.UnitTests.Repositories.Destination
 {
-    public class InadequateItemRepositoryTests
+    public class InvalidObservationRepositoryTests
     {
         private readonly Mock<IProcessClient> _processClient;
-        private readonly Mock<ILogger<InadequateItemRepository>> _loggerMock;
+        private readonly Mock<ILogger<InvalidObservationRepository>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public InadequateItemRepositoryTests()
+        public InvalidObservationRepositoryTests()
         {
             _processClient = new Mock<IProcessClient>();
-            _loggerMock = new Mock<ILogger<InadequateItemRepository>>();
+            _loggerMock = new Mock<ILogger<InvalidObservationRepository>>();
         }
 
         /// <summary>
@@ -28,16 +28,16 @@ namespace SOS.Process.UnitTests.Repositories.Destination
         [Fact]
         public void ConstructorTest()
         {
-            new InadequateItemRepository(
+            new InvalidObservationRepository(
                 _processClient.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new InadequateItemRepository(
+            Action create = () => new InvalidObservationRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
 
-            create = () => new InadequateItemRepository(
+            create = () => new InvalidObservationRepository(
                 _processClient.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");

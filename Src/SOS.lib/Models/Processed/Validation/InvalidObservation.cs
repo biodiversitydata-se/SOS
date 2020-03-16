@@ -5,9 +5,9 @@ using SOS.Lib.Models.Interfaces;
 namespace SOS.Lib.Models.Processed.Validation
 {
     /// <summary>
-    /// Inadequate Darwin core
+    /// Invalid observation
     /// </summary>
-    public class InadequateItem : IEntity<ObjectId>
+    public class InvalidObservation : IEntity<ObjectId>
     {
         /// <summary>
         /// Constructor
@@ -15,7 +15,7 @@ namespace SOS.Lib.Models.Processed.Validation
         /// <param name="datasetID"></param>
         /// <param name="datasetName"></param>
         /// <param name="occurrenceID"></param>
-        public InadequateItem(string datasetID, string datasetName, string occurrenceID)
+        public InvalidObservation(string datasetID, string datasetName, string occurrenceID)
         {
             DatasetID = datasetID;
             DatasetName = datasetName;

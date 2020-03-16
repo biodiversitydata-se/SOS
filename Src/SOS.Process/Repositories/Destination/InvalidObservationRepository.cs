@@ -6,18 +6,18 @@ using SOS.Process.Database.Interfaces;
 namespace SOS.Process.Repositories.Destination
 {
     /// <summary>
-    /// Base class for cosmos db repositories
+    /// Invalid observation repository
     /// </summary>
-    public class InadequateItemRepository : ProcessBaseRepository<InadequateItem, ObjectId>, Interfaces.IInadequateItemRepository
+    public class InvalidObservationRepository : ProcessBaseRepository<InvalidObservation, ObjectId>, Interfaces.IInvalidObservationRepository
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
-        public InadequateItemRepository(
+        public InvalidObservationRepository(
             IProcessClient client,
-            ILogger<InadequateItemRepository> logger
+            ILogger<InvalidObservationRepository> logger
         ) : base(client, true, logger)
         {
             

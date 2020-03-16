@@ -12,7 +12,7 @@ namespace SOS.Process.UnitTests.Repositories.Destination
     public class ProcessedSightingRepositoryTests
     {
         private readonly Mock<IProcessClient> _processClient;
-        private readonly Mock<IInadequateItemRepository> _inadequateItemRepositoryMock;
+        private readonly Mock<IInvalidObservationRepository> _invalidObservationRepositoryMock;
         private readonly Mock<ILogger<ProcessedSightingRepository>> _loggerMock;
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace SOS.Process.UnitTests.Repositories.Destination
         public ProcessedSightingRepositoryTests()
         {
             _processClient = new Mock<IProcessClient>();
-            _inadequateItemRepositoryMock = new Mock<IInadequateItemRepository>();
+            _invalidObservationRepositoryMock = new Mock<IInvalidObservationRepository>();
             _loggerMock = new Mock<ILogger<ProcessedSightingRepository>>();
         }
 
@@ -33,12 +33,12 @@ namespace SOS.Process.UnitTests.Repositories.Destination
         {
             new ProcessedSightingRepository(
                 _processClient.Object,
-                _inadequateItemRepositoryMock.Object,
+                _invalidObservationRepositoryMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new ProcessedSightingRepository(
                 null,
-                _inadequateItemRepositoryMock.Object,
+                _invalidObservationRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
 
@@ -46,11 +46,11 @@ namespace SOS.Process.UnitTests.Repositories.Destination
                 _processClient.Object,
                null,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("darwinCoreInadequateRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("invalidObservationRepository");
 
             create = () => new ProcessedSightingRepository(
                 _processClient.Object,
-                _inadequateItemRepositoryMock.Object,
+                _invalidObservationRepositoryMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
