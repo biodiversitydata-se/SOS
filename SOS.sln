@@ -26,6 +26,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Export", "Src\SOS.Export\SOS.Export.csproj", "{78037770-6CCB-4D5A-84DC-250D77276F7C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{7768AF04-80A0-45EA-A4FD-821937C8DC79}"
+	ProjectSection(SolutionItems) = preProject
+		Docs\FieldMapping.md = Docs\FieldMapping.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Diagrams", "Diagrams", "{A173A436-C08B-4D4C-8245-09C0A037B6A7}"
 	ProjectSection(SolutionItems) = preProject
