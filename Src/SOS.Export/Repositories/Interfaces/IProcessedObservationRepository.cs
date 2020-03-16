@@ -9,7 +9,7 @@ namespace SOS.Export.Repositories.Interfaces
     /// <summary>
     /// 
     /// </summary>
-    public interface IProcessedSightingRepository : IBaseRepository<ProcessedSighting, ObjectId>
+    public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, ObjectId>
     {
         /// <summary>
         /// Get filtered chunk
@@ -18,7 +18,7 @@ namespace SOS.Export.Repositories.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessedSighting>> GetChunkAsync(FilterBase filter, int skip, int take);
+        Task<IEnumerable<ProcessedObservation>> GetChunkAsync(FilterBase filter, int skip, int take);
 
         /// <summary>
         /// Get project parameters.

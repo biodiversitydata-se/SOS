@@ -15,9 +15,9 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
     {
         public static string TenObservations = @"Resources\TenProcessedTestObservations.json";
 
-        public static Mock<IProcessedSightingRepository> Create(string fileName)
+        public static Mock<IProcessedObservationRepository> Create(string fileName)
         {
-            var stub = new Mock<IProcessedSightingRepository>();
+            var stub = new Mock<IProcessedObservationRepository>();
             var observations = LoadObservations(fileName);
             stub
                 .Setup(pdcr => pdcr.GetChunkAsync(It.IsAny<SearchFilter>(), 0, It.IsAny<int>()))
@@ -26,9 +26,9 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             return stub;
         }
         
-        public static Mock<IProcessedSightingRepository> Create(ProcessedSighting observation)
+        public static Mock<IProcessedObservationRepository> Create(ProcessedObservation observation)
         {
-            var stub = new Mock<IProcessedSightingRepository>();
+            var stub = new Mock<IProcessedObservationRepository>();
             stub
                 .Setup(pdcr => pdcr.GetChunkAsync(It.IsAny<SearchFilter>(), 0, It.IsAny<int>()))
                 .ReturnsAsync(new[] { observation });
@@ -36,7 +36,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             return stub;
         }
 
-        private static IEnumerable<ProcessedSighting> LoadObservations(string fileName)
+        private static IEnumerable<ProcessedObservation> LoadObservations(string fileName)
         {
             string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
@@ -46,7 +46,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
                 Converters = new List<JsonConverter> { new ObjectIdConverter() }
             };
 
-            var observations = JsonConvert.DeserializeObject<List<ProcessedSighting>>(str, serializerSettings);
+            var observations = JsonConvert.DeserializeObject<List<ProcessedObservation>>(str, serializerSettings);
             return observations;
         }
     }

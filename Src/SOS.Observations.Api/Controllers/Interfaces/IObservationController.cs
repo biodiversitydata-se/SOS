@@ -7,7 +7,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     /// <summary>
     /// Sighting controller interface
     /// </summary>
-    public interface ISightingController
+    public interface IObservationController
     {
         /// <summary>
         /// Get chunk of sightings 

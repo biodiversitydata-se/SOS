@@ -9,7 +9,7 @@ namespace SOS.Export.Factories.Interfaces
     /// <summary>
     /// Sighting factory repository
     /// </summary>
-    public interface ISightingFactory
+    public interface IObservationFactory
     {
         /// <summary>
         /// Create a export file and upload it to local storage

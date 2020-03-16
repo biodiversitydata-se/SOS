@@ -32,16 +32,16 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 exportConfiguration.ProcessedDbConfiguration.DatabaseName,
                 exportConfiguration.ProcessedDbConfiguration.BatchSize);
-            var processedSightingRepository = new ProcessedSightingRepository(
+            var processedObservationRepository = new ProcessedObservationRepository(
                 exportClient,
                 new TaxonFactory(
                     new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonFactory>>().Object),
-                new Mock<ILogger<ProcessedSightingRepository>>().Object);
+                new Mock<ILogger<ProcessedObservationRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observations = await processedSightingRepository.GetChunkAsync(new SearchFilter(), 0,nrObservations);
+            var observations = await processedObservationRepository.GetChunkAsync(new SearchFilter(), 0,nrObservations);
 
             var serializerSettings = new JsonSerializerSettings()
             {

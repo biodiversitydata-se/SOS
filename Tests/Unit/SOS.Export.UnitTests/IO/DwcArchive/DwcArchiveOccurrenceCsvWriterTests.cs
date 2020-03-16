@@ -64,7 +64,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var sightingBuilder = new ProcessedSightingBuilder();
+            var sightingBuilder = new ProcessedObservationBuilder();
             var observation = sightingBuilder
                 .WithDecimalLatitude(13.823392373018132)
                 .WithDecimalLongitude(55.51071440795833)
@@ -100,7 +100,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var sightingBuilder = new ProcessedSightingBuilder();
+            var sightingBuilder = new ProcessedObservationBuilder();
             var observation = sightingBuilder
                 .WithCoordinateUncertaintyInMeters(0)
                 .Build();
@@ -135,7 +135,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var sightingBuilder = new ProcessedSightingBuilder();
+            var sightingBuilder = new ProcessedObservationBuilder();
             var observation = sightingBuilder
                 .WithOccurrenceRemarks("Sighting found in\r\nUppsala")
                 .Build();

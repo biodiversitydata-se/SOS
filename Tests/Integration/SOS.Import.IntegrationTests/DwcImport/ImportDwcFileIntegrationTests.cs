@@ -136,16 +136,16 @@ namespace SOS.Import.IntegrationTests.DwcImport
         }
     }
 
-    public class ProcessedSightingFactory
+    public class ProcessedObservationFactory
     {
-        public static ProcessedSighting CreateFromDwcRow(IRow row)
+        public static ProcessedObservation CreateFromDwcRow(IRow row)
         {
             if (row == null)
             {
                 return null;
             }
 
-            var obs = new ProcessedSighting(DataProvider.Dwc);
+            var obs = new ProcessedObservation(DataProvider.Dwc);
             
             if (row.TryGetValue(Terms.accessRights, out string accessRights))
             {
@@ -215,7 +215,7 @@ namespace SOS.Import.IntegrationTests.DwcImport
             //    taxon.IndividualId = verbatim.URL;
             //}
 
-            //var obs = new ProcessedSighting(DataProvider.Dwc);
+            //var obs = new ProcessedObservation(DataProvider.Dwc);
             //obs.Event = new ProcessedEvent();
             //obs.Event.BiotopeDescription = verbatim.BiotopeDescription;
             //obs.Event.EndDate = verbatim.EndDate?.ToUniversalTime();

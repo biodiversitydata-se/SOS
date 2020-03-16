@@ -10,7 +10,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
 {
     public static class DarwinCoreObservationFactory
     {
-        public static ProcessedSighting CreateDefaultObservation()
+        public static ProcessedObservation CreateDefaultObservation()
         {
             string fileName = @"Resources\DefaultTestObservation.json";
             string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -21,7 +21,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
                 Converters = new List<JsonConverter> { new ObjectIdConverter() }
             };
 
-            var observation = JsonConvert.DeserializeObject<ProcessedSighting>(str, serializerSettings);
+            var observation = JsonConvert.DeserializeObject<ProcessedObservation>(str, serializerSettings);
             return observation;
         }
     }

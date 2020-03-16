@@ -9,14 +9,14 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     /// <summary>
     /// Processed data class
     /// </summary>
-    public interface IProcessedSightingRepository : IProcessBaseRepository<ProcessedSighting, ObjectId>
+    public interface IProcessedObservationRepository : IProcessBaseRepository<ProcessedObservation, ObjectId>
     {
         /// <summary>
         /// Add many items 
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        new Task<int> AddManyAsync(IEnumerable<ProcessedSighting> items);
+        new Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items);
 
         /// <summary>
         /// Copy provider data from active instance to inactive instance

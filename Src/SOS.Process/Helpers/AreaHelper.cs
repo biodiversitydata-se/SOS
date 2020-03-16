@@ -124,30 +124,30 @@ namespace SOS.Process.Helpers
 
 
         /// <inheritdoc />
-        public void AddAreaDataToProcessedSightings(IEnumerable<ProcessedSighting> processedSightings)
+        public void AddAreaDataToProcessedObservations(IEnumerable<ProcessedObservation> processedObservations)
         {
-            foreach (var processedSighting in processedSightings)
+            foreach (var processedObservation in processedObservations)
             {
-                AddAreaDataToProcessedSighting(processedSighting);
+                AddAreaDataToProcessedObservation(processedObservation);
             }
         }
 
         /// <inheritdoc />
-        public void AddAreaDataToProcessedSighting(ProcessedSighting processedSighting)
+        public void AddAreaDataToProcessedObservation(ProcessedObservation processedObservation)
         {
-            if (processedSighting.Location == null || processedSighting.Location.DecimalLatitude.Equals(0) && processedSighting.Location.DecimalLongitude.Equals(0))
+            if (processedObservation.Location == null || processedObservation.Location.DecimalLatitude.Equals(0) && processedObservation.Location.DecimalLongitude.Equals(0))
             {
                 return;
             }
 
-            var positionLocation = GetPositionLocation(processedSighting.Location.DecimalLongitude, processedSighting.Location.DecimalLatitude);
-            processedSighting.Location.CountyId = ProcessedFieldMapValue.Create(positionLocation.County?.Id);
-            processedSighting.Location.MunicipalityId = ProcessedFieldMapValue.Create(positionLocation.Municipality?.Id);
-            processedSighting.Location.ParishId = ProcessedFieldMapValue.Create(positionLocation.Parish?.Id);
-            processedSighting.Location.ProvinceId = ProcessedFieldMapValue.Create(positionLocation.Province?.Id);
-            processedSighting.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
-            SetCountyPartIdByCoordinate(processedSighting);
-            SetProvincePartIdByCoordinate(processedSighting);
+            var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude, processedObservation.Location.DecimalLatitude);
+            processedObservation.Location.CountyId = ProcessedFieldMapValue.Create(positionLocation.County?.Id);
+            processedObservation.Location.MunicipalityId = ProcessedFieldMapValue.Create(positionLocation.Municipality?.Id);
+            processedObservation.Location.ParishId = ProcessedFieldMapValue.Create(positionLocation.Parish?.Id);
+            processedObservation.Location.ProvinceId = ProcessedFieldMapValue.Create(positionLocation.Province?.Id);
+            processedObservation.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
+            SetCountyPartIdByCoordinate(processedObservation);
+            SetProvincePartIdByCoordinate(processedObservation);
         }
 
         private PositionLocation GetPositionLocation(double decimalLongitude, double decimalLatitude)
@@ -198,10 +198,10 @@ namespace SOS.Process.Helpers
             return positionLocation;
         }
 
-        private static void SetProvincePartIdByCoordinate(ProcessedSighting processedSighting)
+        private static void SetProvincePartIdByCoordinate(ProcessedObservation processedObservation)
         {
             // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
-            processedSighting.Location.ProvincePartIdByCoordinate = processedSighting.Location.ProvinceId?.Id;
+            processedObservation.Location.ProvincePartIdByCoordinate = processedObservation.Location.ProvinceId?.Id;
             if (new[]
             {
                 (int) ProvinceId.LuleLappmark,
@@ -209,25 +209,25 @@ namespace SOS.Process.Helpers
                 (int) ProvinceId.PiteLappmark,
                 (int) ProvinceId.TorneLappmark,
                 (int) ProvinceId.AseleLappmark
-            }.Contains(processedSighting.Location.ProvinceId?.Id ?? 0))
+            }.Contains(processedObservation.Location.ProvinceId?.Id ?? 0))
             {
-                processedSighting.Location.ProvincePartIdByCoordinate = (int) SpecialProvincePartId.Lappland;
+                processedObservation.Location.ProvincePartIdByCoordinate = (int) SpecialProvincePartId.Lappland;
             }
         }
 
-        private static void SetCountyPartIdByCoordinate(ProcessedSighting processedSighting)
+        private static void SetCountyPartIdByCoordinate(ProcessedObservation processedObservation)
         {
             // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
-            processedSighting.Location.CountyPartIdByCoordinate = processedSighting.Location.CountyId?.Id;
-            if (processedSighting.Location.CountyId?.Id == (int) CountyId.Kalmar)
+            processedObservation.Location.CountyPartIdByCoordinate = processedObservation.Location.CountyId?.Id;
+            if (processedObservation.Location.CountyId?.Id == (int) CountyId.Kalmar)
             {
-                if (processedSighting.Location.ProvinceId?.Id == (int) ProvinceId.Oland)
+                if (processedObservation.Location.ProvinceId?.Id == (int) ProvinceId.Oland)
                 {
-                    processedSighting.Location.CountyPartIdByCoordinate = (int) SpecialCountyPartId.Oland;
+                    processedObservation.Location.CountyPartIdByCoordinate = (int) SpecialCountyPartId.Oland;
                 }
                 else
                 {
-                    processedSighting.Location.CountyPartIdByCoordinate = (int) SpecialCountyPartId.KalmarFastland;
+                    processedObservation.Location.CountyPartIdByCoordinate = (int) SpecialCountyPartId.KalmarFastland;
                 }
             }
         }
@@ -258,7 +258,7 @@ namespace SOS.Process.Helpers
             return dic;
         }
 
-        public void AddValueDataToGeographicalFields(ProcessedSighting observation)
+        public void AddValueDataToGeographicalFields(ProcessedObservation observation)
         {
             SetValue(observation?.Location?.CountyId, _fieldMappingValueById[FieldMappingFieldId.County]);
             SetValue(observation?.Location?.MunicipalityId, _fieldMappingValueById[FieldMappingFieldId.Municipality]);

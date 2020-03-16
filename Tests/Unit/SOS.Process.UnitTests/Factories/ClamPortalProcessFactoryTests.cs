@@ -26,7 +26,7 @@ namespace SOS.Process.UnitTests.Factories
     {
         private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
         private readonly Mock<IAreaHelper> _areaHelper;
-        private readonly Mock<IProcessedSightingRepository> _processedSightingRepository;
+        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
         private readonly Mock<ILogger<ClamPortalProcessFactory>> _loggerMock;
 
@@ -37,7 +37,7 @@ namespace SOS.Process.UnitTests.Factories
         {
             _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
-            _processedSightingRepository = new Mock<IProcessedSightingRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
             _loggerMock = new Mock<ILogger<ClamPortalProcessFactory>>();
         }
@@ -51,14 +51,14 @@ namespace SOS.Process.UnitTests.Factories
             new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
-                _processedSightingRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new ClamPortalProcessFactory(
                 null,
                 _areaHelper.Object,
-                _processedSightingRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
@@ -67,7 +67,7 @@ namespace SOS.Process.UnitTests.Factories
             create = () => new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 null,
-                _processedSightingRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
@@ -83,7 +83,7 @@ namespace SOS.Process.UnitTests.Factories
             create = () => new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
-                _processedSightingRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
@@ -105,9 +105,9 @@ namespace SOS.Process.UnitTests.Factories
                     DyntaxaTaxonId = 0
                 } });
 
-            _areaHelper.Setup(r => r.AddAreaDataToProcessedSightings(It.IsAny<IEnumerable<ProcessedSighting>>()));
+            _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<ProcessedObservation>>()));
 
-            _processedSightingRepository.Setup(r => r.AddManyAsync(It.IsAny<ICollection<ProcessedSighting>>()))
+            _processedObservationRepositoryMock.Setup(r => r.AddManyAsync(It.IsAny<ICollection<ProcessedObservation>>()))
                 .ReturnsAsync(1);
 
             var taxa = new Dictionary<int, ProcessedTaxon>
@@ -121,7 +121,7 @@ namespace SOS.Process.UnitTests.Factories
             var clamPortalProcessFactory = new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
-                _processedSightingRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
 
@@ -151,7 +151,7 @@ namespace SOS.Process.UnitTests.Factories
             var clamPortalProcessFactory = new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
-                _processedSightingRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
 
@@ -181,7 +181,7 @@ namespace SOS.Process.UnitTests.Factories
             var clamPortalProcessFactory = new ClamPortalProcessFactory(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
-                _processedSightingRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
 

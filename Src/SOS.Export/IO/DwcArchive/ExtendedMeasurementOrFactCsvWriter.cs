@@ -33,7 +33,7 @@ namespace SOS.Export.IO.DwcArchive
             FilterBase filter, 
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
-            IProcessedSightingRepository processedSightingRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -41,7 +41,7 @@ namespace SOS.Export.IO.DwcArchive
                 var skip = 0;
                 const int take = 100000;
                 var map = new ExtendedMeasurementOrFactRowMap();
-                IEnumerable<ProcessedProject> projectParameters = await processedSightingRepository.GetProjectParameters(filter, skip, take);
+                IEnumerable<ProcessedProject> projectParameters = await processedObservationRepository.GetProjectParameters(filter, skip, take);
 
                 while (projectParameters.Any())
                 {
@@ -49,7 +49,7 @@ namespace SOS.Export.IO.DwcArchive
                     IEnumerable<ExtendedMeasurementOrFactRow> records = projectParameters.ToExtendedMeasurementOrFactRows();
                     await WriteEmofCsvAsync(stream, records, map);
                     skip += take;
-                    projectParameters = await processedSightingRepository.GetProjectParameters(filter, skip, take);
+                    projectParameters = await processedObservationRepository.GetProjectParameters(filter, skip, take);
                 }
 
                 return true;

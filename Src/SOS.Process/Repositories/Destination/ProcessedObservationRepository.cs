@@ -16,7 +16,7 @@ namespace SOS.Process.Repositories.Destination
     /// <summary>
     /// Base class for cosmos db repositories
     /// </summary>
-    public class ProcessedSightingRepository : ProcessBaseRepository<ProcessedSighting, ObjectId>, IProcessedSightingRepository
+    public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, ObjectId>, IProcessedObservationRepository
     {
         private readonly IInvalidObservationRepository _invalidObservationRepository;
 
@@ -26,10 +26,10 @@ namespace SOS.Process.Repositories.Destination
         /// <param name="client"></param>
         /// <param name="invalidObservationRepository"></param>
         /// <param name="logger"></param>
-        public ProcessedSightingRepository(
+        public ProcessedObservationRepository(
             IProcessClient client,
             IInvalidObservationRepository invalidObservationRepository,
-            ILogger<ProcessedSightingRepository> logger
+            ILogger<ProcessedObservationRepository> logger
         ) : base(client, true, logger)
         {
             _invalidObservationRepository = invalidObservationRepository ?? throw new ArgumentNullException(nameof(invalidObservationRepository));
@@ -41,9 +41,9 @@ namespace SOS.Process.Repositories.Destination
         /// <param name="items"></param>
         /// <returns>Invalid items</returns>
         private IEnumerable<InvalidObservation> Validate(
-           ref IEnumerable<ProcessedSighting> items)
+           ref IEnumerable<ProcessedObservation> items)
         {
-            var validItems = new List<ProcessedSighting>();
+            var validItems = new List<ProcessedObservation>();
             var invalidItems = new List<InvalidObservation>();
 
             foreach (var item in items)
@@ -85,10 +85,10 @@ namespace SOS.Process.Repositories.Destination
             return invalidItems.Any() ? invalidItems : null;
         }
 
-        private new IMongoCollection<ProcessedSighting> MongoCollection => Database.GetCollection<ProcessedSighting>(_collectionName);
+        private new IMongoCollection<ProcessedObservation> MongoCollection => Database.GetCollection<ProcessedObservation>(_collectionName);
 
         /// <inheritdoc />
-        public new async Task<int> AddManyAsync(IEnumerable<ProcessedSighting> items)
+        public new async Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items)
         {
             // Separate valid and invalid data
             var invalidObservations = Validate(ref items);
@@ -113,7 +113,7 @@ namespace SOS.Process.Repositories.Destination
 
             var source = await
                 MongoCollection.FindAsync(
-                    Builders<ProcessedSighting>.Filter.Eq(dwc => dwc.Provider, provider));
+                    Builders<ProcessedObservation>.Filter.Eq(dwc => dwc.Provider, provider));
 
             // switch to inactive instance and add data 
             SetCollectionName(InstanceToUpdate);
@@ -124,34 +124,34 @@ namespace SOS.Process.Repositories.Destination
         /// <inheritdoc />
         public async Task CreateIndexAsync()
         {
-            var indexModels = new List<CreateIndexModel<ProcessedSighting>>()
+            var indexModels = new List<CreateIndexModel<ProcessedObservation>>()
             {
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.EndDate)),
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.StartDate)),
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Identification.Validated)),
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.CountyId.Id)),
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Geo2DSphere(a => a.Location.Point)),
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Geo2DSphere(a => a.Location.PointWithBuffer)),
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.ProvinceId.Id)),
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.MunicipalityId.Id)),
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation)),
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.GenderId.Id)),
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Provider)),
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.Id)),
-                new CreateIndexModel<ProcessedSighting>(
-                    Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory))
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Event.EndDate)),
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Event.StartDate)),
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Identification.Validated)),
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.CountyId.Id)),
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Geo2DSphere(a => a.Location.Point)),
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Geo2DSphere(a => a.Location.PointWithBuffer)),
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.ProvinceId.Id)),
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.MunicipalityId.Id)),
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation)),
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Occurrence.GenderId.Id)),
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Provider)),
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Taxon.Id)),
+                new CreateIndexModel<ProcessedObservation>(
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory))
             };
 
             await MongoCollection.Indexes.CreateManyAsync(indexModels);
@@ -234,7 +234,7 @@ namespace SOS.Process.Repositories.Destination
             try
             {
                 // Create the collection
-                var res = await MongoCollection.DeleteManyAsync(Builders<ProcessedSighting>.Filter.Eq(dwc => dwc.Provider, provider));
+                var res = await MongoCollection.DeleteManyAsync(Builders<ProcessedObservation>.Filter.Eq(dwc => dwc.Provider, provider));
 
                 return res.IsAcknowledged;
             }

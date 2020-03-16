@@ -7,17 +7,17 @@ namespace SOS.Process.Helpers.Interfaces
     public interface IAreaHelper
     {
         /// <summary>
-        /// Add area data to processed sightings model
+        /// Add area data to processed observation models
         /// </summary>
-        /// <param name="processedSightings"></param>
+        /// <param name="processedObservations"></param>
         /// <returns></returns>
-        void AddAreaDataToProcessedSightings(IEnumerable<ProcessedSighting> processedSightings);
+        void AddAreaDataToProcessedObservations(IEnumerable<ProcessedObservation> processedObservations);
 
         /// <summary>
-        /// Add area data to processed sighting model
+        /// Add area data to processed observation model
         /// </summary>
-        /// <param name="processedSighting"></param>
-        void AddAreaDataToProcessedSighting(ProcessedSighting processedSighting);
+        /// <param name="processedObservation"></param>
+        void AddAreaDataToProcessedObservation(ProcessedObservation processedObservation);
 
         /// <summary>
         /// Save cache so we can use it after restart

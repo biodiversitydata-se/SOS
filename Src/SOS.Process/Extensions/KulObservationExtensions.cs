@@ -25,7 +25,7 @@ namespace SOS.Process.Extensions
         /// <param name="verbatim"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static ProcessedSighting ToProcessed(this KulObservationVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
+        public static ProcessedObservation ToProcessed(this KulObservationVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
         {
             Point wgs84Point = null;
             if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
@@ -35,7 +35,7 @@ namespace SOS.Process.Extensions
 
             taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
 
-            var obs = new ProcessedSighting(DataProvider.KUL)
+            var obs = new ProcessedObservation(DataProvider.KUL)
             {
                 BasisOfRecordId = new ProcessedFieldMapValue { Id=(int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.KUL.ToString()}",
@@ -96,7 +96,7 @@ namespace SOS.Process.Extensions
         /// <param name="verbatims"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static IEnumerable<ProcessedSighting> ToProcessed(
+        public static IEnumerable<ProcessedObservation> ToProcessed(
             this IEnumerable<KulObservationVerbatim> verbatims, 
             IDictionary<int, ProcessedTaxon> taxa)
         {

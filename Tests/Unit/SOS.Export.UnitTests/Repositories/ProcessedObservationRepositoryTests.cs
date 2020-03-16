@@ -9,20 +9,20 @@ using Xunit;
 
 namespace SOS.Export.UnitTests.Repositories
 {
-    public class ProcessedSightingRepositoryTests
+    public class ProcessedObservationRepositoryTests
     {
         private readonly Mock<IExportClient> _exportClient;
         private readonly Mock<ITaxonFactory> _taxonFactory;
-        private readonly Mock<ILogger<ProcessedSightingRepository>> _loggerMock;
+        private readonly Mock<ILogger<ProcessedObservationRepository>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ProcessedSightingRepositoryTests()
+        public ProcessedObservationRepositoryTests()
         {
             _exportClient = new Mock<IExportClient>();
             _taxonFactory = new Mock<ITaxonFactory>();
-            _loggerMock = new Mock<ILogger<ProcessedSightingRepository>>();
+            _loggerMock = new Mock<ILogger<ProcessedObservationRepository>>();
         }
 
         /// <summary>
@@ -32,24 +32,24 @@ namespace SOS.Export.UnitTests.Repositories
         [Trait("Category","Unit")]
         public void ConstructorTest()
         {
-            new ProcessedSightingRepository(
+            new ProcessedObservationRepository(
                 _exportClient.Object,
                 _taxonFactory.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new ProcessedSightingRepository(
+            Action create = () => new ProcessedObservationRepository(
                 null,
                 _taxonFactory.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("exportClient");
 
-            create = () => new ProcessedSightingRepository(
+            create = () => new ProcessedObservationRepository(
                 _exportClient.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("taxonFactory");
 
-            create = () => new ProcessedSightingRepository(
+            create = () => new ProcessedObservationRepository(
                 _exportClient.Object,
                 _taxonFactory.Object,
                 null);

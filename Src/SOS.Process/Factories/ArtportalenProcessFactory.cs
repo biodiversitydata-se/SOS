@@ -32,18 +32,18 @@ namespace SOS.Process.Factories
         /// Constructor
         /// </summary>
         /// <param name="artportalenVerbatimRepository"></param>
-        /// <param name="processedSightingRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="processedFieldMappingRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         public ArtportalenProcessFactory(
             IArtportalenVerbatimRepository artportalenVerbatimRepository,
-            IProcessedSightingRepository processedSightingRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IProcessedFieldMappingRepository processedFieldMappingRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             ProcessConfiguration processConfiguration,
-            ILogger<ArtportalenProcessFactory> logger) : base(processedSightingRepository, fieldMappingResolverHelper, logger)
+            ILogger<ArtportalenProcessFactory> logger) : base(processedObservationRepository, fieldMappingResolverHelper, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ?? throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
             _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
@@ -66,7 +66,7 @@ namespace SOS.Process.Factories
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
-            ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
+            ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
             var allFieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
             var fieldMappings = GetFieldMappingsDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
 

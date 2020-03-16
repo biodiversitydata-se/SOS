@@ -26,7 +26,7 @@ namespace SOS.Process.Jobs
     /// </summary>
     public class ProcessJob : IProcessJob
     {
-        private readonly IProcessedSightingRepository _darwinCoreRepository;
+        private readonly IProcessedObservationRepository _darwinCoreRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly IArtportalenProcessFactory _artportalenProcessFactory;
@@ -39,7 +39,7 @@ namespace SOS.Process.Jobs
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processedSightingRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="clamPortalProcessFactory"></param>
@@ -49,7 +49,7 @@ namespace SOS.Process.Jobs
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
         public ProcessJob(
-            IProcessedSightingRepository processedSightingRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IClamPortalProcessFactory clamPortalProcessFactory,
@@ -59,7 +59,7 @@ namespace SOS.Process.Jobs
             IAreaHelper areaHelper,
             ILogger<ProcessJob> logger)
         {
-            _darwinCoreRepository = processedSightingRepository ?? throw new ArgumentNullException(nameof(processedSightingRepository));
+            _darwinCoreRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _clamPortalProcessFactory = clamPortalProcessFactory ?? throw new ArgumentNullException(nameof(clamPortalProcessFactory));

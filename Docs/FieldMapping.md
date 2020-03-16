@@ -51,7 +51,7 @@ Their values are stored as JSON files in the _Src\SOS.Import\Resources\FieldMapp
 3.  Then run _/ProcessJob/CopyFieldMapping/Run_ to copy the field mappings from sos-verbatim to sos-processed database.
 
 **Process [Field Name]**
-1.  Add a property of type _ProcessedFieldMapValue_ to the _SOS.Lib.Models.Processed.Sighting.ProcessedSighting_ class, for the new field.
+1.  Add a property of type _ProcessedFieldMapValue_ to the _SOS.Lib.Models.Processed.Sighting.ProcessedObservation_ class, for the new field.
 2.  Update the process for the data providers that support this field. For Artportalen, the _SOS.Process.Factories.ArtportalenProcessFactory_ class needs to be updated.
 3.  Make sure that the _GetFieldMappingsDictionary()_ method delivers the new field mapping.
 4.  Update _Sos.Process.Extension.ArtportalenExtensions.ToProcessed()_ with the new field mapping.

@@ -26,8 +26,8 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var observations = new List<ProcessedSighting>();
-            var observation = new ProcessedSighting(DataProvider.Artportalen)
+            var observations = new List<ProcessedObservation>();
+            var observation = new ProcessedObservation(DataProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -40,7 +40,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            _fixture.AreaHelper.AddAreaDataToProcessedSightings(observations);
+            _fixture.AreaHelper.AddAreaDataToProcessedObservations(observations);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -59,7 +59,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var observation = new ProcessedSighting(DataProvider.Artportalen)
+            var observation = new ProcessedObservation(DataProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -71,7 +71,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            _fixture.AreaHelper.AddAreaDataToProcessedSighting(observation);
+            _fixture.AreaHelper.AddAreaDataToProcessedObservation(observation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -87,8 +87,8 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var observations = new List<ProcessedSighting>();
-            var observation = new ProcessedSighting(DataProvider.Artportalen)
+            var observations = new List<ProcessedObservation>();
+            var observation = new ProcessedObservation(DataProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -101,7 +101,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            _fixture.AreaHelper.AddAreaDataToProcessedSightings(observations);
+            _fixture.AreaHelper.AddAreaDataToProcessedObservations(observations);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -117,8 +117,8 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var observations = new List<ProcessedSighting>();
-            var observation = new ProcessedSighting(DataProvider.Artportalen)
+            var observations = new List<ProcessedObservation>();
+            var observation = new ProcessedObservation(DataProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -131,7 +131,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            _fixture.AreaHelper.AddAreaDataToProcessedSightings(observations);
+            _fixture.AreaHelper.AddAreaDataToProcessedObservations(observations);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

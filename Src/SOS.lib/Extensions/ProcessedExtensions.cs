@@ -153,54 +153,54 @@ namespace SOS.Lib.Extensions
 
         #region Sighting
         /// <summary>
-        /// Cast processed sighting object to Darwin Core
+        /// Cast processed observation object to Darwin Core
         /// </summary>
-        /// <param name="processedSighting"></param>
+        /// <param name="processedObservation"></param>
         /// <returns></returns>
-        public static DarwinCore ToDarwinCore(this ProcessedSighting processedSighting)
+        public static DarwinCore ToDarwinCore(this ProcessedObservation processedObservation)
         {
-            if (processedSighting == null)
+            if (processedObservation == null)
             {
                 return null;
             }
 
             return new DarwinCore
             {
-                AccessRights = processedSighting.AccessRightsId?.Value,
-                BasisOfRecord = processedSighting.BasisOfRecordId?.Value,
-                BibliographicCitation = processedSighting.BasisOfRecordId?.Value,
-                CollectionCode = processedSighting.CollectionCode,
-                CollectionID = processedSighting.CollectionId,
-                DataGeneralizations = processedSighting.DataGeneralizations,
-                DatasetID = processedSighting.DatasetId,
-                DatasetName = processedSighting.DatasetName,
-                Event = processedSighting.Event?.ToDarwinCore(),
-                Identification = processedSighting.Identification?.ToDarwinCore(),
-                InformationWithheld = processedSighting.InformationWithheld,
-                InstitutionCode = processedSighting.InstitutionId?.Value,
-                InstitutionID = processedSighting.InstitutionId == null ? null : $"urn:lsid:artdata.slu.se:organization:{processedSighting.InstitutionId.Id}",
-                Language = processedSighting.Language,
-                Location = processedSighting.Location?.ToDarwinCore(),
+                AccessRights = processedObservation.AccessRightsId?.Value,
+                BasisOfRecord = processedObservation.BasisOfRecordId?.Value,
+                BibliographicCitation = processedObservation.BasisOfRecordId?.Value,
+                CollectionCode = processedObservation.CollectionCode,
+                CollectionID = processedObservation.CollectionId,
+                DataGeneralizations = processedObservation.DataGeneralizations,
+                DatasetID = processedObservation.DatasetId,
+                DatasetName = processedObservation.DatasetName,
+                Event = processedObservation.Event?.ToDarwinCore(),
+                Identification = processedObservation.Identification?.ToDarwinCore(),
+                InformationWithheld = processedObservation.InformationWithheld,
+                InstitutionCode = processedObservation.InstitutionId?.Value,
+                InstitutionID = processedObservation.InstitutionId == null ? null : $"urn:lsid:artdata.slu.se:organization:{processedObservation.InstitutionId.Id}",
+                Language = processedObservation.Language,
+                Location = processedObservation.Location?.ToDarwinCore(),
                 MeasurementOrFact = null,
-                Modified = processedSighting.Modified,
-                Occurrence = processedSighting.Occurrence?.ToDarwinCore(),
-                OwnerInstitutionCode = processedSighting.OwnerInstitutionCode,
-                References = processedSighting.References,
-                Rights = processedSighting.Rights,
-                RightsHolder = processedSighting.RightsHolder,
-                Taxon = processedSighting.Taxon.ToDarwinCore(),
-                Type = processedSighting.TypeId?.Value
+                Modified = processedObservation.Modified,
+                Occurrence = processedObservation.Occurrence?.ToDarwinCore(),
+                OwnerInstitutionCode = processedObservation.OwnerInstitutionCode,
+                References = processedObservation.References,
+                Rights = processedObservation.Rights,
+                RightsHolder = processedObservation.RightsHolder,
+                Taxon = processedObservation.Taxon.ToDarwinCore(),
+                Type = processedObservation.TypeId?.Value
             };
         }
 
         /// <summary>
         ///  Cast processed Darwin Core objects to Darwin Core 
         /// </summary>
-        /// <param name="processedSightings"></param>
+        /// <param name="processedObservations"></param>
         /// <returns></returns>
-        public static IEnumerable<DarwinCore> ToDarwinCore(this IEnumerable<ProcessedSighting> processedSightings)
+        public static IEnumerable<DarwinCore> ToDarwinCore(this IEnumerable<ProcessedObservation> processedObservations)
         {
-            return processedSightings?.Select(m => m.ToDarwinCore());
+            return processedObservations?.Select(m => m.ToDarwinCore());
         }
         #endregion Sighting
 

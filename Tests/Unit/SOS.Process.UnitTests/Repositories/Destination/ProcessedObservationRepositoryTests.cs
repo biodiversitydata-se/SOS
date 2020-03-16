@@ -9,20 +9,20 @@ using Xunit;
 
 namespace SOS.Process.UnitTests.Repositories.Destination
 {
-    public class ProcessedSightingRepositoryTests
+    public class ProcessedObservationRepositoryTests
     {
         private readonly Mock<IProcessClient> _processClient;
         private readonly Mock<IInvalidObservationRepository> _invalidObservationRepositoryMock;
-        private readonly Mock<ILogger<ProcessedSightingRepository>> _loggerMock;
+        private readonly Mock<ILogger<ProcessedObservationRepository>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ProcessedSightingRepositoryTests()
+        public ProcessedObservationRepositoryTests()
         {
             _processClient = new Mock<IProcessClient>();
             _invalidObservationRepositoryMock = new Mock<IInvalidObservationRepository>();
-            _loggerMock = new Mock<ILogger<ProcessedSightingRepository>>();
+            _loggerMock = new Mock<ILogger<ProcessedObservationRepository>>();
         }
 
         /// <summary>
@@ -31,24 +31,24 @@ namespace SOS.Process.UnitTests.Repositories.Destination
         [Fact]
         public void ConstructorTest()
         {
-            new ProcessedSightingRepository(
+            new ProcessedObservationRepository(
                 _processClient.Object,
                 _invalidObservationRepositoryMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new ProcessedSightingRepository(
+            Action create = () => new ProcessedObservationRepository(
                 null,
                 _invalidObservationRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
 
-            create = () => new ProcessedSightingRepository(
+            create = () => new ProcessedObservationRepository(
                 _processClient.Object,
                null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("invalidObservationRepository");
 
-            create = () => new ProcessedSightingRepository(
+            create = () => new ProcessedObservationRepository(
                 _processClient.Object,
                 _invalidObservationRepositoryMock.Object,
                 null);

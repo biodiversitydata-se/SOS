@@ -18,39 +18,39 @@ namespace SOS.Export.Factories
     /// <summary>
     /// Sighting factory class
     /// </summary>
-    public class SightingFactory : Interfaces.ISightingFactory
+    public class ObservationFactory : Interfaces.IObservationFactory
     {
-        private readonly IProcessedSightingRepository _processedSightingRepository;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IFileService _fileService;
         private readonly IBlobStorageService _blobStorageService;
         private readonly IZendToService _zendToService;
         private readonly string _exportPath;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
-        private readonly ILogger<SightingFactory> _logger;
+        private readonly ILogger<ObservationFactory> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="dwcArchiveFileWriter"></param>
-        /// <param name="processedSightingRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="fileService"></param>
         /// <param name="zendToService"></param>
         /// <param name="fileDestination"></param>
         /// <param name="logger"></param>
-        public SightingFactory(
+        public ObservationFactory(
             IDwcArchiveFileWriter dwcArchiveFileWriter,
-            IProcessedSightingRepository processedSightingRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IFileService fileService,
             IBlobStorageService blobStorageService,
             IZendToService zendToService,
             FileDestination fileDestination,
 
-            ILogger<SightingFactory> logger)
+            ILogger<ObservationFactory> logger)
         {
-            _processedSightingRepository = processedSightingRepository ?? throw new ArgumentNullException(nameof(processedSightingRepository));
+            _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
@@ -69,7 +69,7 @@ namespace SOS.Export.Factories
                 var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     filter,
                     fileName,
-                    _processedSightingRepository,
+                    _processedObservationRepository,
                     FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                     processInfo,
                     _exportPath,

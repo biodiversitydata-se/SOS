@@ -25,7 +25,7 @@ namespace SOS.Process.Extensions
         /// <param name="taxa"></param>
         /// <param name="fieldMappings"></param>
         /// <returns></returns>
-        public static ICollection<ProcessedSighting> ToProcessed(
+        public static ICollection<ProcessedObservation> ToProcessed(
             this IEnumerable<ArtportalenVerbatimObservation> verbatimObservations,
             IDictionary<int, ProcessedTaxon> taxa,
             IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings)
@@ -40,7 +40,7 @@ namespace SOS.Process.Extensions
         /// <param name="taxa"></param>
         /// <param name="fieldMappings"></param>
         /// <returns></returns>
-        public static ProcessedSighting ToProcessed(
+        public static ProcessedObservation ToProcessed(
             this ArtportalenVerbatimObservation verbatimObservation, 
             IDictionary<int, ProcessedTaxon> taxa,
             IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings)
@@ -59,7 +59,7 @@ namespace SOS.Process.Extensions
                 taxon.IndividualId = verbatimObservation.URL;
             }
 
-            var obs = new ProcessedSighting(DataProvider.Artportalen)
+            var obs = new ProcessedObservation(DataProvider.Artportalen)
             {
                 AccessRightsId =
                 !verbatimObservation.ProtectedBySystem && verbatimObservation.HiddenByProvider.HasValue &&

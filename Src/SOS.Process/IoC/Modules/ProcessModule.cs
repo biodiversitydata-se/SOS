@@ -59,7 +59,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<FieldMappingVerbatimRepository>().As<IFieldMappingVerbatimRepository>().InstancePerLifetimeScope();
 
             // Repositories destination 
-            builder.RegisterType<ProcessedSightingRepository>().As<IProcessedSightingRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<InvalidObservationRepository>().As<IInvalidObservationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonProcessedRepository>().As<ITaxonProcessedRepository>().InstancePerLifetimeScope();

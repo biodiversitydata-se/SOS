@@ -22,12 +22,12 @@ namespace SOS.Process.Extensions
         private const string ValidatedObservationStringValue = "Godkänd";
 
         /// <summary>
-        /// Cast clam observation verbatim to processed sighting
+        /// Cast clam observation verbatim to processed observation
         /// </summary>
         /// <param name="verbatim"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static ProcessedSighting ToProcessed(this ClamObservationVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
+        public static ProcessedObservation ToProcessed(this ClamObservationVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
         {
             Point wgs84Point = null;
             if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
@@ -37,7 +37,7 @@ namespace SOS.Process.Extensions
             
             taxa.TryGetValue(verbatim.DyntaxaTaxonId ?? -1, out var taxon);
 
-            return new ProcessedSighting(DataProvider.ClamPortal)
+            return new ProcessedObservation(DataProvider.ClamPortal)
             {
                 AccessRightsId = GetAccessRightsIdFromString(verbatim.AccessRights),
                 BasisOfRecordId = GetBasisOfRecordIdFromString(verbatim.BasisOfRecord),
@@ -255,12 +255,12 @@ namespace SOS.Process.Extensions
         }
 
         /// <summary>
-        /// Cast multiple clam observations to processed sightings
+        /// Cast multiple clam observations to processed observations
         /// </summary>
         /// <param name="verbatims"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        public static IEnumerable<ProcessedSighting> ToProcessed(this IEnumerable<ClamObservationVerbatim> verbatims, IDictionary<int, ProcessedTaxon> taxa)
+        public static IEnumerable<ProcessedObservation> ToProcessed(this IEnumerable<ClamObservationVerbatim> verbatims, IDictionary<int, ProcessedTaxon> taxa)
         {
             return verbatims.Select(v => v.ToProcessed(taxa));
         }

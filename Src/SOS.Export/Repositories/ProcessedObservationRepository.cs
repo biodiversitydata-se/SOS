@@ -17,7 +17,7 @@ namespace SOS.Export.Repositories
     /// <summary>
     /// Species data service
     /// </summary>
-    public class ProcessedSightingRepository : BaseRepository<ProcessedSighting, ObjectId>, IProcessedSightingRepository
+    public class ProcessedObservationRepository : BaseRepository<ProcessedObservation, ObjectId>, IProcessedObservationRepository
     {
         private ITaxonFactory _taxonFactory;
         
@@ -26,10 +26,10 @@ namespace SOS.Export.Repositories
         /// </summary>
         /// <param name="exportClient"></param>
         /// <param name="logger"></param>
-        public ProcessedSightingRepository(
+        public ProcessedObservationRepository(
             IExportClient exportClient,
             ITaxonFactory taxonFactory,
-            ILogger<ProcessedSightingRepository> logger) : base(exportClient, true, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(exportClient, true, logger)
         {
             _taxonFactory = taxonFactory ?? throw new ArgumentNullException(nameof(taxonFactory));
         }
@@ -54,7 +54,7 @@ namespace SOS.Export.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ProcessedSighting>> GetChunkAsync(FilterBase filter, int skip, int take)
+        public async Task<IEnumerable<ProcessedObservation>> GetChunkAsync(FilterBase filter, int skip, int take)
         {
             filter = PrepareFilter(filter);
 

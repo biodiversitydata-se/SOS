@@ -7,7 +7,7 @@ namespace SOS.Observations.Api.Factories.Interfaces
     /// <summary>
     /// Sighting factory repository
     /// </summary>
-    public interface ISightingFactory
+    public interface IObservationFactory
     {
         /// <summary>
         /// Get chunk of sightings

@@ -12,18 +12,18 @@ namespace SOS.Lib.Models.Processed.Sighting
     /// <summary>
     /// This class contains information about a species sighting
     /// </summary>
-    public class ProcessedSighting : IEntity<ObjectId>
+    public class ProcessedObservation : IEntity<ObjectId>
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="provider"></param>
-        public ProcessedSighting(DataProvider provider)
+        public ProcessedObservation(DataProvider provider)
         {
             Provider = provider;
         }
 
-        public ProcessedSighting()
+        public ProcessedObservation()
         {
         }
 

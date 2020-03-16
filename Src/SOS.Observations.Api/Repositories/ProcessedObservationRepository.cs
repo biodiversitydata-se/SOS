@@ -18,7 +18,7 @@ namespace SOS.Observations.Api.Repositories
     /// <summary>
     /// Species data service
     /// </summary>
-    public class ProcessedSightingRepository : ProcessBaseRepository<ProcessedSighting, ObjectId>, IProcessedSightingRepository
+    public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, ObjectId>, IProcessedObservationRepository
     {
         private const int BiotaTaxonId = 0;
         private readonly ITaxonFactory _taxonFactory;
@@ -29,10 +29,10 @@ namespace SOS.Observations.Api.Repositories
         /// <param name="client"></param>
         /// <param name="taxonFactory"></param>
         /// <param name="logger"></param>
-        public ProcessedSightingRepository(
+        public ProcessedObservationRepository(
             IProcessClient client,
             ITaxonFactory taxonFactory,
-            ILogger<ProcessedSightingRepository> logger) : base(client, true, logger)
+            ILogger<ProcessedObservationRepository> logger) : base(client, true, logger)
         {
             _taxonFactory = taxonFactory ?? throw new ArgumentNullException(nameof(taxonFactory));
         }
@@ -56,11 +56,11 @@ namespace SOS.Observations.Api.Repositories
             return preparedFilter;
         }
 
-        private SortDefinition<ProcessedSighting> PrepareSorting(string sortBy, SearchSortOrder sortOrder)
+        private SortDefinition<ProcessedObservation> PrepareSorting(string sortBy, SearchSortOrder sortOrder)
         {
             return string.IsNullOrEmpty(sortBy) ?
-                Builders<ProcessedSighting>.Sort.Descending(s => s.Id) : sortOrder.Equals(SearchSortOrder.Desc) ?
-                    Builders<ProcessedSighting>.Sort.Descending(sortBy) : Builders<ProcessedSighting>.Sort.Ascending(sortBy);
+                Builders<ProcessedObservation>.Sort.Descending(s => s.Id) : sortOrder.Equals(SearchSortOrder.Desc) ?
+                    Builders<ProcessedObservation>.Sort.Descending(sortBy) : Builders<ProcessedObservation>.Sort.Ascending(sortBy);
         }
 
         /// <inheritdoc />

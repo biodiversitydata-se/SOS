@@ -28,15 +28,15 @@ namespace SOS.Process.Factories
         /// </summary>
         /// <param name="clamObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
-        /// <param name="processedSightingRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="logger"></param>
         public ClamPortalProcessFactory(
             IClamObservationVerbatimRepository clamObservationVerbatimRepository,
             IAreaHelper areaHelper,
-            IProcessedSightingRepository processedSightingRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<ClamPortalProcessFactory> logger) : base(processedSightingRepository, fieldMappingResolverHelper, logger)
+            ILogger<ClamPortalProcessFactory> logger) : base(processedObservationRepository, fieldMappingResolverHelper, logger)
         {
             _clamObservationVerbatimRepository = clamObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(clamObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -46,15 +46,15 @@ namespace SOS.Process.Factories
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
-            ICollection<ProcessedSighting> sightings = new List<ProcessedSighting>();
+            ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
 
             using var cursor = await _clamObservationVerbatimRepository.GetAllAsync();
             // Process and commit in batches.
             await cursor.ForEachAsync(async c =>
             {
-                ProcessedSighting processedSighting = c.ToProcessed(taxa);
-                _areaHelper.AddAreaDataToProcessedSighting(processedSighting);
-                sightings.Add(processedSighting);
+                ProcessedObservation processedObservation = c.ToProcessed(taxa);
+                _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
+                sightings.Add(processedObservation);
                 if (IsBatchFilledToLimit(sightings.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();

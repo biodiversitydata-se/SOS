@@ -25,7 +25,7 @@ namespace SOS.Process.UnitTests.Jobs
     /// </summary>
     public class ProcessJobTests
     {
-        private readonly Mock<IProcessedSightingRepository> _darwinCoreRepository;
+        private readonly Mock<IProcessedObservationRepository> _darwinCoreRepository;
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
         private readonly Mock<IClamPortalProcessFactory> _clamPortalProcessFactory;
@@ -42,7 +42,7 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         public ProcessJobTests()
         {
-            _darwinCoreRepository = new Mock<IProcessedSightingRepository>();
+            _darwinCoreRepository = new Mock<IProcessedObservationRepository>();
             _processInfoRepository = new Mock<IProcessInfoRepository>();
             _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
             _clamPortalProcessFactory = new Mock<IClamPortalProcessFactory>();

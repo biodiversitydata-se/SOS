@@ -2,31 +2,31 @@
 
 namespace SOS.Export.UnitTests.TestHelpers.Builders
 {
-    public class ProcessedSightingBuilder : BuilderBase<ProcessedSightingBuilder, ProcessedSighting>
+    public class ProcessedObservationBuilder : BuilderBase<ProcessedObservationBuilder, ProcessedObservation>
     {
-        public ProcessedSightingBuilder WithDecimalLatitude(double decimalLatitude)
+        public ProcessedObservationBuilder WithDecimalLatitude(double decimalLatitude)
         {
             return With(entity => entity.Location.DecimalLatitude = decimalLatitude);
         }
 
-        public ProcessedSightingBuilder WithDecimalLongitude(double decimalLongitude)
+        public ProcessedObservationBuilder WithDecimalLongitude(double decimalLongitude)
         {
             return With(entity => entity.Location.DecimalLongitude = decimalLongitude);
         }
 
-        public ProcessedSightingBuilder WithCoordinateUncertaintyInMeters(int? coordinateUncertaintyInMeters)
+        public ProcessedObservationBuilder WithCoordinateUncertaintyInMeters(int? coordinateUncertaintyInMeters)
         {
             return With(entity => entity.Location.CoordinateUncertaintyInMeters = coordinateUncertaintyInMeters);
         }
 
-        public ProcessedSightingBuilder WithOccurrenceRemarks(string occurrenceRemarks)
+        public ProcessedObservationBuilder WithOccurrenceRemarks(string occurrenceRemarks)
         {
             return With(entity => entity.Occurrence.Remarks = occurrenceRemarks);
         }
 
-        protected override ProcessedSighting CreateEntity()
+        protected override ProcessedObservation CreateEntity()
         {
-            var sighting = new ProcessedSighting
+            var sighting = new ProcessedObservation
             {
                 Location = new ProcessedLocation(),
                 Event = new ProcessedEvent(),

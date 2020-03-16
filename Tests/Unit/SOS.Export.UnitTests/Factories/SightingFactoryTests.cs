@@ -19,12 +19,12 @@ namespace SOS.Export.UnitTests.Factories
     public class SightingFactoryTests
     {
         private readonly Mock<IDwcArchiveFileWriter> _dwcArchiveFileWriterMock;
-        private readonly Mock<IProcessedSightingRepository> _processedSightingRepositoryMock;
+        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
         private readonly Mock<IFileService> _fileServiceMock;
         private readonly Mock<IBlobStorageService> _blobStorageService;
         private readonly Mock<IZendToService> _zendToServiceMock;
-        private readonly Mock<ILogger<SightingFactory>> _loggerMock;
+        private readonly Mock<ILogger<ObservationFactory>> _loggerMock;
 
         /// <summary>
         /// Constructor
@@ -32,12 +32,12 @@ namespace SOS.Export.UnitTests.Factories
         public SightingFactoryTests()
         {
             _dwcArchiveFileWriterMock = new Mock<IDwcArchiveFileWriter>();
-            _processedSightingRepositoryMock = new Mock<IProcessedSightingRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
             _fileServiceMock = new Mock<IFileService>();
             _blobStorageService = new Mock<IBlobStorageService>();
             _zendToServiceMock = new Mock<IZendToService>();
-            _loggerMock = new Mock<ILogger<SightingFactory>>();
+            _loggerMock = new Mock<ILogger<ObservationFactory>>();
         }
 
         /// <summary>
@@ -47,9 +47,9 @@ namespace SOS.Export.UnitTests.Factories
         [Trait("Category", "Unit")]
         public void ConstructorTest()
         {
-            new SightingFactory(
+            new ObservationFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedSightingRepositoryMock.Object,
+                _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 _blobStorageService.Object,
@@ -57,9 +57,9 @@ namespace SOS.Export.UnitTests.Factories
                 new FileDestination { Path = "test" },
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new SightingFactory(
+            Action create = () => new ObservationFactory(
                 null,
-                _processedSightingRepositoryMock.Object,
+                _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 _blobStorageService.Object,
@@ -68,7 +68,7 @@ namespace SOS.Export.UnitTests.Factories
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("dwcArchiveFileWriter");
 
-            create = () => new SightingFactory(
+            create = () => new ObservationFactory(
                 _dwcArchiveFileWriterMock.Object,
                 null,
                 _processInfoRepositoryMock.Object,
@@ -77,11 +77,11 @@ namespace SOS.Export.UnitTests.Factories
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedSightingRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
 
-            create = () => new SightingFactory(
+            create = () => new ObservationFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedSightingRepositoryMock.Object,
+                _processedObservationRepositoryMock.Object,
                 null,
                 _fileServiceMock.Object,
                 _blobStorageService.Object,
@@ -90,9 +90,9 @@ namespace SOS.Export.UnitTests.Factories
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processInfoRepository");
 
-            create = () => new SightingFactory(
+            create = () => new ObservationFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedSightingRepositoryMock.Object,
+                _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 null,
                 _blobStorageService.Object,
@@ -101,9 +101,9 @@ namespace SOS.Export.UnitTests.Factories
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("fileService");
 
-            create = () => new SightingFactory(
+            create = () => new ObservationFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedSightingRepositoryMock.Object,
+                _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 null,
@@ -113,9 +113,9 @@ namespace SOS.Export.UnitTests.Factories
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("blobStorageService");
 
 
-            create = () => new SightingFactory(
+            create = () => new ObservationFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedSightingRepositoryMock.Object,
+                _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 _blobStorageService.Object,
@@ -124,9 +124,9 @@ namespace SOS.Export.UnitTests.Factories
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("zendToService");
 
-            create = () => new SightingFactory(
+            create = () => new ObservationFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedSightingRepositoryMock.Object,
+                _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 _blobStorageService.Object,
@@ -135,9 +135,9 @@ namespace SOS.Export.UnitTests.Factories
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("fileDestination");
 
-            create = () => new SightingFactory(
+            create = () => new ObservationFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedSightingRepositoryMock.Object,
+                _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 _blobStorageService.Object,
@@ -168,9 +168,9 @@ namespace SOS.Export.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var sightingFactory = new SightingFactory(
+            var sightingFactory = new ObservationFactory(
                 _dwcArchiveFileWriterMock.Object,
-                _processedSightingRepositoryMock.Object,
+                _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
                 _blobStorageService.Object,

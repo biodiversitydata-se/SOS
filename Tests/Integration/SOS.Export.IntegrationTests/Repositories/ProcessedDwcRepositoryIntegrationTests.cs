@@ -20,12 +20,12 @@ namespace SOS.Export.IntegrationTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var processedSightingRepository = GetProcessedSightingRepository();
+            var processedObservationRepository = GetProcessedObservationRepository();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var projectParameters = await processedSightingRepository.GetProjectParameters(new SearchFilter(), 0, 100);
+            var projectParameters = await processedObservationRepository.GetProjectParameters(new SearchFilter(), 0, 100);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -39,8 +39,8 @@ namespace SOS.Export.IntegrationTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var processedSightingRepository = GetProcessedSightingRepository();
-            var projectParameters = await processedSightingRepository.GetProjectParameters(new SearchFilter(), 0,100);
+            var processedObservationRepository = GetProcessedObservationRepository();
+            var projectParameters = await processedObservationRepository.GetProjectParameters(new SearchFilter(), 0,100);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -53,21 +53,21 @@ namespace SOS.Export.IntegrationTests.Repositories
             extendedMeasurementOrFactRows.Should().NotBeEmpty();
         }
 
-        private ProcessedSightingRepository GetProcessedSightingRepository()
+        private ProcessedObservationRepository GetProcessedObservationRepository()
         {
             var exportConfiguration = GetExportConfiguration();
             var exportClient = new ExportClient(
                 exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 exportConfiguration.ProcessedDbConfiguration.DatabaseName,
                 exportConfiguration.ProcessedDbConfiguration.BatchSize);
-            ProcessedSightingRepository processedSightingRepository =
-                new ProcessedSightingRepository(
+            ProcessedObservationRepository processedObservationRepository =
+                new ProcessedObservationRepository(
                     exportClient,
                     new TaxonFactory(
                         new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonFactory>>().Object),
-                    new NullLogger<ProcessedSightingRepository>());
+                    new NullLogger<ProcessedObservationRepository>());
 
-            return processedSightingRepository;
+            return processedObservationRepository;
         }
     }
 }

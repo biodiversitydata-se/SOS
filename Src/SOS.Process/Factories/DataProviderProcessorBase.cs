@@ -18,9 +18,9 @@ namespace SOS.Process.Factories
         public abstract DataProvider DataProvider { get; }
 
         protected DataProviderProcessorBase(
-            IProcessedSightingRepository processedSightingRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<TEntity> logger) : base(processedSightingRepository, logger)
+            ILogger<TEntity> logger) : base(processedObservationRepository, logger)
         {
             FieldMappingResolverHelper = fieldMappingResolverHelper ?? throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
         }
@@ -64,7 +64,7 @@ namespace SOS.Process.Factories
             IJobCancellationToken cancellationToken);
         
 
-        protected async Task<int> CommitBatchAsync(ICollection<ProcessedSighting> sightings)
+        protected async Task<int> CommitBatchAsync(ICollection<ProcessedObservation> sightings)
         {
             FieldMappingResolverHelper.ResolveFieldMappedValues(sightings);
             var successCount = await ProcessRepository.AddManyAsync(sightings);

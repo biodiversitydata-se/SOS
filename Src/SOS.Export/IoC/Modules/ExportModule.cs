@@ -43,11 +43,11 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterInstance(exportClient).As<IExportClient>().SingleInstance();
 
             // Add factories
-            builder.RegisterType<SightingFactory>().As<ISightingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ObservationFactory>().As<IObservationFactory>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
 
             // Repositories mongo
-            builder.RegisterType<ProcessedSightingRepository>().As<IProcessedSightingRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>().InstancePerLifetimeScope();

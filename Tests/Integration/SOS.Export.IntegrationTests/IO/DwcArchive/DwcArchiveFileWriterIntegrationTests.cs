@@ -30,7 +30,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var exportConfiguration = GetExportConfiguration();
             string exportFolderPath = exportConfiguration.FileDestination.Path;
             var exportClient = CreateExportClient(exportConfiguration);
-            var processedSightingRepository = CreateProcessedSightingRepository(exportClient);
+            var processedObservationRepository = CreateProcessedObservationRepository(exportClient);
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository = new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
             var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
@@ -44,7 +44,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                 filter,
                 filename,
-                processedSightingRepository,
+                processedObservationRepository,
                 processInfo,
                 exportFolderPath,
                 JobCancellationToken.Null);
@@ -115,17 +115,17 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             return dwcArchiveFileWriter;
         }
 
-        private static ProcessedSightingRepository CreateProcessedSightingRepository(ExportClient exportClient)
+        private static ProcessedObservationRepository CreateProcessedObservationRepository(ExportClient exportClient)
         {
-            var processedSightingRepository = new ProcessedSightingRepository(
+            var processedObservationRepository = new ProcessedObservationRepository(
                 exportClient,
                 new TaxonFactory(
                     new ProcessedTaxonRepository(
                         exportClient,
                         new Mock<ILogger<ProcessedTaxonRepository>>().Object),
                     new Mock<ILogger<TaxonFactory>>().Object),
-                new Mock<ILogger<ProcessedSightingRepository>>().Object);
-            return processedSightingRepository;
+                new Mock<ILogger<ProcessedObservationRepository>>().Object);
+            return processedObservationRepository;
         }
     }
 }

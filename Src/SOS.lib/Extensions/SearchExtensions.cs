@@ -14,13 +14,13 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        private static List<FilterDefinition<ProcessedSighting>> CreateFilterDefinitions(FilterBase filter)
+        private static List<FilterDefinition<ProcessedObservation>> CreateFilterDefinitions(FilterBase filter)
         {
-            var filters = new List<FilterDefinition<ProcessedSighting>>();
+            var filters = new List<FilterDefinition<ProcessedObservation>>();
 
             if (filter.CountyIds?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.CountyId.Id, filter.CountyIds));
+                filters.Add(Builders<ProcessedObservation>.Filter.In(m => m.Location.CountyId.Id, filter.CountyIds));
             }
 
             if (filter.GeometryFilter?.IsValid ?? false)
@@ -30,14 +30,14 @@ namespace SOS.Lib.Extensions
                 switch (geoJsonGeometry.Type)
                 {
                     case GeoJsonObjectType.Point:
-                        filters.Add(Builders<ProcessedSighting>.Filter.Near(m => m.Location.Point, (GeoJsonPoint<GeoJson2DGeographicCoordinates>)geoJsonGeometry, filter.GeometryFilter.MaxDistanceFromPoint, 0.0 ));
+                        filters.Add(Builders<ProcessedObservation>.Filter.Near(m => m.Location.Point, (GeoJsonPoint<GeoJson2DGeographicCoordinates>)geoJsonGeometry, filter.GeometryFilter.MaxDistanceFromPoint, 0.0 ));
                         break;
                     case GeoJsonObjectType.Polygon:
                     case GeoJsonObjectType.MultiPolygon:
                         filters.Add(filter.GeometryFilter.UsePointAccuracy ? 
-                            Builders<ProcessedSighting>.Filter.GeoIntersects(m => m.Location.PointWithBuffer, geoJsonGeometry)
+                            Builders<ProcessedObservation>.Filter.GeoIntersects(m => m.Location.PointWithBuffer, geoJsonGeometry)
                             :
-                            Builders<ProcessedSighting>.Filter.GeoWithin(m => m.Location.Point, geoJsonGeometry));
+                            Builders<ProcessedObservation>.Filter.GeoWithin(m => m.Location.Point, geoJsonGeometry));
                         
                         break;
                 }
@@ -45,49 +45,49 @@ namespace SOS.Lib.Extensions
 
             if (filter.EndDate.HasValue)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.Lte(m => m.Event.EndDate, filter.EndDate.Value.ToUniversalTime()));
+                filters.Add(Builders<ProcessedObservation>.Filter.Lte(m => m.Event.EndDate, filter.EndDate.Value.ToUniversalTime()));
             }
 
             if (filter.OnlyValidated.HasValue && filter.OnlyValidated.Value.Equals(true))
             {
                 filters.Add(
-                    Builders<ProcessedSighting>.Filter.Eq(m => m.Identification.Validated, true));
+                    Builders<ProcessedObservation>.Filter.Eq(m => m.Identification.Validated, true));
             }
 
             if (filter.MunicipalityIds?.Any() ?? false)
             {
                 filters.Add(
-                    Builders<ProcessedSighting>.Filter.In(m => m.Location.MunicipalityId.Id, filter.MunicipalityIds));
+                    Builders<ProcessedObservation>.Filter.In(m => m.Location.MunicipalityId.Id, filter.MunicipalityIds));
             }
 
             if (filter.PositiveSightings.HasValue)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.Eq(m => m.Occurrence.IsPositiveObservation, filter.PositiveSightings.Value));
+                filters.Add(Builders<ProcessedObservation>.Filter.Eq(m => m.Occurrence.IsPositiveObservation, filter.PositiveSightings.Value));
             }
 
             if (filter.ProvinceIds?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Location.ProvinceId.Id, filter.ProvinceIds));
+                filters.Add(Builders<ProcessedObservation>.Filter.In(m => m.Location.ProvinceId.Id, filter.ProvinceIds));
             }
 
             if (filter.RedListCategories?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Taxon.RedlistCategory, filter.RedListCategories));
+                filters.Add(Builders<ProcessedObservation>.Filter.In(m => m.Taxon.RedlistCategory, filter.RedListCategories));
             }
 
             if (filter.GenderIds?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Occurrence.GenderId.Id, filter.GenderIds));
+                filters.Add(Builders<ProcessedObservation>.Filter.In(m => m.Occurrence.GenderId.Id, filter.GenderIds));
             }
 
             if (filter.StartDate.HasValue)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.Gte(m => m.Event.StartDate, filter.StartDate.Value.ToUniversalTime()));
+                filters.Add(Builders<ProcessedObservation>.Filter.Gte(m => m.Event.StartDate, filter.StartDate.Value.ToUniversalTime()));
             }
 
             if (filter.TaxonIds?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Taxon.Id, filter.TaxonIds));
+                filters.Add(Builders<ProcessedObservation>.Filter.In(m => m.Taxon.Id, filter.TaxonIds));
             }
 
             return filters;
@@ -98,13 +98,13 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static FilterDefinition<ProcessedSighting> ToProjectParameteFilterDefinition(this FilterBase filter)
+        public static FilterDefinition<ProcessedObservation> ToProjectParameteFilterDefinition(this FilterBase filter)
         {
             var filters = CreateFilterDefinitions(filter);
-            filters.Add(Builders<ProcessedSighting>.Filter.ElemMatch(
+            filters.Add(Builders<ProcessedObservation>.Filter.ElemMatch(
                 o => o.Projects, o => o.ProjectParameters != null));
 
-            return Builders<ProcessedSighting>.Filter.And(filters);
+            return Builders<ProcessedObservation>.Filter.And(filters);
         }
 
         /// <summary>
@@ -112,15 +112,15 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static FilterDefinition<ProcessedSighting> ToFilterDefinition(this FilterBase filter)
+        public static FilterDefinition<ProcessedObservation> ToFilterDefinition(this FilterBase filter)
         {
             if (!filter.IsFilterActive)
             {
-                return FilterDefinition<ProcessedSighting>.Empty;
+                return FilterDefinition<ProcessedObservation>.Empty;
             }
 
             var filters = CreateFilterDefinitions(filter);
-            return Builders<ProcessedSighting>.Filter.And(filters);
+            return Builders<ProcessedObservation>.Filter.And(filters);
         }
 
 

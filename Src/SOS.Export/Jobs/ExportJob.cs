@@ -14,17 +14,17 @@ namespace SOS.Export.Jobs
     /// </summary>
     public class ExportJob : IExportJob
     {
-        private readonly ISightingFactory _sightingFactory;
+        private readonly IObservationFactory _observationFactory;
         private readonly ILogger<ExportJob> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="sightingFactory"></param>
+        /// <param name="observationFactory"></param>
         /// <param name="logger"></param>
-        public ExportJob(ISightingFactory sightingFactory, ILogger<ExportJob> logger)
+        public ExportJob(IObservationFactory observationFactory, ILogger<ExportJob> logger)
         {
-            _sightingFactory = sightingFactory ?? throw new ArgumentNullException(nameof(sightingFactory));
+            _observationFactory = observationFactory ?? throw new ArgumentNullException(nameof(observationFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -34,7 +34,7 @@ namespace SOS.Export.Jobs
             try
             {
                 _logger.LogDebug("Start export job");
-                var success = await _sightingFactory.ExportDWCAsync(filter, email, cancellationToken);
+                var success = await _observationFactory.ExportDWCAsync(filter, email, cancellationToken);
 
                 _logger.LogDebug($"End DOI job. Success: {success}");
                 

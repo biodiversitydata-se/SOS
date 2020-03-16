@@ -61,32 +61,32 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>()));
             var taxonProcessedRepository = new TaxonProcessedRepository(processClient, new NullLogger<TaxonProcessedRepository>());
             var invalidObservationRepository = new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
-            var processedSightingRepository = new ProcessedSightingRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedSightingRepository>());
+            var processedObservationRepository = new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>());
             var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository = new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
             var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
             var clamPortalProcessFactory = new ClamPortalProcessFactory(
                 new ClamObservationVerbatimRepository(verbatimClient, new NullLogger<ClamObservationVerbatimRepository>()), 
                 areaHelper, 
-                processedSightingRepository,
+                processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
                 new NullLogger<ClamPortalProcessFactory>());
             var kulProcessFactory = new KulProcessFactory(
                 new KulObservationVerbatimRepository(verbatimClient, new NullLogger<KulObservationVerbatimRepository>()), 
                 areaHelper,
-                processedSightingRepository,
+                processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<KulProcessFactory>());
             var artportalenProcessFactory = new ArtportalenProcessFactory(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
-                processedSightingRepository,
+                processedObservationRepository,
                 processedFieldMappingRepository, 
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 processConfiguration,
                 new NullLogger<ArtportalenProcessFactory>());
 
             var processTaxaJob = new ProcessJob(
-                processedSightingRepository,
+                processedObservationRepository,
                 processInfoRepository,
                 harvestInfoRepository,
                 clamPortalProcessFactory,

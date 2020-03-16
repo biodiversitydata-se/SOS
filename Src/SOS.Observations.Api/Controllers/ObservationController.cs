@@ -13,36 +13,36 @@ using SOS.Observations.Api.Factories.Interfaces;
 namespace SOS.Observations.Api.Controllers
 {
     /// <summary>
-    /// Sighting controller
+    /// Observation controller
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class SightingController : ControllerBase, ISightingController
+    public class ObservationController : ControllerBase, IObservationController
     {
-        private readonly ISightingFactory _sightingFactory;
+        private readonly IObservationFactory _observationFactory;
         private readonly IFieldMappingFactory _fieldMappingFactory;
-        private readonly ILogger<SightingController> _logger;
+        private readonly ILogger<ObservationController> _logger;
         private const int _maxBatchSize = 10000;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="sightingFactory"></param>
+        /// <param name="observationFactory"></param>
         /// <param name="fieldMappingFactory"></param>
         /// <param name="logger"></param>
-        public SightingController(
-            ISightingFactory sightingFactory, 
+        public ObservationController(
+            IObservationFactory observationFactory, 
             IFieldMappingFactory fieldMappingFactory,
-            ILogger<SightingController> logger)
+            ILogger<ObservationController> logger)
         {
-            _sightingFactory = sightingFactory ?? throw new ArgumentNullException(nameof(sightingFactory));
+            _observationFactory = observationFactory ?? throw new ArgumentNullException(nameof(observationFactory));
             _fieldMappingFactory = fieldMappingFactory ?? throw new ArgumentNullException(nameof(fieldMappingFactory));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
         [HttpPost("search")]
-        [ProducesResponseType(typeof(IEnumerable<ProcessedSighting>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<ProcessedObservation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetChunkAsync([FromBody] SearchFilter filter, [FromQuery]int skip, [FromQuery]int take)
@@ -54,7 +54,7 @@ namespace SOS.Observations.Api.Controllers
                     return new BadRequestResult();
                 }
 
-                return new OkObjectResult(await _sightingFactory.GetChunkAsync(filter, skip, take));
+                return new OkObjectResult(await _observationFactory.GetChunkAsync(filter, skip, take));
             }
             catch (Exception e)
             {

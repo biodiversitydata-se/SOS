@@ -10,14 +10,14 @@ namespace SOS.Process.Helpers.Interfaces
         /// <summary>
         /// Resolve field mapped values.
         /// </summary>
-        /// <param name="processedSightings"></param>
-        void ResolveFieldMappedValues(IEnumerable<ProcessedSighting> processedSightings);
+        /// <param name="processedObservations"></param>
+        void ResolveFieldMappedValues(IEnumerable<ProcessedObservation> processedObservations);
         
         /// <summary>
         /// Resolve field mapped values.
         /// </summary>
-        /// <param name="processedSightings"></param>
+        /// <param name="processedObservations"></param>
         /// <param name="cultureCode"></param>
-        void ResolveFieldMappedValues(IEnumerable<ProcessedSighting> processedSightings, string cultureCode);
+        void ResolveFieldMappedValues(IEnumerable<ProcessedObservation> processedObservations, string cultureCode);
     }
 }
