@@ -32,7 +32,7 @@ namespace SOS.Import.Factories
         /// <param name="genderFieldMappingFactory"></param>
         /// <param name="lifeStageFieldMappingFactory"></param>
         /// <param name="validationStatusFieldMappingFactory"></param>
-        /// <param name="organizationFieldMappingFactory"></param>
+        /// <param name="institutionFieldMappingFactory"></param>
         /// <param name="unitFieldMappingFactory"></param>
         /// <param name="basisOfRecordFieldMappingFactory"></param>
         /// <param name="continentFieldMappingFactory"></param>
@@ -57,7 +57,7 @@ namespace SOS.Import.Factories
             BiotopeFieldMappingFactory biotopeFieldMappingFactory,
             SubstrateFieldMappingFactory substrateFieldMappingFactory,
             ValidationStatusFieldMappingFactory validationStatusFieldMappingFactory,
-            OrganizationFieldMappingFactory organizationFieldMappingFactory,
+            InstitutionFieldMappingFactory institutionFieldMappingFactory,
             UnitFieldMappingFactory unitFieldMappingFactory,
             BasisOfRecordFieldMappingFactory basisOfRecordFieldMappingFactory,
             ContinentFieldMappingFactory continentFieldMappingFactory,
@@ -82,7 +82,7 @@ namespace SOS.Import.Factories
                 {FieldMappingFieldId.Biotope, biotopeFieldMappingFactory},
                 {FieldMappingFieldId.Substrate, substrateFieldMappingFactory},
                 {FieldMappingFieldId.ValidationStatus, validationStatusFieldMappingFactory},
-                {FieldMappingFieldId.Organization, organizationFieldMappingFactory},
+                {FieldMappingFieldId.Institution, institutionFieldMappingFactory},
                 {FieldMappingFieldId.Unit, unitFieldMappingFactory},
                 {FieldMappingFieldId.BasisOfRecord, basisOfRecordFieldMappingFactory},
                 {FieldMappingFieldId.Continent, continentFieldMappingFactory},

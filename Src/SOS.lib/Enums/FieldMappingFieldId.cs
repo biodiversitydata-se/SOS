@@ -15,7 +15,7 @@
         Biotope = 7,
         Substrate = 8,
         ValidationStatus = 9,
-        Organization = 10,
+        Institution = 10,
         Unit = 11,
         BasisOfRecord = 12,
         Continent = 13,

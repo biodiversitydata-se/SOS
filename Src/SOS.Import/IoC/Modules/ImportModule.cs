@@ -89,7 +89,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<BiotopeFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SubstrateFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ValidationStatusFieldMappingFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<OrganizationFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<InstitutionFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<UnitFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<BasisOfRecordFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ContinentFieldMappingFactory>().InstancePerLifetimeScope();

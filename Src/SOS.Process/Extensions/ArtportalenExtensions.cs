@@ -163,7 +163,7 @@ namespace SOS.Process.Extensions
             obs.Event.SubstrateId = GetSosId(verbatimObservation?.Bioptope?.Id, fieldMappings[FieldMappingFieldId.Substrate]);
             obs.Identification.ValidationStatusId = GetSosId(verbatimObservation?.ValidationStatus?.Id, fieldMappings[FieldMappingFieldId.ValidationStatus]);
             obs.Occurrence.LifeStageId = GetSosId(verbatimObservation?.Stage?.Id, fieldMappings[FieldMappingFieldId.LifeStage]);
-            obs.OrganizationId = GetSosId(verbatimObservation?.OwnerOrganization?.Id, fieldMappings[FieldMappingFieldId.Organization]);
+            obs.InstitutionId = GetSosId(verbatimObservation?.OwnerOrganization?.Id, fieldMappings[FieldMappingFieldId.Institution]);
             obs.Occurrence.OrganismQuantityUnitId = GetSosId(verbatimObservation?.Unit?.Id, fieldMappings[FieldMappingFieldId.Unit]);
             return obs;
         }

@@ -57,7 +57,7 @@ namespace SOS.Process.Extensions
                     ValidationStatusId = GetValidationStatusIdFromString(verbatim.IdentificationVerificationStatus),
                     UncertainDetermination = verbatim.UncertainDetermination != 0
                 },
-                OrganizationId = GetOrganizationIdFromString(verbatim.InstitutionCode),
+                InstitutionId = GetOrganizationIdFromString(verbatim.InstitutionCode),
                 Language = verbatim.Language,
                 Location = new ProcessedLocation
                 {

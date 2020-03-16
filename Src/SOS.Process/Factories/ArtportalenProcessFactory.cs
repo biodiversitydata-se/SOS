@@ -179,7 +179,7 @@ namespace SOS.Process.Factories
                 case FieldMappingFieldId.Substrate:
                 case FieldMappingFieldId.ValidationStatus:
                 case FieldMappingFieldId.Biotope:
-                case FieldMappingFieldId.Organization:
+                case FieldMappingFieldId.Institution:
                 case FieldMappingFieldId.Unit:
                     return "Id";
                 default:

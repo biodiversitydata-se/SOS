@@ -133,7 +133,7 @@ namespace SOS.Lib.Models.Processed.Sighting
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue OrganizationId { get; set; }
+        public ProcessedFieldMapValue InstitutionId { get; set; }
 
         /// <summary>
         /// Internal flag used in validation. must be true to be stored in processed data

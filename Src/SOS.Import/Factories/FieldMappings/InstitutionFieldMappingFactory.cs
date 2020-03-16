@@ -11,13 +11,13 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.FieldMappings
 {
     /// <summary>
-    /// Class for creating verification status field mapping.
+    /// Class for creating institution field mapping.
     /// </summary>
-    public class OrganizationFieldMappingFactory : ArtportalenFieldMappingFactoryBase
+    public class InstitutionFieldMappingFactory : ArtportalenFieldMappingFactoryBase
     {
         private readonly IMetadataRepository _artportalenMetadataRepository;
-        private readonly ILogger<OrganizationFieldMappingFactory> _logger;
-        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Organization;
+        private readonly ILogger<InstitutionFieldMappingFactory> _logger;
+        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Institution;
         protected override bool Localized => false;
 
         /// <summary>
@@ -25,9 +25,9 @@ namespace SOS.Import.Factories.FieldMappings
         /// </summary>
         /// <param name="artportalenMetadataRepository"></param>
         /// <param name="logger"></param>
-        public OrganizationFieldMappingFactory(
+        public InstitutionFieldMappingFactory(
             IMetadataRepository artportalenMetadataRepository,
-            ILogger<OrganizationFieldMappingFactory> logger)
+            ILogger<InstitutionFieldMappingFactory> logger)
         {
             _artportalenMetadataRepository = artportalenMetadataRepository ?? throw new ArgumentNullException(nameof(artportalenMetadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

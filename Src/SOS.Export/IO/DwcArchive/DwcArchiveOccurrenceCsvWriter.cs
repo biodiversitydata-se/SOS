@@ -82,7 +82,7 @@ namespace SOS.Export.IO.DwcArchive
                 ResolveFieldMappedValue(processedSighting.BasisOfRecordId, valueMappingDictionaries[FieldMappingFieldId.BasisOfRecord]);
                 ResolveFieldMappedValue(processedSighting.TypeId, valueMappingDictionaries[FieldMappingFieldId.Type]);
                 ResolveFieldMappedValue(processedSighting.AccessRightsId, valueMappingDictionaries[FieldMappingFieldId.AccessRights]);
-                ResolveFieldMappedValue(processedSighting.OrganizationId, valueMappingDictionaries[FieldMappingFieldId.Organization]);
+                ResolveFieldMappedValue(processedSighting.InstitutionId, valueMappingDictionaries[FieldMappingFieldId.Institution]);
                 ResolveFieldMappedValue(processedSighting.Location?.CountyId, valueMappingDictionaries[FieldMappingFieldId.County]);
                 ResolveFieldMappedValue(processedSighting.Location?.MunicipalityId, valueMappingDictionaries[FieldMappingFieldId.Municipality]);
                 ResolveFieldMappedValue(processedSighting.Location?.ParishId, valueMappingDictionaries[FieldMappingFieldId.Parish]);

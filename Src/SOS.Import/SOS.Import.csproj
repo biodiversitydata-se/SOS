@@ -83,7 +83,7 @@
     <Compile Update="Factories\FieldMappings\OccurrenceStatusFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\OrganizationFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMappings\InstitutionFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
     <Compile Update="Factories\FieldMappings\ParishFieldMappingFactory.cs">
@@ -133,6 +133,9 @@
     </None>
     <None Update="Resources\FieldMappings\GenderFieldMapping.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\FieldMappings\InstitutionFieldMapping.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\FieldMappings\LifeStageFieldMapping.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

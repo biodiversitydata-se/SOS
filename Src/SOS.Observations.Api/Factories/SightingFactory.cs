@@ -66,7 +66,7 @@ namespace SOS.Observations.Api.Factories
                     ResolveFieldMappedValue(sighting.BasisOfRecordId, FieldMappingFieldId.BasisOfRecord);
                     ResolveFieldMappedValue(sighting.TypeId, FieldMappingFieldId.Type);
                     ResolveFieldMappedValue(sighting.AccessRightsId, FieldMappingFieldId.AccessRights);
-                    ResolveFieldMappedValue(sighting.OrganizationId, FieldMappingFieldId.Organization);
+                    ResolveFieldMappedValue(sighting.InstitutionId, FieldMappingFieldId.Institution);
                     ResolveFieldMappedValue(sighting.Location?.CountyId, FieldMappingFieldId.County);
                     ResolveFieldMappedValue(sighting.Location?.MunicipalityId, FieldMappingFieldId.Municipality);
                     ResolveFieldMappedValue(sighting.Location?.ProvinceId, FieldMappingFieldId.Province);
@@ -86,7 +86,7 @@ namespace SOS.Observations.Api.Factories
                         ResolveFieldMappedValue(obs, FieldMappingFieldId.BasisOfRecord, nameof(ProcessedSighting.BasisOfRecordId));
                         ResolveFieldMappedValue(obs, FieldMappingFieldId.Type, nameof(ProcessedSighting.TypeId));
                         ResolveFieldMappedValue(obs, FieldMappingFieldId.AccessRights, nameof(ProcessedSighting.AccessRightsId));
-                        ResolveFieldMappedValue(obs, FieldMappingFieldId.Organization, nameof(ProcessedSighting.OrganizationId));
+                        ResolveFieldMappedValue(obs, FieldMappingFieldId.Institution, nameof(ProcessedSighting.InstitutionId));
 
                         if (obs.TryGetValue(nameof(ProcessedSighting.Location), out object locationObject))
                         {

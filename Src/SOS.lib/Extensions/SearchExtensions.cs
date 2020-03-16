@@ -75,9 +75,9 @@ namespace SOS.Lib.Extensions
                 filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Taxon.RedlistCategory, filter.RedListCategories));
             }
 
-            if (filter.Gender?.Any() ?? false)
+            if (filter.GenderIds?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Occurrence.GenderId.Id, filter.Gender));
+                filters.Add(Builders<ProcessedSighting>.Filter.In(m => m.Occurrence.GenderId.Id, filter.GenderIds));
             }
 
             if (filter.StartDate.HasValue)
