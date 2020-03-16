@@ -38,6 +38,11 @@ namespace DwC_A.Meta
             return fieldIndexDictionary[term];
         }
 
+        public bool TryGetTermIndex(string term, out int index)
+        {
+            return fieldIndexDictionary.TryGetValue(term, out index);
+        }
+
         public IEnumerator<FieldType> GetEnumerator()
         {
             return fieldTypes.GetEnumerator();
