@@ -5,12 +5,12 @@
   "Values": [
     {
       "Id": 0,
-      "Name": "Free usage",
+      "Value": "Free usage",
       "Localized": false
     },
     {
       "Id": 1,
-      "Name": "Not for public usage",
+      "Value": "Not for public usage",
       "Localized": false
     }
   ],

@@ -5,62 +5,62 @@
   "Values": [
     {
       "Id": 0,
-      "Name": "Collection",
+      "Value": "Collection",
       "Localized": false
     },
     {
       "Id": 1,
-      "Name": "Dataset",
+      "Value": "Dataset",
       "Localized": false
     },
     {
       "Id": 2,
-      "Name": "Event",
+      "Value": "Event",
       "Localized": false
     },
     {
       "Id": 3,
-      "Name": "Image",
+      "Value": "Image",
       "Localized": false
     },
     {
       "Id": 4,
-      "Name": "InteractiveResource",
+      "Value": "InteractiveResource",
       "Localized": false
     },
     {
       "Id": 5,
-      "Name": "MovingImage",
+      "Value": "MovingImage",
       "Localized": false
     },
     {
       "Id": 6,
-      "Name": "PhysicalObject",
+      "Value": "PhysicalObject",
       "Localized": false
     },
     {
       "Id": 7,
-      "Name": "Service",
+      "Value": "Service",
       "Localized": false
     },
     {
       "Id": 8,
-      "Name": "Software",
+      "Value": "Software",
       "Localized": false
     },
     {
       "Id": 9,
-      "Name": "Sound",
+      "Value": "Sound",
       "Localized": false
     },
     {
       "Id": 10,
-      "Name": "StillImage",
+      "Value": "StillImage",
       "Localized": false
     },
     {
       "Id": 11,
-      "Name": "Text",
+      "Value": "Text",
       "Localized": false
     }
   ],

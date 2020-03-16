@@ -5,7 +5,7 @@
   "Values": [
     {
       "Id": 0,
-      "Name": "empty",
+      "Value": "empty",
       "Localized": true,
       "Category": {
         "Id": 0,
@@ -35,7 +35,7 @@
     },
     {
       "Id": 1,
-      "Name": "nest with egg",
+      "Value": "nest with egg",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -65,7 +65,7 @@
     },
     {
       "Id": 2,
-      "Name": "nest with chick heard",
+      "Value": "nest with chick heard",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -95,7 +95,7 @@
     },
     {
       "Id": 3,
-      "Name": "breeding failed",
+      "Value": "breeding failed",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -125,7 +125,7 @@
     },
     {
       "Id": 4,
-      "Name": "incubating",
+      "Value": "incubating",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -155,7 +155,7 @@
     },
     {
       "Id": 5,
-      "Name": "egg shells",
+      "Value": "egg shells",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -185,7 +185,7 @@
     },
     {
       "Id": 6,
-      "Name": "carrying food for young",
+      "Value": "carrying food for young",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -215,7 +215,7 @@
     },
     {
       "Id": 7,
-      "Name": "carrying faecal sac",
+      "Value": "carrying faecal sac",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -245,7 +245,7 @@
     },
     {
       "Id": 8,
-      "Name": "visiting occupied nest",
+      "Value": "visiting occupied nest",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -275,7 +275,7 @@
     },
     {
       "Id": 9,
-      "Name": "recently fledged young",
+      "Value": "recently fledged young",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -305,7 +305,7 @@
     },
     {
       "Id": 10,
-      "Name": "recently used nest",
+      "Value": "recently used nest",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -335,7 +335,7 @@
     },
     {
       "Id": 11,
-      "Name": "distraction display",
+      "Value": "distraction display",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -365,7 +365,7 @@
     },
     {
       "Id": 12,
-      "Name": "nest building",
+      "Value": "nest building",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -395,7 +395,7 @@
     },
     {
       "Id": 13,
-      "Name": "brood patch",
+      "Value": "brood patch",
       "Localized": true,
       "Category": {
         "Id": 2,
@@ -425,7 +425,7 @@
     },
     {
       "Id": 14,
-      "Name": "agitated behaviour",
+      "Value": "agitated behaviour",
       "Localized": true,
       "Category": {
         "Id": 2,
@@ -455,7 +455,7 @@
     },
     {
       "Id": 15,
-      "Name": "visit possible nest?",
+      "Value": "visit possible nest?",
       "Localized": true,
       "Category": {
         "Id": 2,
@@ -485,7 +485,7 @@
     },
     {
       "Id": 16,
-      "Name": "mating/mating ceremonies",
+      "Value": "mating/mating ceremonies",
       "Localized": true,
       "Category": {
         "Id": 2,
@@ -515,7 +515,7 @@
     },
     {
       "Id": 17,
-      "Name": "permanent territory",
+      "Value": "permanent territory",
       "Localized": true,
       "Category": {
         "Id": 2,
@@ -545,7 +545,7 @@
     },
     {
       "Id": 18,
-      "Name": "pair in suitable habitat",
+      "Value": "pair in suitable habitat",
       "Localized": true,
       "Category": {
         "Id": 3,
@@ -575,7 +575,7 @@
     },
     {
       "Id": 19,
-      "Name": "display/song",
+      "Value": "display/song",
       "Localized": true,
       "Category": {
         "Id": 3,
@@ -605,7 +605,7 @@
     },
     {
       "Id": 20,
-      "Name": "in nesting habitat",
+      "Value": "in nesting habitat",
       "Localized": true,
       "Category": {
         "Id": 3,
@@ -635,7 +635,7 @@
     },
     {
       "Id": 22,
-      "Name": "staging",
+      "Value": "staging",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -665,7 +665,7 @@
     },
     {
       "Id": 23,
-      "Name": "stationary",
+      "Value": "stationary",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -695,7 +695,7 @@
     },
     {
       "Id": 24,
-      "Name": "flying overhead",
+      "Value": "flying overhead",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -725,7 +725,7 @@
     },
     {
       "Id": 25,
-      "Name": "foraging",
+      "Value": "foraging",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -755,7 +755,7 @@
     },
     {
       "Id": 26,
-      "Name": "display / song outside breeding",
+      "Value": "display / song outside breeding",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -785,7 +785,7 @@
     },
     {
       "Id": 27,
-      "Name": "call",
+      "Value": "call",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -815,7 +815,7 @@
     },
     {
       "Id": 28,
-      "Name": "territory outside breeding",
+      "Value": "territory outside breeding",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -845,7 +845,7 @@
     },
     {
       "Id": 29,
-      "Name": "ringed",
+      "Value": "ringed",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -875,7 +875,7 @@
     },
     {
       "Id": 30,
-      "Name": "individually marked",
+      "Value": "individually marked",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -905,7 +905,7 @@
     },
     {
       "Id": 31,
-      "Name": "migration attempt",
+      "Value": "migration attempt",
       "Localized": true,
       "Category": {
         "Id": 5,
@@ -935,7 +935,7 @@
     },
     {
       "Id": 32,
-      "Name": "migrating",
+      "Value": "migrating",
       "Localized": true,
       "Category": {
         "Id": 5,
@@ -965,7 +965,7 @@
     },
     {
       "Id": 33,
-      "Name": "migrating N",
+      "Value": "migrating N",
       "Localized": true,
       "Category": {
         "Id": 5,
@@ -995,7 +995,7 @@
     },
     {
       "Id": 34,
-      "Name": "migrating NE",
+      "Value": "migrating NE",
       "Localized": true,
       "Category": {
         "Id": 5,
@@ -1025,7 +1025,7 @@
     },
     {
       "Id": 35,
-      "Name": "migrating E",
+      "Value": "migrating E",
       "Localized": true,
       "Category": {
         "Id": 5,
@@ -1055,7 +1055,7 @@
     },
     {
       "Id": 36,
-      "Name": "migrating SE",
+      "Value": "migrating SE",
       "Localized": true,
       "Category": {
         "Id": 5,
@@ -1085,7 +1085,7 @@
     },
     {
       "Id": 37,
-      "Name": "migrating S",
+      "Value": "migrating S",
       "Localized": true,
       "Category": {
         "Id": 5,
@@ -1115,7 +1115,7 @@
     },
     {
       "Id": 38,
-      "Name": "migrating SW",
+      "Value": "migrating SW",
       "Localized": true,
       "Category": {
         "Id": 5,
@@ -1145,7 +1145,7 @@
     },
     {
       "Id": 39,
-      "Name": "migrating W",
+      "Value": "migrating W",
       "Localized": true,
       "Category": {
         "Id": 5,
@@ -1175,7 +1175,7 @@
     },
     {
       "Id": 40,
-      "Name": "migrating NW",
+      "Value": "migrating NW",
       "Localized": true,
       "Category": {
         "Id": 5,
@@ -1205,7 +1205,7 @@
     },
     {
       "Id": 41,
-      "Name": "found dead",
+      "Value": "found dead",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -1235,7 +1235,7 @@
     },
     {
       "Id": 42,
-      "Name": "fresh trace",
+      "Value": "fresh trace",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1265,7 +1265,7 @@
     },
     {
       "Id": 43,
-      "Name": "trace",
+      "Value": "trace",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1295,7 +1295,7 @@
     },
     {
       "Id": 44,
-      "Name": "fresh faeces",
+      "Value": "fresh faeces",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1325,7 +1325,7 @@
     },
     {
       "Id": 45,
-      "Name": "faeces",
+      "Value": "faeces",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1355,7 +1355,7 @@
     },
     {
       "Id": 46,
-      "Name": "fresh gnaw",
+      "Value": "fresh gnaw",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1385,7 +1385,7 @@
     },
     {
       "Id": 47,
-      "Name": "gnaw",
+      "Value": "gnaw",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1415,7 +1415,7 @@
     },
     {
       "Id": 48,
-      "Name": "gall",
+      "Value": "gall",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -1445,7 +1445,7 @@
     },
     {
       "Id": 49,
-      "Name": "mine",
+      "Value": "mine",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1475,7 +1475,7 @@
     },
     {
       "Id": 50,
-      "Name": "cocoon",
+      "Value": "cocoon",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -1505,7 +1505,7 @@
     },
     {
       "Id": 51,
-      "Name": "fragment",
+      "Value": "fragment",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1535,7 +1535,7 @@
     },
     {
       "Id": 52,
-      "Name": "display",
+      "Value": "display",
       "Localized": true,
       "Category": {
         "Id": 2,
@@ -1565,7 +1565,7 @@
     },
     {
       "Id": 53,
-      "Name": "territorial",
+      "Value": "territorial",
       "Localized": true,
       "Category": {
         "Id": 3,
@@ -1595,7 +1595,7 @@
     },
     {
       "Id": 54,
-      "Name": "egg laying",
+      "Value": "egg laying",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -1625,7 +1625,7 @@
     },
     {
       "Id": 55,
-      "Name": "running/crawling",
+      "Value": "running/crawling",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -1655,7 +1655,7 @@
     },
     {
       "Id": 56,
-      "Name": "free-flying",
+      "Value": "free-flying",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -1685,7 +1685,7 @@
     },
     {
       "Id": 57,
-      "Name": "in water/swimming",
+      "Value": "in water/swimming",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -1715,7 +1715,7 @@
     },
     {
       "Id": 58,
-      "Name": "digging",
+      "Value": "digging",
       "Localized": true,
       "Category": {
         "Id": 3,
@@ -1745,7 +1745,7 @@
     },
     {
       "Id": 59,
-      "Name": "old nest",
+      "Value": "old nest",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1775,7 +1775,7 @@
     },
     {
       "Id": 60,
-      "Name": "hibernating",
+      "Value": "hibernating",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -1805,7 +1805,7 @@
     },
     {
       "Id": 61,
-      "Name": "trace of oestrous female",
+      "Value": "trace of oestrous female",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1835,7 +1835,7 @@
     },
     {
       "Id": 62,
-      "Name": "remains of prey/food",
+      "Value": "remains of prey/food",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1865,7 +1865,7 @@
     },
     {
       "Id": 63,
-      "Name": "remains of fur or hair",
+      "Value": "remains of fur or hair",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1895,7 +1895,7 @@
     },
     {
       "Id": 64,
-      "Name": "shed skin",
+      "Value": "shed skin",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -1925,7 +1925,7 @@
     },
     {
       "Id": 65,
-      "Name": "ill",
+      "Value": "ill",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -1955,7 +1955,7 @@
     },
     {
       "Id": 66,
-      "Name": "play",
+      "Value": "play",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -1985,7 +1985,7 @@
     },
     {
       "Id": 67,
-      "Name": "migrating fish",
+      "Value": "migrating fish",
       "Localized": true,
       "Category": {
         "Id": 5,
@@ -2015,7 +2015,7 @@
     },
     {
       "Id": 68,
-      "Name": "dead, collided with power line",
+      "Value": "dead, collided with power line",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -2045,7 +2045,7 @@
     },
     {
       "Id": 69,
-      "Name": "dead, collided with wind mill",
+      "Value": "dead, collided with wind mill",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -2075,7 +2075,7 @@
     },
     {
       "Id": 70,
-      "Name": "dead, collided with window",
+      "Value": "dead, collided with window",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -2105,7 +2105,7 @@
     },
     {
       "Id": 71,
-      "Name": "dead, collided with lighthouse",
+      "Value": "dead, collided with lighthouse",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -2135,7 +2135,7 @@
     },
     {
       "Id": 72,
-      "Name": "road kill",
+      "Value": "road kill",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -2165,7 +2165,7 @@
     },
     {
       "Id": 73,
-      "Name": "dead, collided with aeroplane",
+      "Value": "dead, collided with aeroplane",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -2195,7 +2195,7 @@
     },
     {
       "Id": 74,
-      "Name": "dead, collided with fence",
+      "Value": "dead, collided with fence",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -2225,7 +2225,7 @@
     },
     {
       "Id": 75,
-      "Name": "killed by electricity",
+      "Value": "killed by electricity",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -2255,7 +2255,7 @@
     },
     {
       "Id": 76,
-      "Name": "drowned in fishing net",
+      "Value": "drowned in fishing net",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -2285,7 +2285,7 @@
     },
     {
       "Id": 77,
-      "Name": "killed by predator",
+      "Value": "killed by predator",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -2315,7 +2315,7 @@
     },
     {
       "Id": 78,
-      "Name": "dead due to disease/starvation",
+      "Value": "dead due to disease/starvation",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -2345,7 +2345,7 @@
     },
     {
       "Id": 79,
-      "Name": "lactating",
+      "Value": "lactating",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -2375,7 +2375,7 @@
     },
     {
       "Id": 80,
-      "Name": "pregnant female",
+      "Value": "pregnant female",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -2405,7 +2405,7 @@
     },
     {
       "Id": 81,
-      "Name": "signs of gnawing",
+      "Value": "signs of gnawing",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -2435,7 +2435,7 @@
     },
     {
       "Id": 82,
-      "Name": "spawning",
+      "Value": "spawning",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -2465,7 +2465,7 @@
     },
     {
       "Id": 83,
-      "Name": "male with well developed epididymitis",
+      "Value": "male with well developed epididymitis",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -2495,7 +2495,7 @@
     },
     {
       "Id": 84,
-      "Name": "jump",
+      "Value": "jump",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -2525,7 +2525,7 @@
     },
     {
       "Id": 85,
-      "Name": "female with offspring",
+      "Value": "female with offspring",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -2555,7 +2555,7 @@
     },
     {
       "Id": 86,
-      "Name": "dormant",
+      "Value": "dormant",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -2585,7 +2585,7 @@
     },
     {
       "Id": 87,
-      "Name": "heard",
+      "Value": "heard",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -2615,7 +2615,7 @@
     },
     {
       "Id": 88,
-      "Name": "in breeding colours",
+      "Value": "in breeding colours",
       "Localized": true,
       "Category": {
         "Id": 3,
@@ -2645,7 +2645,7 @@
     },
     {
       "Id": 89,
-      "Name": "in water",
+      "Value": "in water",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -2675,7 +2675,7 @@
     },
     {
       "Id": 90,
-      "Name": "dispute between males",
+      "Value": "dispute between males",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -2705,7 +2705,7 @@
     },
     {
       "Id": 91,
-      "Name": "steady course, regular diving",
+      "Value": "steady course, regular diving",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -2735,7 +2735,7 @@
     },
     {
       "Id": 92,
-      "Name": "slow movement, long periods on the surface",
+      "Value": "slow movement, long periods on the surface",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -2765,7 +2765,7 @@
     },
     {
       "Id": 93,
-      "Name": "approaching boat",
+      "Value": "approaching boat",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -2795,7 +2795,7 @@
     },
     {
       "Id": 94,
-      "Name": "winter habitat",
+      "Value": "winter habitat",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -2825,7 +2825,7 @@
     },
     {
       "Id": 95,
-      "Name": "building nest/used nest/nest",
+      "Value": "building nest/used nest/nest",
       "Localized": true,
       "Category": {
         "Id": 2,
@@ -2855,7 +2855,7 @@
     },
     {
       "Id": 96,
-      "Name": "shot/killed",
+      "Value": "shot/killed",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -2885,7 +2885,7 @@
     },
     {
       "Id": 97,
-      "Name": "sunbathing",
+      "Value": "sunbathing",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -2915,7 +2915,7 @@
     },
     {
       "Id": 98,
-      "Name": "trace of adult with offspring",
+      "Value": "trace of adult with offspring",
       "Localized": true,
       "Category": {
         "Id": 6,
@@ -2945,7 +2945,7 @@
     },
     {
       "Id": 100,
-      "Name": "unsteady course/irregualr diving",
+      "Value": "unsteady course/irregualr diving",
       "Localized": true,
       "Category": {
         "Id": 4,
@@ -2975,7 +2975,7 @@
     },
     {
       "Id": 101,
-      "Name": "breeding ground or offspring",
+      "Value": "breeding ground or offspring",
       "Localized": true,
       "Category": {
         "Id": 1,
@@ -3005,7 +3005,7 @@
     },
     {
       "Id": 102,
-      "Name": "killed by oil",
+      "Value": "killed by oil",
       "Localized": true,
       "Category": {
         "Id": 7,
@@ -3035,7 +3035,7 @@
     },
     {
       "Id": 103,
-      "Name": "tracks from climbing",
+      "Value": "tracks from climbing",
       "Localized": true,
       "Category": {
         "Id": 6,

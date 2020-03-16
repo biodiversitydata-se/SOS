@@ -204,7 +204,7 @@ namespace SOS.Import.Factories.FieldMappings
                 values.Add(new FieldMappingValue
                 {
                     Id = area.Id,
-                    Name = area.Name,
+                    Value = area.Name,
                     Localized = false,
                     Extra = new { AreaDatasetId = area.AreaType, FeatureId = area.FeatureId }
                 });

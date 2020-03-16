@@ -72,17 +72,17 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             sb.AppendLine("{");
             foreach (var fieldMappingValue in fieldMapping.Values)
             {
-                if (fieldMappingValue.Name == "")
+                if (fieldMappingValue.Value == "")
                     continue;
 
                 sb.AppendLine("    /// <summary>");
-                sb.AppendLine($"   /// {CapitalizeFirstChar(fieldMappingValue.Name)}.");
+                sb.AppendLine($"   /// {CapitalizeFirstChar(fieldMappingValue.Value)}.");
                 if (fieldMappingValue.Localized)
                 {
                     sb.AppendLine($"   /// ({CapitalizeFirstChar(fieldMappingValue.Translations.Single(m => m.CultureCode == Cultures.sv_SE).Value)})");
                 }
                 sb.AppendLine("    /// </summary>");
-                sb.AppendLine($"    {TrimName(fieldMappingValue.Name)} = {fieldMappingValue.Id},");
+                sb.AppendLine($"    {TrimName(fieldMappingValue.Value)} = {fieldMappingValue.Id},");
                 sb.AppendLine();
             }
             sb.AppendLine("}");

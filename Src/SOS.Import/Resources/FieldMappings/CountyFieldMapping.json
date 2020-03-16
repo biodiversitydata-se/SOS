@@ -5,7 +5,7 @@
   "Values": [
     {
       "Id": 1,
-      "Name": "Blekinge",
+      "Value": "Blekinge",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -14,7 +14,7 @@
     },
     {
       "Id": 2,
-      "Name": "Dalarna",
+      "Value": "Dalarna",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -23,7 +23,7 @@
     },
     {
       "Id": 3,
-      "Name": "Gotland",
+      "Value": "Gotland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -32,7 +32,7 @@
     },
     {
       "Id": 4,
-      "Name": "Gävleborg",
+      "Value": "Gävleborg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -41,7 +41,7 @@
     },
     {
       "Id": 5,
-      "Name": "Halland",
+      "Value": "Halland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -50,7 +50,7 @@
     },
     {
       "Id": 6,
-      "Name": "Jämtland",
+      "Value": "Jämtland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -59,7 +59,7 @@
     },
     {
       "Id": 7,
-      "Name": "Jönköping",
+      "Value": "Jönköping",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -68,7 +68,7 @@
     },
     {
       "Id": 8,
-      "Name": "Kalmar",
+      "Value": "Kalmar",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -77,7 +77,7 @@
     },
     {
       "Id": 9,
-      "Name": "Kronoberg",
+      "Value": "Kronoberg",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -86,7 +86,7 @@
     },
     {
       "Id": 10,
-      "Name": "Norrbotten",
+      "Value": "Norrbotten",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -95,7 +95,7 @@
     },
     {
       "Id": 11,
-      "Name": "Skåne",
+      "Value": "Skåne",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -104,7 +104,7 @@
     },
     {
       "Id": 12,
-      "Name": "Stockholm",
+      "Value": "Stockholm",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -113,7 +113,7 @@
     },
     {
       "Id": 13,
-      "Name": "Södermanland",
+      "Value": "Södermanland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -122,7 +122,7 @@
     },
     {
       "Id": 14,
-      "Name": "Uppsala",
+      "Value": "Uppsala",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -131,7 +131,7 @@
     },
     {
       "Id": 15,
-      "Name": "Värmland",
+      "Value": "Värmland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -140,7 +140,7 @@
     },
     {
       "Id": 16,
-      "Name": "Västerbotten",
+      "Value": "Västerbotten",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -149,7 +149,7 @@
     },
     {
       "Id": 17,
-      "Name": "Östergötland",
+      "Value": "Östergötland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -158,7 +158,7 @@
     },
     {
       "Id": 18,
-      "Name": "Västernorrland",
+      "Value": "Västernorrland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -167,7 +167,7 @@
     },
     {
       "Id": 19,
-      "Name": "Västmanland",
+      "Value": "Västmanland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -176,7 +176,7 @@
     },
     {
       "Id": 20,
-      "Name": "Västra Götaland",
+      "Value": "Västra Götaland",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
@@ -185,7 +185,7 @@
     },
     {
       "Id": 21,
-      "Name": "Örebro",
+      "Value": "Örebro",
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,

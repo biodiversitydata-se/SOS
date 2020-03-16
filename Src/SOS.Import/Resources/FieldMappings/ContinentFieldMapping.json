@@ -5,37 +5,37 @@
   "Values": [
     {
       "Id": 0,
-      "Name": "Africa",
+      "Value": "Africa",
       "Localized": false
     },
     {
       "Id": 1,
-      "Name": "Antarctica",
+      "Value": "Antarctica",
       "Localized": false
     },
     {
       "Id": 2,
-      "Name": "Asia",
+      "Value": "Asia",
       "Localized": false
     },
     {
       "Id": 3,
-      "Name": "Oceania",
+      "Value": "Oceania",
       "Localized": false
     },
     {
       "Id": 4,
-      "Name": "Europe",
+      "Value": "Europe",
       "Localized": false
     },
     {
       "Id": 5,
-      "Name": "North America",
+      "Value": "North America",
       "Localized": false
     },
     {
       "Id": 6,
-      "Name": "South America",
+      "Value": "South America",
       "Localized": false
     }
   ],

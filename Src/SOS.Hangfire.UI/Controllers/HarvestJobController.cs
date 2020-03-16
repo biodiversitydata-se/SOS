@@ -63,39 +63,39 @@ namespace SOS.Hangfire.UI.Controllers
         }
         #endregion Clam Tree Portal
 
-        #region Geo
+        #region Areas
         /// <inheritdoc />
-        [HttpPost("Geo/Schedule/Daily")]
+        [HttpPost("Areas/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailyGeoHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        public IActionResult AddDailyGeoAreasHarvestJob([FromQuery]int hour, [FromQuery]int minute)
         {
             try
             {
-                RecurringJob.AddOrUpdate<IGeoHarvestJob>(nameof(IGeoHarvestJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
-                return new OkObjectResult("Geo harvest job added");
+                RecurringJob.AddOrUpdate<IGeoAreasHarvestJob>(nameof(IGeoAreasHarvestJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("Areas harvest job added");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Adding geo harvest job failed");
+                _logger.LogError(e, "Adding areas harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
-        [HttpPost("Geo/Run")]
+        [HttpPost("Areas/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunGeoHarvestJob()
+        public IActionResult RunGeoAreasHarvestJob()
         {
             try
             {
-                BackgroundJob.Enqueue<IGeoHarvestJob>(job => job.RunAsync());
-                return new OkObjectResult("Started geo harvest job");
+                BackgroundJob.Enqueue<IGeoAreasHarvestJob>(job => job.RunAsync());
+                return new OkObjectResult("Started areas harvest job");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running geo harvest job failed");
+                _logger.LogError(e, "Running areas harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -217,7 +217,7 @@ namespace SOS.Hangfire.UI.Controllers
 
         #region FieldMapping
         /// <inheritdoc />
-        [HttpPost("ImportFieldMapping/Run")]
+        [HttpPost("FieldMapping/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult RunImportFieldMappingJob()

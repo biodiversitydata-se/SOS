@@ -5,57 +5,57 @@
   "Values": [
     {
       "Id": 0,
-      "Name": "HumanObservation",
+      "Value": "HumanObservation",
       "Localized": false
     },
     {
       "Id": 1,
-      "Name": "PreservedSpecimen",
+      "Value": "PreservedSpecimen",
       "Localized": false
     },
     {
       "Id": 2,
-      "Name": "FossilSpecimen",
+      "Value": "FossilSpecimen",
       "Localized": false
     },
     {
       "Id": 3,
-      "Name": "LivingSpecimen",
+      "Value": "LivingSpecimen",
       "Localized": false
     },
     {
       "Id": 4,
-      "Name": "MaterialSample",
+      "Value": "MaterialSample",
       "Localized": false
     },
     {
       "Id": 5,
-      "Name": "Event",
+      "Value": "Event",
       "Localized": false
     },
     {
       "Id": 6,
-      "Name": "MachineObservation",
+      "Value": "MachineObservation",
       "Localized": false
     },
     {
       "Id": 7,
-      "Name": "Taxon",
+      "Value": "Taxon",
       "Localized": false
     },
     {
       "Id": 8,
-      "Name": "Occurrence",
+      "Value": "Occurrence",
       "Localized": false
     },
     {
       "Id": 9,
-      "Name": "Literature",
+      "Value": "Literature",
       "Localized": false
     },
     {
       "Id": 10,
-      "Name": "Unknown",
+      "Value": "Unknown",
       "Localized": false
     }
   ],

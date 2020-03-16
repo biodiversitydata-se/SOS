@@ -22,13 +22,13 @@ namespace SOS.Import.Factories.FieldMappings
             // Vocabulary from https://dwc.tdwg.org/terms/#dwc:continent
             var fieldMappingValues = new List<FieldMappingValue>
             {
-                new FieldMappingValue {Id = 0, Name = "Africa"},
-                new FieldMappingValue {Id = 1, Name = "Antarctica"},
-                new FieldMappingValue {Id = 2, Name = "Asia"},
-                new FieldMappingValue {Id = 3, Name = "Oceania"},
-                new FieldMappingValue {Id = 4, Name = "Europe"},
-                new FieldMappingValue {Id = 5, Name = "North America"},
-                new FieldMappingValue {Id = 6, Name = "South America"}
+                new FieldMappingValue {Id = 0, Value = "Africa"},
+                new FieldMappingValue {Id = 1, Value = "Antarctica"},
+                new FieldMappingValue {Id = 2, Value = "Asia"},
+                new FieldMappingValue {Id = 3, Value = "Oceania"},
+                new FieldMappingValue {Id = 4, Value = "Europe"},
+                new FieldMappingValue {Id = 5, Value = "North America"},
+                new FieldMappingValue {Id = 6, Value = "South America"}
             };
 
             return fieldMappingValues;

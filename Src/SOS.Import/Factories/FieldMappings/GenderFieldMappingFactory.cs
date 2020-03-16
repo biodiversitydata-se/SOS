@@ -77,20 +77,20 @@ namespace SOS.Import.Factories.FieldMappings
                 {
                     new ExternalSystemMappingValue
                     {
-                        Value = "male", SosId = fieldMappingValues.Single(m => m.Name == "male").Id
+                        Value = "male", SosId = fieldMappingValues.Single(m => m.Value == "male").Id
                     },
                     new ExternalSystemMappingValue
                     {
-                        Value = "female", SosId = fieldMappingValues.Single(m => m.Name == "female").Id
+                        Value = "female", SosId = fieldMappingValues.Single(m => m.Value == "female").Id
                     },
                     new ExternalSystemMappingValue
                     {
                         Value = "hermaphrodite",
-                        SosId = fieldMappingValues.Single(m => m.Name == "hermaphroditic").Id
+                        SosId = fieldMappingValues.Single(m => m.Value == "hermaphroditic").Id
                     },
                     new ExternalSystemMappingValue
                     {
-                        Value = "undetermined", SosId = fieldMappingValues.Single(m => m.Name == "empty").Id
+                        Value = "undetermined", SosId = fieldMappingValues.Single(m => m.Value == "empty").Id
                     }
                 }
             };

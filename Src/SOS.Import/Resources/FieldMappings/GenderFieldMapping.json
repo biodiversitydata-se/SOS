@@ -5,7 +5,7 @@
   "Values": [
     {
       "Id": 0,
-      "Name": "empty",
+      "Value": "empty",
       "Localized": true,
       "Translations": [
         {
@@ -20,7 +20,7 @@
     },
     {
       "Id": 1,
-      "Name": "male",
+      "Value": "male",
       "Localized": true,
       "Translations": [
         {
@@ -35,7 +35,7 @@
     },
     {
       "Id": 2,
-      "Name": "female",
+      "Value": "female",
       "Localized": true,
       "Translations": [
         {
@@ -50,7 +50,7 @@
     },
     {
       "Id": 3,
-      "Name": "female coloured",
+      "Value": "female coloured",
       "Localized": true,
       "Translations": [
         {
@@ -65,7 +65,7 @@
     },
     {
       "Id": 4,
-      "Name": "in pair",
+      "Value": "in pair",
       "Localized": true,
       "Translations": [
         {
@@ -80,7 +80,7 @@
     },
     {
       "Id": 5,
-      "Name": "worker",
+      "Value": "worker",
       "Localized": true,
       "Translations": [
         {
@@ -95,7 +95,7 @@
     },
     {
       "Id": 6,
-      "Name": "hermaphroditic",
+      "Value": "hermaphroditic",
       "Localized": true,
       "Translations": [
         {

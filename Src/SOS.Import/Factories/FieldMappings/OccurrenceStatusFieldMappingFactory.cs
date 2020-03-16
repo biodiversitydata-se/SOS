@@ -15,8 +15,8 @@ namespace SOS.Import.Factories.FieldMappings
         {
             var fieldMappingValues = new List<FieldMappingValue>
             {
-                new FieldMappingValue {Id = 0, Name = "present"},
-                new FieldMappingValue {Id = 1, Name = "absent"}
+                new FieldMappingValue {Id = 0, Value = "present"},
+                new FieldMappingValue {Id = 1, Value = "absent"}
             };
              
             return fieldMappingValues;

@@ -15,8 +15,8 @@ namespace SOS.Import.Factories.FieldMappings
         {
             var fieldMappingValues = new List<FieldMappingValue>
             {
-                new FieldMappingValue {Id = 0, Name = "Free usage"},
-                new FieldMappingValue {Id = 1, Name = "Not for public usage"}
+                new FieldMappingValue {Id = 0, Value = "Free usage"},
+                new FieldMappingValue {Id = 1, Value = "Not for public usage"}
             };
 
             return fieldMappingValues;

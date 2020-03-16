@@ -15,18 +15,18 @@ namespace SOS.Import.Factories.FieldMappings
         {
             var fieldMappingValues = new List<FieldMappingValue>
             {
-                new FieldMappingValue {Id = 0, Name = "Collection"},
-                new FieldMappingValue {Id = 1, Name = "Dataset"},
-                new FieldMappingValue {Id = 2, Name = "Event"},
-                new FieldMappingValue {Id = 3, Name = "Image"},
-                new FieldMappingValue {Id = 4, Name = "InteractiveResource"},
-                new FieldMappingValue {Id = 5, Name = "MovingImage"},
-                new FieldMappingValue {Id = 6, Name = "PhysicalObject"},
-                new FieldMappingValue {Id = 7, Name = "Service"},
-                new FieldMappingValue {Id = 8, Name = "Software"},
-                new FieldMappingValue {Id = 9, Name = "Sound"},
-                new FieldMappingValue {Id = 10, Name = "StillImage"},
-                new FieldMappingValue {Id = 11, Name = "Text"}
+                new FieldMappingValue {Id = 0, Value = "Collection"},
+                new FieldMappingValue {Id = 1, Value = "Dataset"},
+                new FieldMappingValue {Id = 2, Value = "Event"},
+                new FieldMappingValue {Id = 3, Value = "Image"},
+                new FieldMappingValue {Id = 4, Value = "InteractiveResource"},
+                new FieldMappingValue {Id = 5, Value = "MovingImage"},
+                new FieldMappingValue {Id = 6, Value = "PhysicalObject"},
+                new FieldMappingValue {Id = 7, Value = "Service"},
+                new FieldMappingValue {Id = 8, Value = "Software"},
+                new FieldMappingValue {Id = 9, Value = "Sound"},
+                new FieldMappingValue {Id = 10, Value = "StillImage"},
+                new FieldMappingValue {Id = 11, Value = "Text"}
             };
 
             return fieldMappingValues;

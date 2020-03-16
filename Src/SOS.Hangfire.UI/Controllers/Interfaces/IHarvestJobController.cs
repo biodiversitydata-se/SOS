@@ -27,13 +27,13 @@ namespace SOS.Hangfire.UI.Controllers.Interfaces
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult AddDailyGeoHarvestJob(int hour, int minute);
+        IActionResult AddDailyGeoAreasHarvestJob(int hour, int minute);
 
         /// <summary>
         /// Run geo data harvest
         /// </summary>
         /// <returns></returns>
-        IActionResult RunGeoHarvestJob();
+        IActionResult RunGeoAreasHarvestJob();
 
         /// <summary>
         /// Add daily harvest of sightings from KUL
