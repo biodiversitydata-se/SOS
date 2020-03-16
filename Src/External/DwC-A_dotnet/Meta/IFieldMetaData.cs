@@ -25,5 +25,7 @@ namespace DwC_A.Meta
         /// <param name="term">Darwin Core Term</param>
         /// <returns>String representation of field</returns>
         FieldType this[string term] { get; }
+
+        bool TryGetTermIndex(string term, out int index);
     }
 }

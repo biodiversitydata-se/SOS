@@ -8,6 +8,7 @@
         SpeciesPortal = 1,
         ClamPortal = 2,
         KUL = 4,
-        TaxonService = 8
+        Dwc = 8,
+        TaxonService = 16
     }
 }

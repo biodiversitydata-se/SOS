@@ -28,5 +28,7 @@ namespace DwC_A
         /// <param name="index">Index into collection of fields</param>
         /// <returns>Field value</returns>
         string this[int index] { get; }
+
+        bool TryGetValue(string term, out string val);
     }
 }
