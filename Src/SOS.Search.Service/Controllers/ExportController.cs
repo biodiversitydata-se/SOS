@@ -38,7 +38,12 @@ namespace SOS.Search.Service.Controllers
             {
                 var emailRegex = new Regex(@"^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
 
-                if (!string.IsNullOrEmpty(email) && !emailRegex.IsMatch(email))
+                if (string.IsNullOrEmpty(email))
+                {
+                    return BadRequest("You must provide a e-mail address");
+                }
+
+                if (!emailRegex.IsMatch(email))
                 {
                     return BadRequest("Not a valid e-mail");
                 }

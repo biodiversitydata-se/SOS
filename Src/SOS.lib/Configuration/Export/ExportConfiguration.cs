@@ -26,5 +26,10 @@ namespace SOS.Lib.Configuration.Export
         /// Host
         /// </summary>
         public MongoDbConfiguration ProcessedDbConfiguration { get; set; }
+
+        /// <summary>
+        /// Zend to config
+        /// </summary>
+        public ZendToConfiguration ZendToConfiguration { get; set; }
     }
 }

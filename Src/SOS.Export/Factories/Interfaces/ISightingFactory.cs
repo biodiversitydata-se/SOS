@@ -12,12 +12,21 @@ namespace SOS.Export.Factories.Interfaces
     public interface ISightingFactory
     {
         /// <summary>
-        /// Create a export file
+        /// Create a export file and upload it to local storage
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<string> ExportDWCAsync(ExportFilter filter, IJobCancellationToken cancellationToken);
+        Task<bool> ExportDWCAsync(ExportFilter filter, IJobCancellationToken cancellationToken);
+
+        /// <summary>
+        /// Create a export file and use ZendTo to send it to user
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="emailAddress"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<bool> ExportDWCAsync(ExportFilter filter, string emailAddress, IJobCancellationToken cancellationToken);
 
         /// <summary>
         /// Export all sightings as DwC-A.

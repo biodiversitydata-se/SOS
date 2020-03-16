@@ -11,10 +11,8 @@ using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Jobs.Export;
-using SOS.Lib.Services;
-using SOS.Lib.Services.Interfaces;
+
 
 namespace SOS.Export.IoC.Modules
 {
@@ -36,9 +34,9 @@ namespace SOS.Export.IoC.Modules
         {
             // Add configuration
             builder.RegisterInstance(Configuration.BlobStorageConfiguration).As<BlobStorageConfiguration>().SingleInstance();
-            builder.RegisterInstance(Configuration.EmailConfiguration).As<EmailConfiguration>().SingleInstance();
             builder.RegisterInstance(Configuration.FileDestination).As<FileDestination>().SingleInstance();
-            
+            builder.RegisterInstance(Configuration.ZendToConfiguration).As<ZendToConfiguration>().SingleInstance();
+
             // Init mongodb
             var exportSettings = Configuration.ProcessedDbConfiguration.GetMongoDbSettings();
             var exportClient = new ExportClient(exportSettings, Configuration.ProcessedDbConfiguration.DatabaseName, Configuration.ProcessedDbConfiguration.BatchSize);
@@ -56,7 +54,6 @@ namespace SOS.Export.IoC.Modules
 
             // Services
             builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().InstancePerLifetimeScope();
-            builder.RegisterType<EmailService>().As<IEmailService>().InstancePerLifetimeScope();
             builder.RegisterType<FileService>().As<IFileService>().InstancePerLifetimeScope();
             builder.RegisterType<ZendToService>().As<IZendToService>().InstancePerLifetimeScope();
 
