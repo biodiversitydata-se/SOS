@@ -6,18 +6,21 @@ using System.Threading.Tasks;
 using DwC_A;
 using DwC_A.Terms;
 using FluentAssertions;
+using SOS.Lib.Enums;
+using SOS.Lib.Enums.FieldMappingValues;
+using SOS.Lib.Models.Processed.Sighting;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.DwcImport
 {
     public class ImportDwcFileIntegrationTests
     {
-        private const string archiveFileName = "./resources/psophus-stridulus-lifewatch-occurrences-dwca.zip";
+        private const string ArchiveFileName = "./resources/psophus-stridulus-lifewatch-occurrences-dwca.zip";
 
         [Fact]
         public void ShouldOpenCoreFile()
         {
-            using (var archive = new ArchiveReader(archiveFileName))
+            using (var archive = new ArchiveReader(ArchiveFileName))
             {
                 foreach (var row in archive.CoreFile.Rows)
                 {
@@ -29,7 +32,7 @@ namespace SOS.Import.IntegrationTests.DwcImport
         [Fact]
         public async Task ShouldOpenCoreFileAsync()
         {
-            using (var archive = new ArchiveReader(archiveFileName))
+            using (var archive = new ArchiveReader(ArchiveFileName))
             {
                 await foreach (IRow row in archive.GetAsyncCoreFile().GetDataRowsAsync())
                 {
@@ -45,7 +48,7 @@ namespace SOS.Import.IntegrationTests.DwcImport
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var valid = TryValidateDwCACoreFile(archiveFileName, out var nrRows, out _);
+            var valid = TryValidateDwCACoreFile(ArchiveFileName, out var nrRows, out _);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -60,7 +63,7 @@ namespace SOS.Import.IntegrationTests.DwcImport
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var records = ReadArchive(archiveFileName);
+            var records = ReadArchive(ArchiveFileName);
             
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -132,6 +135,172 @@ namespace SOS.Import.IntegrationTests.DwcImport
             return true;
         }
     }
+
+    public class ProcessedSightingFactory
+    {
+        public static ProcessedSighting CreateFromDwcRow(IRow row)
+        {
+            if (row == null)
+            {
+                return null;
+            }
+
+            var obs = new ProcessedSighting(DataProvider.Dwc);
+            
+            if (row.TryGetValue(Terms.accessRights, out string accessRights))
+            {
+                obs.AccessRightsId = ProcessedFieldMapValue.Create(accessRights); // todo try parse field mapped value.
+                //AccessRightsId.FreeUsage
+                //AccessRightsId.NotForPublicUsage
+            }
+
+            if (row.TryGetValue(Terms.basisOfRecord, out string basisOfRecord))
+            {
+                obs.BasisOfRecordId = ProcessedFieldMapValue.Create(basisOfRecord); // todo try parse field mapped value.
+                //BasisOfRecordId.Occurrence
+                //BasisOfRecordId.PreservedSpecimen
+                //BasisOfRecordId.MachineObservation
+            }
+            
+            if (row.TryGetValue(Terms.collectionCode, out string collectionCode))
+            {
+                obs.CollectionCode = collectionCode;
+            }
+
+            if (row.TryGetValue(Terms.collectionID, out string collectionId))
+            {
+                obs.CollectionId = collectionId;
+            }
+
+            if (row.TryGetValue(Terms.datasetID, out string datasetId))
+            {
+                obs.DatasetId = datasetId;
+            }
+
+            if (row.TryGetValue(Terms.datasetName, out string datasetName))
+            {
+                obs.DatasetName = datasetName;
+            }
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Event
+            //-----------------------------------------------------------------------------------------------------------
+            // Not handled:
+            //obs.Event.BiotopeDescription = verbatim.BiotopeDescription;
+            //obs.Event.QuantityOfSubstrate = verbatim.QuantityOfSubstrate;
+
+
+            obs.Event = new ProcessedEvent();
+            if (row.TryGetValue(Terms.samplingProtocol, out string samplingProtocol))
+            {
+                obs.Event.SamplingProtocol = samplingProtocol;
+            }
+
+            
+            //obs.Event.EndDate = verbatim.EndDate?.ToUniversalTime();
+            //obs.Event.StartDate = verbatim.StartDate?.ToUniversalTime();
+            //obs.Event.SubstrateSpeciesDescription = verbatim.SubstrateSpeciesDescription;
+            //obs.Event.SubstrateDescription = GetSubstrateDescription(verbatim, taxa);
+            //obs.Event.VerbatimEndDate = verbatim.EndDate;
+            //obs.Event.VerbatimStartDate = verbatim.StartDate;
+
+
+
+            //var taxonId = verbatim.TaxonId ?? -1;
+
+            //var hasPosition = (verbatim.Site?.XCoord ?? 0) > 0 && (verbatim.Site?.YCoord ?? 0) > 0;
+
+            //if (taxa.TryGetValue(taxonId, out var taxon))
+            //{
+            //    taxon.IndividualId = verbatim.URL;
+            //}
+
+            //var obs = new ProcessedSighting(DataProvider.Dwc);
+            //obs.Event = new ProcessedEvent();
+            //obs.Event.BiotopeDescription = verbatim.BiotopeDescription;
+            //obs.Event.EndDate = verbatim.EndDate?.ToUniversalTime();
+            //obs.Event.QuantityOfSubstrate = verbatim.QuantityOfSubstrate;
+            //obs.Event.SamplingProtocol = GetSamplingProtocol(verbatim.Projects);
+            //obs.Event.StartDate = verbatim.StartDate?.ToUniversalTime();
+            //obs.Event.SubstrateSpeciesDescription = verbatim.SubstrateSpeciesDescription;
+            //obs.Event.SubstrateDescription = GetSubstrateDescription(verbatim, taxa);
+            //obs.Event.VerbatimEndDate = verbatim.EndDate;
+            //obs.Event.VerbatimStartDate = verbatim.StartDate;
+            //obs.Identification = new ProcessedIdentification();
+            //obs.Identification.IdentifiedBy = verbatim.VerifiedBy;
+            //obs.Identification.Validated = new[] { 60, 61, 62, 63, 64, 65 }.Contains(verbatim.ValidationStatus?.Id ?? 0);
+            //obs.Identification.UncertainDetermination = verbatim.UnsureDetermination;
+            //obs.InformationWithheld = null;
+            //obs.IsInEconomicZoneOfSweden = hasPosition;
+            //obs.Language = Language.Swedish;
+            //obs.Location = new ProcessedLocation();
+            //obs.Location.ContinentId = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe };
+            //obs.Location.CoordinateUncertaintyInMeters = verbatim.Site?.Accuracy;
+            //obs.Location.CountryId = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden };
+            //obs.Location.CountryCode = CountryCode.Sweden;
+            //obs.Location.DecimalLatitude = verbatim.Site?.Point?.Coordinates?.Latitude ?? 0;
+            //obs.Location.DecimalLongitude = verbatim.Site?.Point?.Coordinates?.Longitude ?? 0;
+            //obs.Location.GeodeticDatum = GeodeticDatum.Wgs84;
+            //obs.Location.Locality = verbatim.Site?.Name;
+            //obs.Location.Id = $"urn:lsid:artportalen.se:site:{verbatim.Site?.Id}";
+            //obs.Location.MaximumDepthInMeters = verbatim.MaxDepth;
+            //obs.Location.MaximumElevationInMeters = verbatim.MaxHeight;
+            //obs.Location.MinimumDepthInMeters = verbatim.MinDepth;
+            //obs.Location.MinimumElevationInMeters = verbatim.MinHeight;
+            //obs.Location.Point = verbatim.Site?.Point;
+            //obs.Location.PointWithBuffer = verbatim.Site?.PointWithBuffer;
+            //obs.Location.VerbatimLatitude = hasPosition ? verbatim.Site.YCoord : 0;
+            //obs.Location.VerbatimLongitude = hasPosition ? verbatim.Site.XCoord : 0;
+            //obs.Location.VerbatimCoordinateSystem = "EPSG:3857";
+            //obs.Modified = verbatim.EndDate ?? verbatim.ReportedDate;
+            //obs.Occurrence = new ProcessedOccurrence();
+            //obs.Occurrence.AssociatedMedia = verbatim.HasImages
+            //    ? $"http://www.artportalen.se/sighting/{verbatim.Id}#SightingDetailImages"
+            //    : "";
+            //obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatim);
+            //obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon);
+            //obs.Occurrence.CatalogNumber = verbatim.Id.ToString();
+            //obs.Occurrence.Id = $"urn:lsid:artportalen.se:Sighting:{verbatim.Id}";
+            //obs.Occurrence.IndividualCount = verbatim.Quantity?.ToString() ?? "";
+            //obs.Occurrence.IsNaturalOccurrence = !verbatim.Unspontaneous;
+            //obs.Occurrence.IsNeverFoundObservation = verbatim.NotPresent;
+            //obs.Occurrence.IsNotRediscoveredObservation = verbatim.NotRecovered;
+            //obs.Occurrence.IsPositiveObservation = !(verbatim.NotPresent || verbatim.NotRecovered);
+            //obs.Occurrence.OrganismQuantity = verbatim.Quantity;
+            //obs.Occurrence.RecordedBy = verbatim.Observers;
+            //obs.Occurrence.RecordNumber = verbatim.Label;
+            //obs.Occurrence.Remarks = verbatim.Comment;
+            //obs.Occurrence.OccurrenceStatusId = verbatim.NotPresent || verbatim.NotRecovered
+            //    ? new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Absent }
+            //    : new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Present };
+            //obs.Occurrence.URL = $"http://www.artportalen.se/sighting/{verbatim.Id}";
+            //obs.OwnerInstitutionCode = verbatim.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
+            //obs.Projects = verbatim.Projects?.ToProcessedProjects();
+            //obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatim.HiddenByProvider, verbatim.ProtectedBySystem);
+            //obs.ReportedBy = verbatim.ReportedBy;
+            //obs.ReportedDate = verbatim.ReportedDate;
+            //obs.RightsHolder = verbatim.RightsHolder ?? verbatim.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
+            //obs.Taxon = taxon;
+            //obs.TypeId = null;
+
+            //// Get field mapping values
+            //obs.Occurrence.GenderId = GetSosId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Gender]);
+            //obs.Occurrence.ActivityId = GetSosId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]);
+            //obs.Location.CountyId = GetSosId(verbatim.Site?.County?.Id, fieldMappings[FieldMappingFieldId.County]);
+            //obs.Location.MunicipalityId = GetSosId(verbatim.Site?.Municipality?.Id, fieldMappings[FieldMappingFieldId.Municipality]);
+            //obs.Location.ProvinceId = GetSosId(verbatim.Site?.Province?.Id, fieldMappings[FieldMappingFieldId.Province]);
+            //obs.Location.ParishId = GetSosId(verbatim.Site?.Parish?.Id, fieldMappings[FieldMappingFieldId.Parish]);
+            //obs.Event.BiotopeId = GetSosId(verbatim?.Bioptope?.Id, fieldMappings[FieldMappingFieldId.Biotope]);
+            //obs.Event.SubstrateId = GetSosId(verbatim?.Bioptope?.Id, fieldMappings[FieldMappingFieldId.Substrate]);
+            //obs.Identification.ValidationStatusId = GetSosId(verbatim?.ValidationStatus?.Id, fieldMappings[FieldMappingFieldId.ValidationStatus]);
+            //obs.Occurrence.LifeStageId = GetSosId(verbatim?.Stage?.Id, fieldMappings[FieldMappingFieldId.LifeStage]);
+            //obs.OrganizationId = GetSosId(verbatim?.OwnerOrganization?.Id, fieldMappings[FieldMappingFieldId.Organization]);
+            //obs.Occurrence.OrganismQuantityUnitId = GetSosId(verbatim?.Unit?.Id, fieldMappings[FieldMappingFieldId.Unit]);
+            return obs;
+        }
+    }
+
+
 
     public class HarvestDarwinCoreFactory
     {
