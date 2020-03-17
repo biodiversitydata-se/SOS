@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Sighting;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Jobs;

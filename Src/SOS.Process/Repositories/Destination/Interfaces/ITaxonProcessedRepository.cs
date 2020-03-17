@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Process.Repositories.Destination.Interfaces
 {

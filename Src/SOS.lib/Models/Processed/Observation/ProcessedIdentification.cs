@@ -1,7 +1,6 @@
 ﻿using System;
-using SOS.Lib.Models.Shared;
 
-namespace SOS.Lib.Models.Processed.Sighting
+namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// This class contains identification information about sighting identification

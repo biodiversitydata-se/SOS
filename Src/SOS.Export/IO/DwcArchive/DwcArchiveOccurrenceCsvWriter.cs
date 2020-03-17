@@ -15,7 +15,7 @@ using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive

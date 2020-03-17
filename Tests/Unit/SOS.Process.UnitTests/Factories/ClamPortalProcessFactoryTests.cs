@@ -8,7 +8,7 @@ using MongoDB.Bson;
 using Moq;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Process.Factories;

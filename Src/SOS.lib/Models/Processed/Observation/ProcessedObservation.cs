@@ -5,9 +5,8 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Shared;
 
-namespace SOS.Lib.Models.Processed.Sighting
+namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// This class contains information about a species sighting

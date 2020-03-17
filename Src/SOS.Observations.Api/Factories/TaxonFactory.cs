@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Observations.Api.Factories.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;

@@ -8,7 +8,7 @@ using Moq;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using  SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Process.Factories;

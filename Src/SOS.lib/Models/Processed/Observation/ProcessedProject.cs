@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SOS.Lib.Models.Processed.Sighting
+namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// Not defined in Darwin Core.

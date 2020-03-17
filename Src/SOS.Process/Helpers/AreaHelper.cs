@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Models.Cache;
 using SOS.Process.Repositories.Destination.Interfaces;

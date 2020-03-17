@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.TestHelpers.Helpers;
 
 namespace SOS.Lib.UnitTests.TestHelpers.Fixtures

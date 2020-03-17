@@ -205,7 +205,7 @@ namespace SOS.Import.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var sightingFactory = new ArtportalenObservationFactory(
+            var observationFactory = new ArtportalenObservationFactory(
                 _artportalenConfiguration,
                 _metadataRepositoryMock.Object,
                 _projectRepositoryMock.Object,
@@ -218,7 +218,7 @@ namespace SOS.Import.UnitTests.Factories
                 _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
 
-            var result = await sightingFactory.HarvestSightingsAsync(JobCancellationToken.Null);
+            var result = await observationFactory.HarvestSightingsAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -241,7 +241,7 @@ namespace SOS.Import.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var sightingFactory = new ArtportalenObservationFactory(
+            var observationFactory = new ArtportalenObservationFactory(
                 _artportalenConfiguration,
                 _metadataRepositoryMock.Object,
                 _projectRepositoryMock.Object,
@@ -254,7 +254,7 @@ namespace SOS.Import.UnitTests.Factories
                 _speciesCollectionItemRepository.Object,
                 _loggerMock.Object);
 
-            var result = await sightingFactory.HarvestSightingsAsync(JobCancellationToken.Null);
+            var result = await observationFactory.HarvestSightingsAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

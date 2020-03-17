@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Factories.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
@@ -13,7 +13,7 @@ using SOS.Observations.Api.Repositories.Interfaces;
 namespace SOS.Observations.Api.Factories
 {
     /// <summary>
-    /// Sighting factory class
+    /// Observation factory class
     /// </summary>
     public class ObservationFactory : Interfaces.IObservationFactory
     {
@@ -49,7 +49,7 @@ namespace SOS.Observations.Api.Factories
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get chunk of sightings");
+                _logger.LogError(e, "Failed to get chunk of observations");
                 return null;
             }
         }
@@ -60,28 +60,28 @@ namespace SOS.Observations.Api.Factories
 
             if (filter.OutputFields == null || !filter.OutputFields.Any()) // ProcessedObservation objects is returned wen OutputFields is not used.
             {
-                var sightings = processedObservations.Cast<ProcessedObservation>();
-                foreach (var sighting in sightings)
+                var observations = processedObservations.Cast<ProcessedObservation>();
+                foreach (var observation in observations)
                 {
-                    ResolveFieldMappedValue(sighting.BasisOfRecordId, FieldMappingFieldId.BasisOfRecord);
-                    ResolveFieldMappedValue(sighting.TypeId, FieldMappingFieldId.Type);
-                    ResolveFieldMappedValue(sighting.AccessRightsId, FieldMappingFieldId.AccessRights);
-                    ResolveFieldMappedValue(sighting.InstitutionId, FieldMappingFieldId.Institution);
-                    ResolveFieldMappedValue(sighting.Location?.CountyId, FieldMappingFieldId.County);
-                    ResolveFieldMappedValue(sighting.Location?.MunicipalityId, FieldMappingFieldId.Municipality);
-                    ResolveFieldMappedValue(sighting.Location?.ProvinceId, FieldMappingFieldId.Province);
-                    ResolveFieldMappedValue(sighting.Location?.ParishId, FieldMappingFieldId.Parish);
-                    ResolveFieldMappedValue(sighting.Location?.CountryId, FieldMappingFieldId.Country);
-                    ResolveFieldMappedValue(sighting.Location?.ContinentId, FieldMappingFieldId.Continent);
-                    ResolveFieldMappedValue(sighting.Occurrence?.EstablishmentMeansId, FieldMappingFieldId.EstablishmentMeans);
-                    ResolveFieldMappedValue(sighting.Occurrence?.OccurrenceStatusId, FieldMappingFieldId.OccurrenceStatus);
+                    ResolveFieldMappedValue(observation.BasisOfRecordId, FieldMappingFieldId.BasisOfRecord);
+                    ResolveFieldMappedValue(observation.TypeId, FieldMappingFieldId.Type);
+                    ResolveFieldMappedValue(observation.AccessRightsId, FieldMappingFieldId.AccessRights);
+                    ResolveFieldMappedValue(observation.InstitutionId, FieldMappingFieldId.Institution);
+                    ResolveFieldMappedValue(observation.Location?.CountyId, FieldMappingFieldId.County);
+                    ResolveFieldMappedValue(observation.Location?.MunicipalityId, FieldMappingFieldId.Municipality);
+                    ResolveFieldMappedValue(observation.Location?.ProvinceId, FieldMappingFieldId.Province);
+                    ResolveFieldMappedValue(observation.Location?.ParishId, FieldMappingFieldId.Parish);
+                    ResolveFieldMappedValue(observation.Location?.CountryId, FieldMappingFieldId.Country);
+                    ResolveFieldMappedValue(observation.Location?.ContinentId, FieldMappingFieldId.Continent);
+                    ResolveFieldMappedValue(observation.Occurrence?.EstablishmentMeansId, FieldMappingFieldId.EstablishmentMeans);
+                    ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatusId, FieldMappingFieldId.OccurrenceStatus);
                 }
             }
             else // dynamic objects is returned when OutputFields is used
             {
-                foreach (var sighting in processedObservations)
+                foreach (var observation in processedObservations)
                 {
-                    if (sighting is IDictionary<string, object> obs)
+                    if (observation is IDictionary<string, object> obs)
                     {
                         ResolveFieldMappedValue(obs, FieldMappingFieldId.BasisOfRecord, nameof(ProcessedObservation.BasisOfRecordId));
                         ResolveFieldMappedValue(obs, FieldMappingFieldId.Type, nameof(ProcessedObservation.TypeId));
@@ -114,8 +114,8 @@ namespace SOS.Observations.Api.Factories
             string cultureCode = filter.TranslationCultureCode;
             if (filter.OutputFields == null || !filter.OutputFields.Any()) // ProcessedObservation objects is returned wen OutputFields is not used.
             {
-                var sightings = processedObservations.Cast<ProcessedObservation>();
-                ProcessLocalizedFieldMappedReturnValues(sightings, cultureCode);
+                var observations = processedObservations.Cast<ProcessedObservation>();
+                ProcessLocalizedFieldMappedReturnValues(observations, cultureCode);
             }
             else // dynamic objects is returned when OutputFields is used
             {
@@ -127,15 +127,15 @@ namespace SOS.Observations.Api.Factories
             IEnumerable<ProcessedObservation> processedObservations,
             string cultureCode)
         {
-            foreach (var sighting in processedObservations)
+            foreach (var observation in processedObservations)
             {
-                TranslateLocalizedValue(sighting.Occurrence?.ActivityId, FieldMappingFieldId.Activity, cultureCode);
-                TranslateLocalizedValue(sighting.Occurrence?.GenderId, FieldMappingFieldId.Gender, cultureCode);
-                TranslateLocalizedValue(sighting.Occurrence?.LifeStageId, FieldMappingFieldId.LifeStage, cultureCode);
-                TranslateLocalizedValue(sighting.Occurrence?.OrganismQuantityUnitId, FieldMappingFieldId.Unit, cultureCode);
-                TranslateLocalizedValue(sighting.Event?.BiotopeId, FieldMappingFieldId.Biotope, cultureCode);
-                TranslateLocalizedValue(sighting.Event?.SubstrateId, FieldMappingFieldId.Substrate, cultureCode);
-                TranslateLocalizedValue(sighting.Identification?.ValidationStatusId, FieldMappingFieldId.ValidationStatus, cultureCode);
+                TranslateLocalizedValue(observation.Occurrence?.ActivityId, FieldMappingFieldId.Activity, cultureCode);
+                TranslateLocalizedValue(observation.Occurrence?.GenderId, FieldMappingFieldId.Gender, cultureCode);
+                TranslateLocalizedValue(observation.Occurrence?.LifeStageId, FieldMappingFieldId.LifeStage, cultureCode);
+                TranslateLocalizedValue(observation.Occurrence?.OrganismQuantityUnitId, FieldMappingFieldId.Unit, cultureCode);
+                TranslateLocalizedValue(observation.Event?.BiotopeId, FieldMappingFieldId.Biotope, cultureCode);
+                TranslateLocalizedValue(observation.Event?.SubstrateId, FieldMappingFieldId.Substrate, cultureCode);
+                TranslateLocalizedValue(observation.Identification?.ValidationStatusId, FieldMappingFieldId.ValidationStatus, cultureCode);
             }
         }
 
@@ -146,9 +146,9 @@ namespace SOS.Observations.Api.Factories
         {
             try
             {
-                foreach (var sighting in processedObservations)
+                foreach (var observation in processedObservations)
                 {
-                    if (sighting is IDictionary<string, object> obs)
+                    if (observation is IDictionary<string, object> obs)
                     {
                         if (obs.TryGetValue(nameof(ProcessedObservation.Occurrence), out object occurrenceObject))
                         {
@@ -182,15 +182,15 @@ namespace SOS.Observations.Api.Factories
         }
 
         private void ResolveFieldMappedValue(
-            IDictionary<string, object> sightingNode, 
+            IDictionary<string, object> observationNode, 
             FieldMappingFieldId fieldMappingFieldId, 
             string fieldName)
         {
-            if (sightingNode == null) return;
+            if (observationNode == null) return;
 
-            if (sightingNode.ContainsKey(fieldName))
+            if (observationNode.ContainsKey(fieldName))
             {
-                if (sightingNode[fieldName] is IDictionary<string, object> fieldNode && fieldNode.ContainsKey("Value") && fieldNode.ContainsKey("_id"))
+                if (observationNode[fieldName] is IDictionary<string, object> fieldNode && fieldNode.ContainsKey("Value") && fieldNode.ContainsKey("_id"))
                 {
                     int id = (int)fieldNode["_id"];
                     if (id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId && _fieldMappingFactory.TryGetValue(fieldMappingFieldId, id, out var translatedValue))
@@ -225,16 +225,16 @@ namespace SOS.Observations.Api.Factories
         }
 
         private void TranslateLocalizedValue(
-            IDictionary<string, object> sightingNode, 
+            IDictionary<string, object> observationNode, 
             FieldMappingFieldId fieldMappingFieldId, 
             string fieldName,
             string cultureCode)
         {
-            if (sightingNode == null) return;
+            if (observationNode == null) return;
 
-            if (sightingNode.ContainsKey(fieldName))
+            if (observationNode.ContainsKey(fieldName))
             {
-                if (sightingNode[fieldName] is IDictionary<string, object> fieldNode && fieldNode.ContainsKey("Value") && fieldNode.ContainsKey("_id"))
+                if (observationNode[fieldName] is IDictionary<string, object> fieldNode && fieldNode.ContainsKey("Value") && fieldNode.ContainsKey("_id"))
                 {
                     int id = (int)fieldNode["_id"];
                     if (id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId && _fieldMappingFactory.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, id, out var translatedValue))

@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Database;
 using SOS.Observations.Api.Factories;
 using SOS.Observations.Api.Repositories;

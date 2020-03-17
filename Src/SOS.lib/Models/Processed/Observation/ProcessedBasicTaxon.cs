@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
 using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Lib.Models.Processed.Sighting
+namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// This class contains basic taxon taxon information that can

@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Processed.Sighting;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 

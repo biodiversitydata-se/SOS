@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Models.Processed.Sighting;
+﻿using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Process.Models.Cache
 {

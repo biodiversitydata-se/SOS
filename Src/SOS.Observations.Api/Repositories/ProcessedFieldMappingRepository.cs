@@ -23,7 +23,7 @@ namespace SOS.Observations.Api.Repositories
         /// <param name="logger"></param>
         public ProcessedFieldMappingRepository(
             IProcessClient client,
-            ILogger<ProcessBaseRepository<FieldMapping, FieldMappingFieldId>> logger) : base(client, true, logger)
+            ILogger<ProcessBaseRepository<FieldMapping, FieldMappingFieldId>> logger) : base(client, false, logger)
         {
             
         }

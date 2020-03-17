@@ -3,7 +3,7 @@ using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.TestHelpers.Gis;
 using SOS.TestHelpers.Helpers;
 using Xunit;

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Export.Repositories
 {

@@ -8,7 +8,7 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;

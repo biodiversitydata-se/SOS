@@ -6,7 +6,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;

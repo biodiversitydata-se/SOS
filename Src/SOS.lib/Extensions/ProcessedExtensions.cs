@@ -2,7 +2,7 @@
 using System.Linq;
 using SOS.Lib.Constants;
 using  SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Extensions
 {

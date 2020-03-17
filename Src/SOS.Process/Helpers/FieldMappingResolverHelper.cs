@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Helpers

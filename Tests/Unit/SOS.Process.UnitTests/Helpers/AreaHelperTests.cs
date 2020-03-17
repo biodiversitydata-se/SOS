@@ -4,7 +4,6 @@ using Moq;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers;

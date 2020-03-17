@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SOS.Lib.Constants;
+﻿using SOS.Lib.Constants;
 
-namespace SOS.Lib.Models.Processed.Sighting
+namespace SOS.Lib.Models.Processed.Observation
 {
     public class ProcessedFieldMapValue
     {

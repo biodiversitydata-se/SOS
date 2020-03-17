@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.TestHelpers.JsonConverters;
 
 namespace SOS.Export.UnitTests.TestHelpers.Factories

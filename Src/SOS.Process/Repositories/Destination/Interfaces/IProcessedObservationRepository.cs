@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Process.Repositories.Destination.Interfaces
 {

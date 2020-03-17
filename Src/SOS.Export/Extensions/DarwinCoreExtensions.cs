@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using SOS.Export.Models.DarwinCore;
 using SOS.Lib.Helpers;
 using  SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Export.Extensions
 {

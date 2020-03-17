@@ -7,7 +7,7 @@ using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Process.Database;
 using SOS.Process.Jobs;
 using SOS.Process.Repositories.Destination;

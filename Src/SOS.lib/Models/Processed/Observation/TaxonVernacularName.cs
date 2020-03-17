@@ -1,4 +1,4 @@
-﻿namespace SOS.Lib.Models.Processed.Sighting
+﻿namespace SOS.Lib.Models.Processed.Observation
 {
     public class TaxonVernacularName
     {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Process.Repositories.Destination.Interfaces

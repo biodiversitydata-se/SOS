@@ -1,4 +1,4 @@
-﻿namespace SOS.Lib.Models.Processed.Sighting
+﻿namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// A physical result of a sampling (or subsampling) event. In biological collections, the material sample is typically collected,

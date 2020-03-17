@@ -8,7 +8,7 @@ using DwC_A.Terms;
 using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.DwcImport

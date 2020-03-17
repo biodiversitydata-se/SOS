@@ -9,7 +9,7 @@ using SOS.Export.Factories.Interfaces;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Export.Repositories

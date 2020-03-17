@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Models.Processed.Sighting;
+﻿using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Export.UnitTests.TestHelpers.Builders
 {
@@ -26,7 +26,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Builders
 
         protected override ProcessedObservation CreateEntity()
         {
-            var sighting = new ProcessedObservation
+            var observation = new ProcessedObservation
             {
                 Location = new ProcessedLocation(),
                 Event = new ProcessedEvent(),
@@ -36,7 +36,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Builders
                 Taxon = new ProcessedTaxon()
             };
 
-            return sighting;
+            return observation;
         }
     }
 }

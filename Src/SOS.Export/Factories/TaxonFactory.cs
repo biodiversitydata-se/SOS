@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.Sighting;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Export.Factories.Interfaces;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Export.Factories
 {

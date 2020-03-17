@@ -1,7 +1,7 @@
-﻿using MongoDB.Driver.GeoJsonObjectModel;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using MongoDB.Driver.GeoJsonObjectModel;
 
-namespace SOS.Lib.Models.Processed.Sighting
+namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// This class contains location information about a species sighting location

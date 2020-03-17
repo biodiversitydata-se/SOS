@@ -64,8 +64,8 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var sightingBuilder = new ProcessedObservationBuilder();
-            var observation = sightingBuilder
+            var observationBuilder = new ProcessedObservationBuilder();
+            var observation = observationBuilder
                 .WithDecimalLatitude(13.823392373018132)
                 .WithDecimalLongitude(55.51071440795833)
                 .Build();
@@ -100,8 +100,8 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var sightingBuilder = new ProcessedObservationBuilder();
-            var observation = sightingBuilder
+            var observationBuilder = new ProcessedObservationBuilder();
+            var observation = observationBuilder
                 .WithCoordinateUncertaintyInMeters(0)
                 .Build();
             var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);
@@ -135,8 +135,8 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveOccurrenceCsvWriter = CreateDwcArchiveOccurrenceCsvWriter();
             var memoryStream = new MemoryStream();
-            var sightingBuilder = new ProcessedObservationBuilder();
-            var observation = sightingBuilder
+            var observationBuilder = new ProcessedObservationBuilder();
+            var observation = observationBuilder
                 .WithOccurrenceRemarks("Sighting found in\r\nUppsala")
                 .Build();
             var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(observation);

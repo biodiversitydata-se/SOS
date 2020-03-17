@@ -2,7 +2,7 @@
 using System.Linq;
 using MongoDB.Driver;
 using MongoDB.Driver.GeoJsonObjectModel;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Extensions

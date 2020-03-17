@@ -1,5 +1,5 @@
 ﻿
-namespace SOS.Lib.Models.Processed.Sighting
+namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// Darwin Core Project Parameter.

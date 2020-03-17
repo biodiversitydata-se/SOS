@@ -1,5 +1,5 @@
 ﻿using CsvHelper.Configuration;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Import.Mappings
 {

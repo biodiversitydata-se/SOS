@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;

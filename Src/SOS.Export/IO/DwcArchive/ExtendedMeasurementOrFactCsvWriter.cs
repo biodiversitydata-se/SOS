@@ -14,7 +14,7 @@ using SOS.Export.Mappings;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
 using  SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Sighting;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive
