@@ -3,6 +3,8 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Jobs.Process;
 using SOS.Process.Database;
 using SOS.Process.Database.Interfaces;
+using SOS.Process.DataProviderProcessors;
+using SOS.Process.DataProviderProcessors.Interfaces;
 using SOS.Process.Factories;
 using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers;
@@ -66,10 +68,10 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>().InstancePerLifetimeScope();
 
             // Add factories
-            builder.RegisterType<ClamPortalProcessFactory>().As<IClamPortalProcessFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ClamPortalProcessor>().As<IClamPortalProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<InstanceFactory>().As<IInstanceFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<KulProcessFactory>().As<IKulProcessFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ArtportalenProcessFactory>().As<IArtportalenProcessFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<KulProcessor>().As<IKulProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenProcessor>().As<IArtportalenProcessor>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();

@@ -12,43 +12,46 @@ using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
-namespace SOS.Process.Factories
+namespace SOS.Process.DataProviderProcessors
 {
     /// <summary>
     /// Process factory class
     /// </summary>
-    public class ClamPortalProcessFactory : DataProviderProcessorBase<ClamPortalProcessFactory>, Interfaces.IClamPortalProcessFactory
+    public class KulProcessor : DataProviderProcessorBase<KulProcessor>, Interfaces.IKulProcessor
     {
-        private readonly IClamObservationVerbatimRepository _clamObservationVerbatimRepository;
+        private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataProvider DataProvider => DataProvider.ClamPortal;
+        public override DataProvider DataProvider => DataProvider.KUL;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="clamObservationVerbatimRepository"></param>
+        /// <param name="kulObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="logger"></param>
-        public ClamPortalProcessFactory(
-            IClamObservationVerbatimRepository clamObservationVerbatimRepository,
+        public KulProcessor(
+            IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<ClamPortalProcessFactory> logger) : base(processedObservationRepository, fieldMappingResolverHelper, logger)
+            ILogger<KulProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,logger)
         {
-            _clamObservationVerbatimRepository = clamObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(clamObservationVerbatimRepository));
+            _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
+       
 
-        protected override async Task<int> ProcessObservations(IDictionary<int, ProcessedTaxon> taxa,
-            IJobCancellationToken cancellationToken)
+        protected override async Task<int> ProcessObservations(
+                    IDictionary<int, ProcessedTaxon> taxa,
+                    IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
 
-            using var cursor = await _clamObservationVerbatimRepository.GetAllAsync();
+            using var cursor = await _kulObservationVerbatimRepository.GetAllAsync();
+
             // Process and commit in batches.
             await cursor.ForEachAsync(async c =>
             {
@@ -59,7 +62,7 @@ namespace SOS.Process.Factories
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     verbatimCount += await CommitBatchAsync(sightings);
-                    Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
+                    Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
                 }
             });
 
@@ -68,7 +71,7 @@ namespace SOS.Process.Factories
             {
                 cancellationToken?.ThrowIfCancellationRequested();
                 verbatimCount += await CommitBatchAsync(sightings);
-                Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
+                Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
             }
 
             return verbatimCount;

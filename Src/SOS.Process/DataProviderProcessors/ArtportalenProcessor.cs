@@ -15,12 +15,12 @@ using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
-namespace SOS.Process.Factories
+namespace SOS.Process.DataProviderProcessors
 {
     /// <summary>
     /// Process factory class
     /// </summary>
-    public class ArtportalenProcessFactory : DataProviderProcessorBase<ArtportalenProcessFactory>, Interfaces.IArtportalenProcessFactory
+    public class ArtportalenProcessor : DataProviderProcessorBase<ArtportalenProcessor>, Interfaces.IArtportalenProcessor
     {
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
@@ -37,13 +37,13 @@ namespace SOS.Process.Factories
         /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
-        public ArtportalenProcessFactory(
+        public ArtportalenProcessor(
             IArtportalenVerbatimRepository artportalenVerbatimRepository,
             IProcessedObservationRepository processedObservationRepository,
             IProcessedFieldMappingRepository processedFieldMappingRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             ProcessConfiguration processConfiguration,
-            ILogger<ArtportalenProcessFactory> logger) : base(processedObservationRepository, fieldMappingResolverHelper, logger)
+            ILogger<ArtportalenProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ?? throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
             _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));

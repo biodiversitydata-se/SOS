@@ -10,18 +10,22 @@ using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
-namespace SOS.Process.Factories
+namespace SOS.Process.DataProviderProcessors
 {
-    public abstract class DataProviderProcessorBase<TEntity> : ProcessBaseFactory<TEntity>
+    public abstract class DataProviderProcessorBase<TEntity>
     {
+        protected readonly IProcessedObservationRepository ProcessRepository;
+        protected readonly ILogger<TEntity> Logger;
         protected readonly IFieldMappingResolverHelper FieldMappingResolverHelper;
         public abstract DataProvider DataProvider { get; }
 
         protected DataProviderProcessorBase(
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<TEntity> logger) : base(processedObservationRepository, logger)
+            ILogger<TEntity> logger)
         {
+            ProcessRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             FieldMappingResolverHelper = fieldMappingResolverHelper ?? throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
         }
 

@@ -14,6 +14,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Process.DataProviderProcessors.Interfaces;
 using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -29,9 +30,9 @@ namespace SOS.Process.Jobs
         private readonly IProcessedObservationRepository _darwinCoreRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
-        private readonly IArtportalenProcessFactory _artportalenProcessFactory;
-        private readonly IClamPortalProcessFactory _clamPortalProcessFactory;
-        private readonly IKulProcessFactory _kulProcessFactory;
+        private readonly IArtportalenProcessor _artportalenProcessor;
+        private readonly IClamPortalProcessor _clamPortalProcessor;
+        private readonly IKulProcessor _kulProcessor;
         private readonly ITaxonProcessedRepository _taxonProcessedRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly ILogger<ProcessJob> _logger;
@@ -42,9 +43,9 @@ namespace SOS.Process.Jobs
         /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="harvestInfoRepository"></param>
-        /// <param name="clamPortalProcessFactory"></param>
-        /// <param name="kulProcessFactory"></param>
-        /// <param name="artportalenProcessFactory"></param>
+        /// <param name="clamPortalProcessor"></param>
+        /// <param name="kulProcessor"></param>
+        /// <param name="artportalenProcessor"></param>
         /// <param name="taxonProcessedRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
@@ -52,9 +53,9 @@ namespace SOS.Process.Jobs
             IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
-            IClamPortalProcessFactory clamPortalProcessFactory,
-            IKulProcessFactory kulProcessFactory,
-            IArtportalenProcessFactory artportalenProcessFactory,
+            IClamPortalProcessor clamPortalProcessor,
+            IKulProcessor kulProcessor,
+            IArtportalenProcessor artportalenProcessor,
             ITaxonProcessedRepository taxonProcessedRepository,
             IAreaHelper areaHelper,
             ILogger<ProcessJob> logger)
@@ -62,9 +63,9 @@ namespace SOS.Process.Jobs
             _darwinCoreRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
-            _clamPortalProcessFactory = clamPortalProcessFactory ?? throw new ArgumentNullException(nameof(clamPortalProcessFactory));
-            _kulProcessFactory = kulProcessFactory ?? throw new ArgumentNullException(nameof(kulProcessFactory));
-            _artportalenProcessFactory = artportalenProcessFactory ?? throw new ArgumentNullException(nameof(artportalenProcessFactory));
+            _clamPortalProcessor = clamPortalProcessor ?? throw new ArgumentNullException(nameof(clamPortalProcessor));
+            _kulProcessor = kulProcessor ?? throw new ArgumentNullException(nameof(kulProcessor));
+            _artportalenProcessor = artportalenProcessor ?? throw new ArgumentNullException(nameof(artportalenProcessor));
             _taxonProcessedRepository = taxonProcessedRepository ?? throw new ArgumentNullException(nameof(taxonProcessedRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -121,7 +122,7 @@ namespace SOS.Process.Jobs
                 // Add Artportalen import if first bit is set
                 if ((sources & (int)DataProvider.Artportalen) > 0)
                 {
-                    processTasks.Add(DataProvider.Artportalen, _artportalenProcessFactory.ProcessAsync(taxonById, cancellationToken));
+                    processTasks.Add(DataProvider.Artportalen, _artportalenProcessor.ProcessAsync(taxonById, cancellationToken));
 
                     var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(ArtportalenVerbatimObservation))) ?? new HarvestInfo(nameof(ArtportalenVerbatimObservation), DataProvider.Artportalen, DateTime.MinValue);
 
@@ -133,7 +134,7 @@ namespace SOS.Process.Jobs
 
                 if ((sources & (int)DataProvider.ClamPortal) > 0)
                 {
-                    processTasks.Add(DataProvider.ClamPortal, _clamPortalProcessFactory.ProcessAsync(taxonById, cancellationToken));
+                    processTasks.Add(DataProvider.ClamPortal, _clamPortalProcessor.ProcessAsync(taxonById, cancellationToken));
 
                     var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(ClamObservationVerbatim))) ?? new HarvestInfo(nameof(ClamObservationVerbatim), DataProvider.ClamPortal, DateTime.MinValue);
                     
@@ -145,7 +146,7 @@ namespace SOS.Process.Jobs
 
                 if ((sources & (int)DataProvider.KUL) > 0)
                 {
-                    processTasks.Add(DataProvider.KUL, _kulProcessFactory.ProcessAsync(taxonById, cancellationToken));
+                    processTasks.Add(DataProvider.KUL, _kulProcessor.ProcessAsync(taxonById, cancellationToken));
 
                     var harvestInfo = currentHarvestInfo?.FirstOrDefault(hi => hi.Id.Equals(nameof(KulObservationVerbatim))) ?? new HarvestInfo(nameof(KulObservationVerbatim), DataProvider.KUL, DateTime.MinValue);
 

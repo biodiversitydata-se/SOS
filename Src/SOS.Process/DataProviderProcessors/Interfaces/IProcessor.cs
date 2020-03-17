@@ -4,12 +4,12 @@ using Hangfire;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Process.Factories.Interfaces
+namespace SOS.Process.DataProviderProcessors.Interfaces
 {
     /// <summary>
     /// Process base factory
     /// </summary>
-    public interface IProcessFactory
+    public interface IProcessor
     {
         /// <summary>
         /// Process sightings
