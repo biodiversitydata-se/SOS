@@ -42,20 +42,20 @@ namespace SOS.Process.DataProviderProcessors
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
        
-
         protected override async Task<int> ProcessObservations(
-                    IDictionary<int, ProcessedTaxon> taxa,
-                    IJobCancellationToken cancellationToken)
+            IDictionary<int, ProcessedTaxon> taxa,
+            IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
+            var observationFactory = new KulProcessedObservationFactory(taxa);
 
             using var cursor = await _kulObservationVerbatimRepository.GetAllAsync();
 
             // Process and commit in batches.
-            await cursor.ForEachAsync(async c =>
+            await cursor.ForEachAsync(async verbatimObservation =>
             {
-                ProcessedObservation processedObservation = c.ToProcessed(taxa);
+                ProcessedObservation processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
                 sightings.Add(processedObservation);
                 if (IsBatchFilledToLimit(sightings.Count))

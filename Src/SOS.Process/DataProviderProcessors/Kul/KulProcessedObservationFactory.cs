@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
@@ -10,22 +11,34 @@ using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Kul;
 
-namespace SOS.Process.Extensions
+namespace SOS.Process.DataProviderProcessors
 {
-    /// <summary>
-    /// Entity extensions
-    /// </summary>
-    public static class KulObservationExtensions
+    public class KulProcessedObservationFactory
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
+        private readonly IDictionary<int, ProcessedTaxon> _taxa;
+
+        public KulProcessedObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
+        {
+            _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
+        }
 
         /// <summary>
-        /// Cast KUL observation verbatim to Darwin Core
+        /// Cast multiple clam observations to ProcessedObservation
+        /// </summary>
+        /// <param name="verbatims"></param>
+        /// <returns></returns>
+        public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<KulObservationVerbatim> verbatims)
+        {
+            return verbatims.Select(CreateProcessedObservation);
+        }
+
+        /// <summary>
+        /// Cast KUL observation verbatim to ProcessedObservation
         /// </summary>
         /// <param name="verbatim"></param>
-        /// <param name="taxa"></param>
         /// <returns></returns>
-        public static ProcessedObservation ToProcessed(this KulObservationVerbatim verbatim, IDictionary<int, ProcessedTaxon> taxa)
+        public ProcessedObservation CreateProcessedObservation(KulObservationVerbatim verbatim)
         {
             Point wgs84Point = null;
             if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
@@ -33,11 +46,11 @@ namespace SOS.Process.Extensions
                 wgs84Point = new Point(verbatim.DecimalLongitude, verbatim.DecimalLatitude) { SRID = (int)CoordinateSys.WGS84 };
             }
 
-            taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
+            _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
 
             var obs = new ProcessedObservation(DataProvider.KUL)
             {
-                BasisOfRecordId = new ProcessedFieldMapValue { Id=(int)BasisOfRecordId.HumanObservation },
+                BasisOfRecordId = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.KUL.ToString()}",
                 DatasetName = "KUL",
                 Event = new ProcessedEvent
@@ -91,33 +104,19 @@ namespace SOS.Process.Extensions
         }
 
         /// <summary>
-        /// Cast multiple clam observations to Darwin Core 
-        /// </summary>
-        /// <param name="verbatims"></param>
-        /// <param name="taxa"></param>
-        /// <returns></returns>
-        public static IEnumerable<ProcessedObservation> ToProcessed(
-            this IEnumerable<KulObservationVerbatim> verbatims, 
-            IDictionary<int, ProcessedTaxon> taxa)
-        {
-            return verbatims.Select(v => v.ToProcessed(taxa));
-        }
-
-        /// <summary>
         /// Creates occurrence id.
         /// </summary>
         /// <returns>The Catalog Number.</returns>
-        private static string GetCatalogNumber(string occurrenceId)
+        private string GetCatalogNumber(string occurrenceId)
         {
             int pos = occurrenceId.LastIndexOf(":", StringComparison.Ordinal);
             return occurrenceId.Substring(pos + 1);
         }
 
-
         /// <summary>
         /// Gets the occurrence status. Set to Present if DyntaxaTaxonId from provider is greater than 0 and Absent if DyntaxaTaxonId is 0
         /// </summary>
-        private static ProcessedFieldMapValue GetOccurrenceStatusId(int dyntaxaTaxonId)
+        private ProcessedFieldMapValue GetOccurrenceStatusId(int dyntaxaTaxonId)
         {
             if (dyntaxaTaxonId == 0)
             {
@@ -134,7 +133,7 @@ namespace SOS.Process.Extensions
         /// If the value is greater than 1 for any parent then the value should equal to the max value among parents.
         /// </summary>
         /// <returns></returns>
-        private static int GetProtectionLevel()
+        private int GetProtectionLevel()
         {
             return 1;
         }
@@ -142,7 +141,7 @@ namespace SOS.Process.Extensions
         /// <summary>
         /// Set to False if DyntaxaTaxonId from provider is greater than 0 and True if DyntaxaTaxonId is 0.
         /// </summary>
-        private static bool GetIsNeverFoundObservation(int dyntaxaTaxonId)
+        private bool GetIsNeverFoundObservation(int dyntaxaTaxonId)
         {
             return dyntaxaTaxonId == 0;
         }
@@ -150,7 +149,7 @@ namespace SOS.Process.Extensions
         /// <summary>
         /// Set to True if DyntaxaTaxonId from provider is greater than 0 and False if DyntaxaTaxonId is 0.
         /// </summary>
-        private static bool GetIsPositiveObservation(int dyntaxaTaxonId)
+        private bool GetIsPositiveObservation(int dyntaxaTaxonId)
         {
             return dyntaxaTaxonId != 0;
         }

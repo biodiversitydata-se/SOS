@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.DataProviderProcessors
 {
@@ -26,6 +29,15 @@ namespace SOS.Process.DataProviderProcessors
                 _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
                 _fieldMappings = fieldMappings ?? throw new ArgumentNullException(nameof(fieldMappings));
             }
+        }
+
+        public static async Task<ArtportalenProcessedObservationFactory> CreateAsync(
+            IDictionary<int, ProcessedTaxon> taxa,
+            IProcessedFieldMappingRepository processedFieldMappingRepository)
+        {
+            var allFieldMappings = await processedFieldMappingRepository.GetFieldMappingsAsync();
+            var fieldMappings = GetFieldMappingsDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
+            return new ArtportalenProcessedObservationFactory(taxa, fieldMappings);
         }
 
         public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<ArtportalenVerbatimObservation> verbatimObservations)
@@ -380,6 +392,55 @@ namespace SOS.Process.DataProviderProcessors
             }
 
             return associatedReferences;
+        }
+
+        /// <summary>
+        /// Get field mappings for Artportalen.
+        /// </summary>
+        /// <param name="externalSystemId"></param>
+        /// <param name="allFieldMappings"></param>
+        /// <returns></returns>
+        private static IDictionary<FieldMappingFieldId, IDictionary<object, int>> GetFieldMappingsDictionary(
+            ExternalSystemId externalSystemId,
+            ICollection<FieldMapping> allFieldMappings)
+        {
+            var dic = new Dictionary<FieldMappingFieldId, IDictionary<object, int>>();
+
+            foreach (var fieldMapping in allFieldMappings)
+            {
+                var fieldMappings = fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
+                if (fieldMappings != null)
+                {
+                    string mappingKey = GetMappingKey(fieldMapping.Id);
+                    var mapping = fieldMappings.Mappings.Single(m => m.Key == mappingKey);
+                    var sosIdByValue = mapping.GetIdByValueDictionary();
+                    dic.Add(fieldMapping.Id, sosIdByValue);
+                }
+            }
+
+            return dic;
+        }
+
+        private static string GetMappingKey(FieldMappingFieldId fieldMappingFieldId)
+        {
+            switch (fieldMappingFieldId)
+            {
+                case FieldMappingFieldId.Activity:
+                case FieldMappingFieldId.Gender:
+                case FieldMappingFieldId.County:
+                case FieldMappingFieldId.Municipality:
+                case FieldMappingFieldId.Parish:
+                case FieldMappingFieldId.Province:
+                case FieldMappingFieldId.LifeStage:
+                case FieldMappingFieldId.Substrate:
+                case FieldMappingFieldId.ValidationStatus:
+                case FieldMappingFieldId.Biotope:
+                case FieldMappingFieldId.Institution:
+                case FieldMappingFieldId.Unit:
+                    return "Id";
+                default:
+                    throw new ArgumentException($"No mapping exist for the field: {fieldMappingFieldId}");
+            }
         }
     }
 }

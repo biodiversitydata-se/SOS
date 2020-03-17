@@ -65,9 +65,7 @@ namespace SOS.Process.DataProviderProcessors
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
-            var allFieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
-            var fieldMappings = GetFieldMappingsDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
-
+            var observationFactory = await ArtportalenProcessedObservationFactory.CreateAsync(taxa, _processedFieldMappingRepository);
             // Get min and max id from db
             (await _artportalenVerbatimRepository.GetIdSpanAsync())
                 .Deconstruct(out var batchStartId, out var maxId);
@@ -78,7 +76,7 @@ namespace SOS.Process.DataProviderProcessors
                 await _semaphore.WaitAsync();
 
                 var batchEndId = batchStartId + _processedFieldMappingRepository.BatchSize - 1;
-                processBatchTasks.Add(ProcessBatchAsync(batchStartId, batchEndId, taxa, fieldMappings, cancellationToken));
+                processBatchTasks.Add(ProcessBatchAsync(batchStartId, batchEndId, observationFactory, cancellationToken));
                 batchStartId = batchEndId + 1;
             }
             await Task.WhenAll(processBatchTasks);
@@ -91,20 +89,17 @@ namespace SOS.Process.DataProviderProcessors
         /// </summary>
         /// <param name="startId"></param>
         /// <param name="endId"></param>
-        /// <param name="taxa"></param>
-        /// <param name="fieldMappings"></param>
+        /// <param name="observationFactory"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<int> ProcessBatchAsync(
-        int startId,
-        int endId,
-        IDictionary<int, ProcessedTaxon> taxa,
-        IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings,
-        IJobCancellationToken cancellationToken)
+            int startId,
+            int endId,
+            ArtportalenProcessedObservationFactory observationFactory,
+            IJobCancellationToken cancellationToken)
         {
             try
             {
-                var observationFactory = new ArtportalenProcessedObservationFactory(taxa, fieldMappings);
                 cancellationToken?.ThrowIfCancellationRequested();
                 Logger.LogDebug($"Start fetching Artportalen batch ({ startId }-{ endId })");
                 var verbatimObservationsBatch = await _artportalenVerbatimRepository.GetBatchAsync(startId, endId);
@@ -135,55 +130,6 @@ namespace SOS.Process.DataProviderProcessors
             }
 
             return 0;
-        }
-
-        /// <summary>
-        /// Get field mappings for Artportalen.
-        /// </summary>
-        /// <param name="externalSystemId"></param>
-        /// <param name="allFieldMappings"></param>
-        /// <returns></returns>
-        private IDictionary<FieldMappingFieldId, IDictionary<object, int>> GetFieldMappingsDictionary(
-            ExternalSystemId externalSystemId,
-            ICollection<FieldMapping> allFieldMappings)
-        {
-            var dic = new Dictionary<FieldMappingFieldId, IDictionary<object, int>>();
-
-            foreach (var fieldMapping in allFieldMappings)
-            {
-                var fieldMappings = fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
-                if (fieldMappings != null)
-                {
-                    string mappingKey = GetMappingKey(fieldMapping.Id);
-                    var mapping = fieldMappings.Mappings.Single(m => m.Key == mappingKey);
-                    var sosIdByValue = mapping.GetIdByValueDictionary();
-                    dic.Add(fieldMapping.Id, sosIdByValue);
-                }
-            }
-
-            return dic;
-        }
-
-        private string GetMappingKey(FieldMappingFieldId fieldMappingFieldId)
-        {
-            switch (fieldMappingFieldId)
-            {
-                case FieldMappingFieldId.Activity:
-                case FieldMappingFieldId.Gender:
-                case FieldMappingFieldId.County:
-                case FieldMappingFieldId.Municipality:
-                case FieldMappingFieldId.Parish:
-                case FieldMappingFieldId.Province:
-                case FieldMappingFieldId.LifeStage:
-                case FieldMappingFieldId.Substrate:
-                case FieldMappingFieldId.ValidationStatus:
-                case FieldMappingFieldId.Biotope:
-                case FieldMappingFieldId.Institution:
-                case FieldMappingFieldId.Unit:
-                    return "Id";
-                default:
-                    throw new ArgumentException($"No mapping exist for the field: {fieldMappingFieldId}");
-            }
         }
     }
 }

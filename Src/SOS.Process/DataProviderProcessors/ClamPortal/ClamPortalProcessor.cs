@@ -47,12 +47,13 @@ namespace SOS.Process.DataProviderProcessors
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
+            var observationFactory = new ClamPortalProcessedObservationFactory(taxa);
 
             using var cursor = await _clamObservationVerbatimRepository.GetAllAsync();
             // Process and commit in batches.
-            await cursor.ForEachAsync(async c =>
+            await cursor.ForEachAsync(async verbatimObservation =>
             {
-                ProcessedObservation processedObservation = c.ToProcessed(taxa);
+                ProcessedObservation processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
                 sightings.Add(processedObservation);
                 if (IsBatchFilledToLimit(sightings.Count))
