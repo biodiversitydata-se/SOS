@@ -25,7 +25,6 @@ namespace SOS.Process.DataProviderProcessors
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly SemaphoreSlim _semaphore;
-
         public override DataProvider DataProvider => DataProvider.Artportalen;
 
         /// <summary>
@@ -66,7 +65,6 @@ namespace SOS.Process.DataProviderProcessors
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
-            ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
             var allFieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
             var fieldMappings = GetFieldMappingsDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
 
@@ -106,17 +104,18 @@ namespace SOS.Process.DataProviderProcessors
         {
             try
             {
+                var observationFactory = new ArtportalenProcessedObservationFactory(taxa, fieldMappings);
                 cancellationToken?.ThrowIfCancellationRequested();
                 Logger.LogDebug($"Start fetching Artportalen batch ({ startId }-{ endId })");
-                var batch = await _artportalenVerbatimRepository.GetBatchAsync(startId, endId);
+                var verbatimObservationsBatch = await _artportalenVerbatimRepository.GetBatchAsync(startId, endId);
                 Logger.LogDebug($"Finish fetching Artportalen batch ({ startId }-{ endId })");
 
                 Logger.LogDebug($"Start processing Artportalen batch ({ startId }-{ endId })");
-                var sightings = batch.ToProcessed(taxa, fieldMappings);
+                var processedObservationsBatch = observationFactory.CreateProcessedObservations(verbatimObservationsBatch);
                 Logger.LogDebug($"Finish processing Artportalen batch ({ startId }-{ endId })");
 
                 Logger.LogDebug($"Start storing Artportalen batch ({ startId }-{ endId })");
-                var successCount = await CommitBatchAsync(sightings);
+                var successCount = await CommitBatchAsync(processedObservationsBatch.ToArray());
                 Logger.LogDebug($"Finish storing Artportalen batch ({ startId }-{ endId })");
                 
                 return successCount;

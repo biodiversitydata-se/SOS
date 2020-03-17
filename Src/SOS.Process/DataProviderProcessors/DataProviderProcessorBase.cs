@@ -68,10 +68,10 @@ namespace SOS.Process.DataProviderProcessors
             IJobCancellationToken cancellationToken);
         
 
-        protected async Task<int> CommitBatchAsync(ICollection<ProcessedObservation> sightings)
+        protected async Task<int> CommitBatchAsync(ICollection<ProcessedObservation> processedObservations)
         {
-            FieldMappingResolverHelper.ResolveFieldMappedValues(sightings);
-            var successCount = await ProcessRepository.AddManyAsync(sightings);
+            FieldMappingResolverHelper.ResolveFieldMappedValues(processedObservations);
+            var successCount = await ProcessRepository.AddManyAsync(processedObservations);
 
             return successCount;
         }

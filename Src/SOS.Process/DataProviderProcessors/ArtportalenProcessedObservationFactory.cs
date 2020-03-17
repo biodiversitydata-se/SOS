@@ -11,39 +11,34 @@ using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
-namespace SOS.Process.Extensions
+namespace SOS.Process.DataProviderProcessors
 {
-    /// <summary>
-    /// Entity extensions
-    /// </summary>
-    public static class ArtportalenExtensions
+    public class ArtportalenProcessedObservationFactory
     {
-        /// <summary>
-        /// Cast multiple sightings entities to models 
-        /// </summary>
-        /// <param name="verbatimObservations"></param>
-        /// <param name="taxa"></param>
-        /// <param name="fieldMappings"></param>
-        /// <returns></returns>
-        public static ICollection<ProcessedObservation> ToProcessed(
-            this IEnumerable<ArtportalenVerbatimObservation> verbatimObservations,
+        private readonly IDictionary<int, ProcessedTaxon> _taxa;
+        private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
+
+        public ArtportalenProcessedObservationFactory(
             IDictionary<int, ProcessedTaxon> taxa,
             IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings)
         {
-            return verbatimObservations.Select(v => v.ToProcessed(taxa, fieldMappings)).ToArray();
+            {
+                _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
+                _fieldMappings = fieldMappings ?? throw new ArgumentNullException(nameof(fieldMappings));
+            }
+        }
+
+        public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<ArtportalenVerbatimObservation> verbatimObservations)
+        {
+            return verbatimObservations.Select(CreateProcessedObservation);
         }
 
         /// <summary>
-        /// Cast sighting verbatim to processed data model
+        /// Cast verbatim observations to processed data model
         /// </summary>
         /// <param name="verbatimObservation"></param>
-        /// <param name="taxa"></param>
-        /// <param name="fieldMappings"></param>
         /// <returns></returns>
-        public static ProcessedObservation ToProcessed(
-            this ArtportalenVerbatimObservation verbatimObservation, 
-            IDictionary<int, ProcessedTaxon> taxa,
-            IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings)
+        public ProcessedObservation CreateProcessedObservation(ArtportalenVerbatimObservation verbatimObservation)
         {
             if (verbatimObservation == null)
             {
@@ -53,8 +48,8 @@ namespace SOS.Process.Extensions
             var taxonId = verbatimObservation.TaxonId ?? -1;
 
             var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 && (verbatimObservation.Site?.YCoord ?? 0) > 0;
-            
-            if (taxa.TryGetValue(taxonId, out var taxon))
+
+            if (_taxa.TryGetValue(taxonId, out var taxon))
             {
                 taxon.IndividualId = verbatimObservation.URL;
             }
@@ -83,7 +78,7 @@ namespace SOS.Process.Extensions
                     SamplingProtocol = GetSamplingProtocol(verbatimObservation.Projects),
                     StartDate = verbatimObservation.StartDate?.ToUniversalTime(),
                     SubstrateSpeciesDescription = verbatimObservation.SubstrateSpeciesDescription,
-                    SubstrateDescription = GetSubstrateDescription(verbatimObservation, taxa),
+                    SubstrateDescription = GetSubstrateDescription(verbatimObservation, _taxa),
                     VerbatimEndDate = verbatimObservation.EndDate,
                     VerbatimStartDate = verbatimObservation.StartDate
                 },
@@ -143,7 +138,7 @@ namespace SOS.Process.Extensions
                     URL = $"http://www.artportalen.se/sighting/{verbatimObservation.Id}"
                 },
                 OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken",
-                Projects = verbatimObservation.Projects?.ToProcessedProjects(),
+                Projects = verbatimObservation.Projects?.Select(CreateProcessedProject),
                 ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem),
                 ReportedBy = verbatimObservation.ReportedBy,
                 ReportedDate = verbatimObservation.ReportedDate,
@@ -153,18 +148,18 @@ namespace SOS.Process.Extensions
             };
 
             // Get field mapping values
-            obs.Occurrence.GenderId = GetSosId(verbatimObservation.Gender?.Id, fieldMappings[FieldMappingFieldId.Gender]);
-            obs.Occurrence.ActivityId = GetSosId(verbatimObservation.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]);
-            obs.Location.CountyId = GetSosId(verbatimObservation.Site?.County?.Id, fieldMappings[FieldMappingFieldId.County]);
-            obs.Location.MunicipalityId = GetSosId(verbatimObservation.Site?.Municipality?.Id, fieldMappings[FieldMappingFieldId.Municipality]);
-            obs.Location.ProvinceId = GetSosId(verbatimObservation.Site?.Province?.Id, fieldMappings[FieldMappingFieldId.Province]);
-            obs.Location.ParishId = GetSosId(verbatimObservation.Site?.Parish?.Id, fieldMappings[FieldMappingFieldId.Parish]);
-            obs.Event.BiotopeId = GetSosId(verbatimObservation?.Bioptope?.Id, fieldMappings[FieldMappingFieldId.Biotope]);
-            obs.Event.SubstrateId = GetSosId(verbatimObservation?.Bioptope?.Id, fieldMappings[FieldMappingFieldId.Substrate]);
-            obs.Identification.ValidationStatusId = GetSosId(verbatimObservation?.ValidationStatus?.Id, fieldMappings[FieldMappingFieldId.ValidationStatus]);
-            obs.Occurrence.LifeStageId = GetSosId(verbatimObservation?.Stage?.Id, fieldMappings[FieldMappingFieldId.LifeStage]);
-            obs.InstitutionId = GetSosId(verbatimObservation?.OwnerOrganization?.Id, fieldMappings[FieldMappingFieldId.Institution]);
-            obs.Occurrence.OrganismQuantityUnitId = GetSosId(verbatimObservation?.Unit?.Id, fieldMappings[FieldMappingFieldId.Unit]);
+            obs.Occurrence.GenderId = GetSosId(verbatimObservation.Gender?.Id, _fieldMappings[FieldMappingFieldId.Gender]);
+            obs.Occurrence.ActivityId = GetSosId(verbatimObservation.Activity?.Id, _fieldMappings[FieldMappingFieldId.Activity]);
+            obs.Location.CountyId = GetSosId(verbatimObservation.Site?.County?.Id, _fieldMappings[FieldMappingFieldId.County]);
+            obs.Location.MunicipalityId = GetSosId(verbatimObservation.Site?.Municipality?.Id, _fieldMappings[FieldMappingFieldId.Municipality]);
+            obs.Location.ProvinceId = GetSosId(verbatimObservation.Site?.Province?.Id, _fieldMappings[FieldMappingFieldId.Province]);
+            obs.Location.ParishId = GetSosId(verbatimObservation.Site?.Parish?.Id, _fieldMappings[FieldMappingFieldId.Parish]);
+            obs.Event.BiotopeId = GetSosId(verbatimObservation?.Bioptope?.Id, _fieldMappings[FieldMappingFieldId.Biotope]);
+            obs.Event.SubstrateId = GetSosId(verbatimObservation?.Bioptope?.Id, _fieldMappings[FieldMappingFieldId.Substrate]);
+            obs.Identification.ValidationStatusId = GetSosId(verbatimObservation?.ValidationStatus?.Id, _fieldMappings[FieldMappingFieldId.ValidationStatus]);
+            obs.Occurrence.LifeStageId = GetSosId(verbatimObservation?.Stage?.Id, _fieldMappings[FieldMappingFieldId.LifeStage]);
+            obs.InstitutionId = GetSosId(verbatimObservation?.OwnerOrganization?.Id, _fieldMappings[FieldMappingFieldId.Institution]);
+            obs.Occurrence.OrganismQuantityUnitId = GetSosId(verbatimObservation?.Unit?.Id, _fieldMappings[FieldMappingFieldId.Unit]);
             return obs;
         }
 
@@ -182,20 +177,15 @@ namespace SOS.Process.Extensions
             {
                 return new ProcessedFieldMapValue { Id = sosId };
             }
-           
+
             return new ProcessedFieldMapValue { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
-           
+
         }
 
-        private static IEnumerable<ProcessedProject> ToProcessedProjects(this IEnumerable<Project> projects)
-        {
-            return projects?.Select(p => p.ToProcessedProject());
-        }
-
-        private static ProcessedProject ToProcessedProject(this Project project)
+        private ProcessedProject CreateProcessedProject(Project project)
         {
             if (project == null) return null;
-            
+
             return new ProcessedProject
             {
                 IsPublic = project.IsPublic,
@@ -208,11 +198,11 @@ namespace SOS.Process.Extensions
                 StartDate = project.StartDate,
                 SurveyMethod = project.SurveyMethod,
                 SurveyMethodUrl = project.SurveyMethodUrl,
-                ProjectParameters = project.ProjectParameters?.Select(p => p.ToProcessedProjectParameter())
+                ProjectParameters = project.ProjectParameters?.Select(CreateProcessedProjectParameter)
             };
         }
 
-        private static ProcessedProjectParameter ToProcessedProjectParameter(this ProjectParameter projectParameter)
+        private ProcessedProjectParameter CreateProcessedProjectParameter(ProjectParameter projectParameter)
         {
             if (projectParameter == null)
             {
@@ -230,7 +220,7 @@ namespace SOS.Process.Extensions
             };
         }
 
-        private static string GetSamplingProtocol(IEnumerable<Project> projects)
+        private string GetSamplingProtocol(IEnumerable<Project> projects)
         {
             if (!projects?.Any() ?? true) return null;
 
@@ -263,7 +253,7 @@ namespace SOS.Process.Extensions
         /// <param name="hiddenByProvider"></param>
         /// <param name="protectedBySystem"></param>
         /// <returns></returns>
-        private static int CalculateProtectionLevel(ProcessedTaxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
+        private int CalculateProtectionLevel(ProcessedTaxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
         {
             if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
             {
@@ -293,7 +283,7 @@ namespace SOS.Process.Extensions
         /// <param name="verbatimObservation"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        private static string GetSubstrateDescription(ArtportalenVerbatimObservation verbatimObservation, IDictionary<int, ProcessedTaxon> taxa)
+        private string GetSubstrateDescription(ArtportalenVerbatimObservation verbatimObservation, IDictionary<int, ProcessedTaxon> taxa)
         {
             if (verbatimObservation == null)
             {
@@ -316,7 +306,7 @@ namespace SOS.Process.Extensions
             {
                 substrateDescription.Append($"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatimObservation.SubstrateDescription}");
             }
-            
+
             if (verbatimObservation.SubstrateSpeciesId.HasValue &&
                 taxa != null &&
                 taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out var taxon))
@@ -331,22 +321,6 @@ namespace SOS.Process.Extensions
 
             var res = substrateDescription.Length > 0 ? substrateDescription.ToString().WithMaxLength(255) : null;
             return res;
-            //return substrateDescription.Length > 0 ? substrateDescription.ToString(0, 255) : null;
-
-            ////return substrateDescription.ToString().WithMaxLength(255);
-            //string result;
-            //try
-            //{
-            //    result = substrateDescription.ToString(0, 255);
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine(e);
-            //    throw;
-            //}
-
-            //return result;
-            ////return substrateDescription.ToString(0, 255);
         }
 
         /// <summary>
@@ -355,7 +329,7 @@ namespace SOS.Process.Extensions
         /// <param name="verbatimObservation"></param>
         /// <param name="taxon"></param>
         /// <returns></returns>
-        public static int? GetBirdNestActivityId(ArtportalenVerbatimObservation verbatimObservation, ProcessedTaxon taxon)
+        public int? GetBirdNestActivityId(ArtportalenVerbatimObservation verbatimObservation, ProcessedTaxon taxon)
         {
             if (verbatimObservation == null || taxon == null)
             {
@@ -375,7 +349,7 @@ namespace SOS.Process.Extensions
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public static string GetAssociatedReferences(ArtportalenVerbatimObservation verbatimObservation)
+        private string GetAssociatedReferences(ArtportalenVerbatimObservation verbatimObservation)
         {
             if (!verbatimObservation?.MigrateSightingObsId.HasValue ?? true)
             {
