@@ -1,4 +1,4 @@
-﻿namespace SOS.Process.DataProviderProcessors.Interfaces
+﻿namespace SOS.Process.Processors.Interfaces
 {
     /// <summary>
     /// Artportalen process factory

@@ -11,12 +11,12 @@ using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
-namespace SOS.Process.DataProviderProcessors.ClamPortal
+namespace SOS.Process.Processors.ClamPortal
 {
     /// <summary>
     /// Process factory class
     /// </summary>
-    public class ClamPortalProcessor : DataProviderProcessorBase<ClamPortalProcessor>, Interfaces.IClamPortalProcessor
+    public class ClamPortalProcessor : ProcessorBase<ClamPortalProcessor>, Interfaces.IClamPortalProcessor
     {
         private readonly IClamObservationVerbatimRepository _clamObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;

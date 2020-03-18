@@ -4,44 +4,40 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using Moq;
-using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Process.DataProviderProcessors;
-using SOS.Process.DataProviderProcessors.Artportalen;
+using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Processors.ClamPortal;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
 
-namespace SOS.Process.UnitTests.DataProviderProcessors
+namespace SOS.Process.UnitTests.Processors
 {
     /// <summary>
     /// Tests for sighting factory
     /// </summary>
-    public class ArtportalenProcessorTests
+    public class ClamPortalProcessorTests
     {
-        private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
+        private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
+        private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
-        private readonly Mock<IProcessedFieldMappingRepository> _processedFieldMappingRepositoryMock;
         private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
-        private readonly ProcessConfiguration _processConfiguration;
-        private readonly Mock<ILogger<ArtportalenProcessor>> _loggerMock;
+        private readonly Mock<ILogger<ClamPortalProcessor>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ArtportalenProcessorTests()
+        public ClamPortalProcessorTests()
         {
-            _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
+            _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
+            _areaHelper = new Mock<IAreaHelper>();
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
-            _processedFieldMappingRepositoryMock = new Mock<IProcessedFieldMappingRepository>();
             _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
-            _processConfiguration = new ProcessConfiguration();
-            _loggerMock = new Mock<ILogger<ArtportalenProcessor>>();
+            _loggerMock = new Mock<ILogger<ClamPortalProcessor>>();
         }
 
         /// <summary>
@@ -50,47 +46,43 @@ namespace SOS.Process.UnitTests.DataProviderProcessors
         [Fact]
         public void ConstructorTest()
         {
-            new ArtportalenProcessor(
-                _artportalenVerbatimRepository.Object,
+            new ClamPortalProcessor(
+                _clamObservationVerbatimRepositoryMock.Object,
+                _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new ArtportalenProcessor(
+            Action create = () => new ClamPortalProcessor(
+                null,
+                _areaHelper.Object,
+                _processedObservationRepositoryMock.Object,
+                _fieldMappingResolverHelperMock.Object,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
+
+
+            create = () => new ClamPortalProcessor(
+                _clamObservationVerbatimRepositoryMock.Object,
                 null,
                 _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenVerbatimRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
 
-            create = () => new ArtportalenProcessor(
-                _artportalenVerbatimRepository.Object,
+            create = () => new ClamPortalProcessor(
+                 _clamObservationVerbatimRepositoryMock.Object,
+                 _areaHelper.Object,
                 null,
-                _processedFieldMappingRepositoryMock.Object,
-                _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
+                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("DarwinCoreRepository");
 
-            create = () => new ArtportalenProcessor(
-                _artportalenVerbatimRepository.Object,
+            create = () => new ClamPortalProcessor(
+                _clamObservationVerbatimRepositoryMock.Object,
+                _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processConfiguration");
-
-            create = () => new ArtportalenProcessor(
-                _artportalenVerbatimRepository.Object,
-                _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
-                _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -105,38 +97,33 @@ namespace SOS.Process.UnitTests.DataProviderProcessors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-
-            _artportalenVerbatimRepository.Setup(r => r.GetBatchAsync(0, 0))
-                .ReturnsAsync(new [] { new ArtportalenVerbatimObservation
+            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty, ObjectId.Empty))
+                .ReturnsAsync(new[] { new ClamObservationVerbatim
                 {
-                    Id = 1
+                    DyntaxaTaxonId = 0
                 } });
+
+            _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<ProcessedObservation>>()));
 
             _processedObservationRepositoryMock.Setup(r => r.AddManyAsync(It.IsAny<ICollection<ProcessedObservation>>()))
                 .ReturnsAsync(1);
 
             var taxa = new Dictionary<int, ProcessedTaxon>
             {
-                { 0, new ProcessedTaxon { Id = 0, TaxonId = "0", ScientificName = "Biota" } }
-            };
-
-            var fieldMappingById = new Dictionary<int, FieldMapping>
-            {
-                {0, new FieldMapping {Id = 0, Name = "ActivityId"}}
+                { 0, new ProcessedTaxon { Id = 0, TaxonId = "taxon:0", ScientificName = "Biota" } }
             };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenProcessFactory = new ArtportalenProcessor(
-                _artportalenVerbatimRepository.Object,
+            var clamPortalProcessFactory = new ClamPortalProcessor(
+                _clamObservationVerbatimRepositoryMock.Object,
+                _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
                 _loggerMock.Object);
 
-            var result = await artportalenProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
+            var result = await clamPortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -154,19 +141,19 @@ namespace SOS.Process.UnitTests.DataProviderProcessors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-           
+
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenProcessFactory = new ArtportalenProcessor(
-                _artportalenVerbatimRepository.Object,
+            var clamPortalProcessFactory = new ClamPortalProcessor(
+                _clamObservationVerbatimRepositoryMock.Object,
+                _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
                 _loggerMock.Object);
 
-            var result = await artportalenProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await clamPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -184,21 +171,19 @@ namespace SOS.Process.UnitTests.DataProviderProcessors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-
-            _artportalenVerbatimRepository.Setup(r => r.GetBatchAsync(0, 0))
+            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty, ObjectId.Empty))
                 .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenProcessFactory = new ArtportalenProcessor(
-                _artportalenVerbatimRepository.Object,
+            var clamPortalProcessFactory = new ClamPortalProcessor(
+                _clamObservationVerbatimRepositoryMock.Object,
+                _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
                 _loggerMock.Object);
 
-            var result = await artportalenProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await clamPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

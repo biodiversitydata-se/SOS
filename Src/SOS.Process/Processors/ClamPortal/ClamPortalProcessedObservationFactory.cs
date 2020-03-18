@@ -11,7 +11,7 @@ using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 
-namespace SOS.Process.DataProviderProcessors.ClamPortal
+namespace SOS.Process.Processors.ClamPortal
 {
     public class ClamPortalProcessedObservationFactory
     {

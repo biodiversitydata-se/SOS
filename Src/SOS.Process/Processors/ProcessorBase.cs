@@ -10,16 +10,16 @@ using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
-namespace SOS.Process.DataProviderProcessors
+namespace SOS.Process.Processors
 {
-    public abstract class DataProviderProcessorBase<TEntity>
+    public abstract class ProcessorBase<TEntity>
     {
         protected readonly IProcessedObservationRepository ProcessRepository;
         protected readonly ILogger<TEntity> Logger;
         protected readonly IFieldMappingResolverHelper FieldMappingResolverHelper;
         public abstract DataProvider DataProvider { get; }
 
-        protected DataProviderProcessorBase(
+        protected ProcessorBase(
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             ILogger<TEntity> logger)

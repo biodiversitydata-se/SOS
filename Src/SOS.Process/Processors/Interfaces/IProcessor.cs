@@ -4,7 +4,7 @@ using Hangfire;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Process.DataProviderProcessors.Interfaces
+namespace SOS.Process.Processors.Interfaces
 {
     /// <summary>
     /// Process base factory

@@ -13,12 +13,12 @@ using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
-namespace SOS.Process.DataProviderProcessors.Artportalen
+namespace SOS.Process.Processors.Artportalen
 {
     /// <summary>
     /// Process factory class
     /// </summary>
-    public class ArtportalenProcessor : DataProviderProcessorBase<ArtportalenProcessor>, Interfaces.IArtportalenProcessor
+    public class ArtportalenProcessor : ProcessorBase<ArtportalenProcessor>, Interfaces.IArtportalenProcessor
     {
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;

@@ -11,12 +11,12 @@ using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
-namespace SOS.Process.DataProviderProcessors.Kul
+namespace SOS.Process.Processors.Kul
 {
     /// <summary>
     /// Process factory class
     /// </summary>
-    public class KulProcessor : DataProviderProcessorBase<KulProcessor>, Interfaces.IKulProcessor
+    public class KulProcessor : ProcessorBase<KulProcessor>, Interfaces.IKulProcessor
     {
         private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;

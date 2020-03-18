@@ -10,7 +10,7 @@ using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Kul;
 
-namespace SOS.Process.DataProviderProcessors.Kul
+namespace SOS.Process.Processors.Kul
 {
     public class KulProcessedObservationFactory
     {

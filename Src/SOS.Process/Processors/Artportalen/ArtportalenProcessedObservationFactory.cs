@@ -14,7 +14,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Process.Repositories.Destination.Interfaces;
 
-namespace SOS.Process.DataProviderProcessors.Artportalen
+namespace SOS.Process.Processors.Artportalen
 {
     public class ArtportalenProcessedObservationFactory
     {
