@@ -1,7 +1,7 @@
 ﻿namespace SOS.Process.Processors.Interfaces
 {
     /// <summary>
-    /// Sighting process factory
+    /// Clam Portal observation processor
     /// </summary>
     public interface IClamPortalProcessor : IProcessor
     {

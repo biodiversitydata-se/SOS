@@ -19,7 +19,7 @@ using Xunit;
 namespace SOS.Import.UnitTests.Harvesters.Observations
 {
     /// <summary>
-    /// Tests for sighting factory
+    /// Tests for Artportalen observation harvester
     /// </summary>
     public class ArtportalenObservationHarvesterTests
     {

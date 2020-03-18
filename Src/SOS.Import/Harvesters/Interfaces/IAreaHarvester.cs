@@ -4,7 +4,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters.Interfaces
 {
     /// <summary>
-    /// Geo related factory
+    /// Area harvester
     /// </summary>
     public interface IAreaHarvester
     {

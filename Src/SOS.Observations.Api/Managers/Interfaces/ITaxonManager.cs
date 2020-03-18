@@ -4,7 +4,7 @@ using SOS.Lib.Models.TaxonTree;
 namespace SOS.Observations.Api.Managers.Interfaces
 {
     /// <summary>
-    /// Taxon factory.
+    /// Taxon manager
     /// </summary>
     public interface ITaxonManager
     {

@@ -4,7 +4,7 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 namespace SOS.Observations.Api.Managers.Interfaces
 {
     /// <summary>
-    /// Process information factory
+    /// Process information manager
     /// </summary>
     public interface IProcessInfoManager
     {

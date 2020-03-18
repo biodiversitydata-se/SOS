@@ -52,12 +52,12 @@ Their values are stored as JSON files in the _Src\SOS.Import\Resources\FieldMapp
 
 **Process [Field Name]**
 1.  Add a property of type _ProcessedFieldMapValue_ to the _SOS.Lib.Models.Processed.Sighting.ProcessedObservation_ class, for the new field.
-2.  Update the process for the data providers that support this field. For Artportalen, the _SOS.Process.Factories.ArtportalenProcessFactory_ class needs to be updated.
+2.  Update the process for the data providers that support this field. For Artportalen, the _SOS.Process.Processors.Artportalen.ArtportalenProcessor_ class needs to be updated.
 3.  Make sure that the _GetFieldMappingsDictionary()_ method delivers the new field mapping.
 4.  Update _Sos.Process.Extension.ArtportalenExtensions.ToProcessed()_ with the new field mapping.
 
 **Resolve field mapped values**<br/>
 Add the new field name to the following classes when resolving field mapped values:
-1. _Sos.Search.Service.Factories.SightingFactory_
+1. _SOS.Observations.Api.Managers.ObservationManager_
 2. _SOS.Export.IO.DwcArchive.DwcArchiveOccurrenceCsvWriter_
 3. _SOS.Process.Helpers.FieldMappingResolverHelper_

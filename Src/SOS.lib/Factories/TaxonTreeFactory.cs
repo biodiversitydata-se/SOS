@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.TaxonTree;
 
-namespace SOS.Lib.Models.TaxonTree
+namespace SOS.Lib.Factories
 {
     /// <summary>
     /// Taxon Tree Factory

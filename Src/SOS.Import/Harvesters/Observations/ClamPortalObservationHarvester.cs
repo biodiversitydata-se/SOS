@@ -13,7 +13,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters.Observations
 {
     /// <summary>
-    /// Sighting factory class
+    /// Clam Portal observation harvester
     /// </summary>
     public class ClamPortalObservationHarvester : Interfaces.IClamPortalObservationHarvester
     {

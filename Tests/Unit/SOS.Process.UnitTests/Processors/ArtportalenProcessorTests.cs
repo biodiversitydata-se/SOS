@@ -19,7 +19,7 @@ using Xunit;
 namespace SOS.Process.UnitTests.Processors
 {
     /// <summary>
-    /// Tests for sighting factory
+    /// Tests for Artportalen processor
     /// </summary>
     public class ArtportalenProcessorTests
     {
@@ -127,7 +127,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenProcessFactory = new ArtportalenProcessor(
+            var artportalenProcessor = new ArtportalenProcessor(
                 _artportalenVerbatimRepository.Object,
                 _processedObservationRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
@@ -135,7 +135,7 @@ namespace SOS.Process.UnitTests.Processors
                 _processConfiguration,
                 _loggerMock.Object);
 
-            var result = await artportalenProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
+            var result = await artportalenProcessor.ProcessAsync(taxa, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenProcessFactory = new ArtportalenProcessor(
+            var artportalenProcessor = new ArtportalenProcessor(
                 _artportalenVerbatimRepository.Object,
                 _processedObservationRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
@@ -165,7 +165,7 @@ namespace SOS.Process.UnitTests.Processors
                 _processConfiguration,
                 _loggerMock.Object);
 
-            var result = await artportalenProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await artportalenProcessor.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -189,7 +189,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenProcessFactory = new ArtportalenProcessor(
+            var artportalenProcessor = new ArtportalenProcessor(
                 _artportalenVerbatimRepository.Object,
                 _processedObservationRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
@@ -197,7 +197,7 @@ namespace SOS.Process.UnitTests.Processors
                 _processConfiguration,
                 _loggerMock.Object);
 
-            var result = await artportalenProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await artportalenProcessor.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

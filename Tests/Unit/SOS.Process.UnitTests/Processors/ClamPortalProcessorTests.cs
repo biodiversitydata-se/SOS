@@ -18,7 +18,7 @@ using Xunit;
 namespace SOS.Process.UnitTests.Processors
 {
     /// <summary>
-    /// Tests for sighting factory
+    /// Tests for Clam Portal processor
     /// </summary>
     public class ClamPortalProcessorTests
     {
@@ -116,14 +116,14 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamPortalProcessFactory = new ClamPortalProcessor(
+            var clamPortalProcessor = new ClamPortalProcessor(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
 
-            var result = await clamPortalProcessFactory.ProcessAsync(taxa, JobCancellationToken.Null);
+            var result = await clamPortalProcessor.ProcessAsync(taxa, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -146,14 +146,14 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamPortalProcessFactory = new ClamPortalProcessor(
+            var clamPortalProcessor = new ClamPortalProcessor(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
 
-            var result = await clamPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await clamPortalProcessor.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -176,14 +176,14 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamPortalProcessFactory = new ClamPortalProcessor(
+            var clamPortalProcessor = new ClamPortalProcessor(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
 
-            var result = await clamPortalProcessFactory.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await clamPortalProcessor.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

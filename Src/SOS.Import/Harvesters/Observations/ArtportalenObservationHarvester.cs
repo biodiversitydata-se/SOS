@@ -20,7 +20,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters.Observations
 {
     /// <summary>
-    /// Sighting factory class
+    /// Artportalen observation harvester
     /// </summary>
     public class ArtportalenObservationHarvester : Interfaces.IArtportalenObservationHarvester
     {

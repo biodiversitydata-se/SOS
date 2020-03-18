@@ -4,7 +4,7 @@ using SOS.Lib.Enums;
 namespace SOS.Process.Managers.Interfaces
 {
     /// <summary>
-    /// Processed data factory
+    /// Instance manager interface
     /// </summary>
     public interface IInstanceManager
     {

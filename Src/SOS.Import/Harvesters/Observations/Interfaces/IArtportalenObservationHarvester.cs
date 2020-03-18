@@ -5,7 +5,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters.Observations.Interfaces
 {
     /// <summary>
-    /// Sighting factory repository
+    /// Artportalen observation harvester interface
     /// </summary>
     public interface IArtportalenObservationHarvester
     {

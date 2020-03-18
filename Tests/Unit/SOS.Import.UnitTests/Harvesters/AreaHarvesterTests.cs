@@ -15,7 +15,7 @@ using Xunit;
 namespace SOS.Import.UnitTests.Harvesters
 {
     /// <summary>
-    /// Tests for area factory
+    /// Tests for area harvester
     /// </summary>
     public class AreaHarvesterTests
     {
@@ -87,12 +87,12 @@ namespace SOS.Import.UnitTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var areaFactory = new AreaHarvester(
+            var areaHarvester = new AreaHarvester(
                 _areaRepositoryMock.Object,
                 _areaVerbatimRepository.Object,
                 _loggerMock.Object);
 
-            var result = await areaFactory.HarvestAreasAsync();
+            var result = await areaHarvester.HarvestAreasAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -114,12 +114,12 @@ namespace SOS.Import.UnitTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var geoFactory = new AreaHarvester(
+            var areaHarvester = new AreaHarvester(
                 _areaRepositoryMock.Object,
                 _areaVerbatimRepository.Object,
                 _loggerMock.Object);
 
-            var result = await geoFactory.HarvestAreasAsync();
+            var result = await areaHarvester.HarvestAreasAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

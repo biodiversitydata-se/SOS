@@ -7,7 +7,7 @@ using SOS.Observations.Api.Repositories.Interfaces;
 namespace SOS.Observations.Api.Managers
 {
     /// <summary>
-    /// Sighting factory class
+    /// Process info manager
     /// </summary>
     public class ProcessInfoManager : Interfaces.IProcessInfoManager
     {

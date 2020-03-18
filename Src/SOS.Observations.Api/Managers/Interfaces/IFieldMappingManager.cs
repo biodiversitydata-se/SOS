@@ -6,7 +6,7 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Observations.Api.Managers.Interfaces
 {
     /// <summary>
-    /// Field mapping factory.
+    /// Field mapping manager.
     /// </summary>
     public interface IFieldMappingManager
     {

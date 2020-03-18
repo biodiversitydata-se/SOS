@@ -5,7 +5,7 @@ using SOS.Process.Repositories.Destination.Interfaces;
 namespace SOS.Process.Managers
 {
     /// <summary>
-    /// Process factory class
+    /// Manager base
     /// </summary>
     public class ManagerBase<TEntity>
     {

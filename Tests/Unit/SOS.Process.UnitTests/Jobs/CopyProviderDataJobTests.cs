@@ -15,7 +15,7 @@ namespace SOS.Process.UnitTests.Jobs
     /// </summary>
     public class CopyProviderDataJobTests
     {
-        private readonly Mock<IInstanceManager> _instanceFactoryMock;
+        private readonly Mock<IInstanceManager> _instanceManagerMock;
         private readonly Mock<ILogger<CopyProviderDataJob>> _loggerMock;
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         public CopyProviderDataJobTests()
         {
-            _instanceFactoryMock = new Mock<IInstanceManager>();
+            _instanceManagerMock = new Mock<IInstanceManager>();
             _loggerMock = new Mock<ILogger<CopyProviderDataJob>>();
         }
 
@@ -34,7 +34,7 @@ namespace SOS.Process.UnitTests.Jobs
         public void ConstructorTest()
         {
             new CopyProviderDataJob(
-                _instanceFactoryMock.Object,
+                _instanceManagerMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new CopyProviderDataJob(
@@ -44,7 +44,7 @@ namespace SOS.Process.UnitTests.Jobs
 
             
             create = () => new CopyProviderDataJob(
-                _instanceFactoryMock.Object,
+                _instanceManagerMock.Object,
                null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -59,14 +59,14 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _instanceFactoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
+            _instanceManagerMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var job = new CopyProviderDataJob(
-                _instanceFactoryMock.Object,
+                _instanceManagerMock.Object,
                 _loggerMock.Object);
 
             var result = await job.RunAsync(It.IsAny<DataProvider>());
@@ -93,7 +93,7 @@ namespace SOS.Process.UnitTests.Jobs
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var job = new CopyProviderDataJob(
-                _instanceFactoryMock.Object,
+                _instanceManagerMock.Object,
                 _loggerMock.Object);
 
             var result = await job.RunAsync(It.IsAny<DataProvider>());
@@ -114,13 +114,13 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _instanceFactoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
+            _instanceManagerMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
                 .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var job = new CopyProviderDataJob(
-                _instanceFactoryMock.Object,
+                _instanceManagerMock.Object,
                 _loggerMock.Object);
 
             var result = await job.RunAsync(It.IsAny<DataProvider>());

@@ -109,13 +109,13 @@ namespace SOS.Import.UnitTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var taxonFactory = new TaxonHarvester(
+            var taxonHarvester = new TaxonHarvester(
                 _taxonVerbatimRepositoryMock.Object,
                 _taxonServiceMock.Object,
                 _taxonAttributeServiceMock.Object,
                 _loggerMock.Object);
 
-            var result = await taxonFactory.HarvestAsync();
+            var result = await taxonHarvester.HarvestAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -140,13 +140,13 @@ namespace SOS.Import.UnitTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var taxonFactory = new TaxonHarvester(
+            var taxonHarvester = new TaxonHarvester(
                 _taxonVerbatimRepositoryMock.Object,
                 _taxonServiceMock.Object,
                 _taxonAttributeServiceMock.Object,
                 _loggerMock.Object);
 
-            var result = await taxonFactory.HarvestAsync();
+            var result = await taxonHarvester.HarvestAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

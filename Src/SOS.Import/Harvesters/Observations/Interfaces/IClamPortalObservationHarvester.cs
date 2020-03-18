@@ -5,7 +5,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters.Observations.Interfaces
 {
     /// <summary>
-    /// Clam and tree portal observation factory interface
+    /// Clam Portal observation harvester interface
     /// </summary>
     public interface IClamPortalObservationHarvester
     {

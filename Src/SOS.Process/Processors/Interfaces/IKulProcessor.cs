@@ -1,7 +1,7 @@
 ﻿namespace SOS.Process.Processors.Interfaces
 {
     /// <summary>
-    /// KUL process factory
+    /// KUL observation processor
     /// </summary>
     public interface IKulProcessor : IProcessor
     {

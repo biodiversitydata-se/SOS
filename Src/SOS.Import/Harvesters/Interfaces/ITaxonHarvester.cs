@@ -4,7 +4,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters.Interfaces
 {
     /// <summary>
-    /// Taxon factory
+    /// Taxon harvester
     /// </summary>
     public interface ITaxonHarvester
     {

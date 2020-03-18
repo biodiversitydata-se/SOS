@@ -1,7 +1,7 @@
 ﻿namespace SOS.Process.Processors.Interfaces
 {
     /// <summary>
-    /// Artportalen process factory
+    /// Artportalen observation processor
     /// </summary>
     public interface IArtportalenProcessor : IProcessor
     {

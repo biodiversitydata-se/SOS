@@ -66,19 +66,19 @@ namespace SOS.Process.IntegrationTests.Jobs
             var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository = new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
             var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
-            var clamPortalProcessFactory = new ClamPortalProcessor(
+            var clamPortalProcessor = new ClamPortalProcessor(
                 new ClamObservationVerbatimRepository(verbatimClient, new NullLogger<ClamObservationVerbatimRepository>()), 
                 areaHelper, 
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
                 new NullLogger<ClamPortalProcessor>());
-            var kulProcessFactory = new KulProcessor(
+            var kulProcessor = new KulProcessor(
                 new KulObservationVerbatimRepository(verbatimClient, new NullLogger<KulObservationVerbatimRepository>()), 
                 areaHelper,
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<KulProcessor>());
-            var artportalenProcessFactory = new ArtportalenProcessor(
+            var artportalenProcessor = new ArtportalenProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
                 processedObservationRepository,
                 processedFieldMappingRepository, 
@@ -90,9 +90,9 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository,
                 processInfoRepository,
                 harvestInfoRepository,
-                clamPortalProcessFactory,
-                kulProcessFactory,
-                artportalenProcessFactory,
+                clamPortalProcessor,
+                kulProcessor,
+                artportalenProcessor,
                 taxonProcessedRepository,
                 areaHelper,
                 new NullLogger<ProcessJob>());

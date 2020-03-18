@@ -16,7 +16,7 @@ using SOS.Lib.Models.Search;
 namespace SOS.Export.Managers
 {
     /// <summary>
-    /// Sighting factory class
+    /// Observation manager class
     /// </summary>
     public class ObservationManager : Interfaces.IObservationManager
     {

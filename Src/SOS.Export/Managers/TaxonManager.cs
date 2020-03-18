@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Factories;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
@@ -12,7 +13,7 @@ using SOS.Lib.Models.TaxonTree;
 namespace SOS.Export.Managers
 {
     /// <summary>
-    /// Taxon factory
+    /// Taxon manager
     /// </summary>
     public class TaxonManager : ITaxonManager
     {

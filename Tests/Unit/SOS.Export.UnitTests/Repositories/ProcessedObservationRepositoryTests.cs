@@ -12,7 +12,7 @@ namespace SOS.Export.UnitTests.Repositories
     public class ProcessedObservationRepositoryTests
     {
         private readonly Mock<IExportClient> _exportClient;
-        private readonly Mock<ITaxonManager> _taxonFactory;
+        private readonly Mock<ITaxonManager> _taxonManager;
         private readonly Mock<ILogger<ProcessedObservationRepository>> _loggerMock;
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace SOS.Export.UnitTests.Repositories
         public ProcessedObservationRepositoryTests()
         {
             _exportClient = new Mock<IExportClient>();
-            _taxonFactory = new Mock<ITaxonManager>();
+            _taxonManager = new Mock<ITaxonManager>();
             _loggerMock = new Mock<ILogger<ProcessedObservationRepository>>();
         }
 
@@ -34,12 +34,12 @@ namespace SOS.Export.UnitTests.Repositories
         {
             new ProcessedObservationRepository(
                 _exportClient.Object,
-                _taxonFactory.Object,
+                _taxonManager.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new ProcessedObservationRepository(
                 null,
-                _taxonFactory.Object,
+                _taxonManager.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("exportClient");
 
@@ -51,7 +51,7 @@ namespace SOS.Export.UnitTests.Repositories
 
             create = () => new ProcessedObservationRepository(
                 _exportClient.Object,
-                _taxonFactory.Object,
+                _taxonManager.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
