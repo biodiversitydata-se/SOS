@@ -458,14 +458,6 @@ namespace SOS.Import.Extensions
         /// <returns></returns>
         public static Site ToVerbatim(this SiteEntity entity)
         {
-            Point wgs84Point = null;
-
-            if (entity.XCoord > 0 && entity.YCoord > 0)
-            {
-                var webMercatorPoint = new Point(entity.XCoord, entity.YCoord);
-                wgs84Point = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
-            }
-
             return new Site
             {
                 Accuracy = entity.Accuracy,
@@ -475,11 +467,10 @@ namespace SOS.Import.Extensions
                 Municipality = entity.MunicipalityId.HasValue ? new GeographicalArea { Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName } : null,
                 Province = entity.ProvinceId.HasValue ? new GeographicalArea { Id = entity.ProvinceId.Value, Name = entity.ProvinceName } : null,
                 Parish = entity.ParishId.HasValue ? new GeographicalArea { Id = entity.ParishId.Value, Name = entity.ParishName } : null,
-                Point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry(),
-                PointWithBuffer = wgs84Point?.ToSquare(entity.Accuracy)?.ToGeoJsonGeometry(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
+                VerbatimCoordinateSystem = CoordinateSys.WebMercator
             };
         }
 
