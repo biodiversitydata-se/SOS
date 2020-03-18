@@ -4,8 +4,8 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Export.Factories;
 using SOS.Export.IO.DwcArchive;
+using SOS.Export.Managers;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Export.Services;
@@ -13,9 +13,9 @@ using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using Xunit;
 
-namespace SOS.Export.IntegrationTests.Factories
+namespace SOS.Export.IntegrationTests.Managers
 {
-    public class SightingFactoryIntegrationTests : TestBase
+    public class ObservationManagerIntegrationTests : TestBase
     {
         [Fact]
         [Trait("Category", "Integration")]
@@ -25,12 +25,12 @@ namespace SOS.Export.IntegrationTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var sightingFactory = CreateSightingFactory();
+            var observationManager = CreateObservationManager();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            bool result = await sightingFactory.ExportAllAsync(JobCancellationToken.Null);
+            bool result = await observationManager.ExportAllAsync(JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -38,7 +38,7 @@ namespace SOS.Export.IntegrationTests.Factories
             result.Should().BeTrue();
         }
 
-        private ObservationFactory CreateSightingFactory()
+        private ObservationManager CreateObservationManager()
         {
             var exportConfiguration = GetExportConfiguration();
             var exportClient = new ExportClient(
@@ -52,21 +52,21 @@ namespace SOS.Export.IntegrationTests.Factories
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>());
-            ObservationFactory observationFactory = new ObservationFactory(
+            ObservationManager observationManager = new ObservationManager(
                 dwcArchiveFileWriter,
                 new ProcessedObservationRepository(
                     exportClient,
-                    new TaxonFactory(
-                        new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonFactory>>().Object),
+                    new TaxonManager(
+                        new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonManager>>().Object),
                     new Mock<ILogger<ProcessedObservationRepository>>().Object),
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,
                 new Mock<IZendToService>().Object,
                 new FileDestination { Path = exportConfiguration.FileDestination.Path },
-                new Mock<ILogger<ObservationFactory>>().Object);
+                new Mock<ILogger<ObservationManager>>().Object);
 
-            return observationFactory;
+            return observationManager;
         }
     }
 }

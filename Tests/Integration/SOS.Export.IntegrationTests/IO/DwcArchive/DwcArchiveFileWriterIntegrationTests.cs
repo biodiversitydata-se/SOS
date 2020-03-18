@@ -4,9 +4,9 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Export.Factories;
 using SOS.Export.IntegrationTests.TestHelpers.Factories;
 using SOS.Export.IO.DwcArchive;
+using SOS.Export.Managers;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Export.Services;
@@ -119,11 +119,11 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
         {
             var processedObservationRepository = new ProcessedObservationRepository(
                 exportClient,
-                new TaxonFactory(
+                new TaxonManager(
                     new ProcessedTaxonRepository(
                         exportClient,
                         new Mock<ILogger<ProcessedTaxonRepository>>().Object),
-                    new Mock<ILogger<TaxonFactory>>().Object),
+                    new Mock<ILogger<TaxonManager>>().Object),
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
             return processedObservationRepository;
         }

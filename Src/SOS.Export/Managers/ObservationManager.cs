@@ -13,12 +13,12 @@ using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Models.Search;
 
-namespace SOS.Export.Factories
+namespace SOS.Export.Managers
 {
     /// <summary>
     /// Sighting factory class
     /// </summary>
-    public class ObservationFactory : Interfaces.IObservationFactory
+    public class ObservationManager : Interfaces.IObservationManager
     {
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
@@ -27,7 +27,7 @@ namespace SOS.Export.Factories
         private readonly IZendToService _zendToService;
         private readonly string _exportPath;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
-        private readonly ILogger<ObservationFactory> _logger;
+        private readonly ILogger<ObservationManager> _logger;
 
         /// <summary>
         /// Constructor
@@ -39,7 +39,7 @@ namespace SOS.Export.Factories
         /// <param name="zendToService"></param>
         /// <param name="fileDestination"></param>
         /// <param name="logger"></param>
-        public ObservationFactory(
+        public ObservationManager(
             IDwcArchiveFileWriter dwcArchiveFileWriter,
             IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
@@ -48,7 +48,7 @@ namespace SOS.Export.Factories
             IZendToService zendToService,
             FileDestination fileDestination,
 
-            ILogger<ObservationFactory> logger)
+            ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));

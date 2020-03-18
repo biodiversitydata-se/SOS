@@ -4,12 +4,12 @@ using Hangfire;
 using SOS.Export.Models;
 using SOS.Lib.Models.Search;
 
-namespace SOS.Export.Factories.Interfaces
+namespace SOS.Export.Managers.Interfaces
 {
     /// <summary>
     /// Sighting factory repository
     /// </summary>
-    public interface IObservationFactory
+    public interface IObservationManager
     {
         /// <summary>
         /// Create a export file and upload it to local storage

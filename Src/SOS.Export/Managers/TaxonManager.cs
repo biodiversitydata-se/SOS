@@ -3,32 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.TaxonTree;
-using SOS.Export.Factories.Interfaces;
+using SOS.Export.Managers.Interfaces;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.TaxonTree;
 
-namespace SOS.Export.Factories
+namespace SOS.Export.Managers
 {
     /// <summary>
     /// Taxon factory
     /// </summary>
-    public class TaxonFactory : ITaxonFactory
+    public class TaxonManager : ITaxonManager
     {
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
-        private readonly ILogger<TaxonFactory> _logger;
+        private readonly ILogger<TaxonManager> _logger;
         private TaxonTree<IBasicTaxon> _taxonTree;
-        static object _initLock = new object();
+        static readonly object InitLock = new object();
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="processedTaxonRepository"></param>
         /// <param name="logger"></param>
-        public TaxonFactory(
+        public TaxonManager(
             IProcessedTaxonRepository processedTaxonRepository,
-            ILogger<TaxonFactory> logger)
+            ILogger<TaxonManager> logger)
         {
             _processedTaxonRepository = processedTaxonRepository ??
                                              throw new ArgumentNullException(nameof(processedTaxonRepository));
@@ -74,7 +74,7 @@ namespace SOS.Export.Factories
             {
                 if (_taxonTree == null)
                 {
-                    lock (_initLock)
+                    lock (InitLock)
                     {
                         if (_taxonTree == null)
                         {

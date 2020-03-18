@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Export.Extensions;
-using SOS.Export.Factories;
+using SOS.Export.Managers;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Lib.Models.Search;
@@ -63,8 +63,8 @@ namespace SOS.Export.IntegrationTests.Repositories
             ProcessedObservationRepository processedObservationRepository =
                 new ProcessedObservationRepository(
                     exportClient,
-                    new TaxonFactory(
-                        new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonFactory>>().Object),
+                    new TaxonManager(
+                        new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonManager>>().Object),
                     new NullLogger<ProcessedObservationRepository>());
 
             return processedObservationRepository;
