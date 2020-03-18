@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
@@ -11,7 +10,7 @@ using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Kul;
 
-namespace SOS.Process.DataProviderProcessors
+namespace SOS.Process.DataProviderProcessors.Kul
 {
     public class KulProcessedObservationFactory
     {

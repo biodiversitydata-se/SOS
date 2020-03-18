@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Factories;
 using SOS.Import.MongoDb;
+using SOS.Import.ObservationHarvesters;
 using SOS.Import.Repositories.Destination.Kul;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Services;
@@ -38,11 +39,11 @@ namespace SOS.Import.IntegrationTests.Factories
                     importConfiguration.VerbatimDbConfiguration.BatchSize), 
                 new Mock<ILogger<KulObservationVerbatimRepository>>().Object);
 
-        var kulObservationFactory = new KulObservationFactory(
+        var kulObservationFactory = new KulObservationHarvester(
                 kulObservationService,
                 kulObservationVerbatimRepository, 
                 importConfiguration.KulServiceConfiguration,
-                new Mock<ILogger<KulObservationFactory>>().Object);
+                new Mock<ILogger<KulObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -66,13 +67,13 @@ namespace SOS.Import.IntegrationTests.Factories
             importConfiguration.KulServiceConfiguration.StartHarvestYear = 2015;
             importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
            
-            var kulObservationFactory = new KulObservationFactory(
+            var kulObservationFactory = new KulObservationHarvester(
                 new KulObservationService(
                     new Mock<ILogger<KulObservationService>>().Object,
                     importConfiguration.KulServiceConfiguration),
                 new Mock<IKulObservationVerbatimRepository>().Object,
                 importConfiguration.KulServiceConfiguration,
-                new Mock<ILogger<KulObservationFactory>>().Object);
+                new Mock<ILogger<KulObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

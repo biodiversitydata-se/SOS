@@ -2,9 +2,9 @@
 using Hangfire;
 using SOS.Lib.Models.Verbatim.Shared;
 
-namespace SOS.Import.Factories.Interfaces
+namespace SOS.Import.ObservationHarvesters.Interfaces
 {
-    public interface IKulObservationFactory
+    public interface IKulObservationHarvester
     {
         /// <summary>
         /// Aggregate sightings.

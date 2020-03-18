@@ -9,13 +9,11 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Shared;
-using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
-namespace SOS.Process.DataProviderProcessors
+namespace SOS.Process.DataProviderProcessors.Artportalen
 {
     /// <summary>
     /// Process factory class

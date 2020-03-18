@@ -2,12 +2,12 @@
 using Hangfire;
 using SOS.Lib.Models.Verbatim.Shared;
 
-namespace SOS.Import.Factories.Interfaces
+namespace SOS.Import.ObservationHarvesters.Interfaces
 {
     /// <summary>
     /// Clam and tree portal observation factory interface
     /// </summary>
-    public interface IClamPortalObservationFactory
+    public interface IClamPortalObservationHarvester
     {
         /// <summary>
         /// Harvest clams.

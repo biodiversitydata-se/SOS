@@ -79,9 +79,9 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>().InstancePerLifetimeScope();
 
             // Add factories
-            builder.RegisterType<ClamPortalObservationFactory>().As<IClamPortalObservationFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ClamPortalObservationHarvester>().As<IClamPortalObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<AreaFactory>().As<IAreaFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<KulObservationFactory>().As<IKulObservationFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<KulObservationHarvester>().As<IKulObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenObservationHarvester>().As<IArtportalenObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingFactory>().As<IFieldMappingFactory>().InstancePerLifetimeScope();

@@ -7,12 +7,11 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Process.Extensions;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
-namespace SOS.Process.DataProviderProcessors
+namespace SOS.Process.DataProviderProcessors.ClamPortal
 {
     /// <summary>
     /// Process factory class

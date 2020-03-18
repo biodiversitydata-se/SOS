@@ -10,6 +10,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Process.DataProviderProcessors;
+using SOS.Process.DataProviderProcessors.ClamPortal;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;

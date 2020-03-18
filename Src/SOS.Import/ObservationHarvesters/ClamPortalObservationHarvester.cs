@@ -10,16 +10,16 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Shared;
 
-namespace SOS.Import.Factories
+namespace SOS.Import.ObservationHarvesters
 {
     /// <summary>
     /// Sighting factory class
     /// </summary>
-    public class ClamPortalObservationFactory : Interfaces.IClamPortalObservationFactory
+    public class ClamPortalObservationHarvester : Interfaces.IClamPortalObservationHarvester
     {
         private readonly IClamObservationVerbatimRepository _clamObservationVerbatimRepository;
         private readonly IClamObservationService _clamObservationService;
-        private readonly ILogger<ClamPortalObservationFactory> _logger;
+        private readonly ILogger<ClamPortalObservationHarvester> _logger;
 
         /// <summary>
         /// Constructor
@@ -27,10 +27,10 @@ namespace SOS.Import.Factories
         /// <param name="clamObservationVerbatimRepository"></param>
         /// <param name="clamObservationService"></param>
         /// <param name="logger"></param>
-        public ClamPortalObservationFactory(
+        public ClamPortalObservationHarvester(
             IClamObservationVerbatimRepository clamObservationVerbatimRepository,
             IClamObservationService clamObservationService,
-            ILogger<ClamPortalObservationFactory> logger)
+            ILogger<ClamPortalObservationHarvester> logger)
         {
             _clamObservationVerbatimRepository = clamObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(clamObservationVerbatimRepository));
             _clamObservationService = clamObservationService ?? throw new ArgumentNullException(nameof(clamObservationService));

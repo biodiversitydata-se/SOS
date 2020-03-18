@@ -6,6 +6,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Factories;
+using SOS.Import.ObservationHarvesters;
 using SOS.Import.Repositories.Destination.ClamPortal.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
@@ -18,7 +19,7 @@ namespace SOS.Import.UnitTests.Factories
     {
         private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
         private readonly Mock<IClamObservationService> _clamObservationServiceMock;
-        private readonly Mock<ILogger<ClamPortalObservationFactory>> _loggerMock;
+        private readonly Mock<ILogger<ClamPortalObservationHarvester>> _loggerMock;
 
         /// <summary>
         /// Constructor
@@ -27,7 +28,7 @@ namespace SOS.Import.UnitTests.Factories
         {
             _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
             _clamObservationServiceMock = new Mock<IClamObservationService>();
-            _loggerMock = new Mock<ILogger<ClamPortalObservationFactory>>();
+            _loggerMock = new Mock<ILogger<ClamPortalObservationHarvester>>();
         }
 
         /// <summary>
@@ -36,24 +37,24 @@ namespace SOS.Import.UnitTests.Factories
         [Fact]
         public void ConstructorTest()
         {
-            new ClamPortalObservationFactory(
+            new ClamPortalObservationHarvester(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _clamObservationServiceMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new ClamPortalObservationFactory(
+            Action create = () => new ClamPortalObservationHarvester(
                 null,
                 _clamObservationServiceMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
 
-            create = () => new ClamPortalObservationFactory(
+            create = () => new ClamPortalObservationHarvester(
                 _clamObservationVerbatimRepositoryMock.Object,
               null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationService");
 
-            create = () => new ClamPortalObservationFactory(
+            create = () => new ClamPortalObservationHarvester(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _clamObservationServiceMock.Object,
                 null);
@@ -86,7 +87,7 @@ namespace SOS.Import.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var sightingFactory = new ClamPortalObservationFactory(
+            var sightingFactory = new ClamPortalObservationHarvester(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _clamObservationServiceMock.Object,
                 _loggerMock.Object);
@@ -115,7 +116,7 @@ namespace SOS.Import.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var sightingFactory = new ClamPortalObservationFactory(
+            var sightingFactory = new ClamPortalObservationHarvester(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _clamObservationServiceMock.Object,
                 _loggerMock.Object);

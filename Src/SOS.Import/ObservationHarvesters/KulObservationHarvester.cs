@@ -13,13 +13,13 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 
-namespace SOS.Import.Factories
+namespace SOS.Import.ObservationHarvesters
 {
-    public class KulObservationFactory : Interfaces.IKulObservationFactory
+    public class KulObservationHarvester : Interfaces.IKulObservationHarvester
     {
         private readonly IKulObservationService _kulObservationService;
         private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
-        private readonly ILogger<KulObservationFactory> _logger;
+        private readonly ILogger<KulObservationHarvester> _logger;
         private readonly KulServiceConfiguration _kulServiceConfiguration;
 
         /// <summary>
@@ -29,11 +29,11 @@ namespace SOS.Import.Factories
         /// <param name="kulObservationVerbatimRepository"></param>
         /// <param name="kulServiceConfiguration"></param>
         /// <param name="logger"></param>
-        public KulObservationFactory(
+        public KulObservationHarvester(
             IKulObservationService kulObservationService,
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             KulServiceConfiguration kulServiceConfiguration,
-            ILogger<KulObservationFactory> logger)
+            ILogger<KulObservationHarvester> logger)
         {
             _kulObservationService = kulObservationService;
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository;
