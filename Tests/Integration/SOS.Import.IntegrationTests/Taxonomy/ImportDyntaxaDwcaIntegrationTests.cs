@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Import.Factories;
+using SOS.Import.Harvesters;
 using SOS.Import.IntegrationTests.TestHelpers.Factories;
 using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Taxon;
@@ -38,7 +39,7 @@ namespace SOS.Import.IntegrationTests.Taxonomy
             harvestInfo.Status.Should().Be(RunStatus.Success);
         }
 
-        private TaxonFactory CreateTaxonFactory(string filename)
+        private TaxonHarvester CreateTaxonFactory(string filename)
         {
             var importConfiguration = GetImportConfiguration();
             var importClient = new ImportClient(
@@ -58,7 +59,7 @@ namespace SOS.Import.IntegrationTests.Taxonomy
                 new TaxonAttributeServiceConfiguration { BaseAddress = importConfiguration.TaxonAttributeServiceConfiguration.BaseAddress },
                 new NullLogger<TaxonAttributeService>());
 
-            var taxonFactory = new TaxonFactory(taxonVerbatimRepository, taxonService, taxonAttributeService, new NullLogger<TaxonFactory>());
+            var taxonFactory = new TaxonHarvester(taxonVerbatimRepository, taxonService, taxonAttributeService, new NullLogger<TaxonHarvester>());
             return taxonFactory;
         }
     }

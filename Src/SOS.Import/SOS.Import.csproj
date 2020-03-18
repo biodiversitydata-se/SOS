@@ -38,70 +38,70 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Factories\FieldMappings\AccessRightsFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\AccessRightsFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\ActivityFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\ActivityFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\ArtportalenFieldMappingFactoryBase.cs">
+    <Compile Update="Factories\FieldMapping\ArtportalenFieldMappingFactoryBase.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\BasisOfRecordFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\BasisOfRecordFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\BiotopeFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\BiotopeFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\ContinentFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\ContinentFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\CountryFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\CountryFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\CountyFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\CountyFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\DwcFieldMappingFactoryBase.cs">
+    <Compile Update="Factories\FieldMapping\DwcFieldMappingFactoryBase.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\EstablishmentMeansFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\EstablishmentMeansFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\GenderFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\GenderFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\GeoRegionFieldMappingFactoryBase.cs">
+    <Compile Update="Factories\FieldMapping\GeoRegionFieldMappingFactoryBase.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\LifeStageFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\LifeStageFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\MunicipalityFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\MunicipalityFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\OccurrenceStatusFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\OccurrenceStatusFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\InstitutionFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\InstitutionFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\ParishFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\ParishFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\ProvinceFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\ProvinceFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\SubstrateFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\SubstrateFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\TypeFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\TypeFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\UnitFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\UnitFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Factories\FieldMappings\ValidationStatusFieldMappingFactory.cs">
+    <Compile Update="Factories\FieldMapping\ValidationStatusFieldMappingFactory.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>

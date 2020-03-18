@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Factories.Interfaces;
+using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
@@ -13,21 +13,21 @@ namespace SOS.Import.Jobs
     /// </summary>
     public class TaxonHarvestJob : ITaxonHarvestJob
     {
-        private readonly ITaxonFactory _taxonFactory;
+        private readonly ITaxonHarvester _taxonHarvester;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<TaxonHarvestJob> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="taxonFactory"></param>
+        /// <param name="taxonHarvester"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="logger"></param>
-        public TaxonHarvestJob(ITaxonFactory taxonFactory,
+        public TaxonHarvestJob(ITaxonHarvester taxonHarvester,
             IHarvestInfoRepository harvestInfoRepository,
             ILogger<TaxonHarvestJob> logger)
         {
-            _taxonFactory = taxonFactory ?? throw new ArgumentNullException(nameof(taxonFactory));
+            _taxonHarvester = taxonHarvester ?? throw new ArgumentNullException(nameof(taxonHarvester));
             _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -37,7 +37,7 @@ namespace SOS.Import.Jobs
         {
             _logger.LogDebug("Start Taxon Harvest Job");
 
-            var result = await _taxonFactory.HarvestAsync();
+            var result = await _taxonHarvester.HarvestAsync();
 
             _logger.LogDebug($"End taxon Harvest Job. Status: {result.Status}");
 

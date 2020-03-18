@@ -263,7 +263,7 @@ namespace SOS.Import.Factories
             return verifiedByDataSightingId;
         }
 
-        public static string ConcatenateVerifiedByString(VerifiedByData vbd)
+        private static string ConcatenateVerifiedByString(VerifiedByData vbd)
         {
             return ConcatenateVerifiedByString(
                 vbd.DeterminerName,

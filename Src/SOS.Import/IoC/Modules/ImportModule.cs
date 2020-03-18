@@ -2,13 +2,14 @@
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Jobs.Import;
 using SOS.Import.Factories;
-using SOS.Import.Factories.FieldMappings;
-using SOS.Import.Factories.Interfaces;
+using SOS.Import.Factories.FieldMapping;
+using SOS.Import.Harvesters;
+using SOS.Import.Harvesters.Interfaces;
+using SOS.Import.Harvesters.Observations;
+using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Jobs;
 using SOS.Import.MongoDb;
 using SOS.Import.MongoDb.Interfaces;
-using SOS.Import.ObservationHarvesters;
-using SOS.Import.ObservationHarvesters.Interfaces;
 using SOS.Import.Repositories.Destination;
 using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
@@ -80,11 +81,11 @@ namespace SOS.Import.IoC.Modules
 
             // Add factories
             builder.RegisterType<ClamPortalObservationHarvester>().As<IClamPortalObservationHarvester>().InstancePerLifetimeScope();
-            builder.RegisterType<AreaFactory>().As<IAreaFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<AreaHarvester>().As<IAreaHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationHarvester>().As<IKulObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenObservationHarvester>().As<IArtportalenObservationHarvester>().InstancePerLifetimeScope();
-            builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<FieldMappingFactory>().As<IFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonHarvester>().As<ITaxonHarvester>().InstancePerLifetimeScope();
+            builder.RegisterType<FieldMappingHarvester>().As<IFieldMappingHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<ActivityFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<GenderFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<LifeStageFieldMappingFactory>().InstancePerLifetimeScope();
