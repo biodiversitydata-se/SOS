@@ -11,7 +11,6 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
 using SOS.Process.Processors.Interfaces;

@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using SOS.Lib.Enums;
 
-namespace SOS.Process.Factories.Interfaces
+namespace SOS.Process.Managers.Interfaces
 {
     /// <summary>
     /// Processed data factory
     /// </summary>
-    public interface IInstanceFactory
+    public interface IInstanceManager
     {
         /// <summary>
         /// Copy data from active to inactive instance

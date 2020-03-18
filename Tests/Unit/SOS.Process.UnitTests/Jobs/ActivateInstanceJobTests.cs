@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Process.Factories.Interfaces;
 using SOS.Process.Jobs;
+using SOS.Process.Managers.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Jobs
@@ -14,7 +14,7 @@ namespace SOS.Process.UnitTests.Jobs
     /// </summary>
     public class ActivateInstanceJobTests
     {
-        private readonly Mock<IInstanceFactory> _instanceFactoryMock;
+        private readonly Mock<IInstanceManager> _instanceFactoryMock;
         private readonly Mock<ILogger<ActivateInstanceJob>> _loggerMock;
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         public ActivateInstanceJobTests()
         {
-            _instanceFactoryMock = new Mock<IInstanceFactory>();
+            _instanceFactoryMock = new Mock<IInstanceManager>();
             _loggerMock = new Mock<ILogger<ActivateInstanceJob>>();
         }
 

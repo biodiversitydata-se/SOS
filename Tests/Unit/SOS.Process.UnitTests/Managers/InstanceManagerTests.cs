@@ -4,29 +4,29 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Enums;
-using SOS.Process.Factories;
+using SOS.Process.Managers;
 using SOS.Process.Repositories.Destination.Interfaces;
 using Xunit;
 
-namespace SOS.Process.UnitTests.Factories
+namespace SOS.Process.UnitTests.Managers
 {
     /// <summary>
-    /// Tests for sighting factory
+    /// Tests for Instance manager
     /// </summary>
-    public class InstanceFactoryTests
+    public class InstanceManagerTests
     {
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
-        private readonly Mock<ILogger<InstanceFactory>> _loggerMock;
+        private readonly Mock<ILogger<InstanceManager>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public InstanceFactoryTests()
+        public InstanceManagerTests()
         {
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
-            _loggerMock = new Mock<ILogger<InstanceFactory>>();
+            _loggerMock = new Mock<ILogger<InstanceManager>>();
         }
 
         /// <summary>
@@ -35,25 +35,25 @@ namespace SOS.Process.UnitTests.Factories
         [Fact]
         public void ConstructorTest()
         {
-            new InstanceFactory(
+            new InstanceManager(
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new InstanceFactory(
+            Action create = () => new InstanceManager(
                 null,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("darwinCoreRepository");
 
             
-            create = () => new InstanceFactory(
+            create = () => new InstanceManager(
                 _processedObservationRepositoryMock.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processInfoRepository");
 
-            create = () => new InstanceFactory(
+            create = () => new InstanceManager(
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 null);
@@ -82,12 +82,12 @@ namespace SOS.Process.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var factory = new InstanceFactory(
+            var instanceManager = new InstanceManager(
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await factory.CopyProviderDataAsync(DataProvider.Artportalen);
+            var result = await instanceManager.CopyProviderDataAsync(DataProvider.Artportalen);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -110,12 +110,12 @@ namespace SOS.Process.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var factory = new InstanceFactory(
+            var instanceManager = new InstanceManager(
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await factory.CopyProviderDataAsync(DataProvider.Artportalen);
+            var result = await instanceManager.CopyProviderDataAsync(DataProvider.Artportalen);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -139,12 +139,12 @@ namespace SOS.Process.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var factory = new InstanceFactory(
+            var instanceManager = new InstanceManager(
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await factory.CopyProviderDataAsync(DataProvider.Artportalen);
+            var result = await instanceManager.CopyProviderDataAsync(DataProvider.Artportalen);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -168,12 +168,12 @@ namespace SOS.Process.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var factory = new InstanceFactory(
+            var instanceManager = new InstanceManager(
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await factory.SetActiveInstanceAsync(0);
+            var result = await instanceManager.SetActiveInstanceAsync(0);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -196,12 +196,12 @@ namespace SOS.Process.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var factory = new InstanceFactory(
+            var instanceManager = new InstanceManager(
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await factory.SetActiveInstanceAsync(0);
+            var result = await instanceManager.SetActiveInstanceAsync(0);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -225,12 +225,12 @@ namespace SOS.Process.UnitTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var factory = new InstanceFactory(
+            var instanceManager = new InstanceManager(
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await factory.SetActiveInstanceAsync(0);
+            var result = await instanceManager.SetActiveInstanceAsync(0);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

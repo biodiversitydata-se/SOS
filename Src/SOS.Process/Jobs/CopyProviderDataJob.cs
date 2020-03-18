@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
-using SOS.Process.Factories.Interfaces;
+using SOS.Process.Managers.Interfaces;
 
 namespace SOS.Process.Jobs
 {
@@ -12,19 +12,19 @@ namespace SOS.Process.Jobs
     /// </summary>
     public class CopyProviderDataJob : ICopyProviderDataJob
     {
-        private readonly IInstanceFactory _instanceFactory;
+        private readonly IInstanceManager _instanceManager;
         private readonly ILogger<CopyProviderDataJob> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="instanceFactory"></param>
+        /// <param name="instanceManager"></param>
         /// <param name="logger"></param>
         public CopyProviderDataJob(
-            IInstanceFactory instanceFactory,
+            IInstanceManager instanceManager,
             ILogger<CopyProviderDataJob> logger)
         {
-            _instanceFactory = instanceFactory ?? throw new ArgumentNullException(nameof(instanceFactory));
+            _instanceManager = instanceManager ?? throw new ArgumentNullException(nameof(instanceManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -34,7 +34,7 @@ namespace SOS.Process.Jobs
             try
             {
                 // Activate passed instance
-                var success =  await _instanceFactory.CopyProviderDataAsync(provider);
+                var success =  await _instanceManager.CopyProviderDataAsync(provider);
                 return success ? true : throw new Exception("Copy provider data job failed");
             }
             catch (Exception e)

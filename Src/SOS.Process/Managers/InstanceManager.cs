@@ -4,12 +4,12 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Process.Repositories.Destination.Interfaces;
 
-namespace SOS.Process.Factories
+namespace SOS.Process.Managers
 {
     /// <summary>
-    /// Process factory class
+    /// Instance manager class
     /// </summary>
-    public class InstanceFactory : ProcessBaseFactory<InstanceFactory>, Interfaces.IInstanceFactory
+    public class InstanceManager : ManagerBase<InstanceManager>, Interfaces.IInstanceManager
     {
         private readonly IProcessInfoRepository _processInfoRepository;
 
@@ -19,10 +19,10 @@ namespace SOS.Process.Factories
         /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="logger"></param>
-        public InstanceFactory(
+        public InstanceManager(
             IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
-            ILogger<InstanceFactory> logger) : base(processedObservationRepository, logger)
+            ILogger<InstanceManager> logger) : base(processedObservationRepository, logger)
         {
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
         }

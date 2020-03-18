@@ -10,7 +10,6 @@ using Moq;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Process.Database;
-using SOS.Process.Factories;
 using SOS.Process.Helpers;
 using SOS.Process.Jobs;
 using SOS.Process.Processors.Artportalen;

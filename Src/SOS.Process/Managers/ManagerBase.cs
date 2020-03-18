@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Logging;
 using SOS.Process.Repositories.Destination.Interfaces;
 
-namespace SOS.Process.Factories
+namespace SOS.Process.Managers
 {
     /// <summary>
     /// Process factory class
     /// </summary>
-    public class ProcessBaseFactory<TEntity>
+    public class ManagerBase<TEntity>
     {
         protected readonly IProcessedObservationRepository ProcessRepository;
         protected readonly ILogger<TEntity> Logger;
@@ -17,7 +17,7 @@ namespace SOS.Process.Factories
         /// </summary>
         /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
-        public ProcessBaseFactory(
+        public ManagerBase(
             IProcessedObservationRepository processedObservationRepository,
             ILogger<TEntity> logger)
         {

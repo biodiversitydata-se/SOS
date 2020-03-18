@@ -4,8 +4,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Enums;
-using SOS.Process.Factories.Interfaces;
 using SOS.Process.Jobs;
+using SOS.Process.Managers.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Jobs
@@ -15,7 +15,7 @@ namespace SOS.Process.UnitTests.Jobs
     /// </summary>
     public class CopyProviderDataJobTests
     {
-        private readonly Mock<IInstanceFactory> _instanceFactoryMock;
+        private readonly Mock<IInstanceManager> _instanceFactoryMock;
         private readonly Mock<ILogger<CopyProviderDataJob>> _loggerMock;
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         public CopyProviderDataJobTests()
         {
-            _instanceFactoryMock = new Mock<IInstanceFactory>();
+            _instanceFactoryMock = new Mock<IInstanceManager>();
             _loggerMock = new Mock<ILogger<CopyProviderDataJob>>();
         }
 

@@ -14,7 +14,6 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Processors.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
