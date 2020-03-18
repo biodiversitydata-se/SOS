@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Observations.Api.Factories.Interfaces
+namespace SOS.Observations.Api.Managers.Interfaces
 {
     /// <summary>
     /// Field mapping factory.
     /// </summary>
-    public interface IFieldMappingFactory
+    public interface IFieldMappingManager
     {
         /// <summary>
         /// Get field mappings

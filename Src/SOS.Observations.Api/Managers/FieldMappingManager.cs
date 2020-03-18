@@ -5,18 +5,18 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Observations.Api.Factories.Interfaces;
+using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
-namespace SOS.Observations.Api.Factories
+namespace SOS.Observations.Api.Managers
 {
     /// <summary>
-    /// Field mapping factory.
+    /// Field mapping manager.
     /// </summary>
-    public class FieldMappingFactory : IFieldMappingFactory
+    public class FieldMappingManager : IFieldMappingManager
     {
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
-        private readonly ILogger<FieldMappingFactory> _logger;
+        private readonly ILogger<FieldMappingManager> _logger;
         private Dictionary<FieldMappingFieldId, Dictionary<int, Dictionary<string, string>>> _translationDictionary;
         private Dictionary<FieldMappingFieldId, Dictionary<int, string>> _nonLocalizedTranslationDictionary;
         static readonly object InitLock = new object();
@@ -26,9 +26,9 @@ namespace SOS.Observations.Api.Factories
         /// </summary>
         /// <param name="processedFieldMappingRepository"></param>
         /// <param name="logger"></param>
-        public FieldMappingFactory(
+        public FieldMappingManager(
             IProcessedFieldMappingRepository processedFieldMappingRepository,
-            ILogger<FieldMappingFactory> logger)
+            ILogger<FieldMappingManager> logger)
         {
             _processedFieldMappingRepository = processedFieldMappingRepository ??
                                              throw new ArgumentNullException(nameof(processedFieldMappingRepository));

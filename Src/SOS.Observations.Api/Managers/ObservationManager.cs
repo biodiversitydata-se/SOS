@@ -7,33 +7,33 @@ using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
-using SOS.Observations.Api.Factories.Interfaces;
+using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
-namespace SOS.Observations.Api.Factories
+namespace SOS.Observations.Api.Managers
 {
     /// <summary>
-    /// Observation factory class
+    /// Observation manager class
     /// </summary>
-    public class ObservationFactory : Interfaces.IObservationFactory
+    public class ObservationManager : Interfaces.IObservationManager
     {
         private readonly IProcessedObservationRepository _processedObservationRepository;
-        private readonly IFieldMappingFactory _fieldMappingFactory;
-        private readonly ILogger<ObservationFactory> _logger;
+        private readonly IFieldMappingManager _fieldMappingManager;
+        private readonly ILogger<ObservationManager> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="processedObservationRepository"></param>
-        /// <param name="fieldMappingFactory"></param>
+        /// <param name="fieldMappingManager"></param>
         /// <param name="logger"></param>
-        public ObservationFactory(
+        public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
-            IFieldMappingFactory fieldMappingFactory,
-            ILogger<ObservationFactory> logger)
+            IFieldMappingManager fieldMappingManager,
+            ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
-            _fieldMappingFactory = fieldMappingFactory ?? throw new ArgumentNullException(nameof(fieldMappingFactory));
+            _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -193,7 +193,7 @@ namespace SOS.Observations.Api.Factories
                 if (observationNode[fieldName] is IDictionary<string, object> fieldNode && fieldNode.ContainsKey("Value") && fieldNode.ContainsKey("_id"))
                 {
                     int id = (int)fieldNode["_id"];
-                    if (id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId && _fieldMappingFactory.TryGetValue(fieldMappingFieldId, id, out var translatedValue))
+                    if (id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId && _fieldMappingManager.TryGetValue(fieldMappingFieldId, id, out var translatedValue))
                     {
                         fieldNode["Value"] = translatedValue;
                     }
@@ -204,7 +204,7 @@ namespace SOS.Observations.Api.Factories
         {
             if (fieldMapValue == null) return;
             if (fieldMapValue.Id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId
-                && _fieldMappingFactory.TryGetValue(fieldMappingFieldId, fieldMapValue.Id, out var translatedValue))
+                && _fieldMappingManager.TryGetValue(fieldMappingFieldId, fieldMapValue.Id, out var translatedValue))
             {
                 fieldMapValue.Value = translatedValue;
             }
@@ -218,7 +218,7 @@ namespace SOS.Observations.Api.Factories
             if (fieldMapValue == null) return;
 
             if (fieldMapValue.Id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId
-                && _fieldMappingFactory.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, fieldMapValue.Id, out var translatedValue))
+                && _fieldMappingManager.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, fieldMapValue.Id, out var translatedValue))
             {
                 fieldMapValue.Value = translatedValue;
             }
@@ -237,7 +237,7 @@ namespace SOS.Observations.Api.Factories
                 if (observationNode[fieldName] is IDictionary<string, object> fieldNode && fieldNode.ContainsKey("Value") && fieldNode.ContainsKey("_id"))
                 {
                     int id = (int)fieldNode["_id"];
-                    if (id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId && _fieldMappingFactory.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, id, out var translatedValue))
+                    if (id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId && _fieldMappingManager.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, id, out var translatedValue))
                     {
                         fieldNode["Value"] = translatedValue;
                     }

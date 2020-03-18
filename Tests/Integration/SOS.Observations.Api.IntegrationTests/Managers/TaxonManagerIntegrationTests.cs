@@ -2,14 +2,14 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Database;
-using SOS.Observations.Api.Factories;
+using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Repositories;
 using Xunit;
 using ProcessedTaxonRepository = SOS.Observations.Api.Repositories.ProcessedTaxonRepository;
 
-namespace SOS.Observations.Api.IntegrationTests.Factories
+namespace SOS.Observations.Api.IntegrationTests.Managers
 {
-    public class TaxonFactoryIntegrationTests : TestBase
+    public class TaxonManagerIntegrationTests : TestBase
     {
         [Fact]
         public void A_taxon_tree_is_created_from_sos_processed_db()
@@ -17,12 +17,12 @@ namespace SOS.Observations.Api.IntegrationTests.Factories
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var taxonFactory = CreateTaxonFactory();
+            var taxonManager = CreateTaxonManager();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var taxonTree = taxonFactory.TaxonTree;
+            var taxonTree = taxonManager.TaxonTree;
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -30,7 +30,7 @@ namespace SOS.Observations.Api.IntegrationTests.Factories
             taxonTree.Root.ScientificName.Should().Be("Biota");
         }
 
-        private TaxonFactory CreateTaxonFactory()
+        private TaxonManager CreateTaxonManager()
         {
             var mongoDbConfiguration = GetMongoDbConfiguration();
             var processClient = new ProcessClient(
@@ -41,7 +41,7 @@ namespace SOS.Observations.Api.IntegrationTests.Factories
             var processedTaxonRepository = new ProcessedTaxonRepository(
                 processClient,
                 new NullLogger<ProcessBaseRepository<ProcessedTaxon, int>>());
-            var taxonFactory = new TaxonFactory(processedTaxonRepository, new NullLogger<TaxonFactory>());
+            var taxonFactory = new TaxonManager(processedTaxonRepository, new NullLogger<TaxonManager>());
             return taxonFactory;
         }
     }

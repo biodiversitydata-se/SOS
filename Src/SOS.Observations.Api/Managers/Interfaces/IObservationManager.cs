@@ -2,12 +2,12 @@
 using System.Threading.Tasks;
 using SOS.Lib.Models.Search;
 
-namespace SOS.Observations.Api.Factories.Interfaces
+namespace SOS.Observations.Api.Managers.Interfaces
 {
     /// <summary>
     /// Sighting factory repository
     /// </summary>
-    public interface IObservationFactory
+    public interface IObservationManager
     {
         /// <summary>
         /// Get chunk of sightings

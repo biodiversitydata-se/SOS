@@ -8,7 +8,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Controllers.Interfaces;
-using SOS.Observations.Api.Factories.Interfaces;
+using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -19,24 +19,24 @@ namespace SOS.Observations.Api.Controllers
     [ApiController]
     public class ObservationController : ControllerBase, IObservationController
     {
-        private readonly IObservationFactory _observationFactory;
-        private readonly IFieldMappingFactory _fieldMappingFactory;
+        private readonly IObservationManager _observationManager;
+        private readonly IFieldMappingManager _fieldMappingManager;
         private readonly ILogger<ObservationController> _logger;
-        private const int _maxBatchSize = 10000;
+        private const int MaxBatchSize = 10000;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="observationFactory"></param>
-        /// <param name="fieldMappingFactory"></param>
+        /// <param name="observationManager"></param>
+        /// <param name="fieldMappingManager"></param>
         /// <param name="logger"></param>
         public ObservationController(
-            IObservationFactory observationFactory, 
-            IFieldMappingFactory fieldMappingFactory,
+            IObservationManager observationManager, 
+            IFieldMappingManager fieldMappingManager,
             ILogger<ObservationController> logger)
         {
-            _observationFactory = observationFactory ?? throw new ArgumentNullException(nameof(observationFactory));
-            _fieldMappingFactory = fieldMappingFactory ?? throw new ArgumentNullException(nameof(fieldMappingFactory));
+            _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
+            _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -49,12 +49,12 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                if (!filter.IsFilterActive || skip < 0 || take <= 0 || take > _maxBatchSize)
+                if (!filter.IsFilterActive || skip < 0 || take <= 0 || take > MaxBatchSize)
                 {
                     return new BadRequestResult();
                 }
 
-                return new OkObjectResult(await _observationFactory.GetChunkAsync(filter, skip, take));
+                return new OkObjectResult(await _observationManager.GetChunkAsync(filter, skip, take));
             }
             catch (Exception e)
             {
@@ -71,7 +71,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                return new OkObjectResult(await _fieldMappingFactory.GetFieldMappingsAsync());
+                return new OkObjectResult(await _fieldMappingManager.GetFieldMappingsAsync());
             }
             catch (Exception e)
             {

@@ -4,25 +4,25 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Observations.Api.Repositories.Interfaces;
 
-namespace SOS.Observations.Api.Factories
+namespace SOS.Observations.Api.Managers
 {
     /// <summary>
     /// Sighting factory class
     /// </summary>
-    public class ProcessInfoFactory : Interfaces.IProcessInfoFactory
+    public class ProcessInfoManager : Interfaces.IProcessInfoManager
     {
         private readonly IProcessInfoRepository _processInfoRepository;
 
-        private readonly ILogger<ProcessInfoFactory> _logger;
+        private readonly ILogger<ProcessInfoManager> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="processInfoRepository"></param>
         /// <param name="logger"></param>
-        public ProcessInfoFactory(
+        public ProcessInfoManager(
             IProcessInfoRepository processInfoRepository,
-            ILogger<ProcessInfoFactory> logger)
+            ILogger<ProcessInfoManager> logger)
         {
             _processInfoRepository = processInfoRepository ??
                                            throw new ArgumentNullException(nameof(processInfoRepository));
