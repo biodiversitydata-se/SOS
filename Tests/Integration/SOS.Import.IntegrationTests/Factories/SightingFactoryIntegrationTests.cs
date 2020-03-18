@@ -7,6 +7,7 @@ using Moq;
 using SOS.Import.Entities;
 using SOS.Import.Factories;
 using SOS.Import.MongoDb;
+using SOS.Import.ObservationHarvesters;
 using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen;
@@ -46,7 +47,7 @@ namespace SOS.Import.IntegrationTests.Factories
             var siteRepositoryMock = new Mock<ISiteRepository>();
             siteRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<SiteEntity>());
 
-            ArtportalenObservationFactory observationFactory = new ArtportalenObservationFactory(
+            ArtportalenObservationHarvester observationHarvester = new ArtportalenObservationHarvester(
                 importConfiguration.ArtportalenConfiguration,
                 metadataRepository,
                 projectRepository,
@@ -58,12 +59,12 @@ namespace SOS.Import.IntegrationTests.Factories
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
-                new Mock<ILogger<ArtportalenObservationFactory>>().Object);
+                new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await observationFactory.HarvestSightingsAsync(JobCancellationToken.Null);
+            var res = await observationHarvester.HarvestSightingsAsync(JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -93,7 +94,7 @@ namespace SOS.Import.IntegrationTests.Factories
             var siteRepositoryMock = new Mock<ISiteRepository>();
             siteRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<SiteEntity>());
 
-            ArtportalenObservationFactory observationFactory = new ArtportalenObservationFactory(
+            ArtportalenObservationHarvester observationHarvester = new ArtportalenObservationHarvester(
                 importConfiguration.ArtportalenConfiguration,
                 metadataRepository,
                 projectRepository,
@@ -105,12 +106,12 @@ namespace SOS.Import.IntegrationTests.Factories
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
-                new Mock<ILogger<ArtportalenObservationFactory>>().Object);
+                new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await observationFactory.HarvestSightingsAsync(JobCancellationToken.Null);
+            var res = await observationHarvester.HarvestSightingsAsync(JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

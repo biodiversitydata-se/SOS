@@ -2,12 +2,12 @@
 using Hangfire;
 using SOS.Lib.Models.Verbatim.Shared;
 
-namespace SOS.Import.Factories.Interfaces
+namespace SOS.Import.ObservationHarvesters.Interfaces
 {
     /// <summary>
     /// Sighting factory repository
     /// </summary>
-    public interface IArtportalenObservationFactory
+    public interface IArtportalenObservationHarvester
     {
         /// <summary>
         /// Aggregate sightings.

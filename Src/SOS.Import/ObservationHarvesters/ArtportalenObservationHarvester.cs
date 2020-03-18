@@ -8,6 +8,9 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities;
 using SOS.Import.Extensions;
+using SOS.Import.Factories;
+using SOS.Import.Factories.Interfaces;
+using SOS.Import.ObservationHarvesters.Interfaces;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Import;
@@ -16,12 +19,12 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.Shared;
 
-namespace SOS.Import.Factories
+namespace SOS.Import.ObservationHarvesters
 {
     /// <summary>
     /// Sighting factory class
     /// </summary>
-    public class ArtportalenObservationFactory : Interfaces.IArtportalenObservationFactory
+    public class ArtportalenObservationHarvester : IArtportalenObservationHarvester
     {
         private readonly ArtportalenConfiguration _artportalenConfiguration;
         private readonly IMetadataRepository _metadataRepository;
@@ -33,7 +36,7 @@ namespace SOS.Import.Factories
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly IOrganizationRepository _organizationRepository;
-        private readonly ILogger<ArtportalenObservationFactory> _logger;
+        private readonly ILogger<ArtportalenObservationHarvester> _logger;
         private readonly SemaphoreSlim _semaphore;
         private bool _hasAddedTestSightings;
 
@@ -51,7 +54,7 @@ namespace SOS.Import.Factories
         /// <param name="sightingRelationRepository"></param>
         /// <param name="speciesCollectionItemRepository"></param>
         /// <param name="logger"></param>
-        public ArtportalenObservationFactory(
+        public ArtportalenObservationHarvester(
             ArtportalenConfiguration artportalenConfiguration,
             IMetadataRepository metadataRepository,
             IProjectRepository projectRepository,
@@ -62,7 +65,7 @@ namespace SOS.Import.Factories
             IOrganizationRepository organizationRepository,
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionItemRepository,
-            ILogger<ArtportalenObservationFactory> logger)
+            ILogger<ArtportalenObservationHarvester> logger)
         {
             _artportalenConfiguration = artportalenConfiguration ?? throw new ArgumentNullException(nameof(artportalenConfiguration));
             _metadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
@@ -123,7 +126,7 @@ namespace SOS.Import.Factories
                 // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
                 var sightingRelations =
                     (await _sightingRelationRepository.GetAsync(sightingIds)).ToVerbatims().ToArray();
-                var personSightingBySightingId = PersonSightingFactory.CalculatePersonSightingDictionary(
+                var personSightingBySightingId = PersonSightingFactory.CreatePersonSightingDictionary(
                     sightingIds,
                     personByUserId,
                     organizationById,
@@ -138,8 +141,8 @@ namespace SOS.Import.Factories
                 _logger.LogDebug("Finish getting projects and parameters");
 
                 _logger.LogDebug("Start casting entities to verbatim");
-                // Cast sightings to aggregates
-                IEnumerable<ArtportalenVerbatimObservation> aggregates = sightings.ToVerbatims(
+                // Cast sightings to verbatim observations
+                IEnumerable<ArtportalenVerbatimObservation> verbatimObservations = sightings.ToVerbatims(
                     activities,
                     biotopes,
                     genders,
@@ -155,7 +158,7 @@ namespace SOS.Import.Factories
 
                 _logger.LogDebug("Start storing batch");
                 // Add sightings to mongodb
-                await _sightingVerbatimRepository.AddManyAsync(aggregates);
+                await _sightingVerbatimRepository.AddManyAsync(verbatimObservations);
                 _logger.LogDebug("Finish storing batch");
 
                 return sightings.Length;

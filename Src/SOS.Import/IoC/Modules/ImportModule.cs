@@ -7,6 +7,8 @@ using SOS.Import.Factories.Interfaces;
 using SOS.Import.Jobs;
 using SOS.Import.MongoDb;
 using SOS.Import.MongoDb.Interfaces;
+using SOS.Import.ObservationHarvesters;
+using SOS.Import.ObservationHarvesters.Interfaces;
 using SOS.Import.Repositories.Destination;
 using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
@@ -80,7 +82,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ClamPortalObservationFactory>().As<IClamPortalObservationFactory>().InstancePerLifetimeScope();
             builder.RegisterType<AreaFactory>().As<IAreaFactory>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationFactory>().As<IKulObservationFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ArtportalenObservationFactory>().As<IArtportalenObservationFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenObservationHarvester>().As<IArtportalenObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingFactory>().As<IFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<ActivityFieldMappingFactory>().InstancePerLifetimeScope();
