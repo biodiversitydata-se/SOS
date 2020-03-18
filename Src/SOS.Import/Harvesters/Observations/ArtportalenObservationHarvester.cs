@@ -223,11 +223,11 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogDebug("Finish getting projects & project parameters");
 
                 _logger.LogDebug("Start getting sites");
-                var siteEntities = await _siteRepository.GetAsync();
+                var siteEntities = (await _siteRepository.GetAsync()).ToList();
                 _logger.LogDebug("Finish getting sites");
 
                 _logger.LogDebug("Start casting site entities to verbatims");
-                var siteVerbatims = siteEntities.ToVerbatims();
+                var siteVerbatims = siteEntities.ToVerbatimsUsingBatch();
                 var sites = siteVerbatims.ToDictionary(s => s.Id, s => s);
                 _logger.LogDebug("Finish casting site entities to verbatims");
 
