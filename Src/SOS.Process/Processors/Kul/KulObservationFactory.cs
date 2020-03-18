@@ -12,12 +12,12 @@ using SOS.Lib.Models.Verbatim.Kul;
 
 namespace SOS.Process.Processors.Kul
 {
-    public class KulProcessedObservationFactory
+    public class KulObservationFactory
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
 
-        public KulProcessedObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
+        public KulObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
         {
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
         }

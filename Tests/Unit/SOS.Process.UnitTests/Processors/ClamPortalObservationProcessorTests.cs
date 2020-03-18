@@ -20,24 +20,24 @@ namespace SOS.Process.UnitTests.Processors
     /// <summary>
     /// Tests for Clam Portal processor
     /// </summary>
-    public class ClamPortalProcessorTests
+    public class ClamPortalObservationProcessorTests
     {
         private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
-        private readonly Mock<ILogger<ClamPortalProcessor>> _loggerMock;
+        private readonly Mock<ILogger<ClamPortalObservationProcessor>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ClamPortalProcessorTests()
+        public ClamPortalObservationProcessorTests()
         {
             _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
-            _loggerMock = new Mock<ILogger<ClamPortalProcessor>>();
+            _loggerMock = new Mock<ILogger<ClamPortalObservationProcessor>>();
         }
 
         /// <summary>
@@ -46,14 +46,14 @@ namespace SOS.Process.UnitTests.Processors
         [Fact]
         public void ConstructorTest()
         {
-            new ClamPortalProcessor(
+            new ClamPortalObservationProcessor(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new ClamPortalProcessor(
+            Action create = () => new ClamPortalObservationProcessor(
                 null,
                 _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
@@ -62,7 +62,7 @@ namespace SOS.Process.UnitTests.Processors
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
 
 
-            create = () => new ClamPortalProcessor(
+            create = () => new ClamPortalObservationProcessor(
                 _clamObservationVerbatimRepositoryMock.Object,
                 null,
                 _processedObservationRepositoryMock.Object,
@@ -70,7 +70,7 @@ namespace SOS.Process.UnitTests.Processors
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
 
-            create = () => new ClamPortalProcessor(
+            create = () => new ClamPortalObservationProcessor(
                  _clamObservationVerbatimRepositoryMock.Object,
                  _areaHelper.Object,
                 null,
@@ -78,7 +78,7 @@ namespace SOS.Process.UnitTests.Processors
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("DarwinCoreRepository");
 
-            create = () => new ClamPortalProcessor(
+            create = () => new ClamPortalObservationProcessor(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
@@ -116,7 +116,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamPortalProcessor = new ClamPortalProcessor(
+            var clamPortalProcessor = new ClamPortalObservationProcessor(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
@@ -146,7 +146,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamPortalProcessor = new ClamPortalProcessor(
+            var clamPortalProcessor = new ClamPortalObservationProcessor(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
@@ -176,7 +176,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamPortalProcessor = new ClamPortalProcessor(
+            var clamPortalProcessor = new ClamPortalObservationProcessor(
                 _clamObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,

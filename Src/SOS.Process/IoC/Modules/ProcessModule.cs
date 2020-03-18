@@ -70,10 +70,10 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>().InstancePerLifetimeScope();
 
             // Add factories
-            builder.RegisterType<ClamPortalProcessor>().As<IClamPortalProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<ClamPortalObservationProcessor>().As<IClamPortalObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
-            builder.RegisterType<KulProcessor>().As<IKulProcessor>().InstancePerLifetimeScope();
-            builder.RegisterType<ArtportalenProcessor>().As<IArtportalenProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<KulObservationProcessor>().As<IKulObservationProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenObservationProcessor>().As<IArtportalenObservationProcessor>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();

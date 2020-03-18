@@ -3,7 +3,7 @@
     /// <summary>
     /// Artportalen observation processor
     /// </summary>
-    public interface IArtportalenProcessor : IProcessor
+    public interface IArtportalenObservationProcessor : IProcessor
     {
         
     }

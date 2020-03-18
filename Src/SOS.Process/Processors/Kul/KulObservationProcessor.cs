@@ -16,7 +16,7 @@ namespace SOS.Process.Processors.Kul
     /// <summary>
     /// Process factory class
     /// </summary>
-    public class KulProcessor : ProcessorBase<KulProcessor>, Interfaces.IKulProcessor
+    public class KulObservationProcessor : ObservationProcessorBase<KulObservationProcessor>, Interfaces.IKulObservationProcessor
     {
         private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
@@ -30,12 +30,12 @@ namespace SOS.Process.Processors.Kul
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="logger"></param>
-        public KulProcessor(
+        public KulObservationProcessor(
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<KulProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,logger)
+            ILogger<KulObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,logger)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -47,7 +47,7 @@ namespace SOS.Process.Processors.Kul
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
-            var observationFactory = new KulProcessedObservationFactory(taxa);
+            var observationFactory = new KulObservationFactory(taxa);
 
             using var cursor = await _kulObservationVerbatimRepository.GetAllAsync();
 

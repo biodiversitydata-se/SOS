@@ -28,9 +28,9 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IProcessedObservationRepository> _darwinCoreRepository;
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
-        private readonly Mock<IClamPortalProcessor> _clamPortalProcessor;
-        private readonly Mock<IKulProcessor> _kulProcessor;
-        private readonly Mock<IArtportalenProcessor> _artportalenProcessor;
+        private readonly Mock<IClamPortalObservationProcessor> _clamPortalProcessor;
+        private readonly Mock<IKulObservationProcessor> _kulProcessor;
+        private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
         private readonly Mock<ITaxonProcessedRepository> _taxonProcessedRepository;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<ILogger<ProcessJob>> _loggerMock;
@@ -45,9 +45,9 @@ namespace SOS.Process.UnitTests.Jobs
             _darwinCoreRepository = new Mock<IProcessedObservationRepository>();
             _processInfoRepository = new Mock<IProcessInfoRepository>();
             _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
-            _clamPortalProcessor = new Mock<IClamPortalProcessor>();
-            _kulProcessor = new Mock<IKulProcessor>();
-            _artportalenProcessor = new Mock<IArtportalenProcessor>();
+            _clamPortalProcessor = new Mock<IClamPortalObservationProcessor>();
+            _kulProcessor = new Mock<IKulObservationProcessor>();
+            _artportalenProcessor = new Mock<IArtportalenObservationProcessor>();
             _taxonProcessedRepository = new Mock<ITaxonProcessedRepository>();
             _areaHelper = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<ProcessJob>>();

@@ -3,7 +3,7 @@
     /// <summary>
     /// Clam Portal observation processor
     /// </summary>
-    public interface IClamPortalProcessor : IProcessor
+    public interface IClamPortalObservationProcessor : IProcessor
     {
         
     }

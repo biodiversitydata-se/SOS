@@ -3,7 +3,7 @@
     /// <summary>
     /// KUL observation processor
     /// </summary>
-    public interface IKulProcessor : IProcessor
+    public interface IKulObservationProcessor : IProcessor
     {
         
     }

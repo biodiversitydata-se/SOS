@@ -13,12 +13,12 @@ using SOS.Lib.Models.Verbatim.ClamPortal;
 
 namespace SOS.Process.Processors.ClamPortal
 {
-    public class ClamPortalProcessedObservationFactory
+    public class ClamPortalObservationFactory
     {
         private const string ValidatedObservationStringValue = "Godkänd";
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
 
-        public ClamPortalProcessedObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
+        public ClamPortalObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
         {
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
         }

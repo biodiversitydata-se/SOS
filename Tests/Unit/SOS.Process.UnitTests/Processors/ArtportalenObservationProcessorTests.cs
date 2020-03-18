@@ -21,26 +21,26 @@ namespace SOS.Process.UnitTests.Processors
     /// <summary>
     /// Tests for Artportalen processor
     /// </summary>
-    public class ArtportalenProcessorTests
+    public class ArtportalenObservationProcessorTests
     {
         private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IProcessedFieldMappingRepository> _processedFieldMappingRepositoryMock;
         private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
         private readonly ProcessConfiguration _processConfiguration;
-        private readonly Mock<ILogger<ArtportalenProcessor>> _loggerMock;
+        private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ArtportalenProcessorTests()
+        public ArtportalenObservationProcessorTests()
         {
             _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _processedFieldMappingRepositoryMock = new Mock<IProcessedFieldMappingRepository>();
             _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
             _processConfiguration = new ProcessConfiguration();
-            _loggerMock = new Mock<ILogger<ArtportalenProcessor>>();
+            _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace SOS.Process.UnitTests.Processors
         [Fact]
         public void ConstructorTest()
         {
-            new ArtportalenProcessor(
+            new ArtportalenObservationProcessor(
                 _artportalenVerbatimRepository.Object,
                 _processedObservationRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
@@ -57,7 +57,7 @@ namespace SOS.Process.UnitTests.Processors
                 _processConfiguration,
                 _loggerMock.Object).Should().NotBeNull();
 
-            Action create = () => new ArtportalenProcessor(
+            Action create = () => new ArtportalenObservationProcessor(
                 null,
                 _processedObservationRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
@@ -66,7 +66,7 @@ namespace SOS.Process.UnitTests.Processors
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenVerbatimRepository");
 
-            create = () => new ArtportalenProcessor(
+            create = () => new ArtportalenObservationProcessor(
                 _artportalenVerbatimRepository.Object,
                 null,
                 _processedFieldMappingRepositoryMock.Object,
@@ -75,7 +75,7 @@ namespace SOS.Process.UnitTests.Processors
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("DarwinCoreRepository");
 
-            create = () => new ArtportalenProcessor(
+            create = () => new ArtportalenObservationProcessor(
                 _artportalenVerbatimRepository.Object,
                 _processedObservationRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
@@ -84,7 +84,7 @@ namespace SOS.Process.UnitTests.Processors
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processConfiguration");
 
-            create = () => new ArtportalenProcessor(
+            create = () => new ArtportalenObservationProcessor(
                 _artportalenVerbatimRepository.Object,
                 _processedObservationRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
@@ -127,7 +127,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenProcessor = new ArtportalenProcessor(
+            var artportalenProcessor = new ArtportalenObservationProcessor(
                 _artportalenVerbatimRepository.Object,
                 _processedObservationRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
@@ -157,7 +157,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenProcessor = new ArtportalenProcessor(
+            var artportalenProcessor = new ArtportalenObservationProcessor(
                 _artportalenVerbatimRepository.Object,
                 _processedObservationRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,
@@ -189,7 +189,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenProcessor = new ArtportalenProcessor(
+            var artportalenProcessor = new ArtportalenObservationProcessor(
                 _artportalenVerbatimRepository.Object,
                 _processedObservationRepositoryMock.Object,
                 _processedFieldMappingRepositoryMock.Object,

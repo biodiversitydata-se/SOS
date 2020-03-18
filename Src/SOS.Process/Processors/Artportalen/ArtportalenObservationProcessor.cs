@@ -18,7 +18,7 @@ namespace SOS.Process.Processors.Artportalen
     /// <summary>
     /// Process factory class
     /// </summary>
-    public class ArtportalenProcessor : ProcessorBase<ArtportalenProcessor>, Interfaces.IArtportalenProcessor
+    public class ArtportalenObservationProcessor : ObservationProcessorBase<ArtportalenObservationProcessor>, Interfaces.IArtportalenObservationProcessor
     {
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
@@ -34,13 +34,13 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
-        public ArtportalenProcessor(
+        public ArtportalenObservationProcessor(
             IArtportalenVerbatimRepository artportalenVerbatimRepository,
             IProcessedObservationRepository processedObservationRepository,
             IProcessedFieldMappingRepository processedFieldMappingRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             ProcessConfiguration processConfiguration,
-            ILogger<ArtportalenProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, logger)
+            ILogger<ArtportalenObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ?? throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
             _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
@@ -63,7 +63,7 @@ namespace SOS.Process.Processors.Artportalen
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = await ArtportalenProcessedObservationFactory.CreateAsync(taxa, _processedFieldMappingRepository);
+            var observationFactory = await ArtportalenObservationFactory.CreateAsync(taxa, _processedFieldMappingRepository);
             // Get min and max id from db
             (await _artportalenVerbatimRepository.GetIdSpanAsync())
                 .Deconstruct(out var batchStartId, out var maxId);
@@ -93,7 +93,7 @@ namespace SOS.Process.Processors.Artportalen
         private async Task<int> ProcessBatchAsync(
             int startId,
             int endId,
-            ArtportalenProcessedObservationFactory observationFactory,
+            ArtportalenObservationFactory observationFactory,
             IJobCancellationToken cancellationToken)
         {
             try

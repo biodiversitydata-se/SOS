@@ -16,7 +16,7 @@ namespace SOS.Process.Processors.ClamPortal
     /// <summary>
     /// Process factory class
     /// </summary>
-    public class ClamPortalProcessor : ProcessorBase<ClamPortalProcessor>, Interfaces.IClamPortalProcessor
+    public class ClamPortalObservationProcessor : ObservationProcessorBase<ClamPortalObservationProcessor>, Interfaces.IClamPortalObservationProcessor
     {
         private readonly IClamObservationVerbatimRepository _clamObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
@@ -30,12 +30,12 @@ namespace SOS.Process.Processors.ClamPortal
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="logger"></param>
-        public ClamPortalProcessor(
+        public ClamPortalObservationProcessor(
             IClamObservationVerbatimRepository clamObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<ClamPortalProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, logger)
+            ILogger<ClamPortalObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, logger)
         {
             _clamObservationVerbatimRepository = clamObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(clamObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -46,7 +46,7 @@ namespace SOS.Process.Processors.ClamPortal
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
-            var observationFactory = new ClamPortalProcessedObservationFactory(taxa);
+            var observationFactory = new ClamPortalObservationFactory(taxa);
 
             using var cursor = await _clamObservationVerbatimRepository.GetAllAsync();
             // Process and commit in batches.

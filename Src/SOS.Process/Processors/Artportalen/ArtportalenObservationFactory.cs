@@ -16,12 +16,12 @@ using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Processors.Artportalen
 {
-    public class ArtportalenProcessedObservationFactory
+    public class ArtportalenObservationFactory
     {
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
         private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
 
-        public ArtportalenProcessedObservationFactory(
+        public ArtportalenObservationFactory(
             IDictionary<int, ProcessedTaxon> taxa,
             IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings)
         {
@@ -31,13 +31,13 @@ namespace SOS.Process.Processors.Artportalen
             }
         }
 
-        public static async Task<ArtportalenProcessedObservationFactory> CreateAsync(
+        public static async Task<ArtportalenObservationFactory> CreateAsync(
             IDictionary<int, ProcessedTaxon> taxa,
             IProcessedFieldMappingRepository processedFieldMappingRepository)
         {
             var allFieldMappings = await processedFieldMappingRepository.GetFieldMappingsAsync();
             var fieldMappings = GetFieldMappingsDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
-            return new ArtportalenProcessedObservationFactory(taxa, fieldMappings);
+            return new ArtportalenObservationFactory(taxa, fieldMappings);
         }
 
         public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<ArtportalenVerbatimObservation> verbatimObservations)

@@ -12,14 +12,14 @@ using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Processors
 {
-    public abstract class ProcessorBase<TEntity>
+    public abstract class ObservationProcessorBase<TEntity>
     {
         protected readonly IProcessedObservationRepository ProcessRepository;
         protected readonly ILogger<TEntity> Logger;
         protected readonly IFieldMappingResolverHelper FieldMappingResolverHelper;
         public abstract DataProvider DataProvider { get; }
 
-        protected ProcessorBase(
+        protected ObservationProcessorBase(
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             ILogger<TEntity> logger)

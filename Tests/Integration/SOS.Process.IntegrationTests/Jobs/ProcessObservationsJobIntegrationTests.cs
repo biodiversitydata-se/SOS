@@ -66,25 +66,25 @@ namespace SOS.Process.IntegrationTests.Jobs
             var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository = new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
             var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
-            var clamPortalProcessor = new ClamPortalProcessor(
+            var clamPortalProcessor = new ClamPortalObservationProcessor(
                 new ClamObservationVerbatimRepository(verbatimClient, new NullLogger<ClamObservationVerbatimRepository>()), 
                 areaHelper, 
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
-                new NullLogger<ClamPortalProcessor>());
-            var kulProcessor = new KulProcessor(
+                new NullLogger<ClamPortalObservationProcessor>());
+            var kulProcessor = new KulObservationProcessor(
                 new KulObservationVerbatimRepository(verbatimClient, new NullLogger<KulObservationVerbatimRepository>()), 
                 areaHelper,
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
-                new NullLogger<KulProcessor>());
-            var artportalenProcessor = new ArtportalenProcessor(
+                new NullLogger<KulObservationProcessor>());
+            var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
                 processedObservationRepository,
                 processedFieldMappingRepository, 
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 processConfiguration,
-                new NullLogger<ArtportalenProcessor>());
+                new NullLogger<ArtportalenObservationProcessor>());
 
             var processTaxaJob = new ProcessJob(
                 processedObservationRepository,
