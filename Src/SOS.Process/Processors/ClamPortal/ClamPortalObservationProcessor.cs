@@ -48,7 +48,7 @@ namespace SOS.Process.Processors.ClamPortal
             ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
             var observationFactory = new ClamPortalObservationFactory(taxa);
 
-            using var cursor = await _clamObservationVerbatimRepository.GetAllAsync();
+            using var cursor = await _clamObservationVerbatimRepository.GetAllByCursorAsync();
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {

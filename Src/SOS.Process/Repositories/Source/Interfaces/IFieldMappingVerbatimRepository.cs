@@ -8,6 +8,5 @@ namespace SOS.Process.Repositories.Source.Interfaces
 {
     public interface IFieldMappingVerbatimRepository : IVerbatimBaseRepository<FieldMapping, FieldMappingFieldId>
     {
-        Task<IEnumerable<FieldMapping>> GetFieldMappingsAsync();
     }
 }

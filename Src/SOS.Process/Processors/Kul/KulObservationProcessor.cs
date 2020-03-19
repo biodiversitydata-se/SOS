@@ -49,7 +49,7 @@ namespace SOS.Process.Processors.Kul
             ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
             var observationFactory = new KulObservationFactory(taxa);
 
-            using var cursor = await _kulObservationVerbatimRepository.GetAllAsync();
+            using var cursor = await _kulObservationVerbatimRepository.GetAllByCursorAsync();
 
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>

@@ -35,7 +35,7 @@ namespace SOS.Process.Jobs
             var areas = await _areaVerbatimRepository.GetAllAsync();
             if (!areas?.Any() ?? true)
             {
-                _logger.LogDebug("Failed to get field mappings");
+                _logger.LogDebug("Failed to get areas");
                 return false;
             }
 
@@ -48,40 +48,11 @@ namespace SOS.Process.Jobs
             _logger.LogDebug("Finish deleting areas");
 
             _logger.LogDebug("Start copy areas");
-            var success = await CopyAreas();
+            var success = await _areaProcessedRepository.AddManyAsync(areas);
+            //var success = await CopyAreas();
             _logger.LogDebug("Finish copy areas");
 
             return success ? true : throw new Exception("Copy field areas job failed");
-        }
-
-        const int BatchSize = 100000;
-        private async Task<bool> CopyAreas()
-        {
-            List<Area> areas = new List<Area>();
-            using var cursor = await _areaVerbatimRepository.GetAllAsync();
-            
-            // Process and commit in batches.
-            await cursor.ForEachAsync(async area =>
-            {
-                areas.Add(area);
-                if (IsBatchFilledToLimit(areas.Count))
-                {
-                    await _areaProcessedRepository.AddManyAsync(areas);
-                }
-            });
-
-            // Commit remaining batch (not filled to limit).
-            if (areas.Any())
-            {
-                await _areaProcessedRepository.AddManyAsync(areas);
-            }
-
-            return true;
-        }
-
-        private bool IsBatchFilledToLimit(int count)
-        {
-            return count % BatchSize == 0;
         }
     }
 }

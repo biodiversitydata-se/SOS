@@ -77,22 +77,11 @@ namespace SOS.Process.Helpers
                 return;
             }
 
-            
-            var areas = (await _areaVerbatimRepository.GetBatchBySkipAsync(0)).ToArray();
-            var count = areas.Length;
-            var totalCount = count;
-
-            while (count != 0)
+            var areas = await _areaVerbatimRepository.GetAllAsync();
+            foreach (var area in areas)
             {
-                foreach (var area in areas)
-                {
-                    var feature = area.ToFeature();
-                    _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
-                }
-                
-                areas = (await _areaVerbatimRepository.GetBatchBySkipAsync(totalCount + 1)).ToArray();
-                count = areas.Length;
-                totalCount += count;
+                var feature = area.ToFeature();
+                _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
             }
 
             _strTree.Build();

@@ -34,7 +34,7 @@ namespace SOS.Process.Helpers
         public async Task<byte[]> CreateDiffZipFile(IEnumerable<FieldMapping> generatedFieldMappings)
         {
             var processedFieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
-            var verbatimFieldMappings = await _fieldMappingVerbatimRepository.GetFieldMappingsAsync();
+            var verbatimFieldMappings = await _fieldMappingVerbatimRepository.GetAllAsync();
             var generatedFieldMappingsJtoken = JToken.FromObject(generatedFieldMappings);
             var verbatimFieldMappingsJtoken = JToken.FromObject(verbatimFieldMappings);
             var processedFieldMappingsJtoken = JToken.FromObject(processedFieldMappings);

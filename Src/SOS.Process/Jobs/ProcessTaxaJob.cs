@@ -33,7 +33,7 @@ namespace SOS.Process.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {
-            var dwcTaxa = await GetDarwinCoreTaxaAsync();
+            var dwcTaxa = await _taxonVerbatimRepository.GetAllAsync();
             if (!dwcTaxa?.Any() ?? true)
             {
                 _logger.LogDebug("Failed to get taxa");
@@ -59,28 +59,12 @@ namespace SOS.Process.Jobs
             return success ? true : throw new Exception("Process taxa job failed");
         }
 
-        private async Task<IEnumerable<DarwinCoreTaxon>> GetDarwinCoreTaxaAsync()
-        {
-            var skip = 0;
-            var tmpTaxa = await _taxonVerbatimRepository.GetBatchBySkipAsync(skip);
-            var taxa = new List<DarwinCoreTaxon>();
-
-            while (tmpTaxa?.Any() ?? false)
-            {
-                taxa.AddRange(tmpTaxa);
-                skip += tmpTaxa.Count();
-                tmpTaxa = await _taxonVerbatimRepository.GetBatchBySkipAsync(skip);
-            }
-
-            return taxa;
-        }
-
         /// <summary>
         /// Calculate higher classification tree by creating a taxon tree and iterate
         /// each nodes parents.
         /// </summary>
         /// <param name="taxa"></param>
-        private void CalculateHigherClassificationField(IEnumerable<ProcessedTaxon> taxa)
+        private void CalculateHigherClassificationField(ICollection<ProcessedTaxon> taxa)
         {
             var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
             var taxonById = taxa.ToDictionary(m => m.Id, m => m);
