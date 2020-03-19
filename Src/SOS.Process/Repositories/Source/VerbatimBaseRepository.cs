@@ -71,10 +71,7 @@ namespace SOS.Process.Repositories.Source
         /// <inheritdoc />
         public async Task<List<TEntity>> GetAllAsync()
         {
-            List<TEntity> list = new List<TEntity>();
-            using var cursor = await GetAllByCursorAsync();
-            await cursor.ForEachAsync( item => list.Add(item));
-            return list;
+            return await MongoCollection.AsQueryable().ToListAsync();
         }
 
         /// <inheritdoc />
