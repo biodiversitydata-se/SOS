@@ -11,7 +11,7 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     /// <summary>
     /// Repository for retrieving processed areas.
     /// </summary>
-    public interface IAreaProcessedRepository : IProcessBaseRepository<Area, int>
+    public interface IProcessedAreaRepository : IProcessBaseRepository<Area, int>
     {
         /// <summary>
         /// Gets all processed areas.

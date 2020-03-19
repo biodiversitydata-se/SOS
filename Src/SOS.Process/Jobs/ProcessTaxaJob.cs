@@ -17,16 +17,16 @@ namespace SOS.Process.Jobs
     public class ProcessTaxaJob : IProcessTaxaJob
     {
         private readonly ITaxonVerbatimRepository _taxonVerbatimRepository;
-        private readonly ITaxonProcessedRepository _taxonProcessedRepository;
+        private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly ILogger<ProcessTaxaJob> _logger;
 
         public ProcessTaxaJob(
             ITaxonVerbatimRepository taxonVerbatimRepository,
-            ITaxonProcessedRepository taxonProcessedRepository,
+            IProcessedTaxonRepository processedTaxonRepository,
             ILogger<ProcessTaxaJob> logger)
         {
             _taxonVerbatimRepository = taxonVerbatimRepository ?? throw new ArgumentNullException(nameof(taxonVerbatimRepository));
-            _taxonProcessedRepository = taxonProcessedRepository ?? throw new ArgumentNullException(nameof(taxonProcessedRepository));
+            _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -45,7 +45,7 @@ namespace SOS.Process.Jobs
             CalculateHigherClassificationField(taxa);
 
             _logger.LogDebug("Start deleting processed taxa");
-            if (!await _taxonProcessedRepository.DeleteCollectionAsync())
+            if (!await _processedTaxonRepository.DeleteCollectionAsync())
             {
                 _logger.LogError("Failed to delete processed taxa");
                 return false;
@@ -53,7 +53,7 @@ namespace SOS.Process.Jobs
             _logger.LogDebug("Finish deleting processed taxa");
 
             _logger.LogDebug("Start copy processed taxa");
-            var success = await _taxonProcessedRepository.AddManyAsync(taxa);
+            var success = await _processedTaxonRepository.AddManyAsync(taxa);
             _logger.LogDebug("Finish copy processed taxa");
 
             return success ? true : throw new Exception("Process taxa job failed");

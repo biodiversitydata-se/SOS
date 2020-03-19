@@ -15,7 +15,7 @@ namespace SOS.Process.Repositories.Destination
     /// <summary>
     /// Repository for retrieving processd taxa.
     /// </summary>
-    public class TaxonProcessedRepository : ProcessBaseRepository<ProcessedTaxon, int>, ITaxonProcessedRepository
+    public class ProcessedTaxonRepository : ProcessBaseRepository<ProcessedTaxon, int>, IProcessedTaxonRepository
     {
         private new IMongoCollection<ProcessedTaxon> MongoCollection => Database.GetCollection<ProcessedTaxon>(_collectionName);
 
@@ -24,9 +24,9 @@ namespace SOS.Process.Repositories.Destination
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
-        public TaxonProcessedRepository(
+        public ProcessedTaxonRepository(
             IProcessClient client, 
-            ILogger<TaxonProcessedRepository> logger) 
+            ILogger<ProcessedTaxonRepository> logger) 
             : base(client, false, logger)
         {
 

@@ -31,7 +31,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IClamPortalObservationProcessor> _clamPortalProcessor;
         private readonly Mock<IKulObservationProcessor> _kulProcessor;
         private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
-        private readonly Mock<ITaxonProcessedRepository> _taxonProcessedRepository;
+        private readonly Mock<IProcessedTaxonRepository> _taxonProcessedRepository;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<ILogger<ProcessJob>> _loggerMock;
 
@@ -48,7 +48,7 @@ namespace SOS.Process.UnitTests.Jobs
             _clamPortalProcessor = new Mock<IClamPortalObservationProcessor>();
             _kulProcessor = new Mock<IKulObservationProcessor>();
             _artportalenProcessor = new Mock<IArtportalenObservationProcessor>();
-            _taxonProcessedRepository = new Mock<ITaxonProcessedRepository>();
+            _taxonProcessedRepository = new Mock<IProcessedTaxonRepository>();
             _areaHelper = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<ProcessJob>>();
         }

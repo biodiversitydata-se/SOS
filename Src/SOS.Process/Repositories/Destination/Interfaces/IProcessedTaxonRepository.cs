@@ -9,7 +9,7 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     /// <summary>
     /// Repository for retrieving processd taxa.
     /// </summary>
-    public interface ITaxonProcessedRepository: IProcessBaseRepository<ProcessedTaxon, int>
+    public interface IProcessedTaxonRepository: IProcessBaseRepository<ProcessedTaxon, int>
     {
         /// <summary>
         /// Gets all processed taxa.

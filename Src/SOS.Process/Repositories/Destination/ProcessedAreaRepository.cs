@@ -17,7 +17,7 @@ namespace SOS.Process.Repositories.Destination
     /// <summary>
     /// Repository for retrieving processed areas.
     /// </summary>
-    public class AreaProcessedRepository : ProcessBaseRepository<Area, int>, IAreaProcessedRepository
+    public class ProcessedAreaRepository : ProcessBaseRepository<Area, int>, IProcessedAreaRepository
     {
         private new IMongoCollection<Area> MongoCollection => Database.GetCollection<Area>(_collectionName);
 
@@ -26,9 +26,9 @@ namespace SOS.Process.Repositories.Destination
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
-        public AreaProcessedRepository(
+        public ProcessedAreaRepository(
             IProcessClient client, 
-            ILogger<AreaProcessedRepository> logger) 
+            ILogger<ProcessedAreaRepository> logger) 
             : base(client, false, logger)
         {
 

@@ -32,7 +32,7 @@ namespace SOS.Process.Jobs
         private readonly IArtportalenObservationProcessor _artportalenObservationProcessor;
         private readonly IClamPortalObservationProcessor _clamPortalObservationProcessor;
         private readonly IKulObservationProcessor _kulObservationProcessor;
-        private readonly ITaxonProcessedRepository _taxonProcessedRepository;
+        private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly ILogger<ProcessJob> _logger;
 
@@ -45,7 +45,7 @@ namespace SOS.Process.Jobs
         /// <param name="clamPortalObservationProcessor"></param>
         /// <param name="kulObservationProcessor"></param>
         /// <param name="artportalenObservationProcessor"></param>
-        /// <param name="taxonProcessedRepository"></param>
+        /// <param name="processedTaxonRepository"></param>
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
         public ProcessJob(
@@ -55,7 +55,7 @@ namespace SOS.Process.Jobs
             IClamPortalObservationProcessor clamPortalObservationProcessor,
             IKulObservationProcessor kulObservationProcessor,
             IArtportalenObservationProcessor artportalenObservationProcessor,
-            ITaxonProcessedRepository taxonProcessedRepository,
+            IProcessedTaxonRepository processedTaxonRepository,
             IAreaHelper areaHelper,
             ILogger<ProcessJob> logger)
         {
@@ -65,7 +65,7 @@ namespace SOS.Process.Jobs
             _clamPortalObservationProcessor = clamPortalObservationProcessor ?? throw new ArgumentNullException(nameof(clamPortalObservationProcessor));
             _kulObservationProcessor = kulObservationProcessor ?? throw new ArgumentNullException(nameof(kulObservationProcessor));
             _artportalenObservationProcessor = artportalenObservationProcessor ?? throw new ArgumentNullException(nameof(artportalenObservationProcessor));
-            _taxonProcessedRepository = taxonProcessedRepository ?? throw new ArgumentNullException(nameof(taxonProcessedRepository));
+            _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -81,7 +81,7 @@ namespace SOS.Process.Jobs
                 _logger.LogDebug("Start getting taxa");
 
                 // Get taxa
-                var taxa = await _taxonProcessedRepository.GetTaxaAsync();
+                var taxa = await _processedTaxonRepository.GetTaxaAsync();
                 if (!taxa?.Any() ?? true)
                 {
                     _logger.LogDebug("Failed to get taxa");

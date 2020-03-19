@@ -16,16 +16,16 @@ namespace SOS.Process.Jobs
     public class CopyAreasJob : ICopyAreasJob
     {
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
-        private readonly IAreaProcessedRepository _areaProcessedRepository;
+        private readonly IProcessedAreaRepository _processedAreaRepository;
         private readonly ILogger<CopyAreasJob> _logger;
 
         public CopyAreasJob(
             IAreaVerbatimRepository areaVerbatimRepository,
-            IAreaProcessedRepository areaProcessedRepository,
+            IProcessedAreaRepository processedAreaRepository,
             ILogger<CopyAreasJob> logger)
         {
             _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
-            _areaProcessedRepository = areaProcessedRepository ?? throw new ArgumentNullException(nameof(areaProcessedRepository));
+            _processedAreaRepository = processedAreaRepository ?? throw new ArgumentNullException(nameof(processedAreaRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -40,7 +40,7 @@ namespace SOS.Process.Jobs
             }
 
             _logger.LogDebug("Start deleting areas");
-            if (!await _areaProcessedRepository.DeleteCollectionAsync())
+            if (!await _processedAreaRepository.DeleteCollectionAsync())
             {
                 _logger.LogError("Failed to delete areas");
                 return false;
@@ -48,7 +48,7 @@ namespace SOS.Process.Jobs
             _logger.LogDebug("Finish deleting areas");
 
             _logger.LogDebug("Start copy areas");
-            var success = await _areaProcessedRepository.AddManyAsync(areas);
+            var success = await _processedAreaRepository.AddManyAsync(areas);
             //var success = await CopyAreas();
             _logger.LogDebug("Finish copy areas");
 
