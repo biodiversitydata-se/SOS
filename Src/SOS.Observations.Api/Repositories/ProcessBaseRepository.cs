@@ -112,11 +112,18 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync()
         {
-            var res = await MongoCollection.AsQueryable().ToListAsync();
+            return await MongoCollection.FindAsync(FilterDefinition<TEntity>.Empty);
+        }
 
-            return res;
+        /// <inheritdoc />
+        public async Task<List<TEntity>> GetAllAsync()
+        {
+            List<TEntity> list = new List<TEntity>();
+            using var cursor = await GetAllByCursorAsync();
+            await cursor.ForEachAsync(item => list.Add(item));
+            return list;
         }
 
         /// <summary>

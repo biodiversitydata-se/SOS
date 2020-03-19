@@ -38,7 +38,7 @@ namespace SOS.Observations.Api.Managers
         private async Task<Dictionary<FieldMappingFieldId, Dictionary<int, Dictionary<string, string>>>> CreateLocalizedTranslationDictionaryAsync()
         {
             var dic = new Dictionary<FieldMappingFieldId, Dictionary<int, Dictionary<string, string>>>();
-            var fieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
+            var fieldMappings = await _processedFieldMappingRepository.GetAllAsync();
             foreach (var fieldMapping in fieldMappings.Where(m => m.Localized))
             {
                 var fieldMappingFieldId = (FieldMappingFieldId) fieldMapping.Id;
@@ -59,7 +59,7 @@ namespace SOS.Observations.Api.Managers
         private async Task<Dictionary<FieldMappingFieldId, Dictionary<int, string>>> CreateNonLocalizedTranslationDictionaryAsync()
         {
             var dic = new Dictionary<FieldMappingFieldId, Dictionary<int, string>>();
-            var fieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
+            var fieldMappings = await _processedFieldMappingRepository.GetAllAsync();
             foreach (var fieldMapping in fieldMappings.Where(m => !m.Localized))
             {
                 var fieldMappingFieldId = (FieldMappingFieldId)fieldMapping.Id;
@@ -118,7 +118,7 @@ namespace SOS.Observations.Api.Managers
         /// <inheritdoc />
         public async Task<IEnumerable<FieldMapping>> GetFieldMappingsAsync()
         {
-            return await _processedFieldMappingRepository.GetFieldMappingsAsync();
+            return await _processedFieldMappingRepository.GetAllAsync();
         }
 
         /// <inheritdoc />
