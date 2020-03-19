@@ -15,6 +15,7 @@ using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -29,10 +30,10 @@ namespace SOS.Process.Jobs
         private readonly IProcessedObservationRepository _darwinCoreRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
-        private readonly IArtportalenProcessFactory _artportalenProcessFactory;
-        private readonly IClamPortalProcessFactory _clamPortalProcessFactory;
-        private readonly IKulProcessFactory _kulProcessFactory;
-        private readonly IInstanceFactory _instanceFactory;
+        private readonly IArtportalenObservationProcessor _artportalenObservationProcessor;
+        private readonly IClamPortalObservationProcessor _clamPortalObservationProcessor;
+        private readonly IKulObservationProcessor _kulObservationProcessor;
+        private readonly IInstanceManager _instanceManager;
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly ICopyFieldMappingsJob _copyFieldMappingsJob;
         private readonly IProcessTaxaJob _processTaxaJob;
@@ -40,16 +41,16 @@ namespace SOS.Process.Jobs
         private readonly ILogger<ProcessJob> _logger;
 
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
         /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="harvestInfoRepository"></param>
-        /// <param name="clamPortalProcessFactory"></param>
-        /// <param name="kulProcessFactory"></param>
-        /// <param name="artportalenProcessFactory"></param>
-        /// <param name="taxonProcessedRepository"></param>
-        /// <param name="instanceFactory"></param>
+        /// <param name="clamPortalObservationProcessor"></param>
+        /// <param name="kulObservationProcessor"></param>
+        /// <param name="artportalenObservationProcessor"></param>
+        /// <param name="processedTaxonRepository"></param>
+        /// <param name="instanceManager"></param>
         /// <param name="copyFieldMappingsJob"></param>
         /// <param name="processTaxaJob"></param>
         /// <param name="areaHelper"></param>
@@ -58,11 +59,11 @@ namespace SOS.Process.Jobs
             IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
-            IClamPortalProcessFactory clamPortalProcessFactory,
-            IKulProcessFactory kulProcessFactory,
-            IArtportalenProcessFactory artportalenProcessFactory,
+            IClamPortalObservationProcessor clamPortalObservationProcessor,
+            IKulObservationProcessor kulObservationProcessor,
+            IArtportalenObservationProcessor artportalenObservationProcessor,
             IProcessedTaxonRepository processedTaxonRepository,
-            IInstanceFactory instanceFactory,
+            IInstanceManager instanceManager,
             ICopyFieldMappingsJob copyFieldMappingsJob,
             IProcessTaxaJob processTaxaJob,
             IAreaHelper areaHelper,
@@ -71,13 +72,13 @@ namespace SOS.Process.Jobs
             _darwinCoreRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
-            _clamPortalProcessFactory = clamPortalProcessFactory ?? throw new ArgumentNullException(nameof(clamPortalProcessFactory));
-            _kulProcessFactory = kulProcessFactory ?? throw new ArgumentNullException(nameof(kulProcessFactory));
-            _artportalenProcessFactory = artportalenProcessFactory ?? throw new ArgumentNullException(nameof(artportalenProcessFactory));
+            _clamPortalObservationProcessor = clamPortalObservationProcessor ?? throw new ArgumentNullException(nameof(clamPortalObservationProcessor));
+            _kulObservationProcessor = kulObservationProcessor ?? throw new ArgumentNullException(nameof(kulObservationProcessor));
+            _artportalenObservationProcessor = artportalenObservationProcessor ?? throw new ArgumentNullException(nameof(artportalenObservationProcessor));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
             _copyFieldMappingsJob = copyFieldMappingsJob ?? throw new ArgumentNullException(nameof(copyFieldMappingsJob));
             _processTaxaJob = processTaxaJob ?? throw new ArgumentNullException(nameof(processTaxaJob));
-            _instanceFactory = instanceFactory ?? throw new ArgumentNullException(nameof(instanceFactory));
+            _instanceManager = instanceManager ?? throw new ArgumentNullException(nameof(instanceManager));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -200,7 +201,7 @@ namespace SOS.Process.Jobs
                 {
                     var copyTasks = processTasks
                         .Where(t => t.Value.Result.Status == RunStatus.Failed)
-                        .Select(t => _instanceFactory.CopyProviderDataAsync(t.Key)).ToArray();
+                        .Select(t => _instanceManager.CopyProviderDataAsync(t.Key)).ToArray();
                     
                     await Task.WhenAll(copyTasks);
 

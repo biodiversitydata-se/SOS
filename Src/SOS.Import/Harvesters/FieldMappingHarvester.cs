@@ -13,6 +13,7 @@ using SOS.Import.Factories.FieldMapping.Interfaces;
 using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Harvesters
 {
@@ -102,12 +103,14 @@ namespace SOS.Import.Harvesters
         /// Import field mappings.
         /// </summary>
         /// <returns></returns>
-        public async Task<bool> ImportAsync()
+        public async Task<HarvestInfo> HarvestAsync()
         {
+            var harvestInfo = new HarvestInfo(nameof(FieldMapping), DataProvider.Artportalen, DateTime.Now);
+            var fieldMappings = new List<FieldMapping>();
             try
             {
                 _logger.LogDebug("Start importing field mappings");
-                var fieldMappings = new List<FieldMapping>();
+               
                 foreach (string fileName in Directory.GetFiles(@"Resources\FieldMappings\"))
                 {
                     var fieldMapping = CreateFieldMappingFromJsonFile(fileName);
@@ -119,14 +122,17 @@ namespace SOS.Import.Harvesters
                 await _fieldMappingRepository.AddCollectionAsync();
                 await _fieldMappingRepository.AddManyAsync(fieldMappings);
                 _logger.LogDebug("Finish storing field mappings");
+                harvestInfo.Status = RunStatus.Success;
+                harvestInfo.Count = fieldMappings.Count;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed importing field mappings");
-                return false;
+                harvestInfo.Status = RunStatus.Failed;
             }
 
-            return true;
+            harvestInfo.End = DateTime.Now;
+            return harvestInfo;
         }
 
         /// <inheritdoc />

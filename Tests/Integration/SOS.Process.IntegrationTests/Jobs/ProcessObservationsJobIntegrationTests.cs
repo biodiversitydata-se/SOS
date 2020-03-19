@@ -12,6 +12,7 @@ using SOS.Lib.Enums;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Jobs;
+using SOS.Process.Managers;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.Processors.ClamPortal;
 using SOS.Process.Processors.Kul;
@@ -63,7 +64,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>()));
             var taxonVerbatimRepository = new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
             var fieldMappingVerbatimRepository = new FieldMappingVerbatimRepository(verbatimClient, new NullLogger<FieldMappingVerbatimRepository>());
-            var taxonProcessedRepository = new TaxonProcessedRepository(processClient, new NullLogger<TaxonProcessedRepository>());
             var taxonProcessedRepository = new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
             var invalidObservationRepository = new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var processedObservationRepository = new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>());
@@ -88,30 +88,25 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedFieldMappingRepository, 
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 processConfiguration,
-                new NullLogger<ArtportalenProcessFactory>());
-            var instanceFactory = new InstanceFactory(
+                new NullLogger<ArtportalenObservationProcessor>());
+            var instanceManager = new InstanceManager(
                 new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>()),
                 processInfoRepository,
-                new NullLogger<InstanceFactory>());
+                new NullLogger<InstanceManager>());
             var copyFieldMappingsJob = new CopyFieldMappingsJob(fieldMappingVerbatimRepository, processedFieldMappingRepository, new NullLogger<CopyFieldMappingsJob>());
             var processTaxaJob = new ProcessTaxaJob(taxonVerbatimRepository, taxonProcessedRepository, new NullLogger<ProcessTaxaJob>());
-                new NullLogger<ArtportalenObservationProcessor>());
-
+            
             var processJob = new ProcessJob(
                 processedObservationRepository,
                 processInfoRepository,
                 harvestInfoRepository,
-                clamPortalProcessFactory,
-                kulProcessFactory,
-                artportalenProcessFactory,
-                taxonProcessedRepository, 
-                instanceFactory,
-                copyFieldMappingsJob, 
-                processTaxaJob,
                 clamPortalProcessor,
                 kulProcessor,
                 artportalenProcessor,
                 taxonProcessedRepository,
+                instanceManager,
+                copyFieldMappingsJob,
+                processTaxaJob,
                 areaHelper,
                 new NullLogger<ProcessJob>());
 

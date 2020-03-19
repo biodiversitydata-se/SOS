@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Harvesters.Interfaces
 {
@@ -14,7 +15,7 @@ namespace SOS.Import.Harvesters.Interfaces
         /// Import field mappings to MongoDb.
         /// </summary>
         /// <returns></returns>
-        Task<bool> ImportAsync();
+        Task<HarvestInfo> HarvestAsync();
 
         /// <summary>
         /// Creates a field mapping json file for specified field.

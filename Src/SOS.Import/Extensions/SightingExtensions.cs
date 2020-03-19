@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MongoDB.Driver.GeoJsonObjectModel;
-using NetTopologySuite.Geometries;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Factories;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.Shared;
