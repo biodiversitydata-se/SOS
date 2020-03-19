@@ -15,6 +15,6 @@ namespace SOS.Import.Harvesters.Interfaces
         /// <returns></returns>
         Task<HarvestInfo> HarvestAreasAsync();
 
-        Task<IEnumerable<Area>> GetAreasAsync();
+        Task<IEnumerable<Area>> GetAreasAsync(bool includeGeometry = true);
     }
 }

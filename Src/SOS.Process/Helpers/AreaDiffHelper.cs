@@ -29,50 +29,49 @@ namespace SOS.Process.Helpers
         }
 
         /// <summary>
-        /// Get diff between generated, verbatim and processed field mappings.
+        /// Get diff between generated, verbatim and processed areas.
         /// </summary>
         /// <returns></returns>
         public async Task<byte[]> CreateDiffZipFile(Area[] generatedAreas)
         {
-            foreach (var generatedArea in generatedAreas)
-            {
-                generatedArea.Geometry = null;
-            }
-
-            var processedAreas = (await _processedAreaRepository.GetAreasAsync()).ToArray();
-            foreach (var processedArea in processedAreas)
-            {
-                processedArea.Geometry = null;
-            }
+            // Get verbatim areas and set Geometry to null. It takes too long time and RAM to compare coordinates using JsonDiffPatch.
             var verbatimAreas = (await _areaVerbatimRepository.GetAllAsync()).ToArray();
             foreach (var verbatimArea in verbatimAreas)
             {
                 verbatimArea.Geometry = null;
             }
+
+            // Get processed areas and set Geometry to null. It takes too long time and RAM to compare coordinates using JsonDiffPatch.
+            var processedAreas = (await _processedAreaRepository.GetAreasAsync()).ToArray();
+            foreach (var processedArea in processedAreas)
+            {
+                processedArea.Geometry = null;
+            }
+
             var generatedAreasJtoken = JToken.FromObject(generatedAreas);
             var verbatimAreasJtoken = JToken.FromObject(verbatimAreas);
             var processedAreasJtoken = JToken.FromObject(processedAreas);
             var serializerSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
-            var generatedFieldMappingsJson = JsonConvert.SerializeObject(generatedAreas, Formatting.Indented, serializerSettings);
-            var verbatimFieldMappingsJson = JsonConvert.SerializeObject(verbatimAreas, Formatting.Indented, serializerSettings);
-            var processedFieldMappingsJson = JsonConvert.SerializeObject(processedAreas, Formatting.Indented, serializerSettings);
-            var generatedFile = Encoding.UTF8.GetBytes(generatedFieldMappingsJson);
-            var verbatimFile = Encoding.UTF8.GetBytes(verbatimFieldMappingsJson);
-            var processedFile = Encoding.UTF8.GetBytes(processedFieldMappingsJson);
+            var generatedAreasJson = JsonConvert.SerializeObject(generatedAreas, Formatting.Indented, serializerSettings);
+            var verbatimAreasJson = JsonConvert.SerializeObject(verbatimAreas, Formatting.Indented, serializerSettings);
+            var processedAreasJson = JsonConvert.SerializeObject(processedAreas, Formatting.Indented, serializerSettings);
+            var generatedFile = Encoding.UTF8.GetBytes(generatedAreasJson);
+            var verbatimFile = Encoding.UTF8.GetBytes(verbatimAreasJson);
+            var processedFile = Encoding.UTF8.GetBytes(processedAreasJson);
             var zipFile = CreateZipFile(new[]
             {
                 (Filename: "1.GeneratedAreas.json", Bytes: generatedFile),
                 (Filename: "2.VerbatimAreas.json", Bytes: verbatimFile),
                 (Filename: "3.ProcessedAreas.json", Bytes: processedFile),
-                CreateFieldMappingDiffResult(generatedAreasJtoken, verbatimAreasJtoken, "JsonDiffPatch - GeneratedComparedToVerbatim"),
-                CreateFieldMappingDiffResult(verbatimAreasJtoken, processedAreasJtoken, "JsonDiffPatch - VerbatimComparedToProcessed"),
-                CreateFieldMappingDiffResult(generatedAreasJtoken, processedAreasJtoken, "JsonDiffPatch - GeneratedComparedToProcessed"),
+                CreateDiffResult(generatedAreasJtoken, verbatimAreasJtoken, "JsonDiffPatch - GeneratedComparedToVerbatim"),
+                CreateDiffResult(verbatimAreasJtoken, processedAreasJtoken, "JsonDiffPatch - VerbatimComparedToProcessed"),
+                CreateDiffResult(generatedAreasJtoken, processedAreasJtoken, "JsonDiffPatch - GeneratedComparedToProcessed"),
             });
 
             return zipFile;
         }
 
-        private (string Filename, byte[] Bytes) CreateFieldMappingDiffResult(JToken left, JToken right, string fileName)
+        private (string Filename, byte[] Bytes) CreateDiffResult(JToken left, JToken right, string fileName)
         {
             JsonDiffPatch jdp = new JsonDiffPatch();
             JToken diff = jdp.Diff(left, right);

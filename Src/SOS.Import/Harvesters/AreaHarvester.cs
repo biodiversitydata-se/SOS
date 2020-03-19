@@ -85,10 +85,14 @@ namespace SOS.Import.Harvesters
             return harvestInfo;
         }
 
-        public async Task<IEnumerable<Area>> GetAreasAsync()
+        public async Task<IEnumerable<Area>> GetAreasAsync(bool includeGeometry = true)
         {
-            var areas = (await _areaRepository.GetAsync()).ToVerbatims();
-            return areas;
+            if (includeGeometry)
+            {
+                return (await _areaRepository.GetAsync()).ToVerbatims();
+            }
+
+            return (await _areaRepository.GetAreasExceptGeometryFieldAsync()).ToVerbatims();
         }
     }
 }

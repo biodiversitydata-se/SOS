@@ -27,7 +27,7 @@ namespace SOS.Import.Extensions
                 Id = entity.Id,
                 FeatureId = entity.FeatureId,
                 ParentId = entity.ParentId,
-                Geometry = entity.Polygon.ToGeometry().Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoJsonGeometry(),
+                Geometry = entity.Polygon?.ToGeometry().Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoJsonGeometry(),
                 Name = entity.Name
             };
         }
