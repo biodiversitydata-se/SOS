@@ -32,7 +32,7 @@ namespace SOS.Process.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {
-            var dwcTaxa = await GetDarwinCoreTaxaAsync();
+            var dwcTaxa = await GetVerbatimTaxaAsync();
             if (!dwcTaxa?.Any() ?? true)
             {
                 _logger.LogDebug("Failed to get taxa");
@@ -58,7 +58,7 @@ namespace SOS.Process.Jobs
             return success ? true : throw new Exception("Process taxa job failed");
         }
 
-        private async Task<IEnumerable<DarwinCoreTaxon>> GetDarwinCoreTaxaAsync()
+        private async Task<IEnumerable<DarwinCoreTaxon>> GetVerbatimTaxaAsync()
         {
             var skip = 0;
             var tmpTaxa = await _taxonVerbatimRepository.GetBatchBySkipAsync(skip);

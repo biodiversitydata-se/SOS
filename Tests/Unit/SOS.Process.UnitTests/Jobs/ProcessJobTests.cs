@@ -6,7 +6,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Enums;
-using  SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
@@ -32,10 +32,11 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IKulProcessFactory> _kulProcessFactory;
         private readonly Mock<IArtportalenProcessFactory> _artportalenProcessFactory;
         private readonly Mock<ITaxonProcessedRepository> _taxonProcessedRepository;
+        private readonly Mock<IInstanceFactory> _instanceFactory;
+        private readonly Mock<ICopyFieldMappingsJob> _copyFieldMappingsJob;
+        private readonly Mock<IProcessTaxaJob> _processTaxaJob;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<ILogger<ProcessJob>> _loggerMock;
-
-
 
         /// <summary>
         /// Constructor
@@ -48,7 +49,10 @@ namespace SOS.Process.UnitTests.Jobs
             _clamPortalProcessFactory = new Mock<IClamPortalProcessFactory>();
             _kulProcessFactory = new Mock<IKulProcessFactory>();
             _artportalenProcessFactory = new Mock<IArtportalenProcessFactory>();
+            _instanceFactory = new Mock<IInstanceFactory>();
             _taxonProcessedRepository = new Mock<ITaxonProcessedRepository>();
+            _copyFieldMappingsJob = new Mock<ICopyFieldMappingsJob>();
+            _processTaxaJob = new Mock<IProcessTaxaJob>();
             _areaHelper = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<ProcessJob>>();
         }
@@ -67,6 +71,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessFactory.Object,
                 _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
@@ -78,6 +85,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessFactory.Object,
                 _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("darwinCoreRepository");
@@ -90,6 +100,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessFactory.Object,
                 _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processInfoRepository");
@@ -102,6 +115,24 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessFactory.Object,
                 _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
+                _areaHelper.Object,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
+
+            create = () => new ProcessJob(
+                _darwinCoreRepository.Object,
+                _processInfoRepository.Object,
+                _harvestInfoRepository.Object,
+                _clamPortalProcessFactory.Object,
+                _kulProcessFactory.Object,
+                _artportalenProcessFactory.Object,
+                _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
@@ -114,6 +145,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessFactory.Object,
                 _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamPortalProcessFactory");
@@ -123,9 +157,12 @@ namespace SOS.Process.UnitTests.Jobs
                 _processInfoRepository.Object,
                 _harvestInfoRepository.Object,
                 _clamPortalProcessFactory.Object,
-                null,
+               null,
                 _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("kulProcessFactory");
@@ -138,6 +175,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessFactory.Object,
                 null,
                 _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenProcessFactory");
@@ -150,9 +190,12 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessFactory.Object,
                 _artportalenProcessFactory.Object,
                 null,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("taxonVerbatimRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("taxonProcessedRepository");
 
             create = () => new ProcessJob(
                 _darwinCoreRepository.Object,
@@ -162,6 +205,54 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessFactory.Object,
                 _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
+                null,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
+                _areaHelper.Object,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("instanceFactory");
+
+            create = () => new ProcessJob(
+                _darwinCoreRepository.Object,
+                _processInfoRepository.Object,
+                _harvestInfoRepository.Object,
+                _clamPortalProcessFactory.Object,
+                _kulProcessFactory.Object,
+                _artportalenProcessFactory.Object,
+                _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                null,
+                _processTaxaJob.Object,
+                _areaHelper.Object,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("copyFieldMappingsJob");
+
+            create = () => new ProcessJob(
+                _darwinCoreRepository.Object,
+                _processInfoRepository.Object,
+                _harvestInfoRepository.Object,
+                _clamPortalProcessFactory.Object,
+                _kulProcessFactory.Object,
+                _artportalenProcessFactory.Object,
+                _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                null,
+                _areaHelper.Object,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processTaxaJob");
+
+            create = () => new ProcessJob(
+                _darwinCoreRepository.Object,
+                _processInfoRepository.Object,
+                _harvestInfoRepository.Object,
+                _clamPortalProcessFactory.Object,
+                _kulProcessFactory.Object,
+                _artportalenProcessFactory.Object,
+                _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
@@ -174,6 +265,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessFactory.Object,
                 _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 _areaHelper.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
@@ -237,11 +331,14 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessFactory.Object,
                 _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
 
             var sources = (byte) DataProvider.Artportalen + (byte) DataProvider.ClamPortal + (byte) DataProvider.KUL;
-            var result = await job.RunAsync(sources, false, true, JobCancellationToken.Null);
+            var result = await job.RunAsync(sources, false, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -272,10 +369,13 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessFactory.Object,
                 _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
 
-            var result = await job.RunAsync(It.IsAny<int>(), false, true, JobCancellationToken.Null);
+            var result = await job.RunAsync(It.IsAny<int>(), false, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -306,10 +406,13 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessFactory.Object,
                 _artportalenProcessFactory.Object,
                 _taxonProcessedRepository.Object,
+                _instanceFactory.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
 
-            var result = await job.RunAsync(It.IsAny<int>(), false, true, JobCancellationToken.Null);
+            var result = await job.RunAsync(It.IsAny<int>(), false, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
