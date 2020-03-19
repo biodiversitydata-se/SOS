@@ -2,8 +2,8 @@
 using SOS.Lib.Configuration.Shared;
 using SOS.Observations.Api.Database;
 using SOS.Observations.Api.Database.Interfaces;
-using SOS.Observations.Api.Factories;
-using SOS.Observations.Api.Factories.Interfaces;
+using SOS.Observations.Api.Managers;
+using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -28,10 +28,10 @@ namespace SOS.Observations.Api.IoC.Modules
             builder.RegisterInstance(processClient).As<IProcessClient>().SingleInstance();
 
             // Add factories
-            builder.RegisterType<ObservationFactory>().As<IObservationFactory>().SingleInstance(); // InstancePerLifetimeScope?
-            builder.RegisterType<ProcessInfoFactory>().As<IProcessInfoFactory>().SingleInstance(); // InstancePerLifetimeScope
-            builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().SingleInstance();
-            builder.RegisterType<FieldMappingFactory>().As<IFieldMappingFactory>().SingleInstance();
+            builder.RegisterType<ObservationManager>().As<IObservationManager>().SingleInstance(); // InstancePerLifetimeScope?
+            builder.RegisterType<ProcessInfoManager>().As<IProcessInfoManager>().SingleInstance(); // InstancePerLifetimeScope
+            builder.RegisterType<TaxonManager>().As<ITaxonManager>().SingleInstance();
+            builder.RegisterType<FieldMappingManager>().As<IFieldMappingManager>().SingleInstance();
 
             // Repositories mongo
             builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>().SingleInstance();

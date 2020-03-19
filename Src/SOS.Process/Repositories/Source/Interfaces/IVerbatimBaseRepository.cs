@@ -17,7 +17,13 @@ namespace SOS.Process.Repositories.Source.Interfaces
         /// Get cursor to all documents in collection
         /// </summary>
         /// <returns></returns>
-        Task<IAsyncCursor<TEntity>> GetAllAsync();
+        Task<IAsyncCursor<TEntity>> GetAllByCursorAsync();
+
+        /// <summary>
+        /// Get all documents in collection.
+        /// </summary>
+        /// <returns></returns>
+        Task<List<TEntity>> GetAllAsync();
 
         /// <summary>
         /// Get document batch
@@ -26,13 +32,6 @@ namespace SOS.Process.Repositories.Source.Interfaces
         /// <param name="endId"></param>
         /// <returns></returns>
         Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId);
-
-        /// <summary>
-        /// Get entity batch by skip.
-        /// </summary>
-        /// <param name="skip"></param>
-        /// <returns></returns>
-        Task<IEnumerable<TEntity>> GetBatchBySkipAsync(int skip);
 
         /// <summary>
         /// Get min and max id in collection

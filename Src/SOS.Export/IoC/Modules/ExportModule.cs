@@ -1,9 +1,9 @@
 ﻿using Autofac;
-using SOS.Export.Factories;
-using SOS.Export.Factories.Interfaces;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Jobs;
+using SOS.Export.Managers;
+using SOS.Export.Managers.Interfaces;
 using SOS.Export.MongoDb;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories;
@@ -43,8 +43,8 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterInstance(exportClient).As<IExportClient>().SingleInstance();
 
             // Add factories
-            builder.RegisterType<ObservationFactory>().As<IObservationFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<TaxonFactory>().As<ITaxonFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ObservationManager>().As<IObservationManager>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonManager>().As<ITaxonManager>().InstancePerLifetimeScope();
 
             // Repositories mongo
             builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>().InstancePerLifetimeScope();

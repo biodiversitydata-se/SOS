@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Export.Factories.Interfaces;
+using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Search;
 
@@ -14,17 +14,17 @@ namespace SOS.Export.Jobs
     /// </summary>
     public class ExportJob : IExportJob
     {
-        private readonly IObservationFactory _observationFactory;
+        private readonly IObservationManager _observationManager;
         private readonly ILogger<ExportJob> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="observationFactory"></param>
+        /// <param name="observationManager"></param>
         /// <param name="logger"></param>
-        public ExportJob(IObservationFactory observationFactory, ILogger<ExportJob> logger)
+        public ExportJob(IObservationManager observationManager, ILogger<ExportJob> logger)
         {
-            _observationFactory = observationFactory ?? throw new ArgumentNullException(nameof(observationFactory));
+            _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -34,7 +34,7 @@ namespace SOS.Export.Jobs
             try
             {
                 _logger.LogDebug("Start export job");
-                var success = await _observationFactory.ExportDWCAsync(filter, email, cancellationToken);
+                var success = await _observationManager.ExportDWCAsync(filter, email, cancellationToken);
 
                 _logger.LogDebug($"End DOI job. Success: {success}");
                 

@@ -112,11 +112,15 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync()
         {
-            var res = await MongoCollection.AsQueryable().ToListAsync();
+            return await MongoCollection.FindAsync(FilterDefinition<TEntity>.Empty);
+        }
 
-            return res;
+        /// <inheritdoc />
+        public async Task<List<TEntity>> GetAllAsync()
+        {
+            return await MongoCollection.AsQueryable().ToListAsync();
         }
 
         /// <summary>

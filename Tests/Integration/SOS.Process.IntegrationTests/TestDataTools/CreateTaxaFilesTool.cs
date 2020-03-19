@@ -63,15 +63,15 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             System.IO.File.WriteAllBytes(filePath, bin);
         }
 
-        private TaxonProcessedRepository CreateTaxonProcessedRepository()
+        private ProcessedTaxonRepository CreateTaxonProcessedRepository()
         {
             var processConfiguration = GetProcessConfiguration();
             var processClient = new ProcessClient(
                 processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 processConfiguration.ProcessedDbConfiguration.DatabaseName,
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
-            TaxonProcessedRepository taxonProcessedRepository = new TaxonProcessedRepository(processClient, new NullLogger<TaxonProcessedRepository>());
-            return taxonProcessedRepository;
+            ProcessedTaxonRepository processedTaxonRepository = new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
+            return processedTaxonRepository;
         }
 
         private TaxonVerbatimRepository CreateTaxonVerbatimRepository(int batchSize)

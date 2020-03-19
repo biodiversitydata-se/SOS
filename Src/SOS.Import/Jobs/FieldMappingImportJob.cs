@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Factories.Interfaces;
+using SOS.Import.Harvesters.Interfaces;
 using SOS.Lib.Jobs.Import;
 
 namespace SOS.Import.Jobs
@@ -11,19 +11,19 @@ namespace SOS.Import.Jobs
     /// </summary>
     public class FieldMappingImportJob : IFieldMappingImportJob
     {
-        private readonly IFieldMappingFactory _fieldMappingFactory;
+        private readonly IFieldMappingHarvester _fieldMappingHarvester;
         private readonly ILogger<FieldMappingImportJob> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="fieldMappingFactory"></param>
+        /// <param name="fieldMappingHarvester"></param>
         /// <param name="logger"></param>
         public FieldMappingImportJob(
-            IFieldMappingFactory fieldMappingFactory,
+            IFieldMappingHarvester fieldMappingHarvester,
             ILogger<FieldMappingImportJob> logger)
         {
-            _fieldMappingFactory = fieldMappingFactory ?? throw new ArgumentNullException(nameof(fieldMappingFactory));
+            _fieldMappingHarvester = fieldMappingHarvester ?? throw new ArgumentNullException(nameof(fieldMappingHarvester));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -32,7 +32,7 @@ namespace SOS.Import.Jobs
         {
             _logger.LogDebug("Start Field Mapping Import Job");
 
-            var result = await _fieldMappingFactory.ImportAsync();
+            var result = await _fieldMappingHarvester.ImportAsync();
 
             _logger.LogDebug($"End Field Mapping Import Job. Result: {result}");
 

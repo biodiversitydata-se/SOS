@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Factories\" />
       <Folder Include="Properties\" />
     </ItemGroup>
 

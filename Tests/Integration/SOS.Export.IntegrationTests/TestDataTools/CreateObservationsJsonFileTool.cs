@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
-using SOS.Export.Factories;
+using SOS.Export.Managers;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Lib.Models.Search;
@@ -34,8 +34,8 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 exportConfiguration.ProcessedDbConfiguration.BatchSize);
             var processedObservationRepository = new ProcessedObservationRepository(
                 exportClient,
-                new TaxonFactory(
-                    new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonFactory>>().Object),
+                new TaxonManager(
+                    new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonManager>>().Object),
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

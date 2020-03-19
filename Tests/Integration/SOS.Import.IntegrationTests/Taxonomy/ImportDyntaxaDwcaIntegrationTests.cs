@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Import.Factories;
+using SOS.Import.Harvesters;
 using SOS.Import.IntegrationTests.TestHelpers.Factories;
 using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Taxon;
@@ -25,12 +26,12 @@ namespace SOS.Import.IntegrationTests.Taxonomy
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var taxonFactory = CreateTaxonFactory(@"Resources\dyntaxa.custom.dwca.zip");
+            var taxonHarvester = CreateTaxonHarvester(@"Resources\dyntaxa.custom.dwca.zip");
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            HarvestInfo harvestInfo = await taxonFactory.HarvestAsync();
+            HarvestInfo harvestInfo = await taxonHarvester.HarvestAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -38,7 +39,7 @@ namespace SOS.Import.IntegrationTests.Taxonomy
             harvestInfo.Status.Should().Be(RunStatus.Success);
         }
 
-        private TaxonFactory CreateTaxonFactory(string filename)
+        private TaxonHarvester CreateTaxonHarvester(string filename)
         {
             var importConfiguration = GetImportConfiguration();
             var importClient = new ImportClient(
@@ -58,8 +59,8 @@ namespace SOS.Import.IntegrationTests.Taxonomy
                 new TaxonAttributeServiceConfiguration { BaseAddress = importConfiguration.TaxonAttributeServiceConfiguration.BaseAddress },
                 new NullLogger<TaxonAttributeService>());
 
-            var taxonFactory = new TaxonFactory(taxonVerbatimRepository, taxonService, taxonAttributeService, new NullLogger<TaxonFactory>());
-            return taxonFactory;
+            var taxonHarvester = new TaxonHarvester(taxonVerbatimRepository, taxonService, taxonAttributeService, new NullLogger<TaxonHarvester>());
+            return taxonHarvester;
         }
     }
 }

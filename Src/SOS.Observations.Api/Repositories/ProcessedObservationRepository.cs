@@ -10,7 +10,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Database.Interfaces;
 using SOS.Observations.Api.Enum;
-using SOS.Observations.Api.Factories.Interfaces;
+using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Repositories
@@ -21,20 +21,20 @@ namespace SOS.Observations.Api.Repositories
     public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, ObjectId>, IProcessedObservationRepository
     {
         private const int BiotaTaxonId = 0;
-        private readonly ITaxonFactory _taxonFactory;
+        private readonly ITaxonManager _taxonManager;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="taxonFactory"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IProcessClient client,
-            ITaxonFactory taxonFactory,
+            ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger) : base(client, true, logger)
         {
-            _taxonFactory = taxonFactory ?? throw new ArgumentNullException(nameof(taxonFactory));
+            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }
 
         private SearchFilter PrepareFilter(SearchFilter filter)
@@ -49,7 +49,7 @@ namespace SOS.Observations.Api.Repositories
                 }
                 else
                 {
-                    preparedFilter.TaxonIds = _taxonFactory.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
+                    preparedFilter.TaxonIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
                 }
             }
 

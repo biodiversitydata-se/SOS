@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Factories.Interfaces;
+using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
@@ -14,21 +14,21 @@ namespace SOS.Import.Jobs
     /// </summary>
     public class ClamPortalHarvestJob : IClamPortalHarvestJob
     {
-        private readonly IClamPortalObservationFactory _clamPortalObservationFactory;
+        private readonly IClamPortalObservationHarvester _clamPortalObservationHarvester;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<ClamPortalHarvestJob> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="clamPortalObservationFactory"></param>
+        /// <param name="clamPortalObservationHarvester"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="logger"></param>
-        public ClamPortalHarvestJob(IClamPortalObservationFactory clamPortalObservationFactory,
+        public ClamPortalHarvestJob(IClamPortalObservationHarvester clamPortalObservationHarvester,
             IHarvestInfoRepository harvestInfoRepository,
             ILogger<ClamPortalHarvestJob> logger)
         {
-            _clamPortalObservationFactory = clamPortalObservationFactory ?? throw new ArgumentNullException(nameof(clamPortalObservationFactory));
+            _clamPortalObservationHarvester = clamPortalObservationHarvester ?? throw new ArgumentNullException(nameof(clamPortalObservationHarvester));
             _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -38,7 +38,7 @@ namespace SOS.Import.Jobs
         {
             _logger.LogDebug("Start Clam Portal Harvest Job");
 
-            var result = await _clamPortalObservationFactory.HarvestClamsAsync(cancellationToken);
+            var result = await _clamPortalObservationHarvester.HarvestClamsAsync(cancellationToken);
             
             _logger.LogDebug($"End Clam Portal Harvest Job. Status: {result.Status}");
             

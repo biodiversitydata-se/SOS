@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Process.Factories.Interfaces;
 using SOS.Process.Jobs;
+using SOS.Process.Managers.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Jobs
@@ -14,7 +14,7 @@ namespace SOS.Process.UnitTests.Jobs
     /// </summary>
     public class ActivateInstanceJobTests
     {
-        private readonly Mock<IInstanceFactory> _instanceFactoryMock;
+        private readonly Mock<IInstanceManager> _instanceManagerMock;
         private readonly Mock<ILogger<ActivateInstanceJob>> _loggerMock;
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         public ActivateInstanceJobTests()
         {
-            _instanceFactoryMock = new Mock<IInstanceFactory>();
+            _instanceManagerMock = new Mock<IInstanceManager>();
             _loggerMock = new Mock<ILogger<ActivateInstanceJob>>();
         }
 
@@ -33,17 +33,17 @@ namespace SOS.Process.UnitTests.Jobs
         public void ConstructorTest()
         {
             new ActivateInstanceJob(
-                _instanceFactoryMock.Object,
+                _instanceManagerMock.Object,
                 _loggerMock.Object).Should().NotBeNull();
 
             Action create = () => new ActivateInstanceJob(
                 null,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("instanceFactory");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("instanceManager");
 
             
             create = () => new ActivateInstanceJob(
-                _instanceFactoryMock.Object,
+                _instanceManagerMock.Object,
                null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
@@ -58,14 +58,14 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _instanceFactoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
+            _instanceManagerMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var job = new ActivateInstanceJob(
-                _instanceFactoryMock.Object,
+                _instanceManagerMock.Object,
                 _loggerMock.Object);
 
             var result = await job.RunAsync(It.IsAny<byte>());
@@ -92,7 +92,7 @@ namespace SOS.Process.UnitTests.Jobs
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var job = new ActivateInstanceJob(
-                _instanceFactoryMock.Object,
+                _instanceManagerMock.Object,
                 _loggerMock.Object);
 
             var result = await job.RunAsync(It.IsAny<byte>());
@@ -113,13 +113,13 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _instanceFactoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
+            _instanceManagerMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
                 .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var job = new ActivateInstanceJob(
-                _instanceFactoryMock.Object,
+                _instanceManagerMock.Object,
                 _loggerMock.Object);
 
             var result = await job.RunAsync(It.IsAny<byte>());

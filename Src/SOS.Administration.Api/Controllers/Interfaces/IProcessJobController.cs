@@ -48,5 +48,11 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         IActionResult RunCopyFieldMappingJob();
+
+        /// <summary>
+        /// Run copy areas job.
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunCopyAreasJob();
     }
 }

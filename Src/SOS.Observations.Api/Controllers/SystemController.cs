@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Observations.Api.Controllers.Interfaces;
-using SOS.Observations.Api.Factories.Interfaces;
+using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -16,17 +16,17 @@ namespace SOS.Observations.Api.Controllers
     [ApiController]
     public class SystemController : ControllerBase, ISystemController
     {
-        private readonly IProcessInfoFactory _processInfoFactory;
+        private readonly IProcessInfoManager _processInfoManager;
         private readonly ILogger<SystemController> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processInfoFactory"></param>
+        /// <param name="processInfoManager"></param>
         /// <param name="logger"></param>
-        public SystemController(IProcessInfoFactory processInfoFactory, ILogger<SystemController> logger)
+        public SystemController(IProcessInfoManager processInfoManager, ILogger<SystemController> logger)
         {
-            _processInfoFactory = processInfoFactory ?? throw new ArgumentNullException(nameof(processInfoFactory));
+            _processInfoManager = processInfoManager ?? throw new ArgumentNullException(nameof(processInfoManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -38,7 +38,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                return new OkObjectResult(await _processInfoFactory.GetProcessInfoAsync(active));
+                return new OkObjectResult(await _processInfoManager.GetProcessInfoAsync(active));
             }
             catch (Exception e)
             {

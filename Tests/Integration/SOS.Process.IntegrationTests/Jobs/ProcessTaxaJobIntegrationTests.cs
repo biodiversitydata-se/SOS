@@ -49,7 +49,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration.ProcessedDbConfiguration.DatabaseName,
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
             var taxonVerbatimRepository = new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
-            var taxonProcessedRepository = new TaxonProcessedRepository(processClient, new NullLogger<TaxonProcessedRepository>());
+            var taxonProcessedRepository = new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
             var processTaxaJob = new ProcessTaxaJob(
                 taxonVerbatimRepository,
                 taxonProcessedRepository,

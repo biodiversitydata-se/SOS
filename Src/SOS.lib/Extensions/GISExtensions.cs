@@ -23,6 +23,7 @@ namespace SOS.Lib.Extensions
     {
         #region Private
         private static readonly ConcurrentDictionary<long, ICoordinateTransformation> TransformationsDictionary = new ConcurrentDictionary<long, ICoordinateTransformation>();
+        private static readonly Dictionary<Tuple<CoordinateSys, CoordinateSys>, MathTransformFilter> MathTransformFilterDictionary = new Dictionary<Tuple<CoordinateSys, CoordinateSys>, MathTransformFilter>();
 
         /// <summary>
         /// Math transform filter
@@ -187,6 +188,34 @@ namespace SOS.Lib.Extensions
         #endregion Private
 
         #region Public
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        static GISExtensions()
+        {
+            CoordinateSystemFactory coordinateSystemFactory = new CoordinateSystemFactory();
+            Dictionary<CoordinateSys, CoordinateSystem> coordinateSystemsById = new Dictionary<CoordinateSys, CoordinateSystem>();
+
+            foreach (var coordinateSys in Enum.GetValues(typeof(CoordinateSys)).Cast<CoordinateSys>())
+            {
+                coordinateSystemsById.Add(coordinateSys, coordinateSystemFactory.CreateFromWkt(GetCoordinateSystemWkt(coordinateSys)));
+            }
+
+            var coordinateTransformationFactory = new CoordinateTransformationFactory();
+            foreach (var sourceCoordinateSys in Enum.GetValues(typeof(CoordinateSys)).Cast<CoordinateSys>())
+            {
+                foreach (var targetCoordinateSys in Enum.GetValues(typeof(CoordinateSys)).Cast<CoordinateSys>())
+                {
+                    ICoordinateTransformation coordinateTransformation = coordinateTransformationFactory.CreateFromCoordinateSystems(
+                        coordinateSystemsById[sourceCoordinateSys],
+                        coordinateSystemsById[targetCoordinateSys]);
+
+                    MathTransformFilterDictionary.Add(new Tuple<CoordinateSys, CoordinateSys>(sourceCoordinateSys, targetCoordinateSys), new MathTransformFilter(coordinateTransformation.MathTransform));
+                }
+            }
+        }
+
         /// <summary>
         ///  Transform WGS 84 point to circle by adding a buffer to it
         /// </summary>
@@ -379,18 +408,10 @@ namespace SOS.Lib.Extensions
                 return geometry;
             }
 
-            // Create coordinate systems
-            var coordinateSystemFactory = new CoordinateSystemFactory();
-            var sourceCoordinateSystem = coordinateSystemFactory.CreateFromWkt(GetCoordinateSystemWkt(fromCoordinateSystem));
-            var targetCoordinateSystem = coordinateSystemFactory.CreateFromWkt(GetCoordinateSystemWkt(toCoordinateSystem));
-
-            // Transform coordinates
-            var coordinateTransformationFactory = new CoordinateTransformationFactory();
-            var transformFactory = coordinateTransformationFactory.CreateFromCoordinateSystems(sourceCoordinateSystem, targetCoordinateSystem);
-
-            var transformedGeometry = geometry.Transform(transformFactory.MathTransform);
+            var mathTransformFilter = MathTransformFilterDictionary[new Tuple<CoordinateSys, CoordinateSys>(fromCoordinateSystem, toCoordinateSystem)];
+            var transformedGeometry = geometry.Copy();
+            transformedGeometry.Apply(mathTransformFilter);
             transformedGeometry.SRID = (int)toCoordinateSystem;
-
             return transformedGeometry;
         }
         #endregion Public

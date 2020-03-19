@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Extensions;
+using SOS.Lib.Factories;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
@@ -16,23 +17,23 @@ namespace SOS.Process.Jobs
     public class ProcessTaxaJob : IProcessTaxaJob
     {
         private readonly ITaxonVerbatimRepository _taxonVerbatimRepository;
-        private readonly ITaxonProcessedRepository _taxonProcessedRepository;
+        private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly ILogger<ProcessTaxaJob> _logger;
 
         public ProcessTaxaJob(
             ITaxonVerbatimRepository taxonVerbatimRepository,
-            ITaxonProcessedRepository taxonProcessedRepository,
+            IProcessedTaxonRepository processedTaxonRepository,
             ILogger<ProcessTaxaJob> logger)
         {
             _taxonVerbatimRepository = taxonVerbatimRepository ?? throw new ArgumentNullException(nameof(taxonVerbatimRepository));
-            _taxonProcessedRepository = taxonProcessedRepository ?? throw new ArgumentNullException(nameof(taxonProcessedRepository));
+            _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {
-            var dwcTaxa = await GetVerbatimTaxaAsync();
+            var dwcTaxa = await _taxonVerbatimRepository.GetAllAsync();
             if (!dwcTaxa?.Any() ?? true)
             {
                 _logger.LogDebug("Failed to get taxa");
@@ -44,7 +45,7 @@ namespace SOS.Process.Jobs
             CalculateHigherClassificationField(taxa);
 
             _logger.LogDebug("Start deleting processed taxa");
-            if (!await _taxonProcessedRepository.DeleteCollectionAsync())
+            if (!await _processedTaxonRepository.DeleteCollectionAsync())
             {
                 _logger.LogError("Failed to delete processed taxa");
                 return false;
@@ -52,26 +53,10 @@ namespace SOS.Process.Jobs
             _logger.LogDebug("Finish deleting processed taxa");
 
             _logger.LogDebug("Start copy processed taxa");
-            var success = await _taxonProcessedRepository.AddManyAsync(taxa);
+            var success = await _processedTaxonRepository.AddManyAsync(taxa);
             _logger.LogDebug("Finish copy processed taxa");
 
             return success ? true : throw new Exception("Process taxa job failed");
-        }
-
-        private async Task<IEnumerable<DarwinCoreTaxon>> GetVerbatimTaxaAsync()
-        {
-            var skip = 0;
-            var tmpTaxa = await _taxonVerbatimRepository.GetBatchBySkipAsync(skip);
-            var taxa = new List<DarwinCoreTaxon>();
-
-            while (tmpTaxa?.Any() ?? false)
-            {
-                taxa.AddRange(tmpTaxa);
-                skip += tmpTaxa.Count();
-                tmpTaxa = await _taxonVerbatimRepository.GetBatchBySkipAsync(skip);
-            }
-
-            return taxa;
         }
 
         /// <summary>
@@ -79,7 +64,7 @@ namespace SOS.Process.Jobs
         /// each nodes parents.
         /// </summary>
         /// <param name="taxa"></param>
-        private void CalculateHigherClassificationField(IEnumerable<ProcessedTaxon> taxa)
+        private void CalculateHigherClassificationField(ICollection<ProcessedTaxon> taxa)
         {
             var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
             var taxonById = taxa.ToDictionary(m => m.Id, m => m);

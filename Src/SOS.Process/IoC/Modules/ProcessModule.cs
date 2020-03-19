@@ -3,13 +3,17 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Jobs.Process;
 using SOS.Process.Database;
 using SOS.Process.Database.Interfaces;
-using SOS.Process.Factories;
-using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
+using SOS.Process.Managers;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Mappings;
 using SOS.Process.Mappings.Interfaces;
+using SOS.Process.Processors.Artportalen;
+using SOS.Process.Processors.ClamPortal;
+using SOS.Process.Processors.Interfaces;
+using SOS.Process.Processors.Kul;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
@@ -62,14 +66,15 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<InvalidObservationRepository>().As<IInvalidObservationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<TaxonProcessedRepository>().As<ITaxonProcessedRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedAreaRepository>().As<IProcessedAreaRepository>().InstancePerLifetimeScope();
 
             // Add factories
-            builder.RegisterType<ClamPortalProcessFactory>().As<IClamPortalProcessFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<InstanceFactory>().As<IInstanceFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<KulProcessFactory>().As<IKulProcessFactory>().InstancePerLifetimeScope();
-            builder.RegisterType<ArtportalenProcessFactory>().As<IArtportalenProcessFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<ClamPortalObservationProcessor>().As<IClamPortalObservationProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
+            builder.RegisterType<KulObservationProcessor>().As<IKulObservationProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenObservationProcessor>().As<IArtportalenObservationProcessor>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();
@@ -77,6 +82,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ProcessJob>().As<IProcessJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessTaxaJob>().As<IProcessTaxaJob>().InstancePerLifetimeScope();
             builder.RegisterType<CopyFieldMappingsJob>().As<ICopyFieldMappingsJob>().InstancePerLifetimeScope();
+            builder.RegisterType<CopyAreasJob>().As<ICopyAreasJob>().InstancePerLifetimeScope();
         }
     }
 }

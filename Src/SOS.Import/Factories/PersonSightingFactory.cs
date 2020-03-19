@@ -10,7 +10,7 @@ namespace SOS.Import.Factories
 {
     public static class PersonSightingFactory
     {
-        public static Dictionary<int, PersonSighting> CalculatePersonSightingDictionary(
+        public static Dictionary<int, PersonSighting> CreatePersonSightingDictionary(
            ISet<int> sightingIds,
            IDictionary<int, Person> personByUserId,
            IDictionary<int, Organization> organizationById,
@@ -23,7 +23,7 @@ namespace SOS.Import.Factories
             //------------------------------------------------------------------------------
             // Add SpeciesCollection values
             //------------------------------------------------------------------------------
-            var speciesCollectionBySightingId = CalculateSpeciesCollectionDictionary(personByUserId,
+            var speciesCollectionBySightingId = CreateSpeciesCollectionDictionary(personByUserId,
                 organizationById,
                 filteredSpeciesCollectionItems);
 
@@ -35,7 +35,7 @@ namespace SOS.Import.Factories
             //------------------------------------------------------------------------------
             // Add Observers values
             //------------------------------------------------------------------------------
-            var observersBySightingId = CalculateObserversDictionary(
+            var observersBySightingId = CreateObserversDictionary(
                 sightingRelations,
                 personByUserId);
 
@@ -54,7 +54,7 @@ namespace SOS.Import.Factories
             //------------------------------------------------------------------------------
             // Add VerifiedBy values
             //------------------------------------------------------------------------------
-            var verifiedByStringBySightingId = CalculateVerifiedByStringDictionary(personByUserId,
+            var verifiedByStringBySightingId = CreateVerifiedByStringDictionary(personByUserId,
                 filteredSpeciesCollectionItems,
                 sightingRelations);
 
@@ -73,7 +73,7 @@ namespace SOS.Import.Factories
             //------------------------------------------------------------------------------
             // Add ReportedBy values
             //------------------------------------------------------------------------------
-            var reportedBySightingId = CalculateReportedByDictionary(
+            var reportedBySightingId = CreateReportedByDictionary(
                 sightingRelations,
                 personByUserId);
 
@@ -103,7 +103,7 @@ namespace SOS.Import.Factories
             return personSightingBySightingId;
         }
 
-        private static Dictionary<int, string> CalculateSpeciesCollectionDictionary(
+        private static Dictionary<int, string> CreateSpeciesCollectionDictionary(
             IDictionary<int, Person> personById,
             IDictionary<int, Organization> organizationById,
             IList<SpeciesCollectionItem> speciesCollectionItems)
@@ -142,7 +142,7 @@ namespace SOS.Import.Factories
             return speciesCollectionBySightingId;
         }
 
-        private static IDictionary<int, string> CalculateObserversDictionary(
+        private static IDictionary<int, string> CreateObserversDictionary(
             IEnumerable<SightingRelation> sightingRelations,
             IDictionary<int, Person> personsByUserId)
         {
@@ -160,7 +160,7 @@ namespace SOS.Import.Factories
             return observersBySightingId;
         }
 
-        private static IDictionary<int, string> CalculateReportedByDictionary(
+        private static IDictionary<int, string> CreateReportedByDictionary(
             IEnumerable<SightingRelation> sightingRelations,
             IDictionary<int, Person> personsByUserId)
         {
@@ -182,13 +182,13 @@ namespace SOS.Import.Factories
         }
 
 
-        private static Dictionary<int, string> CalculateVerifiedByStringDictionary(
+        private static Dictionary<int, string> CreateVerifiedByStringDictionary(
             IDictionary<int, Person> personById,
             IList<SpeciesCollectionItem> speciesCollectionItems,
             IList<SightingRelation> sightingRelations
         )
         {
-            var verifiedByDataSightingId = CalculateVerifiedByDataDictionary(
+            var verifiedByDataSightingId = CreateVerifiedByDataDictionary(
                 personById,
                 speciesCollectionItems,
                 sightingRelations);
@@ -196,7 +196,7 @@ namespace SOS.Import.Factories
             return verifiedByDataSightingId.ToDictionary(x => x.Key, x => ConcatenateVerifiedByString(x.Value));
         }
 
-        private static Dictionary<int, VerifiedByData> CalculateVerifiedByDataDictionary(
+        private static Dictionary<int, VerifiedByData> CreateVerifiedByDataDictionary(
             IDictionary<int, Person> personById,
             IList<SpeciesCollectionItem> speciesCollectionItems,
             IList<SightingRelation> sightingRelations)
@@ -263,7 +263,7 @@ namespace SOS.Import.Factories
             return verifiedByDataSightingId;
         }
 
-        public static string ConcatenateVerifiedByString(VerifiedByData vbd)
+        private static string ConcatenateVerifiedByString(VerifiedByData vbd)
         {
             return ConcatenateVerifiedByString(
                 vbd.DeterminerName,

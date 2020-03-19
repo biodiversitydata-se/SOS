@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MongoDB.Driver;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Observations.Api.Repositories.Interfaces
@@ -19,9 +20,15 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         Task<TEntity> GetAsync(TKey id);
 
         /// <summary>
-        /// Get all objects in repository
+        /// Get cursor to all documents in collection
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<TEntity>> GetAllAsync();
+        Task<IAsyncCursor<TEntity>> GetAllByCursorAsync();
+
+        /// <summary>
+        /// Get all documents in collection.
+        /// </summary>
+        /// <returns></returns>
+        Task<List<TEntity>> GetAllAsync();
     }
 }

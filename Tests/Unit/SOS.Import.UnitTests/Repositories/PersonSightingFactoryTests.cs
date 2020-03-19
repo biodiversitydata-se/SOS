@@ -71,7 +71,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = PersonSightingFactory.CalculatePersonSightingDictionary(
+            var result = PersonSightingFactory.CreatePersonSightingDictionary(
                 sightingIds,
                 personByUserId,
                 null,

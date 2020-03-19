@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Factories.Interfaces;
+using SOS.Import.Harvesters.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers.Interfaces;
@@ -21,21 +21,21 @@ namespace SOS.Administration.Api.Controllers
     public class FieldMappingController : ControllerBase, Interfaces.IFieldMappingController
     {
         private readonly ILogger<FieldMappingController> _logger;
-        private readonly IFieldMappingFactory _fieldMappingFactory;
+        private readonly IFieldMappingHarvester _fieldMappingHarvester;
         private readonly IFieldMappingDiffHelper _fieldMappingDiffHelper;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="fieldMappingFactory"></param>
+        /// <param name="fieldMappingHarvester"></param>
         /// <param name="fieldMappingDiffHelper"></param>
         /// <param name="logger"></param>
         public FieldMappingController(
-            IFieldMappingFactory fieldMappingFactory,
+            IFieldMappingHarvester fieldMappingHarvester,
             IFieldMappingDiffHelper fieldMappingDiffHelper,
             ILogger<FieldMappingController> logger)
         {
-            _fieldMappingFactory = fieldMappingFactory ?? throw new ArgumentNullException(nameof(fieldMappingFactory));
+            _fieldMappingHarvester = fieldMappingHarvester ?? throw new ArgumentNullException(nameof(fieldMappingHarvester));
             _fieldMappingDiffHelper = fieldMappingDiffHelper ?? throw new ArgumentNullException(nameof(fieldMappingDiffHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -49,7 +49,7 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 var fieldMappingFieldIds = Enum.GetValues(typeof(FieldMappingFieldId)).Cast<FieldMappingFieldId>();
-                var zipBytes = await _fieldMappingFactory.CreateFieldMappingsZipFileAsync(fieldMappingFieldIds);
+                var zipBytes = await _fieldMappingHarvester.CreateFieldMappingsZipFileAsync(fieldMappingFieldIds);
                 return File(zipBytes, "application/zip", "AllFieldMappings.zip");
             }
             catch (Exception e)
@@ -67,7 +67,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                var fieldMappingFileTuple = await _fieldMappingFactory.CreateFieldMappingFileAsync(fieldMappingFieldId);
+                var fieldMappingFileTuple = await _fieldMappingHarvester.CreateFieldMappingFileAsync(fieldMappingFieldId);
                 return File(fieldMappingFileTuple.Bytes, "application/json", fieldMappingFileTuple.Filename);
             }
             catch (Exception e)
@@ -89,7 +89,7 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 var fieldMappingFieldIds = Enum.GetValues(typeof(FieldMappingFieldId)).Cast<FieldMappingFieldId>();
-                IEnumerable<FieldMapping> generatedFieldMappings = await _fieldMappingFactory.CreateAllFieldMappingsAsync(fieldMappingFieldIds);
+                IEnumerable<FieldMapping> generatedFieldMappings = await _fieldMappingHarvester.CreateAllFieldMappingsAsync(fieldMappingFieldIds);
                 var zipBytes = await _fieldMappingDiffHelper.CreateDiffZipFile(generatedFieldMappings);
                 return File(zipBytes, "application/zip", "FieldMappingDiffBetweenVerbatimAndProcessed.zip");
             }

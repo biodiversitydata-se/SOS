@@ -11,9 +11,9 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Process.Factories.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
+using SOS.Process.Processors.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
@@ -35,6 +35,10 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IInstanceFactory> _instanceFactory;
         private readonly Mock<ICopyFieldMappingsJob> _copyFieldMappingsJob;
         private readonly Mock<IProcessTaxaJob> _processTaxaJob;
+        private readonly Mock<IClamPortalObservationProcessor> _clamPortalProcessor;
+        private readonly Mock<IKulObservationProcessor> _kulProcessor;
+        private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
+        private readonly Mock<IProcessedTaxonRepository> _taxonProcessedRepository;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<ILogger<ProcessJob>> _loggerMock;
 
@@ -53,6 +57,10 @@ namespace SOS.Process.UnitTests.Jobs
             _taxonProcessedRepository = new Mock<ITaxonProcessedRepository>();
             _copyFieldMappingsJob = new Mock<ICopyFieldMappingsJob>();
             _processTaxaJob = new Mock<IProcessTaxaJob>();
+            _clamPortalProcessor = new Mock<IClamPortalObservationProcessor>();
+            _kulProcessor = new Mock<IKulObservationProcessor>();
+            _artportalenProcessor = new Mock<IArtportalenObservationProcessor>();
+            _taxonProcessedRepository = new Mock<IProcessedTaxonRepository>();
             _areaHelper = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<ProcessJob>>();
         }
@@ -67,9 +75,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _darwinCoreRepository.Object,
                 _processInfoRepository.Object,
                 _harvestInfoRepository.Object,
-                _clamPortalProcessFactory.Object,
-                _kulProcessFactory.Object,
-                _artportalenProcessFactory.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceFactory.Object,
                 _copyFieldMappingsJob.Object,
@@ -81,9 +89,9 @@ namespace SOS.Process.UnitTests.Jobs
                 null,
                 _processInfoRepository.Object,
                 _harvestInfoRepository.Object,
-                _clamPortalProcessFactory.Object,
-                _kulProcessFactory.Object,
-                _artportalenProcessFactory.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceFactory.Object,
                 _copyFieldMappingsJob.Object,
@@ -96,9 +104,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _darwinCoreRepository.Object,
                 null,
                 _harvestInfoRepository.Object,
-                _clamPortalProcessFactory.Object,
-                _kulProcessFactory.Object,
-                _artportalenProcessFactory.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceFactory.Object,
                 _copyFieldMappingsJob.Object,
@@ -111,9 +119,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _darwinCoreRepository.Object,
                 _processInfoRepository.Object,
                 null,
-                _clamPortalProcessFactory.Object,
-                _kulProcessFactory.Object,
-                _artportalenProcessFactory.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceFactory.Object,
                 _copyFieldMappingsJob.Object,
@@ -142,8 +150,8 @@ namespace SOS.Process.UnitTests.Jobs
                 _processInfoRepository.Object,
                 _harvestInfoRepository.Object,
                 null,
-                _kulProcessFactory.Object,
-                _artportalenProcessFactory.Object,
+                _kulProcessor.Object,
+                _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceFactory.Object,
                 _copyFieldMappingsJob.Object,
@@ -159,6 +167,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessFactory.Object,
                null,
                 _artportalenProcessFactory.Object,
+                _clamPortalProcessor.Object,
+                null,
+                _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceFactory.Object,
                 _copyFieldMappingsJob.Object,
@@ -171,8 +182,8 @@ namespace SOS.Process.UnitTests.Jobs
                 _darwinCoreRepository.Object,
                 _processInfoRepository.Object,
                 _harvestInfoRepository.Object,
-                _clamPortalProcessFactory.Object,
-                _kulProcessFactory.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
                 null,
                 _taxonProcessedRepository.Object,
                 _instanceFactory.Object,
@@ -186,9 +197,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _darwinCoreRepository.Object,
                 _processInfoRepository.Object,
                 _harvestInfoRepository.Object,
-                _clamPortalProcessFactory.Object,
-                _kulProcessFactory.Object,
-                _artportalenProcessFactory.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _artportalenProcessor.Object,
                 null,
                 _instanceFactory.Object,
                 _copyFieldMappingsJob.Object,
@@ -246,9 +257,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _darwinCoreRepository.Object,
                 _processInfoRepository.Object,
                 _harvestInfoRepository.Object,
-                _clamPortalProcessFactory.Object,
-                _kulProcessFactory.Object,
-                _artportalenProcessFactory.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceFactory.Object,
                 _copyFieldMappingsJob.Object,
@@ -261,9 +272,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _darwinCoreRepository.Object,
                 _processInfoRepository.Object,
                 _harvestInfoRepository.Object,
-                _clamPortalProcessFactory.Object,
-                _kulProcessFactory.Object,
-                _artportalenProcessFactory.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceFactory.Object,
                 _copyFieldMappingsJob.Object,
@@ -297,13 +308,13 @@ namespace SOS.Process.UnitTests.Jobs
                     new HarvestInfo("0", DataProvider.Artportalen, DateTime.Now)
                 });
 
-            _artportalenProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+            _artportalenProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(RunInfo.Success(DataProvider.Artportalen, DateTime.Now, DateTime.Now, 1));
 
-            _clamPortalProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+            _clamPortalProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(RunInfo.Success(DataProvider.ClamPortal, DateTime.Now, DateTime.Now, 1));
 
-            _kulProcessFactory.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+            _kulProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(RunInfo.Success(DataProvider.KUL, DateTime.Now, DateTime.Now, 1));
 
             _darwinCoreRepository.Setup(r => r.DropIndexAsync());
@@ -327,9 +338,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _darwinCoreRepository.Object,
                 _processInfoRepository.Object,
                 _harvestInfoRepository.Object,
-                _clamPortalProcessFactory.Object,
-                _kulProcessFactory.Object,
-                _artportalenProcessFactory.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceFactory.Object,
                 _copyFieldMappingsJob.Object,
@@ -365,9 +376,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _darwinCoreRepository.Object,
                 _processInfoRepository.Object,
                 _harvestInfoRepository.Object,
-                _clamPortalProcessFactory.Object,
-                _kulProcessFactory.Object,
-                _artportalenProcessFactory.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceFactory.Object,
                 _copyFieldMappingsJob.Object,
@@ -402,9 +413,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _darwinCoreRepository.Object,
                 _processInfoRepository.Object,
                 _harvestInfoRepository.Object,
-                _clamPortalProcessFactory.Object,
-                _kulProcessFactory.Object,
-                _artportalenProcessFactory.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceFactory.Object,
                 _copyFieldMappingsJob.Object,

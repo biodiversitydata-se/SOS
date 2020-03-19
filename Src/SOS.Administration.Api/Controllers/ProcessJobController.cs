@@ -114,5 +114,23 @@ namespace SOS.Administration.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <inheritdoc />
+        [HttpPost("CopyAreas/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunCopyAreasJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<ICopyAreasJob>(job => job.RunAsync());
+                return new OkObjectResult("Started copy areas job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Starting copy areas job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

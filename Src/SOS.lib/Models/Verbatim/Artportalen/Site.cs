@@ -1,4 +1,7 @@
 ﻿using MongoDB.Driver.GeoJsonObjectModel;
+using NetTopologySuite.Geometries;
+using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen
 {
@@ -7,6 +10,9 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
     /// </summary>
     public class Site
     {
+        private GeoJsonGeometry<GeoJson2DGeographicCoordinates> _pointWithBuffer;
+        private GeoJsonPoint<GeoJson2DGeographicCoordinates> _point;
+
         /// <summary>
         /// Accuracy in meters
         /// </summary>
@@ -40,13 +46,48 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         /// Point (WGS84)
         /// </summary>
-        public GeoJsonPoint<GeoJson2DGeographicCoordinates> Point { get; set; }
+        public GeoJsonPoint<GeoJson2DGeographicCoordinates> Point
+        {
+            get
+            {
+                if (_point == null)
+                {
+                    InitGeometries();
+                }
+
+                return _point;
+            }
+            set => _point = value;
+        }
 
         /// <summary>
         /// Point with accuracy buffer (WGS84)
         /// </summary>
-        public GeoJsonGeometry<GeoJson2DGeographicCoordinates> PointWithBuffer { get; set; }
+        public GeoJsonGeometry<GeoJson2DGeographicCoordinates> PointWithBuffer
+        {
+            get
+            {
+                if (_pointWithBuffer == null)
+                {
+                    InitGeometries();
+                }
 
+                return _pointWithBuffer;
+            }
+            set => _pointWithBuffer = value;
+        }
+
+        private void InitGeometries()
+        {
+            if (XCoord > 0 && YCoord > 0)
+            {
+                var webMercatorPoint = new Point(XCoord, YCoord);
+                var wgs84Point = (Point)webMercatorPoint.Transform(VerbatimCoordinateSystem, CoordinateSys.WGS84);
+                _point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry();
+                _pointWithBuffer = wgs84Point?.ToSquare(Accuracy)?.ToGeoJsonGeometry();
+            }
+        }
+        
         /// <summary>
         /// Province
         /// </summary>
@@ -67,5 +108,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// Y coordinate of site
         /// </summary>
         public int YCoord { get; set; }
+
+        public CoordinateSys VerbatimCoordinateSystem { get; set; }
     }
 }

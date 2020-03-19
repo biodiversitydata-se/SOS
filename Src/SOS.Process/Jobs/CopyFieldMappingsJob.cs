@@ -27,7 +27,7 @@ namespace SOS.Process.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {
-            var fieldMappings = await _fieldMappingVerbatimRepository.GetFieldMappingsAsync();
+            var fieldMappings = await _fieldMappingVerbatimRepository.GetAllAsync();
             if (!fieldMappings?.Any() ?? true)
             {
                 _logger.LogDebug("Failed to get field mappings");

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using SOS.Export.Factories.Interfaces;
+using SOS.Export.Managers.Interfaces;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Extensions;
@@ -19,7 +19,7 @@ namespace SOS.Export.Repositories
     /// </summary>
     public class ProcessedObservationRepository : BaseRepository<ProcessedObservation, ObjectId>, IProcessedObservationRepository
     {
-        private ITaxonFactory _taxonFactory;
+        private ITaxonManager _taxonManager;
         
         /// <summary>
         /// Constructor
@@ -28,10 +28,10 @@ namespace SOS.Export.Repositories
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IExportClient exportClient,
-            ITaxonFactory taxonFactory,
+            ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger) : base(exportClient, true, logger)
         {
-            _taxonFactory = taxonFactory ?? throw new ArgumentNullException(nameof(taxonFactory));
+            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }
 
         private SearchFilter PrepareFilter(FilterBase filter)
@@ -46,7 +46,7 @@ namespace SOS.Export.Repositories
                 }
                 else
                 {
-                    preparedFilter.TaxonIds = _taxonFactory.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
+                    preparedFilter.TaxonIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
                 }
             }
 
