@@ -5,6 +5,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities;
+using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters.Observations;
 using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Artportalen;

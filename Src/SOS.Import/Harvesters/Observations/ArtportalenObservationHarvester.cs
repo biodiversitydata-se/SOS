@@ -7,6 +7,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities;
+using SOS.Import.Entities.Artportalen;
 using SOS.Import.Extensions;
 using SOS.Import.Factories;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;

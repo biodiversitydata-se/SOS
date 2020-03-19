@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using SOS.Import.Entities;
+using SOS.Import.Entities.Artportalen;
 using SOS.Import.Factories.FieldMapping.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;

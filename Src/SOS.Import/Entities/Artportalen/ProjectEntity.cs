@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SOS.Import.Entities
+namespace SOS.Import.Entities.Artportalen
 {
     /// <summary>
     /// Project class

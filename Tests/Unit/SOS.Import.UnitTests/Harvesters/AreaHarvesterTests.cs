@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities;
+using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters;
 using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;

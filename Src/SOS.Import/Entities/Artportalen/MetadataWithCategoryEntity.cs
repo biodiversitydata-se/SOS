@@ -1,4 +1,4 @@
-﻿namespace SOS.Import.Entities
+﻿namespace SOS.Import.Entities.Artportalen
 {
     /// <summary>
     /// Represents metadata item with category

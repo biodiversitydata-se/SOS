@@ -1,6 +1,6 @@
 ﻿using Microsoft.SqlServer.Types;
 
-namespace SOS.Import.Entities
+namespace SOS.Import.Entities.Artportalen
 {
     public class AreaEntity 
     {

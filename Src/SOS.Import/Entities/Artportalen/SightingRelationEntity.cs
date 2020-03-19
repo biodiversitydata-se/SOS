@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace SOS.Import.Entities
+namespace SOS.Import.Entities.Artportalen
 {
     public class SightingRelationEntity
     {

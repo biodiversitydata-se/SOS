@@ -4,6 +4,7 @@ using System.Linq;
 using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Geometries;
 using SOS.Import.Entities;
+using SOS.Import.Entities.Artportalen;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;

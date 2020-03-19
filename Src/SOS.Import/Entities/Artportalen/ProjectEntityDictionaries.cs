@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace SOS.Import.Entities
+namespace SOS.Import.Entities.Artportalen
 {
     /// <summary>
     /// Project & project parameter dictionaries.
