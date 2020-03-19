@@ -107,20 +107,21 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<EstablishmentMeansFieldMappingFactory>().InstancePerLifetimeScope();
 
             // Add Services
+            builder.RegisterType<ArtportalenDataService>().As<IArtportalenDataService>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationService>().As<IClamObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<HttpClientService>().As<IHttpClientService>().InstancePerLifetimeScope();
-            builder.RegisterType<ArtportalenDataService>().As<IArtportalenDataService>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonServiceProxy>().As<ITaxonServiceProxy>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonService>().As<ITaxonService>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonAttributeService>().As<ITaxonAttributeService>().InstancePerLifetimeScope();
 
             // Add jobs
+            builder.RegisterType<ArtportalenHarvestJob>().As<IArtportalenHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ClamPortalHarvestJob>().As<IClamPortalHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<FieldMappingImportJob>().As<IFieldMappingImportJob>().InstancePerLifetimeScope();
             builder.RegisterType<GeoAreasHarvestJob>().As<IGeoAreasHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<KulHarvestJob>().As<IKulHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<ArtportalenHarvestJob>().As<IArtportalenHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ObservationsHarvestJob>().As<IObservationsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonHarvestJob>().As<ITaxonHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<FieldMappingImportJob>().As<IFieldMappingImportJob>().InstancePerLifetimeScope();
         }
     }
 }

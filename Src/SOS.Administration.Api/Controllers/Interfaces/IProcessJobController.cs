@@ -12,20 +12,22 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="sources"></param>
         /// <param name="cleanStart"></param>
+        /// <param name="copyFromActiveOnFail"></param>
         /// <param name="toggleInstanceOnSuccess"></param>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult ScheduleDailyProcessJob(int sources, bool cleanStart, bool toggleInstanceOnSuccess, int hour, int minute);
+        IActionResult ScheduleDailyProcessJob(int sources, bool cleanStart, bool copyFromActiveOnFail, bool toggleInstanceOnSuccess, int hour, int minute);
 
         /// <summary>
         /// Run process job
         /// </summary>
         /// <param name="sources"></param>
         /// <param name="cleanStart"></param>
+        /// <param name="copyFromActiveOnFail"></param>
         /// <param name="toggleInstanceOnSuccess"></param>
         /// <returns></returns>
-        IActionResult RunProcessJob(int sources, bool cleanStart, bool toggleInstanceOnSuccess);
+        IActionResult RunProcessJob(int sources, bool cleanStart, bool copyFromActiveOnFail, bool toggleInstanceOnSuccess);
 
         /// <summary>
         /// Add daily process taxa job.

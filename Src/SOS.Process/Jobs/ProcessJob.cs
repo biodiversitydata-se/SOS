@@ -15,6 +15,7 @@ using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -32,7 +33,10 @@ namespace SOS.Process.Jobs
         private readonly IArtportalenObservationProcessor _artportalenObservationProcessor;
         private readonly IClamPortalObservationProcessor _clamPortalObservationProcessor;
         private readonly IKulObservationProcessor _kulObservationProcessor;
+        private readonly IInstanceManager _instanceManager;
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
+        private readonly ICopyFieldMappingsJob _copyFieldMappingsJob;
+        private readonly IProcessTaxaJob _processTaxaJob;
         private readonly IAreaHelper _areaHelper;
         private readonly ILogger<ProcessJob> _logger;
 
@@ -46,6 +50,9 @@ namespace SOS.Process.Jobs
         /// <param name="kulObservationProcessor"></param>
         /// <param name="artportalenObservationProcessor"></param>
         /// <param name="processedTaxonRepository"></param>
+        /// <param name="instanceManager"></param>
+        /// <param name="copyFieldMappingsJob"></param>
+        /// <param name="processTaxaJob"></param>
         /// <param name="areaHelper"></param>
         /// <param name="logger"></param>
         public ProcessJob(
@@ -56,6 +63,9 @@ namespace SOS.Process.Jobs
             IKulObservationProcessor kulObservationProcessor,
             IArtportalenObservationProcessor artportalenObservationProcessor,
             IProcessedTaxonRepository processedTaxonRepository,
+            IInstanceManager instanceManager,
+            ICopyFieldMappingsJob copyFieldMappingsJob,
+            IProcessTaxaJob processTaxaJob,
             IAreaHelper areaHelper,
             ILogger<ProcessJob> logger)
         {
@@ -66,27 +76,50 @@ namespace SOS.Process.Jobs
             _kulObservationProcessor = kulObservationProcessor ?? throw new ArgumentNullException(nameof(kulObservationProcessor));
             _artportalenObservationProcessor = artportalenObservationProcessor ?? throw new ArgumentNullException(nameof(artportalenObservationProcessor));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
+            _copyFieldMappingsJob = copyFieldMappingsJob ?? throw new ArgumentNullException(nameof(copyFieldMappingsJob));
+            _processTaxaJob = processTaxaJob ?? throw new ArgumentNullException(nameof(processTaxaJob));
+            _instanceManager = instanceManager ?? throw new ArgumentNullException(nameof(instanceManager));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(int sources, bool cleanStart, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(int sources, bool cleanStart, bool copyFromActiveOnFail, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken)
         {
             try
             {
+                if (sources == 0)
+                {
+                    return false;
+                }
+
                 var start = DateTime.Now;
+                var metadataTasks = new[]
+                {
+                    _copyFieldMappingsJob.RunAsync(),
+                    _processTaxaJob.RunAsync()
+                };
+                await Task.WhenAll(metadataTasks);
+
+                _logger.LogDebug("Start processing meta data");
+                if (!metadataTasks.All(t => t.Result))
+                {
+                    _logger.LogError("Failed to process meta data");
+                    return false;
+                }
+                _logger.LogDebug("Finish processing meta data");
 
                 // Create task list
-                _logger.LogDebug("Start getting taxa");
+                _logger.LogDebug("Start getting processed taxa");
 
                 // Get taxa
                 var taxa = await _processedTaxonRepository.GetTaxaAsync();
                 if (!taxa?.Any() ?? true)
                 {
-                    _logger.LogDebug("Failed to get taxa");
+                    _logger.LogDebug("Failed to get processed taxa");
                     return false;
                 }
+                _logger.LogDebug("Finish getting processed taxa");
 
                 var taxonById = taxa.ToDictionary(m => m.Id, m => m);
                 cancellationToken?.ThrowIfCancellationRequested();
@@ -142,7 +175,7 @@ namespace SOS.Process.Jobs
                         currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon)) || hi.Id.Equals(nameof(Area))).ToArray())
                     );
                 }
-
+                
                 if ((sources & (int)DataProvider.KUL) > 0)
                 {
                     processTasks.Add(DataProvider.KUL, _kulObservationProcessor.ProcessAsync(taxonById, cancellationToken));
@@ -154,11 +187,26 @@ namespace SOS.Process.Jobs
                         currentHarvestInfo?.Where(hi => hi.Id.Equals(nameof(DarwinCoreTaxon)) || hi.Id.Equals(nameof(Area))).ToArray())
                     );
                 }
-
+                
                 // Run all tasks async
                 await Task.WhenAll(processTasks.Values);
 
                 var success = processTasks.Values.All(t => t.Result.Status == RunStatus.Success);
+
+                // If some task/s failed and it was not Artportalen, Try to copy provider data from active instance
+                if (!success 
+                    && copyFromActiveOnFail 
+                    && processTasks.ContainsKey(DataProvider.Artportalen) 
+                    && processTasks[DataProvider.Artportalen].Result.Status == RunStatus.Success)
+                {
+                    var copyTasks = processTasks
+                        .Where(t => t.Value.Result.Status == RunStatus.Failed)
+                        .Select(t => _instanceManager.CopyProviderDataAsync(t.Key)).ToArray();
+                    
+                    await Task.WhenAll(copyTasks);
+
+                    success = copyTasks.All(t => t.Result);
+                }
 
                 // Create index if great success
                 if (success)

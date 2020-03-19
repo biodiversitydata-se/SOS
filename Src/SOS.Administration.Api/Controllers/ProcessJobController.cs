@@ -3,7 +3,6 @@ using System.Net;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 
 namespace SOS.Administration.Api.Controllers
@@ -30,11 +29,11 @@ namespace SOS.Administration.Api.Controllers
         [HttpPost("Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult ScheduleDailyProcessJob([FromQuery]int sources, [FromQuery]bool cleanStart = true, [FromQuery]bool toggleInstanceOnSuccess = true, [FromQuery]int hour = 0, [FromQuery]int minute = 0)
+        public IActionResult ScheduleDailyProcessJob([FromQuery]int sources, [FromQuery]bool cleanStart = true, [FromQuery]bool copyFromActiveOnFail = false, [FromQuery]bool toggleInstanceOnSuccess = true, [FromQuery]int hour = 0, [FromQuery]int minute = 0)
         {
             try
             {
-                RecurringJob.AddOrUpdate<IProcessJob>(nameof(IProcessJob), job => job.RunAsync(sources, cleanStart, toggleInstanceOnSuccess, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IProcessJob>(nameof(IProcessJob), job => job.RunAsync(sources, cleanStart, copyFromActiveOnFail, toggleInstanceOnSuccess, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Process job added");
             }
             catch (Exception e)
@@ -48,11 +47,11 @@ namespace SOS.Administration.Api.Controllers
         [HttpPost("Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunProcessJob([FromQuery]int sources, [FromQuery]bool cleanStart = true, [FromQuery]bool toggleInstanceOnSuccess = true)
+        public IActionResult RunProcessJob([FromQuery]int sources, [FromQuery]bool cleanStart = true, [FromQuery]bool copyFromActiveOnFail = false, [FromQuery]bool toggleInstanceOnSuccess = true)
         {
             try
             {
-                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(sources, cleanStart, toggleInstanceOnSuccess, JobCancellationToken.Null));
+                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(sources, cleanStart, copyFromActiveOnFail, toggleInstanceOnSuccess, JobCancellationToken.Null));
                 return new OkObjectResult("Started process job");
             }
             catch (Exception e)

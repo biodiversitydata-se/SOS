@@ -12,6 +12,7 @@ using SOS.Lib.Enums;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Jobs;
+using SOS.Process.Managers;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.Processors.ClamPortal;
 using SOS.Process.Processors.Kul;
@@ -38,6 +39,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 (int)DataProvider.Artportalen, 
                 false,
                 false, 
+                false,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -60,6 +62,8 @@ namespace SOS.Process.IntegrationTests.Jobs
             var areaHelper = new AreaHelper(
                 new AreaVerbatimRepository(verbatimClient, new NullLogger<AreaVerbatimRepository>()), 
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>()));
+            var taxonVerbatimRepository = new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
+            var fieldMappingVerbatimRepository = new FieldMappingVerbatimRepository(verbatimClient, new NullLogger<FieldMappingVerbatimRepository>());
             var taxonProcessedRepository = new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
             var invalidObservationRepository = new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var processedObservationRepository = new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>());
@@ -85,8 +89,14 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
-
-            var processTaxaJob = new ProcessJob(
+            var instanceManager = new InstanceManager(
+                new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>()),
+                processInfoRepository,
+                new NullLogger<InstanceManager>());
+            var copyFieldMappingsJob = new CopyFieldMappingsJob(fieldMappingVerbatimRepository, processedFieldMappingRepository, new NullLogger<CopyFieldMappingsJob>());
+            var processTaxaJob = new ProcessTaxaJob(taxonVerbatimRepository, taxonProcessedRepository, new NullLogger<ProcessTaxaJob>());
+            
+            var processJob = new ProcessJob(
                 processedObservationRepository,
                 processInfoRepository,
                 harvestInfoRepository,
@@ -94,10 +104,13 @@ namespace SOS.Process.IntegrationTests.Jobs
                 kulProcessor,
                 artportalenProcessor,
                 taxonProcessedRepository,
+                instanceManager,
+                copyFieldMappingsJob,
+                processTaxaJob,
                 areaHelper,
                 new NullLogger<ProcessJob>());
 
-            return processTaxaJob;
+            return processJob;
         }
     }
 }

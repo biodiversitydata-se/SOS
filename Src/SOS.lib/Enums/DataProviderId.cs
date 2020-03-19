@@ -9,6 +9,7 @@
         ClamPortal = 2,
         KUL = 4,
         Dwc = 8,
-        TaxonService = 16
+        TaxonService = 16,
+        FieldMappings
     }
 }
