@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -82,6 +83,12 @@ namespace SOS.Import.Harvesters
             }
 
             return harvestInfo;
+        }
+
+        public async Task<IEnumerable<Area>> GetAreasAsync()
+        {
+            var areas = (await _areaRepository.GetAsync()).ToVerbatims();
+            return areas;
         }
     }
 }

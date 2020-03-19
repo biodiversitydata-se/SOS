@@ -18,39 +18,51 @@ namespace SOS.Administration.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class FieldMappingController : ControllerBase, Interfaces.IFieldMappingController
+    public class DiagnosticsController : ControllerBase, Interfaces.IDiagnosticsController
     {
-        private readonly ILogger<FieldMappingController> _logger;
+        private readonly ILogger<DiagnosticsController> _logger;
         private readonly IFieldMappingHarvester _fieldMappingHarvester;
         private readonly IFieldMappingDiffHelper _fieldMappingDiffHelper;
+        private readonly IAreaDiffHelper _areaDiffHelper;
+        private readonly IAreaHarvester _areaHarvester;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="fieldMappingHarvester"></param>
         /// <param name="fieldMappingDiffHelper"></param>
+        /// <param name="areaDiffHelper"></param>
         /// <param name="logger"></param>
-        public FieldMappingController(
+        /// <param name="areaHarvester"></param>
+        public DiagnosticsController(
             IFieldMappingHarvester fieldMappingHarvester,
             IFieldMappingDiffHelper fieldMappingDiffHelper,
-            ILogger<FieldMappingController> logger)
+            IAreaHarvester areaHarvester,
+            IAreaDiffHelper areaDiffHelper,
+            ILogger<DiagnosticsController> logger)
         {
             _fieldMappingHarvester = fieldMappingHarvester ?? throw new ArgumentNullException(nameof(fieldMappingHarvester));
             _fieldMappingDiffHelper = fieldMappingDiffHelper ?? throw new ArgumentNullException(nameof(fieldMappingDiffHelper));
+            _areaHarvester = areaHarvester ?? throw new ArgumentNullException(nameof(areaHarvester));
+            _areaDiffHelper = areaDiffHelper ?? throw new ArgumentNullException(nameof(areaDiffHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
-        [HttpPost("AllFields/Create")]
+        /// <summary>
+        /// Get diff between generated, verbatim and processed field mappings.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("FieldMappingDiffAsZipFile")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CreateAllFieldsMappingFilesAsync()
+        public async Task<IActionResult> GetFieldMappingsDiffAsZipFile()
         {
             try
             {
                 var fieldMappingFieldIds = Enum.GetValues(typeof(FieldMappingFieldId)).Cast<FieldMappingFieldId>();
-                var zipBytes = await _fieldMappingHarvester.CreateFieldMappingsZipFileAsync(fieldMappingFieldIds);
-                return File(zipBytes, "application/zip", "AllFieldMappings.zip");
+                IEnumerable<FieldMapping> generatedFieldMappings = await _fieldMappingHarvester.CreateAllFieldMappingsAsync(fieldMappingFieldIds);
+                var zipBytes = await _fieldMappingDiffHelper.CreateDiffZipFile(generatedFieldMappings);
+                return File(zipBytes, "application/zip", "FieldMappingDiffBetweenVerbatimAndProcessed.zip");
             }
             catch (Exception e)
             {
@@ -59,16 +71,20 @@ namespace SOS.Administration.Api.Controllers
             }
         }
 
-        /// <inheritdoc />
-        [HttpPost("SingleField/Create")]
+        /// <summary>
+        /// Get diff between generated, verbatim and processed areas.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("AreaDiffAsZipFile")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CreateFieldMappingFileAsync(FieldMappingFieldId fieldMappingFieldId)
+        public async Task<IActionResult> GetAreasDiffAsZipFile()
         {
             try
             {
-                var fieldMappingFileTuple = await _fieldMappingHarvester.CreateFieldMappingFileAsync(fieldMappingFieldId);
-                return File(fieldMappingFileTuple.Bytes, "application/json", fieldMappingFileTuple.Filename);
+                var generatedAreas = await _areaHarvester.GetAreasAsync();
+                var zipBytes = await _areaDiffHelper.CreateDiffZipFile(generatedAreas.ToArray());
+                return File(zipBytes, "application/zip", "AreaDiffBetweenVerbatimAndProcessed.zip");
             }
             catch (Exception e)
             {

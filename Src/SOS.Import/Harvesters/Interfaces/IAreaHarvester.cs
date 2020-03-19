@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Harvesters.Interfaces
@@ -13,5 +14,7 @@ namespace SOS.Import.Harvesters.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<HarvestInfo> HarvestAreasAsync();
+
+        Task<IEnumerable<Area>> GetAreasAsync();
     }
 }
