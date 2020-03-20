@@ -1,519 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DwC_A;
-using DwC_A.Terms;
-using FluentAssertions;
-using SOS.Lib.Enums;
-using SOS.Lib.Enums.FieldMappingValues;
-using SOS.Lib.Models.Processed.Observation;
-using Xunit;
+﻿using MongoDB.Bson;
+using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Import.IntegrationTests.DwcImport
+namespace SOS.Lib.Models.Verbatim.DarwinCore
 {
-    public class ImportDwcFileIntegrationTests
+    public class DarwinCoreObservationVerbatim : IEntity<ObjectId>
     {
-        private const string ArchiveFileName = "./resources/psophus-stridulus-lifewatch-occurrences-dwca.zip";
+        /// <summary>
+        /// MongoDb Id. // todo - should we use another occurrenceID as Id field?
+        /// </summary>
+        public ObjectId Id { get; set; }
 
-        [Fact]
-        public void ShouldOpenCoreFile()
-        {
-            using (var archive = new ArchiveReader(ArchiveFileName))
-            {
-                foreach (var row in archive.CoreFile.Rows)
-                {
-                    Assert.NotNull(row[0]);
-                }
-            }
-        }
-
-        [Fact]
-        public async Task ShouldOpenCoreFileAsync()
-        {
-            using (var archive = new ArchiveReader(ArchiveFileName))
-            {
-                await foreach (IRow row in archive.GetAsyncCoreFile().GetDataRowsAsync())
-                {
-                    
-                    Assert.NotNull(row[0]);
-                }
-            }
-        }
-
-        [Fact]
-        public void TestValidateFile()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var valid = TryValidateDwCACoreFile(ArchiveFileName, out var nrRows, out _);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            valid.Should().BeTrue();
-            nrRows.Should().Be(2158);
-        }
-
-        [Fact]
-        public void TestReadFile()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var records = ReadArchive(ArchiveFileName);
-            
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            records.Should().NotBeNull();
-            records.Count.Should().Be(2158);
-        }
-
-        private List<HarvestDarwinCore> ReadArchive(string archiveFileName)
-        {
-            using var archive = new ArchiveReader(archiveFileName);
-            bool dwcIndexSpecified = archive.CoreFile.FileMetaData.Id.IndexSpecified;
-            var dataRows = archive.CoreFile.DataRows;
-            List<HarvestDarwinCore> verbatimRecords = new List<HarvestDarwinCore>();
-
-            foreach (var row in dataRows)
-            {
-                HarvestDarwinCore verbatimRecord = HarvestDarwinCoreFactory.Create(row);
-                string catalogNumber = null;
-
-                if (dwcIndexSpecified)
-                {
-                    catalogNumber = row[archive.CoreFile.FileMetaData.Id.Index];
-                }
-                else
-                {
-                    catalogNumber = null; //verbatimRecord.CatalogNumber;
-                }
-
-                if (string.IsNullOrEmpty(catalogNumber))
-                {
-                    throw new Exception("Could not parse the catalog number for the verbatimRecord.");
-                }
-
-                verbatimRecords.Add(verbatimRecord);
-            }
-
-            return verbatimRecords;
-        }
-
-        private bool TryValidateDwCACoreFile(string filePath, out long nrRows, out string message)
-        {
-            nrRows = 0;
-            message = null;
-
-            try
-            {
-                using var archive = new ArchiveReader(filePath);
-                nrRows = archive.CoreFile.DataRows.LongCount();
-
-                if (archive.CoreFile.FileMetaData.Id.IndexSpecified == false)
-                {
-                    message = "Core file is missing index of id.";
-                    return false;
-                }
-
-                if (nrRows == 0)
-                {
-                    message = "No data rows in core file";
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
-                message = e.Message;
-                return false;
-            }
-
-            return true;
-        }
-    }
-
-    public class ProcessedObservationFactory
-    {
-        public static ProcessedObservation CreateFromDwcRow(IRow row)
-        {
-            if (row == null)
-            {
-                return null;
-            }
-
-            var obs = new ProcessedObservation(DataProvider.Dwc);
-            
-            if (row.TryGetValue(Terms.accessRights, out string accessRights))
-            {
-                obs.AccessRightsId = ProcessedFieldMapValue.Create(accessRights); // todo try parse field mapped value.
-                //AccessRightsId.FreeUsage
-                //AccessRightsId.NotForPublicUsage
-            }
-
-            if (row.TryGetValue(Terms.basisOfRecord, out string basisOfRecord))
-            {
-                obs.BasisOfRecordId = ProcessedFieldMapValue.Create(basisOfRecord); // todo try parse field mapped value.
-                //BasisOfRecordId.Occurrence
-                //BasisOfRecordId.PreservedSpecimen
-                //BasisOfRecordId.MachineObservation
-            }
-            
-            if (row.TryGetValue(Terms.collectionCode, out string collectionCode))
-            {
-                obs.CollectionCode = collectionCode;
-            }
-
-            if (row.TryGetValue(Terms.collectionID, out string collectionId))
-            {
-                obs.CollectionId = collectionId;
-            }
-
-            if (row.TryGetValue(Terms.datasetID, out string datasetId))
-            {
-                obs.DatasetId = datasetId;
-            }
-
-            if (row.TryGetValue(Terms.datasetName, out string datasetName))
-            {
-                obs.DatasetName = datasetName;
-            }
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Event
-            //-----------------------------------------------------------------------------------------------------------
-            // Not handled:
-            //obs.Event.BiotopeDescription = verbatim.BiotopeDescription;
-            //obs.Event.QuantityOfSubstrate = verbatim.QuantityOfSubstrate;
-
-
-            obs.Event = new ProcessedEvent();
-            if (row.TryGetValue(Terms.samplingProtocol, out string samplingProtocol))
-            {
-                obs.Event.SamplingProtocol = samplingProtocol;
-            }
-
-            
-            //obs.Event.EndDate = verbatim.EndDate?.ToUniversalTime();
-            //obs.Event.StartDate = verbatim.StartDate?.ToUniversalTime();
-            //obs.Event.SubstrateSpeciesDescription = verbatim.SubstrateSpeciesDescription;
-            //obs.Event.SubstrateDescription = GetSubstrateDescription(verbatim, taxa);
-            //obs.Event.VerbatimEndDate = verbatim.EndDate;
-            //obs.Event.VerbatimStartDate = verbatim.StartDate;
-
-
-
-            //var taxonId = verbatim.TaxonId ?? -1;
-
-            //var hasPosition = (verbatim.Site?.XCoord ?? 0) > 0 && (verbatim.Site?.YCoord ?? 0) > 0;
-
-            //if (taxa.TryGetValue(taxonId, out var taxon))
-            //{
-            //    taxon.IndividualId = verbatim.URL;
-            //}
-
-            //var obs = new ProcessedObservation(DataProvider.Dwc);
-            //obs.Event = new ProcessedEvent();
-            //obs.Event.BiotopeDescription = verbatim.BiotopeDescription;
-            //obs.Event.EndDate = verbatim.EndDate?.ToUniversalTime();
-            //obs.Event.QuantityOfSubstrate = verbatim.QuantityOfSubstrate;
-            //obs.Event.SamplingProtocol = GetSamplingProtocol(verbatim.Projects);
-            //obs.Event.StartDate = verbatim.StartDate?.ToUniversalTime();
-            //obs.Event.SubstrateSpeciesDescription = verbatim.SubstrateSpeciesDescription;
-            //obs.Event.SubstrateDescription = GetSubstrateDescription(verbatim, taxa);
-            //obs.Event.VerbatimEndDate = verbatim.EndDate;
-            //obs.Event.VerbatimStartDate = verbatim.StartDate;
-            //obs.Identification = new ProcessedIdentification();
-            //obs.Identification.IdentifiedBy = verbatim.VerifiedBy;
-            //obs.Identification.Validated = new[] { 60, 61, 62, 63, 64, 65 }.Contains(verbatim.ValidationStatus?.Id ?? 0);
-            //obs.Identification.UncertainDetermination = verbatim.UnsureDetermination;
-            //obs.InformationWithheld = null;
-            //obs.IsInEconomicZoneOfSweden = hasPosition;
-            //obs.Language = Language.Swedish;
-            //obs.Location = new ProcessedLocation();
-            //obs.Location.ContinentId = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe };
-            //obs.Location.CoordinateUncertaintyInMeters = verbatim.Site?.Accuracy;
-            //obs.Location.CountryId = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden };
-            //obs.Location.CountryCode = CountryCode.Sweden;
-            //obs.Location.DecimalLatitude = verbatim.Site?.Point?.Coordinates?.Latitude ?? 0;
-            //obs.Location.DecimalLongitude = verbatim.Site?.Point?.Coordinates?.Longitude ?? 0;
-            //obs.Location.GeodeticDatum = GeodeticDatum.Wgs84;
-            //obs.Location.Locality = verbatim.Site?.Name;
-            //obs.Location.Id = $"urn:lsid:artportalen.se:site:{verbatim.Site?.Id}";
-            //obs.Location.MaximumDepthInMeters = verbatim.MaxDepth;
-            //obs.Location.MaximumElevationInMeters = verbatim.MaxHeight;
-            //obs.Location.MinimumDepthInMeters = verbatim.MinDepth;
-            //obs.Location.MinimumElevationInMeters = verbatim.MinHeight;
-            //obs.Location.Point = verbatim.Site?.Point;
-            //obs.Location.PointWithBuffer = verbatim.Site?.PointWithBuffer;
-            //obs.Location.VerbatimLatitude = hasPosition ? verbatim.Site.YCoord : 0;
-            //obs.Location.VerbatimLongitude = hasPosition ? verbatim.Site.XCoord : 0;
-            //obs.Location.VerbatimCoordinateSystem = "EPSG:3857";
-            //obs.Modified = verbatim.EndDate ?? verbatim.ReportedDate;
-            //obs.Occurrence = new ProcessedOccurrence();
-            //obs.Occurrence.AssociatedMedia = verbatim.HasImages
-            //    ? $"http://www.artportalen.se/sighting/{verbatim.Id}#SightingDetailImages"
-            //    : "";
-            //obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatim);
-            //obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(verbatim, taxon);
-            //obs.Occurrence.CatalogNumber = verbatim.Id.ToString();
-            //obs.Occurrence.Id = $"urn:lsid:artportalen.se:Sighting:{verbatim.Id}";
-            //obs.Occurrence.IndividualCount = verbatim.Quantity?.ToString() ?? "";
-            //obs.Occurrence.IsNaturalOccurrence = !verbatim.Unspontaneous;
-            //obs.Occurrence.IsNeverFoundObservation = verbatim.NotPresent;
-            //obs.Occurrence.IsNotRediscoveredObservation = verbatim.NotRecovered;
-            //obs.Occurrence.IsPositiveObservation = !(verbatim.NotPresent || verbatim.NotRecovered);
-            //obs.Occurrence.OrganismQuantity = verbatim.Quantity;
-            //obs.Occurrence.RecordedBy = verbatim.Observers;
-            //obs.Occurrence.RecordNumber = verbatim.Label;
-            //obs.Occurrence.Remarks = verbatim.Comment;
-            //obs.Occurrence.OccurrenceStatusId = verbatim.NotPresent || verbatim.NotRecovered
-            //    ? new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Absent }
-            //    : new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Present };
-            //obs.Occurrence.URL = $"http://www.artportalen.se/sighting/{verbatim.Id}";
-            //obs.OwnerInstitutionCode = verbatim.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
-            //obs.Projects = verbatim.Projects?.ToProcessedProjects();
-            //obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatim.HiddenByProvider, verbatim.ProtectedBySystem);
-            //obs.ReportedBy = verbatim.ReportedBy;
-            //obs.ReportedDate = verbatim.ReportedDate;
-            //obs.RightsHolder = verbatim.RightsHolder ?? verbatim.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
-            //obs.Taxon = taxon;
-            //obs.TypeId = null;
-
-            //// Get field mapping values
-            //obs.Occurrence.GenderId = GetSosId(verbatim.Gender?.Id, fieldMappings[FieldMappingFieldId.Gender]);
-            //obs.Occurrence.ActivityId = GetSosId(verbatim.Activity?.Id, fieldMappings[FieldMappingFieldId.Activity]);
-            //obs.Location.CountyId = GetSosId(verbatim.Site?.County?.Id, fieldMappings[FieldMappingFieldId.County]);
-            //obs.Location.MunicipalityId = GetSosId(verbatim.Site?.Municipality?.Id, fieldMappings[FieldMappingFieldId.Municipality]);
-            //obs.Location.ProvinceId = GetSosId(verbatim.Site?.Province?.Id, fieldMappings[FieldMappingFieldId.Province]);
-            //obs.Location.ParishId = GetSosId(verbatim.Site?.Parish?.Id, fieldMappings[FieldMappingFieldId.Parish]);
-            //obs.Event.BiotopeId = GetSosId(verbatim?.Bioptope?.Id, fieldMappings[FieldMappingFieldId.Biotope]);
-            //obs.Event.SubstrateId = GetSosId(verbatim?.Bioptope?.Id, fieldMappings[FieldMappingFieldId.Substrate]);
-            //obs.Identification.ValidationStatusId = GetSosId(verbatim?.ValidationStatus?.Id, fieldMappings[FieldMappingFieldId.ValidationStatus]);
-            //obs.Occurrence.LifeStageId = GetSosId(verbatim?.Stage?.Id, fieldMappings[FieldMappingFieldId.LifeStage]);
-            //obs.OrganizationId = GetSosId(verbatim?.OwnerOrganization?.Id, fieldMappings[FieldMappingFieldId.Organization]);
-            //obs.Occurrence.OrganismQuantityUnitId = GetSosId(verbatim?.Unit?.Id, fieldMappings[FieldMappingFieldId.Unit]);
-            return obs;
-        }
-    }
-
-
-
-    public class HarvestDarwinCoreFactory
-    {
-        public static HarvestDarwinCore Create(IRow row)
-        {
-            var result = new HarvestDarwinCore();
-
-            if (row.TryGetValue(Terms.acceptedNameUsage, out string acceptedNameUsage))
-            {
-                result.AcceptedNameUsage = acceptedNameUsage;
-            }
-
-            if (row.TryGetValue(Terms.basisOfRecord, out string basisOfRecord))
-            {
-                result.BasisOfRecord = basisOfRecord;
-            }
-
-            if (row.TryGetValue(Terms.occurrenceID, out string occurrenceId))
-            {
-                result.OccurrenceID = occurrenceId;
-            }
-
-            if (row.TryGetValue(Terms.catalogNumber, out string catalogNumber))
-            {
-                result.CatalogNumber = catalogNumber;
-            }
-
-            return result;
-
-            // todo - add more mappings
-
-            //result.AcceptedNameUsage = row[Terms.acceptedNameUsage];
-            //result.AcceptedNameUsageID = row[Terms.acceptedNameUsageID];
-            //result.AccessRights = row[Terms.accessRights];
-            //result.AssociatedMedia = row[Terms.associatedMedia];
-            //result.AssociatedOccurrences = row[Terms.associatedOccurrences];
-            ////Terms.associatedOrganisms
-            //result.AssociatedReferences = row[Terms.associatedReferences];
-            //result.AssociatedSequences = row[Terms.associatedSequences];
-            //result.AssociatedTaxa = row[Terms.associatedTaxa];
-            //result.BasisOfRecord = row[Terms.basisOfRecord];
-            //result.Bed = row[Terms.bed];
-            //result.Behavior = row[Terms.behavior];
-            //result.BibliographicCitation = row[Terms.bibliographicCitation];
-            //result.CatalogNumber = row[Terms.catalogNumber];
-            //result.Class = row[Terms.@class];
-            //result.CollectionCode = row[Terms.collectionCode];
-            //result.CollectionID = row[Terms.collectionID];
-            //result.Continent = row[Terms.continent];
-            //result.CoordinatePrecision = row[Terms.coordinatePrecision];
-            //result.CoordinateUncertaintyInMeters = row[Terms.coordinateUncertaintyInMeters];
-            //result.Country = row[Terms.country];
-            //result.CountryCode = row[Terms.countryCode];
-            //result.County = row[Terms.country];
-            //result.DataGeneralizations = row[Terms.dataGeneralizations];
-            //result.DatasetID = row[Terms.datasetID];
-            //result.DatasetName = row[Terms.datasetName];
-            //result.DateIdentified = row[Terms.dateIdentified];
-            //result.Day = row[Terms.day];
-            //result.DecimalLatitude = row[Terms.decimalLatitude];
-            //result.DecimalLongitude = row[Terms.decimalLongitude];
-            //result.Disposition = row[Terms.disposition];
-            //result.DynamicProperties = row[Terms.dynamicProperties];
-            //result.EarliestAgeOrLowestStage = row[Terms.earliestAgeOrLowestStage];
-            //result.EarliestEonOrLowestEonothem = row[Terms.earliestEonOrLowestEonothem];
-            //result.EarliestEpochOrLowestSeries = row[Terms.earliestEpochOrLowestSeries];
-            //result.EarliestEraOrLowestErathem = row[Terms.earliestEraOrLowestErathem];
-            //result.EarliestPeriodOrLowestSystem = row[Terms.earliestPeriodOrLowestSystem];
-            ////Tems.earliestGeochronologicalEra
-            //result.EndDayOfYear = row[Terms.endDayOfYear];
-            //result.EstablishmentMeans = row[Terms.establishmentMeans];
-            //result.EventID = row[Terms.eventID];
-            //result.EventRemarks = row[Terms.eventRemarks];
-            //result.EventTime = row[Terms.eventTime];
-            //result.Family = row[Terms.family];
-            //result.FieldNotes = row[Terms.fieldNotes];
-            //result.FieldNumber = row[Terms.fieldNumber];
-            //result.FootprintSpatialFit = row[Terms.footprintSpatialFit];
-            //result.FootprintSRS = row[Terms.footprintSRS];
-            //result.FootprintWKT = row[Terms.footprintWKT];
-            //result.Genus = row[Terms.genus];
-            //result.GeodeticDatum = row[Terms.geodeticDatum];
-            ////Terms.geologicalContext
-            //result.GeologicalContextID = row[Terms.geologicalContextID];
-            //result.GeoreferencedBy = row[Terms.georeferencedBy];
-            //result.GeoreferencedDate = row[Terms.georeferencedDate];
-            //result.GeoreferenceProtocol = row[Terms.georeferenceProtocol];
-            //result.GeoreferenceRemarks = row[Terms.georeferenceRemarks];
-            //result.GeoreferenceSources = row[Terms.georeferenceSources];
-            //result.GeoreferenceVerificationStatus = row[Terms.georeferenceVerificationStatus];
-            //result.Group = row[Terms.group];
-            //result.Habitat = row[Terms.habitat];
-            //result.HigherClassification = row[Terms.higherClassification];
-            //result.HigherGeography = row[Terms.higherGeography];
-            //result.HigherGeographyID = row[Terms.higherGeographyID];
-            //result.HighestBiostratigraphicZone = row[Terms.highestBiostratigraphicZone];
-            //result.IdentificationID = row[Terms.identificationID];
-            //result.IdentificationQualifier = row[Terms.identificationQualifier];
-            //result.IdentificationReferences = row[Terms.identificationReferences];
-            //result.IdentificationRemarks = row[Terms.identificationRemarks];
-            //result.IdentificationVerificationStatus = row[Terms.identificationVerificationStatus];
-            //result.IdentifiedBy = row[Terms.identifiedBy];
-            //result.IndividualCount = row[Terms.individualCount];
-            ////-->>result.IndividualID 
-            //result.InformationWithheld = row[Terms.informationWithheld];
-            //result.InfraspecificEpithet = row[Terms.infraspecificEpithet];
-            //result.InstitutionCode = row[Terms.institutionCode];
-            //result.InstitutionID = row[Terms.institutionID];
-            //result.Island = row[Terms.island];
-            //result.IslandGroup = row[Terms.islandGroup];
-            //result.Kingdom = row[Terms.kingdom];
-            //result.Language = row[Terms.language];
-            //result.LatestAgeOrHighestStage = row[Terms.latestAgeOrHighestStage];
-            //result.LatestEonOrHighestEonothem = row[Terms.latestEonOrHighestEonothem];
-            //result.LatestEpochOrHighestSeries = row[Terms.latestEpochOrHighestSeries];
-            //result.LatestEraOrHighestErathem = row[Terms.latestEraOrHighestErathem];
-            ////Terms.latestGeochronologicalEra
-            //result.LatestPeriodOrHighestSystem = row[Terms.latestPeriodOrHighestSystem];
-            //result.LifeStage = row[Terms.lifeStage];
-            ////Terms.license
-            //result.LithostratigraphicTerms = row[Terms.lithostratigraphicTerms];
-            //result.Locality = row[Terms.locality];
-            ////Terms.Location
-            //result.LocationAccordingTo = row[Terms.locationAccordingTo];
-            //result.LocationId = row[Terms.locationID];
-            //result.LocationRemarks = row[Terms.locationRemarks];
-            //result.LowestBiostratigraphicZone = row[Terms.lowestBiostratigraphicZone];
-            ////Terms.MachineObservation
-            ////Terms.MaterialSample
-            ////Terms.materialSampleID
-            //result.MaximumDepthInMeters = row[Terms.maximumDepthInMeters];
-            //result.MaximumDistanceAboveSurfaceInMeters = row[Terms.maximumDistanceAboveSurfaceInMeters];
-            //result.MaximumElevationInMeters = row[Terms.maximumElevationInMeters];
-            ////Terms.measurementMethod
-            //result.Member = row[Terms.member];
-            //result.MinimumDepthInMeters = row[Terms.minimumDepthInMeters];
-            //result.MinimumDistanceAboveSurfaceInMeters = row[Terms.minimumDistanceAboveSurfaceInMeters];
-            //result.MinimumElevationInMeters = row[Terms.minimumElevationInMeters];
-            //result.Modified = row[Terms.modified];
-            //result.Month = row[Terms.month];
-            //result.Municipality = row[Terms.municipality];
-            //result.NameAccordingTo = row[Terms.nameAccordingTo];
-            //result.NameAccordingToID = row[Terms.nameAccordingToID];
-            //result.NamePublishedIn = row[Terms.namePublishedIn];
-            //result.NamePublishedInID = row[Terms.namePublishedInID];
-            //result.NamePublishedInYear = row[Terms.namePublishedInYear];
-            //result.NomenclaturalCode = row[Terms.nomenclaturalCode];
-            //result.NomenclaturalStatus = row[Terms.nomenclaturalStatus];
-            ////Terms.Occurrence
-            //result.OccurrenceID = row[Terms.occurrenceID];
-            //result.OccurrenceRemarks = row[Terms.occurrenceRemarks];
-            //result.OccurrenceStatus = row[Terms.occurrenceStatus];
-            //result.Order = row[Terms.order];
-            ////Terms.Organism x 7
-            //result.OriginalNameUsage = row[Terms.originalNameUsage];
-            //result.OriginalNameUsageID = row[Terms.originalNameUsageID];
-            //result.OtherCatalogNumbers = row[Terms.otherCatalogNumbers];
-            //result.OwnerInstitutionCode = row[Terms.ownerInstitutionCode];
-            ////Terms.parentEventID
-            //result.ParentNameUsage = row[Terms.parentNameUsage];
-            //result.ParentNameUsageID = row[Terms.parentNameUsageID];
-            //result.Phylum = row[Terms.phylum];
-            //result.PointRadiusSpatialFit = row[Terms.pointRadiusSpatialFit];
-            //result.Preparations = row[Terms.preparations];
-            //result.PreviousIdentifications = row[Terms.previousIdentifications];
-            //result.RecordedBy = row[Terms.recordedBy];
-            //result.RecordNumber = row[Terms.recordNumber];
-            //result.References = row[Terms.references];
-            ////Terms.relatedResourceID
-            ////Terms.relationshipAccordingTo x 4            
-            //result.ReproductiveCondition = row[Terms.reproductiveCondition];
-            //result.RightsHolder = row[Terms.rightsHolder];
-            ////Terms.sampleSizeUnit x 2
-            //result.SamplingEffort = row[Terms.samplingEffort];
-            //result.SamplingProtocol = row[Terms.samplingProtocol];
-            //result.ScientificName = row[Terms.scientificName];
-            //result.ScientificNameAuthorship = row[Terms.scientificNameAuthorship];
-            //result.ScientificNameID = row[Terms.scientificNameID];
-            //result.Sex = row[Terms.sex];
-            //result.SpecificEpithet = row[Terms.specificEpithet];
-            //result.StartDayOfYear = row[Terms.startDayOfYear];
-            //result.StateProvince = row[Terms.stateProvince];
-            //result.Subgenus = row[Terms.subgenus];
-            //result.TaxonConceptID = row[Terms.taxonConceptID];
-            ////Terms.Taxon
-            //result.TaxonID = row[Terms.taxonID];
-            //result.TaxonomicStatus = row[Terms.taxonomicStatus];
-            //result.TaxonRank = row[Terms.taxonRank];
-            //result.TaxonRemarks = row[Terms.taxonRemarks];
-            //result.Type = row[Terms.type];
-            //result.TypeStatus = row[Terms.typeStatus];
-            ////Terms.UseWithIRI
-            //result.VerbatimCoordinates = row[Terms.verbatimCoordinates];
-            //result.VerbatimCoordinateSystem = row[Terms.verbatimCoordinateSystem];
-            //result.VerbatimDepth = row[Terms.verbatimDepth];
-            //result.VerbatimElevation = row[Terms.verbatimElevation];
-            //result.VerbatimEventDate = row[Terms.verbatimEventDate];
-            //result.VerbatimLatitude = row[Terms.verbatimLatitude];
-            //result.VerbatimLocality = row[Terms.verbatimLocality];
-            //result.VerbatimLongitude = row[Terms.verbatimLongitude];
-            //result.VerbatimSRS = row[Terms.verbatimSRS];
-            //result.VerbatimTaxonRank = row[Terms.verbatimTaxonRank];
-            //result.VernacularName = row[Terms.vernacularName];
-            //result.WaterBody = row[Terms.waterBody];
-            //result.Year = row[Terms.year];
-
-            //return result;
-        }
-
-    }
-
-    public class HarvestDarwinCore
-    {
         #region RecordLevel
         /// <summary>
         /// Darwin Core term name: dcterms:accessRights.
@@ -635,6 +131,11 @@ namespace SOS.Import.IntegrationTests.DwcImport
         /// This property is currently not used.
         /// </summary>
         public string Language { get; set; }
+
+        /// <summary>
+        /// A legal document giving official permission to do something with the resource.
+        /// </summary>
+        public string License { get; set; }
 
         /// <summary>
         /// Darwin Core term name: dcterms:modified.
@@ -784,7 +285,7 @@ namespace SOS.Import.IntegrationTests.DwcImport
         /// For example: ”2007-03-01 13:00:00 - 2008-05-11 15:30:00”
         /// This property is currently not used.
         /// </summary>
-        //public string EventDate { get; set; }
+        public string EventDate { get; set; }
 
         /// <summary>
         /// Darwin Core term name: eventID.
@@ -795,6 +296,11 @@ namespace SOS.Import.IntegrationTests.DwcImport
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string EventID { get; set; }
+
+        /// <summary>
+        /// An identifier for the broader Event that groups this and potentially other Events.
+        /// </summary>
+        public string ParentEventID { get; set; }
 
         /// <summary>
         /// Darwin Core term name: eventRemarks.
@@ -844,6 +350,23 @@ namespace SOS.Import.IntegrationTests.DwcImport
         /// This property is currently not used.
         /// </summary>
         public string Month { get; set; }
+
+        /// <summary>
+        /// The unit of measurement of the size (time duration, length, area, or volume) of a sample in a sampling event.
+        /// A sampleSizeUnit must have a corresponding sampleSizeValue, e.g., 5 for sampleSizeValue with metre for sampleSizeUnit.
+        /// </summary>
+        /// <example>
+        /// minute, hour, day, metre, square metre, cubic metre
+        /// </example>
+        public string SampleSizeUnit { get; set; }
+
+        /// <summary>
+        /// A numeric value for a measurement of the size (time duration, length, area, or volume) of a sample in a sampling event.
+        /// </summary>
+        /// <example>
+        /// 5 for sampleSizeValue with metre for sampleSizeUnit.
+        /// </example>
+        public string SampleSizeValue { get; set; }
 
         /// <summary>
         /// Darwin Core term name: samplingEffort.
@@ -943,6 +466,14 @@ namespace SOS.Import.IntegrationTests.DwcImport
         public string EarliestEraOrLowestErathem { get; set; }
 
         /// <summary>
+        /// Use to link a dwc:GeologicalContext instance to chronostratigraphic time
+        /// periods at the lowest possible level in a standardized hierarchy. Use this
+        /// property to point to the earliest possible geological time period from which
+        /// the cataloged item was collected.
+        /// </summary>
+        public string EarliestGeochronologicalEra { get; set; }
+
+        /// <summary>
         /// Darwin Core term name: earliestPeriodOrLowestSystem.
         /// The full name of the earliest possible geochronologic
         /// period or lowest chronostratigraphic system attributable
@@ -1027,6 +558,13 @@ namespace SOS.Import.IntegrationTests.DwcImport
         /// This property is currently not used.
         /// </summary>
         public string LatestEraOrHighestErathem { get; set; }
+
+        /// <summary>
+        /// Use to link a dwc:GeologicalContext instance to chronostratigraphic time periods at the lowest possible
+        /// level in a standardized hierarchy. Use this property to point to the latest possible geological time period
+        /// from which the cataloged item was collected.
+        /// </summary>
+        public string LatestGeochronologicalEra { get; set; }
 
         /// <summary>
         /// Darwin Core term name: latestPeriodOrHighestSystem.
@@ -1671,6 +1209,18 @@ namespace SOS.Import.IntegrationTests.DwcImport
         public string WaterBody { get; set; }
         #endregion
 
+        #region MaterialSample
+
+        /// <summary>
+        /// An identifier for the MaterialSample (as opposed to a particular
+        /// digital record of the material sample). In the absence of a persistent
+        /// global unique identifier, construct one from a combination of identifiers
+        /// in the record that will most closely make the materialSampleID globally unique.
+        /// </summary>
+        public string MaterialSampleID;
+
+        #endregion
+
         #region Occurrence
         /// <summary>
         /// Darwin Core term name: associatedMedia.
@@ -1680,15 +1230,6 @@ namespace SOS.Import.IntegrationTests.DwcImport
         /// This property is currently not used.
         /// </summary>
         public string AssociatedMedia { get; set; }
-
-        /// <summary>
-        /// Darwin Core term name: associatedOccurrences.
-        /// A list (concatenated and separated) of identifiers of
-        /// other Occurrence records and their associations to
-        /// this Occurrence.
-        /// This property is currently not used.
-        /// </summary>
-        public string AssociatedOccurrences { get; set; }
 
         /// <summary>
         /// Darwin Core term name: associatedReferences.
@@ -1759,52 +1300,6 @@ namespace SOS.Import.IntegrationTests.DwcImport
         public string IndividualCount { get; set; }
 
         /// <summary>
-        /// Darwin Core term name: individualID.
-        /// An identifier for an individual or named group of
-        /// individual organisms represented in the Occurrence.
-        /// Meant to accommodate resampling of the same individual
-        /// or group for monitoring purposes. May be a global unique
-        /// identifier or an identifier specific to a data set.
-        /// This property is currently not used.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        public string IndividualID { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Indicates if this species occurrence is natural or
-        /// if it is a result of human activity.
-        /// </summary>
-        //public bool IsNaturalOccurrence { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Indicates if this observation is a never found observation.
-        /// "Never found observation" is an observation that says
-        /// that the specified species was not found in a location
-        /// deemed appropriate for the species.
-        /// </summary>
-        //public bool IsNeverFoundObservation { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Indicates if this observation is a 
-        /// not rediscovered observation.
-        /// "Not rediscovered observation" is an observation that says
-        /// that the specified species was not found in a location
-        /// where it has previously been observed.
-        /// </summary>
-        //public bool IsNotRediscoveredObservation { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Indicates if this observation is a positive observation.
-        /// "Positive observation" is a normal observation indicating
-        /// that a species has been seen at a specified location.
-        /// </summary>
-        //public bool IsPositiveObservation { get; set; }
-
-        /// <summary>
         /// Darwin Core term name: lifeStage.
         /// The age class or life stage of the biological individual(s)
         /// at the time the Occurrence was recorded.
@@ -1857,6 +1352,28 @@ namespace SOS.Import.IntegrationTests.DwcImport
         //public string OccurrenceURL { get; set; }
 
         /// <summary>
+        /// A number or enumeration value for the quantity of organisms.
+        /// A dwc:organismQuantity must have a corresponding dwc:organismQuantityType.
+        /// </summary>
+        /// <example>
+        /// 27 (organismQuantity) with individuals (organismQuantityType).
+        /// 12.5 (organismQuantity) with %biomass (organismQuantityType).
+        /// r (organismQuantity) with BraunBlanquetScale (organismQuantityType).
+        /// </example>
+        public string OrganismQuantity { get; set; }
+
+        /// <summary>
+        /// The type of quantification system used for the quantity of organisms.
+        /// A dwc:organismQuantityType must have a corresponding dwc:organismQuantity.
+        /// </summary>
+        /// <example>
+        /// 27 (organismQuantity) with individuals (organismQuantityType).
+        /// 12.5 (organismQuantity) with %biomass (organismQuantityType).
+        /// r (organismQuantity) with BraunBlanquetScale (organismQuantityType).
+        /// </example>
+        public string OrganismQuantityType { get; set; }
+
+        /// <summary>
         /// Darwin Core term name: otherCatalogNumbers.
         /// A list (concatenated and separated) of previous or
         /// alternate fully qualified catalog numbers or other
@@ -1873,14 +1390,6 @@ namespace SOS.Import.IntegrationTests.DwcImport
         /// This property is currently not used.
         /// </summary>
         public string Preparations { get; set; }
-
-        /// <summary>
-        /// Darwin Core term name: previousIdentifications.
-        /// A list (concatenated and separated) of previous
-        /// assignments of names to the Occurrence.
-        /// This property is currently not used.
-        /// </summary>
-        public string PreviousIdentifications { get; set; }
 
         /// <summary>
         /// Not defined in Darwin Core.
@@ -1937,6 +1446,49 @@ namespace SOS.Import.IntegrationTests.DwcImport
         /// </summary>
         //public string Substrate { get; set; }
         #endregion
+
+        #region Organism
+        /// <summary>
+        /// An identifier for the Organism instance (as opposed to a particular digital record of the Organism).
+        /// May be a globally unique identifier or an identifier specific to the data set.
+        /// </summary>
+        public string OrganismID { get; set; }
+
+        /// <summary>
+        /// A textual name or label assigned to an Organism instance.
+        /// </summary>
+        public string OrganismName { get; set; }
+
+        /// <summary>
+        /// A description of the kind of Organism instance. Can be used to indicate whether
+        /// the Organism instance represents a discrete organism or if it represents
+        /// a particular type of aggregation..
+        /// </summary>
+        public string OrganismScope { get; set; }
+
+        /// <summary>
+        /// A list (concatenated and separated) of identifiers of other Occurrence records
+        /// and their associations to this Occurrence.
+        /// </summary>
+        public string AssociatedOccurrences { get; set; }
+
+        /// <summary>
+        /// A list (concatenated and separated) of identifiers of other Organisms and their
+        /// associations to this Organism.
+        /// </summary>
+        public string AssociatedOrganisms { get; set; }
+
+        /// <summary>
+        /// A list (concatenated and separated) of previous assignments of names to the Organism.
+        /// </summary>
+        public string PreviousIdentifications { get; set; }
+
+        /// <summary>
+        /// Comments or notes about the Organism instance..
+        /// </summary>
+        public string OrganismRemarks { get; set; }
+
+        #endregion Organism
 
         #region Project
         /// <summary>
@@ -2362,7 +1914,34 @@ namespace SOS.Import.IntegrationTests.DwcImport
         /// A common or vernacular name.
         /// </summary>
         public string VernacularName { get; set; }
+
+        #endregion
+
+        #region UseWithIRI
+
+        /// <summary>
+        /// Use to link a dwc:GeologicalContext instance to an IRI-identified
+        /// lithostratigraphic unit at the lowest possible level in a hierarchy.
+        /// </summary>
+        public string FromLithostratigraphicUnit { get; set; }
+
+        /// <summary>
+        /// Use to link a subject dataset record to the dataset which contains it.
+        /// </summary>
+        public string InDataset { get; set; }
+
+        /// <summary>
+        /// Use to link a dcterms:Location instance subject to the lowest level
+        /// standardized hierarchically-described resource.
+        /// </summary>
+        public string InDescribedPlace { get; set; }
+
+        /// <summary>
+        /// Use to link a dwc:Identification instance subject to a taxonomic entity
+        /// such as a taxon, taxon concept, or taxon name use.
+        /// </summary>
+        public string ToTaxon { get; set; }
+
         #endregion
     }
-
 }
