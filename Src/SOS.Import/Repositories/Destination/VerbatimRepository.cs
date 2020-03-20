@@ -271,28 +271,11 @@ namespace SOS.Import.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        public async Task<List<TEntity>> GetAllAsync()
         {
-            try
-            {
-                var skip = 0;
-                var batch = (await GetBatchAsync(skip)).ToArray();
-                var result = new List<TEntity>();
+            var res = await MongoCollection.AsQueryable().ToListAsync();
 
-                while (batch?.Any() ?? false)
-                {
-                    result.AddRange(batch);
-                    skip += batch.Count();
-                    batch = (await GetBatchAsync(skip)).ToArray();
-                }
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to get all items");
-                return null;
-            }
+            return res;
         }
 
 

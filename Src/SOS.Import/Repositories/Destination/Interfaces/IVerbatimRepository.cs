@@ -70,7 +70,7 @@ namespace SOS.Import.Repositories.Destination.Interfaces
         /// Get all entities
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<TEntity>> GetAllAsync();
+        Task<List<TEntity>> GetAllAsync();
 
         /// <summary>
         /// Update entity
