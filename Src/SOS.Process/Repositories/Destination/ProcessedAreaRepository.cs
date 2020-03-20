@@ -34,42 +34,17 @@ namespace SOS.Process.Repositories.Destination
 
         }
 
-        /// <summary>
-        /// Gets processed taxa.
-        /// </summary>
-        /// <returns></returns>
-        public async Task<IEnumerable<Area>> GetAreasAsync()
-        {
-            try
-            {
-                const int batchSize = 200000;
-                var skip = 0;
-                var areasBatch = (await GetChunkAsync(skip, batchSize)).ToArray();
-                var areas = new List<Area>();
-
-                while (areasBatch?.Any() ?? false)
-                {
-                    areas.AddRange(areasBatch);
-                    skip += areasBatch.Count();
-                    areasBatch = (await GetChunkAsync(skip, batchSize)).ToArray();
-                }
-
-                return areas;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to get chunk of areas");
-                return null;
-            }
-        }
-
-
-        private async Task<IEnumerable<Area>> GetChunkAsync(int skip, int take)
+        public async Task<IEnumerable<Area>> GetAllExceptGeometryFieldAsync()
         {
             var res = await MongoCollection
                 .Find(x => true)
-                .Skip(skip)
-                .Limit(take)
+                .Project(m => new Area(m.AreaType)
+                {
+                    FeatureId = m.FeatureId,
+                    Id = m.Id,
+                    Name = m.Name,
+                    ParentId = m.ParentId,
+                })
                 .ToListAsync();
 
             return res;

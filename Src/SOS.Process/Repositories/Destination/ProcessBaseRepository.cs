@@ -162,6 +162,15 @@ namespace SOS.Process.Repositories.Destination
             .GetCollection<ProcessedConfiguration>(_collectionNameConfiguration)
             .WithWriteConcern(new WriteConcern(w:1, journal: true ));
 
+        /// <inheritdoc />
+        public async Task<List<TEntity>> GetAllAsync()
+        {
+            var res = await MongoCollection.AsQueryable().ToListAsync();
+
+            return res;
+        }
+
+
         /// <summary>
         /// 
         /// </summary>

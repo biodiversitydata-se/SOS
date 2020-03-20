@@ -35,18 +35,10 @@ namespace SOS.Process.Helpers
         public async Task<byte[]> CreateDiffZipFile(Area[] generatedAreas)
         {
             // Get verbatim areas and set Geometry to null. It takes too long time and RAM to compare coordinates using JsonDiffPatch.
-            var verbatimAreas = (await _areaVerbatimRepository.GetAllAsync()).ToArray();
-            foreach (var verbatimArea in verbatimAreas)
-            {
-                verbatimArea.Geometry = null;
-            }
+            var verbatimAreas = (await _areaVerbatimRepository.GetAllExceptGeometryFieldAsync()).ToArray();
 
             // Get processed areas and set Geometry to null. It takes too long time and RAM to compare coordinates using JsonDiffPatch.
-            var processedAreas = (await _processedAreaRepository.GetAreasAsync()).ToArray();
-            foreach (var processedArea in processedAreas)
-            {
-                processedArea.Geometry = null;
-            }
+            var processedAreas = (await _processedAreaRepository.GetAllExceptGeometryFieldAsync()).ToArray();
 
             var generatedAreasJtoken = JToken.FromObject(generatedAreas);
             var verbatimAreasJtoken = JToken.FromObject(verbatimAreas);

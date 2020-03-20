@@ -14,5 +14,7 @@ namespace SOS.Process.Repositories.Source.Interfaces
         /// <param name="latitude"></param>
         /// <returns></returns>
         Task<IEnumerable<Area>> GetAreasByCoordinatesAsync(double longitude, double latitude);
+
+        Task<IEnumerable<Area>> GetAllExceptGeometryFieldAsync();
     }
 }

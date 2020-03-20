@@ -35,7 +35,7 @@ namespace SOS.Process.Processors.Artportalen
             IDictionary<int, ProcessedTaxon> taxa,
             IProcessedFieldMappingRepository processedFieldMappingRepository)
         {
-            var allFieldMappings = await processedFieldMappingRepository.GetFieldMappingsAsync();
+            var allFieldMappings = await processedFieldMappingRepository.GetAllAsync();
             var fieldMappings = GetFieldMappingsDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
             return new ArtportalenObservationFactory(taxa, fieldMappings);
         }

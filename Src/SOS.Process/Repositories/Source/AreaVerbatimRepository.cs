@@ -49,5 +49,21 @@ namespace SOS.Process.Repositories.Source
                 return default;
             }
         }
+
+        public async Task<IEnumerable<Area>> GetAllExceptGeometryFieldAsync()
+        {
+            var res = await MongoCollection
+                .Find(x => true)
+                .Project(m => new Area(m.AreaType)
+                {
+                    FeatureId = m.FeatureId,
+                    Id = m.Id,
+                    Name = m.Name,
+                    ParentId = m.ParentId,
+                })
+                .ToListAsync();
+
+            return res;
+        }
     }
 }

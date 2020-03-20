@@ -12,10 +12,6 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     /// </summary>
     public interface IProcessedFieldMappingRepository : IProcessBaseRepository<FieldMapping, FieldMappingFieldId>
     {
-        /// <summary>
-        /// Gets all field mappings.
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<FieldMapping>> GetFieldMappingsAsync();
+      
     }
 }

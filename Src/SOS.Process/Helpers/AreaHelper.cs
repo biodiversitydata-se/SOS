@@ -24,24 +24,24 @@ namespace SOS.Process.Helpers
 {
     public class AreaHelper : Interfaces.IAreaHelper
     {
-        private readonly IAreaVerbatimRepository _areaVerbatimRepository;
+        private readonly IProcessedAreaRepository _processedAreaRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly STRtree<IFeature> _strTree;
         private readonly IDictionary<string, PositionLocation> _featureCache;
         private IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappingsByFeatureId;
         private IDictionary<FieldMappingFieldId, Dictionary<int, FieldMappingValue>> _fieldMappingValueById;
-        private const string _cacheFileName = "positionAreas.json";
+        private const string CacheFileName = "positionAreas.json";
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="areaVerbatimRepository"></param>
+        /// <param name="processedAreaRepository"></param>
         /// <param name="processedFieldMappingRepository"></param>
         public AreaHelper(
-            IAreaVerbatimRepository areaVerbatimRepository,
+            IProcessedAreaRepository processedAreaRepository,
             IProcessedFieldMappingRepository processedFieldMappingRepository)
         {
-            _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
+            _processedAreaRepository = processedAreaRepository ?? throw new ArgumentNullException(nameof(processedAreaRepository));
             _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
             _strTree = new STRtree<IFeature>();
 
@@ -58,15 +58,15 @@ namespace SOS.Process.Helpers
         private static IDictionary<string, PositionLocation> InitializeCache()
         {
             // Try to get saved cache
-           return File.Exists(_cacheFileName) ?
+           return File.Exists(CacheFileName) ?
                 JsonConvert.DeserializeObject<IDictionary<string, PositionLocation>>(
-                    File.ReadAllText(_cacheFileName, Encoding.UTF8)) : new ConcurrentDictionary<string, PositionLocation>();
+                    File.ReadAllText(CacheFileName, Encoding.UTF8)) : new ConcurrentDictionary<string, PositionLocation>();
         }
 
         private async Task InitializeAsync()
         {
             // Get field mappings
-            var fieldMappings = (await _processedFieldMappingRepository.GetFieldMappingsAsync()).ToArray();
+            var fieldMappings = (await _processedFieldMappingRepository.GetAllAsync()).ToArray();
             _fieldMappingsByFeatureId = GetGeoRegionFieldMappingDictionaries(fieldMappings);
             _fieldMappingValueById = fieldMappings.ToDictionary(m => m.Id,
                 m => m.Values.ToDictionary(v => v.Id, v => v));
@@ -77,7 +77,7 @@ namespace SOS.Process.Helpers
                 return;
             }
 
-            var areas = await _areaVerbatimRepository.GetAllAsync();
+            var areas = await _processedAreaRepository.GetAllAsync();
             foreach (var area in areas)
             {
                 var feature = area.ToFeature();
@@ -225,7 +225,7 @@ namespace SOS.Process.Helpers
         public void PersistCache()
         {
             // Update saved cache
-            using var file = new StreamWriter(File.Create(_cacheFileName), Encoding.UTF8);
+            using var file = new StreamWriter(File.Create(CacheFileName), Encoding.UTF8);
             file.Write(JsonConvert.SerializeObject(_featureCache));
         }
 

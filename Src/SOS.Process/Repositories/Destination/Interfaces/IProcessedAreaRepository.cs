@@ -13,10 +13,6 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     /// </summary>
     public interface IProcessedAreaRepository : IProcessBaseRepository<Area, int>
     {
-        /// <summary>
-        /// Gets all processed areas.
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<Area>> GetAreasAsync();
+        Task<IEnumerable<Area>> GetAllExceptGeometryFieldAsync();
     }
 }

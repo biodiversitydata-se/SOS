@@ -11,10 +11,6 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     /// </summary>
     public interface IProcessedTaxonRepository: IProcessBaseRepository<ProcessedTaxon, int>
     {
-        /// <summary>
-        /// Gets all processed taxa.
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<ProcessedTaxon>> GetTaxaAsync();
+        
     }
 }
