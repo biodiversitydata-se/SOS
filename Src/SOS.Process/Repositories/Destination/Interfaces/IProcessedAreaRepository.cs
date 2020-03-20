@@ -13,6 +13,10 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     /// </summary>
     public interface IProcessedAreaRepository : IProcessBaseRepository<Area, int>
     {
-        Task<IEnumerable<Area>> GetAllExceptGeometryFieldAsync();
+        /// <summary>
+        /// Get all areas, but skip getting the geometry field.
+        /// </summary>
+        /// <returns></returns>
+        Task<List<AreaBase>> GetAllAreaBaseAsync();
     }
 }

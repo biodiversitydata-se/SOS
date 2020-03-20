@@ -14,6 +14,6 @@ namespace SOS.Process.Helpers.Interfaces
         /// and returns the result in a zip file.
         /// </summary>
         /// <returns></returns>
-        Task<byte[]> CreateDiffZipFile(Area[] generatedAreas);
+        Task<byte[]> CreateDiffZipFile(AreaBase[] generatedAreas);
     }
 }

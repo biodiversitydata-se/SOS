@@ -34,11 +34,12 @@ namespace SOS.Process.Repositories.Destination
 
         }
 
-        public async Task<IEnumerable<Area>> GetAllExceptGeometryFieldAsync()
+        /// <inheritdoc />
+        public async Task<List<AreaBase>> GetAllAreaBaseAsync()
         {
             var res = await MongoCollection
                 .Find(x => true)
-                .Project(m => new Area(m.AreaType)
+                .Project(m => new AreaBase(m.AreaType)
                 {
                     FeatureId = m.FeatureId,
                     Id = m.Id,

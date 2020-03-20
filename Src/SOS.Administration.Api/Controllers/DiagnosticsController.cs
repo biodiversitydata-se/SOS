@@ -82,7 +82,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                var generatedAreas = await _areaHarvester.GetAreasAsync(false);
+                var generatedAreas = await _areaHarvester.GetAreasBaseAsync();
                 var zipBytes = await _areaDiffHelper.CreateDiffZipFile(generatedAreas.ToArray());
                 return File(zipBytes, "application/zip", "AreaDiffBetweenVerbatimAndProcessed.zip");
             }
