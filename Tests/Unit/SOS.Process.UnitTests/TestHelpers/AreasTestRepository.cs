@@ -8,6 +8,7 @@ using NetTopologySuite.Features;
 using NetTopologySuite.IO;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Process.UnitTests.TestHelpers

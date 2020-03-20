@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Moq;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Repositories.Source.Interfaces;
 

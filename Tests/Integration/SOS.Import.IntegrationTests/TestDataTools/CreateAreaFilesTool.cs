@@ -15,6 +15,7 @@ using SOS.Import.Repositories.Destination.FieldMappings;
 using SOS.Import.Repositories.Destination.Taxon;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.TestHelpers.IO;
 using SOS.TestHelpers.JsonConverters;

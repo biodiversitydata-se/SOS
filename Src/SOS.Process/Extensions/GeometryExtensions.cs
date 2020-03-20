@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Process.Extensions

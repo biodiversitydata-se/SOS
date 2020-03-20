@@ -8,6 +8,7 @@ using MongoDB.Driver;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;

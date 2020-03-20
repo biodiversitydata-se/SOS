@@ -1,8 +1,7 @@
-﻿using MongoDB.Driver.GeoJsonObjectModel;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Lib.Models.Verbatim.Shared
+namespace SOS.Lib.Models.Shared
 {
     public class AreaBase : IEntity<int>
     {

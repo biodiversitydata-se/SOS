@@ -7,6 +7,7 @@ using SOS.Import.Extensions;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Harvesters
