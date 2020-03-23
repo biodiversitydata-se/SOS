@@ -44,6 +44,15 @@ namespace DwC_A
             val = null;
             return false;
         }
-    }
 
+        public string GetValue(string term)
+        {
+            if (FieldMetaData.TryGetTermIndex(term, out var termIndex))
+            {
+                return this[termIndex];
+            }
+
+            return null;
+        }
+    }
 }

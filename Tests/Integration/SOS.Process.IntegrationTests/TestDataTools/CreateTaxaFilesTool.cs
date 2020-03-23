@@ -56,7 +56,7 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            IEnumerable<ProcessedTaxon> taxa = await taxonProcessedRepository.GetTaxaAsync();
+            IEnumerable<ProcessedTaxon> taxa = await taxonProcessedRepository.GetAllAsync();
             var basicTaxa = taxa.ToProcessedBasicTaxa();
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
             byte[] bin = MessagePackSerializer.Serialize(basicTaxa, options);

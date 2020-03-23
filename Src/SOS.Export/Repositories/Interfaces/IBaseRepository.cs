@@ -32,6 +32,6 @@ namespace SOS.Export.Repositories.Interfaces
         /// Get all objects in repository
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<TEntity>> GetAllAsync();
+        Task<List<TEntity>> GetAllAsync();
     }
 }

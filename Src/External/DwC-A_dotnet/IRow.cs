@@ -30,5 +30,7 @@ namespace DwC_A
         string this[int index] { get; }
 
         bool TryGetValue(string term, out string val);
+
+        string GetValue(string term);
     }
 }

@@ -15,6 +15,8 @@ using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Destination.ClamPortal;
 using SOS.Import.Repositories.Destination.ClamPortal.Interfaces;
+using SOS.Import.Repositories.Destination.DarwinCoreArchive;
+using SOS.Import.Repositories.Destination.DarwinCoreArchive.Interfaces;
 using SOS.Import.Repositories.Destination.FieldMappings;
 using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
@@ -68,7 +70,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<PersonRepository>().As<IPersonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingRelationRepository>().As<ISightingRelationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SpeciesCollectionItemRepository>().As<ISpeciesCollectionItemRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<KulObservationService>().As<IKulObservationService>().InstancePerLifetimeScope();
+            builder.RegisterType<DarwinCoreArchiveVerbatimRepository>().As<IDarwinCoreArchiveVerbatimRepository>().InstancePerLifetimeScope();
 
             // Repositories destination
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
@@ -79,13 +81,16 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<TaxonVerbatimRepository>().As<ITaxonVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>().InstancePerLifetimeScope();
 
-            // Add factories
+            // Add harvesters
             builder.RegisterType<ClamPortalObservationHarvester>().As<IClamPortalObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<AreaHarvester>().As<IAreaHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationHarvester>().As<IKulObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenObservationHarvester>().As<IArtportalenObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonHarvester>().As<ITaxonHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingHarvester>().As<IFieldMappingHarvester>().InstancePerLifetimeScope();
+            builder.RegisterType<DwcObservationHarvester>().As<IDwcObservationHarvester>().InstancePerLifetimeScope();
+
+            // Add factories
             builder.RegisterType<ActivityFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<GenderFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<LifeStageFieldMappingFactory>().InstancePerLifetimeScope();
@@ -113,6 +118,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<TaxonServiceProxy>().As<ITaxonServiceProxy>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonService>().As<ITaxonService>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonAttributeService>().As<ITaxonAttributeService>().InstancePerLifetimeScope();
+            builder.RegisterType<KulObservationService>().As<IKulObservationService>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ArtportalenHarvestJob>().As<IArtportalenHarvestJob>().InstancePerLifetimeScope();

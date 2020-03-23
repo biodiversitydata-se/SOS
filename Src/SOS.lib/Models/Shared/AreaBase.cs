@@ -1,16 +1,15 @@
-﻿using MongoDB.Driver.GeoJsonObjectModel;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Lib.Models.Verbatim.Shared
+namespace SOS.Lib.Models.Shared
 {
-    public class Area : IEntity<int>
+    public class AreaBase : IEntity<int>
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="areaType"></param>
-        public Area(AreaType areaType)
+        public AreaBase(AreaType areaType)
         {
             AreaType = areaType;
         }
@@ -19,12 +18,6 @@ namespace SOS.Lib.Models.Verbatim.Shared
         /// Area Id
         /// </summary>
         public int Id { get; set; }
-
-        /// <summary>
-        /// Area geometry
-        /// </summary>
-       
-        public GeoJsonGeometry<GeoJson2DGeographicCoordinates> Geometry { get; set; }
 
         /// <summary>
         /// Name of area

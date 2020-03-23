@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database.Interfaces;
 
@@ -48,6 +49,23 @@ namespace SOS.Process.Repositories.Source
 
                 return default;
             }
+        }
+
+        /// <inheritdoc />
+        public async Task<List<AreaBase>> GetAllAreaBaseAsync()
+        {
+            var res = await MongoCollection
+                .Find(x => true)
+                .Project(m => new AreaBase(m.AreaType)
+                {
+                    FeatureId = m.FeatureId,
+                    Id = m.Id,
+                    Name = m.Name,
+                    ParentId = m.ParentId,
+                })
+                .ToListAsync();
+
+            return res;
         }
     }
 }

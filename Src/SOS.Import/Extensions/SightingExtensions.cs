@@ -16,6 +16,16 @@ namespace SOS.Import.Extensions
     public static class SightingExtensions
     {
         /// <summary>
+        /// Cast multiple area entities to models 
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        public static IEnumerable<Area> ToVerbatims(this IEnumerable<AreaEntity> entities)
+        {
+            return entities.Select(e => e.ToVerbatim());
+        }
+
+        /// <summary>
         /// Cast area entity to model 
         /// </summary>
         /// <param name="entity"></param>
@@ -27,19 +37,25 @@ namespace SOS.Import.Extensions
                 Id = entity.Id,
                 FeatureId = entity.FeatureId,
                 ParentId = entity.ParentId,
-                Geometry = entity.Polygon.ToGeometry().Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoJsonGeometry(),
+                Geometry = entity.Polygon?.ToGeometry().Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoJsonGeometry(),
                 Name = entity.Name
             };
         }
 
         /// <summary>
-        /// Cast multiple area entities to models 
+        /// Cast area entity to model 
         /// </summary>
-        /// <param name="entities"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public static IEnumerable<Area> ToVerbatims(this IEnumerable<AreaEntity> entities)
+        public static AreaBase ToAreaBaseVerbatim(this AreaEntity entity)
         {
-            return entities.Select(e => e.ToVerbatim());
+            return new AreaBase((AreaType)entity.AreaDatasetId)
+            {
+                Id = entity.Id,
+                FeatureId = entity.FeatureId,
+                ParentId = entity.ParentId,
+                Name = entity.Name
+            };
         }
 
         /// <summary>

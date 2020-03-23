@@ -113,7 +113,7 @@ namespace SOS.Export.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetAllAsync()
+        public async Task<List<TEntity>> GetAllAsync()
         {
             var res = await MongoCollection.AsQueryable().ToListAsync();
 

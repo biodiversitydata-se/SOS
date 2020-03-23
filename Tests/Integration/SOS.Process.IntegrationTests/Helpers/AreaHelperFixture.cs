@@ -26,22 +26,18 @@ namespace SOS.Process.IntegrationTests.Helpers
         private AreaHelper CreateAreaHelper()
         {
             var processConfiguration = GetProcessConfiguration();
-            var verbatimClient = new VerbatimClient(
-                processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.VerbatimDbConfiguration.DatabaseName,
-                processConfiguration.VerbatimDbConfiguration.BatchSize);
             var processClient = new ProcessClient(
                 processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 processConfiguration.ProcessedDbConfiguration.DatabaseName,
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
-            var areaVerbatimRepository = new AreaVerbatimRepository(
-                verbatimClient,
-                new Mock<ILogger<AreaVerbatimRepository>>().Object);
+            var processedAreaRepository = new ProcessedAreaRepository(
+                processClient,
+                new Mock<ILogger<ProcessedAreaRepository>>().Object);
             var processedFieldMappingRepository = new ProcessedFieldMappingRepository(
                 processClient,
                 new NullLogger<ProcessedFieldMappingRepository>());
             var areaHelper = new AreaHelper(
-                areaVerbatimRepository,
+                processedAreaRepository,
                 processedFieldMappingRepository);
 
             return areaHelper;

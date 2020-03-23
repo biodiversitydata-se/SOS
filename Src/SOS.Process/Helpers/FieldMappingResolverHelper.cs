@@ -32,7 +32,7 @@ namespace SOS.Process.Helpers
 
         private async Task InitializeAsync()
         {
-            var fieldMappings = (await _processedFieldMappingRepository.GetFieldMappingsAsync()).ToArray();
+            var fieldMappings = await _processedFieldMappingRepository.GetAllAsync();
             _valueMappingDictionariesByCultureCode =
                 new Dictionary<string, Dictionary<FieldMappingFieldId, Dictionary<int, string>>>
                 {

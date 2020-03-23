@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -6,6 +7,7 @@ using SOS.Import.Extensions;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Harvesters
@@ -82,6 +84,19 @@ namespace SOS.Import.Harvesters
             }
 
             return harvestInfo;
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<Area>> GetAreasAsync()
+        {
+            return (await _areaRepository.GetAsync()).ToVerbatims();
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<AreaBase>> GetAreasBaseAsync()
+        {
+            var areaEntities = await _areaRepository.GetAreasExceptGeometryFieldAsync();
+            return areaEntities.Select(ae => ae.ToAreaBaseVerbatim());
         }
     }
 }

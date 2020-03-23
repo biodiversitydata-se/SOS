@@ -285,10 +285,10 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _taxonProcessedRepository.Setup(r => r.GetTaxaAsync())
-                .ReturnsAsync(new []
+            _taxonProcessedRepository.Setup(r => r.GetAllAsync())
+                .ReturnsAsync(new List<ProcessedTaxon>
                 {
-                    new ProcessedTaxon() {Id = 100024, ScientificName = "Canus Lupus"},
+                    new ProcessedTaxon {Id = 100024, ScientificName = "Canus Lupus"},
                 });
 
             _darwinCoreRepository.Setup(r => r.VerifyCollectionAsync());
@@ -395,7 +395,7 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _taxonProcessedRepository.Setup(r => r.GetTaxaAsync())
+            _taxonProcessedRepository.Setup(r => r.GetAllAsync())
                 .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
             // Act

@@ -51,6 +51,12 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         Task<bool> DeleteCollectionAsync();
 
         /// <summary>
+        /// Get all items.
+        /// </summary>
+        /// <returns></returns>
+        Task<List<TEntity>> GetAllAsync();
+
+        /// <summary>
         /// Get item by id
         /// </summary>
         /// <param name="id"></param>

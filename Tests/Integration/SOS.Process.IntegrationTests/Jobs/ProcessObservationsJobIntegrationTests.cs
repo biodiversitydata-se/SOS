@@ -60,7 +60,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration.ProcessedDbConfiguration.DatabaseName,
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
             var areaHelper = new AreaHelper(
-                new AreaVerbatimRepository(verbatimClient, new NullLogger<AreaVerbatimRepository>()), 
+                new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()), 
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>()));
             var taxonVerbatimRepository = new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
             var fieldMappingVerbatimRepository = new FieldMappingVerbatimRepository(verbatimClient, new NullLogger<FieldMappingVerbatimRepository>());

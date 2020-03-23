@@ -109,7 +109,7 @@ namespace SOS.Process.Jobs
                 _logger.LogDebug("Start getting processed taxa");
 
                 // Get taxa
-                var taxa = await _processedTaxonRepository.GetTaxaAsync();
+                var taxa = await _processedTaxonRepository.GetAllAsync();
                 if (!taxa?.Any() ?? true)
                 {
                     _logger.LogDebug("Failed to get processed taxa");

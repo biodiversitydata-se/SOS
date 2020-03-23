@@ -15,7 +15,7 @@ namespace SOS.Process.UnitTests.TestHelpers.Factories
             var fieldMappings = MessagePackHelper.CreateListFromMessagePackFile<FieldMapping>(filename);
             Mock<IProcessedFieldMappingRepository> processedFieldMappingRepositoryStub = new Mock<IProcessedFieldMappingRepository>();
             processedFieldMappingRepositoryStub
-                .Setup(pfmr => pfmr.GetFieldMappingsAsync())
+                .Setup(pfmr => pfmr.GetAllAsync())
                 .ReturnsAsync(fieldMappings);
 
             return processedFieldMappingRepositoryStub;

@@ -52,5 +52,33 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 return null;
             }
         }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<AreaEntity>> GetAreasExceptGeometryFieldAsync()
+        {
+            try
+            {
+                var areaTypes = (int[])Enum.GetValues(typeof(AreaType));
+
+                var query = @"
+                SELECT 
+	                a.AreaDatasetId,
+                    a.Id,
+                    a.FeatureId,                    
+	                a.Name,
+                    a.ParentId
+                FROM 
+	                Area a
+                WHERE
+                    a.AreaDatasetId IN (" + string.Join(",", areaTypes) + ")";
+
+                return await QueryAsync<AreaEntity>(query);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting areas");
+                return null;
+            }
+        }
     }
 }
