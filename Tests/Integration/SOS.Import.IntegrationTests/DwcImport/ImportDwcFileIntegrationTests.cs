@@ -145,7 +145,7 @@ namespace SOS.Import.IntegrationTests.DwcImport
                 return null;
             }
 
-            var obs = new ProcessedObservation(DataProvider.Dwc);
+            var obs = new ProcessedObservation(ObservationProvider.Artportalen);
             
             if (row.TryGetValue(Terms.accessRights, out string accessRights))
             {

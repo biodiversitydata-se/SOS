@@ -20,7 +20,7 @@ namespace SOS.Process.Processors.Kul
     {
         private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataProvider DataProvider => DataProvider.KUL;
+        public override ObservationProvider DataProvider => ObservationProvider.KUL;
 
         /// <summary>
         /// Constructor

@@ -1,28 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
+using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
-using SOS.Lib.Models.Processed;
-using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Jobs
 {
-    public class CopyAreasJob : ICopyAreasJob
+    public class CopyAreasJob : ProcessJobBase, ICopyAreasJob
     {
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
         private readonly IProcessedAreaRepository _processedAreaRepository;
         private readonly ILogger<CopyAreasJob> _logger;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="areaVerbatimRepository"></param>
+        /// <param name="processedAreaRepository"></param>
+        /// <param name="harvestInfoRepository"></param>
+        /// <param name="processInfoRepository"></param>
+        /// <param name="logger"></param>
         public CopyAreasJob(
             IAreaVerbatimRepository areaVerbatimRepository,
             IProcessedAreaRepository processedAreaRepository,
-            ILogger<CopyAreasJob> logger)
+            IHarvestInfoRepository harvestInfoRepository,
+            IProcessInfoRepository processInfoRepository,
+            ILogger<CopyAreasJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
             _processedAreaRepository = processedAreaRepository ?? throw new ArgumentNullException(nameof(processedAreaRepository));
@@ -32,6 +40,8 @@ namespace SOS.Process.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {
+            var start = DateTime.Now;
+
             var areas = await _areaVerbatimRepository.GetAllAsync();
             if (!areas?.Any() ?? true)
             {
@@ -51,6 +61,13 @@ namespace SOS.Process.Jobs
             var success = await _processedAreaRepository.AddManyAsync(areas);
             //var success = await CopyAreas();
             _logger.LogDebug("Finish copy areas");
+
+            _logger.LogDebug("Start updating process info for areas");
+            var harvestInfo = await GetHarvestInfoAsync(nameof(Area));
+            var providerInfo = CreateProviderInfo(DataSet.Areas, harvestInfo,  start, DateTime.Now, success ? RunStatus.Success : RunStatus.Failed, areas.Count);
+            await SaveProcessInfo(nameof(Area), start, areas.Count,
+                success ? RunStatus.Success : RunStatus.Failed, new [] { providerInfo } );
+            _logger.LogDebug("Finish updating process info for areas");
 
             return success ? true : throw new Exception("Copy field areas job failed");
         }

@@ -106,7 +106,7 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> CopyProviderDataAsync(DataProvider provider)
+        public async Task<bool> CopyProviderDataAsync(ObservationProvider provider)
         {
             // Get data from active instance
             SetCollectionName(ActiveInstance);
@@ -116,7 +116,7 @@ namespace SOS.Process.Repositories.Destination
                     Builders<ProcessedObservation>.Filter.Eq(dwc => dwc.Provider, provider));
 
             // switch to inactive instance and add data 
-            SetCollectionName(InstanceToUpdate);
+            SetCollectionName(InActiveInstance);
 
             return await AddManyAsync(source.ToEnumerable()) != 0;
         }
@@ -229,7 +229,7 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteProviderDataAsync(DataProvider provider)
+        public async Task<bool> DeleteProviderDataAsync(ObservationProvider provider)
         {
             try
             {

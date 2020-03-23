@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Xml;
 using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Export.IO.DwcArchive
 {
@@ -37,23 +36,23 @@ namespace SOS.Export.IO.DwcArchive
             processEndAttribute.Value = processInfo.End.ToString("O");
             processNode.Attributes.Append(processEndAttribute);
 
-            var processSuccessAttribute = doc.CreateAttribute("success");
-            processSuccessAttribute.Value = processInfo.Success.ToString();
+            var processSuccessAttribute = doc.CreateAttribute("status");
+            processSuccessAttribute.Value = processInfo.Status.ToString();
             processNode.Attributes.Append(processSuccessAttribute);
 
-            if (processInfo.ProviderInfo != null)
+            if (processInfo.ProvidersInfo != null)
             {
                 // Add verbatim info
-                foreach (var providerInfo in processInfo.ProviderInfo)
+                foreach (var providerInfo in processInfo.ProvidersInfo)
                 {
                     var providerInfoNode = CreateProviderInfoNode(doc, "verbatim", providerInfo);
 
-                    if (providerInfo.HarvestMetadata != null)
+                    if (providerInfo.MetadataInfo != null)
                     {
                         // Add verbatim info
-                        foreach (var metadata in providerInfo.HarvestMetadata)
+                        foreach (var metadata in providerInfo.MetadataInfo)
                         {
-                            var metadataNode = CreateHarvestInfoNode(doc, "metadata", metadata);
+                            var metadataNode = CreateProviderInfoNode(doc, "metadata", metadata);
 
                             providerInfoNode.AppendChild(metadataNode);
                         }
@@ -89,11 +88,11 @@ namespace SOS.Export.IO.DwcArchive
             providerInfoNode.Attributes.Append(harvestCountAttribute);
 
             var harvestStartAttribute = doc.CreateAttribute("harvest-start");
-            harvestStartAttribute.Value = providerInfo.HarvestStart.ToString("O");
+            harvestStartAttribute.Value = providerInfo.HarvestStart?.ToString("O");
             providerInfoNode.Attributes.Append(harvestStartAttribute);
 
             var harvestEndAttribute = doc.CreateAttribute("harvest-end");
-            harvestEndAttribute.Value = providerInfo.HarvestEnd.ToString("O");
+            harvestEndAttribute.Value = providerInfo.HarvestEnd?.ToString("O");
             providerInfoNode.Attributes.Append(harvestEndAttribute);
 
             var harvestStatusAttribute = doc.CreateAttribute("harvest-end");
@@ -109,7 +108,7 @@ namespace SOS.Export.IO.DwcArchive
             providerInfoNode.Attributes.Append(processStartAttribute);
 
             var processEndAttribute = doc.CreateAttribute("process-end");
-            processEndAttribute.Value = providerInfo.ProcessEnd.ToString("O");
+            processEndAttribute.Value = providerInfo.ProcessEnd?.ToString("O");
             providerInfoNode.Attributes.Append(processEndAttribute);
 
             var processStatusAttribute = doc.CreateAttribute("process-end");
@@ -117,38 +116,6 @@ namespace SOS.Export.IO.DwcArchive
             providerInfoNode.Attributes.Append(processStatusAttribute);
 
             return providerInfoNode;
-        }
-
-        /// <summary>
-        /// Create a harvest information node
-        /// </summary>
-        /// <param name="doc"></param>
-        /// <param name="nodeName"></param>
-        /// <param name="harvestInfo"></param>
-        /// <returns></returns>
-        private static XmlNode CreateHarvestInfoNode(XmlDocument doc, string nodeName, HarvestInfo harvestInfo)
-        {
-            // Create new node
-            var harvestInfoNode = doc.CreateElement(nodeName, _elementNamespace);
-
-            // Add verbatim info attributes
-            var providerAttribute = doc.CreateAttribute("provider");
-            providerAttribute.Value = harvestInfo.DataProvider.ToString();
-            harvestInfoNode.Attributes.Append(providerAttribute);
-
-            var nameAttribute = doc.CreateAttribute("name");
-            nameAttribute.Value = harvestInfo.Id;
-            harvestInfoNode.Attributes.Append(nameAttribute);
-
-            var startAttribute = doc.CreateAttribute("start");
-            startAttribute.Value = harvestInfo.Start.ToString("O");
-            harvestInfoNode.Attributes.Append(startAttribute);
-
-            var endAttribute = doc.CreateAttribute("end");
-            endAttribute.Value = harvestInfo.End.ToString("O");
-            harvestInfoNode.Attributes.Append(endAttribute);
-
-            return harvestInfoNode;
         }
     }
 }

@@ -66,7 +66,7 @@ namespace SOS.Process.Processors.Artportalen
                 taxon.IndividualId = verbatimObservation.URL;
             }
 
-            var obs = new ProcessedObservation(DataProvider.Artportalen)
+            var obs = new ProcessedObservation(ObservationProvider.Artportalen)
             {
                 AccessRightsId =
                 !verbatimObservation.ProtectedBySystem && verbatimObservation.HiddenByProvider.HasValue &&
@@ -80,7 +80,7 @@ namespace SOS.Process.Processors.Artportalen
                 ? "Artportalen"
                 : verbatimObservation.SpeciesCollection,
                 CollectionId = verbatimObservation.CollectionID,
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.Artportalen.ToString()}",
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ObservationProvider.Artportalen.ToString()}",
                 DatasetName = "Artportalen",
                 Event = new ProcessedEvent
                 {

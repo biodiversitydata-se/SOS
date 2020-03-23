@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Hangfire;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Processed;
 
 namespace SOS.Process.Processors.Interfaces
 {
@@ -17,7 +17,7 @@ namespace SOS.Process.Processors.Interfaces
         /// <param name="taxa"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<RunInfo> ProcessAsync(
+        Task<ProcessingStatus> ProcessAsync(
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken);
 

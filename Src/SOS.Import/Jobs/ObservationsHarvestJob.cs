@@ -51,30 +51,30 @@ namespace SOS.Import.Jobs
         {
             _logger.LogDebug("Start Harvest Jobs");
 
-            var harvestTasks = new Dictionary<DataProvider, Task<bool>>();
+            var harvestTasks = new Dictionary<DataSet, Task<bool>>();
 
             // Always add Artportalen import
             _logger.LogDebug("Added Artportalen harvest (mandatory)");
-            harvestTasks.Add(DataProvider.Artportalen, _artportalenHarvestJob.RunAsync(cancellationToken));
+            harvestTasks.Add(DataSet.ArtportalenObservations, _artportalenHarvestJob.RunAsync(cancellationToken));
 
             // Always add metadata 
             _logger.LogDebug("Added taxon harvest (mandatory)");
-            harvestTasks.Add(DataProvider.TaxonService, _taxonHarvestJob.RunAsync());
+            harvestTasks.Add(DataSet.Taxa, _taxonHarvestJob.RunAsync());
             _logger.LogDebug("Added field mapping harvest (mandatory)");
-            harvestTasks.Add(DataProvider.FieldMappings, _fieldMappingImportJob.RunAsync());
+            harvestTasks.Add(DataSet.FieldMappings, _fieldMappingImportJob.RunAsync());
 
             // Add Clam portal import if second bit is set
-            if ((harvestSources & (int)DataProvider.ClamPortal) > 0)
+            if ((harvestSources & (int)ObservationProvider.ClamPortal) > 0)
             {
                 _logger.LogDebug("Added Clamportal harvest");
-                harvestTasks.Add(DataProvider.ClamPortal, _clamPortalHarvestJob.RunAsync(cancellationToken));
+                harvestTasks.Add(DataSet.ClamPortalObservations, _clamPortalHarvestJob.RunAsync(cancellationToken));
             }
 
             // Add Clam portal import if third bit is set
-            if ((harvestSources & (int)DataProvider.KUL) > 0)
+            if ((harvestSources & (int)ObservationProvider.KUL) > 0)
             {
                 _logger.LogDebug("Added KUL harvest");
-                harvestTasks.Add(DataProvider.KUL, _kulHarvestJob.RunAsync(cancellationToken));
+                harvestTasks.Add(DataSet.KULObservations, _kulHarvestJob.RunAsync(cancellationToken));
             }
 
             // Run all tasks async
@@ -82,15 +82,15 @@ namespace SOS.Import.Jobs
             _logger.LogDebug("Finish Harvest Jobs");
 
             // If Artportalen and meta data harvest was successful, go on with processing
-            if (harvestTasks[DataProvider.Artportalen].Result &&
-                harvestTasks[DataProvider.TaxonService].Result &&
-                harvestTasks[DataProvider.FieldMappings].Result)
+            if (harvestTasks[DataSet.ArtportalenObservations].Result &&
+                harvestTasks[DataSet.Taxa].Result &&
+                harvestTasks[DataSet.FieldMappings].Result)
             {
                 // Make sure Artportalen is added 
-                if ((processSources & (int) DataProvider.Artportalen) == 0)
+                if ((processSources & (int)ObservationProvider.Artportalen) == 0)
                 {
                     _logger.LogDebug("Added Artportalen to sources to process (mandatory)");
-                    processSources += (int) DataProvider.Artportalen;
+                    processSources += (int)ObservationProvider.Artportalen;
                 }
 
                 var jobId = BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(processSources, true, true, true, cancellationToken));

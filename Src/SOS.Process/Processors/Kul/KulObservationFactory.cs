@@ -47,10 +47,10 @@ namespace SOS.Process.Processors.Kul
 
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
 
-            var obs = new ProcessedObservation(DataProvider.KUL)
+            var obs = new ProcessedObservation(ObservationProvider.KUL)
             {
                 BasisOfRecordId = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.KUL.ToString()}",
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ObservationProvider.KUL.ToString()}",
                 DatasetName = "KUL",
                 Event = new ProcessedEvent
                 {

@@ -8,7 +8,7 @@ namespace SOS.Export.Repositories
     /// <summary>
     /// Base class for cosmos db repositories
     /// </summary>
-    public class ProcessInfoRepository : BaseRepository<ProcessInfo, byte>, IProcessInfoRepository
+    public class ProcessInfoRepository : BaseRepository<ProcessInfo, string>, IProcessInfoRepository
     {
         /// <summary>
         /// Constructor

@@ -13,7 +13,7 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="provider"></param>
         /// <returns></returns>
-        IActionResult RunCopyProviderData(DataProvider provider);
+        IActionResult RunCopyProviderData(ObservationProvider provider);
 
         /// <summary>
         /// Activate instance

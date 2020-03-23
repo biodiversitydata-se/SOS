@@ -50,9 +50,13 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
             var taxonVerbatimRepository = new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
             var taxonProcessedRepository = new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
+            var harvestInfoRepository = new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
+            var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var processTaxaJob = new ProcessTaxaJob(
                 taxonVerbatimRepository,
                 taxonProcessedRepository,
+                harvestInfoRepository,
+                processInfoRepository,
                 new NullLogger<ProcessTaxaJob>());
 
             return processTaxaJob;

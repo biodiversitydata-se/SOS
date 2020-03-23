@@ -6,7 +6,7 @@ namespace SOS.Export.Repositories.Interfaces
     /// <summary>
     /// Processed data class
     /// </summary>
-    public interface IProcessInfoRepository : IBaseRepository<ProcessInfo, byte>
+    public interface IProcessInfoRepository : IBaseRepository<ProcessInfo, string>
     {
 
     }

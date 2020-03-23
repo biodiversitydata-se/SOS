@@ -38,7 +38,7 @@ namespace SOS.Import.Harvesters
         /// <inheritdoc />
         public async Task<HarvestInfo> HarvestAreasAsync()
         {
-            var harvestInfo = new HarvestInfo(nameof(Area), DataProvider.Artportalen, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(Area), DataSet.ArtportalenObservations, DateTime.Now);
             try
             {
                 var start = DateTime.Now;

@@ -7,6 +7,13 @@ namespace SOS.Process.Repositories.Source.Interfaces
     public interface IHarvestInfoRepository : IVerbatimBaseRepository<HarvestInfo, string>
     {
         /// <summary>
+        /// Get harvest info by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<HarvestInfo> GetAsync(string id);
+
+        /// <summary>
         /// Get harvest information 
         /// </summary>
         /// <returns></returns>

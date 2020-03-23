@@ -13,7 +13,7 @@ namespace SOS.Process.Managers.Interfaces
         /// </summary>
         /// <param name="provider"></param>
         /// <returns></returns>
-        Task<bool> CopyProviderDataAsync(DataProvider provider);
+        Task<bool> CopyProviderDataAsync(ObservationProvider provider);
 
         /// <summary>
         /// Activate passed instance

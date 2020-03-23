@@ -16,8 +16,6 @@ namespace SOS.Process.Repositories.Destination
     /// </summary>
     public class ProcessedFieldMappingRepository : ProcessBaseRepository<FieldMapping, FieldMappingFieldId>, IProcessedFieldMappingRepository
     {
-        private new IMongoCollection<FieldMapping> MongoCollection => Database.GetCollection<FieldMapping>(_collectionName);
-
         /// <summary>
         /// Constructor.
         /// </summary>

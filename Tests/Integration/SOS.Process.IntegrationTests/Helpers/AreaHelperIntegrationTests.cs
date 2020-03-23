@@ -27,7 +27,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var observations = new List<ProcessedObservation>();
-            var observation = new ProcessedObservation(DataProvider.Artportalen)
+            var observation = new ProcessedObservation(ObservationProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -59,7 +59,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var observation = new ProcessedObservation(DataProvider.Artportalen)
+            var observation = new ProcessedObservation(ObservationProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -88,7 +88,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var observations = new List<ProcessedObservation>();
-            var observation = new ProcessedObservation(DataProvider.Artportalen)
+            var observation = new ProcessedObservation(ObservationProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -118,7 +118,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var observations = new List<ProcessedObservation>();
-            var observation = new ProcessedObservation(DataProvider.Artportalen)
+            var observation = new ProcessedObservation(ObservationProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {

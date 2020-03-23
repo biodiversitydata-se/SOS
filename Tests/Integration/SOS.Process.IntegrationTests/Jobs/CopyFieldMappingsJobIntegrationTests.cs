@@ -50,9 +50,14 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
             var fieldMappingVerbatimRepository = new FieldMappingVerbatimRepository(verbatimClient, new NullLogger<FieldMappingVerbatimRepository>());
             var fieldMappingProcessedRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
+            var harvestInfoRepository = new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
+            var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
+
             var copyFieldMappingsJob = new CopyFieldMappingsJob(
                 fieldMappingVerbatimRepository,
                 fieldMappingProcessedRepository,
+                harvestInfoRepository,
+                processInfoRepository,
                 new NullLogger<CopyFieldMappingsJob>());
 
             return copyFieldMappingsJob;

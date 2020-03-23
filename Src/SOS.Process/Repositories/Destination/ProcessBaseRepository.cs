@@ -24,6 +24,8 @@ namespace SOS.Process.Repositories.Destination
         protected readonly ILogger<ProcessBaseRepository<TEntity, TKey>> Logger;
 
         private readonly IProcessClient _client;
+        private readonly bool _toggleable;
+        protected string _collectionName;
 
         /// <summary>
         /// Mongo db
@@ -35,7 +37,7 @@ namespace SOS.Process.Repositories.Destination
         /// </summary>
         private bool _disposed;
 
-        protected string _collectionName;
+
         private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
 
         /// <summary>
@@ -51,15 +53,16 @@ namespace SOS.Process.Repositories.Destination
         )
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
+            _toggleable = toggleable;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             BatchSize = _client.BatchSize;
             Database = _client.GetDatabase();
 
+            _collectionName = GetInstanceName(InActiveInstance);
+
             // Init config
             InitializeConfiguration();
-            
-            _collectionName = toggleable ? GetTogglableInstanceName(InstanceToUpdate) : $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }";
         }
 
 
@@ -112,7 +115,8 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
-        protected byte ActiveInstance => (byte)(GetConfiguration()?.ActiveInstance ?? 1);
+        public byte ActiveInstance => (byte)(GetConfiguration()?.ActiveInstance ?? 1);
+        public byte InActiveInstance => (byte)(ActiveInstance == 0 ? 1 : 0);
 
         /// <summary>
         /// Get configuration object
@@ -134,9 +138,9 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
-        protected string GetTogglableInstanceName(byte instance)
+        protected string GetInstanceName(byte instance)
         {
-            return $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{instance}";
+            return _toggleable ? $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ instance }" : $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }";
         }
 
         /// <summary>
@@ -146,7 +150,7 @@ namespace SOS.Process.Repositories.Destination
         /// <returns></returns>
         protected void SetCollectionName(byte instance)
         {
-            _collectionName = GetTogglableInstanceName(instance);
+            _collectionName = GetInstanceName(instance);
         }
 
         /// <summary>
@@ -246,6 +250,10 @@ namespace SOS.Process.Repositories.Destination
             GC.SuppressFinalize(this);
         }
 
+        public string ActiveCollectionName =>  GetInstanceName(ActiveInstance);
+
+        public string InActiveCollectionName => GetInstanceName(InActiveInstance);
+
         /// <inheritdoc />
         public async Task<bool> AddAsync(TEntity item)
         {
@@ -314,12 +322,6 @@ namespace SOS.Process.Repositories.Destination
                 return false;
             }
         }
-
-        /// <summary>
-        /// Check config for instance to update
-        /// </summary>
-        /// <returns></returns>
-        public byte InstanceToUpdate => (byte)(ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
         public async Task<TEntity> GetAsync(TKey id)

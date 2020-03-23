@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using SOS.Lib.Models.Processed;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -19,8 +15,6 @@ namespace SOS.Process.Repositories.Destination
     /// </summary>
     public class ProcessedAreaRepository : ProcessBaseRepository<Area, int>, IProcessedAreaRepository
     {
-        private new IMongoCollection<Area> MongoCollection => Database.GetCollection<Area>(_collectionName);
-
         /// <summary>
         /// Constructor.
         /// </summary>

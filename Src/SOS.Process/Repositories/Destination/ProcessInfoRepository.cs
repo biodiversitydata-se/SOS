@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
@@ -11,7 +12,7 @@ namespace SOS.Process.Repositories.Destination
     /// <summary>
     /// Base class for cosmos db repositories
     /// </summary>
-    public class ProcessInfoRepository : ProcessBaseRepository<ProcessInfo, byte>, IProcessInfoRepository
+    public class ProcessInfoRepository : ProcessBaseRepository<ProcessInfo, string>, IProcessInfoRepository
     {
         /// <summary>
         /// Constructor
@@ -27,29 +28,29 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> CopyProviderDataAsync(DataProvider provider)
+        public async Task<bool> CopyProviderDataAsync(ObservationProvider provider)
         {
             // Get data from active instance
-            var source = await GetAsync(ActiveInstance);
+            var source = await GetAsync(ActiveCollectionName);
 
-            var sourceProvider = source?.ProviderInfo?.FirstOrDefault(pi => pi.Provider.Equals(provider));
+            var sourceProvider = source?.ProvidersInfo?.FirstOrDefault(pi => pi.Provider.Equals(provider));
 
             if (sourceProvider == null)
             {
                 return false;
             }
 
-            var target = (await GetAsync(InstanceToUpdate)) ?? new ProcessInfo(InstanceToUpdate);
+            var target = await GetAsync(InActiveCollectionName) ?? new ProcessInfo(InActiveCollectionName, DateTime.Now);
 
             // make a list of providers
-            var targetProviders = target.ProviderInfo.ToList();
+            var targetProviders = target.ProvidersInfo.ToList();
 
             // Remove provider data
             targetProviders.RemoveAll(p => p.Provider.Equals(provider));
 
             // Add provider data from active instance and update db document
             targetProviders.Add(sourceProvider);
-            target.ProviderInfo = targetProviders;
+            target.ProvidersInfo = targetProviders;
 
             return await AddOrUpdateAsync(target);
         }

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
@@ -17,8 +15,6 @@ namespace SOS.Process.Repositories.Destination
     /// </summary>
     public class ProcessedTaxonRepository : ProcessBaseRepository<ProcessedTaxon, int>, IProcessedTaxonRepository
     {
-        private new IMongoCollection<ProcessedTaxon> MongoCollection => Database.GetCollection<ProcessedTaxon>(_collectionName);
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -60,7 +56,6 @@ namespace SOS.Process.Repositories.Destination
                 return null;
             }
         }
-
 
         private async Task<IEnumerable<ProcessedTaxon>> GetChunkAsync(int skip, int take)
         {

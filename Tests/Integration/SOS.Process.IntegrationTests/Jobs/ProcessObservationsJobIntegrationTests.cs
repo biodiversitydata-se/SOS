@@ -36,7 +36,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result = await processJob.RunAsync(
-                (int)DataProvider.Artportalen, 
+                (int)ObservationProvider.Artportalen, 
                 false,
                 false, 
                 false,
@@ -93,8 +93,9 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>()),
                 processInfoRepository,
                 new NullLogger<InstanceManager>());
-            var copyFieldMappingsJob = new CopyFieldMappingsJob(fieldMappingVerbatimRepository, processedFieldMappingRepository, new NullLogger<CopyFieldMappingsJob>());
-            var processTaxaJob = new ProcessTaxaJob(taxonVerbatimRepository, taxonProcessedRepository, new NullLogger<ProcessTaxaJob>());
+
+            var copyFieldMappingsJob = new CopyFieldMappingsJob(fieldMappingVerbatimRepository, processedFieldMappingRepository, harvestInfoRepository, processInfoRepository, new NullLogger<CopyFieldMappingsJob>());
+            var processTaxaJob = new ProcessTaxaJob(taxonVerbatimRepository, taxonProcessedRepository, harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());
             
             var processJob = new ProcessJob(
                 processedObservationRepository,
