@@ -7,8 +7,8 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
-using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.ClamPortal;
@@ -148,7 +148,7 @@ namespace SOS.Process.Jobs
                 var metaDataProviderInfo = await GetProviderInfoAsync(new Dictionary<string, DataSet>
                 {
                     {nameof(Area), DataSet.Areas},
-                    {nameof(DarwinCoreTaxon), DataSet.Taxa}
+                    {nameof(ProcessedTaxon), DataSet.Taxa}
                 });
                
                 // Add Artportalen import if first bit is set
@@ -239,7 +239,7 @@ namespace SOS.Process.Jobs
 
                 _logger.LogDebug("Start updating process info for observations");
                
-                await SaveProcessInfo("", start, providersInfo.Sum(pi => pi.Value.ProcessCount ?? 0),
+                await SaveProcessInfo(_processedObservationRepository.InActiveCollectionName, start, providersInfo.Sum(pi => pi.Value.ProcessCount ?? 0),
                     success ? RunStatus.Success : RunStatus.Failed, providersInfo.Values);
                 _logger.LogDebug("Finish updating process info for observations");
 

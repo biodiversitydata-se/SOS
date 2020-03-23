@@ -16,6 +16,16 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         byte ActiveInstance { get; }
 
         /// <summary>
+        /// Name of active collection
+        /// </summary>
+        string ActiveCollectionName { get; }
+
+        /// <summary>
+        /// Name of in active collection
+        /// </summary>
+        string InActiveCollectionName { get; }
+
+        /// <summary>
         /// Add one item
         /// </summary>
         /// <param name="item"></param>
