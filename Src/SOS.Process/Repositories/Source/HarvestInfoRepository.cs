@@ -35,20 +35,5 @@ namespace SOS.Process.Repositories.Source
                 return default;
             }
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<HarvestInfo>> GetAllAsync()
-        {
-            try
-            {
-                var searchFilter = Builders<HarvestInfo>.Filter.Empty;
-                return await MongoCollection.FindSync(Builders<HarvestInfo>.Filter.Empty).ToListAsync();
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return default;
-            }
-        }
     }
 }

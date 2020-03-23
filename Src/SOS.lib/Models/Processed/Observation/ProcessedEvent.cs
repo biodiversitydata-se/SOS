@@ -14,7 +14,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue BiotopeId { get; set; }
+        public ProcessedFieldMapValue Biotope { get; set; }
 
         /// <summary>
         /// Description of biotope
@@ -112,7 +112,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue SubstrateId { get; set; }
+        public ProcessedFieldMapValue Substrate { get; set; }
 
         /// <summary>
         /// Description of substrate

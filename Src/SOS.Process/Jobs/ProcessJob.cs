@@ -13,7 +13,7 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
-using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Interfaces;

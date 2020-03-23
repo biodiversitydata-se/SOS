@@ -61,8 +61,6 @@ namespace SOS.Process.Processors
                 Logger.LogError(e, $"Failed to process {DataProvider} sightings");
                 return ProcessingStatus.Failed(DataProvider, startTime, DateTime.Now);
             }
-
-          return null;
         }
 
         protected abstract Task<int> ProcessObservations(

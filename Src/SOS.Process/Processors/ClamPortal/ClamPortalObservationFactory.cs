@@ -72,7 +72,7 @@ namespace SOS.Process.Processors.ClamPortal
                 Language = verbatimObservation.Language,
                 Location = new ProcessedLocation
                 {
-                    ContinentId = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
+                    Continent = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
                     CoordinatePrecision = verbatimObservation.CoordinateUncertaintyInMeters,
                     CountryCode = verbatimObservation.CountryCode,
                     DecimalLatitude = verbatimObservation.DecimalLatitude,
@@ -99,12 +99,12 @@ namespace SOS.Process.Processors.ClamPortal
                     IsNeverFoundObservation = verbatimObservation.IsNeverFoundObservation,
                     IsNotRediscoveredObservation = verbatimObservation.IsNotRediscoveredObservation,
                     IsPositiveObservation = verbatimObservation.IsPositiveObservation,
-                    LifeStageId = GetLifeStageIdFromString(verbatimObservation.LifeStage),
+                    LifeStage = GetLifeStageIdFromString(verbatimObservation.LifeStage),
                     OrganismQuantity = verbatimObservation.Quantity,
-                    OrganismQuantityUnitId = GetOrganismQuantityUnitIdFromString(verbatimObservation.QuantityUnit),
+                    OrganismQuantityUnit = GetOrganismQuantityUnitIdFromString(verbatimObservation.QuantityUnit),
                     RecordedBy = verbatimObservation.RecordedBy,
                     Remarks = verbatimObservation.OccurrenceRemarks,
-                    OccurrenceStatusId = GetOccurrenceStatusIdFromString(verbatimObservation.OccurrenceStatus)
+                    OccurrenceStatus = GetOccurrenceStatusIdFromString(verbatimObservation.OccurrenceStatus)
                 },
                 Projects = string.IsNullOrEmpty(verbatimObservation.ProjectName) ? null : new[]
                 {

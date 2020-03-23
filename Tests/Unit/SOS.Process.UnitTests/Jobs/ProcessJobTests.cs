@@ -293,12 +293,6 @@ namespace SOS.Process.UnitTests.Jobs
 
             _darwinCoreRepository.Setup(r => r.VerifyCollectionAsync());
 
-            _harvestInfoRepository.Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new []
-                {
-                    new HarvestInfo("0", DataSet.ArtportalenObservations, DateTime.Now)
-                });
-
             _artportalenProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(ObservationProvider.Artportalen, DateTime.Now, DateTime.Now, 1));
 

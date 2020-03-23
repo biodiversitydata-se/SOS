@@ -4,8 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
-using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Models.Shared;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 

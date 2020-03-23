@@ -133,19 +133,19 @@ namespace SOS.Process.Repositories.Destination
                 new CreateIndexModel<ProcessedObservation>(
                     Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Identification.Validated)),
                 new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.CountyId.Id)),
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.County.Id)),
                 new CreateIndexModel<ProcessedObservation>(
                     Builders<ProcessedObservation>.IndexKeys.Geo2DSphere(a => a.Location.Point)),
                 new CreateIndexModel<ProcessedObservation>(
                     Builders<ProcessedObservation>.IndexKeys.Geo2DSphere(a => a.Location.PointWithBuffer)),
                 new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.ProvinceId.Id)),
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.Province.Id)),
                 new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.MunicipalityId.Id)),
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.Municipality.Id)),
                 new CreateIndexModel<ProcessedObservation>(
                     Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation)),
                 new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Occurrence.GenderId.Id)),
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Occurrence.Gender.Id)),
                 new CreateIndexModel<ProcessedObservation>(
                     Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Provider)),
                 new CreateIndexModel<ProcessedObservation>(

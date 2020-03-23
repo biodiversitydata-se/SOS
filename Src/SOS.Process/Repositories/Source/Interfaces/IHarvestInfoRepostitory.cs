@@ -13,10 +13,6 @@ namespace SOS.Process.Repositories.Source.Interfaces
         /// <returns></returns>
         Task<HarvestInfo> GetAsync(string id);
 
-        /// <summary>
-        /// Get harvest information 
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<HarvestInfo>> GetAllAsync();
+        
     }
 }

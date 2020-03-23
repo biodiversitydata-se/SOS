@@ -67,14 +67,14 @@ namespace SOS.Observations.Api.Managers
                     ResolveFieldMappedValue(observation.TypeId, FieldMappingFieldId.Type);
                     ResolveFieldMappedValue(observation.AccessRightsId, FieldMappingFieldId.AccessRights);
                     ResolveFieldMappedValue(observation.InstitutionId, FieldMappingFieldId.Institution);
-                    ResolveFieldMappedValue(observation.Location?.CountyId, FieldMappingFieldId.County);
-                    ResolveFieldMappedValue(observation.Location?.MunicipalityId, FieldMappingFieldId.Municipality);
-                    ResolveFieldMappedValue(observation.Location?.ProvinceId, FieldMappingFieldId.Province);
-                    ResolveFieldMappedValue(observation.Location?.ParishId, FieldMappingFieldId.Parish);
-                    ResolveFieldMappedValue(observation.Location?.CountryId, FieldMappingFieldId.Country);
-                    ResolveFieldMappedValue(observation.Location?.ContinentId, FieldMappingFieldId.Continent);
-                    ResolveFieldMappedValue(observation.Occurrence?.EstablishmentMeansId, FieldMappingFieldId.EstablishmentMeans);
-                    ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatusId, FieldMappingFieldId.OccurrenceStatus);
+                    ResolveFieldMappedValue(observation.Location?.County, FieldMappingFieldId.County);
+                    ResolveFieldMappedValue(observation.Location?.Municipality, FieldMappingFieldId.Municipality);
+                    ResolveFieldMappedValue(observation.Location?.Province, FieldMappingFieldId.Province);
+                    ResolveFieldMappedValue(observation.Location?.Parish, FieldMappingFieldId.Parish);
+                    ResolveFieldMappedValue(observation.Location?.Country, FieldMappingFieldId.Country);
+                    ResolveFieldMappedValue(observation.Location?.Continent, FieldMappingFieldId.Continent);
+                    ResolveFieldMappedValue(observation.Occurrence?.EstablishmentMeans, FieldMappingFieldId.EstablishmentMeans);
+                    ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatus, FieldMappingFieldId.OccurrenceStatus);
                 }
             }
             else // dynamic objects is returned when OutputFields is used
@@ -91,17 +91,17 @@ namespace SOS.Observations.Api.Managers
                         if (obs.TryGetValue(nameof(ProcessedObservation.Location), out object locationObject))
                         {
                             var locationDictionary = locationObject as IDictionary<string, object>;
-                            ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.County, nameof(ProcessedObservation.Location.CountyId));
-                            ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Municipality, nameof(ProcessedObservation.Location.MunicipalityId));
-                            ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Province, nameof(ProcessedObservation.Location.ProvinceId));
-                            ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Parish, nameof(ProcessedObservation.Location.ParishId));
+                            ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.County, nameof(ProcessedObservation.Location.County));
+                            ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Municipality, nameof(ProcessedObservation.Location.Municipality));
+                            ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Province, nameof(ProcessedObservation.Location.Province));
+                            ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Parish, nameof(ProcessedObservation.Location.Parish));
                         }
 
                         if (obs.TryGetValue(nameof(ProcessedObservation.Occurrence), out object occurrenceObject))
                         {
                             var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-                            ResolveFieldMappedValue(occurrenceDictionary, FieldMappingFieldId.EstablishmentMeans, nameof(ProcessedObservation.Occurrence.EstablishmentMeansId));
-                            ResolveFieldMappedValue(occurrenceDictionary, FieldMappingFieldId.OccurrenceStatus, nameof(ProcessedObservation.Occurrence.OccurrenceStatusId));
+                            ResolveFieldMappedValue(occurrenceDictionary, FieldMappingFieldId.EstablishmentMeans, nameof(ProcessedObservation.Occurrence.EstablishmentMeans));
+                            ResolveFieldMappedValue(occurrenceDictionary, FieldMappingFieldId.OccurrenceStatus, nameof(ProcessedObservation.Occurrence.OccurrenceStatus));
                         }
                     }
                 }
@@ -129,12 +129,12 @@ namespace SOS.Observations.Api.Managers
         {
             foreach (var observation in processedObservations)
             {
-                TranslateLocalizedValue(observation.Occurrence?.ActivityId, FieldMappingFieldId.Activity, cultureCode);
-                TranslateLocalizedValue(observation.Occurrence?.GenderId, FieldMappingFieldId.Gender, cultureCode);
-                TranslateLocalizedValue(observation.Occurrence?.LifeStageId, FieldMappingFieldId.LifeStage, cultureCode);
-                TranslateLocalizedValue(observation.Occurrence?.OrganismQuantityUnitId, FieldMappingFieldId.Unit, cultureCode);
-                TranslateLocalizedValue(observation.Event?.BiotopeId, FieldMappingFieldId.Biotope, cultureCode);
-                TranslateLocalizedValue(observation.Event?.SubstrateId, FieldMappingFieldId.Substrate, cultureCode);
+                TranslateLocalizedValue(observation.Occurrence?.Activity, FieldMappingFieldId.Activity, cultureCode);
+                TranslateLocalizedValue(observation.Occurrence?.Gender, FieldMappingFieldId.Gender, cultureCode);
+                TranslateLocalizedValue(observation.Occurrence?.LifeStage, FieldMappingFieldId.LifeStage, cultureCode);
+                TranslateLocalizedValue(observation.Occurrence?.OrganismQuantityUnit, FieldMappingFieldId.Unit, cultureCode);
+                TranslateLocalizedValue(observation.Event?.Biotope, FieldMappingFieldId.Biotope, cultureCode);
+                TranslateLocalizedValue(observation.Event?.Substrate, FieldMappingFieldId.Substrate, cultureCode);
                 TranslateLocalizedValue(observation.Identification?.ValidationStatusId, FieldMappingFieldId.ValidationStatus, cultureCode);
             }
         }
@@ -153,17 +153,17 @@ namespace SOS.Observations.Api.Managers
                         if (obs.TryGetValue(nameof(ProcessedObservation.Occurrence), out object occurrenceObject))
                         {
                             var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-                            TranslateLocalizedValue(occurrenceDictionary, FieldMappingFieldId.Activity, nameof(ProcessedObservation.Occurrence.ActivityId), cultureCode);
-                            TranslateLocalizedValue(occurrenceDictionary, FieldMappingFieldId.Gender, nameof(ProcessedObservation.Occurrence.GenderId), cultureCode);
-                            TranslateLocalizedValue(occurrenceDictionary, FieldMappingFieldId.LifeStage, nameof(ProcessedObservation.Occurrence.LifeStageId), cultureCode);
-                            TranslateLocalizedValue(occurrenceDictionary, FieldMappingFieldId.Unit, nameof(ProcessedObservation.Occurrence.OrganismQuantityUnitId), cultureCode);
+                            TranslateLocalizedValue(occurrenceDictionary, FieldMappingFieldId.Activity, nameof(ProcessedObservation.Occurrence.Activity), cultureCode);
+                            TranslateLocalizedValue(occurrenceDictionary, FieldMappingFieldId.Gender, nameof(ProcessedObservation.Occurrence.Gender), cultureCode);
+                            TranslateLocalizedValue(occurrenceDictionary, FieldMappingFieldId.LifeStage, nameof(ProcessedObservation.Occurrence.LifeStage), cultureCode);
+                            TranslateLocalizedValue(occurrenceDictionary, FieldMappingFieldId.Unit, nameof(ProcessedObservation.Occurrence.OrganismQuantityUnit), cultureCode);
                         }
 
                         if (obs.TryGetValue(nameof(ProcessedObservation.Event), out object eventObject))
                         {
                             var eventDictionary = eventObject as IDictionary<string, object>;
-                            TranslateLocalizedValue(eventDictionary, FieldMappingFieldId.Biotope, nameof(ProcessedObservation.Event.BiotopeId), cultureCode);
-                            TranslateLocalizedValue(eventDictionary, FieldMappingFieldId.Substrate, nameof(ProcessedObservation.Event.SubstrateId), cultureCode);
+                            TranslateLocalizedValue(eventDictionary, FieldMappingFieldId.Biotope, nameof(ProcessedObservation.Event.Biotope), cultureCode);
+                            TranslateLocalizedValue(eventDictionary, FieldMappingFieldId.Substrate, nameof(ProcessedObservation.Event.Substrate), cultureCode);
                         }
 
                         if (obs.TryGetValue(nameof(ProcessedObservation.Identification), out object identificationObject))

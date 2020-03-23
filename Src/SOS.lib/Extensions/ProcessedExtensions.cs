@@ -19,7 +19,7 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
-            var biotope = source.BiotopeId?.Value;
+            var biotope = source.Biotope?.Value;
             return new DarwinCoreEvent
             {
                 EventDate = $"{source.StartDate?.ToString("s")}Z" ?? "",
@@ -68,12 +68,12 @@ namespace SOS.Lib.Extensions
             // todo - initialize the Value property for field mapped types.
             return new DarwinCoreLocation
             {
-                Continent = source.ContinentId?.Value,
+                Continent = source.Continent?.Value,
                 CoordinatePrecision = source.CoordinatePrecision?.ToString(),
                 CoordinateUncertaintyInMeters = source.CoordinateUncertaintyInMeters,
-                Country = source.CountryId?.Value,
+                Country = source.Country?.Value,
                 CountryCode = source.CountryCode,
-                County = source.CountyId?.Value,
+                County = source.County?.Value,
                 DecimalLatitude = source.DecimalLatitude,
                 DecimalLongitude = source.DecimalLongitude,
                 FootprintSRS = source.FootprintSRS,
@@ -100,9 +100,9 @@ namespace SOS.Lib.Extensions
                 MinimumDepthInMeters = source.MinimumDepthInMeters?.ToString(),
                 MinimumDistanceAboveSurfaceInMeters = source.MinimumDistanceAboveSurfaceInMeters?.ToString(),
                 MinimumElevationInMeters = source.MinimumElevationInMeters?.ToString(),
-                Municipality = source.MunicipalityId?.Value,
+                Municipality = source.Municipality?.Value,
                 PointRadiusSpatialFit = source.PointRadiusSpatialFit,
-                StateProvince = source.ProvinceId?.Value,
+                StateProvince = source.Province?.Value,
                 VerbatimCoordinates = null,
                 VerbatimCoordinateSystem = source.VerbatimCoordinateSystem,
                 VerbatimDepth = source.VerbatimDepth?.ToString(),
@@ -131,22 +131,22 @@ namespace SOS.Lib.Extensions
                 AssociatedReferences = source.AssociatedReferences,
                 AssociatedSequences = source.AssociatedSequences,
                 AssociatedTaxa = source.AssociatedTaxa,
-                Behavior = source.ActivityId?.Value,
+                Behavior = source.Activity?.Value,
                 CatalogNumber = source.CatalogNumber,
                 Disposition = source.Disposition,
-                EstablishmentMeans = source.EstablishmentMeansId?.Value,
+                EstablishmentMeans = source.EstablishmentMeans?.Value,
                 IndividualCount = source.IndividualCount,
                 IndividualID = source.IndividualID,
-                LifeStage = source.LifeStageId?.Value,
+                LifeStage = source.LifeStage?.Value,
                 OccurrenceID = source.Id,
                 OccurrenceRemarks = source.Remarks,
-                OccurrenceStatus = source.OccurrenceStatusId?.Value,
+                OccurrenceStatus = source.OccurrenceStatus?.Value,
                 OrganismQuantity = source.OrganismQuantity?.ToString(),
-                OrganismQuantityType = source.OrganismQuantity.HasValue ? source.OrganismQuantityUnitId?.Value ?? "Individuals" : null,
+                OrganismQuantityType = source.OrganismQuantity.HasValue ? source.OrganismQuantityUnit?.Value ?? "Individuals" : null,
                 OtherCatalogNumbers = source.OtherCatalogNumbers,
                 RecordedBy = source.RecordedBy,
-                ReproductiveCondition = source.ActivityId?.Value,
-                Sex = source.GenderId?.Value
+                ReproductiveCondition = source.Activity?.Value,
+                Sex = source.Gender?.Value
             };
         }
         #endregion Occurrence
