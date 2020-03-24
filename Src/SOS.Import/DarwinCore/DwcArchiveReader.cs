@@ -81,6 +81,34 @@ namespace SOS.Import.DarwinCore
             }
         }
 
+        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatches(string archivePath, int batchSize)
+        {
+            using var archiveReader = new ArchiveReader(archivePath);
+            var filename = System.IO.Path.GetFileName(archivePath);
+            IAsyncFileReader occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Occurrence);
+            List<DwcObservationVerbatim> occurrenceRecords = new List<DwcObservationVerbatim>();
+            bool dwcIndexSpecified = occurrenceFileReader.FileMetaData.Id.IndexSpecified;
+
+            await foreach (IRow row in occurrenceFileReader.GetDataRowsAsync())
+            {
+                if (dwcIndexSpecified)
+                {
+                    var id = row[occurrenceFileReader.FileMetaData.Id.Index]; // todo - should we use the id in some way?
+                }
+                
+                var verbatimObservation = DwcObservationVerbatimFactory.Create(row, filename);
+                occurrenceRecords.Add(verbatimObservation);
+
+                if (occurrenceRecords.Count % batchSize == 0)
+                {
+                    yield return occurrenceRecords;
+                    occurrenceRecords.Clear();
+                }
+            }
+
+            yield return occurrenceRecords;
+        }
+
         public bool TryValidateDwcACoreFile(string archivePath, out long nrRows, out string message)
         {
             nrRows = 0;
@@ -111,5 +139,6 @@ namespace SOS.Import.DarwinCore
 
             return true;
         }
+
     }
 }

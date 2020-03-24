@@ -16,24 +16,30 @@ using Xunit;
 
 namespace SOS.Import.IntegrationTests.DarwinCore
 {
-    public class DwcArchiveReaderIntegrationTests
+    public class DwcArchiveReaderBatchIntegrationTests
     {
         private const string PsophusStridulusArchivePath = "./resources/dwca/dwca-occurrence-lifewatch-psophus-stridulus.zip";
         private const string DwcArchiveWithEmofExtension = "./resources/dwca/dwca-occurrence-emof-lifewatch.zip";
         private const string SamplingEventDwcArchiveWithMofExtension = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
 
         [Fact]
-        public async Task Read_psophus_stridulus_occurrence_dwc_archive_observations()
+        public async Task Read_psophus_stridulus_occurrence_dwc_archive_observations_in_batches()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            const int batchSize = 1000;
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observations = await dwcArchiveReader.ReadArchiveAsync(PsophusStridulusArchivePath);
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatches(PsophusStridulusArchivePath, batchSize);
+            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
+            await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
+            {
+                observations.AddRange(verbatimObservationsBatch);
+            }
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -46,17 +52,23 @@ namespace SOS.Import.IntegrationTests.DarwinCore
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task Read_occurrence_dwc_archive_with_emof_extension()
+        public async Task Read_occurrence_dwc_archive_with_emof_extension_in_batches()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            const int batchSize = 1000;
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observations = await dwcArchiveReader.ReadArchiveAsync(DwcArchiveWithEmofExtension);
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatches(DwcArchiveWithEmofExtension, batchSize);
+            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
+            await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
+            {
+                observations.AddRange(verbatimObservationsBatch);
+            }
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -72,22 +84,62 @@ namespace SOS.Import.IntegrationTests.DarwinCore
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task Read_sampling_event_dwc_archive_with_mof_extension()
+        public async Task Read_sampling_event_dwc_archive_with_mof_extension_in_batches()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            const int batchSize = 10000;
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observations = await dwcArchiveReader.ReadArchiveAsync(SamplingEventDwcArchiveWithMofExtension);
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatches(SamplingEventDwcArchiveWithMofExtension, batchSize);
+            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
+            await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
+            {
+                observations.AddRange(verbatimObservationsBatch);
+            }
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             observations.Count.Should().Be(105872);
+        }
+
+        /// <summary>
+        /// This test uses the following DwC-A: http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds&v=19.3
+        /// containing 6,706,047 records.
+        /// Reading all observations and storing them in RAM will use more than 10GB, so reading in batches is necessary.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task Read_local_large_occurrence_dwc_archive_observations_in_batches()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            const string ringedBirdsDwcArchive = @"C:\DwC-A\SOS dev\dwca-nrm-ringedbirds-v19.3.zip";
+            const int batchSize = 50000;
+            const int totalNrObservationsToRead = 250000;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatches(ringedBirdsDwcArchive, batchSize);
+            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
+            await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
+            {
+                observations.AddRange(verbatimObservationsBatch);
+                if (observations.Count >= totalNrObservationsToRead) break;
+            }
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            observations.Count.Should().Be(totalNrObservationsToRead);
         }
     }
 }

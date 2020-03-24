@@ -9,5 +9,6 @@ namespace SOS.Import.DarwinCore.Interfaces
     public interface IDwcArchiveReader
     {
         Task<List<DwcObservationVerbatim>> ReadArchiveAsync(string archivePath);
+        IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatches(string archivePath, int batchSize);
     }
 }
