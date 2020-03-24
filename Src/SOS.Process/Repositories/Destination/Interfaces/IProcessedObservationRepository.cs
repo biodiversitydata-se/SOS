@@ -23,7 +23,7 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// </summary>
         /// <param name="provider"></param>
         /// <returns></returns>
-        Task<bool> CopyProviderDataAsync(DataProvider provider);
+        Task<bool> CopyProviderDataAsync(ObservationProvider provider);
 
         /// <summary>
         /// Create search index
@@ -36,7 +36,7 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// </summary>
         /// <param name="provider"></param>
         /// <returns></returns>
-        Task<bool> DeleteProviderDataAsync(DataProvider provider);
+        Task<bool> DeleteProviderDataAsync(ObservationProvider provider);
 
         /// <summary>
         /// Drop current indexes

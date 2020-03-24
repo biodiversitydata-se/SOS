@@ -5,8 +5,8 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
@@ -17,7 +17,7 @@ namespace SOS.Process.Processors
         protected readonly IProcessedObservationRepository ProcessRepository;
         protected readonly ILogger<TEntity> Logger;
         protected readonly IFieldMappingResolverHelper FieldMappingResolverHelper;
-        public abstract DataProvider DataProvider { get; }
+        public abstract ObservationProvider DataProvider { get; }
 
         protected ObservationProcessorBase(
             IProcessedObservationRepository processedObservationRepository,
@@ -29,7 +29,7 @@ namespace SOS.Process.Processors
             FieldMappingResolverHelper = fieldMappingResolverHelper ?? throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
         }
 
-        public virtual async Task<RunInfo> ProcessAsync(
+        public virtual async Task<ProcessingStatus> ProcessAsync(
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
@@ -41,7 +41,7 @@ namespace SOS.Process.Processors
                 if (!await ProcessRepository.DeleteProviderDataAsync(DataProvider))
                 {
                     Logger.LogError($"Failed to delete {DataProvider} data");
-                    return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
+                    return ProcessingStatus.Failed(DataProvider, startTime, DateTime.Now);
                 }
                 Logger.LogDebug($"Finish deleting {DataProvider} data");
 
@@ -49,17 +49,17 @@ namespace SOS.Process.Processors
                 var verbatimCount = await ProcessObservations(taxa, cancellationToken);
                 Logger.LogDebug($"Finish processing {DataProvider} data.");
 
-                return RunInfo.Success(DataProvider, startTime, DateTime.Now, verbatimCount);
+                return ProcessingStatus.Success(DataProvider, startTime, DateTime.Now, verbatimCount);
             }
             catch (JobAbortedException)
             {
                 Logger.LogInformation($"{DataProvider} observation processing was canceled.");
-                return RunInfo.Cancelled(DataProvider, startTime, DateTime.Now);
+                return ProcessingStatus.Cancelled(DataProvider, startTime, DateTime.Now);
             }
             catch (Exception e)
             {
                 Logger.LogError(e, $"Failed to process {DataProvider} sightings");
-                return RunInfo.Failed(DataProvider, startTime, DateTime.Now);
+                return ProcessingStatus.Failed(DataProvider, startTime, DateTime.Now);
             }
         }
 

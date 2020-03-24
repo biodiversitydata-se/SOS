@@ -28,7 +28,7 @@ namespace SOS.Process.Managers
         }
 
         /// <inheritdoc />
-        public async Task<bool> CopyProviderDataAsync(DataProvider provider)
+        public async Task<bool> CopyProviderDataAsync(ObservationProvider provider)
         {
             try
             {

@@ -9,7 +9,7 @@ namespace SOS.Observations.Api.Repositories
     /// <summary>
     /// Process information repository
     /// </summary>
-    public class ProcessInfoRepository : ProcessBaseRepository<ProcessInfo, byte>, IProcessInfoRepository
+    public class ProcessInfoRepository : ProcessBaseRepository<ProcessInfo, string>, IProcessInfoRepository
     {
         /// <summary>
         /// Constructor
@@ -25,8 +25,7 @@ namespace SOS.Observations.Api.Repositories
         /// <inheritdoc />
         public async Task<ProcessInfo> GetProcessInfoAsync(bool current)
         {
-            var instance = (byte)(current ? ActiveInstance : ActiveInstance == 0 ? 1 : 0);
-            return await GetAsync(instance);
+            return await GetAsync(current ? CollectionName : InactiveCollectionName);
         }
     }
 }

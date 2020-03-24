@@ -1,11 +1,10 @@
 ﻿using System;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Verbatim.Shared
 {
-    public class HarvestInfo : RunInfo, IEntity<string>
+    public class HarvestInfo : IEntity<string>
     {
         /// <summary>
         /// Constructor
@@ -13,15 +12,41 @@ namespace SOS.Lib.Models.Verbatim.Shared
         /// <param name="id"></param>
         /// <param name="provider"></param>
         /// <param name="start"></param>
-        public HarvestInfo(string id, DataProvider provider, DateTime start) : base(provider)
+        public HarvestInfo(string id, DataSet provider, DateTime start)
         {
+            DataProvider = provider;
             Id = id;
             Start = start;
         }
 
         /// <summary>
+        /// Number of items
+        /// </summary>
+        public int Count { get; set; }
+
+        /// <summary>
+        /// Id of data provider
+        /// </summary>
+        public DataSet DataProvider { get; }
+
+        /// <summary>
+        /// Harvest end date and time
+        /// </summary>
+        public DateTime End { get; set; }
+
+        /// <summary>
         /// Id of data set
         /// </summary>
         public string Id { get; set; }
+
+        /// <summary>
+        /// Harvest start date and time
+        /// </summary>
+        public DateTime Start { get; set; }
+
+        /// <summary>
+        /// Running status
+        /// </summary>
+        public RunStatus Status { get; set; }
     }
 }

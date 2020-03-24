@@ -29,7 +29,7 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(DataProvider provider)
+        public async Task<bool> RunAsync(ObservationProvider provider)
         {
             try
             {

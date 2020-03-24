@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -20,8 +19,6 @@ namespace SOS.Process.Repositories.Destination
     /// </summary>
     public class ProcessedAreaRepository : ProcessBaseRepository<Area, int>, IProcessedAreaRepository
     {
-        private new IMongoCollection<Area> MongoCollection => Database.GetCollection<Area>(_collectionName);
-
         /// <summary>
         /// Constructor.
         /// </summary>

@@ -6,7 +6,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
     /// <summary>
     /// 
     /// </summary>
-    public interface IProcessInfoRepository : IBaseRepository<ProcessInfo, byte>
+    public interface IProcessInfoRepository : IBaseRepository<ProcessInfo, string>
     {
         /// <summary>
         /// Get process information

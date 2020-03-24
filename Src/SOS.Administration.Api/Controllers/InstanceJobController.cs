@@ -30,7 +30,7 @@ namespace SOS.Administration.Api.Controllers
         [HttpPost("Copy")]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult RunCopyProviderData(DataProvider provider)
+        public IActionResult RunCopyProviderData(ObservationProvider provider)
         {
             try
             {

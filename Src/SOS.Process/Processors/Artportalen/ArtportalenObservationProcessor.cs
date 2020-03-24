@@ -23,7 +23,7 @@ namespace SOS.Process.Processors.Artportalen
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly SemaphoreSlim _semaphore;
-        public override DataProvider DataProvider => DataProvider.Artportalen;
+        public override ObservationProvider DataProvider => ObservationProvider.Artportalen;
 
         /// <summary>
         /// Constructor

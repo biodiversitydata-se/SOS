@@ -7,9 +7,9 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
+using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
@@ -293,20 +293,14 @@ namespace SOS.Process.UnitTests.Jobs
 
             _darwinCoreRepository.Setup(r => r.VerifyCollectionAsync());
 
-            _harvestInfoRepository.Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new []
-                {
-                    new HarvestInfo("0", DataProvider.Artportalen, DateTime.Now)
-                });
-
             _artportalenProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(RunInfo.Success(DataProvider.Artportalen, DateTime.Now, DateTime.Now, 1));
+                .ReturnsAsync(ProcessingStatus.Success(ObservationProvider.Artportalen, DateTime.Now, DateTime.Now, 1));
 
             _clamPortalProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(RunInfo.Success(DataProvider.ClamPortal, DateTime.Now, DateTime.Now, 1));
+                .ReturnsAsync(ProcessingStatus.Success(ObservationProvider.ClamPortal, DateTime.Now, DateTime.Now, 1));
 
             _kulProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(RunInfo.Success(DataProvider.KUL, DateTime.Now, DateTime.Now, 1));
+                .ReturnsAsync(ProcessingStatus.Success(ObservationProvider.KUL, DateTime.Now, DateTime.Now, 1));
 
             _darwinCoreRepository.Setup(r => r.DropIndexAsync());
             _darwinCoreRepository.Setup(r => r.CreateIndexAsync());
@@ -315,8 +309,8 @@ namespace SOS.Process.UnitTests.Jobs
 
             _processInfoRepository.Setup(r => r.VerifyCollectionAsync());
 
-            _processInfoRepository.Setup(r => r.GetAsync(It.IsAny<byte>()))
-                .ReturnsAsync(new ProcessInfo(It.IsAny<byte>()));
+            _processInfoRepository.Setup(r => r.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new ProcessInfo(It.IsAny<string>(), It.IsAny<DateTime>()));
 
             _processInfoRepository.Setup(r => r.AddOrUpdateAsync(It.IsAny<ProcessInfo>()))
                 .ReturnsAsync(true);
@@ -339,7 +333,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _areaHelper.Object,
                 _loggerMock.Object);
 
-            var sources = (byte) DataProvider.Artportalen + (byte) DataProvider.ClamPortal + (byte) DataProvider.KUL;
+            var sources = (byte) ObservationProvider.Artportalen + (byte)ObservationProvider.ClamPortal + (byte)ObservationProvider.KUL;
             var result = await job.RunAsync(sources, false, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert

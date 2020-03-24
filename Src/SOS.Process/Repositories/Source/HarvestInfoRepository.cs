@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database.Interfaces;
 
@@ -23,13 +22,12 @@ namespace SOS.Process.Repositories.Source
             
         }
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<HarvestInfo>> GetAllAsync()
+        public async Task<HarvestInfo> GetAsync(string id)
         {
             try
             {
-                var searchFilter = Builders<HarvestInfo>.Filter.Empty;
-                return await MongoCollection.FindSync(Builders<HarvestInfo>.Filter.Empty).ToListAsync();
+                var searchFilter = Builders<HarvestInfo>.Filter.Eq("_id", id);
+                return await MongoCollection.FindSync(searchFilter).FirstOrDefaultAsync();
             }
             catch (Exception e)
             {

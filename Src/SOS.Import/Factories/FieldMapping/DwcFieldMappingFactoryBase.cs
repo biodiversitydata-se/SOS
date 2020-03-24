@@ -18,16 +18,18 @@ namespace SOS.Import.Factories.FieldMapping
         {
             var fieldMappingValues = GetFieldMappingValues();
 
-            Lib.Models.Shared.FieldMapping fieldMapping = new Lib.Models.Shared.FieldMapping
-            {
-                Id = FieldId,
-                Name = FieldId.ToString(),
-                Localized = Localized,
-                Values = fieldMappingValues,
-                ExternalSystemsMapping = GetExternalSystemMappings(fieldMappingValues)
-            };
+           return await Task.Run(() => {
+                Lib.Models.Shared.FieldMapping fieldMapping = new Lib.Models.Shared.FieldMapping
+                {
+                    Id = FieldId,
+                    Name = FieldId.ToString(),
+                    Localized = Localized,
+                    Values = fieldMappingValues,
+                    ExternalSystemsMapping = GetExternalSystemMappings(fieldMappingValues)
+                };
 
-            return fieldMapping;
+                return fieldMapping;
+            });
         }
 
         protected virtual List<ExternalSystemMapping> GetExternalSystemMappings(ICollection<FieldMappingValue> fieldMappingValues)

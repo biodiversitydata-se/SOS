@@ -47,10 +47,10 @@ namespace SOS.Process.Processors.Kul
 
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
 
-            var obs = new ProcessedObservation(DataProvider.KUL)
+            var obs = new ProcessedObservation(ObservationProvider.KUL)
             {
                 BasisOfRecordId = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProvider.KUL.ToString()}",
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ObservationProvider.KUL.ToString()}",
                 DatasetName = "KUL",
                 Event = new ProcessedEvent
                 {
@@ -71,8 +71,8 @@ namespace SOS.Process.Processors.Kul
                     DecimalLatitude = verbatim.DecimalLatitude,
                     DecimalLongitude = verbatim.DecimalLongitude,
                     GeodeticDatum = GeodeticDatum.Wgs84,
-                    ContinentId = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
-                    CountryId = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
+                    Continent = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
+                    Country = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
                     Locality = verbatim.Locality,
                     Point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry(),
                     PointWithBuffer = wgs84Point?.ToSquare(verbatim.CoordinateUncertaintyInMeters)?.ToGeoJsonGeometry(),
@@ -90,7 +90,7 @@ namespace SOS.Process.Processors.Kul
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
                     RecordedBy = verbatim.RecordedBy,
-                    OccurrenceStatusId = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
+                    OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
                 },
                 OwnerInstitutionCode = verbatim.Owner,
                 ProtectionLevel = GetProtectionLevel(),

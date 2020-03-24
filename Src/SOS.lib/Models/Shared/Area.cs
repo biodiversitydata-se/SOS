@@ -1,10 +1,9 @@
 ﻿using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Shared
 {
-    public class Area : AreaBase, IEntity<int>
+    public class Area : AreaBase
     {
         /// <summary>
         /// Constructor

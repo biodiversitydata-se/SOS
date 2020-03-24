@@ -11,6 +11,21 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     public interface IProcessBaseRepository<TEntity, in TKey> : IDisposable where TEntity : IEntity<TKey>
     {
         /// <summary>
+        /// Get 0 or 1 depending of witch instance to update
+        /// </summary>
+        byte ActiveInstance { get; }
+
+        /// <summary>
+        /// Name of active collection
+        /// </summary>
+        string ActiveCollectionName { get; }
+
+        /// <summary>
+        /// Name of in active collection
+        /// </summary>
+        string InActiveCollectionName { get; }
+
+        /// <summary>
         /// Add one item
         /// </summary>
         /// <param name="item"></param>
@@ -61,7 +76,7 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// <summary>
         /// Get 0 or 1 depending of witch instance to update
         /// </summary>
-        byte InstanceToUpdate { get; }
+        byte InActiveInstance { get; }
 
         /// <summary>
         /// Set active instance

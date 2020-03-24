@@ -22,6 +22,7 @@ namespace SOS.Observations.Api.Repositories
         protected readonly ILogger<ProcessBaseRepository<TEntity, TKey>> Logger;
 
         private readonly IProcessClient _client;
+        private readonly bool _multipleInstances;
         /// <summary>
         /// Mongo db
         /// </summary>
@@ -31,13 +32,26 @@ namespace SOS.Observations.Api.Repositories
         /// Batch size.
         /// </summary>
         protected int BatchSize { get; }
-        
+
+        /// <summary>
+        /// Get collection name
+        /// </summary>
+        protected string CollectionName => _multipleInstances
+            ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{ActiveInstance}"
+            : typeof(TEntity).Name.UntilNonAlfanumeric();
+
+        /// <summary>
+        /// If multiple instances is supported, return inactive instance name
+        /// </summary>
+        protected string InactiveCollectionName => _multipleInstances
+            ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{ (ActiveInstance == 0 ? 1 : 0) }"
+            : typeof(TEntity).Name.UntilNonAlfanumeric();
+
         /// <summary>
         /// Disposed
         /// </summary>
         private bool _disposed;
 
-        private readonly string _collectionName;
         private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
 
         /// <summary>
@@ -53,10 +67,11 @@ namespace SOS.Observations.Api.Repositories
         )
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
+            _multipleInstances = multipleInstances;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             BatchSize = _client.BatchSize;
             Database = _client.GetDatabase();
-            _collectionName = multipleInstances ? $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ ActiveInstance }" : typeof(TEntity).Name.UntilNonAlfanumeric();
+            
         }
 
         /// <summary>
@@ -89,7 +104,7 @@ namespace SOS.Observations.Api.Repositories
         /// Get client
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName);
+        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(CollectionName);
 
         /// <summary>
         /// Configuration collection

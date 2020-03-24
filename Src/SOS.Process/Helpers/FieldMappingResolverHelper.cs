@@ -57,21 +57,21 @@ namespace SOS.Process.Helpers
                 ResolveFieldMappedValue(observation.TypeId, valueMappingDictionaries[FieldMappingFieldId.Type]);
                 ResolveFieldMappedValue(observation.AccessRightsId, valueMappingDictionaries[FieldMappingFieldId.AccessRights]);
                 ResolveFieldMappedValue(observation.InstitutionId, valueMappingDictionaries[FieldMappingFieldId.Institution]);
-                ResolveFieldMappedValue(observation.Location?.CountyId, valueMappingDictionaries[FieldMappingFieldId.County]);
-                ResolveFieldMappedValue(observation.Location?.MunicipalityId, valueMappingDictionaries[FieldMappingFieldId.Municipality]);
-                ResolveFieldMappedValue(observation.Location?.ParishId, valueMappingDictionaries[FieldMappingFieldId.Parish]);
-                ResolveFieldMappedValue(observation.Location?.ProvinceId, valueMappingDictionaries[FieldMappingFieldId.Province]);
-                ResolveFieldMappedValue(observation.Location?.CountryId, valueMappingDictionaries[FieldMappingFieldId.Country]);
-                ResolveFieldMappedValue(observation.Location?.ContinentId, valueMappingDictionaries[FieldMappingFieldId.Continent]);
-                ResolveFieldMappedValue(observation.Event?.BiotopeId, valueMappingDictionaries[FieldMappingFieldId.Biotope]);
-                ResolveFieldMappedValue(observation.Event?.SubstrateId, valueMappingDictionaries[FieldMappingFieldId.Substrate]);
+                ResolveFieldMappedValue(observation.Location?.County, valueMappingDictionaries[FieldMappingFieldId.County]);
+                ResolveFieldMappedValue(observation.Location?.Municipality, valueMappingDictionaries[FieldMappingFieldId.Municipality]);
+                ResolveFieldMappedValue(observation.Location?.Parish, valueMappingDictionaries[FieldMappingFieldId.Parish]);
+                ResolveFieldMappedValue(observation.Location?.Province, valueMappingDictionaries[FieldMappingFieldId.Province]);
+                ResolveFieldMappedValue(observation.Location?.Country, valueMappingDictionaries[FieldMappingFieldId.Country]);
+                ResolveFieldMappedValue(observation.Location?.Continent, valueMappingDictionaries[FieldMappingFieldId.Continent]);
+                ResolveFieldMappedValue(observation.Event?.Biotope, valueMappingDictionaries[FieldMappingFieldId.Biotope]);
+                ResolveFieldMappedValue(observation.Event?.Substrate, valueMappingDictionaries[FieldMappingFieldId.Substrate]);
                 ResolveFieldMappedValue(observation.Identification?.ValidationStatusId, valueMappingDictionaries[FieldMappingFieldId.ValidationStatus]);
-                ResolveFieldMappedValue(observation.Occurrence?.LifeStageId, valueMappingDictionaries[FieldMappingFieldId.LifeStage]);
-                ResolveFieldMappedValue(observation.Occurrence?.ActivityId, valueMappingDictionaries[FieldMappingFieldId.Activity]);
-                ResolveFieldMappedValue(observation.Occurrence?.GenderId, valueMappingDictionaries[FieldMappingFieldId.Gender]);
-                ResolveFieldMappedValue(observation.Occurrence?.OrganismQuantityUnitId, valueMappingDictionaries[FieldMappingFieldId.Unit]);
-                ResolveFieldMappedValue(observation.Occurrence?.EstablishmentMeansId, valueMappingDictionaries[FieldMappingFieldId.EstablishmentMeans]);
-                ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatusId, valueMappingDictionaries[FieldMappingFieldId.OccurrenceStatus]);
+                ResolveFieldMappedValue(observation.Occurrence?.LifeStage, valueMappingDictionaries[FieldMappingFieldId.LifeStage]);
+                ResolveFieldMappedValue(observation.Occurrence?.Activity, valueMappingDictionaries[FieldMappingFieldId.Activity]);
+                ResolveFieldMappedValue(observation.Occurrence?.Gender, valueMappingDictionaries[FieldMappingFieldId.Gender]);
+                ResolveFieldMappedValue(observation.Occurrence?.OrganismQuantityUnit, valueMappingDictionaries[FieldMappingFieldId.Unit]);
+                ResolveFieldMappedValue(observation.Occurrence?.EstablishmentMeans, valueMappingDictionaries[FieldMappingFieldId.EstablishmentMeans]);
+                ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatus, valueMappingDictionaries[FieldMappingFieldId.OccurrenceStatus]);
             }
         }
 

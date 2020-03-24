@@ -8,8 +8,8 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     /// <summary>
     /// Processed data class
     /// </summary>
-    public interface IProcessInfoRepository : IProcessBaseRepository<ProcessInfo, byte>
+    public interface IProcessInfoRepository : IProcessBaseRepository<ProcessInfo, string>
     {
-        Task<bool> CopyProviderDataAsync(DataProvider provider);
+        Task<bool> CopyProviderDataAsync(ObservationProvider provider);
     }
 }

@@ -16,7 +16,12 @@ namespace SOS.Export.Repositories.Interfaces
         /// Get active database instance
         /// </summary>
         byte ActiveInstance { get; }
-        
+
+        /// <summary>
+        /// Get current collection name
+        /// </summary>
+        string CollectionName { get; }
+
         /// <summary>
         /// Get entity
         /// </summary>

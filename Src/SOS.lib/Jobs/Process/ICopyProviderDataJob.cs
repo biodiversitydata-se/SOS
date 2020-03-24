@@ -10,6 +10,6 @@ namespace SOS.Lib.Jobs.Process
         /// </summary>
         /// <param name="provider"></param>
         /// <returns></returns>
-        Task<bool> RunAsync(DataProvider provider);
+        Task<bool> RunAsync(ObservationProvider provider);
     }
 }

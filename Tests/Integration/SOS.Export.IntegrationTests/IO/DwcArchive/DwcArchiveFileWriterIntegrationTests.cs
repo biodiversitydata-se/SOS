@@ -33,7 +33,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var processedObservationRepository = CreateProcessedObservationRepository(exportClient);
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository = new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
-            var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
+            var processInfo = await processInfoRepository.GetAsync(processInfoRepository.CollectionName);
             var filename = FilenameGenerator.CreateFilename("sos_dwc_archive_with_all_data");
             //var filter = new AdvancedFilter();
             var filter = new SearchFilter {TaxonIds = new[] {102951}};
@@ -70,7 +70,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var processedDarwinCoreRepositoryStub = ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources\TenProcessedTestObservations.json");
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository = new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
-            var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstance);
+            var processInfo = await processInfoRepository.GetAsync(processInfoRepository.CollectionName);
             var filename = FilenameGenerator.CreateFilename("sos_dwc_archive_with_ten_observations");
 
             //-----------------------------------------------------------------------------------------------------------

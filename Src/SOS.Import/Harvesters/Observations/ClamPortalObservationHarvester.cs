@@ -43,7 +43,7 @@ namespace SOS.Import.Harvesters.Observations
         /// <returns></returns>
         public async Task<HarvestInfo> HarvestClamsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(ClamObservationVerbatim), DataProvider.ClamPortal, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(ClamObservationVerbatim), DataSet.ClamPortalObservations, DateTime.Now);
             try
             {
                 _logger.LogDebug("Start storing clams verbatim");

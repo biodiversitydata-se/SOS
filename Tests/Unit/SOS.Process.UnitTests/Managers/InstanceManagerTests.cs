@@ -70,13 +70,13 @@ namespace SOS.Process.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<ObservationProvider>()))
                 .ReturnsAsync(true);
 
-            _processedObservationRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedObservationRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<ObservationProvider>()))
                 .ReturnsAsync(true);
             
-            _processInfoRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
+            _processInfoRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<ObservationProvider>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ namespace SOS.Process.UnitTests.Managers
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await instanceManager.CopyProviderDataAsync(DataProvider.Artportalen);
+            var result = await instanceManager.CopyProviderDataAsync(ObservationProvider.Artportalen);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ namespace SOS.Process.UnitTests.Managers
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await instanceManager.CopyProviderDataAsync(DataProvider.Artportalen);
+            var result = await instanceManager.CopyProviderDataAsync(ObservationProvider.Artportalen);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ namespace SOS.Process.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
+            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<ObservationProvider>()))
                 .ThrowsAsync(new Exception("Failed"));
 
             //-----------------------------------------------------------------------------------------------------------
@@ -144,7 +144,7 @@ namespace SOS.Process.UnitTests.Managers
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await instanceManager.CopyProviderDataAsync(DataProvider.Artportalen);
+            var result = await instanceManager.CopyProviderDataAsync(ObservationProvider.Artportalen);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

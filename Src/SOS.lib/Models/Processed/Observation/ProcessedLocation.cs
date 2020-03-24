@@ -18,7 +18,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue ContinentId { get; set; }
+        public ProcessedFieldMapValue Continent { get; set; }
 
         /// <summary>
         /// A decimal representation of the precision of the coordinates
@@ -47,7 +47,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue CountryId { get; set; }
+        public ProcessedFieldMapValue Country { get; set; }
 
         /// <summary>
         /// Special handling of Kalmar/Öland
@@ -72,7 +72,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue CountyId { get; set; }
+        public ProcessedFieldMapValue County { get; set; }
 
         /// <summary>
         /// Darwin Core term name: municipality.
@@ -83,7 +83,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue MunicipalityId { get; set; }
+        public ProcessedFieldMapValue Municipality { get; set; }
         
         /// <summary>
         /// Parish ('socken' in swedish).
@@ -91,7 +91,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue ParishId { get; set; }
+        public ProcessedFieldMapValue Parish { get; set; }
 
         /// <summary>
         /// Darwin Core term name: stateProvince.
@@ -103,7 +103,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue ProvinceId { get; set; }
+        public ProcessedFieldMapValue Province { get; set; }
 
         /// <summary>
         /// Darwin Core term name: decimalLatitude.

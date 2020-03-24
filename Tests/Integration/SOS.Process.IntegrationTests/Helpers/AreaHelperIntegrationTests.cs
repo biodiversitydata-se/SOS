@@ -27,7 +27,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var observations = new List<ProcessedObservation>();
-            var observation = new ProcessedObservation(DataProvider.Artportalen)
+            var observation = new ProcessedObservation(ObservationProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -46,10 +46,10 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             _fixture.AreaHelper.AddValueDataToGeographicalFields(observation);
-            observation.Location.CountyId.Value.Should().Be("Jönköping");
-            observation.Location.MunicipalityId.Value.Should().Be("Tranås");
-            observation.Location.ProvinceId.Value.Should().Be("Småland");
-            observation.Location.ParishId.Value.Should().Be("Tranås");
+            observation.Location.County.Value.Should().Be("Jönköping");
+            observation.Location.Municipality.Value.Should().Be("Tranås");
+            observation.Location.Province.Value.Should().Be("Småland");
+            observation.Location.Parish.Value.Should().Be("Tranås");
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var observation = new ProcessedObservation(DataProvider.Artportalen)
+            var observation = new ProcessedObservation(ObservationProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -77,7 +77,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             observation.Location.ProvincePartIdByCoordinate.Should().Be((int)SpecialProvincePartId.Lappland);
-            observation.Location.ProvinceId.Id.Should().Be((int)ProvinceId.TorneLappmark);
+            observation.Location.Province.Id.Should().Be((int)ProvinceId.TorneLappmark);
         }
 
         [Fact]
@@ -88,7 +88,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var observations = new List<ProcessedObservation>();
-            var observation = new ProcessedObservation(DataProvider.Artportalen)
+            var observation = new ProcessedObservation(ObservationProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -107,7 +107,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             observation.Location.CountyPartIdByCoordinate.Should().Be((int)SpecialCountyPartId.Oland);
-            observation.Location.CountyId.Id.Should().Be((int)CountyId.Kalmar);
+            observation.Location.County.Id.Should().Be((int)CountyId.Kalmar);
         }
 
         [Fact]
@@ -118,7 +118,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var observations = new List<ProcessedObservation>();
-            var observation = new ProcessedObservation(DataProvider.Artportalen)
+            var observation = new ProcessedObservation(ObservationProvider.Artportalen)
             {
                 Location = new ProcessedLocation
                 {
@@ -137,7 +137,7 @@ namespace SOS.Process.IntegrationTests.Helpers
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             observation.Location.CountyPartIdByCoordinate.Should().Be((int)SpecialCountyPartId.KalmarFastland);
-            observation.Location.CountyId.Id.Should().Be((int)CountyId.Kalmar);
+            observation.Location.County.Id.Should().Be((int)CountyId.Kalmar);
         }
     }
 }

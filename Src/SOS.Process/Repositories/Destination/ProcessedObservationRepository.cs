@@ -106,7 +106,7 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> CopyProviderDataAsync(DataProvider provider)
+        public async Task<bool> CopyProviderDataAsync(ObservationProvider provider)
         {
             // Get data from active instance
             SetCollectionName(ActiveInstance);
@@ -116,7 +116,7 @@ namespace SOS.Process.Repositories.Destination
                     Builders<ProcessedObservation>.Filter.Eq(dwc => dwc.Provider, provider));
 
             // switch to inactive instance and add data 
-            SetCollectionName(InstanceToUpdate);
+            SetCollectionName(InActiveInstance);
 
             return await AddManyAsync(source.ToEnumerable()) != 0;
         }
@@ -133,19 +133,19 @@ namespace SOS.Process.Repositories.Destination
                 new CreateIndexModel<ProcessedObservation>(
                     Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Identification.Validated)),
                 new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.CountyId.Id)),
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.County.Id)),
                 new CreateIndexModel<ProcessedObservation>(
                     Builders<ProcessedObservation>.IndexKeys.Geo2DSphere(a => a.Location.Point)),
                 new CreateIndexModel<ProcessedObservation>(
                     Builders<ProcessedObservation>.IndexKeys.Geo2DSphere(a => a.Location.PointWithBuffer)),
                 new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.ProvinceId.Id)),
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.Province.Id)),
                 new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.MunicipalityId.Id)),
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.Municipality.Id)),
                 new CreateIndexModel<ProcessedObservation>(
                     Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation)),
                 new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Occurrence.GenderId.Id)),
+                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Occurrence.Gender.Id)),
                 new CreateIndexModel<ProcessedObservation>(
                     Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Provider)),
                 new CreateIndexModel<ProcessedObservation>(
@@ -229,7 +229,7 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteProviderDataAsync(DataProvider provider)
+        public async Task<bool> DeleteProviderDataAsync(ObservationProvider provider)
         {
             try
             {

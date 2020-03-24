@@ -17,7 +17,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Constructor
         /// </summary>
         /// <param name="provider"></param>
-        public ProcessedObservation(DataProvider provider)
+        public ProcessedObservation(ObservationProvider provider)
         {
             Provider = provider;
         }
@@ -207,7 +207,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Internal use. Provider of the data
         /// </summary>
         [JsonIgnore]
-        public DataProvider Provider { get; set; }
+        public ObservationProvider Provider { get; set; }
 
         /// <summary>
         /// A related resource that is referenced, cited,

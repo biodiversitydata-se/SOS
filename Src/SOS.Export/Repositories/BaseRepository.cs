@@ -30,7 +30,8 @@ namespace SOS.Export.Repositories
         /// </summary>
         private bool _disposed;
 
-        private readonly string _collectionName;
+        private readonly bool _toggleable;
+
         private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
 
         /// <summary>
@@ -50,11 +51,11 @@ namespace SOS.Export.Repositories
                 throw new ArgumentNullException(nameof(exportClient));
             }
 
+            _toggleable = toggleable;
+
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Database = exportClient.GetDatabase();
-
-            _collectionName = toggleable ? $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ ActiveInstance }" : $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }";
         }
 
         /// <summary>
@@ -83,11 +84,13 @@ namespace SOS.Export.Repositories
         /// <returns></returns>
         public byte ActiveInstance => GetConfiguration().ActiveInstance;
 
+        public string CollectionName => _toggleable ? $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ ActiveInstance }" : $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }";
+
         /// <summary>
         /// Get client
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName);
+        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(CollectionName);
 
         /// <summary>
         /// Configuration collection

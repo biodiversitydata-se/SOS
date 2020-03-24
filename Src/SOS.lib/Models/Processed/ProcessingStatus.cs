@@ -1,15 +1,15 @@
 ﻿using System;
 using SOS.Lib.Enums;
 
-namespace SOS.Lib.Models.Shared
+namespace SOS.Lib.Models.Processed
 {
-    public class RunInfo 
+    public class ProcessingStatus 
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="provider"></param>
-        protected RunInfo(DataProvider provider)
+        protected ProcessingStatus(ObservationProvider provider)
         {
             DataProvider = provider;
         }
@@ -22,7 +22,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         /// Id of data provider
         /// </summary>
-        public DataProvider DataProvider { get; }
+        public ObservationProvider DataProvider { get; }
 
         /// <summary>
         /// Harvest end date and time
@@ -40,13 +40,13 @@ namespace SOS.Lib.Models.Shared
         public RunStatus Status { get; set; }
 
 
-        public static RunInfo Success(
-            DataProvider dataProvider,
+        public static ProcessingStatus Success(
+            ObservationProvider dataProvider,
             DateTime start,
             DateTime end,
             int count)
         {
-            return new RunInfo(dataProvider)
+            return new ProcessingStatus(dataProvider)
             {
                 Status = RunStatus.Success,
                 Start = start,
@@ -55,12 +55,12 @@ namespace SOS.Lib.Models.Shared
             };
         }
 
-        public static RunInfo Failed(
-            DataProvider dataProvider,
+        public static ProcessingStatus Failed(
+            ObservationProvider dataProvider,
             DateTime start,
             DateTime end)
         {
-            return new RunInfo(dataProvider)
+            return new ProcessingStatus(dataProvider)
             {
                 Status = RunStatus.Failed,
                 Start = start,
@@ -68,12 +68,12 @@ namespace SOS.Lib.Models.Shared
             };
         }
 
-        public static RunInfo Cancelled(
-            DataProvider dataProvider,
+        public static ProcessingStatus Cancelled(
+            ObservationProvider dataProvider,
             DateTime start,
             DateTime end)
         {
-            return new RunInfo(dataProvider)
+            return new ProcessingStatus(dataProvider)
             {
                 Status = RunStatus.Canceled,
                 Start = start,

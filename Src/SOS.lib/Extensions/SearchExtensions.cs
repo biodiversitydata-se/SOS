@@ -20,7 +20,7 @@ namespace SOS.Lib.Extensions
 
             if (filter.CountyIds?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedObservation>.Filter.In(m => m.Location.CountyId.Id, filter.CountyIds));
+                filters.Add(Builders<ProcessedObservation>.Filter.In(m => m.Location.County.Id, filter.CountyIds));
             }
 
             if (filter.GeometryFilter?.IsValid ?? false)
@@ -57,7 +57,7 @@ namespace SOS.Lib.Extensions
             if (filter.MunicipalityIds?.Any() ?? false)
             {
                 filters.Add(
-                    Builders<ProcessedObservation>.Filter.In(m => m.Location.MunicipalityId.Id, filter.MunicipalityIds));
+                    Builders<ProcessedObservation>.Filter.In(m => m.Location.Municipality.Id, filter.MunicipalityIds));
             }
 
             if (filter.PositiveSightings.HasValue)
@@ -67,7 +67,7 @@ namespace SOS.Lib.Extensions
 
             if (filter.ProvinceIds?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedObservation>.Filter.In(m => m.Location.ProvinceId.Id, filter.ProvinceIds));
+                filters.Add(Builders<ProcessedObservation>.Filter.In(m => m.Location.Province.Id, filter.ProvinceIds));
             }
 
             if (filter.RedListCategories?.Any() ?? false)
@@ -77,7 +77,7 @@ namespace SOS.Lib.Extensions
 
             if (filter.GenderIds?.Any() ?? false)
             {
-                filters.Add(Builders<ProcessedObservation>.Filter.In(m => m.Occurrence.GenderId.Id, filter.GenderIds));
+                filters.Add(Builders<ProcessedObservation>.Filter.In(m => m.Occurrence.Gender.Id, filter.GenderIds));
             }
 
             if (filter.StartDate.HasValue)

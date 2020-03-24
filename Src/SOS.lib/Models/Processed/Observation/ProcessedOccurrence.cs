@@ -14,7 +14,7 @@
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue ActivityId { get; set; }
+        public ProcessedFieldMapValue Activity { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of identifiers
@@ -91,7 +91,7 @@
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue EstablishmentMeansId { get; set; }
+        public ProcessedFieldMapValue EstablishmentMeans { get; set; }
 
         /// <summary>
         /// The number of individuals represented present
@@ -148,7 +148,7 @@
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue LifeStageId { get; set; }
+        public ProcessedFieldMapValue LifeStage { get; set; }
 
         /// <summary>
         /// An identifier for the Occurrence (as opposed to a
@@ -208,7 +208,7 @@
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue OrganismQuantityUnitId { get; set; }
+        public ProcessedFieldMapValue OrganismQuantityUnit { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of preparations
@@ -249,7 +249,7 @@
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue GenderId { get; set; }
+        public ProcessedFieldMapValue Gender { get; set; }
 
         /// <summary>
         /// A statement about the presence or absence of a Taxon at a
@@ -260,7 +260,7 @@
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue OccurrenceStatusId { get; set; }
+        public ProcessedFieldMapValue OccurrenceStatus { get; set; }
 
         /// <summary>
         /// URL to occurrence

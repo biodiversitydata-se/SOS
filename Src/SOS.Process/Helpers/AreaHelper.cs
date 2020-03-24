@@ -130,10 +130,10 @@ namespace SOS.Process.Helpers
             }
 
             var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude, processedObservation.Location.DecimalLatitude);
-            processedObservation.Location.CountyId = ProcessedFieldMapValue.Create(positionLocation.County?.Id);
-            processedObservation.Location.MunicipalityId = ProcessedFieldMapValue.Create(positionLocation.Municipality?.Id);
-            processedObservation.Location.ParishId = ProcessedFieldMapValue.Create(positionLocation.Parish?.Id);
-            processedObservation.Location.ProvinceId = ProcessedFieldMapValue.Create(positionLocation.Province?.Id);
+            processedObservation.Location.County = ProcessedFieldMapValue.Create(positionLocation.County?.Id);
+            processedObservation.Location.Municipality = ProcessedFieldMapValue.Create(positionLocation.Municipality?.Id);
+            processedObservation.Location.Parish = ProcessedFieldMapValue.Create(positionLocation.Parish?.Id);
+            processedObservation.Location.Province = ProcessedFieldMapValue.Create(positionLocation.Province?.Id);
             processedObservation.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
             SetCountyPartIdByCoordinate(processedObservation);
             SetProvincePartIdByCoordinate(processedObservation);
@@ -190,7 +190,7 @@ namespace SOS.Process.Helpers
         private static void SetProvincePartIdByCoordinate(ProcessedObservation processedObservation)
         {
             // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
-            processedObservation.Location.ProvincePartIdByCoordinate = processedObservation.Location.ProvinceId?.Id;
+            processedObservation.Location.ProvincePartIdByCoordinate = processedObservation.Location.Province?.Id;
             if (new[]
             {
                 (int) ProvinceId.LuleLappmark,
@@ -198,7 +198,7 @@ namespace SOS.Process.Helpers
                 (int) ProvinceId.PiteLappmark,
                 (int) ProvinceId.TorneLappmark,
                 (int) ProvinceId.AseleLappmark
-            }.Contains(processedObservation.Location.ProvinceId?.Id ?? 0))
+            }.Contains(processedObservation.Location.Province?.Id ?? 0))
             {
                 processedObservation.Location.ProvincePartIdByCoordinate = (int) SpecialProvincePartId.Lappland;
             }
@@ -207,10 +207,10 @@ namespace SOS.Process.Helpers
         private static void SetCountyPartIdByCoordinate(ProcessedObservation processedObservation)
         {
             // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
-            processedObservation.Location.CountyPartIdByCoordinate = processedObservation.Location.CountyId?.Id;
-            if (processedObservation.Location.CountyId?.Id == (int) CountyId.Kalmar)
+            processedObservation.Location.CountyPartIdByCoordinate = processedObservation.Location.County?.Id;
+            if (processedObservation.Location.County?.Id == (int) CountyId.Kalmar)
             {
-                if (processedObservation.Location.ProvinceId?.Id == (int) ProvinceId.Oland)
+                if (processedObservation.Location.Province?.Id == (int) ProvinceId.Oland)
                 {
                     processedObservation.Location.CountyPartIdByCoordinate = (int) SpecialCountyPartId.Oland;
                 }
@@ -249,10 +249,10 @@ namespace SOS.Process.Helpers
 
         public void AddValueDataToGeographicalFields(ProcessedObservation observation)
         {
-            SetValue(observation?.Location?.CountyId, _fieldMappingValueById[FieldMappingFieldId.County]);
-            SetValue(observation?.Location?.MunicipalityId, _fieldMappingValueById[FieldMappingFieldId.Municipality]);
-            SetValue(observation?.Location?.ProvinceId, _fieldMappingValueById[FieldMappingFieldId.Province]);
-            SetValue(observation?.Location?.ParishId, _fieldMappingValueById[FieldMappingFieldId.Parish]);
+            SetValue(observation?.Location?.County, _fieldMappingValueById[FieldMappingFieldId.County]);
+            SetValue(observation?.Location?.Municipality, _fieldMappingValueById[FieldMappingFieldId.Municipality]);
+            SetValue(observation?.Location?.Province, _fieldMappingValueById[FieldMappingFieldId.Province]);
+            SetValue(observation?.Location?.Parish, _fieldMappingValueById[FieldMappingFieldId.Parish]);
         }
 
         private void SetValue(ProcessedFieldMapValue val, IDictionary<int, FieldMappingValue> fieldMappingValueById)

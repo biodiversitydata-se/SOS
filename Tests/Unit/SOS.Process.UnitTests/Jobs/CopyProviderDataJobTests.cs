@@ -59,7 +59,7 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _instanceManagerMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
+            _instanceManagerMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<ObservationProvider>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _instanceManagerMock.Object,
                 _loggerMock.Object);
 
-            var result = await job.RunAsync(It.IsAny<DataProvider>());
+            var result = await job.RunAsync(It.IsAny<ObservationProvider>());
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _instanceManagerMock.Object,
                 _loggerMock.Object);
 
-            var result = await job.RunAsync(It.IsAny<DataProvider>());
+            var result = await job.RunAsync(It.IsAny<ObservationProvider>());
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _instanceManagerMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
+            _instanceManagerMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<ObservationProvider>()))
                 .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -123,7 +123,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _instanceManagerMock.Object,
                 _loggerMock.Object);
 
-            var result = await job.RunAsync(It.IsAny<DataProvider>());
+            var result = await job.RunAsync(It.IsAny<ObservationProvider>());
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
