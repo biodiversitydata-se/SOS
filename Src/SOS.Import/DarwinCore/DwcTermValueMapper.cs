@@ -1,12 +1,11 @@
-﻿using DwC_A.Terms;
-using SOS.Lib.Models.Verbatim.DarwinCore;
+﻿using SOS.Lib.Models.Verbatim.DarwinCore;
 
-namespace SOS.Import.Harvesters.Observations
+namespace SOS.Import.DarwinCore
 {
-    public static class DwcMapper
+    public static class DwcTermValueMapper
     {
         public static void MapValueByTerm(
-            DarwinCoreObservationVerbatim observation,
+            DwcObservationVerbatim observation,
             string term, 
             string val)
         {

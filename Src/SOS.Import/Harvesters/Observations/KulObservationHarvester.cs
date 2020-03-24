@@ -35,10 +35,10 @@ namespace SOS.Import.Harvesters.Observations
             KulServiceConfiguration kulServiceConfiguration,
             ILogger<KulObservationHarvester> logger)
         {
-            _kulObservationService = kulObservationService;
-            _kulObservationVerbatimRepository = kulObservationVerbatimRepository;
-            _kulServiceConfiguration = kulServiceConfiguration;
-            _logger = logger;
+            _kulObservationService = kulObservationService ?? throw new ArgumentNullException(nameof(kulObservationService));
+            _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository)); ;
+            _kulServiceConfiguration = kulServiceConfiguration ?? throw new ArgumentNullException(nameof(kulServiceConfiguration));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         private string GetKulHarvestSettingsInfoString()

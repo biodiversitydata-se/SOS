@@ -3,7 +3,7 @@ using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.DarwinCore
 {
-    public class DarwinCoreObservationVerbatim : IEntity<ObjectId>
+    public class DwcObservationVerbatim : IEntity<ObjectId>
     {
         /// <summary>
         /// MongoDb Id. // todo - should we use another occurrenceID as Id field?

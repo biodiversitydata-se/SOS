@@ -7,7 +7,7 @@ namespace SOS.Import.Repositories.Destination.DarwinCoreArchive.Interfaces
     /// <summary>
     /// 
     /// </summary>
-    public interface IDarwinCoreArchiveVerbatimRepository : IVerbatimRepository<DarwinCoreObservationVerbatim, ObjectId>
+    public interface IDarwinCoreArchiveVerbatimRepository : IVerbatimRepository<DwcObservationVerbatim, ObjectId>
     {
 
     }
