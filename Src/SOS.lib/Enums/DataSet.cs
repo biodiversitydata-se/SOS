@@ -11,5 +11,6 @@
         ArtportalenObservations,
         ClamPortalObservations,
         KULObservations,
+        Dwc
     }
 }

@@ -42,7 +42,7 @@ namespace SOS.Import.Harvesters.Observations
         /// <returns></returns>
         public async Task<HarvestInfo> HarvestObservationsAsync(string archivePath, IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(DwcObservationVerbatim), DataProvider.Dwc, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(DwcObservationVerbatim), DataSet.Dwc, DateTime.Now);
             try
             {
                 _logger.LogDebug("Start storing DwC verbatim");

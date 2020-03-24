@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
+using Org.BouncyCastle.Security;
 using SOS.Import.DarwinCore;
 using SOS.Import.Harvesters.Observations;
 using SOS.Import.MongoDb;
@@ -87,5 +88,34 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             observations.Count.Should().Be(105872);
         }
+
+        /// <summary>
+        /// This test uses the following DwC-A: http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds&v=19.3
+        /// containing 6,706,047 records.
+        ///
+        /// With the current implementation (reading all observations into RAM) the amount of RAM usage is too high > 11GB
+        /// Need to add a new function that reads the observations in batches.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task Read_local_large_occurrence_dwc_archive_observations()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            const string ringedBirdsDwcArchive = @"C:\DwC-A\SOS dev\dwca-nrm-ringedbirds-v19.3.zip";
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observations = await dwcArchiveReader.ReadArchiveAsync(ringedBirdsDwcArchive);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            observations.Should().NotBeNull();
+        }
+
     }
 }
