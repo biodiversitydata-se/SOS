@@ -1,4 +1,6 @@
 ﻿using Autofac;
+using SOS.Import.DarwinCore;
+using SOS.Import.DarwinCore.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Jobs.Import;
 using SOS.Import.Factories;
@@ -59,6 +61,9 @@ namespace SOS.Import.IoC.Modules
                     Configuration.VerbatimDbConfiguration.BatchSize);
                 builder.RegisterInstance(importClient).As<IImportClient>().SingleInstance();
             }
+
+            // Darwin Core
+            builder.RegisterType<DwcArchiveReader>().As<IDwcArchiveReader>().InstancePerLifetimeScope();
 
             // Repositories source
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();

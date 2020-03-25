@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DwC_A.Terms;
 
 namespace DwC_A
 {
@@ -56,7 +57,7 @@ namespace DwC_A
         public ArchiveReader(string archivePath):
             this(archivePath, new DefaultFactory())
         {
-
+            
         }
         /// <summary>
         /// Constructor
@@ -94,6 +95,21 @@ namespace DwC_A
                 extensionFiles.Add(CreateFileReader(extensionFileMetaData));
             }
             Extensions = new FileReaderCollection(extensionFiles);
+        }
+
+        /// <summary>
+        /// Get async file reader for a specific row type.
+        /// </summary>
+        /// <param name="rowType"></param>
+        /// <returns></returns>
+        public IAsyncFileReader GetAsyncFileReader(string rowType)
+        {
+            if (MetaData.Core.RowType == rowType)
+            {
+                return GetAsyncCoreFile(); 
+            }
+
+            return Extensions.GetAsyncFileReadersByRowType(rowType).FirstOrDefault();
         }
 
         private IFileReaderAggregate CreateFileReader(IFileMetaData fileMetaData)

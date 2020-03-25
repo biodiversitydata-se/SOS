@@ -8,7 +8,7 @@ namespace SOS.Import.Repositories.Destination.DarwinCoreArchive
     /// <summary>
     /// Clam verbatim repository
     /// </summary>
-    public class DarwinCoreArchiveVerbatimRepository : VerbatimDbConfiguration<DarwinCoreObservationVerbatim, ObjectId>, Interfaces.IDarwinCoreArchiveVerbatimRepository
+    public class DarwinCoreArchiveVerbatimRepository : VerbatimDbConfiguration<DwcObservationVerbatim, ObjectId>, Interfaces.IDarwinCoreArchiveVerbatimRepository
     {
         /// <summary>
         /// Constructor

@@ -3,12 +3,14 @@ using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.DarwinCore
 {
-    public class DarwinCoreObservationVerbatim : IEntity<ObjectId>
+    public class DwcObservationVerbatim : IEntity<ObjectId>
     {
         /// <summary>
         /// MongoDb Id. // todo - should we use another occurrenceID as Id field?
         /// </summary>
         public ObjectId Id { get; set; }
+
+        public string DwcArchiveFilename { get; set; }
 
         #region RecordLevel
         /// <summary>
@@ -995,7 +997,7 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// specific to the data set.
         /// This property is currently not used.
         /// </summary>
-        public string LocationId { get; set; }
+        public string LocationID { get; set; }
 
         /// <summary>
         /// Darwin Core term name: locationRemarks.
@@ -1941,6 +1943,11 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// such as a taxon, taxon concept, or taxon name use.
         /// </summary>
         public string ToTaxon { get; set; }
+
+        /// <summary>
+        /// Use to link any subject resource that is part of a collection to the collection containing the resource.
+        /// </summary>
+        public string InCollection { get; set; }
 
         #endregion
     }

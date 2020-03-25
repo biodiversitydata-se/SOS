@@ -45,7 +45,7 @@ namespace SOS.Process.Processors.ClamPortal
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
-            ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
+            ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
             var observationFactory = new ClamPortalObservationFactory(taxa);
 
             using var cursor = await _clamObservationVerbatimRepository.GetAllByCursorAsync();
@@ -54,20 +54,21 @@ namespace SOS.Process.Processors.ClamPortal
             {
                 ProcessedObservation processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
-                sightings.Add(processedObservation);
-                if (IsBatchFilledToLimit(sightings.Count))
+                observations.Add(processedObservation);
+                if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    verbatimCount += await CommitBatchAsync(sightings);
+                    verbatimCount += await CommitBatchAsync(observations);
+                    observations.Clear();
                     Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
                 }
             });
 
             // Commit remaining batch (not filled to limit).
-            if (sightings.Any())
+            if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                verbatimCount += await CommitBatchAsync(sightings);
+                verbatimCount += await CommitBatchAsync(observations);
                 Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
             }
 
