@@ -13,7 +13,7 @@ namespace SOS.Observations.Api.Controllers
     /// Import job controller
     /// </summary>
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class ExportController : ControllerBase, Interfaces.IExportController
     {
         private readonly ILogger<ExportController> _logger;
