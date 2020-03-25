@@ -193,6 +193,22 @@ namespace SOS.Process.Jobs
 
                 var success = processTasks.Values.All(t => t.Result.Status == RunStatus.Success);
 
+                // Update provider info from process result
+                foreach (var task in processTasks)
+                {
+                    var vi = providersInfo[task.Key];
+                    vi.ProcessCount = task.Value.Result.Count;
+                    vi.ProcessEnd = task.Value.Result.End;
+                    vi.ProcessStart = task.Value.Result.Start;
+                    vi.ProcessStatus = task.Value.Result.Status;
+                }
+
+                _logger.LogDebug("Start updating process info for observations");
+
+                await SaveProcessInfo(_processedObservationRepository.InActiveCollectionName, start, providersInfo.Sum(pi => pi.Value.ProcessCount ?? 0),
+                    success ? RunStatus.Success : RunStatus.Failed, providersInfo.Values);
+                _logger.LogDebug("Finish updating process info for observations");
+
                 // If some task/s failed and it was not Artportalen, Try to copy provider data from active instance
                 if (!success 
                     && copyFromActiveOnFail 
@@ -226,22 +242,6 @@ namespace SOS.Process.Jobs
                 }
 
                 _logger.LogDebug($"Processing done: {success}");
-
-                // Update provider info from process result
-                foreach (var task in processTasks)
-                {
-                    var vi = providersInfo[task.Key];
-                    vi.ProcessCount = task.Value.Result.Count;
-                    vi.ProcessEnd = task.Value.Result.End;
-                    vi.ProcessStart = task.Value.Result.Start;
-                    vi.ProcessStatus = task.Value.Result.Status;
-                }
-
-                _logger.LogDebug("Start updating process info for observations");
-               
-                await SaveProcessInfo(_processedObservationRepository.InActiveCollectionName, start, providersInfo.Sum(pi => pi.Value.ProcessCount ?? 0),
-                    success ? RunStatus.Success : RunStatus.Failed, providersInfo.Values);
-                _logger.LogDebug("Finish updating process info for observations");
 
                 _logger.LogDebug("Persist area cache");
                 _areaHelper.PersistCache();

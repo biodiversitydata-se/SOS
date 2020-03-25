@@ -51,7 +51,7 @@ namespace SOS.Process.Repositories.Destination
             // Add provider data from active instance and update db document
             targetProviders.Add(sourceProvider);
             target.ProvidersInfo = targetProviders;
-
+            target.Count = target.ProvidersInfo.Sum(pi => pi.ProcessCount ?? 0);
             return await AddOrUpdateAsync(target);
         }
     }
