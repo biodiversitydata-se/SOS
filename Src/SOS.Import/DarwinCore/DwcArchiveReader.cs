@@ -101,11 +101,13 @@ namespace SOS.Import.DarwinCore
 
                 if (occurrenceRecords.Count % batchSize == 0)
                 {
+                    await AddEventDataAsync(occurrenceRecords, archiveReader);
                     yield return occurrenceRecords;
                     occurrenceRecords.Clear();
                 }
             }
 
+            await AddEventDataAsync(occurrenceRecords, archiveReader);
             yield return occurrenceRecords;
         }
 

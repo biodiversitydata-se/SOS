@@ -53,6 +53,9 @@
     <None Update="Resources\Dwca\dwca-event-mof-swedish-butterfly-monitoring.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Dwca\dwca-occurrence-emof-lifewatch-artportalen.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Dwca\dwca-occurrence-emof-lifewatch.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

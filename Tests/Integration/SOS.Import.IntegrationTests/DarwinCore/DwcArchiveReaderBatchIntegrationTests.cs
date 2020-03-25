@@ -21,6 +21,33 @@ namespace SOS.Import.IntegrationTests.DarwinCore
         private const string PsophusStridulusArchivePath = "./resources/dwca/dwca-occurrence-lifewatch-psophus-stridulus.zip";
         private const string DwcArchiveWithEmofExtension = "./resources/dwca/dwca-occurrence-emof-lifewatch.zip";
         private const string SamplingEventDwcArchiveWithMofExtension = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
+        private const string ArtportalenDwcArchiveExportedFromAnalysisPortal = "./resources/dwca/dwca-occurrence-emof-lifewatch-artportalen.zip";
+
+        [Fact]
+        public async Task Read_artportalen_occurrence_dwc_archive_observations_in_batches()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            const int batchSize = 10000;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatches(ArtportalenDwcArchiveExportedFromAnalysisPortal, batchSize);
+            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
+            await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
+            {
+                observations.AddRange(verbatimObservationsBatch);
+            }
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            observations.Count.Should().Be(35670);
+        }
+
 
         [Fact]
         public async Task Read_psophus_stridulus_occurrence_dwc_archive_observations_in_batches()
