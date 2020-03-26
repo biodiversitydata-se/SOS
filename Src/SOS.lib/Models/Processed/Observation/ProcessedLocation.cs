@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using MongoDB.Driver.GeoJsonObjectModel;
+using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -379,7 +380,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public double? MinimumElevationInMeters { get; set; }
 
-        
+
         //public ProcessedArea Municipality { get; set; }
 
         ///// <summary>
@@ -387,16 +388,20 @@ namespace SOS.Lib.Models.Processed.Observation
         ///// </summary>
         //public ProcessedArea Parish { get; set; }
 
+        public Nest.GeoLocation GeoLocation { get; set; }
+
         /// <summary>
         /// Point (WGS84)
         /// </summary>
-        [JsonIgnore]
+        [Nest.Ignore,JsonIgnore,Text(Ignore = true)]
         public GeoJsonPoint<GeoJson2DGeographicCoordinates> Point { get; set; }
+
+       
 
         /// <summary>
         /// Point with accuracy buffer (WGS84)
         /// </summary>
-        [JsonIgnore]
+        [Nest.Ignore, JsonIgnore, Text(Ignore = true)]
         public GeoJsonGeometry<GeoJson2DGeographicCoordinates> PointWithBuffer { get; set; }
 
         /// <summary>

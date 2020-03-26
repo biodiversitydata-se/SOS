@@ -280,7 +280,7 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddCollectionAsync()
+        public virtual async Task<bool> AddCollectionAsync()
         {
             try
             {
@@ -316,7 +316,7 @@ namespace SOS.Process.Repositories.Destination
 
 
         /// <inheritdoc />
-        public async Task<bool> DeleteCollectionAsync()
+        public virtual async Task<bool> DeleteCollectionAsync()
         {
             try
             {

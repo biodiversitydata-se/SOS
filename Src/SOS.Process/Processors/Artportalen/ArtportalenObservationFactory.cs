@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
@@ -120,6 +121,7 @@ namespace SOS.Process.Processors.Artportalen
                     MinimumElevationInMeters = verbatimObservation.MinHeight,
                     Point = verbatimObservation.Site?.Point,
                     PointWithBuffer = verbatimObservation.Site?.PointWithBuffer,
+                    GeoLocation = hasPosition ? new Nest.GeoLocation((double)verbatimObservation.Site?.Point?.Coordinates?.Latitude, (double)verbatimObservation.Site?.Point?.Coordinates?.Longitude) : null,
                     VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord : 0,
                     VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0,
                     VerbatimCoordinateSystem = "EPSG:3857"
@@ -156,7 +158,8 @@ namespace SOS.Process.Processors.Artportalen
                 ReportedDate = verbatimObservation.ReportedDate,
                 RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas",
                 Taxon = taxon,
-                TypeId = null
+                TypeId = null,
+                Id = ObjectId.GenerateNewId()
             };
 
             // Get field mapping values

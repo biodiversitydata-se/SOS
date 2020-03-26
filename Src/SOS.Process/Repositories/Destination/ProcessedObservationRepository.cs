@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
@@ -19,6 +20,7 @@ namespace SOS.Process.Repositories.Destination
     public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, ObjectId>, IProcessedObservationRepository
     {
         private readonly IInvalidObservationRepository _invalidObservationRepository;
+        private readonly IElasticClient _elasticClient;
 
         /// <summary>
         /// Constructor
@@ -29,10 +31,12 @@ namespace SOS.Process.Repositories.Destination
         public ProcessedObservationRepository(
             IProcessClient client,
             IInvalidObservationRepository invalidObservationRepository,
-            ILogger<ProcessedObservationRepository> logger
+            ILogger<ProcessedObservationRepository> logger,
+            IElasticClient elasticClient
         ) : base(client, true, logger)
         {
             _invalidObservationRepository = invalidObservationRepository ?? throw new ArgumentNullException(nameof(invalidObservationRepository));
+            _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
         }
 
         /// <summary>
@@ -86,23 +90,44 @@ namespace SOS.Process.Repositories.Destination
         }
 
         private new IMongoCollection<ProcessedObservation> MongoCollection => Database.GetCollection<ProcessedObservation>(_collectionName);
-
+       
         /// <inheritdoc />
         public new async Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items)
         {
             // Separate valid and invalid data
             var invalidObservations = Validate(ref items);
-
+                        
             // Save valid processed data
-            var success = await base.AddManyAsync(items);
+            Logger.LogDebug($"Start indexing batch for searching with {items.Count()} items");            
+            var indexResult = WriteToElastic(items);
+            Logger.LogDebug($"Finished indexing batch for searching");
 
             // No invalid observations, we are done here
-            if (success && (invalidObservations?.Any() ?? false))
+            if (indexResult.TotalNumberOfFailedBuffers == 0 && (invalidObservations?.Any() ?? false))
             {
                 await _invalidObservationRepository.AddManyAsync(invalidObservations);
             }
 
-            return success ? items.Count() : 0;
+            return (indexResult.TotalNumberOfFailedBuffers == 0) ? items.Count() : 0;
+        }
+
+        private BulkAllObserver WriteToElastic(IEnumerable<ProcessedObservation> items)
+        {
+            int count = 0;
+            return _elasticClient.BulkAll(items, b => b
+                       .Index(_collectionName.ToLower())
+                       // how long to wait between retries
+                       .BackOffTime("30s")
+                       // how many retries are attempted if a failure occurs                        .
+                       .BackOffRetries(2)
+                       // how many concurrent bulk requests to make
+                       .MaxDegreeOfParallelism(Environment.ProcessorCount)
+                       // number of items per bulk request
+                       .Size(1000)
+                   ).Wait(TimeSpan.FromDays(1), next => 
+                   {
+                       Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}");
+                   });             
         }
 
         /// <inheritdoc />
@@ -111,121 +136,27 @@ namespace SOS.Process.Repositories.Destination
             // Get data from active instance
             SetCollectionName(ActiveInstance);
 
-            var source = await
-                MongoCollection.FindAsync(
-                    Builders<ProcessedObservation>.Filter.Eq(dwc => dwc.Provider, provider));
-
+            var source = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                    .Query(q => q
+                        .Term(t => t
+                            .Field(f => f.Provider)
+                            .Value(provider))));
+           
             // switch to inactive instance and add data 
             SetCollectionName(InActiveInstance);
 
-            return await AddManyAsync(source.ToEnumerable()) != 0;
-        }
+            Logger.LogDebug($"Start copying provider data to search");
+            var indexResult = WriteToElastic(source.Documents.ToList());
+            Logger.LogDebug($"Finished copying provider data to search");
+
+
+            return (indexResult.TotalNumberOfFailedBuffers == 0);
+        }      
 
         /// <inheritdoc />
         public async Task CreateIndexAsync()
         {
-            var indexModels = new List<CreateIndexModel<ProcessedObservation>>()
-            {
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Event.EndDate)),
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Event.StartDate)),
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Identification.Validated)),
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.County.Id)),
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Geo2DSphere(a => a.Location.Point)),
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Geo2DSphere(a => a.Location.PointWithBuffer)),
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.Province.Id)),
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Location.Municipality.Id)),
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation)),
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Occurrence.Gender.Id)),
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Provider)),
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Taxon.Id)),
-                new CreateIndexModel<ProcessedObservation>(
-                    Builders<ProcessedObservation>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory))
-            };
-
-            await MongoCollection.Indexes.CreateManyAsync(indexModels);
-
-            /*   indexModels.Add(new CreateIndexModel<DarwinCore>(Builders<DarwinCore>.IndexKeys.Combine(
-                   Builders<DarwinCore>.IndexKeys.Ascending(x => x.ParentIds),
-                   Builders<ImageADarwinCoreggregate>.IndexKeys.Ascending(x => x.Class))));
-                   */
-
-            /*
-            Logger.LogDebug("Start creating End date index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.EndDate)));
-            Logger.LogDebug("Finish creating End date index");
-
-            Logger.LogDebug("Start creating Start date index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Event.StartDate)));
-            Logger.LogDebug("Finish creating Start date index");
-
-            Logger.LogDebug("Start creating Validated index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Identification.Validated)));
-            Logger.LogDebug("Finish creating Validated index");
-
-            Logger.LogDebug("Start creating County index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.CountyId.Id)));
-            Logger.LogDebug("Finish creating County index");
-
-            Logger.LogDebug("Start creating Point index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.Point)));
-            Logger.LogDebug("Finish creating Point index");
-
-            Logger.LogDebug("Start creating Point with buffer index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.PointWithBuffer)));
-            Logger.LogDebug("Finish creating Point with buffer index");
-
-            Logger.LogDebug("Start creating Province index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.ProvinceId.Id)));
-            Logger.LogDebug("Finish creating Province index");
-
-            Logger.LogDebug("Start creating Municipality index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Location.MunicipalityId.Id)));
-            Logger.LogDebug("Finish creating Municipality index");
-
-            Logger.LogDebug("Start creating Is Positive Observation index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.IsPositiveObservation)));
-            Logger.LogDebug("Finish creating Is Positive Observation index");
-
-            Logger.LogDebug("Start creating Gender index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Occurrence.GenderId.Id)));
-            Logger.LogDebug("Finish creating Gender index");
-
-            Logger.LogDebug("Start creating Provider index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Provider)));
-            Logger.LogDebug("Finish creating Provider index");
-
-            Logger.LogDebug("Start creating Taxon id index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.Id)));
-            Logger.LogDebug("Finish creating Taxon id index");
-
-            Logger.LogDebug("Start creating Taxon Redlist Category index");
-            await MongoCollection.Indexes.CreateOneAsync(new CreateIndexModel<ProcessedSighting>(
-                Builders<ProcessedSighting>.IndexKeys.Ascending(p => p.Taxon.RedlistCategory)));
-            Logger.LogDebug("Finish creating Taxon Redlist Category index");*/
+            await _elasticClient.Indices.UpdateSettingsAsync(_collectionName.ToLower(), p => p.IndexSettings(g => g.RefreshInterval(1)));
         }
 
         /// <inheritdoc />
@@ -234,9 +165,14 @@ namespace SOS.Process.Repositories.Destination
             try
             {
                 // Create the collection
-                var res = await MongoCollection.DeleteManyAsync(Builders<ProcessedObservation>.Filter.Eq(dwc => dwc.Provider, provider));
+                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q=> q
+                    .Query(q => q
+                        .Term(t => t
+                            .Field(f => f.Provider)
+                            .Value(provider))));
+                
 
-                return res.IsAcknowledged;
+                return res.IsValid;
             }
             catch (Exception e)
             {
@@ -251,7 +187,23 @@ namespace SOS.Process.Repositories.Destination
             Logger.LogDebug("Dropping current indexes");
             await MongoCollection.Indexes.DropAllAsync();
         }
+        public override async Task<bool> DeleteCollectionAsync()
+        {
+            var res = await _elasticClient.Indices.DeleteAsync(_collectionName.ToLower());
+            return res.IsValid;
+        }
+        public override async Task<bool> AddCollectionAsync()
+        {
+            var res =  await _elasticClient.Indices.CreateAsync(_collectionName.ToLower(), s => s
+                 .Map<ProcessedObservation>(p => p
+                     .AutoMap()
+                     .Properties(ps => ps
+                        .GeoPoint(gp => gp
+                            .Name(nn => nn.Location.GeoLocation)))));
 
+            await _elasticClient.Indices.UpdateSettingsAsync(_collectionName.ToLower(), p => p.IndexSettings(g => g.RefreshInterval(-1)));
+            return res.IsValid;
+        }
         /// <inheritdoc />
         public override async Task<bool> VerifyCollectionAsync()
         {

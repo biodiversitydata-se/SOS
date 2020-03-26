@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
@@ -75,6 +76,7 @@ namespace SOS.Process.Processors.Kul
                     Country = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
                     Locality = verbatim.Locality,
                     Point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry(),
+                    GeoLocation = new Nest.GeoLocation(verbatim.DecimalLatitude, verbatim.DecimalLongitude),
                     PointWithBuffer = wgs84Point?.ToSquare(verbatim.CoordinateUncertaintyInMeters)?.ToGeoJsonGeometry(),
                     VerbatimLatitude = verbatim.DecimalLatitude,
                     VerbatimLongitude = verbatim.DecimalLongitude
@@ -96,7 +98,8 @@ namespace SOS.Process.Processors.Kul
                 ProtectionLevel = GetProtectionLevel(),
                 ReportedBy = verbatim.ReportedBy,
                 ReportedDate = verbatim.Start,
-                Taxon = taxon
+                Taxon = taxon,
+                Id = ObjectId.GenerateNewId()
             };
 
             return obs;
