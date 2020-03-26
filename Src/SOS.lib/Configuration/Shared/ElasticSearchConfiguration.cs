@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using System.Security.Authentication;
-using MongoDB.Driver;
-
-namespace SOS.Lib.Configuration.Shared
+﻿namespace SOS.Lib.Configuration.Shared
 {
     /// <summary>
     /// ElasticSearch configuration properties
