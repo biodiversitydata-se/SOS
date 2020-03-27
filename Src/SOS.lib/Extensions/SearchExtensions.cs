@@ -25,25 +25,47 @@ namespace SOS.Lib.Extensions
                 );
             }
 
-            /*  if (filter.GeometryFilter?.IsValid ?? false)
-              {
-                  var geoJsonGeometry = filter.GeometryFilter.Geometry.ToGeoJsonGeometry(); ;
+            if (filter.GeometryFilter?.IsValid ?? false)
+            {
+                switch (filter.GeometryFilter.Geometry.Type.ToLower())
+                {
+                    case "point":
+                        queryContainers.Add(q => q
+                            .GeoDistance(gd => gd
+                                .Field(f => f.Location.Point)
+                                .DistanceType(GeoDistanceType.Arc)
+                                .Location(((PointGeoShape)filter.GeometryFilter.Geometry.ToGeoShape())?.Coordinates)
+                                .Distance(filter.GeometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
+                                .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
+                            )
+                        );
 
-                  switch (geoJsonGeometry.Type)
-                  {
-                      case GeoJsonObjectType.Point:
-                          filters.Add(Builders<ProcessedObservation>.Filter.Near(m => m.Location.Point, (GeoJsonPoint<GeoJson2DGeographicCoordinates>)geoJsonGeometry, filter.GeometryFilter.MaxDistanceFromPoint, 0.0));
-                          break;
-                      case GeoJsonObjectType.Polygon:
-                      case GeoJsonObjectType.MultiPolygon:
-                          filters.Add(filter.GeometryFilter.UsePointAccuracy ?
-                              Builders<ProcessedObservation>.Filter.GeoIntersects(m => m.Location.PointWithBuffer, geoJsonGeometry)
-                              :
-                              Builders<ProcessedObservation>.Filter.GeoWithin(m => m.Location.Point, geoJsonGeometry));
-
-                          break;
-                  }
-              }*/
+                        break;
+                    case "polygon":
+                    case "multipolygon":
+                        if (filter.GeometryFilter.UsePointAccuracy)
+                        {
+                            queryContainers.Add(q => q
+                                .GeoShape(gd => gd
+                                    .Field(f => f.Location.PointWithBuffer)
+                                    .Shape(s => filter.GeometryFilter.Geometry.ToGeoShape())
+                                    .Relation(GeoShapeRelation.Intersects)
+                                )
+                            );
+                        }
+                        else
+                        {
+                            queryContainers.Add(q => q
+                                .GeoShape(gd => gd
+                                    .Field(f => f.Location.Point)
+                                    .Shape(s => filter.GeometryFilter.Geometry.ToGeoShape())
+                                    .Relation(GeoShapeRelation.Within)
+                                )
+                            );
+                        }
+                        break;
+                }
+            }
 
             if (filter.EndDate.HasValue)
             {

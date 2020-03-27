@@ -77,7 +77,7 @@ namespace SOS.Process.Processors.Kul
                     Country = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
                     Locality = verbatim.Locality,
                     Point = (PointGeoShape)wgs84Point?.ToGeoShape(),
-                    PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToSquare(verbatim.CoordinateUncertaintyInMeters)?.ToGeoShape(),
+                    PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoShape(),
                     VerbatimLatitude = verbatim.DecimalLatitude,
                     VerbatimLongitude = verbatim.DecimalLongitude
                 },
