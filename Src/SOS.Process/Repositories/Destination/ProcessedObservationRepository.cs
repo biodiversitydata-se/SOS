@@ -199,7 +199,9 @@ namespace SOS.Process.Repositories.Destination
                      .AutoMap()
                      .Properties(ps => ps
                         .GeoPoint(gp => gp
-                            .Name(nn => nn.Location.GeoLocation)))));
+                            .Name(nn => nn.Location.Point))
+                        .GeoShape(gpb => gpb
+                            .Name(gpbn => gpbn.Location.PointWithBuffer)))));
 
             await _elasticClient.Indices.UpdateSettingsAsync(_collectionName.ToLower(), p => p.IndexSettings(g => g.RefreshInterval(-1)));
             return res.IsValid;

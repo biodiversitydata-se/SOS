@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text.Json;
 using Microsoft.SqlServer.Types;
 using MongoDB.Driver.GeoJsonObjectModel;
+using Nest;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using NetTopologySuite.IO;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Operation.Buffer;
 using NetTopologySuite.Utilities;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
@@ -98,6 +98,49 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Cast polygon to coordinates
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        private static GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates> ToGeoJsonPolygonCoordinates(this Polygon polygon)
+        {
+            var exteriorRing = GeoJson.LinearRingCoordinates(polygon.ExteriorRing.Coordinates.Select(er => GeoJson.Geographic(er.X, er.Y)).ToArray());
+            var holes = polygon.Holes.Select(h => GeoJson.LinearRingCoordinates(h.Coordinates.Select(er => GeoJson.Geographic(er.X, er.Y)).ToArray())).ToArray();
+            var coordinates = GeoJson.PolygonCoordinates(exteriorRing, holes);
+
+            return coordinates;
+        }
+
+        /// <summary>
+        /// Cast array of array of array of double to polygon coordinates
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        private static IEnumerable<IEnumerable<GeoCoordinate>> ToPolygonGeoShapeCoordinates(this
+            IEnumerable<IEnumerable<IEnumerable<double>>> polygon)
+        {
+           return polygon.Select(r =>
+                 r.Select(p => new GeoCoordinate(p.ElementAt(1), p.ElementAt(0))) );
+        }
+
+        /// <summary>
+        /// Cast polygon to shape coordinates
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        private static IEnumerable<IEnumerable<GeoCoordinate>> ToPolygonGeoShapeCoordinates(this Polygon polygon)
+        {
+            var coordinates = new List<IEnumerable<GeoCoordinate>>();
+            var exteriorRing = polygon.ExteriorRing.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X));
+            var holes = polygon.Holes.Select(h => h.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)));
+
+            coordinates.Add(exteriorRing);
+            coordinates.AddRange(holes);
+
+            return coordinates;
+        }
+
+        /// <summary>
         /// Create a linear ring out of coordinates
         /// </summary>
         /// <param name="coordinates"></param>
@@ -157,20 +200,6 @@ namespace SOS.Lib.Extensions
             return polygon;*/
         }
 
-        /// <summary>
-        /// Cast polygon to coordinates
-        /// </summary>
-        /// <param name="polygon"></param>
-        /// <returns></returns>
-        private static GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates> ToGeoJsonPolygonCoordinates(this Polygon polygon)
-        {
-            var exteriorRing = GeoJson.LinearRingCoordinates(polygon.ExteriorRing.Coordinates.Select(er => GeoJson.Geographic(er.X, er.Y)).ToArray());
-            var holes = polygon.Holes.Select(h => GeoJson.LinearRingCoordinates(h.Coordinates.Select(er => GeoJson.Geographic(er.X, er.Y)).ToArray())).ToArray();
-            var coordinates = GeoJson.PolygonCoordinates(exteriorRing, holes);
-
-            return coordinates;
-        }
-
 
         /// <summary>
         /// Transform coordinates
@@ -217,12 +246,12 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        ///  Transform WGS 84 point to circle by adding a buffer to it
-        /// </summary>
-        /// <param name="point"></param>
-        /// <param name="accuracy"></param>
-        /// <returns></returns>
-        public static Geometry ToCircle(this Point point, int? accuracy)
+            ///  Transform WGS 84 point to circle by adding a buffer to it
+            /// </summary>
+            /// <param name="point"></param>
+            /// <param name="accuracy"></param>
+            /// <returns></returns>
+            public static Geometry ToCircle(this Point point, int? accuracy)
         {
             if (accuracy == null || accuracy < 0.0)
             {
@@ -297,6 +326,78 @@ namespace SOS.Lib.Extensions
 
             return square;
         }
+
+
+        public static IGeoShape ToGeoShape(this InputGeometry geometry)
+        {
+            if (!geometry.IsValid)
+            {
+                return null;
+            }
+
+            switch (geometry.Type?.ToLower())
+            {
+                case "point":
+                    var coordinates = geometry.Coordinates.ToArray().Select(p => ((JsonElement)p).GetDouble())
+                        .ToArray();
+                   
+                    return new PointGeoShape(new GeoCoordinate(coordinates[1], coordinates[0]));
+                case "polygon":
+                    var polygon = geometry.Coordinates.ToArray()
+                        .Select(ring =>
+                            ((JsonElement)ring).EnumerateArray().Select(point => point.EnumerateArray().Select(nmr => nmr.GetDouble())));
+
+                    return new PolygonGeoShape(polygon.ToPolygonGeoShapeCoordinates());
+                case "multipolygon":
+                    var multipolygon = geometry.Coordinates.ToArray()
+                        .Select(polygon => ((JsonElement)polygon).EnumerateArray()
+                            .Select(ring =>
+                                ring.EnumerateArray().Select(point => point.EnumerateArray().Select(nmr => nmr.GetDouble()))));
+
+                    return new MultiPolygonGeoShape(multipolygon.Select(p => p.ToPolygonGeoShapeCoordinates()));
+                default:
+                    return null;
+            }
+        }
+
+        public static IGeoShape ToGeoShape(this Geometry geometry)
+        {
+            if (geometry?.Coordinates == null)
+            {
+                return null;
+            }
+
+            switch (geometry.OgcGeometryType)
+            {
+                case OgcGeometryType.Point:
+                    var point = (Point)geometry;
+                    
+                    return new PointGeoShape(new GeoCoordinate(point.Y, point.X));
+                case OgcGeometryType.LineString:
+                    var lineString = (LineString)geometry;
+
+                    return new LineStringGeoShape(lineString.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)));
+                case OgcGeometryType.MultiLineString:
+                    var multiLineString = (MultiLineString)geometry;
+
+                   return new MultiLineStringGeoShape(multiLineString.Geometries.Select(mls => mls.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X))));
+                case OgcGeometryType.MultiPoint:
+                    var multiPoint = (MultiPoint)geometry;
+
+                    return new MultiPointGeoShape(multiPoint.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)));
+                case OgcGeometryType.Polygon:
+                    var polygon = (Polygon)geometry;
+
+                    return new PolygonGeoShape(polygon.MakeValid().ToPolygonGeoShapeCoordinates());
+                case OgcGeometryType.MultiPolygon:
+                    var multiPolygon = (MultiPolygon)geometry;
+
+                    return new MultiPolygonGeoShape(multiPolygon.Geometries.Select(p => ((Polygon)p).MakeValid().ToPolygonGeoShapeCoordinates()));
+                default:
+                    throw new ArgumentException($"Not handled geometry type: {geometry.GeometryType}");
+            }
+        }
+
 
         /// <summary>
         /// Cast input geometry to geojson geometry

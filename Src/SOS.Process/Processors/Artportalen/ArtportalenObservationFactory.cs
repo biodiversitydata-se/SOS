@@ -121,7 +121,6 @@ namespace SOS.Process.Processors.Artportalen
                     MinimumElevationInMeters = verbatimObservation.MinHeight,
                     Point = verbatimObservation.Site?.Point,
                     PointWithBuffer = verbatimObservation.Site?.PointWithBuffer,
-                    GeoLocation = hasPosition ? new Nest.GeoLocation((double)verbatimObservation.Site?.Point?.Coordinates?.Latitude, (double)verbatimObservation.Site?.Point?.Coordinates?.Longitude) : null,
                     VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord : 0,
                     VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0,
                     VerbatimCoordinateSystem = "EPSG:3857"

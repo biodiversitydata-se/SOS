@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
-using MongoDB.Driver;
 using Nest;
-using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Database.Interfaces;
-using SOS.Observations.Api.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -50,7 +45,7 @@ namespace SOS.Observations.Api.Repositories
             {
                 return null;
             }
-            
+
             var searchResponse = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
                 .Index(CollectionName.ToLower())
                 .From(skip)
@@ -66,6 +61,8 @@ namespace SOS.Observations.Api.Repositories
                 Records = searchResponse.Documents,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
+
+
         }
     }
 }
