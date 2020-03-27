@@ -64,7 +64,7 @@ namespace SOS.Observations.Api.Controllers
         }
         /// <inheritdoc />
         [HttpPost("searchinternal")]
-        [ProducesResponseType(typeof(IEnumerable<ProcessedObservation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResult<ProcessedObservation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ApiExplorerSettings(IgnoreApi = true)]

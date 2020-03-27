@@ -7,7 +7,7 @@ namespace SOS.Lib.Models.Search
     /// </summary>
     public class SearchFilterInternal : SearchFilter
     {        
-        public int UserId { get; set; }
-        public int ProjectId { get; set; }     
+        public int? UserId { get; set; }
+        public int? ProjectId { get; set; }     
     }
 }

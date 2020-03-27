@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
@@ -45,6 +47,8 @@ namespace SOS.Observations.Api.Repositories
             {
                 return null;
             }
+            var query = filter.ToQuery();
+            query = AddInternalFilters(filter, query);
 
             var searchResponse = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
                 .Index(CollectionName.ToLower())
@@ -52,7 +56,7 @@ namespace SOS.Observations.Api.Repositories
                 .Size(take)
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(filter.ToQuery()))));
+                        .Filter(query))));
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
@@ -63,6 +67,35 @@ namespace SOS.Observations.Api.Repositories
             };
 
 
+        }
+
+        private static IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> AddInternalFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> query)
+        {
+            var queryInternal = query.ToList();
+            if (filter is SearchFilterInternal)
+            {
+                var internalFilter = filter as SearchFilterInternal;
+
+                if (internalFilter.ProjectId.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Match(t => t
+                            .Field(new Field("projects.id"))
+                            .Query(internalFilter.ProjectId.ToString())
+                        )
+                    );
+                }
+                if (internalFilter.UserId.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Terms(t => t
+                            .Field(new Field("reportedByUserId"))
+                            .Terms(internalFilter.UserId)
+                        )
+                    );
+                }
+            }
+            return queryInternal;
         }
     }
 }
