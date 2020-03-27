@@ -62,6 +62,16 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+        /// <inheritdoc />
+        [HttpPost("searchinternal")]
+        [ProducesResponseType(typeof(IEnumerable<ProcessedObservation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> GetChunkInternalAsync([FromBody] SearchFilterInternal filter, [FromQuery]int skip, [FromQuery]int take)
+        {
+            return await GetChunkAsync(filter, skip, take);            
+        }
 
         /// <inheritdoc />
         [HttpGet("FieldMapping")]
