@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Nest;
 using Newtonsoft.Json;
 using SOS.Export.Managers;
 using SOS.Export.MongoDb;
@@ -28,11 +29,13 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             const int nrObservations = 10;
             const string filePath = @"c:\temp\TenProcessedTestObservations.json";
             var exportConfiguration = GetExportConfiguration();
+            var elasticClient = new ElasticClient();
             var exportClient = new ExportClient(
                 exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 exportConfiguration.ProcessedDbConfiguration.DatabaseName,
                 exportConfiguration.ProcessedDbConfiguration.BatchSize);
             var processedObservationRepository = new ProcessedObservationRepository(
+                elasticClient,
                 exportClient,
                 new TaxonManager(
                     new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonManager>>().Object),

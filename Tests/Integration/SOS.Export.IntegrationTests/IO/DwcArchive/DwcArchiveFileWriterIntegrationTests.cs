@@ -117,7 +117,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
 
         private static ProcessedObservationRepository CreateProcessedObservationRepository(ExportClient exportClient)
         {
-            var processedObservationRepository = new ProcessedObservationRepository(
+          /*  var processedObservationRepository = new ProcessedObservationRepository(
                 exportClient,
                 new TaxonManager(
                     new ProcessedTaxonRepository(
@@ -125,7 +125,9 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                         new Mock<ILogger<ProcessedTaxonRepository>>().Object),
                     new Mock<ILogger<TaxonManager>>().Object),
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
-            return processedObservationRepository;
+            return processedObservationRepository;*/
+
+          return null;
         }
     }
 }

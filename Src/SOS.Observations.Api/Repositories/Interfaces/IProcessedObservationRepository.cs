@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using MongoDB.Bson;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -18,6 +17,6 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take);
+        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take);
     }
 }
