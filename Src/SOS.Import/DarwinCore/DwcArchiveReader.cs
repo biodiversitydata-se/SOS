@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DwC_A;
-using DwC_A.Meta;
 using DwC_A.Terms;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Harvesters.Observations;
+using SOS.Import.DarwinCore.Interfaces;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Import.DarwinCore
 {
+    /// <summary>
+    /// DwC-A reader.
+    /// </summary>
     public class DwcArchiveReader : Interfaces.IDwcArchiveReader
     {
         private readonly ILogger<DwcArchiveReader> _logger;
@@ -22,95 +21,51 @@ namespace SOS.Import.DarwinCore
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(string archivePath)
-        {
-            using var archive = new ArchiveReader(archivePath);
-            var filename = System.IO.Path.GetFileName(archivePath);
-            var verbatimRecords = await GetOccurrenceRecordsAsync(archive, filename);
-            await AddEventDataAsync(verbatimRecords, archive);
-            return verbatimRecords;
-        }
-
-        private async Task<List<DwcObservationVerbatim>> GetOccurrenceRecordsAsync(ArchiveReader archiveReader, string filename)
-        {
-            IAsyncFileReader occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Occurrence);
-            List<DwcObservationVerbatim> occurrenceRecords = new List<DwcObservationVerbatim>();
-            bool dwcIndexSpecified = occurrenceFileReader.FileMetaData.Id.IndexSpecified;
-
-            await foreach (IRow row in occurrenceFileReader.GetDataRowsAsync())
-            {
-                if (dwcIndexSpecified)
-                {
-                    var id = row[occurrenceFileReader.FileMetaData.Id.Index]; // todo - should we use the id in some way?
-                }
-
-                var verbatimObservation = DwcObservationVerbatimFactory.Create(row, filename);
-                occurrenceRecords.Add(verbatimObservation);
-            }
-
-            return occurrenceRecords;
-        }
-
-        private async Task AddEventDataAsync(List<DwcObservationVerbatim> verbatimRecords, ArchiveReader archiveReader)
-        {
-            IAsyncFileReader eventFileReader = archiveReader.GetAsyncFileReader(RowTypes.Event);
-            if (eventFileReader == null) return;
-
-            Dictionary<string, IEnumerable<DwcObservationVerbatim>> observationsByEventId =
-                verbatimRecords
-                    .GroupBy(observation => observation.EventID)
-                    .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
-            bool dwcIndexSpecified = eventFileReader.FileMetaData.Id.IndexSpecified;
-            await foreach (IRow row in eventFileReader.GetDataRowsAsync())
-            {
-                if (dwcIndexSpecified)
-                {
-                    var id = row[eventFileReader.FileMetaData.Id.Index]; // todo - should we use the id in some way?
-                }
-
-                var eventId = row.GetValue(Terms.eventID);
-                if (!observationsByEventId.TryGetValue(eventId, out var observations)) continue;
-                foreach (var observation in observations)
-                {
-                    foreach (FieldType fieldType in row.FieldMetaData)
-                    {
-                        var val = row[fieldType.Index];
-                        DwcTermValueMapper.MapValueByTerm(observation, fieldType.Term, val);
-                    }
-                }
-            }
-        }
-
-        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatches(string archivePath, int batchSize)
+        /// <inheritdoc />
+        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
+            string archivePath,
+            int batchSize)
         {
             using var archiveReader = new ArchiveReader(archivePath);
             var filename = System.IO.Path.GetFileName(archivePath);
-            IAsyncFileReader occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Occurrence);
-            List<DwcObservationVerbatim> occurrenceRecords = new List<DwcObservationVerbatim>();
-            bool dwcIndexSpecified = occurrenceFileReader.FileMetaData.Id.IndexSpecified;
-
-            await foreach (IRow row in occurrenceFileReader.GetDataRowsAsync())
+            var occurrenceReader = CreateOccurrenceReader(archiveReader.CoreFile.FileMetaData.RowType);
+            await foreach (var batch in occurrenceReader.ReadArchiveInBatchesAsDwcObservation(archiveReader, batchSize, filename))
             {
-                if (dwcIndexSpecified)
-                {
-                    var id = row[occurrenceFileReader.FileMetaData.Id.Index]; // todo - should we use the id in some way?
-                }
-                
-                var verbatimObservation = DwcObservationVerbatimFactory.Create(row, filename);
-                occurrenceRecords.Add(verbatimObservation);
-
-                if (occurrenceRecords.Count % batchSize == 0)
-                {
-                    await AddEventDataAsync(occurrenceRecords, archiveReader);
-                    yield return occurrenceRecords;
-                    occurrenceRecords.Clear();
-                }
+                yield return batch;
             }
-
-            await AddEventDataAsync(occurrenceRecords, archiveReader);
-            yield return occurrenceRecords;
         }
 
+        /// <inheritdoc />
+        public async IAsyncEnumerable<List<DwcEvent>> ReadSamplingEventArchiveInBatchesAsDwcEventAsync(
+            string archivePath,
+            int batchSize)
+        {
+            var dwcSamplingEventArchiveReader = new DwcSamplingEventArchiveReader(_logger);
+            await foreach (var batch in dwcSamplingEventArchiveReader.ReadEventArchiveInBatchesAsDwcEvent(archivePath, batchSize))
+            {
+                yield return batch;
+            }
+        }
+
+        private IDwcArchiveReaderAsDwcObservation CreateOccurrenceReader(string rowType)
+        {
+            if (rowType == RowTypes.Occurrence)
+            {
+                return new DwcOccurrenceArchiveReader(_logger);
+            }
+            else // Event
+            {
+                return new DwcSamplingEventArchiveReader(_logger);
+            }
+        }
+
+        /// <summary>
+        /// Validate a DwC-A file.
+        /// </summary>
+        /// <param name="archivePath"></param>
+        /// <param name="nrRows"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public bool TryValidateDwcACoreFile(string archivePath, out long nrRows, out string message)
         {
             nrRows = 0;
@@ -141,6 +96,5 @@ namespace SOS.Import.DarwinCore
 
             return true;
         }
-
     }
 }

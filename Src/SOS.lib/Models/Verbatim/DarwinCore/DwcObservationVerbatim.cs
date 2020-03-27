@@ -1,4 +1,6 @@
-﻿using MongoDB.Bson;
+﻿using System.Collections.Generic;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.DarwinCore
@@ -6,11 +8,34 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
     public class DwcObservationVerbatim : IEntity<ObjectId>
     {
         /// <summary>
-        /// MongoDb Id. // todo - should we use another occurrenceID as Id field?
+        /// MongoDb Id. // todo - should we use Id, RecordId or occurrenceID as Id field?
         /// </summary>
         public ObjectId Id { get; set; }
 
+        [BsonIgnore]
+        public string RecordId { get; set; }
+
         public string DwcArchiveFilename { get; set; }
+
+        /// <summary>
+        /// Measurement or fact linked to the observation.
+        /// </summary>
+        public ICollection<DwcMeasurementOrFact> MeasurementOrFacts { get; set; }
+
+        /// <summary>
+        /// Measurement or fact linked to the event.
+        /// </summary>
+        public ICollection<DwcMeasurementOrFact> EventMeasurementOrFacts { get; set; }
+
+        /// <summary>
+        /// Extended measurement or fact linked to the observation.
+        /// </summary>
+        public ICollection<DwcExtendedMeasurementOrFact> ExtendedMeasurementOrFacts { get; set; }
+
+        /// <summary>
+        /// Extended measurement or fact linked to the event.
+        /// </summary>
+        public ICollection<DwcExtendedMeasurementOrFact> EventExtendedMeasurementOrFacts { get; set; }
 
         #region RecordLevel
         /// <summary>

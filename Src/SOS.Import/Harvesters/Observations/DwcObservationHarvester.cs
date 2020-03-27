@@ -20,12 +20,22 @@ using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Harvesters.Observations
 {
+    /// <summary>
+    /// DwC-A observation harvester.
+    /// </summary>
     public class DwcObservationHarvester : Interfaces.IDwcObservationHarvester
     {
+        private const int BatchSize = 100000;
         private readonly IDarwinCoreArchiveVerbatimRepository _dwcArchiveVerbatimRepository;
         private readonly IDwcArchiveReader _dwcArchiveReader;
         private readonly ILogger<DwcObservationHarvester> _logger;
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="dwcArchiveVerbatimRepository"></param>
+        /// <param name="dwcArchiveReader"></param>
+        /// <param name="logger"></param>
         public DwcObservationHarvester(
             IDarwinCoreArchiveVerbatimRepository dwcArchiveVerbatimRepository,
             IDwcArchiveReader dwcArchiveReader,
@@ -46,18 +56,24 @@ namespace SOS.Import.Harvesters.Observations
             try
             {
                 _logger.LogDebug("Start storing DwC verbatim");
-                var observations = await _dwcArchiveReader.ReadArchiveAsync(archivePath);
                 await _dwcArchiveVerbatimRepository.DeleteCollectionAsync();
                 await _dwcArchiveVerbatimRepository.AddCollectionAsync();
-                await _dwcArchiveVerbatimRepository.AddManyAsync(observations);
-                _logger.LogDebug("Finish storing DwC verbatim");
 
-                cancellationToken?.ThrowIfCancellationRequested();
+                int observationCount = 0;
+                var observationBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(archivePath, BatchSize);
+                await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    observationCount += verbatimObservationsBatch.Count;
+                    await _dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch);
+                }
+
+                _logger.LogDebug("Finish storing DwC verbatim");
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
-                harvestInfo.Count = observations?.Count() ?? 0;
+                harvestInfo.Count = observationCount;
             }
             catch (JobAbortedException e)
             {

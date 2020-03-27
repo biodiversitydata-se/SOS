@@ -65,6 +65,11 @@ namespace DwC_A
             }
         }
 
+        public FieldType TryGetFieldMetaData(string term)
+        {
+            return FileMetaData.Fields.FirstOrDefault(m => m.Term == term);
+        }
+
         public async IAsyncEnumerable<IRow> GetHeaderRowsAsync()
         {
             int count = 0;

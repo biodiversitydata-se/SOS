@@ -28,5 +28,11 @@ namespace DwC_A
         /// Enumerable collection of all row objects including headers and data
         /// </summary>
         IAsyncEnumerable<IRow> GetRowsAsync();
+        /// <summary>
+        /// Try to get field metadata.
+        /// </summary>
+        /// <param name="term"></param>
+        /// <returns></returns>
+        FieldType TryGetFieldMetaData(string term);
     }
 }

@@ -8,11 +8,19 @@ namespace DwC_A
     {
         public Row(IEnumerable<string> fields, IFieldMetaData fieldMetaData)
         {
-            this.Fields = fields;
             this.FieldMetaData = fieldMetaData;
+            this.FieldValueById = new Dictionary<int, string>();
+            int index = 0;
+            foreach (var val in fields)
+            {
+                this.FieldValueById.Add(index, val);
+                index++;
+            }
         }
 
-        public IEnumerable<string> Fields { get; }
+        public IEnumerable<string> Fields => FieldValueById.Values;
+
+        public IDictionary<int, string> FieldValueById { get; }
 
         public IFieldMetaData FieldMetaData { get; }
 
@@ -29,7 +37,9 @@ namespace DwC_A
         {
             get
             {
-                return Fields.ElementAt(index);
+                // todo - improve performance by introducing Dictionary
+                return FieldValueById[index];
+                //return Fields.ElementAt(index);
             }
         }
 

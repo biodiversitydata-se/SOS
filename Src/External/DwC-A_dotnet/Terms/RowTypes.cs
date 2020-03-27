@@ -10,6 +10,7 @@
         public static string Identification { get; } = "http://rs.tdwg.org/dwc/terms/Identification";
         public static string Taxon { get; } = "http://rs.tdwg.org/dwc/terms/Taxon";
         public static string ResourceRelationship { get; } = "http://rs.tdwg.org/dwc/terms/ResourceRelationship";
-        public static string MeasurementOrFact { get; } = "http://rs.tdwg.org/dwc/terms/MeasurementOrFact"; 
+        public static string MeasurementOrFact { get; } = "http://rs.tdwg.org/dwc/terms/MeasurementOrFact";
+        public static string ExtendedMeasurementOrFact { get; } = "http://rs.iobis.org/obis/terms/ExtendedMeasurementOrFact";
     }
 }

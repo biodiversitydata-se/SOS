@@ -4,7 +4,7 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Import.DarwinCore
 {
-    public class DwcObservationVerbatimFactory
+    public static class DwcObservationVerbatimFactory
     {
         public static DwcObservationVerbatim Create(IRow row, string filename)
         {

@@ -213,6 +213,25 @@ namespace DwC_A.Terms
         public static string waterBody = "http://rs.tdwg.org/dwc/terms/waterBody";
         public static string year = "http://rs.tdwg.org/dwc/terms/year";
 
+        // ExtendedMeasurementOrFact
+        public static string measurementTypeID = "http://rs.iobis.org/obis/terms/measurementTypeID";
+        public static string measurementValueID = "http://rs.iobis.org/obis/terms/measurementValueID";
+        public static string measurementUnitID = "http://rs.iobis.org/obis/terms/measurementUnitID";
+
+        // Simple Multimedia
+        public static string format = "http://purl.org/dc/terms/format";
+        public static string identifier = "http://purl.org/dc/terms/identifier";
+        public static string title = "http://purl.org/dc/terms/title";
+        public static string description = "http://purl.org/dc/terms/description";
+        public static string created = "http://purl.org/dc/terms/created";
+        public static string creator = "http://purl.org/dc/terms/creator";
+        public static string contributor = "http://purl.org/dc/terms/contributor";
+        public static string publisher = "http://purl.org/dc/terms/publisher";
+        public static string audience = "http://purl.org/dc/terms/audience";
+        public static string source = "	http://purl.org/dc/terms/source";
+
+
+
         public static string ShortName(string term)
         {
             if(term == null)

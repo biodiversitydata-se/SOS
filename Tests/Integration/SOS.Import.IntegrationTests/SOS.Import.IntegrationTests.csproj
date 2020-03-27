@@ -50,6 +50,9 @@
     <None Update="Resources\AllMongoDbTaxa.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Dwca\dwca-event-emof-vims_neamap.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Dwca\dwca-event-mof-swedish-butterfly-monitoring.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
