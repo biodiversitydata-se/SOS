@@ -17,6 +17,11 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string RecordId { get; set; }
 
         public string DwcArchiveFilename { get; set; }
+        
+        /// <summary>
+        /// Measurement or fact linked to the event.
+        /// </summary>
+        public ICollection<DwcMeasurementOrFact> MeasurementOrFacts { get; set; }
 
         /// <summary>
         /// Extended measurement or fact linked to the event.

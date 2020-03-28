@@ -186,6 +186,52 @@ namespace SOS.Import.IntegrationTests.DarwinCore
                 .MeasurementValue.Should().Be("9");
         }
 
+        [Fact]
+        public async Task Read_sampling_event_dwc_archive_with_mof_extension_in_batches_as_DwcEvent_type()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            const int batchSize = 50000;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var eventBatches = dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(SamplingEventDwcArchiveWithMofExtension, batchSize);
+            List<DwcEvent> dwcEvents = new List<DwcEvent>();
+            await foreach (List<DwcEvent> verbatimObservationsBatch in eventBatches)
+            {
+                dwcEvents.AddRange(verbatimObservationsBatch);
+            }
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            dwcEvents.Count.Should().Be(20449);
+            var dwcEvent = dwcEvents.Single(observation => observation.EventID == "SEBMS:10015");
+            dwcEvent.MeasurementOrFacts.Count.Should().Be(6, "because there are 6 different event measurements for the 'SEBMS:10015:201062' event");
+            dwcEvent.MeasurementOrFacts
+                .Single(measurement => measurement.MeasurementType == "Temperature")
+                .MeasurementValue.Should().Be("19");
+            dwcEvent.MeasurementOrFacts
+                .Single(measurement => measurement.MeasurementType == "Sunshine")
+                .MeasurementValue.Should().Be("80");
+            dwcEvent.MeasurementOrFacts
+                .Single(measurement => measurement.MeasurementType == "Wind direction")
+                .MeasurementValue.Should().Be("0.0");
+            dwcEvent.MeasurementOrFacts
+                .Single(measurement => measurement.MeasurementType == "Wind Speed")
+                .MeasurementValue.Should().Be("3");
+            dwcEvent.MeasurementOrFacts
+                .Single(measurement => measurement.MeasurementType == "ZeroObservation")
+                .MeasurementValue.Should().Be("false");
+            dwcEvent.MeasurementOrFacts
+                .Single(measurement => measurement.MeasurementType == "Site type")
+                .MeasurementValue.Should().Be("Point site");
+        }
+
+
 
         /// <summary>
         /// Some links to Sampling Event Data Dwc-A:
@@ -200,7 +246,7 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
-            const int batchSize = 10000;
+            const int batchSize = 50000;
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -216,6 +262,26 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             observations.Count.Should().Be(105872);
+            var obs = observations.Single(observation => observation.OccurrenceID == "SEBMS:10015:201062");
+            obs.EventMeasurementOrFacts.Count.Should().Be(6, "because there are 6 different event measurements for the 'SEBMS:10015:201062' event");
+            obs.EventMeasurementOrFacts
+                .Single(measurement => measurement.MeasurementType == "Temperature")
+                .MeasurementValue.Should().Be("19");
+            obs.EventMeasurementOrFacts
+                .Single(measurement => measurement.MeasurementType == "Sunshine")
+                .MeasurementValue.Should().Be("80");
+            obs.EventMeasurementOrFacts
+                .Single(measurement => measurement.MeasurementType == "Wind direction")
+                .MeasurementValue.Should().Be("0.0");
+            obs.EventMeasurementOrFacts
+                .Single(measurement => measurement.MeasurementType == "Wind Speed")
+                .MeasurementValue.Should().Be("3");
+            obs.EventMeasurementOrFacts
+                .Single(measurement => measurement.MeasurementType == "ZeroObservation")
+                .MeasurementValue.Should().Be("false");
+            obs.EventMeasurementOrFacts
+                .Single(measurement => measurement.MeasurementType == "Site type")
+                .MeasurementValue.Should().Be("Point site");
         }
 
         /// <summary>

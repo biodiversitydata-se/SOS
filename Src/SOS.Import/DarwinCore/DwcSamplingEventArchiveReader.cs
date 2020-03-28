@@ -50,6 +50,7 @@ namespace SOS.Import.DarwinCore
                 {
                     await AddEventDataAsync(occurrenceRecords, archiveReader);
                     await AddEmofDataAsync(occurrenceRecords, archiveReader);
+                    await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
                     yield return occurrenceRecords;
                     occurrenceRecords.Clear();
                 }
@@ -57,7 +58,64 @@ namespace SOS.Import.DarwinCore
 
             await AddEventDataAsync(occurrenceRecords, archiveReader);
             await AddEmofDataAsync(occurrenceRecords, archiveReader);
+            await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
             yield return occurrenceRecords;
+        }
+
+        /// <summary>
+        /// Add Measurement Or Fact extension data
+        /// </summary>
+        /// <param name="occurrenceRecords"></param>
+        /// <param name="archiveReader"></param>
+        /// <returns></returns>
+        private async Task AddMofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
+        {
+            try
+            {
+                IAsyncFileReader mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
+                if (mofFileReader == null) return;
+                if (!mofFileReader.FileMetaData.Id.IndexSpecified) return;
+
+                Dictionary<string, IEnumerable<DwcObservationVerbatim>> observationsByRecordId =
+                    occurrenceRecords
+                        .GroupBy(observation => observation.RecordId)
+                        .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
+
+                await foreach (IRow row in mofFileReader.GetDataRowsAsync())
+                {
+                    string id = row[mofFileReader.FileMetaData.Id.Index];
+                    AddEventMof(row, id, observationsByRecordId);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to add MeasurementOrFact extension data");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Add MeasureMentOrFact data
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="id"></param>
+        /// <param name="observationsByRecordId"></param>
+        private void AddEventMof(
+            IRow row, 
+            string id, 
+            Dictionary<string, IEnumerable<DwcObservationVerbatim>> observationsByRecordId)
+        {
+            if (!observationsByRecordId.TryGetValue(id, out var observations)) return;
+            foreach (var observation in observations)
+            {
+                if (observation.EventMeasurementOrFacts == null)
+                {
+                    observation.EventMeasurementOrFacts = new List<DwcMeasurementOrFact>();
+                }
+
+                var mofItem = DwcMeasurementOrFactFactory.Create(row);
+                observation.EventMeasurementOrFacts.Add(mofItem);
+            }
         }
 
         /// <summary>
@@ -209,13 +267,39 @@ namespace SOS.Import.DarwinCore
                 if (eventRecords.Count % batchSize == 0)
                 {
                     await AddEventEmofDataAsync(eventRecords, archiveReader);
+                    await AddEventMofDataAsync(eventRecords, archiveReader);
                     yield return eventRecords;
                     eventRecords.Clear();
                 }
             }
 
             await AddEventEmofDataAsync(eventRecords, archiveReader);
+            await AddEventMofDataAsync(eventRecords, archiveReader);
             yield return eventRecords;
+        }
+
+        private async Task AddEventMofDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
+        {
+            IAsyncFileReader mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
+            if (mofFileReader == null) return;
+            if (!mofFileReader.FileMetaData.Id.IndexSpecified) return;
+
+            var dwcEventByRecordId = dwcEvents.ToDictionary(e => e.RecordId, e => e);
+
+            await foreach (IRow row in mofFileReader.GetDataRowsAsync())
+            {
+                var id = row[mofFileReader.FileMetaData.Id.Index];
+                if (dwcEventByRecordId.TryGetValue(id, out DwcEvent dwcEvent))
+                {
+                    if (dwcEvent.MeasurementOrFacts == null)
+                    {
+                        dwcEvent.MeasurementOrFacts = new List<DwcMeasurementOrFact>();
+                    }
+
+                    var mofItem = DwcMeasurementOrFactFactory.Create(row);
+                    dwcEvent.MeasurementOrFacts.Add(mofItem);
+                }
+            }
         }
 
         /// <summary>

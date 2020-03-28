@@ -60,5 +60,10 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// Comments or notes accompanying the MeasurementOrFact.
         /// </summary>
         public string MeasurementRemarks { get; set; }
+
+        public override string ToString()
+        {
+            return $"Type: \"{MeasurementType}\", Value: \"{MeasurementValue}\", Unit: \"{MeasurementUnit}\"";
+        }
     }
 }

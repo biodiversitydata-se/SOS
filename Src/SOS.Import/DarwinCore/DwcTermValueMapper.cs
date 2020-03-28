@@ -967,5 +967,43 @@ namespace SOS.Import.DarwinCore
                     break;
             }
         }
+
+        public static void MapValueByTerm(DwcMeasurementOrFact mofItem, string term, string val)
+        {
+            switch (term)
+            {
+                // todo - should we handle "id"?
+                //case "id":
+                //    mofItem.Id = val;
+                //    break;
+                case "http://rs.tdwg.org/dwc/terms/measurementID":
+                    mofItem.MeasurementID = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/measurementType":
+                    mofItem.MeasurementType = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/measurementValue":
+                    mofItem.MeasurementValue = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/measurementAccuracy":
+                    mofItem.MeasurementAccuracy = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/measurementUnit":
+                    mofItem.MeasurementUnit = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/measurementDeterminedDate":
+                    mofItem.MeasurementDeterminedDate = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/measurementDeterminedBy":
+                    mofItem.MeasurementDeterminedBy = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/measurementMethod":
+                    mofItem.MeasurementMethod = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/measurementRemarks":
+                    mofItem.MeasurementRemarks = val;
+                    break;
+            }
+        }
     }
 }
