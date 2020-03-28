@@ -4,6 +4,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Nest;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Managers;
 using SOS.Export.MongoDb;
@@ -41,6 +42,7 @@ namespace SOS.Export.IntegrationTests.Managers
         private ObservationManager CreateObservationManager()
         {
             var exportConfiguration = GetExportConfiguration();
+            var elasticClient = new ElasticClient();
             var exportClient = new ExportClient(
                 exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 exportConfiguration.ProcessedDbConfiguration.DatabaseName,
@@ -55,6 +57,7 @@ namespace SOS.Export.IntegrationTests.Managers
             ObservationManager observationManager = new ObservationManager(
                 dwcArchiveFileWriter,
                 new ProcessedObservationRepository(
+                    elasticClient, 
                     exportClient,
                     new TaxonManager(
                         new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonManager>>().Object),

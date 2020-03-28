@@ -7,7 +7,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\SOS.Administration.Api.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\netcoreapp3.0\SOS.Administration.Api.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netcoreapp3.0\SOS.Administration.Api.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

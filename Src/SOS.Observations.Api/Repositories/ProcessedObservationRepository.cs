@@ -4,12 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
-using MongoDB.Driver;
+using Nest;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Database.Interfaces;
-using SOS.Observations.Api.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -20,74 +19,83 @@ namespace SOS.Observations.Api.Repositories
     /// </summary>
     public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, ObjectId>, IProcessedObservationRepository
     {
+        private readonly IElasticClient _elasticClient;
         private const int BiotaTaxonId = 0;
         private readonly ITaxonManager _taxonManager;
 
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="elasticClient"></param>
         /// <param name="client"></param>
         /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
+            IElasticClient elasticClient,
             IProcessClient client,
             ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger) : base(client, true, logger)
         {
+            _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }
 
-        private SearchFilter PrepareFilter(SearchFilter filter)
-        {
-            var preparedFilter = filter.Clone();
-
-            if (preparedFilter.IncludeUnderlyingTaxa && preparedFilter.TaxonIds != null && preparedFilter.TaxonIds.Any())
-            {
-                if (preparedFilter.TaxonIds.Contains(BiotaTaxonId)) // If Biota, then clear taxon filter
-                {
-                    preparedFilter.TaxonIds = new List<int>();
-                }
-                else
-                {
-                    preparedFilter.TaxonIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
-                }
-            }
-
-            return preparedFilter;
-        }
-
-        private SortDefinition<ProcessedObservation> PrepareSorting(string sortBy, SearchSortOrder sortOrder)
-        {
-            return string.IsNullOrEmpty(sortBy) ?
-                Builders<ProcessedObservation>.Sort.Descending(s => s.Id) : sortOrder.Equals(SearchSortOrder.Desc) ?
-                    Builders<ProcessedObservation>.Sort.Descending(sortBy) : Builders<ProcessedObservation>.Sort.Ascending(sortBy);
-        }
-
         /// <inheritdoc />
-        public async Task<IEnumerable<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
+        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
         {
-           // var sorting = PrepareSorting(sortBy, sortOrder);
-            filter = PrepareFilter(filter);
-
-            if (filter?.OutputFields?.Any() ?? false)
+            if (!filter?.IsFilterActive ?? true)
             {
-                var query = MongoCollection
-                    .Find(filter.ToFilterDefinition())
-                    .Project(filter.OutputFields.ToProjection())
-                    .Skip(skip)
-                    .Limit(take);
-
-                return (await query.ToListAsync()).ConvertAll(BsonTypeMapper.MapToDotNetValue);
+                return null;
             }
-            else
+            var query = filter.ToQuery();
+            query = AddInternalFilters(filter, query);
+
+            var searchResponse = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                .Index(CollectionName.ToLower())
+                .From(skip)
+                .Size(take)
+                .Query(q => q
+                    .Bool(b => b
+                        .Filter(query))));
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            return new PagedResult<dynamic>
             {
-                var query = MongoCollection
-                    .Find(filter.ToFilterDefinition())
-                    .Limit(take)
-                    .Skip(skip);
+                Records = searchResponse.Documents,
+                TotalCount = searchResponse.HitsMetadata.Total.Value
+            };
 
-                return await query.ToListAsync();
+
+        }
+
+        private static IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> AddInternalFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> query)
+        {
+            var queryInternal = query.ToList();
+            if (filter is SearchFilterInternal)
+            {
+                var internalFilter = filter as SearchFilterInternal;
+
+                if (internalFilter.ProjectId.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Match(t => t
+                            .Field(new Field("projects.id"))
+                            .Query(internalFilter.ProjectId.ToString())
+                        )
+                    );
+                }
+                if (internalFilter.UserId.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Terms(t => t
+                            .Field(new Field("reportedByUserId"))
+                            .Terms(internalFilter.UserId)
+                        )
+                    );
+                }
             }
+            return queryInternal;
         }
     }
 }

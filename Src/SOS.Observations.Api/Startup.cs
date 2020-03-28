@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Elasticsearch.Net;
 using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.Mongo;
@@ -16,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Nest;
 using NLog.Web;
 using SOS.Lib.Configuration.Shared;
 using SOS.Observations.Api.Swagger;
@@ -138,6 +140,19 @@ namespace SOS.Observations.Api
                         })
             );
 
+
+            //setup the elastic search configuration
+            var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+
+            var uris = elasticConfiguration.Hosts.Select(u => new Uri(u));
+            var nodes = uris.Select(u => new Node(u) { MasterEligible = true });
+
+            var connectionPool = new SniffingConnectionPool(nodes);
+            var settings = new ConnectionSettings(connectionPool)
+                .SniffLifeSpan(TimeSpan.FromMinutes(1))
+                .RequestTimeout(TimeSpan.FromMinutes(5));
+            
+            services.AddSingleton<IElasticClient>(new ElasticClient(settings));
         }
 
         /// <summary>

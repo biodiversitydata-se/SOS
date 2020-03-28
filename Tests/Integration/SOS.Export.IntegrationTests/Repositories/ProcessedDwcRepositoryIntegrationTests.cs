@@ -3,6 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Nest;
 using SOS.Export.Extensions;
 using SOS.Export.Managers;
 using SOS.Export.MongoDb;
@@ -56,12 +57,14 @@ namespace SOS.Export.IntegrationTests.Repositories
         private ProcessedObservationRepository GetProcessedObservationRepository()
         {
             var exportConfiguration = GetExportConfiguration();
+            var elasticClient = new ElasticClient();
             var exportClient = new ExportClient(
                 exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 exportConfiguration.ProcessedDbConfiguration.DatabaseName,
                 exportConfiguration.ProcessedDbConfiguration.BatchSize);
             ProcessedObservationRepository processedObservationRepository =
                 new ProcessedObservationRepository(
+                    elasticClient,
                     exportClient,
                     new TaxonManager(
                         new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonManager>>().Object),

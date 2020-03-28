@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Nest;
 using SOS.Export.Managers.Interfaces;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
@@ -19,18 +20,23 @@ namespace SOS.Export.Repositories
     /// </summary>
     public class ProcessedObservationRepository : BaseRepository<ProcessedObservation, ObjectId>, IProcessedObservationRepository
     {
+        private readonly IElasticClient _elasticClient;
         private ITaxonManager _taxonManager;
-        
+
         /// <summary>
-        /// Constructor
+        ///  Constructor
         /// </summary>
+        /// <param name="elasticClient"></param>
         /// <param name="exportClient"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
+            IElasticClient elasticClient,
             IExportClient exportClient,
             ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger) : base(exportClient, true, logger)
         {
+            _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }
 
@@ -56,15 +62,22 @@ namespace SOS.Export.Repositories
         /// <inheritdoc />
         public async Task<IEnumerable<ProcessedObservation>> GetChunkAsync(FilterBase filter, int skip, int take)
         {
-            filter = PrepareFilter(filter);
+            if (!filter?.IsFilterActive ?? true)
+            {
+                return null;
+            }
 
-            var query = MongoCollection
-                .Find(filter.ToFilterDefinition())
-                .Limit(take)
-                .Skip(skip);
+            var searchResponse = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                .Index(CollectionName.ToLower())
+                .From(skip)
+                .Size(take)
+                .Query(q => q
+                    .Bool(b => b
+                        .Filter(filter.ToQuery()))));
 
-            return await query.ToListAsync();
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
+            return searchResponse.Documents;
         }
 
         public async Task<IEnumerable<ProcessedProject>> GetProjectParameters(
@@ -72,7 +85,7 @@ namespace SOS.Export.Repositories
             int skip,
             int take)
         {
-            List<IEnumerable<ProcessedProject>> res = await MongoCollection
+           /* List<IEnumerable<ProcessedProject>> res = await MongoCollection
                 .Find(filter.ToProjectParameteFilterDefinition())
                 .Skip(skip)
                 .Limit(take)
@@ -81,6 +94,11 @@ namespace SOS.Export.Repositories
 
             var projectParameters = res.SelectMany(pp => pp);
             return projectParameters;
+            
+            Todo
+             */
+
+            return null;
         }
     }
 }

@@ -42,7 +42,7 @@ namespace SOS.Observations.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost("search")]
-        [ProducesResponseType(typeof(IEnumerable<ProcessedObservation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResult<ProcessedObservation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetChunkAsync([FromBody] SearchFilter filter, [FromQuery]int skip, [FromQuery]int take)
@@ -61,6 +61,16 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Error getting batch of sightings");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+        }
+        /// <inheritdoc />
+        [HttpPost("searchinternal")]
+        [ProducesResponseType(typeof(PagedResult<ProcessedObservation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> GetChunkInternalAsync([FromBody] SearchFilterInternal filter, [FromQuery]int skip, [FromQuery]int take)
+        {
+            return await GetChunkAsync(filter, skip, take);            
         }
 
         /// <inheritdoc />

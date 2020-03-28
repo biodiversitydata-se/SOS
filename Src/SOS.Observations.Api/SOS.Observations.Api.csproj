@@ -5,10 +5,10 @@
         <UserSecretsId>92cd2cdb-499c-480d-9f04-feaf7a68f89c</UserSecretsId>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile>bin\Debug\SOS.Observations.Api.xml</DocumentationFile>
+        <DocumentationFile>bin\Debug\netcoreapp3.0\SOS.Observations.Api.xml</DocumentationFile>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\netcoreapp2.0\SOS.Search.Service.xml</DocumentationFile>
+        <DocumentationFile>bin\Release\netcoreapp3.0\SOS.Observations.Api.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Autofac" Version="5.1.2" />

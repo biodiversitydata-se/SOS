@@ -19,32 +19,40 @@ namespace SOS.Observations.Api.Managers
     {
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IFieldMappingManager _fieldMappingManager;
+        private readonly ITaxonManager _taxonManager;
         private readonly ILogger<ObservationManager> _logger;
+        
+        private const int BiotaTaxonId = 0;
 
         /// <summary>
-        /// Constructor
+        ///  Constructor
         /// </summary>
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingManager"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingManager fieldMappingManager,
+            ITaxonManager taxonManager,
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
+            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
+        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
         {
             try
             {
-                var processedObservations = (await _processedObservationRepository.GetChunkAsync(filter, skip, take)).ToArray();
-                ProcessLocalizedFieldMappings(filter, processedObservations);
-                ProcessNonLocalizedFieldMappings(filter, processedObservations);
+                filter = PrepareFilter(filter);
+
+                var processedObservations = (await _processedObservationRepository.GetChunkAsync(filter, skip, take));
+                ProcessLocalizedFieldMappings(filter, processedObservations.Records);
+                ProcessNonLocalizedFieldMappings(filter, processedObservations.Records);
                 return processedObservations;
             }
             catch (Exception e)
@@ -52,6 +60,25 @@ namespace SOS.Observations.Api.Managers
                 _logger.LogError(e, "Failed to get chunk of observations");
                 return null;
             }
+        }
+
+        private SearchFilter PrepareFilter(SearchFilter filter)
+        {
+            var preparedFilter = filter.Clone();
+
+            if (preparedFilter.IncludeUnderlyingTaxa && preparedFilter.TaxonIds != null && preparedFilter.TaxonIds.Any())
+            {
+                if (preparedFilter.TaxonIds.Contains(BiotaTaxonId)) // If Biota, then clear taxon filter
+                {
+                    preparedFilter.TaxonIds = new List<int>();
+                }
+                else
+                {
+                    preparedFilter.TaxonIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
+                }
+            }
+
+            return preparedFilter;
         }
 
         private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)

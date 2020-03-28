@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MongoDB.Bson;
 using MongoDB.Driver.GeoJsonObjectModel;
+using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -80,8 +82,8 @@ namespace SOS.Process.Processors.ClamPortal
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Id = verbatimObservation.LocationId,
                     Locality = verbatimObservation.Locality,
-                    Point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry(),
-                    PointWithBuffer = wgs84Point?.ToSquare(verbatimObservation.CoordinateUncertaintyInMeters)?.ToGeoJsonGeometry(),
+                    Point = (PointGeoShape)wgs84Point?.ToGeoShape(),
+                    PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatimObservation.CoordinateUncertaintyInMeters)?.ToGeoShape(),
                     Remarks = verbatimObservation.LocationRemarks,
                     MaximumDepthInMeters = verbatimObservation.MaximumDepthInMeters,
                     VerbatimLatitude = verbatimObservation.DecimalLatitude,
@@ -116,7 +118,8 @@ namespace SOS.Process.Processors.ClamPortal
                 ReportedBy = verbatimObservation.ReportedBy,
                 ReportedDate = verbatimObservation.ReportedDate,
                 RightsHolder = verbatimObservation.RightsHolder,
-                Taxon = taxon
+                Taxon = taxon,
+                Id = ObjectId.GenerateNewId()
             };
         }
 

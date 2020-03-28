@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Elasticsearch.Net;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Nest;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Process.Database;
@@ -51,6 +53,15 @@ namespace SOS.Process.IntegrationTests.Jobs
         private ProcessJob CreateProcessJob()
         {
             var processConfiguration = GetProcessConfiguration();
+            var elasticConfiguration = GetElasticConfiguration();
+            var uris = new Uri[elasticConfiguration.Hosts.Length];
+            for (int i = 0; i < uris.Length; i++)
+            {
+                uris[i] = new Uri(elasticConfiguration.Hosts[i]);
+            }
+
+            var elasticClient = new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris)));
+
             var verbatimClient = new VerbatimClient(
                 processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
                 processConfiguration.VerbatimDbConfiguration.DatabaseName,
@@ -66,7 +77,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             var fieldMappingVerbatimRepository = new FieldMappingVerbatimRepository(verbatimClient, new NullLogger<FieldMappingVerbatimRepository>());
             var taxonProcessedRepository = new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
             var invalidObservationRepository = new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
-            var processedObservationRepository = new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>());
+            var processedObservationRepository = new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>(), elasticClient);
             var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository = new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
             var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
@@ -90,7 +101,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
             var instanceManager = new InstanceManager(
-                new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>()),
+                new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>(), elasticClient),
                 processInfoRepository,
                 new NullLogger<InstanceManager>());
 

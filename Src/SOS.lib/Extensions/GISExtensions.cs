@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text.Json;
 using Microsoft.SqlServer.Types;
 using MongoDB.Driver.GeoJsonObjectModel;
+using Nest;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using NetTopologySuite.IO;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Operation.Buffer;
 using NetTopologySuite.Utilities;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
@@ -72,13 +72,17 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Get the crs urn string
+        /// Cast polygon to coordinates
         /// </summary>
-        /// <param name="srid"></param>
+        /// <param name="polygon"></param>
         /// <returns></returns>
-        private static string GetCrsUrn(int srid)
+        private static GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates> ToGeoJsonPolygonCoordinates(this Polygon polygon)
         {
-            return $"urn:ogc:def:crs:EPSG::{srid}";
+            var exteriorRing = GeoJson.LinearRingCoordinates(polygon.ExteriorRing.Coordinates.Select(er => GeoJson.Geographic(er.X, er.Y)).ToArray());
+            var holes = polygon.Holes.Select(h => GeoJson.LinearRingCoordinates(h.Coordinates.Select(er => GeoJson.Geographic(er.X, er.Y)).ToArray())).ToArray();
+            var coordinates = GeoJson.PolygonCoordinates(exteriorRing, holes);
+
+            return coordinates;
         }
 
         /// <summary>
@@ -86,33 +90,28 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="polygon"></param>
         /// <returns></returns>
-        private static GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates> ToGeoJsonPolygonCoordinates(this
+        private static IEnumerable<IEnumerable<GeoCoordinate>> ToPolygonGeoShapeCoordinates(this
             IEnumerable<IEnumerable<IEnumerable<double>>> polygon)
         {
-            var rings = polygon.Select(r =>
-                new GeoJsonLinearRingCoordinates<GeoJson2DGeographicCoordinates>(r.Select(p => new GeoJson2DGeographicCoordinates(p.ElementAt(0), p.ElementAt(1)))));
-
-            return new GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates>(
-                rings.FirstOrDefault(),
-                rings.Skip(1));
+            return polygon.Select(r =>
+                  r.Select(p => new GeoCoordinate(p.ElementAt(1), p.ElementAt(0))));
         }
 
         /// <summary>
-        /// Create a linear ring out of coordinates
+        /// Cast polygon to shape coordinates
         /// </summary>
-        /// <param name="coordinates"></param>
+        /// <param name="polygon"></param>
         /// <returns></returns>
-        private static LinearRing ToLineRing(this Coordinate[] coordinates)
+        private static IEnumerable<IEnumerable<GeoCoordinate>> ToPolygonGeoShapeCoordinates(this Polygon polygon)
         {
-            // Make sure we don't have any dublicates
-            coordinates = coordinates.Select(c => c).Distinct().ToArray();
+            var coordinates = new List<IEnumerable<GeoCoordinate>>();
+            var exteriorRing = polygon.ExteriorRing.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X));
+            var holes = polygon.Holes.Select(h => h.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)));
 
-            // Make sure first and last coordinate is the same
-            var newCoordinates = coordinates.Append(coordinates.First());
+            coordinates.Add(exteriorRing);
+            coordinates.AddRange(holes);
 
-            // Create a new linear ring
-            var geomFactory = new GeometryFactory();
-            return geomFactory.CreateLinearRing(newCoordinates.ToArray());
+            return coordinates;
         }
 
         /// <summary>
@@ -138,83 +137,28 @@ namespace SOS.Lib.Extensions
             }
 
             return (Polygon)polygon.Buffer(0);
-           /* if (polygon.IsValid)
-            {
-                return polygon;
-            }
-            var geomFactory = new GeometryFactory();
+            /* if (polygon.IsValid)
+             {
+                 return polygon;
+             }
+             var geomFactory = new GeometryFactory();
 
-            var exteriorRing = polygon.ExteriorRing.Coordinates.ToLineRing();
-            var holes = polygon.Holes.Select(h => h.Coordinates.ToLineRing()).ToArray();
+             var exteriorRing = polygon.ExteriorRing.Coordinates.ToLineRing();
+             var holes = polygon.Holes.Select(h => h.Coordinates.ToLineRing()).ToArray();
 
-            polygon = geomFactory.CreatePolygon(exteriorRing, holes);
-            
-            if (!polygon.IsValid)
-            {
-                return (Polygon)polygon.Buffer(0);
-            }
+             polygon = geomFactory.CreatePolygon(exteriorRing, holes);
 
-            return polygon;*/
-        }
+             if (!polygon.IsValid)
+             {
+                 return (Polygon)polygon.Buffer(0);
+             }
 
-        /// <summary>
-        /// Cast polygon to coordinates
-        /// </summary>
-        /// <param name="polygon"></param>
-        /// <returns></returns>
-        private static GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates> ToGeoJsonPolygonCoordinates(this Polygon polygon)
-        {
-            var exteriorRing = GeoJson.LinearRingCoordinates(polygon.ExteriorRing.Coordinates.Select(er => GeoJson.Geographic(er.X, er.Y)).ToArray());
-            var holes = polygon.Holes.Select(h => GeoJson.LinearRingCoordinates(h.Coordinates.Select(er => GeoJson.Geographic(er.X, er.Y)).ToArray())).ToArray();
-            var coordinates = GeoJson.PolygonCoordinates(exteriorRing, holes);
-
-            return coordinates;
-        }
-
-
-        /// <summary>
-        /// Transform coordinates
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <param name="mathTransform"></param>
-        /// <returns></returns>
-        private static Geometry Transform(this Geometry geometry, MathTransform mathTransform)
-        {
-            geometry = geometry.Copy();
-            geometry.Apply(new MathTransformFilter(mathTransform));
-            return geometry;
+             return polygon;*/
         }
 
         #endregion Private
 
         #region Public
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        static GISExtensions()
-        {
-            CoordinateSystemFactory coordinateSystemFactory = new CoordinateSystemFactory();
-            Dictionary<CoordinateSys, CoordinateSystem> coordinateSystemsById = new Dictionary<CoordinateSys, CoordinateSystem>();
-
-            foreach (var coordinateSys in Enum.GetValues(typeof(CoordinateSys)).Cast<CoordinateSys>())
-            {
-                coordinateSystemsById.Add(coordinateSys, coordinateSystemFactory.CreateFromWkt(GetCoordinateSystemWkt(coordinateSys)));
-            }
-
-            var coordinateTransformationFactory = new CoordinateTransformationFactory();
-            foreach (var sourceCoordinateSys in Enum.GetValues(typeof(CoordinateSys)).Cast<CoordinateSys>())
-            {
-                foreach (var targetCoordinateSys in Enum.GetValues(typeof(CoordinateSys)).Cast<CoordinateSys>())
-                {
-                    ICoordinateTransformation coordinateTransformation = coordinateTransformationFactory.CreateFromCoordinateSystems(
-                        coordinateSystemsById[sourceCoordinateSys],
-                        coordinateSystemsById[targetCoordinateSys]);
-
-                    MathTransformFilterDictionary.Add(new Tuple<CoordinateSys, CoordinateSys>(sourceCoordinateSys, targetCoordinateSys), new MathTransformFilter(coordinateTransformation.MathTransform));
-                }
-            }
-        }
 
         /// <summary>
         ///  Transform WGS 84 point to circle by adding a buffer to it
@@ -246,7 +190,7 @@ namespace SOS.Lib.Extensions
                     var shapeFactory = new GeometricShapeFactory();
                     shapeFactory.NumPoints = accuracy < 1000 ? 32 : accuracy < 10000 ? 64 : 128;
                     shapeFactory.Centre = point.Coordinate;
-                   
+
                     // Length in meters of 1° of latitude = always 111.32 km
                     shapeFactory.Height = diameterInMeters / 111320d;
 
@@ -260,78 +204,83 @@ namespace SOS.Lib.Extensions
             return circle;
         }
 
-        public static Geometry ToSquare(this Point point, int? accuracy)
-        {
-            if (accuracy == null || accuracy < 0.0)
-            {
-                return null;
-            }
-
-            var shapeFactory = new GeometricShapeFactory();
-            var diameterInMeters = (double)(accuracy == 0 ? 1 : accuracy * 2);
-            switch ((CoordinateSys)point.SRID)
-            {
-                // Metric systems, add buffer to create a circle
-                case CoordinateSys.SWEREF99:
-                case CoordinateSys.SWEREF99_TM:
-                case CoordinateSys.Rt90_25_gon_v:
-                    // Height in meters
-                    shapeFactory.Height = diameterInMeters;
-
-                    // Length in meters 
-                    shapeFactory.Width = diameterInMeters;
-                    break;
-                case CoordinateSys.WebMercator:
-                case CoordinateSys.WGS84:
-                    // Length in meters of 1° of latitude = always 111.32 km
-                    shapeFactory.Height = diameterInMeters / 111320d;
-
-                    // Length in meters of 1° of longitude = 40075 km * cos( latitude radian ) / 360
-                    shapeFactory.Width = diameterInMeters / (40075000 * Math.Cos(point.Y.ToRadians()) / 360);
-                    break;
-            }
-            shapeFactory.NumPoints = 4;
-            shapeFactory.Centre = point.Coordinate;
-
-            var square = shapeFactory.CreateRectangle();
-
-            return square;
-        }
-
         /// <summary>
-        /// Cast input geometry to geojson geometry
+        /// Cast input geometry to Geo shape
         /// </summary>
         /// <param name="geometry"></param>
         /// <returns></returns>
-        public static GeoJsonGeometry<GeoJson2DGeographicCoordinates> ToGeoJsonGeometry(this InputGeometry geometry)
+        public static IGeoShape ToGeoShape(this InputGeometry geometry)
         {
             if (!geometry.IsValid)
             {
                 return null;
             }
-            
+
             switch (geometry.Type?.ToLower())
             {
                 case "point":
-                    var coordinates = geometry.Coordinates.ToArray().Select(p => ((JsonElement) p).GetDouble()).ToArray();
-                    return GeoJson.Point(GeoJson.Geographic(coordinates[0], coordinates[1]));
+                    var coordinates = geometry.Coordinates.ToArray().Select(p => ((JsonElement)p).GetDouble())
+                        .ToArray();
+
+                    return new PointGeoShape(new GeoCoordinate(coordinates[1], coordinates[0]));
                 case "polygon":
                     var polygon = geometry.Coordinates.ToArray()
                         .Select(ring =>
                             ((JsonElement)ring).EnumerateArray().Select(point => point.EnumerateArray().Select(nmr => nmr.GetDouble())));
 
-                    return GeoJson.Polygon(polygon.ToGeoJsonPolygonCoordinates());
-                    
+                    return new PolygonGeoShape(polygon.ToPolygonGeoShapeCoordinates());
                 case "multipolygon":
-                   var multipolygon = geometry.Coordinates.ToArray()
+                    var multipolygon = geometry.Coordinates.ToArray()
                         .Select(polygon => ((JsonElement)polygon).EnumerateArray()
                             .Select(ring =>
                                 ring.EnumerateArray().Select(point => point.EnumerateArray().Select(nmr => nmr.GetDouble()))));
 
-                   return GeoJson.MultiPolygon(multipolygon.Select(p => p.ToGeoJsonPolygonCoordinates()).ToArray());
-
+                    return new MultiPolygonGeoShape(multipolygon.Select(p => p.ToPolygonGeoShapeCoordinates()));
                 default:
                     return null;
+            }
+        }
+
+        /// <summary>
+        /// Cast geometry to geo shape
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <returns></returns>
+        public static IGeoShape ToGeoShape(this Geometry geometry)
+        {
+            if (geometry?.Coordinates == null)
+            {
+                return null;
+            }
+
+            switch (geometry.OgcGeometryType)
+            {
+                case OgcGeometryType.Point:
+                    var point = (Point)geometry;
+
+                    return new PointGeoShape(new GeoCoordinate(point.Y, point.X));
+                case OgcGeometryType.LineString:
+                    var lineString = (LineString)geometry;
+
+                    return new LineStringGeoShape(lineString.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)));
+                case OgcGeometryType.MultiLineString:
+                    var multiLineString = (MultiLineString)geometry;
+
+                    return new MultiLineStringGeoShape(multiLineString.Geometries.Select(mls => mls.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X))));
+                case OgcGeometryType.MultiPoint:
+                    var multiPoint = (MultiPoint)geometry;
+
+                    return new MultiPointGeoShape(multiPoint.Coordinates.Select(p => new GeoCoordinate(p.Y, p.X)));
+                case OgcGeometryType.Polygon:
+                    var polygon = (Polygon)geometry;
+
+                    return new PolygonGeoShape(polygon.MakeValid().ToPolygonGeoShapeCoordinates());
+                case OgcGeometryType.MultiPolygon:
+                    var multiPolygon = (MultiPolygon)geometry;
+
+                    return new MultiPolygonGeoShape(multiPolygon.Geometries.Select(p => ((Polygon)p).MakeValid().ToPolygonGeoShapeCoordinates()));
+                default:
+                    throw new ArgumentException($"Not handled geometry type: {geometry.GeometryType}");
             }
         }
 
@@ -346,7 +295,7 @@ namespace SOS.Lib.Extensions
             {
                 return null;
             }
-            
+
             switch (geometry.OgcGeometryType)
             {
                 case OgcGeometryType.Point:

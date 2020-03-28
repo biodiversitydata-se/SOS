@@ -5,12 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Elasticsearch.Net;
 using Hangfire;
 using Hangfire.Mongo;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Nest;
 using NLog.Web;
 using SOS.Export.IoC.Modules;
 using SOS.Import.IoC.Modules;
@@ -101,6 +103,16 @@ namespace SOS.Hangfire.JobServer
 
                     // Add the processing server as IHostedService
                     services.AddHangfireServer();
+
+                    //setup the elastic search configuration
+                    var elasticConfiguration = hostContext.Configuration.GetSection("ProcessConfiguration").GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+                    var uris = new Uri[elasticConfiguration.Hosts.Length];
+                    for(int i = 0; i< uris.Length; i++)
+                    {
+                        uris[i] = new Uri(elasticConfiguration.Hosts[i]);
+                    }
+
+                    services.AddSingleton<IElasticClient>(new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))));
                 })
                 .UseServiceProviderFactory(hostContext =>
                     {
