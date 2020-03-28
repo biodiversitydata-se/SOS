@@ -2,7 +2,7 @@
 using DwC_A.Meta;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
-namespace SOS.Import.DarwinCore
+namespace SOS.Import.DarwinCore.Factories
 {
     public static class DwcEventFactory
     {
