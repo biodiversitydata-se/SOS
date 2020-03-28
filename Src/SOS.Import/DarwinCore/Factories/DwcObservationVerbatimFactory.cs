@@ -6,7 +6,7 @@ namespace SOS.Import.DarwinCore
 {
     public static class DwcObservationVerbatimFactory
     {
-        public static DwcObservationVerbatim Create(IRow row, string filename, int? idIndex = null)
+        public static DwcObservationVerbatim Create(IRow row, string filename, int idIndex)
         {
             var verbatimRecord = new DwcObservationVerbatim {DwcArchiveFilename = filename};
             foreach (FieldType fieldType in row.FieldMetaData)
@@ -14,11 +14,8 @@ namespace SOS.Import.DarwinCore
                 var val = row[fieldType.Index];
                 DwcTermValueMapper.MapValueByTerm(verbatimRecord, fieldType.Term, val);
             }
-            if (idIndex.HasValue)
-            {
-                verbatimRecord.RecordId = row[idIndex.Value];
-            }
-
+            
+            verbatimRecord.RecordId = row[idIndex];
             return verbatimRecord;
         }
     }

@@ -6,7 +6,7 @@ namespace SOS.Import.DarwinCore
 {
     public static class DwcEventFactory
     {
-        public static DwcEvent Create(IRow row, string filename)
+        public static DwcEvent Create(IRow row, string filename, int idIndex)
         {
             var dwcEvent = new DwcEvent { DwcArchiveFilename = filename };
             foreach (FieldType fieldType in row.FieldMetaData)
@@ -15,6 +15,7 @@ namespace SOS.Import.DarwinCore
                 DwcTermValueMapper.MapValueByTerm(dwcEvent, fieldType.Term, val);
             }
 
+            dwcEvent.RecordId = row[idIndex];
             return dwcEvent;
         }
     }
