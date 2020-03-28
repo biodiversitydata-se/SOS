@@ -49,6 +49,33 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             observations.Count.Should().Be(35670);
         }
 
+        [Fact]
+        public async Task Read_occurrence_dwca_with_mof_extension()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            const int batchSize = 10000;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(
+                "./resources/dwca/measurementorfact/bdrs1.zip", batchSize);
+            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
+            await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
+            {
+                observations.AddRange(verbatimObservationsBatch);
+            }
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            observations.Count.Should().Be(2);
+            observations[0].MeasurementOrFacts.Should().NotBeNull();
+        }
+
 
         [Fact]
         public async Task Read_psophus_stridulus_occurrence_dwc_archive_observations_in_batches()

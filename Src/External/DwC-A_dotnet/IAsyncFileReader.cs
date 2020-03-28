@@ -34,5 +34,7 @@ namespace DwC_A
         /// <param name="term"></param>
         /// <returns></returns>
         FieldType TryGetFieldMetaData(string term);
+
+        int GetIdIndex();
     }
 }

@@ -35,23 +35,57 @@ namespace SOS.Import.DarwinCore
             string filename)
         {
             IAsyncFileReader occurrenceFileReader = archiveReader.GetAsyncCoreFile();
+            int idIndex = occurrenceFileReader.GetIdIndex();
             List<DwcObservationVerbatim> occurrenceRecords = new List<DwcObservationVerbatim>();
 
             await foreach (IRow row in occurrenceFileReader.GetDataRowsAsync())
             {
-                var verbatimObservation = DwcObservationVerbatimFactory.Create(row, filename);
+                var verbatimObservation = DwcObservationVerbatimFactory.Create(row, filename, idIndex);
                 occurrenceRecords.Add(verbatimObservation);
 
                 if (occurrenceRecords.Count % batchSize == 0)
                 {
                     await AddEmofDataAsync(occurrenceRecords, archiveReader);
+                    await AddMofDataAsync(occurrenceRecords, archiveReader);
                     yield return occurrenceRecords;
                     occurrenceRecords.Clear();
                 }
             }
 
             await AddEmofDataAsync(occurrenceRecords, archiveReader);
+            await AddMofDataAsync(occurrenceRecords, archiveReader);
             yield return occurrenceRecords;
+        }
+
+        private async Task AddMofDataAsync(List<DwcObservationVerbatim> verbatimRecords, ArchiveReader archiveReader)
+        {
+            try
+            {
+                IAsyncFileReader mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
+                if (mofFileReader == null) return;
+                int idIndex = mofFileReader.GetIdIndex();
+
+                var observationByRecordId = verbatimRecords.ToDictionary(v => v.RecordId, v => v);
+                await foreach (IRow row in mofFileReader.GetDataRowsAsync())
+                {
+                    var id = row[idIndex];
+                    if (observationByRecordId.TryGetValue(id, out DwcObservationVerbatim obs))
+                    {
+                        if (obs.MeasurementOrFacts == null)
+                        {
+                            obs.MeasurementOrFacts = new List<DwcMeasurementOrFact>();
+                        }
+
+                        var mofItem = DwcMeasurementOrFactFactory.Create(row);
+                        obs.MeasurementOrFacts.Add(mofItem);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to add MeasurementOrFact extension data");
+                throw;
+            }
         }
 
         /// <summary>

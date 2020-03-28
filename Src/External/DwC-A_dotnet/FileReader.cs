@@ -70,6 +70,11 @@ namespace DwC_A
             return FileMetaData.Fields.FirstOrDefault(m => m.Term == term);
         }
 
+        public int GetIdIndex()
+        {
+            return FileMetaData.Id?.Index ?? 0;
+        }
+
         public async IAsyncEnumerable<IRow> GetHeaderRowsAsync()
         {
             int count = 0;
