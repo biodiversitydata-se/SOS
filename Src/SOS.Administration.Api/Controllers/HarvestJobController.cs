@@ -1,8 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Administration.Api.Models;
 using SOS.Lib.Jobs.Import;
 
 namespace SOS.Administration.Api.Controllers
@@ -234,5 +237,41 @@ namespace SOS.Administration.Api.Controllers
             }
         }
         #endregion FieldMapping
+
+        #region DwC-A
+        [HttpPost("DwcArchive/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> RunDwcArchiveHarvestJob([FromForm]UploadDwcArchiveModelDto model)
+        {
+            try
+            {
+                if (model.DwcaFile.Length > 0)
+                {
+                    //var filePath = Path.GetTempFileName();
+                    var filePath = System.IO.Path.Combine(Path.GetTempPath(), model.DwcaFile.FileName);
+                    if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+
+                    await using var stream = new FileStream(filePath, FileMode.Create);
+                    await model.DwcaFile.CopyToAsync(stream).ConfigureAwait(false);
+
+                    // process uploaded file
+                    BackgroundJob.Enqueue<IDwcArchiveHarvestJob>(job => job.RunAsync(filePath, JobCancellationToken.Null));
+                    return new OkObjectResult("Started DwC-A harvest job");
+                }
+                else
+                {
+                    return new BadRequestObjectResult("No file content");
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running DwC-A harvest job failed");
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+            }
+        }
+
+        #endregion DwC-A
     }
 }
