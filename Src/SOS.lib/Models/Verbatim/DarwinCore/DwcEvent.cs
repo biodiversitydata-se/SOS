@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.DarwinCore
 {
-    public class DwcEvent
+    public class DwcEvent : IEntity<ObjectId>
     {
         /// <summary>
         /// MongoDb Id. // todo - should we use Id, RecordId or EventID?

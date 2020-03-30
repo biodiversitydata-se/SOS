@@ -48,6 +48,8 @@ namespace DwC_A
         /// </summary>
         public FileReaderCollection Extensions { get; }
 
+        public bool IsSamplingEventCore => CoreFile.FileMetaData.RowType == RowTypes.Event;
+
         /// <summary>
         /// Constructor
         /// </summary>

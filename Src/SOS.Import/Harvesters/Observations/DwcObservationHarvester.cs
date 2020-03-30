@@ -11,6 +11,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson.IO;
+using MongoDB.Bson.Serialization.Conventions;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Import.Repositories.Destination.DarwinCoreArchive.Interfaces;
 using SOS.Lib.Enums;
@@ -27,6 +28,7 @@ namespace SOS.Import.Harvesters.Observations
     {
         private const int BatchSize = 100000;
         private readonly IDarwinCoreArchiveVerbatimRepository _dwcArchiveVerbatimRepository;
+        private readonly IDarwinCoreArchiveEventRepository _dwcArchiveEventRepository;
         private readonly IDwcArchiveReader _dwcArchiveReader;
         private readonly ILogger<DwcObservationHarvester> _logger;
 
@@ -34,14 +36,17 @@ namespace SOS.Import.Harvesters.Observations
         /// Constructor.
         /// </summary>
         /// <param name="dwcArchiveVerbatimRepository"></param>
+        /// <param name="dwcArchiveEventRepository"></param>
         /// <param name="dwcArchiveReader"></param>
         /// <param name="logger"></param>
         public DwcObservationHarvester(
             IDarwinCoreArchiveVerbatimRepository dwcArchiveVerbatimRepository,
+            IDarwinCoreArchiveEventRepository dwcArchiveEventRepository,
             IDwcArchiveReader dwcArchiveReader,
             ILogger<DwcObservationHarvester> logger)
         {
             _dwcArchiveVerbatimRepository = dwcArchiveVerbatimRepository ?? throw new ArgumentNullException(nameof(dwcArchiveVerbatimRepository));
+            _dwcArchiveEventRepository = dwcArchiveEventRepository ?? throw new ArgumentNullException(nameof(dwcArchiveEventRepository));
             _dwcArchiveReader = dwcArchiveReader ?? throw new ArgumentNullException(nameof(dwcArchiveReader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -55,20 +60,39 @@ namespace SOS.Import.Harvesters.Observations
             var harvestInfo = new HarvestInfo(nameof(DwcObservationVerbatim), DataSet.Dwc, DateTime.Now);
             try
             {
-                _logger.LogDebug("Start storing DwC verbatim");
+                ConventionRegistry.Register("IgnoreIfNull",
+                    new ConventionPack { new IgnoreIfNullConvention(true) },
+                    t => true);
+
+                _logger.LogDebug("Start storing DwC-A observations");
                 await _dwcArchiveVerbatimRepository.DeleteCollectionAsync();
                 await _dwcArchiveVerbatimRepository.AddCollectionAsync();
-
                 int observationCount = 0;
-                var observationBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(archivePath, BatchSize);
+                using var archiveReader = _dwcArchiveReader.OpenArchive(archivePath);
+                var observationBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, BatchSize);
                 await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     observationCount += verbatimObservationsBatch.Count;
                     await _dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch);
                 }
+                _logger.LogDebug("Finish storing DwC-A observations");
 
-                _logger.LogDebug("Finish storing DwC verbatim");
+                // Read and store events
+                if (archiveReader.IsSamplingEventCore)
+                {
+                    _logger.LogDebug("Start storing DwC-A events");
+                    await _dwcArchiveEventRepository.DeleteCollectionAsync();
+                    await _dwcArchiveEventRepository.AddCollectionAsync();
+                    var eventBatches = _dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archiveReader, BatchSize);
+                    await foreach (List<DwcEvent> eventBatch in eventBatches)
+                    {
+                        cancellationToken?.ThrowIfCancellationRequested();
+                        await _dwcArchiveEventRepository.AddManyAsync(eventBatch);
+                    }
+
+                    _logger.LogDebug("Finish storing DwC-A events");
+                }
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;

@@ -6,18 +6,18 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 namespace SOS.Import.Repositories.Destination.DarwinCoreArchive
 {
     /// <summary>
-    /// DwC-A observation repository
+    /// DwC-A event repository
     /// </summary>
-    public class DarwinCoreArchiveVerbatimRepository : VerbatimDbConfiguration<DwcObservationVerbatim, ObjectId>, Interfaces.IDarwinCoreArchiveVerbatimRepository
+    public class DarwinCoreArchiveEventRepository : VerbatimDbConfiguration<DwcEvent, ObjectId>, Interfaces.IDarwinCoreArchiveEventRepository
     {
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
-        public DarwinCoreArchiveVerbatimRepository(
+        public DarwinCoreArchiveEventRepository(
             IImportClient importClient,
-            ILogger<DarwinCoreArchiveVerbatimRepository> logger) : base(importClient, logger)
+            ILogger<DarwinCoreArchiveEventRepository> logger) : base(importClient, logger)
         {
         }
     }

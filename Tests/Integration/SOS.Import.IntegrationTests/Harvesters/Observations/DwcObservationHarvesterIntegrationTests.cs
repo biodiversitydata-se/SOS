@@ -93,9 +93,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 importConfiguration.VerbatimDbConfiguration.DatabaseName,
                 importConfiguration.VerbatimDbConfiguration.BatchSize);
             var dwcObservationHarvester = new DwcObservationHarvester(
-                new DarwinCoreArchiveVerbatimRepository(
-                    importClient, 
-                    new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
+                new DarwinCoreArchiveVerbatimRepository(importClient, new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
+                new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()), 
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()), 
                 new NullLogger<DwcObservationHarvester>());
             return dwcObservationHarvester;
