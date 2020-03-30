@@ -81,11 +81,12 @@ namespace SOS.Import.Factories
             {
                 if (personSightingBySightingId.TryGetValue(pair.Key, out PersonSighting personSighting))
                 {
-                    personSighting.ReportedBy = pair.Value;
+                    personSighting.ReportedBy = pair.Value.FullName;
+                    personSighting.ReportedByUserId = pair.Value.UserId;
                 }
                 else
                 {
-                    personSightingBySightingId.Add(pair.Key, new PersonSighting { ReportedBy = pair.Value });
+                    personSightingBySightingId.Add(pair.Key, new PersonSighting { ReportedBy = pair.Value.FullName, ReportedByUserId = pair.Value.UserId });
                 }
             }
 
@@ -160,11 +161,11 @@ namespace SOS.Import.Factories
             return observersBySightingId;
         }
 
-        private static IDictionary<int, string> CreateReportedByDictionary(
+        private static IDictionary<int, Person> CreateReportedByDictionary(
             IEnumerable<SightingRelation> sightingRelations,
             IDictionary<int, Person> personsByUserId)
         {
-            Dictionary<int, string> reportedBySightingId = new Dictionary<int, string>();
+            Dictionary<int, Person> reportedBySightingId = new Dictionary<int, Person>();
             var query = sightingRelations
                 .Where(y => y.SightingRelationTypeId == (int)SightingRelationTypeId.Reporter && y.IsPublic);
             foreach (var sightingRelation in query)
@@ -173,7 +174,7 @@ namespace SOS.Import.Factories
                 {
                     if (!reportedBySightingId.ContainsKey(sightingRelation.SightingId))
                     {
-                        reportedBySightingId.Add(sightingRelation.SightingId, person.FullName);
+                        reportedBySightingId.Add(sightingRelation.SightingId, person);
                     }
                 }
             }
