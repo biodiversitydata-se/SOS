@@ -205,6 +205,7 @@ namespace SOS.Import.Extensions
                 observation.Observers = personSighting.Observers;
                 observation.ReportedBy = personSighting.ReportedBy;
                 observation.SpeciesCollection = personSighting.SpeciesCollection;
+                observation.ReportedByUserId = personSighting.ReportedByUserId;
             }
 
             return observation;
