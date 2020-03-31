@@ -29,7 +29,7 @@ namespace SOS.Import.DarwinCore
         /// <param name="batchSize"></param>
         /// <param name="filename"></param>
         /// <returns></returns>
-        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsDwcObservation(
+        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader, 
             int batchSize,
             string filename)

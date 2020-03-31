@@ -28,7 +28,7 @@ namespace SOS.Import.DarwinCore
         {
             var filename = System.IO.Path.GetFileName(archiveReader.FileName);
             var occurrenceReader = CreateOccurrenceReader(archiveReader.CoreFile.FileMetaData.RowType);
-            await foreach (var batch in occurrenceReader.ReadArchiveInBatchesAsDwcObservation(archiveReader, batchSize, filename))
+            await foreach (var batch in occurrenceReader.ReadArchiveInBatchesAsync(archiveReader, batchSize, filename))
             {
                 yield return batch;
             }
@@ -40,7 +40,7 @@ namespace SOS.Import.DarwinCore
             int batchSize)
         {
             var dwcSamplingEventArchiveReader = new DwcSamplingEventArchiveReader(_logger);
-            await foreach (var batch in dwcSamplingEventArchiveReader.ReadEventArchiveInBatchesAsDwcEvent(archiveReader, batchSize))
+            await foreach (var batch in dwcSamplingEventArchiveReader.ReadArchiveInBatchesAsync(archiveReader, batchSize))
             {
                 yield return batch;
             }

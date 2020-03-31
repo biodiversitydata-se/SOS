@@ -33,7 +33,7 @@ namespace SOS.Import.DarwinCore
         /// <param name="archiveReader"></param>
         /// <param name="batchSize"></param>
         /// <returns></returns>
-        public async IAsyncEnumerable<List<DwcEvent>> ReadEventArchiveInBatchesAsDwcEvent(
+        public async IAsyncEnumerable<List<DwcEvent>> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader, 
             int batchSize)
         {
@@ -49,13 +49,13 @@ namespace SOS.Import.DarwinCore
 
                 if (eventRecords.Count % batchSize == 0)
                 {
-                    await AddEventDataFromExtensionsAsync(archiveReader, eventRecords);
+                    await AddDataFromExtensionsAsync(archiveReader, eventRecords);
                     yield return eventRecords;
                     eventRecords.Clear();
                 }
             }
 
-            await AddEventDataFromExtensionsAsync(archiveReader, eventRecords);
+            await AddDataFromExtensionsAsync(archiveReader, eventRecords);
             yield return eventRecords;
         }
 
@@ -65,14 +65,14 @@ namespace SOS.Import.DarwinCore
         /// <param name="archiveReader"></param>
         /// <param name="eventRecords"></param>
         /// <returns></returns>
-        private async Task AddEventDataFromExtensionsAsync(ArchiveReader archiveReader, List<DwcEvent> eventRecords)
+        private async Task AddDataFromExtensionsAsync(ArchiveReader archiveReader, List<DwcEvent> eventRecords)
         {
-            await AddEventEmofExtensionDataAsync(eventRecords, archiveReader);
-            await AddEventMofExtensionDataAsync(eventRecords, archiveReader);
-            await AddEventMultimediaExtensionDataAsync(eventRecords, archiveReader);
+            await AddEmofExtensionDataAsync(eventRecords, archiveReader);
+            await AddMofExtensionDataAsync(eventRecords, archiveReader);
+            await AddMultimediaExtensionDataAsync(eventRecords, archiveReader);
         }
 
-        private async Task AddEventMofExtensionDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
+        private async Task AddMofExtensionDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
         {
             IAsyncFileReader mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
             if (mofFileReader == null) return;
@@ -95,7 +95,7 @@ namespace SOS.Import.DarwinCore
             }
         }
 
-        private async Task AddEventMultimediaExtensionDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
+        private async Task AddMultimediaExtensionDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
         {
             try
             {
@@ -132,7 +132,7 @@ namespace SOS.Import.DarwinCore
         /// <param name="dwcEvents"></param>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        private async Task AddEventEmofExtensionDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
+        private async Task AddEmofExtensionDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
         {
             IAsyncFileReader emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
             if (emofFileReader == null) return;
