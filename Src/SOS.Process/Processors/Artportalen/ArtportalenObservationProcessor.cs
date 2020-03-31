@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
@@ -23,6 +24,7 @@ namespace SOS.Process.Processors.Artportalen
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly SemaphoreSlim _semaphore;
+        private readonly ProcessConfiguration _processConfiguration;
         public override ObservationProvider DataProvider => ObservationProvider.Artportalen;
 
         /// <summary>
@@ -44,6 +46,7 @@ namespace SOS.Process.Processors.Artportalen
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ?? throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
             _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _processConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
 
             if (processConfiguration == null)
             {
@@ -60,6 +63,21 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         protected override async Task<int> ProcessObservations(
+            IDictionary<int, ProcessedTaxon> taxa,
+            IJobCancellationToken cancellationToken)
+        {
+            if (_processConfiguration.ParallelProcessing)
+            {
+                return await ProcessObservationsParallel(taxa, cancellationToken);
+            }
+            else
+            {
+                // Sequential processing is used for easier debugging.
+                return await ProcessObservationsSequential(taxa, cancellationToken);
+            }
+        }
+
+        private async Task<int> ProcessObservationsParallel(
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
@@ -128,6 +146,37 @@ namespace SOS.Process.Processors.Artportalen
             }
 
             return 0;
+        }
+        private async Task<int> ProcessObservationsSequential(
+            IDictionary<int, ProcessedTaxon> taxa,
+            IJobCancellationToken cancellationToken)
+        {
+            var verbatimCount = 0;
+            var observationFactory = await ArtportalenObservationFactory.CreateAsync(taxa, _processedFieldMappingRepository);
+            ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
+            using var cursor = await _artportalenVerbatimRepository.GetAllByCursorAsync();
+
+            // Process and commit in batches.
+            await cursor.ForEachAsync(async verbatimObservation =>
+            {
+                sightings.Add(observationFactory.CreateProcessedObservation(verbatimObservation));
+                if (IsBatchFilledToLimit(sightings.Count))
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    verbatimCount += await CommitBatchAsync(sightings);
+                    Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
+                }
+            });
+
+            // Commit remaining batch (not filled to limit).
+            if (sightings.Any())
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
+                verbatimCount += await CommitBatchAsync(sightings);
+                Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
+            }
+
+            return verbatimCount;
         }
     }
 }

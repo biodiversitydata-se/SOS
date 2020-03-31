@@ -154,6 +154,7 @@ namespace SOS.Process.Processors.Artportalen
                 Projects = verbatimObservation.Projects?.Select(CreateProcessedProject),
                 ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem),
                 ReportedBy = verbatimObservation.ReportedBy,
+                ReportedByUserId = verbatimObservation.ReportedByUserId,
                 ReportedDate = verbatimObservation.ReportedDate,
                 RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas",
                 Taxon = taxon,

@@ -70,13 +70,13 @@ namespace SOS.Import.DarwinCore
                     var id = row[idIndex];
                     if (observationByRecordId.TryGetValue(id, out DwcObservationVerbatim obs))
                     {
-                        if (obs.MeasurementOrFacts == null)
+                        if (obs.ObservationMeasurementOrFacts == null)
                         {
-                            obs.MeasurementOrFacts = new List<DwcMeasurementOrFact>();
+                            obs.ObservationMeasurementOrFacts = new List<DwcMeasurementOrFact>();
                         }
 
                         var mofItem = DwcMeasurementOrFactFactory.Create(row);
-                        obs.MeasurementOrFacts.Add(mofItem);
+                        obs.ObservationMeasurementOrFacts.Add(mofItem);
                     }
                 }
             }
@@ -107,13 +107,13 @@ namespace SOS.Import.DarwinCore
                     var id = row[idIndex];
                     if (observationByRecordId.TryGetValue(id, out DwcObservationVerbatim obs))
                     {
-                        if (obs.ExtendedMeasurementOrFacts == null)
+                        if (obs.ObservationExtendedMeasurementOrFacts == null)
                         {
-                            obs.ExtendedMeasurementOrFacts = new List<DwcExtendedMeasurementOrFact>();
+                            obs.ObservationExtendedMeasurementOrFacts = new List<DwcExtendedMeasurementOrFact>();
                         }
 
                         var emofItem = DwcExtendedMeasurementOrFactFactory.Create(row);
-                        obs.ExtendedMeasurementOrFacts.Add(emofItem);
+                        obs.ObservationExtendedMeasurementOrFacts.Add(emofItem);
                     }
                 }
             }

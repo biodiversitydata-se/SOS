@@ -36,7 +36,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(ArtportalenDwcArchiveExportedFromAnalysisPortal, batchSize);
+            using var archiveReader = dwcArchiveReader.OpenArchive(ArtportalenDwcArchiveExportedFromAnalysisPortal);
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, batchSize);
             List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
             await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
             {
@@ -61,8 +62,10 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
+            using var archiveReader = dwcArchiveReader.OpenArchive("./resources/dwca/measurementorfact/bdrs1.zip");
             var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(
-                "./resources/dwca/measurementorfact/bdrs1.zip", batchSize);
+                archiveReader, 
+                batchSize);
             List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
             await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
             {
@@ -73,7 +76,7 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             observations.Count.Should().Be(2);
-            observations[0].MeasurementOrFacts.Should().NotBeNull();
+            observations[0].ObservationMeasurementOrFacts.Should().NotBeNull();
         }
 
 
@@ -89,7 +92,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(PsophusStridulusArchivePath, batchSize);
+            using var archiveReader = dwcArchiveReader.OpenArchive(PsophusStridulusArchivePath);
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, batchSize);
             List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
             await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
             {
@@ -114,7 +118,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(DwcArchiveWithEmofExtension, batchSize);
+            using var archiveReader = dwcArchiveReader.OpenArchive(DwcArchiveWithEmofExtension);
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, batchSize);
             List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
             await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
             {
@@ -126,7 +131,7 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             observations.Count.Should().Be(25816);
             var obs = observations.Single(o => o.RecordId == "urn:lsid:artportalen.se:Sighting:69400054");
-            obs.ExtendedMeasurementOrFacts.Single(m => m.MeasurementType == "Teknik")
+            obs.ObservationExtendedMeasurementOrFacts.Single(m => m.MeasurementType == "Teknik")
                 .MeasurementValue.Should().Be("D240X");
         }
 
@@ -143,7 +148,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(archivePath, batchSize);
+            using var archiveReader = dwcArchiveReader.OpenArchive(archivePath);
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, batchSize);
             List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
             await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
             {
@@ -164,15 +170,15 @@ namespace SOS.Import.IntegrationTests.DarwinCore
                 .Single(m => m.MeasurementType == "wind speed")
                 .MeasurementValue.Should().Be("9");
 
-            obs.ExtendedMeasurementOrFacts
+            obs.ObservationExtendedMeasurementOrFacts
                 .Count().Should().Be(3, "because there are 3 different occurrence measurements for the 'e3cc741e-23e6-11e8-a64f-4f26032957e3' occurrence.");
-            obs.ExtendedMeasurementOrFacts
+            obs.ObservationExtendedMeasurementOrFacts
                 .Single(o => o.MeasurementType == "catch per unit effort count")
                 .MeasurementValue.Should().Be("1.304408918");
-            obs.ExtendedMeasurementOrFacts
+            obs.ObservationExtendedMeasurementOrFacts
                 .Single(o => o.MeasurementType == "catch per unit effort biomass")
                 .MeasurementValue.Should().Be("0.632638325");
-            obs.ExtendedMeasurementOrFacts
+            obs.ObservationExtendedMeasurementOrFacts
                 .Single(o => o.MeasurementType == "total number of individuals caught")
                 .MeasurementValue.Should().Be("1");
 
@@ -191,7 +197,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var eventBatches = dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archivePath, batchSize);
+            using var archiveReader = dwcArchiveReader.OpenArchive(archivePath);
+            var eventBatches = dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archiveReader, batchSize);
             List<DwcEvent> dwcEvents = new List<DwcEvent>();
             await foreach (List<DwcEvent> verbatimObservationsBatch in eventBatches)
             {
@@ -225,7 +232,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var eventBatches = dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(SamplingEventDwcArchiveWithMofExtension, batchSize);
+            using var archiveReader = dwcArchiveReader.OpenArchive(SamplingEventDwcArchiveWithMofExtension);
+            var eventBatches = dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archiveReader, batchSize);
             List<DwcEvent> dwcEvents = new List<DwcEvent>();
             await foreach (List<DwcEvent> verbatimObservationsBatch in eventBatches)
             {
@@ -278,7 +286,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(SamplingEventDwcArchiveWithMofExtension, batchSize);
+            using var archiveReader = dwcArchiveReader.OpenArchive(SamplingEventDwcArchiveWithMofExtension);
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, batchSize);
             List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
             await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
             {
@@ -331,7 +340,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(ringedBirdsDwcArchive, batchSize);
+            using var archiveReader = dwcArchiveReader.OpenArchive(ringedBirdsDwcArchive);
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, batchSize);
             List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
             await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
             {

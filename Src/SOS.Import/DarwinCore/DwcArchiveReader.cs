@@ -23,11 +23,10 @@ namespace SOS.Import.DarwinCore
 
         /// <inheritdoc />
         public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
-            string archivePath,
+            ArchiveReader archiveReader,
             int batchSize)
         {
-            using var archiveReader = new ArchiveReader(archivePath);
-            var filename = System.IO.Path.GetFileName(archivePath);
+            var filename = System.IO.Path.GetFileName(archiveReader.FileName);
             var occurrenceReader = CreateOccurrenceReader(archiveReader.CoreFile.FileMetaData.RowType);
             await foreach (var batch in occurrenceReader.ReadArchiveInBatchesAsDwcObservation(archiveReader, batchSize, filename))
             {
@@ -37,14 +36,19 @@ namespace SOS.Import.DarwinCore
 
         /// <inheritdoc />
         public async IAsyncEnumerable<List<DwcEvent>> ReadSamplingEventArchiveInBatchesAsDwcEventAsync(
-            string archivePath,
+            ArchiveReader archiveReader,
             int batchSize)
         {
             var dwcSamplingEventArchiveReader = new DwcSamplingEventArchiveReader(_logger);
-            await foreach (var batch in dwcSamplingEventArchiveReader.ReadEventArchiveInBatchesAsDwcEvent(archivePath, batchSize))
+            await foreach (var batch in dwcSamplingEventArchiveReader.ReadEventArchiveInBatchesAsDwcEvent(archiveReader, batchSize))
             {
                 yield return batch;
             }
+        }
+
+        public ArchiveReader OpenArchive(string archivePath)
+        {
+            return new ArchiveReader(archivePath);
         }
 
         private IDwcArchiveReaderAsDwcObservation CreateOccurrenceReader(string rowType)

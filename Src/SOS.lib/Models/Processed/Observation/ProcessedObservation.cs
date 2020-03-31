@@ -231,6 +231,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public string ReportedBy { get; set; }
 
+        // <summary>
+        /// User id of the person that reported the species observation.
+        /// </summary>
+        public int? ReportedByUserId { get; set; }
+
         /// <summary>
         /// Date and time when the species observation was reported.
         /// </summary>

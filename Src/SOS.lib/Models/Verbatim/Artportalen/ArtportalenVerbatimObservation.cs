@@ -228,6 +228,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public string VerifiedBy { get; set; }
         public string Observers { get; set; }
         public string ReportedBy { get; set; }
+        public int ReportedByUserId { get; set; }
         public string SpeciesCollection { get; set; }
     }
 }

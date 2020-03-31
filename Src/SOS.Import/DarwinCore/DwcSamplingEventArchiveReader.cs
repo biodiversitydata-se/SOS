@@ -35,7 +35,9 @@ namespace SOS.Import.DarwinCore
         /// <param name="filename"></param>
         /// <returns></returns>
         public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsDwcObservation(
-            ArchiveReader archiveReader, int batchSize, string filename)
+            ArchiveReader archiveReader, 
+            int batchSize, 
+            string filename)
         {
             IAsyncFileReader occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Occurrence);
             if (occurrenceFileReader == null) yield break;
@@ -238,26 +240,27 @@ namespace SOS.Import.DarwinCore
             
             if (observationByOccurrenceId.TryGetValue(occurrenceId, out DwcObservationVerbatim obs))
             {
-                if (obs.ExtendedMeasurementOrFacts == null)
+                if (obs.ObservationExtendedMeasurementOrFacts == null)
                 {
-                    obs.ExtendedMeasurementOrFacts = new List<DwcExtendedMeasurementOrFact>();
+                    obs.ObservationExtendedMeasurementOrFacts = new List<DwcExtendedMeasurementOrFact>();
                 }
 
                 var emofItem = DwcExtendedMeasurementOrFactFactory.Create(row);
-                obs.ExtendedMeasurementOrFacts.Add(emofItem);
+                obs.ObservationExtendedMeasurementOrFacts.Add(emofItem);
             }
         }
 
         /// <summary>
         /// Reads a sampling event based DwC-A, and returns events in batches.
         /// </summary>
-        /// <param name="archivePath"></param>
+        /// <param name="archiveReader"></param>
         /// <param name="batchSize"></param>
         /// <returns></returns>
-        public async IAsyncEnumerable<List<DwcEvent>> ReadEventArchiveInBatchesAsDwcEvent(string archivePath, int batchSize)
+        public async IAsyncEnumerable<List<DwcEvent>> ReadEventArchiveInBatchesAsDwcEvent(
+            ArchiveReader archiveReader, 
+            int batchSize)
         {
-            using var archiveReader = new ArchiveReader(archivePath);
-            var filename = System.IO.Path.GetFileName(archivePath);
+            var filename = System.IO.Path.GetFileName(archiveReader.FileName);
             var occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Event);
             int idIndex = occurrenceFileReader.GetIdIndex();
             var eventRecords = new List<DwcEvent>();

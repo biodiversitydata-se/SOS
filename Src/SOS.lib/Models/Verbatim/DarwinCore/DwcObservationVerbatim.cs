@@ -20,7 +20,7 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// <summary>
         /// Measurement or fact linked to the observation.
         /// </summary>
-        public ICollection<DwcMeasurementOrFact> MeasurementOrFacts { get; set; }
+        public ICollection<DwcMeasurementOrFact> ObservationMeasurementOrFacts { get; set; }
 
         /// <summary>
         /// Measurement or fact linked to the event.
@@ -30,7 +30,7 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// <summary>
         /// Extended measurement or fact linked to the observation.
         /// </summary>
-        public ICollection<DwcExtendedMeasurementOrFact> ExtendedMeasurementOrFacts { get; set; }
+        public ICollection<DwcExtendedMeasurementOrFact> ObservationExtendedMeasurementOrFacts { get; set; }
 
         /// <summary>
         /// Extended measurement or fact linked to the event.
