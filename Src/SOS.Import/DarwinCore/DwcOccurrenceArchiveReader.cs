@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DwC_A;
@@ -32,8 +33,12 @@ namespace SOS.Import.DarwinCore
         public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader, 
             int batchSize,
-            string filename)
+            string filename = null)
         {
+            if (filename == null)
+            {
+                filename = Path.GetFileName(archiveReader.FileName);
+            }
             IAsyncFileReader occurrenceFileReader = archiveReader.GetAsyncCoreFile();
             int idIndex = occurrenceFileReader.GetIdIndex();
             List<DwcObservationVerbatim> occurrenceRecords = new List<DwcObservationVerbatim>();
@@ -55,13 +60,35 @@ namespace SOS.Import.DarwinCore
             yield return occurrenceRecords;
         }
 
+        public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
+            ArchiveReader archiveReader,
+            string filename = null)
+        {
+            const int batchSize = 100000;
+            if (filename == null)
+            {
+                filename = Path.GetFileName(archiveReader.FileName);
+            }
+            var observationsBatches = ReadArchiveInBatchesAsync(
+                archiveReader,
+                batchSize,
+                filename);
+            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
+            await foreach (List<DwcObservationVerbatim> observationsBatch in observationsBatches)
+            {
+                observations.AddRange(observationsBatch);
+            }
+
+            return observations;
+        }
+
         /// <summary>
-        /// Add data from DwC-A extensions.
-        /// </summary>
-        /// <param name="archiveReader"></param>
-        /// <param name="occurrenceRecords"></param>
-        /// <returns></returns>
-        private async Task AddDataFromExtensionsAsync(ArchiveReader archiveReader, List<DwcObservationVerbatim> occurrenceRecords)
+            /// Add data from DwC-A extensions.
+            /// </summary>
+            /// <param name="archiveReader"></param>
+            /// <param name="occurrenceRecords"></param>
+            /// <returns></returns>
+            private async Task AddDataFromExtensionsAsync(ArchiveReader archiveReader, List<DwcObservationVerbatim> occurrenceRecords)
         {
             await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
             await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);

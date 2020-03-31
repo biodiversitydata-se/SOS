@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,6 +61,29 @@ namespace SOS.Import.DarwinCore
             await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
             yield return occurrenceRecords;
         }
+
+        public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
+            ArchiveReader archiveReader,
+            string filename = null)
+        {
+            const int batchSize = 100000;
+            if (filename == null)
+            {
+                filename = Path.GetFileName(archiveReader.FileName);
+            }
+            var observationsBatches = ReadArchiveInBatchesAsync(
+                archiveReader,
+                batchSize,
+                filename);
+            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
+            await foreach (List<DwcObservationVerbatim> observationsBatch in observationsBatches)
+            {
+                observations.AddRange(observationsBatch);
+            }
+
+            return observations;
+        }
+
 
         /// <summary>
         /// Add data from DwC-A extensions

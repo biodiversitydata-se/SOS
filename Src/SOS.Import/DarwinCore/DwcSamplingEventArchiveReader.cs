@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,12 +33,13 @@ namespace SOS.Import.DarwinCore
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <param name="batchSize"></param>
+        /// <param name="filename"></param>
         /// <returns></returns>
         public async IAsyncEnumerable<List<DwcEvent>> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader, 
-            int batchSize)
+            int batchSize,
+            string filename)
         {
-            var filename = System.IO.Path.GetFileName(archiveReader.FileName);
             var occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Event);
             int idIndex = occurrenceFileReader.GetIdIndex();
             var eventRecords = new List<DwcEvent>();
@@ -58,6 +60,35 @@ namespace SOS.Import.DarwinCore
             await AddDataFromExtensionsAsync(archiveReader, eventRecords);
             yield return eventRecords;
         }
+
+        /// <summary>
+        /// Reads a sampling event based DwC-A.
+        /// </summary>
+        /// <param name="archiveReader"></param>
+        /// <param name="filename"></param>
+        /// <returns></returns>
+        public async Task<List<DwcEvent>> ReadArchiveAsync(
+            ArchiveReader archiveReader,
+            string filename = null)
+        {
+            const int batchSize = 100000;
+            if (filename == null)
+            {
+                filename = Path.GetFileName(archiveReader.FileName);
+            }
+            var observationsBatches = ReadArchiveInBatchesAsync(
+                archiveReader,
+                batchSize,
+                filename);
+            List<DwcEvent> dwcEvents = new List<DwcEvent>();
+            await foreach (List<DwcEvent> observationsBatch in observationsBatches)
+            {
+                dwcEvents.AddRange(observationsBatch);
+            }
+
+            return dwcEvents;
+        }
+
 
         /// <summary>
         /// Add event data from DwC-A extensions.
