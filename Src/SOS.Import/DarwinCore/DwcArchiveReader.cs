@@ -59,7 +59,7 @@ namespace SOS.Import.DarwinCore
             }
             else // Event
             {
-                return new DwcSamplingEventArchiveReader(_logger);
+                return new DwcOccurrenceSamplingEventArchiveReader(_logger);
             }
         }
 
