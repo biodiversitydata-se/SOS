@@ -31,17 +31,9 @@ namespace SOS.Process.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync(ObservationProvider provider)
         {
-            try
-            {
-                // Activate passed instance
-                var success =  await _instanceManager.CopyProviderDataAsync(provider);
-                return success ? true : throw new Exception("Copy provider data job failed");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to copy provider data");
-                return false;
-            }
+            // Activate passed instance
+            var success =  await _instanceManager.CopyProviderDataAsync(provider);
+            return success ? true : throw new Exception("Copy provider data job failed");
         }
     }
 }

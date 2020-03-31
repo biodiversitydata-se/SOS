@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 
@@ -11,7 +11,7 @@ namespace SOS.Lib.Models.Processed.Observation
     /// <summary>
     /// This class contains information about a species sighting
     /// </summary>
-    public class ProcessedObservation : IEntity<ObjectId>
+    public class ProcessedObservation : IEntity<Guid>
     {
         /// <summary>
         /// Constructor
@@ -36,6 +36,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue AccessRightsId { get; set; }
 
         /// <summary>
@@ -48,6 +49,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue BasisOfRecordId { get; set; }
 
         /// <summary>
@@ -103,18 +105,20 @@ namespace SOS.Lib.Models.Processed.Observation
         /// The category of information pertaining to an event (an 
         /// action that occurs at a place and during a period of time).
         /// </summary>
+        [Object]
         public ProcessedEvent Event { get; set; }
 
        /// <summary>
         /// Mongodb id
         /// </summary>
-        [BsonId]
-        public ObjectId Id { get; set; }
+
+       public Guid Id { get; set; }
 
         /// <summary>
         /// The category of information pertaining to taxonomic
         /// determinations (the assignment of a scientific name).
         /// </summary>
+        [Object]
         public ProcessedIdentification Identification { get; set; }
 
         /// <summary>
@@ -132,6 +136,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue InstitutionId { get; set; }
 
         /// <summary>
@@ -160,6 +165,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// A spatial region or named place. For Darwin Core,
         /// a set of terms describing a place, whether named or not.
         /// </summary>
+        [Object]
         public ProcessedLocation Location { get; set; }
 
         /// <summary>
@@ -168,6 +174,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <example>
         /// A whole organism preserved in a collection. A part of an organism isolated for some purpose. A soil sample. A marine microbial sample.
         /// </example>
+        [Object]
         public ProcessedMaterialSample MaterialSample { get; set; }
 
 
@@ -176,6 +183,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// For Darwin Core, recommended best practice is to use an
         /// encoding scheme, such as ISO 8601:2004(E).
         /// </summary>
+        [Date]
         public DateTime? Modified { get; set; }
 
         /// <summary>
@@ -183,6 +191,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// an occurrence in nature, in a collection, or in a
         /// dataset (specimen, observation, etc.).
         /// </summary>
+        [Object]
         public ProcessedOccurrence Occurrence { get; set; }
 
         /// <summary>
@@ -196,6 +205,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Projects connected to sighting
         /// </summary>
+        [Nested]
         public IEnumerable<ProcessedProject> Projects { get; set; }
 
         /// <summary>
@@ -229,6 +239,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Date and time when the species observation was reported.
         /// </summary>
+        [Date]
         public DateTime? ReportedDate { get; set; }
 
         /// <summary>
@@ -251,6 +262,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// The category of information pertaining to taxonomic names,
         /// taxon name usages, or taxon concepts.
         /// </summary>
+        [Object]
         public ProcessedTaxon Taxon { get; set; }
 
         /// <summary>
@@ -263,6 +275,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue TypeId { get; set; }
     }
 }

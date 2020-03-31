@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Nest;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Processed.Observation
@@ -29,6 +30,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Vernacular names.
         /// </summary>
+        [Nested]
         public IEnumerable<TaxonVernacularName> VernacularNames { get; set; }
 
         /// <summary>

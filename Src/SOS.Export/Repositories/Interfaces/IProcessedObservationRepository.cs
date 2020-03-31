@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
@@ -9,7 +9,7 @@ namespace SOS.Export.Repositories.Interfaces
     /// <summary>
     /// 
     /// </summary>
-    public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, ObjectId>
+    public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, Guid>
     {
         /// <summary>
         /// Get filtered chunk

@@ -1,5 +1,4 @@
 ﻿using MongoDB.Driver.GeoJsonObjectModel;
-using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -11,9 +10,9 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
     /// </summary>
     public class Site
     {
-        private PolygonGeoShape _pointWithBuffer;
-        private PointGeoShape _point;
-
+        private GeoJsonPoint<GeoJson2DGeographicCoordinates> _point;
+        private GeoJsonGeometry<GeoJson2DGeographicCoordinates> _pointWithBuffer;
+        
         /// <summary>
         /// Accuracy in meters
         /// </summary>
@@ -47,7 +46,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         /// Point (WGS84)
         /// </summary>
-        public PointGeoShape Point
+        public GeoJsonPoint<GeoJson2DGeographicCoordinates> Point
         {
             get
             {
@@ -64,7 +63,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         /// Point with accuracy buffer (WGS84)
         /// </summary>
-        public PolygonGeoShape PointWithBuffer
+        public GeoJsonGeometry<GeoJson2DGeographicCoordinates> PointWithBuffer
         {
             get
             {
@@ -84,8 +83,8 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
             {
                 var webMercatorPoint = new Point(XCoord, YCoord);
                 var wgs84Point = (Point)webMercatorPoint.Transform(VerbatimCoordinateSystem, CoordinateSys.WGS84);
-                _point = (PointGeoShape)wgs84Point?.ToGeoShape();
-                _pointWithBuffer = (PolygonGeoShape) wgs84Point?.ToCircle(Accuracy)?.ToGeoShape();
+                _point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry();
+                _pointWithBuffer = (GeoJsonPolygon<GeoJson2DGeographicCoordinates>) wgs84Point?.ToCircle(Accuracy)?.ToGeoJsonGeometry();
             }
         }
         

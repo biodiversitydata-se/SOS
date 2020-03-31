@@ -143,16 +143,8 @@ namespace SOS.Observations.Api
 
             //setup the elastic search configuration
             var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
-
             var uris = elasticConfiguration.Hosts.Select(u => new Uri(u));
-            var nodes = uris.Select(u => new Node(u) { MasterEligible = true });
-
-            var connectionPool = new SniffingConnectionPool(nodes);
-            var settings = new ConnectionSettings(connectionPool)
-                .SniffLifeSpan(TimeSpan.FromMinutes(1))
-                .RequestTimeout(TimeSpan.FromMinutes(5));
-            
-            services.AddSingleton<IElasticClient>(new ElasticClient(settings));
+            services.AddSingleton<IElasticClient>(new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))));
         }
 
         /// <summary>

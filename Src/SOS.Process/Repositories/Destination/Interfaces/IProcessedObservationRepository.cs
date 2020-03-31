@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 
@@ -9,7 +9,7 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     /// <summary>
     /// Processed data class
     /// </summary>
-    public interface IProcessedObservationRepository : IProcessBaseRepository<ProcessedObservation, ObjectId>
+    public interface IProcessedObservationRepository : IProcessBaseRepository<ProcessedObservation, Guid>
     {
         /// <summary>
         /// Add many items 
@@ -37,11 +37,5 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// <param name="provider"></param>
         /// <returns></returns>
         Task<bool> DeleteProviderDataAsync(ObservationProvider provider);
-
-        /// <summary>
-        /// Drop current indexes
-        /// </summary>
-        /// <returns></returns>
-        Task DropIndexAsync();
     }
 }

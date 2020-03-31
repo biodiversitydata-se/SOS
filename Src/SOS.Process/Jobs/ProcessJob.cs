@@ -191,7 +191,7 @@ namespace SOS.Process.Jobs
                 // Run all tasks async
                 await Task.WhenAll(processTasks.Values);
 
-                var success = processTasks.Values.All(t => t.Result.Status == RunStatus.Success);
+               var success = processTasks.Values.All(t => t.Result.Status == RunStatus.Success);
 
                 // Update provider info from process result
                 foreach (var task in processTasks)
@@ -252,11 +252,6 @@ namespace SOS.Process.Jobs
             catch (JobAbortedException)
             {
                 _logger.LogInformation("Process job was cancelled.");
-                return false;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Process job failed");
                 return false;
             }
         }

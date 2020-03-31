@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
-using MongoDB.Driver;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
@@ -17,7 +15,7 @@ namespace SOS.Process.Repositories.Destination
     /// <summary>
     /// Base class for cosmos db repositories
     /// </summary>
-    public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, ObjectId>, IProcessedObservationRepository
+    public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, Guid>, IProcessedObservationRepository
     {
         private readonly IInvalidObservationRepository _invalidObservationRepository;
         private readonly IElasticClient _elasticClient;
@@ -38,6 +36,8 @@ namespace SOS.Process.Repositories.Destination
             _invalidObservationRepository = invalidObservationRepository ?? throw new ArgumentNullException(nameof(invalidObservationRepository));
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
         }
+
+        private string IndexName => _collectionName.ToLower();
 
         /// <summary>
         /// Validate Darwin core.
@@ -89,45 +89,64 @@ namespace SOS.Process.Repositories.Destination
             return invalidItems.Any() ? invalidItems : null;
         }
 
-        private new IMongoCollection<ProcessedObservation> MongoCollection => Database.GetCollection<ProcessedObservation>(_collectionName);
-       
+        /// <summary>
+        /// Write data to elastic search
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        private BulkAllObserver WriteToElastic(IEnumerable<ProcessedObservation> items)
+        {
+            if (!items.Any())
+            {
+                return null;
+            }
+
+            int count = 0;
+            return _elasticClient.BulkAll(items, b => b
+                .Index(IndexName)
+                // how long to wait between retries
+                .BackOffTime("30s")
+                // how many retries are attempted if a failure occurs                        .
+                .BackOffRetries(2)
+                // how many concurrent bulk requests to make
+                .MaxDegreeOfParallelism(Environment.ProcessorCount)
+                // number of items per bulk request
+                .Size(1000)
+            )
+            .Wait(TimeSpan.FromDays(1), next =>
+            {
+                Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}");
+            });
+        }
+
         /// <inheritdoc />
         public new async Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items)
         {
             // Separate valid and invalid data
             var invalidObservations = Validate(ref items);
-                        
+
             // Save valid processed data
-            Logger.LogDebug($"Start indexing batch for searching with {items.Count()} items");            
+            Logger.LogDebug($"Start indexing batch for searching with {items.Count()} items");
             var indexResult = WriteToElastic(items);
             Logger.LogDebug($"Finished indexing batch for searching");
 
-            // No invalid observations, we are done here
-            if (indexResult.TotalNumberOfFailedBuffers == 0 && (invalidObservations?.Any() ?? false))
+            if ((indexResult?.TotalNumberOfFailedBuffers ?? 0) == 0)
             {
-                await _invalidObservationRepository.AddManyAsync(invalidObservations);
+                if (invalidObservations?.Any() ?? false)
+                {
+                    await _invalidObservationRepository.AddManyAsync(invalidObservations);
+                }
+
+                return items.Count();
             }
 
-            return (indexResult.TotalNumberOfFailedBuffers == 0) ? items.Count() : 0;
+            return 0;
         }
 
-        private BulkAllObserver WriteToElastic(IEnumerable<ProcessedObservation> items)
+        /// <inheritdoc />
+        public async Task CreateIndexAsync()
         {
-            int count = 0;
-            return _elasticClient.BulkAll(items, b => b
-                       .Index(_collectionName.ToLower())
-                       // how long to wait between retries
-                       .BackOffTime("30s")
-                       // how many retries are attempted if a failure occurs                        .
-                       .BackOffRetries(2)
-                       // how many concurrent bulk requests to make
-                       .MaxDegreeOfParallelism(Environment.ProcessorCount)
-                       // number of items per bulk request
-                       .Size(1000)
-                   ).Wait(TimeSpan.FromDays(1), next => 
-                   {
-                       Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}");
-                   });             
+            await _elasticClient.Indices.UpdateSettingsAsync(IndexName, p => p.IndexSettings(g => g.RefreshInterval(1)));
         }
 
         /// <inheritdoc />
@@ -137,11 +156,12 @@ namespace SOS.Process.Repositories.Destination
             SetCollectionName(ActiveInstance);
 
             var source = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                .Index(IndexName)
                     .Query(q => q
                         .Term(t => t
                             .Field(f => f.Provider)
                             .Value(provider))));
-           
+
             // switch to inactive instance and add data 
             SetCollectionName(InActiveInstance);
 
@@ -151,12 +171,6 @@ namespace SOS.Process.Repositories.Destination
 
 
             return (indexResult.TotalNumberOfFailedBuffers == 0);
-        }      
-
-        /// <inheritdoc />
-        public async Task CreateIndexAsync()
-        {
-            await _elasticClient.Indices.UpdateSettingsAsync(_collectionName.ToLower(), p => p.IndexSettings(g => g.RefreshInterval(1)));
         }
 
         /// <inheritdoc />
@@ -165,12 +179,13 @@ namespace SOS.Process.Repositories.Destination
             try
             {
                 // Create the collection
-                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q=> q
+                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q => q
+                    .Index(IndexName)
                     .Query(q => q
                         .Term(t => t
                             .Field(f => f.Provider)
                             .Value(provider))));
-                
+
 
                 return res.IsValid;
             }
@@ -181,41 +196,52 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
-        /// <inheritdoc />
-        public async Task DropIndexAsync()
-        {
-            Logger.LogDebug("Dropping current indexes");
-            await MongoCollection.Indexes.DropAllAsync();
-        }
         public override async Task<bool> DeleteCollectionAsync()
         {
-            var res = await _elasticClient.Indices.DeleteAsync(_collectionName.ToLower());
+            var res = await _elasticClient.Indices.DeleteAsync(IndexName);
             return res.IsValid;
         }
         public override async Task<bool> AddCollectionAsync()
         {
-            var res =  await _elasticClient.Indices.CreateAsync(_collectionName.ToLower(), s => s
-                 .Map<ProcessedObservation>(p => p
-                     .AutoMap()
-                     .Properties(ps => ps
-                        .GeoPoint(gp => gp
-                            .Name(nn => nn.Location.Point))
-                        .GeoShape(gpb => gpb
-                            .Name(gpbn => gpbn.Location.PointWithBuffer)))));
+            var createIndexResponse = await _elasticClient.Indices.CreateAsync(IndexName, s => s
+               .IncludeTypeName(false)
+               .Settings(s => s
+                   .NumberOfShards(6)
+                   .NumberOfReplicas(0)
 
-            await _elasticClient.Indices.UpdateSettingsAsync(_collectionName.ToLower(), p => p.IndexSettings(g => g.RefreshInterval(-1)));
-            return res.IsValid;
+               )
+                .Map<ProcessedObservation>(p => p
+                   .AutoMap()
+                   /*    .Properties(ps => ps
+                          .GeoShape(gs => gs
+                              .Name(nn => nn.Location.Point))
+                         .GeoShape(gs => gs
+                             .Name(nn => nn.Location.PointWithBuffer)))*/));
+
+            if (createIndexResponse.Acknowledged && createIndexResponse.IsValid)
+            {
+                var updateSettingsResponse = await _elasticClient.Indices.UpdateSettingsAsync(IndexName, p => p.IndexSettings(g => g.RefreshInterval(-1)));
+
+                return updateSettingsResponse.Acknowledged && updateSettingsResponse.IsValid;
+            }
+
+            return false;
         }
         /// <inheritdoc />
         public override async Task<bool> VerifyCollectionAsync()
         {
-            var newCreated = await base.VerifyCollectionAsync();
+            var response = await _elasticClient.Indices.ExistsAsync(IndexName);
+
+            if (!response.Exists)
+            {
+                await AddCollectionAsync();
+            }
 
             // Make sure invalid collection is empty 
             await _invalidObservationRepository.DeleteCollectionAsync();
             await _invalidObservationRepository.AddCollectionAsync();
 
-            return newCreated;
+            return !response.Exists;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -34,6 +35,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Not defined in Darwin Core.
         /// Date when the project ends.
         /// </summary>
+        [Date]
         public DateTime? EndDate { get; set; }
 
         /// <summary>
@@ -65,6 +67,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Not defined in Darwin Core.
         /// Date when the project starts.
         /// </summary>
+        [Date]
         public DateTime? StartDate { get; set; }
 
         /// <summary>
@@ -91,6 +94,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Project parameters.
         /// </summary>
+        [Nested]
         public IEnumerable<ProcessedProjectParameter> ProjectParameters { get; set; }
     }
 }
