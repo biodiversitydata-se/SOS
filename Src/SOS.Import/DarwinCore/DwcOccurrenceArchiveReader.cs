@@ -45,18 +45,27 @@ namespace SOS.Import.DarwinCore
 
                 if (occurrenceRecords.Count % batchSize == 0)
                 {
-                    await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
-                    await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
-                    await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
+                    await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
                     yield return occurrenceRecords;
                     occurrenceRecords.Clear();
                 }
             }
 
+            await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
+            yield return occurrenceRecords;
+        }
+
+        /// <summary>
+        /// Add data from DwC-A extensions.
+        /// </summary>
+        /// <param name="archiveReader"></param>
+        /// <param name="occurrenceRecords"></param>
+        /// <returns></returns>
+        private async Task AddDataFromExtensionsAsync(ArchiveReader archiveReader, List<DwcObservationVerbatim> occurrenceRecords)
+        {
             await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
             await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
             await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
-            yield return occurrenceRecords;
         }
 
         private async Task AddMultimediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)

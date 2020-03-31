@@ -51,20 +51,28 @@ namespace SOS.Import.DarwinCore
 
                 if (occurrenceRecords.Count % batchSize == 0)
                 {
-                    await AddEventDataAsync(occurrenceRecords, archiveReader);
-                    await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
-                    await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
-                    await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
+                    await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
                     yield return occurrenceRecords;
                     occurrenceRecords.Clear();
                 }
             }
 
+            await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
+            yield return occurrenceRecords;
+        }
+
+        /// <summary>
+        /// Add data from DwC-A extensions
+        /// </summary>
+        /// <param name="archiveReader"></param>
+        /// <param name="occurrenceRecords"></param>
+        /// <returns></returns>
+        private async Task AddDataFromExtensionsAsync(ArchiveReader archiveReader, List<DwcObservationVerbatim> occurrenceRecords)
+        {
             await AddEventDataAsync(occurrenceRecords, archiveReader);
             await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
             await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
             await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
-            yield return occurrenceRecords;
         }
 
         /// <summary>
@@ -316,18 +324,27 @@ namespace SOS.Import.DarwinCore
 
                 if (eventRecords.Count % batchSize == 0)
                 {
-                    await AddEventEmofExtensionDataAsync(eventRecords, archiveReader);
-                    await AddEventMofExtensionDataAsync(eventRecords, archiveReader);
-                    await AddEventMultimediaExtensionDataAsync(eventRecords, archiveReader);
+                    await AddEventDataFromExtensionsAsync(archiveReader, eventRecords);
                     yield return eventRecords;
                     eventRecords.Clear();
                 }
             }
 
+            await AddEventDataFromExtensionsAsync(archiveReader, eventRecords);
+            yield return eventRecords;
+        }
+
+        /// <summary>
+        /// Add event data from DwC-A extensions.
+        /// </summary>
+        /// <param name="archiveReader"></param>
+        /// <param name="eventRecords"></param>
+        /// <returns></returns>
+        private async Task AddEventDataFromExtensionsAsync(ArchiveReader archiveReader, List<DwcEvent> eventRecords)
+        {
             await AddEventEmofExtensionDataAsync(eventRecords, archiveReader);
             await AddEventMofExtensionDataAsync(eventRecords, archiveReader);
             await AddEventMultimediaExtensionDataAsync(eventRecords, archiveReader);
-            yield return eventRecords;
         }
 
         private async Task AddEventMofExtensionDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
