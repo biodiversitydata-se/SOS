@@ -41,7 +41,7 @@ namespace SOS.Import.Services
                     query,
                     parameters,
                     null,
-                    null,
+                    5*60, // 5 minutes
                     CommandType.Text,
                     CommandFlags.NoCache
                 )
