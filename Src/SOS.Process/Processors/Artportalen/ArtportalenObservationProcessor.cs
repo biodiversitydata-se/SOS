@@ -70,11 +70,9 @@ namespace SOS.Process.Processors.Artportalen
             {
                 return await ProcessObservationsParallel(taxa, cancellationToken);
             }
-            else
-            {
-                // Sequential processing is used for easier debugging.
-                return await ProcessObservationsSequential(taxa, cancellationToken);
-            }
+            
+            // Sequential processing is used for easier debugging.
+            return await ProcessObservationsSequential(taxa, cancellationToken);
         }
 
         private async Task<int> ProcessObservationsParallel(

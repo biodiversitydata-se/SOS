@@ -5,15 +5,17 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MongoDB.Bson;
+using Nest;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Process.Repositories.Destination.Interfaces;
+using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
+using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
 
 namespace SOS.Process.Processors.Artportalen
 {
@@ -119,8 +121,8 @@ namespace SOS.Process.Processors.Artportalen
                     MaximumElevationInMeters = verbatimObservation.MaxHeight,
                     MinimumDepthInMeters = verbatimObservation.MinDepth,
                     MinimumElevationInMeters = verbatimObservation.MinHeight,
-                    Point = verbatimObservation.Site?.Point,
-                    PointWithBuffer = verbatimObservation.Site?.PointWithBuffer,
+                    Point = (PointGeoShape)verbatimObservation.Site?.Point?.ToGeoShape(),
+                    PointWithBuffer = (PolygonGeoShape)verbatimObservation.Site?.PointWithBuffer?.ToGeoShape(),
                     VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord : 0,
                     VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0,
                     VerbatimCoordinateSystem = "EPSG:3857"

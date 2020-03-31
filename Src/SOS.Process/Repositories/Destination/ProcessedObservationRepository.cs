@@ -126,7 +126,7 @@ namespace SOS.Process.Repositories.Destination
             var invalidObservations = Validate(ref items);
 
             // Save valid processed data
-            Logger.LogDebug($"Start indexing batch for searching with {items.Count()} items");            
+            Logger.LogDebug($"Start indexing batch for searching with {items.Count()} items");
             var indexResult = WriteToElastic(items);
             Logger.LogDebug($"Finished indexing batch for searching");
 
@@ -161,7 +161,7 @@ namespace SOS.Process.Repositories.Destination
                         .Term(t => t
                             .Field(f => f.Provider)
                             .Value(provider))));
-           
+
             // switch to inactive instance and add data 
             SetCollectionName(InActiveInstance);
 
@@ -179,13 +179,13 @@ namespace SOS.Process.Repositories.Destination
             try
             {
                 // Create the collection
-                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q=> q
+                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q => q
                     .Index(IndexName)
                     .Query(q => q
                         .Term(t => t
                             .Field(f => f.Provider)
                             .Value(provider))));
-                
+
 
                 return res.IsValid;
             }
@@ -203,20 +203,20 @@ namespace SOS.Process.Repositories.Destination
         }
         public override async Task<bool> AddCollectionAsync()
         {
-            var createIndexResponse =  await _elasticClient.Indices.CreateAsync(IndexName, s => s
-                .IncludeTypeName(false)
-                .Settings(s => s
-                    .NumberOfShards(6)
-                    .NumberOfReplicas(0)
-                    
-                )
-                 .Map<ProcessedObservation>(p => p
-                    .AutoMap()
-                     .Properties(ps => ps
-                        .GeoShape(gp => gp
-                            .Name(nn => nn.Location.Point))
-                       .GeoShape(gpb => gpb
-                           .Name(gpbn => gpbn.Location.PointWithBuffer)))));
+            var createIndexResponse = await _elasticClient.Indices.CreateAsync(IndexName, s => s
+               .IncludeTypeName(false)
+               .Settings(s => s
+                   .NumberOfShards(6)
+                   .NumberOfReplicas(0)
+
+               )
+                .Map<ProcessedObservation>(p => p
+                   .AutoMap()
+                   /*    .Properties(ps => ps
+                          .GeoShape(gs => gs
+                              .Name(nn => nn.Location.Point))
+                         .GeoShape(gs => gs
+                             .Name(nn => nn.Location.PointWithBuffer)))*/));
 
             if (createIndexResponse.Acknowledged && createIndexResponse.IsValid)
             {
