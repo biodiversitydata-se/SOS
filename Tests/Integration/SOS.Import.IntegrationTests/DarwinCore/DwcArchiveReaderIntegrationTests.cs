@@ -51,6 +51,37 @@ namespace SOS.Import.IntegrationTests.DarwinCore
         }
 
         [Fact]
+        public async Task Read_occurrence_dwca_with_multimedia_extension()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var dwcArchiveReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            const int batchSize = 10000;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            using var archiveReader = dwcArchiveReader.OpenArchive("./resources/dwca/dwca-occurrence-multimedia-verbatimoccurrence.zip");
+            var observationBatches = dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, batchSize);
+            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
+            await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
+            {
+                observations.AddRange(verbatimObservationsBatch);
+            }
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            observations.Count.Should().Be(2582);
+            var obs = observations.Single(o => o.OccurrenceID == "0C94D544-8B14-4DA8-A3AE-70AA4FC803AF");
+            obs.ObservationMultimedia.Count.Should().Be(3);
+            obs.ObservationMultimedia.Single(m =>
+                    m.Identifier == "http://ww2.bgbm.org/specimentool/plants/dicots/Teucrium_chamaedrys_Duerbye_1.jpg")
+                .Format.Should().Be("image/scan");
+        }
+
+        [Fact]
         public async Task Read_occurrence_dwca_with_mof_extension()
         {
             //-----------------------------------------------------------------------------------------------------------

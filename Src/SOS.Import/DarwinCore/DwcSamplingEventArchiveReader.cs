@@ -54,6 +54,7 @@ namespace SOS.Import.DarwinCore
                     await AddEventDataAsync(occurrenceRecords, archiveReader);
                     await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
                     await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
+                    await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
                     yield return occurrenceRecords;
                     occurrenceRecords.Clear();
                 }
@@ -62,6 +63,7 @@ namespace SOS.Import.DarwinCore
             await AddEventDataAsync(occurrenceRecords, archiveReader);
             await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
             await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
+            await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
             yield return occurrenceRecords;
         }
 
@@ -96,6 +98,48 @@ namespace SOS.Import.DarwinCore
                 throw;
             }
         }
+
+        /// <summary>
+        /// Add Simple Multimedia extension data
+        /// </summary>
+        /// <param name="occurrenceRecords"></param>
+        /// <param name="archiveReader"></param>
+        /// <returns></returns>
+        private async Task AddMultimediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
+        {
+            try
+            {
+                IAsyncFileReader multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
+                if (multimediaFileReader == null) return;
+                int idIndex = multimediaFileReader.GetIdIndex();
+                Dictionary<string, IEnumerable<DwcObservationVerbatim>> observationsByRecordId =
+                    occurrenceRecords
+                        .GroupBy(observation => observation.RecordId)
+                        .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
+
+                await foreach (IRow row in multimediaFileReader.GetDataRowsAsync())
+                {
+                    string id = row[idIndex];
+                    if (!observationsByRecordId.TryGetValue(id, out var observations)) continue;
+                    foreach (var observation in observations)
+                    {
+                        if (observation.EventMultimedia == null)
+                        {
+                            observation.EventMultimedia = new List<DwcMultimedia>();
+                        }
+
+                        var multimediaItem = DwcMultimediaFactory.Create(row);
+                        observation.EventMultimedia.Add(multimediaItem);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to add Multimedia extension data");
+                throw;
+            }
+        }
+
 
         /// <summary>
         /// Add MeasureMentOrFact data
@@ -274,6 +318,7 @@ namespace SOS.Import.DarwinCore
                 {
                     await AddEventEmofExtensionDataAsync(eventRecords, archiveReader);
                     await AddEventMofExtensionDataAsync(eventRecords, archiveReader);
+                    await AddEventMultimediaExtensionDataAsync(eventRecords, archiveReader);
                     yield return eventRecords;
                     eventRecords.Clear();
                 }
@@ -281,6 +326,7 @@ namespace SOS.Import.DarwinCore
 
             await AddEventEmofExtensionDataAsync(eventRecords, archiveReader);
             await AddEventMofExtensionDataAsync(eventRecords, archiveReader);
+            await AddEventMultimediaExtensionDataAsync(eventRecords, archiveReader);
             yield return eventRecords;
         }
 
@@ -306,6 +352,37 @@ namespace SOS.Import.DarwinCore
                 }
             }
         }
+
+        private async Task AddEventMultimediaExtensionDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
+        {
+            try
+            {
+                IAsyncFileReader multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
+                if (multimediaFileReader == null) return;
+                int idIndex = multimediaFileReader.GetIdIndex();
+                var dwcEventByRecordId = dwcEvents.ToDictionary(e => e.RecordId, e => e);
+                await foreach (IRow row in multimediaFileReader.GetDataRowsAsync())
+                {
+                    var id = row[idIndex];
+                    if (dwcEventByRecordId.TryGetValue(id, out DwcEvent dwcEvent))
+                    {
+                        if (dwcEvent.Multimedia == null)
+                        {
+                            dwcEvent.Multimedia = new List<DwcMultimedia>();
+                        }
+
+                        var multimediaItem = DwcMultimediaFactory.Create(row);
+                        dwcEvent.Multimedia.Add(multimediaItem);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to add Multimedia extension data");
+                throw;
+            }
+        }
+
 
         /// <summary>
         /// Add Extended Measurement Or Fact data to DwcEvent objects.

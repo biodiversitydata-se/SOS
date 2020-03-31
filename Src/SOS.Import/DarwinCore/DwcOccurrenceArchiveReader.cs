@@ -47,6 +47,7 @@ namespace SOS.Import.DarwinCore
                 {
                     await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
                     await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
+                    await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
                     yield return occurrenceRecords;
                     occurrenceRecords.Clear();
                 }
@@ -54,7 +55,38 @@ namespace SOS.Import.DarwinCore
 
             await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
             await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
+            await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
             yield return occurrenceRecords;
+        }
+
+        private async Task AddMultimediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
+        {
+            try
+            {
+                IAsyncFileReader multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
+                if (multimediaFileReader == null) return;
+                int idIndex = multimediaFileReader.GetIdIndex();
+                var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
+                await foreach (IRow row in multimediaFileReader.GetDataRowsAsync())
+                {
+                    var id = row[idIndex];
+                    if (observationByRecordId.TryGetValue(id, out DwcObservationVerbatim obs))
+                    {
+                        if (obs.ObservationMultimedia == null)
+                        {
+                            obs.ObservationMultimedia = new List<DwcMultimedia>();
+                        }
+
+                        var multimediaItem = DwcMultimediaFactory.Create(row);
+                        obs.ObservationMultimedia.Add(multimediaItem);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to add Multimedia extension data");
+                throw;
+            }
         }
 
         private async Task AddMofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)

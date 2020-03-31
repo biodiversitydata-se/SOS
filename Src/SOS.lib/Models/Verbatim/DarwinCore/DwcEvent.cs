@@ -18,7 +18,12 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string RecordId { get; set; }
 
         public string DwcArchiveFilename { get; set; }
-        
+
+        /// <summary>
+        /// Multimedia linked to the event.
+        /// </summary>
+        public List<DwcMultimedia> Multimedia { get; set; }
+
         /// <summary>
         /// Measurement or fact linked to the event.
         /// </summary>
@@ -1014,6 +1019,7 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// This property is currently not used.
         /// </summary>
         public string Member { get; set; }
+
         #endregion
     }
 }

@@ -8,7 +8,7 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
     /// Simple Multimedia extension
     /// http://rs.gbif.org/extension/gbif/1.0/multimedia.xml
     /// </summary>
-    public class DwcSimpleMultimedia
+    public class DwcMultimedia
     {
         public string Type { get; set; }
         public string Format { get; set; }

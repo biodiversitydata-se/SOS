@@ -12,5 +12,7 @@
         public static string ResourceRelationship { get; } = "http://rs.tdwg.org/dwc/terms/ResourceRelationship";
         public static string MeasurementOrFact { get; } = "http://rs.tdwg.org/dwc/terms/MeasurementOrFact";
         public static string ExtendedMeasurementOrFact { get; } = "http://rs.iobis.org/obis/terms/ExtendedMeasurementOrFact";
+        public static string Multimedia { get; } = "http://rs.gbif.org/terms/1.0/Multimedia";
+        public static string AudubonMediaDescription { get; } = "http://rs.tdwg.org/ac/terms/Multimedia";
     }
 }
