@@ -158,7 +158,7 @@ namespace SOS.Process.Processors.Artportalen
                 RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas",
                 Taxon = taxon,
                 TypeId = null,
-                Id = ObjectId.GenerateNewId()
+                Id = Guid.NewGuid()
             };
 
             // Get field mapping values

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 using Nest;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
@@ -17,7 +16,7 @@ namespace SOS.Observations.Api.Repositories
     /// <summary>
     /// Species data service
     /// </summary>
-    public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, ObjectId>, IProcessedObservationRepository
+    public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, Guid>, IProcessedObservationRepository
     {
         private readonly IElasticClient _elasticClient;
         private const int BiotaTaxonId = 0;

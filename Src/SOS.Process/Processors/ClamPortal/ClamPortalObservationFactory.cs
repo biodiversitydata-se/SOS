@@ -119,7 +119,7 @@ namespace SOS.Process.Processors.ClamPortal
                 ReportedDate = verbatimObservation.ReportedDate,
                 RightsHolder = verbatimObservation.RightsHolder,
                 Taxon = taxon,
-                Id = ObjectId.GenerateNewId()
+                Id = Guid.NewGuid()
             };
         }
 

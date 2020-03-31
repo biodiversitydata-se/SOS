@@ -159,6 +159,32 @@ namespace SOS.Lib.Extensions
         #endregion Private
 
         #region Public
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        static GISExtensions()
+        {
+            CoordinateSystemFactory coordinateSystemFactory = new CoordinateSystemFactory();
+            Dictionary<CoordinateSys, CoordinateSystem> coordinateSystemsById = new Dictionary<CoordinateSys, CoordinateSystem>();
+
+            foreach (var coordinateSys in Enum.GetValues(typeof(CoordinateSys)).Cast<CoordinateSys>())
+            {
+                coordinateSystemsById.Add(coordinateSys, coordinateSystemFactory.CreateFromWkt(GetCoordinateSystemWkt(coordinateSys)));
+            }
+
+            var coordinateTransformationFactory = new CoordinateTransformationFactory();
+            foreach (var sourceCoordinateSys in Enum.GetValues(typeof(CoordinateSys)).Cast<CoordinateSys>())
+            {
+                foreach (var targetCoordinateSys in Enum.GetValues(typeof(CoordinateSys)).Cast<CoordinateSys>())
+                {
+                    ICoordinateTransformation coordinateTransformation = coordinateTransformationFactory.CreateFromCoordinateSystems(
+                        coordinateSystemsById[sourceCoordinateSys],
+                        coordinateSystemsById[targetCoordinateSys]);
+
+                    MathTransformFilterDictionary.Add(new Tuple<CoordinateSys, CoordinateSys>(sourceCoordinateSys, targetCoordinateSys), new MathTransformFilter(coordinateTransformation.MathTransform));
+                }
+            }
+        }
 
         /// <summary>
         ///  Transform WGS 84 point to circle by adding a buffer to it
@@ -202,6 +228,16 @@ namespace SOS.Lib.Extensions
             }
 
             return circle;
+        }
+
+        public static GeoLocation ToGeoLocation(this Point point)
+        {
+            if (point == null)
+            {
+                return null;
+            }
+
+            return new GeoLocation(point.Y, point.X);
         }
 
         /// <summary>

@@ -1,5 +1,4 @@
-﻿using MongoDB.Driver.GeoJsonObjectModel;
-using Nest;
+﻿using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;

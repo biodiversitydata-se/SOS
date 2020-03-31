@@ -302,9 +302,6 @@ namespace SOS.Process.UnitTests.Jobs
             _kulProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(ObservationProvider.KUL, DateTime.Now, DateTime.Now, 1));
 
-            _darwinCoreRepository.Setup(r => r.DropIndexAsync());
-            _darwinCoreRepository.Setup(r => r.CreateIndexAsync());
-
             _darwinCoreRepository.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()));
 
             _processInfoRepository.Setup(r => r.VerifyCollectionAsync());

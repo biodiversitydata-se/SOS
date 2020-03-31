@@ -1,4 +1,5 @@
 ﻿using Nest;
+using Newtonsoft.Json;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -17,6 +18,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue Continent { get; set; }
 
         /// <summary>
@@ -46,6 +48,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue Country { get; set; }
 
         /// <summary>
@@ -71,6 +74,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue County { get; set; }
 
         /// <summary>
@@ -82,6 +86,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue Municipality { get; set; }
         
         /// <summary>
@@ -90,6 +95,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue Parish { get; set; }
 
         /// <summary>
@@ -102,6 +108,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue Province { get; set; }
 
         /// <summary>
@@ -390,11 +397,13 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Point (WGS84)
         /// </summary>
+        [GeoShape, JsonIgnore]
         public PointGeoShape Point { get; set; }
 
         /// <summary>
         /// Point with accuracy buffer (WGS84)
         /// </summary>
+        [GeoShape, JsonIgnore]
         public PolygonGeoShape PointWithBuffer { get; set; }
 
         /// <summary>

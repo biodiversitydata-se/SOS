@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
-using MongoDB.Driver;
 using Nest;
 using SOS.Export.Managers.Interfaces;
 using SOS.Export.MongoDb.Interfaces;
@@ -18,7 +16,7 @@ namespace SOS.Export.Repositories
     /// <summary>
     /// Species data service
     /// </summary>
-    public class ProcessedObservationRepository : BaseRepository<ProcessedObservation, ObjectId>, IProcessedObservationRepository
+    public class ProcessedObservationRepository : BaseRepository<ProcessedObservation, Guid>, IProcessedObservationRepository
     {
         private readonly IElasticClient _elasticClient;
         private ITaxonManager _taxonManager;

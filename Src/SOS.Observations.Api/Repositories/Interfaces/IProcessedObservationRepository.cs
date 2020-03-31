@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using MongoDB.Bson;
+﻿using System;
+using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
@@ -8,7 +8,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
     /// <summary>
     /// 
     /// </summary>
-    public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, ObjectId>
+    public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, Guid>
     {
         /// <summary>
         /// Get chunk of objects from repository

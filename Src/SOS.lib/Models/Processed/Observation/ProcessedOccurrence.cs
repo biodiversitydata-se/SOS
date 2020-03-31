@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Models.Processed.Observation
+﻿using Nest;
+
+namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
     /// This class contains occurrence information about a species
@@ -14,6 +16,7 @@
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue Activity { get; set; }
 
         /// <summary>
@@ -91,6 +94,7 @@
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue EstablishmentMeans { get; set; }
 
         /// <summary>
@@ -148,6 +152,7 @@
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue LifeStage { get; set; }
 
         /// <summary>
@@ -249,6 +254,7 @@
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue Gender { get; set; }
 
         /// <summary>
@@ -260,6 +266,7 @@
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue OccurrenceStatus { get; set; }
 
         /// <summary>

@@ -30,17 +30,9 @@ namespace SOS.Process.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync(byte instance)
         {
-            try
-            {
-                // Activate passed instance
-                var success = await _instanceManager.SetActiveInstanceAsync(instance);
-                return success ? true : throw new Exception("Activate instance job failed");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to active instance");
-                return false;
-            }
+            // Activate passed instance
+            var success = await _instanceManager.SetActiveInstanceAsync(instance);
+            return success ? true : throw new Exception("Activate instance job failed");
         }
     }
 }

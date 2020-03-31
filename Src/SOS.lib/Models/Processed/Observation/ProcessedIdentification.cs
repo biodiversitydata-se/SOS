@@ -1,4 +1,5 @@
 ﻿using System;
+using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -13,6 +14,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// to use an encoding scheme, such as ISO 8601:2004(E).
         /// This property is currently not used.
         /// </summary>
+        [Date]
         public DateTime DateIdentified { get; set; }
 
         /// <summary>
@@ -61,6 +63,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue ValidationStatusId { get; set; }
 
         /// <summary>

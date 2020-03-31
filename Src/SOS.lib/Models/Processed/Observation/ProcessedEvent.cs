@@ -1,5 +1,5 @@
 ﻿using System;
-using MongoDB.Bson.Serialization.Attributes;
+using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -14,6 +14,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue Biotope { get; set; }
 
         /// <summary>
@@ -24,7 +25,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// End date/time of the event
         /// </summary>
-        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+        [Date]
         public DateTime? EndDate { get; set; }
 
         /// <summary>
@@ -103,7 +104,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Start date/time of the event
         /// </summary>
-        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+        [Date]
         public DateTime? StartDate { get; set; }
 
         /// <summary>
@@ -112,6 +113,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         /// This value is field mapped.
         /// </remarks>
+        [Object]
         public ProcessedFieldMapValue Substrate { get; set; }
 
         /// <summary>
@@ -132,13 +134,13 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Verbatim end date
         /// </summary>
-        [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+        [Date]
         public DateTime? VerbatimEndDate { get; set; }
 
         /// <summary>
         /// Verbatim start date
         /// </summary>
-        [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+        [Date]
         public DateTime? VerbatimStartDate { get; set; }
     }
 }
