@@ -56,6 +56,9 @@
     <None Update="Resources\Dwca\dwca-event-mof-swedish-butterfly-monitoring.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Dwca\dwca-occurrence-audubonmedia-rrel-cumv_amph.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Dwca\dwca-occurrence-emof-lifewatch-artportalen.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -66,6 +69,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Dwca\dwca-occurrence-multimedia-rrel-cumv_amph.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Dwca\dwca-occurrence-multimedia-verbatimoccurrence.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Dwca\MeasurementOrFact\bdrs1.zip">

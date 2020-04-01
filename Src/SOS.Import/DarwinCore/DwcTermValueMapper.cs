@@ -1005,5 +1005,61 @@ namespace SOS.Import.DarwinCore
                     break;
             }
         }
+
+        public static void MapValueByTerm(DwcMultimedia item, string term, string val)
+        {
+            switch (term)
+            {
+                // todo - should we handle "id"?
+                //case "id":
+                //    mofItem.Id = val;
+                //    break;
+                case "http://purl.org/dc/terms/type":
+                    item.Type = val;
+                    break;
+                case "http://purl.org/dc/terms/format":
+                    item.Format = val;
+                    break;
+                case "http://purl.org/dc/terms/identifier":
+                    item.Identifier = val;
+                    break;
+                case "http://purl.org/dc/terms/references":
+                    item.References = val;
+                    break;
+                case "http://purl.org/dc/terms/title":
+                    item.Title = val;
+                    break;
+                case "http://purl.org/dc/terms/description":
+                    item.Description = val;
+                    break;
+                case "http://purl.org/dc/terms/created":
+                    item.Created = val;
+                    break;
+                case "http://purl.org/dc/terms/creator":
+                    item.Creator = val;
+                    break;
+                case "http://purl.org/dc/terms/contributor":
+                    item.Contributor = val;
+                    break;
+                case "http://purl.org/dc/terms/publisher":
+                    item.Publisher = val;
+                    break;
+                case "http://purl.org/dc/terms/audience":
+                    item.Audience = val;
+                    break;
+                case "http://purl.org/dc/terms/source":
+                    item.Source = val;
+                    break;
+                case "http://purl.org/dc/terms/license":
+                    item.License = val;
+                    break;
+                case "http://purl.org/dc/terms/rightsHolder":
+                    item.RightsHolder = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/datasetID":
+                    item.DatasetID = val;
+                    break;
+            }
+        }
     }
 }

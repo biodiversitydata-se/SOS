@@ -12,6 +12,7 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization.Conventions;
+using SOS.Import.DarwinCore;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Import.Repositories.Destination.DarwinCoreArchive.Interfaces;
 using SOS.Lib.Enums;
@@ -68,7 +69,7 @@ namespace SOS.Import.Harvesters.Observations
                 await _dwcArchiveVerbatimRepository.DeleteCollectionAsync();
                 await _dwcArchiveVerbatimRepository.AddCollectionAsync();
                 int observationCount = 0;
-                using var archiveReader = _dwcArchiveReader.OpenArchive(archivePath);
+                using var archiveReader = new ArchiveReader(archivePath);
                 var observationBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, BatchSize);
                 await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
                 {

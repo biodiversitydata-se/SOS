@@ -18,6 +18,16 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string DwcArchiveFilename { get; set; }
 
         /// <summary>
+        /// Multimedia linked to the observation
+        /// </summary>
+        public ICollection<DwcMultimedia> ObservationMultimedia { get; set; }
+
+        /// <summary>
+        /// Multimedia linked to the event
+        /// </summary>
+        public ICollection<DwcMultimedia> EventMultimedia { get; set; }
+
+        /// <summary>
         /// Measurement or fact linked to the observation.
         /// </summary>
         public ICollection<DwcMeasurementOrFact> ObservationMeasurementOrFacts { get; set; }

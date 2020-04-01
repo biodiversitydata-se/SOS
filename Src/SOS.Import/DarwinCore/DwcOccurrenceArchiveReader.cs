@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DwC_A;
@@ -29,11 +30,15 @@ namespace SOS.Import.DarwinCore
         /// <param name="batchSize"></param>
         /// <param name="filename"></param>
         /// <returns></returns>
-        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsDwcObservation(
+        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader, 
             int batchSize,
-            string filename)
+            string filename = null)
         {
+            if (filename == null)
+            {
+                filename = Path.GetFileName(archiveReader.FileName);
+            }
             IAsyncFileReader occurrenceFileReader = archiveReader.GetAsyncCoreFile();
             int idIndex = occurrenceFileReader.GetIdIndex();
             List<DwcObservationVerbatim> occurrenceRecords = new List<DwcObservationVerbatim>();
@@ -45,16 +50,79 @@ namespace SOS.Import.DarwinCore
 
                 if (occurrenceRecords.Count % batchSize == 0)
                 {
-                    await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
-                    await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
+                    await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
                     yield return occurrenceRecords;
                     occurrenceRecords.Clear();
                 }
             }
 
+            await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
+            yield return occurrenceRecords;
+        }
+
+        public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
+            ArchiveReader archiveReader,
+            string filename = null)
+        {
+            const int batchSize = 100000;
+            if (filename == null)
+            {
+                filename = Path.GetFileName(archiveReader.FileName);
+            }
+            var observationsBatches = ReadArchiveInBatchesAsync(
+                archiveReader,
+                batchSize,
+                filename);
+            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
+            await foreach (List<DwcObservationVerbatim> observationsBatch in observationsBatches)
+            {
+                observations.AddRange(observationsBatch);
+            }
+
+            return observations;
+        }
+
+        /// <summary>
+            /// Add data from DwC-A extensions.
+            /// </summary>
+            /// <param name="archiveReader"></param>
+            /// <param name="occurrenceRecords"></param>
+            /// <returns></returns>
+            private async Task AddDataFromExtensionsAsync(ArchiveReader archiveReader, List<DwcObservationVerbatim> occurrenceRecords)
+        {
             await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
             await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
-            yield return occurrenceRecords;
+            await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
+        }
+
+        private async Task AddMultimediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
+        {
+            try
+            {
+                IAsyncFileReader multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
+                if (multimediaFileReader == null) return;
+                int idIndex = multimediaFileReader.GetIdIndex();
+                var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
+                await foreach (IRow row in multimediaFileReader.GetDataRowsAsync())
+                {
+                    var id = row[idIndex];
+                    if (observationByRecordId.TryGetValue(id, out DwcObservationVerbatim obs))
+                    {
+                        if (obs.ObservationMultimedia == null)
+                        {
+                            obs.ObservationMultimedia = new List<DwcMultimedia>();
+                        }
+
+                        var multimediaItem = DwcMultimediaFactory.Create(row);
+                        obs.ObservationMultimedia.Add(multimediaItem);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to add Multimedia extension data");
+                throw;
+            }
         }
 
         private async Task AddMofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)

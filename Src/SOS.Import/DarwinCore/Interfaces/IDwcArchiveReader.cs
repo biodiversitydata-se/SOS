@@ -28,12 +28,5 @@ namespace SOS.Import.DarwinCore.Interfaces
         IAsyncEnumerable<List<DwcEvent>> ReadSamplingEventArchiveInBatchesAsDwcEventAsync(
             ArchiveReader archiveReader,
             int batchSize);
-
-        /// <summary>
-        /// Opens a DwC-A file.
-        /// </summary>
-        /// <param name="archivePath"></param>
-        /// <returns></returns>
-        ArchiveReader OpenArchive(string archivePath);
     }
 }
