@@ -9,6 +9,7 @@ using CsvHelper.Configuration;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Export.Managers.Interfaces;
 using SOS.Export.Mappings;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
@@ -24,12 +25,15 @@ namespace SOS.Export.IO.DwcArchive
     {
         private readonly ILogger<DwcArchiveOccurrenceCsvWriter> _logger;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
+        private readonly ITaxonManager _taxonManager;
 
         public DwcArchiveOccurrenceCsvWriter(
             IProcessedFieldMappingRepository processedFieldMappingRepository,
+            ITaxonManager taxonManager,
             ILogger<DwcArchiveOccurrenceCsvWriter> logger)
         {
             _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -43,6 +47,8 @@ namespace SOS.Export.IO.DwcArchive
         {
             try
             {
+                filter = PrepareFilter(filter);
+
                 var skip = 0;
                 const int take = 1000000;
                 var darwinCoreMap = new DarwinCoreDynamicMap(fieldDescriptions);
@@ -71,6 +77,25 @@ namespace SOS.Export.IO.DwcArchive
                 _logger.LogError(e, "Failed to create occurrence CSV file.");
                 return false;
             }
+        }
+
+        private SearchFilter PrepareFilter(FilterBase filter)
+        {
+            var preparedFilter = filter.Clone();
+
+            if (preparedFilter.IncludeUnderlyingTaxa && preparedFilter.TaxonIds != null && preparedFilter.TaxonIds.Any())
+            {
+                if (preparedFilter.TaxonIds.Contains(0)) // If Biota, then clear taxon filter
+                {
+                    preparedFilter.TaxonIds = new List<int>();
+                }
+                else
+                {
+                    preparedFilter.TaxonIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
+                }
+            }
+
+            return preparedFilter;
         }
 
         private void ResolveFieldMappedValues(

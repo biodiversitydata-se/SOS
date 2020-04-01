@@ -2,22 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nest;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Extensions
 {
     public static class SearchExtensions
     {
-        private static List<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> CreateQuery(FilterBase filter)
+        private static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateQuery(FilterBase filter)
         {
-            var queryContainers = new List<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>>();
+            var queryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
             if (filter.CountyIds?.Any() ?? false)
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field(f => f.Location.County.Id)
+                        .Field("location.county.id")
                         .Terms(filter.CountyIds)
                     )
                 );
@@ -30,7 +29,7 @@ namespace SOS.Lib.Extensions
                     case "point":
                         queryContainers.Add(q => q
                             .GeoDistance(gd => gd
-                                .Field(f => f.Location.PointLocation)
+                                .Field("location.pointLocation")
                                 .DistanceType(GeoDistanceType.Arc)
                                 .Location(filter.GeometryFilter.Geometry.ToGeoLocation())
                                 .Distance(filter.GeometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
@@ -45,7 +44,7 @@ namespace SOS.Lib.Extensions
                         {
                             queryContainers.Add(q => q
                                 .GeoShape(gd => gd
-                                    .Field(f => f.Location.PointWithBuffer)
+                                    .Field("location.pointWithBuffer")
                                     .Shape(s => filter.GeometryFilter.Geometry.ToGeoShape())
                                     .Relation(GeoShapeRelation.Intersects)
                                 )
@@ -55,7 +54,7 @@ namespace SOS.Lib.Extensions
                         {
                             queryContainers.Add(q => q
                                 .GeoShape(gd => gd
-                                    .Field(f => f.Location.Point)
+                                    .Field("location.point")
                                     .Shape(s => filter.GeometryFilter.Geometry.ToGeoShape())
                                     .Relation(GeoShapeRelation.Within)
                                 )
@@ -67,10 +66,9 @@ namespace SOS.Lib.Extensions
 
             if (filter.EndDate.HasValue)
             {
-                queryContainers.Add((QueryContainerDescriptor<ProcessedObservation> q) => q
+                queryContainers.Add((QueryContainerDescriptor<dynamic> q) => q
                     .Range(r => r
-                        .Field((y => y.Event.EndDate != null))
-                        .Field(f => f.Event.EndDate)
+                        .Field("event.endDate")
                         .LessThanOrEquals(filter.EndDate.Value.ToUniversalTime().Ticks)
                     )
                 );
@@ -80,7 +78,7 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field(f => f.Occurrence.Gender.Id)
+                        .Field("occurrence.gender.id")
                         .Terms(filter.GenderIds)
                     )
                 );
@@ -90,7 +88,7 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field(f => f.Location.Municipality.Id)
+                        .Field("location.municipality.id")
                         .Terms(filter.MunicipalityIds)
                     )
                 );
@@ -99,20 +97,20 @@ namespace SOS.Lib.Extensions
             if (filter.OnlyValidated.HasValue && filter.OnlyValidated.Value.Equals(true))
             {
                 queryContainers.Add(q => q
-                    .Term(m => m.Field(f => f.Identification.Validated).Value(true)));
+                    .Term(m => m.Field("identification.validated").Value(true)));
             }
 
             if (filter.PositiveSightings.HasValue)
             {
                 queryContainers.Add(q => q
-                    .Term(m => m.Field(f => f.Occurrence.IsPositiveObservation).Value(filter.PositiveSightings.Value)));
+                    .Term(m => m.Field("occurrence.isPositiveObservation").Value(filter.PositiveSightings.Value)));
             }
 
             if (filter.ProvinceIds?.Any() ?? false)
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field(f => f.Location.Province.Id)
+                        .Field("location.province.id")
                         .Terms(filter.ProvinceIds)
                     )
                 );
@@ -122,7 +120,7 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field(f => f.Taxon.RedlistCategory)
+                        .Field("taxon.redlistCategory")
                         .Terms(filter.RedListCategories)
                     )
                 );
@@ -132,8 +130,7 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .Range(r => r
-                        .Field((y => y.Event.StartDate != null))
-                        .Field(f => f.Event.StartDate)
+                        .Field("event.startDate")
                         .GreaterThanOrEquals(filter.StartDate.Value.ToUniversalTime().Ticks)
                     )
                 );
@@ -143,7 +140,7 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field(f => f.Taxon.Id)
+                        .Field("taxon.id")
                         .Terms(filter.TaxonIds)
                     )
                 );
@@ -158,19 +155,18 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> ToProjectParameteQuery(this FilterBase filter)
+        public static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToProjectParameterQuery(this FilterBase filter)
         {
             var query = CreateQuery(filter);
-
+            // Todo fix query so it 
             query.Add(q => q
                 .Nested(n => n
-                        .Path(p => p.Projects)
+                        .Path("projects")
                         .Query(q => q
                             .Exists(e => 
-                                e.Field(f => f.Projects.Where(prj => prj.ProjectParameters.Any()))
+                                e.Field("projects")
                             )
                         )
-                        
                 )
             );
 
@@ -182,11 +178,11 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> ToQuery(this FilterBase filter)
+        public static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToQuery(this FilterBase filter)
         {
             if (!filter.IsFilterActive)
             {
-                return new List<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>>();
+                return new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
             }
 
             return CreateQuery(filter);
@@ -198,10 +194,23 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="fields"></param>
         /// <returns></returns>
-        public static string ToProjection(this IEnumerable<string> fields)
+        public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> fields)
         {
-            var projection = $"{{ _id: 0, { string.Join(",", fields?.Where(f => !string.IsNullOrEmpty(f)).Select((f, i) => $"'{f}': {i + 1}") ?? new string[0]) } }}";
-            return projection;
+            var projection = new SourceFilterDescriptor<dynamic>()
+                   .Excludes(e => e
+                       .Field("location.point")
+                       .Field("location.pointLocation")
+                       .Field("location.pointWithBuffer")
+               );
+
+            if (fields?.Any() ?? false)
+            {
+                projection.Includes(i => i
+                    .Fields(fields.Select(f =>new Field(f) ))
+                );
+            }
+
+            return p => projection;
         }
     }
 }

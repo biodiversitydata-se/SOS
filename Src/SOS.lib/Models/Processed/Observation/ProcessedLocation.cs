@@ -397,7 +397,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Point (WGS84)
         /// </summary>
-        [GeoShape, JsonIgnore]
+        [GeoShape]
         public PointGeoShape Point { get; set; }
 
         /// <summary>
@@ -409,7 +409,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Point with accuracy buffer (WGS84)
         /// </summary>
-        [GeoShape, JsonIgnore]
+        [GeoShape]
         public PolygonGeoShape PointWithBuffer { get; set; }
 
         /// <summary>

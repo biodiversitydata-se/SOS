@@ -108,6 +108,8 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             DwcArchiveFileWriter dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     processedFieldMappingRepository,
+                    new TaxonManager(
+                        new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonManager>>().Object),
                     new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object),
                 new ExtendedMeasurementOrFactCsvWriter(new Mock<ILogger<ExtendedMeasurementOrFactCsvWriter>>().Object),
                 new FileService(),

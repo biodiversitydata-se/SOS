@@ -44,8 +44,9 @@ namespace SOS.Observations.Api.Repositories
             var query = filter.ToQuery();
             query = AddInternalFilters(filter, query);
 
-            var searchResponse = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(CollectionName.ToLower())
+                .Source(filter.OutputFields.ToProjection())
                 .From(skip)
                 .Size(take)
                 .Query(q => q
@@ -57,11 +58,12 @@ namespace SOS.Observations.Api.Repositories
             return new PagedResult<dynamic>
             {
                 Records = searchResponse.Documents,
+                //Records = searchResponse.Hits,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
         }
 
-        private static IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> AddInternalFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> query)
+        private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddInternalFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
         {
             var queryInternal = query.ToList();
             if (filter is SearchFilterInternal)

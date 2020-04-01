@@ -66,8 +66,6 @@ namespace SOS.Export.IntegrationTests.Repositories
                 new ProcessedObservationRepository(
                     elasticClient,
                     exportClient,
-                    new TaxonManager(
-                        new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonManager>>().Object),
                     new NullLogger<ProcessedObservationRepository>());
 
             return processedObservationRepository;

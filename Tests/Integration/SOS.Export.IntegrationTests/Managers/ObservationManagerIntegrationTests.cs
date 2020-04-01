@@ -49,7 +49,9 @@ namespace SOS.Export.IntegrationTests.Managers
                 exportConfiguration.ProcessedDbConfiguration.BatchSize);
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
-                    new ProcessedFieldMappingRepository(exportClient, new NullLogger<ProcessedFieldMappingRepository>()), 
+                    new ProcessedFieldMappingRepository(exportClient, new NullLogger<ProcessedFieldMappingRepository>()),
+                    new TaxonManager(
+                        new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonManager>>().Object),
                     new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new FileService(),
@@ -59,8 +61,6 @@ namespace SOS.Export.IntegrationTests.Managers
                 new ProcessedObservationRepository(
                     elasticClient, 
                     exportClient,
-                    new TaxonManager(
-                        new ProcessedTaxonRepository(exportClient, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonManager>>().Object),
                     new Mock<ILogger<ProcessedObservationRepository>>().Object),
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),

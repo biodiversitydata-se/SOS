@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
-using SOS.Export.Managers.Interfaces;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Extensions;
@@ -19,7 +18,6 @@ namespace SOS.Export.Repositories
     public class ProcessedObservationRepository : BaseRepository<ProcessedObservation, string>, IProcessedObservationRepository
     {
         private readonly IElasticClient _elasticClient;
-        private ITaxonManager _taxonManager;
 
         /// <summary>
         ///  Constructor
@@ -31,30 +29,9 @@ namespace SOS.Export.Repositories
         public ProcessedObservationRepository(
             IElasticClient elasticClient,
             IExportClient exportClient,
-            ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger) : base(exportClient, true, logger)
         {
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
-            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
-        }
-
-        private SearchFilter PrepareFilter(FilterBase filter)
-        {
-            var preparedFilter = filter.Clone();
-
-            if (preparedFilter.IncludeUnderlyingTaxa && preparedFilter.TaxonIds != null && preparedFilter.TaxonIds.Any())
-            {
-                if (preparedFilter.TaxonIds.Contains(0)) // If Biota, then clear taxon filter
-                {
-                    preparedFilter.TaxonIds = new List<int>();
-                }
-                else
-                {
-                    preparedFilter.TaxonIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
-                }
-            }
-
-            return preparedFilter;
         }
 
         /// <inheritdoc />
@@ -65,8 +42,17 @@ namespace SOS.Export.Repositories
                 return null;
             }
 
-            var searchResponse = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+            var projection = new SourceFilterDescriptor<dynamic>()
+                .Excludes(e => e
+                    .Field("location.point")
+                    .Field("location.pointLocation")
+                    .Field("location.pointWithBuffer")
+                );
+            var x = new SourceFilter();
+
+            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(CollectionName.ToLower())
+                .Source(new string[0].ToProjection())
                 .From(skip)
                 .Size(take)
                 .Query(q => q
@@ -75,7 +61,7 @@ namespace SOS.Export.Repositories
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
-            return searchResponse.Documents;
+            return (IEnumerable<ProcessedObservation>)searchResponse.Documents;
         }
 
         public async Task<IEnumerable<ProcessedProject>> GetProjectParameters(
@@ -83,18 +69,21 @@ namespace SOS.Export.Repositories
             int skip,
             int take)
         {
-            // Not sure this query works
-            var searchResponse = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+            // Todo fix
+            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(CollectionName.ToLower())
+                .Source(s => 
+                    s.Includes(i => i
+                        .Field("projects")))
                 .From(skip)
                 .Size(take)
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(filter.ToProjectParameteQuery()))));
+                        .Filter(filter.ToProjectParameterQuery()))));
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
-            return searchResponse.Documents.SelectMany(d => d.Projects);
+            return searchResponse.Documents.Select(d => ((ProcessedObservation)d)).SelectMany(po => po.Projects);
         }
     }
 }
