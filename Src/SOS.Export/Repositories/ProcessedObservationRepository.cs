@@ -16,7 +16,7 @@ namespace SOS.Export.Repositories
     /// <summary>
     /// Species data service
     /// </summary>
-    public class ProcessedObservationRepository : BaseRepository<ProcessedObservation, Guid>, IProcessedObservationRepository
+    public class ProcessedObservationRepository : BaseRepository<ProcessedObservation, string>, IProcessedObservationRepository
     {
         private readonly IElasticClient _elasticClient;
         private ITaxonManager _taxonManager;
@@ -83,20 +83,18 @@ namespace SOS.Export.Repositories
             int skip,
             int take)
         {
-           /* List<IEnumerable<ProcessedProject>> res = await MongoCollection
-                .Find(filter.ToProjectParameteFilterDefinition())
-                .Skip(skip)
-                .Limit(take)
-                .Project(x => x.Projects)
-                .ToListAsync();
+            // Not sure this query works
+            var searchResponse = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                .Index(CollectionName.ToLower())
+                .From(skip)
+                .Size(take)
+                .Query(q => q
+                    .Bool(b => b
+                        .Filter(filter.ToProjectParameteQuery()))));
 
-            var projectParameters = res.SelectMany(pp => pp);
-            return projectParameters;
-            
-            Todo
-             */
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
-            return null;
+            return searchResponse.Documents.SelectMany(d => d.Projects);
         }
     }
 }

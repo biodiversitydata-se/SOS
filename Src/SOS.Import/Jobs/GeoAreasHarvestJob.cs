@@ -35,11 +35,11 @@ namespace SOS.Import.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {
-            _logger.LogDebug("Start Geo Harvest Job");
+            _logger.LogInformation("Start Geo Harvest Job");
            
             var result = await _areaHarvester.HarvestAreasAsync();
 
-            _logger.LogDebug($"End Geo Harvest Job. Status: {result.Status}");
+            _logger.LogInformation($"End Geo Harvest Job. Status: {result.Status}");
 
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(result);

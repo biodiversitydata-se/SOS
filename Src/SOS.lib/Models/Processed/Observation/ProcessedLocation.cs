@@ -401,6 +401,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public PointGeoShape Point { get; set; }
 
         /// <summary>
+        /// Point used in distance from point search
+        /// </summary>
+        [GeoPoint]
+        public GeoLocation PointLocation { get; set; }
+
+        /// <summary>
         /// Point with accuracy buffer (WGS84)
         /// </summary>
         [GeoShape, JsonIgnore]

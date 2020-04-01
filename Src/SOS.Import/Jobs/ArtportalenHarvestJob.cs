@@ -36,11 +36,11 @@ namespace SOS.Import.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
-            _logger.LogDebug("Start Artportalen Harvest Job");
+            _logger.LogInformation("Start Artportalen Harvest Job");
            
             var result = await _artportalenObservationHarvester.HarvestSightingsAsync(cancellationToken);
 
-            _logger.LogDebug($"End Artportalen Harvest Job. Status: {result.Status}");
+            _logger.LogInformation($"End Artportalen Harvest Job. Status: {result.Status}");
 
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(result);

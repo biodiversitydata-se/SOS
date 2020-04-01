@@ -9,7 +9,7 @@ namespace SOS.Export.Repositories.Interfaces
     /// <summary>
     /// 
     /// </summary>
-    public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, Guid>
+    public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, string>
     {
         /// <summary>
         /// Get filtered chunk

@@ -264,6 +264,51 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Cast GeoJson point geometry to geo location
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <returns></returns>
+        public static GeoLocation ToGeoLocation(this GeoJsonGeometry<GeoJson2DGeographicCoordinates> geometry)
+        {
+            if (geometry == null || geometry.Type != GeoJsonObjectType.Point)
+            {
+                return null;
+            }
+
+            var point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)geometry;
+
+            if (point.Coordinates == null || point.Coordinates.Latitude.Equals(0) || point.Coordinates.Longitude.Equals(0))
+            {
+                return null;
+            }
+
+            return new GeoLocation(point.Coordinates.Latitude, point.Coordinates.Longitude);
+        }
+
+        /// <summary>
+        /// Cast input geometry (point) to geo location
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <returns></returns>
+        public static GeoLocation ToGeoLocation(this InputGeometry geometry)
+        {
+            if (!geometry.IsValid || geometry.Type?.ToLower() != "point")
+            {
+                return null;
+            }
+
+            var coordinates = geometry.Coordinates.ToArray().Select(p => ((JsonElement)p).GetDouble())
+                .ToArray();
+
+            if (coordinates?.Length != 2 || coordinates[0].Equals(0) || coordinates[1].Equals(0))
+            {
+                return null;
+            }
+
+            return new GeoLocation(coordinates[1], coordinates[0]);
+        }
+
+        /// <summary>
         /// Cast input geometry to Geo shape
         /// </summary>
         /// <param name="geometry"></param>
@@ -317,7 +362,7 @@ namespace SOS.Lib.Extensions
                 case OgcGeometryType.Point:
                     var point = (Point)geometry;
 
-                    return point.X.Equals(0) || point.Y.Equals(0) ? null :  new PointGeoShape(new GeoCoordinate(point.Y, point.X));
+                    return point.X.Equals(0) || point.Y.Equals(0) ? null : new PointGeoShape(new GeoCoordinate(point.Y, point.X));
                 case OgcGeometryType.LineString:
                     var lineString = (LineString)geometry;
 

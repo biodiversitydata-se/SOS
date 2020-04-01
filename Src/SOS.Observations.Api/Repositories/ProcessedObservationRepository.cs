@@ -8,7 +8,6 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Database.Interfaces;
-using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Repositories
@@ -16,27 +15,23 @@ namespace SOS.Observations.Api.Repositories
     /// <summary>
     /// Species data service
     /// </summary>
-    public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, Guid>, IProcessedObservationRepository
+    public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, string>, IProcessedObservationRepository
     {
         private readonly IElasticClient _elasticClient;
-        private const int BiotaTaxonId = 0;
-        private readonly ITaxonManager _taxonManager;
+
 
         /// <summary>
-        /// Constructor
+        ///  Constructor
         /// </summary>
         /// <param name="elasticClient"></param>
         /// <param name="client"></param>
-        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IElasticClient elasticClient,
             IProcessClient client,
-            ITaxonManager taxonManager,
             ILogger<ProcessedObservationRepository> logger) : base(client, true, logger)
         {
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
-            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }
 
         /// <inheritdoc />
@@ -64,8 +59,6 @@ namespace SOS.Observations.Api.Repositories
                 Records = searchResponse.Documents,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
-
-
         }
 
         private static IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> AddInternalFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> query)

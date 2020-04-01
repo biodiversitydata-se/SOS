@@ -97,7 +97,7 @@ namespace SOS.Process.Jobs
                 };
                 await Task.WhenAll(metadataTasks);
 
-                _logger.LogDebug("Start processing meta data");
+                _logger.LogInformation("Start processing meta data");
                 if (!metadataTasks.All(t => t.Result))
                 {
                     _logger.LogError("Failed to process meta data");
@@ -241,7 +241,7 @@ namespace SOS.Process.Jobs
                     }
                 }
 
-                _logger.LogDebug($"Processing done: {success}");
+                _logger.LogInformation($"Processing done: {success}");
 
                 _logger.LogDebug("Persist area cache");
                 _areaHelper.PersistCache();

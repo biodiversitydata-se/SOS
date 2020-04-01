@@ -15,7 +15,7 @@ namespace SOS.Process.Repositories.Destination
     /// <summary>
     /// Base class for cosmos db repositories
     /// </summary>
-    public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, Guid>, IProcessedObservationRepository
+    public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, string>, IProcessedObservationRepository
     {
         private readonly IInvalidObservationRepository _invalidObservationRepository;
         private readonly IElasticClient _elasticClient;
@@ -100,7 +100,7 @@ namespace SOS.Process.Repositories.Destination
             {
                 return null;
             }
-
+            
             int count = 0;
             return _elasticClient.BulkAll(items, b => b
                 .Index(IndexName)
@@ -212,11 +212,13 @@ namespace SOS.Process.Repositories.Destination
                )
                 .Map<ProcessedObservation>(p => p
                    .AutoMap()
-                   /*    .Properties(ps => ps
+                       .Properties(ps => ps
                           .GeoShape(gs => gs
                               .Name(nn => nn.Location.Point))
+                          .GeoPoint(gp => gp
+                              .Name(nn => nn.Location.PointLocation))
                          .GeoShape(gs => gs
-                             .Name(nn => nn.Location.PointWithBuffer)))*/));
+                             .Name(nn => nn.Location.PointWithBuffer)))));
 
             if (createIndexResponse.Acknowledged && createIndexResponse.IsValid)
             {

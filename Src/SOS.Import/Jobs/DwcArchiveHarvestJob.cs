@@ -34,9 +34,9 @@ namespace SOS.Import.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync(string archivePath, IJobCancellationToken  cancellationToken)
         {
-            _logger.LogDebug("Start DwC-A Harvest Job");
+            _logger.LogInformation("Start DwC-A Harvest Job");
             var result = await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, cancellationToken);
-            _logger.LogDebug($"End DwC-A Harvest Job. Status: {result.Status}");
+            _logger.LogInformation($"End DwC-A Harvest Job. Status: {result.Status}");
 
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(result);

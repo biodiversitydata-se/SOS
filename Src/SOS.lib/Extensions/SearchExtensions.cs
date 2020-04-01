@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MongoDB.Driver;
-using MongoDB.Driver.GeoJsonObjectModel;
 using Nest;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -32,9 +30,9 @@ namespace SOS.Lib.Extensions
                     case "point":
                         queryContainers.Add(q => q
                             .GeoDistance(gd => gd
-                                .Field(f => f.Location.Point)
+                                .Field(f => f.Location.PointLocation)
                                 .DistanceType(GeoDistanceType.Arc)
-                                .Location(((PointGeoShape)filter.GeometryFilter.Geometry.ToGeoShape())?.Coordinates)
+                                .Location(filter.GeometryFilter.Geometry.ToGeoLocation())
                                 .Distance(filter.GeometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
                                 .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
                             )
@@ -155,7 +153,6 @@ namespace SOS.Lib.Extensions
         }
 
 
-
         /// <summary>
         /// Create project parameter filter.
         /// </summary>
@@ -164,8 +161,19 @@ namespace SOS.Lib.Extensions
         public static IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> ToProjectParameteQuery(this FilterBase filter)
         {
             var query = CreateQuery(filter);
-            // filters.Add(Builders<ProcessedObservation>.Filter.ElemMatch(o => o.Projects, o => o.ProjectParameters != null));
-            //query.Add(Todo);
+
+            query.Add(q => q
+                .Nested(n => n
+                        .Path(p => p.Projects)
+                        .Query(q => q
+                            .Exists(e => 
+                                e.Field(f => f.Projects.Where(prj => prj.ProjectParameters.Any()))
+                            )
+                        )
+                        
+                )
+            );
+
             return query;
         }
 

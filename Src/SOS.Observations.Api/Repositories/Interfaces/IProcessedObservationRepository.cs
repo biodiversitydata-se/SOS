@@ -8,7 +8,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
     /// <summary>
     /// 
     /// </summary>
-    public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, Guid>
+    public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, string>
     {
         /// <summary>
         /// Get chunk of objects from repository

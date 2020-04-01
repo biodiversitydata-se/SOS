@@ -83,6 +83,7 @@ namespace SOS.Process.Processors.ClamPortal
                     Id = verbatimObservation.LocationId,
                     Locality = verbatimObservation.Locality,
                     Point = (PointGeoShape)wgs84Point?.ToGeoShape(),
+                    PointLocation = wgs84Point?.ToGeoLocation(),
                     PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatimObservation.CoordinateUncertaintyInMeters)?.ToGeoShape(),
                     Remarks = verbatimObservation.LocationRemarks,
                     MaximumDepthInMeters = verbatimObservation.MaximumDepthInMeters,
@@ -118,8 +119,7 @@ namespace SOS.Process.Processors.ClamPortal
                 ReportedBy = verbatimObservation.ReportedBy,
                 ReportedDate = verbatimObservation.ReportedDate,
                 RightsHolder = verbatimObservation.RightsHolder,
-                Taxon = taxon,
-                Id = Guid.NewGuid()
+                Taxon = taxon
             };
         }
 

@@ -35,11 +35,11 @@ namespace SOS.Import.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {
-            _logger.LogDebug("Start Field Mapping Import Job");
+            _logger.LogInformation("Start Field Mapping Import Job");
 
             var result = await _fieldMappingHarvester.HarvestAsync();
 
-            _logger.LogDebug($"End Field Mapping Import Job. Result: {result.Status == RunStatus.Success}");
+            _logger.LogInformation($"End Field Mapping Import Job. Result: {result.Status == RunStatus.Success}");
 
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(result);

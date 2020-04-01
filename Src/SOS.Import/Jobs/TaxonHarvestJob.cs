@@ -35,11 +35,11 @@ namespace SOS.Import.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {
-            _logger.LogDebug("Start Taxon Harvest Job");
+            _logger.LogInformation("Start Taxon Harvest Job");
 
             var result = await _taxonHarvester.HarvestAsync();
 
-            _logger.LogDebug($"End taxon Harvest Job. Status: {result.Status}");
+            _logger.LogInformation($"End taxon Harvest Job. Status: {result.Status}");
 
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(result);

@@ -36,11 +36,11 @@ namespace SOS.Import.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
-            _logger.LogDebug("Start Clam Portal Harvest Job");
+            _logger.LogInformation("Start Clam Portal Harvest Job");
 
             var result = await _clamPortalObservationHarvester.HarvestClamsAsync(cancellationToken);
             
-            _logger.LogDebug($"End Clam Portal Harvest Job. Status: {result.Status}");
+            _logger.LogInformation($"End Clam Portal Harvest Job. Status: {result.Status}");
             
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(result);

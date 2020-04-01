@@ -122,6 +122,7 @@ namespace SOS.Process.Processors.Artportalen
                     MinimumDepthInMeters = verbatimObservation.MinDepth,
                     MinimumElevationInMeters = verbatimObservation.MinHeight,
                     Point = (PointGeoShape)verbatimObservation.Site?.Point?.ToGeoShape(),
+                    PointLocation = verbatimObservation.Site?.Point?.ToGeoLocation(),
                     PointWithBuffer = (PolygonGeoShape)verbatimObservation.Site?.PointWithBuffer?.ToGeoShape(),
                     VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord : 0,
                     VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0,
@@ -160,8 +161,7 @@ namespace SOS.Process.Processors.Artportalen
                 ReportedDate = verbatimObservation.ReportedDate,
                 RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas",
                 Taxon = taxon,
-                TypeId = null,
-                Id = Guid.NewGuid()
+                TypeId = null
             };
 
             // Get field mapping values

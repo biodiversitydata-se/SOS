@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using MongoDB.Bson;
 using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
@@ -11,7 +10,7 @@ namespace SOS.Lib.Models.Processed.Observation
     /// <summary>
     /// This class contains information about a species sighting
     /// </summary>
-    public class ProcessedObservation : IEntity<Guid>
+    public class ProcessedObservation : IEntity<string>
     {
         /// <summary>
         /// Constructor
@@ -108,11 +107,10 @@ namespace SOS.Lib.Models.Processed.Observation
         [Object]
         public ProcessedEvent Event { get; set; }
 
-       /// <summary>
-        /// Mongodb id
+        /// <summary>
+        /// Unique id, Omit to automatically generate an id on insert (best performance)
         /// </summary>
-
-       public Guid Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// The category of information pertaining to taxonomic

@@ -33,10 +33,10 @@ namespace SOS.Export.Jobs
         {
             try
             {
-                _logger.LogDebug("Start export job");
+                _logger.LogInformation("Start export job");
                 var success = await _observationManager.ExportDWCAsync(filter, email, cancellationToken);
 
-                _logger.LogDebug($"End DOI job. Success: {success}");
+                _logger.LogInformation($"End export job. Success: {success}");
                 
                 return success ? true : throw new Exception("Export Job failed");
             }
@@ -44,11 +44,6 @@ namespace SOS.Export.Jobs
             {
                 _logger.LogInformation("Export job was cancelled.");
                 return false;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Export job failed");
-                throw new Exception("Export Job failed");
             }
         }
     }

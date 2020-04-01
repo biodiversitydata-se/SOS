@@ -9,7 +9,7 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     /// <summary>
     /// Processed data class
     /// </summary>
-    public interface IProcessedObservationRepository : IProcessBaseRepository<ProcessedObservation, Guid>
+    public interface IProcessedObservationRepository : IProcessBaseRepository<ProcessedObservation, string>
     {
         /// <summary>
         /// Add many items 

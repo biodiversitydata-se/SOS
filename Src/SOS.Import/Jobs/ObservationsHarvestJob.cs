@@ -49,7 +49,7 @@ namespace SOS.Import.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync(int harvestSources, int processSources, IJobCancellationToken cancellationToken)
         {
-            _logger.LogDebug("Start Harvest Jobs");
+            _logger.LogInformation("Start Harvest Jobs");
 
             var harvestTasks = new Dictionary<DataSet, Task<bool>>();
 
@@ -79,7 +79,7 @@ namespace SOS.Import.Jobs
 
             // Run all tasks async
             await Task.WhenAll(harvestTasks.Values);
-            _logger.LogDebug("Finish Harvest Jobs");
+            _logger.LogInformation("Finish Harvest Jobs");
 
             // If Artportalen and meta data harvest was successful, go on with processing
             if (harvestTasks[DataSet.ArtportalenObservations].Result &&
@@ -95,7 +95,7 @@ namespace SOS.Import.Jobs
 
                 var jobId = BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(processSources, true, true, true, cancellationToken));
                
-                _logger.LogDebug($"Start Process Jobs {jobId}");
+                _logger.LogInformation($"Start Process Jobs {jobId}");
 
                 return true;
             }

@@ -33,9 +33,9 @@ namespace SOS.Import.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync(IJobCancellationToken  cancellationToken)
         {
-            _logger.LogDebug("Start KUL Harvest Job");
+            _logger.LogInformation("Start KUL Harvest Job");
             var result = await _kulObservationHarvester.HarvestObservationsAsync(cancellationToken);
-            _logger.LogDebug($"End KUL Harvest Job. Status: {result.Status}");
+            _logger.LogInformation($"End KUL Harvest Job. Status: {result.Status}");
 
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(result);

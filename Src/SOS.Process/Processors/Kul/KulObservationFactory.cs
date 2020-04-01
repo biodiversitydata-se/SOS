@@ -77,6 +77,7 @@ namespace SOS.Process.Processors.Kul
                     Country = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
                     Locality = verbatim.Locality,
                     Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
+                    PointLocation = wgs84Point?.ToGeoLocation(),
                     PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoShape(),
                     VerbatimLatitude = verbatim.DecimalLatitude,
                     VerbatimLongitude = verbatim.DecimalLongitude
@@ -98,8 +99,7 @@ namespace SOS.Process.Processors.Kul
                 ProtectionLevel = GetProtectionLevel(),
                 ReportedBy = verbatim.ReportedBy,
                 ReportedDate = verbatim.Start,
-                Taxon = taxon,
-                Id = Guid.NewGuid()
+                Taxon = taxon
             };
 
             return obs;
