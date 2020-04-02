@@ -158,15 +158,19 @@ namespace SOS.Lib.Extensions
         public static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToProjectParameterQuery(this FilterBase filter)
         {
             var query = CreateQuery(filter);
-            // Todo fix query so it 
             query.Add(q => q
                 .Nested(n => n
-                        .Path("projects")
-                        .Query(q => q
-                            .Exists(e => 
-                                e.Field("projects")
+                    .Path("projects")
+                    .Query(q => q
+                        .Nested(n => n
+                            .Path("projects.projectParameters")
+                            .Query(q => q
+                                .Exists(e => e
+                                    .Field("projects.projectParameters")
+                                )
                             )
                         )
+                    )
                 )
             );
 
