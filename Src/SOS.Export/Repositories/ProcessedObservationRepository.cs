@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
+using Newtonsoft.Json;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Extensions;
@@ -69,11 +70,10 @@ namespace SOS.Export.Repositories
             int skip,
             int take)
         {
-            // Todo fix
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(CollectionName.ToLower())
-                .Source(s => 
-                    s.Includes(i => i
+                .Source(s => s
+                    .Includes(i => i
                         .Field("projects")))
                 .From(skip)
                 .Size(take)
@@ -83,7 +83,9 @@ namespace SOS.Export.Repositories
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
-            return searchResponse.Documents.Select(d => ((ProcessedObservation)d)).SelectMany(po => po.Projects);
+           return searchResponse.Documents
+                .Select(po => (ProcessedObservation)JsonConvert.DeserializeObject<ProcessedObservation>(JsonConvert.SerializeObject(po)))
+                .SelectMany(p => p.Projects);
         }
     }
 }
