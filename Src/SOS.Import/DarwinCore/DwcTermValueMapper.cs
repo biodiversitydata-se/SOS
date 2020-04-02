@@ -1061,5 +1061,300 @@ namespace SOS.Import.DarwinCore
                     break;
             }
         }
+
+        public static void MapValueByTerm(DwcAudubonMedia item, string term, string val)
+        {
+            switch (term)
+            {
+                case "http://purl.org/dc/terms/identifier":
+                    item.Identifier = val;
+                    break;
+                case "http://purl.org/dc/elements/1.1/type":
+                    item.TypeAc = val;
+                    break;
+                case "http://purl.org/dc/terms/type":
+                    item.Type = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/subtypeLiteral":
+                    item.SubtypeLiteral = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/subtype":
+                    item.Subtype = val;
+                    break;
+                case "http://purl.org/dc/terms/title":
+                    item.Title = val;
+                    break;
+                case "http://purl.org/dc/terms/modified":
+                    item.Modified = val;
+                    break;
+                case "http://ns.adobe.com/xap/1.0/MetadataDate":
+                    item.MetadataDate = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/metadataLanguageLiteral":
+                    item.MetadataLanguageLiteral = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/metadataLanguage":
+                    item.MetadataLanguage = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/providerManagedID":
+                    item.ProviderManagedID = val;
+                    break;
+                case "http://ns.adobe.com/xap/1.0/Rating":
+                    item.Rating = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/commenterLiteral":
+                    item.CommenterLiteral = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/commenter":
+                    item.Commenter = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/comments":
+                    item.Comments = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/reviewerLiteral":
+                    item.ReviewerLiteral = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/reviewer":
+                    item.Reviewer = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/reviewerComments":
+                    item.ReviewerComments = val;
+                    break;
+                case "http://purl.org/dc/terms/available":
+                    item.Available = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/hasServiceAccessPoint":
+                    item.HasServiceAccessPoint = val;
+                    break;
+                case "http://purl.org/dc/elements/1.1/rights":
+                    item.RightsAc = val;
+                    break;
+                case "http://purl.org/dc/terms/rights":
+                    item.Rights = val;
+                    break;
+                case "http://ns.adobe.com/xap/1.0/rights/Owner":
+                    item.Owner = val;
+                    break;
+                case "http://ns.adobe.com/xap/1.0/rights/UsageTerms":
+                    item.UsageTerms = val;
+                    break;
+                case "http://ns.adobe.com/xap/1.0/rights/WebStatement":
+                    item.WebStatement = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/licenseLogoURL":
+                    item.LicenseLogoURL = val;
+                    break;
+                case "http://ns.adobe.com/photoshop/1.0/Credit":
+                    item.Credit = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/attributionLogoURL":
+                    item.AttributionLogoURL = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/attributionLinkURL":
+                    item.AttributionLinkURL = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/fundingAttribution":
+                    item.FundingAttribution = val;
+                    break;
+                case "http://purl.org/dc/elements/1.1/source":
+                    item.SourceAc = val;
+                    break;
+                case "http://purl.org/dc/terms/source":
+                    item.Source = val;
+                    break;
+                case "http://purl.org/dc/elements/1.1/creator":
+                    item.CreatorAc = val;
+                    break;
+                case "http://purl.org/dc/terms/creator":
+                    item.Creator = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/providerLiteral":
+                    item.ProviderLiteral = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/provider":
+                    item.Provider = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/metadataCreatorLiteral":
+                    item.MetadataCreatorLiteral = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/metadataCreator":
+                    item.MetadataCreator = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/metadataProviderLiteral":
+                    item.MetadataProviderLiteral = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/metadataProvider":
+                    item.MetadataProvider = val;
+                    break;
+                case "http://purl.org/dc/terms/description":
+                    item.Description = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/caption":
+                    item.Caption = val;
+                    break;
+                case "http://purl.org/dc/elements/1.1/language":
+                    item.LanguageAc = val;
+                    break;
+                case "http://purl.org/dc/terms/language":
+                    item.Language = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/physicalSetting":
+                    item.PhysicalSetting = val;
+                    break;
+                case "http://iptc.org/std/Iptc4xmpExt/2008-02-29/CVterm":
+                    item.CVterm = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/subjectCategoryVocabulary":
+                    item.SubjectCategoryVocabulary = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/tag":
+                    item.Tag = val;
+                    break;
+                case "http://iptc.org/std/Iptc4xmpExt/2008-02-29/LocationShown":
+                    item.LocationShown = val;
+                    break;
+                case "http://iptc.org/std/Iptc4xmpExt/2008-02-29/WorldRegion":
+                    item.WorldRegion = val;
+                    break;
+                case "http://iptc.org/std/Iptc4xmpExt/2008-02-29/CountryCode":
+                    item.CountryCode = val;
+                    break;
+                case "http://iptc.org/std/Iptc4xmpExt/2008-02-29/CountryName":
+                    item.CountryName = val;
+                    break;
+                case "http://iptc.org/std/Iptc4xmpExt/2008-02-29/ProvinceState":
+                    item.ProvinceState = val;
+                    break;
+                case "http://iptc.org/std/Iptc4xmpExt/2008-02-29/City":
+                    item.City = val;
+                    break;
+                case "http://iptc.org/std/Iptc4xmpExt/2008-02-29/Sublocation":
+                    item.Sublocation = val;
+                    break;
+                case "http://purl.org/dc/terms/temporal":
+                    item.Temporal = val;
+                    break;
+                case "http://ns.adobe.com/xap/1.0/CreateDate":
+                    item.CreateDate = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/timeOfDay":
+                    item.TimeOfDay = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/taxonCoverage":
+                    item.TaxonCoverage = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/scientificName":
+                    item.ScientificName = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/identificationQualifier":
+                    item.IdentificationQualifier = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/vernacularName":
+                    item.VernacularName = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/nameAccordingTo":
+                    item.NameAccordingTo = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/scientificNameID":
+                    item.ScientificNameID = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/otherScientificName":
+                    item.OtherScientificName = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/identifiedBy":
+                    item.IdentifiedBy = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/dateIdentified":
+                    item.DateIdentified = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/taxonCount":
+                    item.TaxonCount = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/subjectPart":
+                    item.SubjectPart = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/sex":
+                    item.Sex = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/lifeStage":
+                    item.LifeStage = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/subjectOrientation":
+                    item.SubjectOrientation = val;
+                    break;
+                case "http://rs.tdwg.org/dwc/terms/preparations":
+                    item.Preparations = val;
+                    break;
+                case "http://iptc.org/std/Iptc4xmpExt/2008-02-29/LocationCreated":
+                    item.LocationCreated = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/digitizationDate":
+                    item.DigitizationDate = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/captureDevice":
+                    item.CaptureDevice = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/resourceCreationTechnique":
+                    item.ResourceCreationTechnique = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/IDofContainingCollection":
+                    item.IDofContainingCollection = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/relatedResourceID":
+                    item.RelatedResourceID = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/providerID":
+                    item.ProviderID = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/derivedFrom":
+                    item.DerivedFrom = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/associatedSpecimenReference":
+                    item.AssociatedSpecimenReference = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/associatedObservationReference":
+                    item.AssociatedObservationReference = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/accessURI":
+                    item.AccessURI = val;
+                    break;
+                case "http://purl.org/dc/elements/1.1/format":
+                    item.FormatAc = val;
+                    break;
+                case "http://purl.org/dc/terms/format":
+                    item.Format = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/variantLiteral":
+                    item.VariantLiteral = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/variant":
+                    item.Variant = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/variantDescription":
+                    item.VariantDescription = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/furtherInformationURL":
+                    item.FurtherInformationURL = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/licensingException":
+                    item.LicensingException = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/serviceExpectation":
+                    item.ServiceExpectation = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/hashFunction":
+                    item.HashFunction = val;
+                    break;
+                case "http://rs.tdwg.org/ac/terms/hashValue":
+                    item.HashValue = val;
+                    break;
+                case "http://ns.adobe.com/exif/1.0/PixelXDimension":
+                    item.PixelXDimension = val;
+                    break;
+                case "http://ns.adobe.com/exif/1.0/PixelYDimension":
+                    item.PixelYDimension = val;
+                    break;
+            }
+        }
     }
 }

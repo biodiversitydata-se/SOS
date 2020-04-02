@@ -62,6 +62,37 @@ namespace SOS.Import.IntegrationTests.DarwinCore
                 .Format.Should().Be("image/scan");
         }
 
+        [Fact]
+        public async Task Read_occurrence_dwca_with_audubon_media_description_extension()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/dwca-occurrence-audubonmedia-rrel-cumv_amph.zip";
+            var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            using var archiveReader = new ArchiveReader(archivePath);
+            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            observations.Count.Should().Be(13380);
+            var obs = observations.Single(o => o.CatalogNumber == "6021");
+            obs.ObservationAudubonMedia.Count.Should().Be(1);
+            var mediaItem = obs.ObservationAudubonMedia.First();
+            mediaItem.Identifier.Should().Be("http://arctos.database.museum/media/10451700");
+            mediaItem.AccessURI.Should().Be("http://arctos.database.museum/media/10451700?open");
+            mediaItem.Format.Should().Be("image/jpeg");
+            mediaItem.FormatAc.Should().Be("image/jpeg");
+            mediaItem.Type.Should().Be("image");
+            mediaItem.TypeAc.Should().Be("image");
+            mediaItem.WebStatement.Should().Be("http://creativecommons.org/licenses/by-nc-sa/3.0");
+            mediaItem.Modified.Should().Be("2017-12-12 11:50:34.0");
+        }
 
         [Fact]
         public async Task Read_occurrence_dwca_with_emof_extension()

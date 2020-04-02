@@ -93,6 +93,7 @@ namespace SOS.Import.DarwinCore
             await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
             await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
             await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
+            await AddAudubonMediaExtensionDataAsync(occurrenceRecords, archiveReader);
         }
 
         private async Task AddMultimediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
@@ -124,6 +125,37 @@ namespace SOS.Import.DarwinCore
                 throw;
             }
         }
+
+        private async Task AddAudubonMediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
+        {
+            try
+            {
+                IAsyncFileReader audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
+                if (audubonFileReader == null) return;
+                int idIndex = audubonFileReader.GetIdIndex();
+                var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
+                await foreach (IRow row in audubonFileReader.GetDataRowsAsync())
+                {
+                    var id = row[idIndex];
+                    if (observationByRecordId.TryGetValue(id, out DwcObservationVerbatim obs))
+                    {
+                        if (obs.ObservationAudubonMedia == null)
+                        {
+                            obs.ObservationAudubonMedia = new List<DwcAudubonMedia>();
+                        }
+
+                        var audubonItem = DwcAudubonMediaFactory.Create(row);
+                        obs.ObservationAudubonMedia.Add(audubonItem);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to add Audubon media description extension data");
+                throw;
+            }
+        }
+
 
         private async Task AddMofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
         {
