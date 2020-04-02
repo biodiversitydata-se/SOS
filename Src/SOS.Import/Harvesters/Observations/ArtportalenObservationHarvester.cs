@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Extensions;
 using SOS.Import.Factories;
@@ -164,7 +163,7 @@ namespace SOS.Import.Harvesters.Observations
             }
             catch(Exception e)
             {
-                _logger.LogError(e, $"Harvest Artportalen sightings from id: {currentId} to id: {currentId + _artportalenConfiguration.ChunkSize - 1} failed");
+                _logger.LogError(e, $"Harvest Artportalen sightings from id: {currentId} to id: {currentId + _artportalenConfiguration.ChunkSize - 1} failed.");
             }
             finally
             {
@@ -172,7 +171,7 @@ namespace SOS.Import.Harvesters.Observations
                 _semaphore.Release();
             }
 
-            return 0;
+            throw new Exception("Harvest Artportalen batch failed");
         }
 
         /// <inheritdoc />
@@ -244,7 +243,6 @@ namespace SOS.Import.Harvesters.Observations
                 _hasAddedTestSightings = false;
 
                 _logger.LogDebug("Start getting Artportalen sightings");
-
                 // Loop until all sightings are fetched
                 while (currentId <= maxId)
                 {
@@ -315,7 +313,9 @@ namespace SOS.Import.Harvesters.Observations
             Dictionary<int, IEnumerable<ProjectEntity>> projectEntitiesBySightingId = sightingProjectIds
                 .Where(p => sightingIds.Contains(p.SightingId))
                 .GroupBy(p => p.SightingId)
-                .ToDictionary(g => g.Key, g => g.Select(p => projectEntityById[p.ProjectId]));
+                .ToDictionary(g => g.Key, g => g
+                    .Where(p => projectEntityById.ContainsKey(p.ProjectId))
+                    .Select(p => projectEntityById[p.ProjectId]));
 
             Dictionary<int, IEnumerable<ProjectParameterEntity>> projectParameterEntitiesBySightingId = projectParameterEntities
                 .Where(p => sightingIds.Contains(p.SightingId))

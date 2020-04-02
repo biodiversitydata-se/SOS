@@ -100,9 +100,7 @@ namespace SOS.Import.Jobs
                 return true;
             }
 
-            _logger.LogDebug("Failed to harvest Artportalen or meta data");
-            return false;
-
+            throw new Exception("Failed to harvest data");
         }
     }
 }
