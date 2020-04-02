@@ -89,7 +89,6 @@ namespace SOS.Import.DarwinCore
             return dwcEvents;
         }
 
-
         /// <summary>
         /// Add event data from DwC-A extensions.
         /// </summary>
@@ -101,6 +100,7 @@ namespace SOS.Import.DarwinCore
             await AddEmofExtensionDataAsync(eventRecords, archiveReader);
             await AddMofExtensionDataAsync(eventRecords, archiveReader);
             await AddMultimediaExtensionDataAsync(eventRecords, archiveReader);
+            await AddAudubonMediaExtensionDataAsync(eventRecords, archiveReader);
         }
 
         private async Task AddMofExtensionDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
@@ -156,6 +156,35 @@ namespace SOS.Import.DarwinCore
             }
         }
 
+        private async Task AddAudubonMediaExtensionDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
+        {
+            try
+            {
+                IAsyncFileReader audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
+                if (audubonFileReader == null) return;
+                int idIndex = audubonFileReader.GetIdIndex();
+                var dwcEventByRecordId = dwcEvents.ToDictionary(e => e.RecordId, e => e);
+                await foreach (IRow row in audubonFileReader.GetDataRowsAsync())
+                {
+                    var id = row[idIndex];
+                    if (dwcEventByRecordId.TryGetValue(id, out DwcEvent dwcEvent))
+                    {
+                        if (dwcEvent.AudubonMedia == null)
+                        {
+                            dwcEvent.AudubonMedia = new List<DwcAudubonMedia>();
+                        }
+
+                        var audubonItem = DwcAudubonMediaFactory.Create(row);
+                        dwcEvent.AudubonMedia.Add(audubonItem);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to add Audubon media description extension data");
+                throw;
+            }
+        }
 
         /// <summary>
         /// Add Extended Measurement Or Fact data to DwcEvent objects.

@@ -97,6 +97,7 @@ namespace SOS.Import.DarwinCore
             await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
             await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
             await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
+            await AddAudubonMediaExtensionDataAsync(occurrenceRecords, archiveReader);
         }
 
         /// <summary>
@@ -172,6 +173,40 @@ namespace SOS.Import.DarwinCore
             }
         }
 
+        private async Task AddAudubonMediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
+        {
+            try
+            {
+                IAsyncFileReader audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
+                if (audubonFileReader == null) return;
+                int idIndex = audubonFileReader.GetIdIndex();
+                Dictionary<string, IEnumerable<DwcObservationVerbatim>> observationsByRecordId =
+                    occurrenceRecords
+                        .GroupBy(observation => observation.RecordId)
+                        .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
+
+                await foreach (IRow row in audubonFileReader.GetDataRowsAsync())
+                {
+                    string id = row[idIndex];
+                    if (!observationsByRecordId.TryGetValue(id, out var observations)) continue;
+                    foreach (var observation in observations)
+                    {
+                        if (observation.EventAudubonMedia == null)
+                        {
+                            observation.EventAudubonMedia = new List<DwcAudubonMedia>();
+                        }
+
+                        var multimediaItem = DwcAudubonMediaFactory.Create(row);
+                        observation.EventAudubonMedia.Add(multimediaItem);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to add Audubon media description extension data");
+                throw;
+            }
+        }
 
         /// <summary>
         /// Add MeasureMentOrFact data

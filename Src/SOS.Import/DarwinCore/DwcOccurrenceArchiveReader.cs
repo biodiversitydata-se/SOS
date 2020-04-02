@@ -156,7 +156,6 @@ namespace SOS.Import.DarwinCore
             }
         }
 
-
         private async Task AddMofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
         {
             try
