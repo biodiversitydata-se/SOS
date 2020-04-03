@@ -22,7 +22,8 @@ namespace SOS.Observations.Api.Controllers
         private readonly IObservationManager _observationManager;
         private readonly IFieldMappingManager _fieldMappingManager;
         private readonly ILogger<ObservationController> _logger;
-        private const int MaxBatchSize = 10000;
+        private const int MaxBatchSize = 1000;
+        private const int ElasticSearchMaxRecords = 10000;
 
         /// <summary>
         /// Constructor
@@ -45,13 +46,23 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(PagedResult<ProcessedObservation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetChunkAsync([FromBody] SearchFilter filter, [FromQuery]int skip, [FromQuery]int take)
+        public async Task<IActionResult> GetChunkAsync([FromBody] SearchFilter filter, [FromQuery]int skip = 0, [FromQuery]int take = 100)
         {
             try
             {
-                if (!filter.IsFilterActive || skip < 0 || take <= 0 || take > MaxBatchSize)
+                if (!filter.IsFilterActive )
                 {
-                    return new BadRequestResult();
+                    return BadRequest("You must provide a filter.");
+                }
+
+                if (skip < 0 || take <= 0 || take > MaxBatchSize)
+                {
+                    return BadRequest($"You can't take more than { MaxBatchSize } at a time.");
+                }
+
+                if (skip + take > ElasticSearchMaxRecords)
+                {
+                    return BadRequest($"Skip + take ");
                 }
 
                 return new OkObjectResult(await _observationManager.GetChunkAsync(filter, skip, take));
@@ -62,13 +73,14 @@ namespace SOS.Observations.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
         /// <inheritdoc />
         [HttpPost("searchinternal")]
         [ProducesResponseType(typeof(PagedResult<ProcessedObservation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> GetChunkInternalAsync([FromBody] SearchFilterInternal filter, [FromQuery]int skip, [FromQuery]int take)
+        public async Task<IActionResult> GetChunkInternalAsync([FromBody] SearchFilterInternal filter, [FromQuery]int skip = 0, [FromQuery]int take = 100)
         {
             return await GetChunkAsync(filter, skip, take);            
         }

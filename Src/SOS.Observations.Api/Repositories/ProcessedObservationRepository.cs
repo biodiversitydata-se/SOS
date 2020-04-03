@@ -37,7 +37,6 @@ namespace SOS.Observations.Api.Repositories
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
         {
-
             if (!filter?.IsFilterActive ?? true)
             {
                 return null;
