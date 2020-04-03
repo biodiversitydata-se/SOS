@@ -18,6 +18,7 @@ namespace SOS.Export.Repositories
     /// </summary>
     public class ProcessedObservationRepository : BaseRepository<ProcessedObservation, string>, IProcessedObservationRepository
     {
+      
         private readonly IElasticClient _elasticClient;
 
         /// <summary>
@@ -34,9 +35,7 @@ namespace SOS.Export.Repositories
         {
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<ProcessedObservation>> GetChunkAsync(FilterBase filter, int skip, int take)
+        public async Task<IProcessedObservationRepository.ScrollObservationResults> StartGetChunkAsync(FilterBase filter, int skip, int take)
         {
             if (!filter?.IsFilterActive ?? true)
             {
@@ -50,42 +49,74 @@ namespace SOS.Export.Repositories
                     .Field("location.pointWithBuffer")
                 );
             var x = new SourceFilter();
-
-            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+            var scanResults = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(CollectionName.ToLower())
                 .Source(new string[0].ToProjection())
                 .From(skip)
                 .Size(take)
+                .Scroll("1m")
                 .Query(q => q
                     .Bool(b => b
                         .Filter(filter.ToQuery()))));
 
+            if (!scanResults.IsValid) throw new InvalidOperationException(scanResults.DebugInformation);
+
+            return new IProcessedObservationRepository.ScrollObservationResults 
+            {
+                Documents = scanResults.Documents.Select(po => (ProcessedObservation)JsonConvert.DeserializeObject<ProcessedObservation>(JsonConvert.SerializeObject(po))),                 
+                ScrollId = scanResults.ScrollId 
+            };
+        }
+        /// <inheritdoc />
+        public async Task<IProcessedObservationRepository.ScrollObservationResults> GetChunkAsync(string scrollId)
+        {            
+            var searchResponse = await _elasticClient.ScrollAsync<dynamic>("1m", scrollId);
+
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
-            return (IEnumerable<ProcessedObservation>)searchResponse.Documents;
+            return new IProcessedObservationRepository.ScrollObservationResults
+            {
+                Documents = searchResponse.Documents.Select(po => (ProcessedObservation)JsonConvert.DeserializeObject<ProcessedObservation>(JsonConvert.SerializeObject(po))),
+                ScrollId = searchResponse.ScrollId
+            };
         }
 
-        public async Task<IEnumerable<ProcessedProject>> GetProjectParameters(
-            FilterBase filter, 
-            int skip,
-            int take)
+        public async Task<IProcessedObservationRepository.ScrollProjectResults> StartGetProjectParameters(FilterBase filter, int skip, int take)
         {
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
-                .Index(CollectionName.ToLower())
-                .Source(s => s
-                    .Includes(i => i
-                        .Field("projects")))
-                .From(skip)
-                .Size(take)
-                .Query(q => q
-                    .Bool(b => b
-                        .Filter(filter.ToProjectParameterQuery()))));
+              .Index(CollectionName.ToLower())
+              .Source(s => s
+                  .Includes(i => i
+                      .Field("projects")))
+              .From(skip)
+              .Size(take)
+              .Scroll("1m")
+              .Query(q => q
+                  .Bool(b => b
+                      .Filter(filter.ToProjectParameterQuery()))));
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+                 
+            return new IProcessedObservationRepository.ScrollProjectResults
+            {
+                Documents = searchResponse.Documents.Select(po => (ProcessedObservation)JsonConvert.DeserializeObject<ProcessedObservation>(JsonConvert.SerializeObject(po)))
+                 .SelectMany(p => p.Projects),
+                ScrollId = searchResponse.ScrollId
+            };
+        }
+
+        public async Task<IProcessedObservationRepository.ScrollProjectResults> GetProjectParameters(string scrollId)
+        {
+            var searchResponse = await _elasticClient.ScrollAsync<dynamic>("1m", scrollId);
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
-           return searchResponse.Documents
-                .Select(po => (ProcessedObservation)JsonConvert.DeserializeObject<ProcessedObservation>(JsonConvert.SerializeObject(po)))
-                .SelectMany(p => p.Projects);
+            return new IProcessedObservationRepository.ScrollProjectResults
+            {
+                Documents = searchResponse.Documents.Select(po => (ProcessedObservation)JsonConvert.DeserializeObject<ProcessedObservation>(JsonConvert.SerializeObject(po)))
+                 .SelectMany(p => p.Projects),
+                ScrollId = searchResponse.ScrollId
+            };
         }
     }
 }

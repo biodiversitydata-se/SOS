@@ -11,6 +11,16 @@ namespace SOS.Export.Repositories.Interfaces
     /// </summary>
     public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, string>
     {
+        public class ScrollObservationResults
+        {
+            public IEnumerable<ProcessedObservation> Documents { get; set; }
+            public string ScrollId { get; set; }
+        }
+        public class ScrollProjectResults
+        {
+            public IEnumerable<ProcessedProject> Documents { get; set; }
+            public string ScrollId { get; set; }
+        }
         /// <summary>
         /// Get filtered chunk
         /// </summary>
@@ -18,7 +28,16 @@ namespace SOS.Export.Repositories.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessedObservation>> GetChunkAsync(FilterBase filter, int skip, int take);
+        Task<ScrollObservationResults> StartGetChunkAsync(FilterBase filter, int skip, int take);
+
+        /// <summary>
+        /// Get filtered chunk
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        Task<ScrollObservationResults> GetChunkAsync(string scrollId);
 
         /// <summary>
         /// Get project parameters.
@@ -27,6 +46,15 @@ namespace SOS.Export.Repositories.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessedProject>> GetProjectParameters(FilterBase filter, int skip, int take);
+        Task<ScrollProjectResults> StartGetProjectParameters(FilterBase filter, int skip, int take);
+
+        /// <summary>
+        /// Get project parameters.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        Task<ScrollProjectResults> GetProjectParameters(string scrollId);
     }
 }

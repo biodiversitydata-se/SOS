@@ -50,11 +50,12 @@ namespace SOS.Export.IO.DwcArchive
                 filter = PrepareFilter(filter);
 
                 var skip = 0;
-                const int take = 1000000;
+                const int take = 9999;
                 var darwinCoreMap = new DarwinCoreDynamicMap(fieldDescriptions);
                 var fieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
                 var valueMappingDictionaries = fieldMappings.ToDictionary(m => m.Id, m => m.CreateValueDictionary());
-                var processedObservations = (await processedObservationRepository.GetChunkAsync(filter, skip, take)).ToArray();
+                var scrollResults = (await processedObservationRepository.StartGetChunkAsync(filter, skip, take));
+                var processedObservations = scrollResults.Documents.ToArray();
 
                 while (processedObservations.Any())
                 {
@@ -62,7 +63,8 @@ namespace SOS.Export.IO.DwcArchive
                     ResolveFieldMappedValues(processedObservations, valueMappingDictionaries);
                     await WriteOccurrenceCsvAsync(stream, processedObservations.ToDarwinCore(), darwinCoreMap);
                     skip += take;
-                    processedObservations = (await processedObservationRepository.GetChunkAsync(filter, skip, take)).ToArray();
+                    scrollResults = (await processedObservationRepository.GetChunkAsync(scrollResults.ScrollId));
+                    processedObservations = scrollResults.Documents.ToArray();
                 }
 
                 return true;
@@ -79,7 +81,7 @@ namespace SOS.Export.IO.DwcArchive
             }
         }
 
-        private SearchFilter PrepareFilter(FilterBase filter)
+        private FilterBase PrepareFilter(FilterBase filter)
         {
             var preparedFilter = filter.Clone();
 

@@ -96,9 +96,9 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public string TranslationCultureCode { get; set; } = "en-GB";
 
-        public SearchFilter Clone()
+        public FilterBase Clone()
         {
-            var searchFilter = (SearchFilter)MemberwiseClone();
+            var searchFilter = (FilterBase)MemberwiseClone();
             return searchFilter;
         }
     }
