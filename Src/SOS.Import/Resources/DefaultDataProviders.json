@@ -1,0 +1,79 @@
+﻿[
+  {
+    "Id": 1,
+    "Identifier": "Artportalen",
+    "DataType": "ArtportalenObservations",
+    "Name": "Artportalen",
+    "Organization": "SLU Swedish Species Information Centre (SLU Artdatabanken)",
+    "Description": "This is an open access database for sightings of plants, fungi and animals in Sweden. The system handles reports of geo-referenced species observations of all major organism groups from all environments, including terrestrial, freshwater and marine habitats. Data derives from citizen science, research, governmental monitoring and conservation administration. The database is administered by SLU Swedish Species Information Centre (SLU Artdatabanken).",
+    "Url": "https://www.artportalen.se/",
+    "ContactPerson": "Stephen Coulson",
+    "ContactEmail": "stephen.coulson@slu.se"
+  },
+  {
+    "Id": 2,
+    "Identifier": "ClamGateway",
+    "DataType": "ClamPortalObservations",
+    "Name": "Clam Gateway",
+    "Organization": "SLU Swedish Species Information Centre (SLU Artdatabanken)",
+    "Description": "The Clam Gateway is an independent site for collecting data about large freshwater clams in Sweden. Threatened and rare species are of special interest but information on more common clams is also important.",
+    "Url": "http://musselportalen.se/",
+    "ContactPerson": "Eddie Von Wachenfeldt",
+    "ContactEmail": "eddie.vonwachenfeldt@slu.se"
+  },
+  {
+    "Id": 3,
+    "Identifier": "KUL",
+    "DataType": "KULObservations",
+    "Name": "The database for coastal fish (KUL)",
+    "Organization": "Department of Aquatic Resources, Institute of Coastal Research, SLU",
+    "Description": "\tKUL provides quality assured catch data of coastal fish.",
+    "Url": "https://www.slu.se/kul/",
+    "ContactPerson": "Peter Ljungberg",
+    "ContactEmail": "peter.ljungberg@slu.se"
+  },
+  {
+    "Id": 4,
+    "Identifier": "MalaiseTrap",
+    "DataType": "Dwc",
+    "Name": "Swedish Malaise Trap Project (SMTP) from GBIF",
+    "Organization": "Foundation Station Linné",
+    "Description": "The Swedish Malaise Trap Project (SMTP) aims to provide species determinations for the 80 million insect specimens obtained from Malaise traps sampling continuously over a three-year period (2003-2006). More than 500 undescribed species have been discovered in these samples, and new records have been verified for species not known previously from Sweden. Specimens in this collection are dry-mounted or stored in 96% ethanol. The collection is estimated to represent 50-60% of the Swedish insect fauna and is particularly rich in species of Diptera and Hymenoptera.",
+    "Url": "http://www.gbif.org/dataset/38c1351d-9cfe-42c0-97da-02d2c8be141c",
+    "ContactPerson": "",
+    "ContactEmail": ""
+  },
+  {
+    "Id": 5,
+    "Identifier": "EntomologicalCollection",
+    "DataType": "Dwc",
+    "Name": "Entomological Collections (NHRS) from GBIF",
+    "Organization": "Swedish Museum of Natural History",
+    "Description": "The dataset represents the digital holdings of insects, arachnids (mites and spiders) and myriapods (millipedes and centipedes) at the Swedish Museum of Natural History. These collections include over three million specimens, are international in scope, and have broad systematic and geographic coverage.",
+    "Url": "http://www.gbif.org/dataset/9940af5a-3271-4e6a-ad71-ced986b9a9a5",
+    "ContactPerson": "",
+    "ContactEmail": ""
+  },
+  {
+    "Id": 6,
+    "Identifier": "BirdRinging",
+    "DataType": "Dwc",
+    "Name": "Bird ringing centre in Sweden via GBIF",
+    "Organization": "Swedish Museum of Natural History",
+    "Description": "This database contains information about bird ringing in Sweden. The database is maintained by The Swedish Natural History Museum. Swedish LifeWatch provides all georeferenced records from this data provider which relates to taxa in the Swedish Taxonomic Database (Dyntaxa) and that represents observations made in Sweden. The records are obtained via the web service at GBIF.org.",
+    "Url": "http://www.nrm.se/forskningochsamlingar/miljoforskningochovervakning/ringmarkningscentralen.214.html",
+    "ContactPerson": "",
+    "ContactEmail": ""
+  },
+  {
+    "Id": 7,
+    "Identifier": "ButterflyMonitoring",
+    "DataType": "Dwc",
+    "Name": "Swedish Butterfly Monitoring Scheme (SeBMS)",
+    "Organization": "Lund University",
+    "Description": "The SeBMS is a standarised monitoring scheme for monitoring in Sweden. This dataset includes records from traditional fixed transect sites, often called ‘Pollard Walks’, and point site counts which cover a set area for a standardised visit time. The SeBMS is run by Lund University for the Swedish Environmental Protection Agency, in partnership with the Entomological Society of Sweden, the Swedish Environmental Protection Agency, Lund University, the Swedish University of Agricultural Sciences, the Swedish Transport Administration and the Swedish County Administration Boards.",
+    "Url": "http://www.gbif.se/ipt/resource?r=lu_sebms",
+    "ContactPerson": "",
+    "ContactEmail": ""
+  }
+]

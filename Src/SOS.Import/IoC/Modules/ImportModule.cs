@@ -10,6 +10,8 @@ using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Harvesters.Observations;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Jobs;
+using SOS.Import.Managers;
+using SOS.Import.Managers.Interfaces;
 using SOS.Import.MongoDb;
 using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination;
@@ -65,6 +67,9 @@ namespace SOS.Import.IoC.Modules
             // Darwin Core
             builder.RegisterType<DwcArchiveReader>().As<IDwcArchiveReader>().InstancePerLifetimeScope();
 
+            // Managers
+            builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
+
             // Repositories source
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<MetadataRepository>().As<IMetadataRepository>().InstancePerLifetimeScope();
@@ -82,6 +87,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepostitory>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationVerbatimRepository>().As<IKulObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingVerbatimRepository>().As<ISightingVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonVerbatimRepository>().As<ITaxonVerbatimRepository>().InstancePerLifetimeScope();
