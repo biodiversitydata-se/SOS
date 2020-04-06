@@ -39,9 +39,10 @@ namespace SOS.Export.IO.DwcArchive
             try
             {
                 var skip = 0;
-                const int take = 100000;
+                const int take = 10000;
                 var map = new ExtendedMeasurementOrFactRowMap();
-                IEnumerable<ProcessedProject> projectParameters = await processedObservationRepository.GetProjectParameters(filter, skip, take);
+                var results = await processedObservationRepository.StartGetProjectParameters(filter, skip, take);
+                IEnumerable<ProcessedProject> projectParameters = results.Documents;
 
                 while (projectParameters.Any())
                 {
@@ -49,7 +50,8 @@ namespace SOS.Export.IO.DwcArchive
                     IEnumerable<ExtendedMeasurementOrFactRow> records = projectParameters.ToExtendedMeasurementOrFactRows();
                     await WriteEmofCsvAsync(stream, records, map);
                     skip += take;
-                    projectParameters = await processedObservationRepository.GetProjectParameters(filter, skip, take);
+                    results = await processedObservationRepository.GetProjectParameters(results.ScrollId);
+                    projectParameters = results.Documents;
                 }
 
                 return true;

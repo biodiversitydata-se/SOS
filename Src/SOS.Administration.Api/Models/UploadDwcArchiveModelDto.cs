@@ -8,10 +8,13 @@ namespace SOS.Administration.Api.Models
     public class UploadDwcArchiveModelDto
     {
         /// <summary>
+        /// Data provider id.
+        /// </summary>
+        public int DataProviderId { get; set; }
+
+        /// <summary>
         /// DwC-A file.
         /// </summary>
         public IFormFile DwcaFile { get; set; }
-
-        //public int DatasetId { get; set; } // todo - handle this later?
     }
 }

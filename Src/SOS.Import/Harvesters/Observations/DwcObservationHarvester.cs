@@ -56,7 +56,11 @@ namespace SOS.Import.Harvesters.Observations
         /// Harvest DwC Archive observations
         /// </summary>
         /// <returns></returns>
-        public async Task<HarvestInfo> HarvestObservationsAsync(string archivePath, IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(
+            string archivePath, 
+            int dataProviderId,
+            string dataProviderIdentifier,
+            IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(nameof(DwcObservationVerbatim), DataSet.Dwc, DateTime.Now);
             try

@@ -107,6 +107,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Resources\DefaultDataProviders.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\FieldMappings\AccessRightsFieldMapping.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

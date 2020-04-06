@@ -6,6 +6,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Models;
+using SOS.Import.Managers.Interfaces;
 using SOS.Lib.Jobs.Import;
 
 namespace SOS.Administration.Api.Controllers
@@ -17,14 +18,19 @@ namespace SOS.Administration.Api.Controllers
     [Route("[controller]")]
     public class HarvestJobsController : ControllerBase, Interfaces.IHarvestJobController
     {
+        private readonly IDataProviderManager _dataProviderManager;
         private readonly ILogger<HarvestJobsController> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
-        public HarvestJobsController(ILogger<HarvestJobsController> logger)
+        public HarvestJobsController(
+            IDataProviderManager dataProviderManager,
+            ILogger<HarvestJobsController> logger)
         {
+            _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -239,6 +245,11 @@ namespace SOS.Administration.Api.Controllers
         #endregion FieldMapping
 
         #region DwC-A
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost("DwcArchive/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -247,23 +258,27 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                if (model.DwcaFile.Length > 0)
+                var dataProvider = await _dataProviderManager.TryGetDataProviderAsync(model.DataProviderId);
+                if (dataProvider == null)
                 {
-                    //var filePath = Path.GetTempFileName();
-                    var filePath = System.IO.Path.Combine(Path.GetTempPath(), model.DwcaFile.FileName);
-                    if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
-
-                    await using var stream = new FileStream(filePath, FileMode.Create);
-                    await model.DwcaFile.CopyToAsync(stream).ConfigureAwait(false);
-
-                    // process uploaded file
-                    BackgroundJob.Enqueue<IDwcArchiveHarvestJob>(job => job.RunAsync(filePath, JobCancellationToken.Null));
-                    return new OkObjectResult("Started DwC-A harvest job");
+                    return new BadRequestObjectResult($"No data provider exist with Id={model.DataProviderId}");
                 }
-                else
+
+                if (model.DwcaFile.Length == 0)
                 {
                     return new BadRequestObjectResult("No file content");
                 }
+                
+                //var filePath = Path.GetTempFileName();
+                var filePath = System.IO.Path.Combine(Path.GetTempPath(), model.DwcaFile.FileName);
+                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+                await using var stream = new FileStream(filePath, FileMode.Create);
+                await model.DwcaFile.CopyToAsync(stream).ConfigureAwait(false);
+
+                // process uploaded file
+                BackgroundJob.Enqueue<IDwcArchiveHarvestJob>(job => job.RunAsync(filePath, dataProvider.Id, JobCancellationToken.Null));
+                return new OkObjectResult("Started DwC-A harvest job");
+               
             }
             catch (Exception e)
             {
