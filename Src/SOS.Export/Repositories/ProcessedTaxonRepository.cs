@@ -21,7 +21,7 @@ namespace SOS.Export.Repositories
         /// <param name="logger"></param>
         public ProcessedTaxonRepository(
             IExportClient exportClient,
-            ILogger<ProcessedTaxonRepository> logger) : base(exportClient, true, logger)
+            ILogger<ProcessedTaxonRepository> logger) : base(exportClient, false, logger)
         {
         }
 

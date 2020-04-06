@@ -18,9 +18,12 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
         public static Mock<IProcessedObservationRepository> Create(string fileName)
         {
             var stub = new Mock<IProcessedObservationRepository>();
-            var observations = LoadObservations(fileName);
+            var observations = new ScrollResult<ProcessedObservation>
+            {
+                Records = LoadObservations(fileName)
+            };
             stub
-                .Setup(pdcr => pdcr.GetChunkAsync(It.IsAny<SearchFilter>(), 0, It.IsAny<int>()))
+                .Setup(pdcr => pdcr.ScrollAsync(It.IsAny<SearchFilter>(), null))
                 .ReturnsAsync(observations);
 
             return stub;
@@ -30,8 +33,11 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
         {
             var stub = new Mock<IProcessedObservationRepository>();
             stub
-                .Setup(pdcr => pdcr.GetChunkAsync(It.IsAny<SearchFilter>(), 0, It.IsAny<int>()))
-                .ReturnsAsync(new[] { observation });
+                .Setup(pdcr => pdcr.ScrollAsync(It.IsAny<SearchFilter>(), null))
+                .ReturnsAsync(new ScrollResult<ProcessedObservation>
+                {
+                    Records = new [] { observation }
+                });
 
             return stub;
         }

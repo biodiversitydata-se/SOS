@@ -49,20 +49,19 @@ namespace SOS.Export.IO.DwcArchive
             {
                 filter = PrepareFilter(filter);
 
-                var skip = 0;
-                const int take = 1000000;
                 var darwinCoreMap = new DarwinCoreDynamicMap(fieldDescriptions);
                 var fieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
                 var valueMappingDictionaries = fieldMappings.ToDictionary(m => m.Id, m => m.CreateValueDictionary());
-                var processedObservations = (await processedObservationRepository.GetChunkAsync(filter, skip, take)).ToArray();
+                var scrollResult = await processedObservationRepository.ScrollAsync(filter, null);
 
-                while (processedObservations.Any())
+                while (scrollResult?.Records?.Any() ?? false)
                 {
+                    var processedObservations = scrollResult.Records;
                     cancellationToken?.ThrowIfCancellationRequested();
                     ResolveFieldMappedValues(processedObservations, valueMappingDictionaries);
                     await WriteOccurrenceCsvAsync(stream, processedObservations.ToDarwinCore(), darwinCoreMap);
-                    skip += take;
-                    processedObservations = (await processedObservationRepository.GetChunkAsync(filter, skip, take)).ToArray();
+
+                    scrollResult = await processedObservationRepository.ScrollAsync(filter, scrollResult.ScrollId);
                 }
 
                 return true;
@@ -75,31 +74,29 @@ namespace SOS.Export.IO.DwcArchive
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to create occurrence CSV file.");
-                return false;
+                throw;
             }
         }
 
-        private SearchFilter PrepareFilter(FilterBase filter)
+        private FilterBase PrepareFilter(FilterBase filter)
         {
-            var preparedFilter = filter.Clone();
-
-            if (preparedFilter.IncludeUnderlyingTaxa && preparedFilter.TaxonIds != null && preparedFilter.TaxonIds.Any())
+            if (filter.IncludeUnderlyingTaxa && filter.TaxonIds != null && filter.TaxonIds.Any())
             {
-                if (preparedFilter.TaxonIds.Contains(0)) // If Biota, then clear taxon filter
+                if (filter.TaxonIds.Contains(0)) // If Biota, then clear taxon filter
                 {
-                    preparedFilter.TaxonIds = new List<int>();
+                    filter.TaxonIds = new List<int>();
                 }
                 else
                 {
-                    preparedFilter.TaxonIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
+                    filter.TaxonIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(filter.TaxonIds, true);
                 }
             }
 
-            return preparedFilter;
+            return filter;
         }
 
         private void ResolveFieldMappedValues(
-            ProcessedObservation[] processedObservations, 
+            IEnumerable<ProcessedObservation>  processedObservations, 
             Dictionary<FieldMappingFieldId, Dictionary<int, string>> valueMappingDictionaries)
         {
             foreach (var observation in processedObservations)
@@ -145,17 +142,18 @@ namespace SOS.Export.IO.DwcArchive
                 return;
             }
 
-            await using var streamWriter = new StreamWriter(stream, null, -1, false);
+            await using var streamWriter = new StreamWriter(stream, null, -1, true);
             var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = true,
                 Delimiter = "\t", // tab
                 Encoding = System.Text.Encoding.UTF8
             };
-            using var csv = new CsvWriter(streamWriter, csvConfig);
+            await using var csv = new CsvWriter(streamWriter, csvConfig);
 
             csv.Configuration.RegisterClassMap(map);
             csv.WriteRecords(records);
+            csv.Flush();
         }
     }
 }
