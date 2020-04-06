@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -47,6 +49,13 @@ namespace SOS.Import.Managers
             await _dataProviderRepository.DeleteCollectionAsync();
             await _dataProviderRepository.AddCollectionAsync();
             return await _dataProviderRepository.AddManyAsync(dataProviders);
+        }
+
+        public async Task<DataProvider> TryGetDataProviderAsync(int id)
+        {
+            var dataProviders = await _dataProviderRepository.GetAllAsync();
+            var dataProvider = dataProviders.FirstOrDefault(provider => provider.Id == id);
+            return dataProvider;
         }
     }
 }

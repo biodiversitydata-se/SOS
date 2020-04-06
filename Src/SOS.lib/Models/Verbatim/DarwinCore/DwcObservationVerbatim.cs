@@ -12,10 +12,26 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// </summary>
         public ObjectId Id { get; set; }
 
+        /// <summary>
+        /// The Record Id used in the DwC-A CSV file.
+        /// </summary>
         [BsonIgnore]
         public string RecordId { get; set; }
 
+        /// <summary>
+        /// DwC-A file name.
+        /// </summary>
         public string DwcArchiveFilename { get; set; }
+        
+        /// <summary>
+        /// Data provider id.
+        /// </summary>
+        public int DataProviderId { get; set; }
+        
+        /// <summary>
+        /// Data provider identifier.
+        /// </summary>
+        public string DataProviderIdentifier { get; set; }
 
         /// <summary>
         /// Audubon media linked to the observation
@@ -228,75 +244,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string Type { get; set; }
         #endregion
 
-        #region Conservation
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// This property indicates whether the species is the subject
-        /// of an action plan ('åtgärdsprogram' in swedish).
-        /// </summary>
-        //public bool ActionPlan { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// This property indicates whether a species has been
-        /// classified as nature conservation relevant
-        /// ('naturvårdsintressant' in swedish).
-        /// The concept 'nature conservation relevant' must be defined
-        /// before this property can be used.
-        /// </summary>
-        //public bool ConservationRelevant { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// This property indicates whether
-        /// the species is included in Natura 2000.
-        /// </summary>
-        //public bool Natura2000 { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// This property indicates whether the species 
-        /// is protected by the law in Sweden.
-        /// </summary>
-        //public bool ProtectedByLaw { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Information about how protected information
-        /// about a species is in Sweden.
-        /// Currently this is a value between 1 to 5.
-        /// 1 indicates public access and 5 is the highest used security level.
-        /// </summary>
-        //public int ProtectionLevel { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Redlist category for redlisted species. The property also
-        /// contains information about which redlist that is referenced.
-        /// Example value: CR (Sweden, 2010). Possible redlist values
-        /// are DD (Data Deficient), EX (Extinct),
-        /// RE (Regionally Extinct), CR (Critically Endangered),
-        /// EN (Endangered), VU (Vulnerable), NT (Near Threatened).
-        /// Not redlisted species has no value in this property.
-        /// </summary>
-        //public string RedlistCategory { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// This property contains information about the species
-        /// immigration history.
-        /// </summary>
-        //public string SwedishImmigrationHistory { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Information about the species occurrence in Sweden.
-        /// For example information about if the species reproduce
-        /// in sweden.
-        /// </summary>
-        //public string SwedishOccurrence { get; set; }
-        #endregion
-
         #region Event
         /// <summary>
         /// Darwin Core term name: day.
@@ -305,13 +252,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// This property is currently not used.
         /// </summary>
         public string Day { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Information about date and time when the
-        /// species observation ended.
-        /// </summary>
-        //public DateTime End { get; set; }
 
         /// <summary>
         /// Darwin Core term name: endDayOfYear.
@@ -429,13 +369,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// This property is currently not used.
         /// </summary>
         public string SamplingProtocol { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Information about date and time when the
-        /// species observation started.
-        /// </summary>
-        //public DateTime Start { get; set; }
 
         /// <summary>
         /// Darwin Core term name: startDayOfYear.
@@ -720,13 +653,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// This property is currently not used.
         /// </summary>
         public string TypeStatus { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Indicates if the species observer himself is
-        /// uncertain about the taxon determination.
-        /// </summary>
-        //public bool UncertainDetermination { get; set; }
         #endregion
 
         #region Location
@@ -741,31 +667,12 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string Continent { get; set; }
 
         /// <summary>
-        /// Not defined in Darwin Core.
-        /// M value that is part of a linear reference system.
-        /// The properties CoordinateX, CoordinateY, CoordinateZ,
-        /// CoordinateM and CoordinateSystemWkt defines where the
-        /// species observation was made.
-        /// </summary>
-        //public string CoordinateM { get; set; }
-
-        /// <summary>
         /// Darwin Core term name: CoordinatePrecision.
         /// A decimal representation of the precision of the coordinates
         /// given in the DecimalLatitude and DecimalLongitude.
         /// This property is currently not used.
         /// </summary>
         public string CoordinatePrecision { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Coordinate system wkt (Well-known text)
-        /// as defined by OGC (Open Geospatial Consortium).
-        /// The properties CoordinateX, CoordinateY, CoordinateZ,
-        /// CoordinateM and CoordinateSystemWkt defines where the
-        /// species observation was made.
-        /// </summary>
-        //public string CoordinateSystemWkt { get; set; }
 
         /// <summary>
         /// Darwin Core term name: coordinateUncertaintyInMeters.
@@ -777,37 +684,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// no coordinates). Zero is not a valid value for this term.
         /// </summary>
         public string CoordinateUncertaintyInMeters { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// East-west value of the coordinate.
-        /// The properties CoordinateX, CoordinateY, CoordinateZ,
-        /// CoordinateM and CoordinateSystemWkt defines where the
-        /// species observation was made.
-        /// Which values that are valid depends on which
-        /// coordinate system that is used.
-        /// </summary>
-        //public Double CoordinateX { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// North-south value of the coordinate.
-        /// The properties CoordinateX, CoordinateY, CoordinateZ,
-        /// CoordinateM and CoordinateSystemWkt defines where the
-        /// species observation was made.
-        /// Which values that are valid depends on which
-        /// coordinate system that is used.
-        /// </summary>
-        //public Double CoordinateY { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Altitude value of the coordinate.
-        /// The properties CoordinateX, CoordinateY, CoordinateZ,
-        /// CoordinateM and CoordinateSystemWkt defines where the
-        /// species observation was made.
-        /// </summary>
-        //public string CoordinateZ { get; set; }
 
         /// <summary>
         /// Darwin Core term name: country.
@@ -1052,14 +928,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string LocationRemarks { get; set; }
 
         /// <summary>
-        /// Not defined in Darwin Core.
-        /// Web address that leads to more information about the
-        /// location. The information should be accessible
-        /// from the most commonly used web browsers.
-        /// </summary>
-        //public string LocationURL { get; set; }
-
-        /// <summary>
         /// Darwin Core term name: maximumDepthInMeters.
         /// The greater depth of a range of depth below
         /// the local surface, in meters.
@@ -1126,13 +994,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// that does not contain the actual location.
         /// </summary>
         public string Municipality { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Parish where the species observation where made.
-        /// 'Socken/församling' in swedish.
-        /// </summary>
-        //public string Parish { get; set; }
 
         /// <summary>
         /// Darwin Core term name: pointRadiusSpatialFit.
@@ -1391,14 +1252,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string OccurrenceStatus { get; set; }
 
         /// <summary>
-        /// Not defined in Darwin Core.
-        /// Web address that leads to more information about the
-        /// occurrence. The information should be accessible
-        /// from the most commonly used web browsers.
-        /// </summary>
-        //public string OccurrenceURL { get; set; }
-
-        /// <summary>
         /// A number or enumeration value for the quantity of organisms.
         /// A dwc:organismQuantity must have a corresponding dwc:organismQuantityType.
         /// </summary>
@@ -1439,19 +1292,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string Preparations { get; set; }
 
         /// <summary>
-        /// Not defined in Darwin Core.
-        /// Quantity of observed species, for example distribution area.
-        /// Unit is specified in property QuantityUnit.
-        /// </summary>
-        //public string Quantity { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Unit for quantity value of observed species.
-        /// </summary>
-        //public string QuantityUnit { get; set; }
-
-        /// <summary>
         /// Darwin Core term name: recordedBy.
         /// A list (concatenated and separated) of names of people,
         /// groups, or organizations responsible for recording the
@@ -1486,12 +1326,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// Recommended best practice is to use a controlled vocabulary.
         /// </summary>
         public string Sex { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Substrate on which the species was observed.
-        /// </summary>
-        //public string Substrate { get; set; }
         #endregion
 
         #region Organism
@@ -1534,82 +1368,7 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// Comments or notes about the Organism instance..
         /// </summary>
         public string OrganismRemarks { get; set; }
-
         #endregion Organism
-
-        #region Project
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Indicates if species observations that are reported in
-        /// a project are publicly available or not.
-        /// </summary>
-        //public bool IsPublic { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Information about the type of project,
-        /// for example 'Environmental monitoring'.
-        /// </summary>
-        //public string ProjectCategory { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Description of a project.
-        /// </summary>
-        //public string ProjectDescription { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Date when the project ends.
-        /// </summary>
-        //public string ProjectEndDate { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// An identifier for the project.
-        /// In the absence of a persistent global unique identifier,
-        /// construct one from a combination of identifiers in
-        /// the project that will most closely make the ProjectID
-        /// globally unique.
-        /// The format LSID (Life Science Identifiers) is used as GUID
-        /// (Globally unique identifier).
-        /// </summary>
-        //public string ProjectID { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Name of the project.
-        /// </summary>
-        //public string ProjectName { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Name of person or organization that owns the project.
-        /// </summary>
-        //public string ProjectOwner { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Date when the project starts.
-        /// </summary>
-        //public string ProjectStartDate { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Web address that leads to more information about the
-        /// project. The information should be accessible
-        /// from the most commonly used web browsers.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        //public string ProjectURL { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Survey method used in a project to
-        /// retrieve species observations.
-        /// </summary>
-        //public string SurveyMethod { get; set; }
-        #endregion
 
         #region Taxon
         /// <summary>
@@ -1760,14 +1519,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string Order { get; set; }
 
         /// <summary>
-        /// Not defined in Darwin Core.
-        /// Common name of the organism group that observed species
-        /// belongs to. Classification of species groups is the same as
-        /// used in latest 'Red List of Swedish Species'.
-        /// </summary>
-        //public string OrganismGroup { get; set; }
-
-        /// <summary>
         /// Darwin Core term name: originalNameUsage.
         /// The taxon name, with authorship and date information
         /// if known, as it originally appeared when first established
@@ -1877,15 +1628,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         public string TaxonConceptID { get; set; }
 
         /// <summary>
-        /// Not defined in Darwin Core.
-        /// Status of the taxon concept.
-        /// Examples of possible values are InvalidDueToSplit,
-        /// InvalidDueToLump, InvalidDueToDelete, Unchanged,
-        /// ValidAfterLump or ValidAfterSplit.
-        /// </summary>
-        //public string TaxonConceptStatus { get; set; }
-
-        /// <summary>
         /// Darwin Core term name: taxonID.
         /// An identifier for the set of taxon information
         /// (data associated with the Taxon class). May be a global
@@ -1925,28 +1667,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// This property is currently not used.
         /// </summary>
         public string TaxonRemarks { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Sort order of taxon according to Dyntaxa.
-        /// This property is currently not used.
-        /// </summary>
-        //public int TaxonSortOrder { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// Web address that leads to more information about the
-        /// taxon. The information should be accessible
-        /// from the most commonly used web browsers.
-        /// </summary>
-        //public string TaxonURL { get; set; }
-
-        /// <summary>
-        /// Not defined in Darwin Core.
-        /// ScientificName as it appears in the original record.
-        /// This property is currently not used.
-        /// </summary>
-        //public string VerbatimScientificName { get; set; }
 
         /// <summary>
         /// Darwin Core term name: verbatimTaxonRank.

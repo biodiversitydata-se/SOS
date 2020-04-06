@@ -20,8 +20,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
 {
     public class DwcObservationHarvesterIntegrationTests : TestBase
     {
-        private const string PsophusStridulusArchivePath = "./resources/dwca/dwca-occurrence-lifewatch-psophus-stridulus.zip";
-        private const string DwcArchiveWithEmofExtension = "./resources/dwca/dwca-occurrence-emof-lifewatch.zip";
         private const string SamplingEventDwcArchiveWithMofExtension = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
 
         [Fact]
@@ -30,12 +28,19 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/dwca-occurrence-lifewatch-psophus-stridulus.zip";
+            const int dataProviderId = 100;
+            const string dataProviderIdentifier = "TestPsophusStridulusCollection";
             var dwcObservationHarvester = CreateDwcObservationHarvester();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(PsophusStridulusArchivePath, JobCancellationToken.Null);
+            var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
+                archivePath,
+                dataProviderId,
+                dataProviderIdentifier,
+                JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -49,13 +54,19 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/dwca-occurrence-emof-lifewatch.zip";
+            const int dataProviderId = 101;
+            const string dataProviderIdentifier = "TestLifeWatchSubsetCollection";
             var dwcObservationHarvester = CreateDwcObservationHarvester();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            // todo - handle emof extension
-            var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(DwcArchiveWithEmofExtension, JobCancellationToken.Null);
+            var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
+                archivePath, 
+                dataProviderId,
+                dataProviderIdentifier,
+                JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -69,6 +80,9 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
+            const int dataProviderId = 102;
+            const string dataProviderIdentifier = "TestButterflyMonitoring";
             var dwcObservationHarvester = CreateDwcObservationHarvester();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -77,7 +91,11 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             // todo - handle sampling event based dwc and measurementOrFact extension.
             // https://github.com/gbif/ipt/wiki/BestPracticesSamplingEventData
             // https://www.gbif.org/data-quality-requirements-sampling-events
-            var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(SamplingEventDwcArchiveWithMofExtension, JobCancellationToken.Null);
+            var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
+                archivePath,
+                dataProviderId,
+                dataProviderIdentifier,
+                JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

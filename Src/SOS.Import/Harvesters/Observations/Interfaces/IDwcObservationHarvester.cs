@@ -10,6 +10,10 @@ namespace SOS.Import.Harvesters.Observations.Interfaces
         /// Harvest observations.
         /// </summary>
         /// <returns></returns>
-        Task<HarvestInfo> HarvestObservationsAsync(string archivePath, IJobCancellationToken cancellationToken);
+        Task<HarvestInfo> HarvestObservationsAsync(
+            string archivePath,
+            int dataProviderId,
+            string dataProviderIdentifier,
+            IJobCancellationToken cancellationToken);
     }
 }

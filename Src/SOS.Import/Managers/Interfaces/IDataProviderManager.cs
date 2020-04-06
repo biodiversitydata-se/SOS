@@ -12,5 +12,6 @@ namespace SOS.Import.Managers.Interfaces
         Task<bool> DeleteDataProvider(int id);
         Task<bool> UpdateDataProvider(int id, DataProvider dataProvider);
         Task<bool> InitDefaultDataProviders();
+        Task<DataProvider> TryGetDataProviderAsync(int id);
     }
 }
