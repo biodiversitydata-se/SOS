@@ -69,8 +69,8 @@ namespace SOS.Import.Harvesters.Observations
                     t => true);
 
                 _logger.LogDebug("Start storing DwC-A observations");
-                await _dwcArchiveVerbatimRepository.DeleteCollectionAsync();
-                await _dwcArchiveVerbatimRepository.AddCollectionAsync();
+                await _dwcArchiveVerbatimRepository.DeleteCollectionAsync(datasetInfo);
+                await _dwcArchiveVerbatimRepository.AddCollectionAsync(datasetInfo);
                 int observationCount = 0;
                 using var archiveReader = new ArchiveReader(archivePath);
                 var observationBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, datasetInfo, BatchSize);
@@ -78,7 +78,7 @@ namespace SOS.Import.Harvesters.Observations
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     observationCount += verbatimObservationsBatch.Count;
-                    await _dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch);
+                    await _dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch, datasetInfo);
                 }
                 _logger.LogDebug("Finish storing DwC-A observations");
 
@@ -86,13 +86,13 @@ namespace SOS.Import.Harvesters.Observations
                 if (archiveReader.IsSamplingEventCore)
                 {
                     _logger.LogDebug("Start storing DwC-A events");
-                    await _dwcArchiveEventRepository.DeleteCollectionAsync();
-                    await _dwcArchiveEventRepository.AddCollectionAsync();
+                    await _dwcArchiveEventRepository.DeleteCollectionAsync(datasetInfo);
+                    await _dwcArchiveEventRepository.AddCollectionAsync(datasetInfo);
                     var eventBatches = _dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archiveReader, datasetInfo, BatchSize);
                     await foreach (List<DwcEvent> eventBatch in eventBatches)
                     {
                         cancellationToken?.ThrowIfCancellationRequested();
-                        await _dwcArchiveEventRepository.AddManyAsync(eventBatch);
+                        await _dwcArchiveEventRepository.AddManyAsync(eventBatch, datasetInfo);
                     }
 
                     _logger.LogDebug("Finish storing DwC-A events");

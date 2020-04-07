@@ -65,12 +65,24 @@ namespace SOS.Import.Repositories.Destination
         protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName)
             .WithWriteConcern(new WriteConcern(w: 1, journal: true ));
 
+        protected IMongoCollection<TEntity> GetMongoCollection(string collectionName)
+        {
+            return Database.GetCollection<TEntity>(collectionName)
+                .WithWriteConcern(new WriteConcern(w: 1, journal: true));
+        }
+
         /// <inheritdoc />
         public async Task<bool> AddAsync(TEntity item)
         {
+            return await AddAsync(item, MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> AddAsync(TEntity item, IMongoCollection<TEntity> mongoCollection)
+        {
             try
             {
-                await MongoCollection.InsertOneAsync(item);
+                await mongoCollection.InsertOneAsync(item);
 
                 return true;
             }
@@ -93,10 +105,21 @@ namespace SOS.Import.Repositories.Destination
         /// <returns></returns>
         private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
         {
+            return await AddBatchAsync(batch, MongoCollection);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="batch"></param>
+        /// <param name="mongoCollection"></param>
+        /// <returns></returns>
+        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch, IMongoCollection<TEntity> mongoCollection)
+        {
             var items = batch?.ToArray();
             try
             {
-                await MongoCollection.InsertManyAsync(batch, new InsertManyOptions() { IsOrdered = false, BypassDocumentValidation = true });
+                await mongoCollection.InsertManyAsync(batch, new InsertManyOptions() { IsOrdered = false, BypassDocumentValidation = true });
                 return true;
             }
             catch (MongoCommandException e)
@@ -138,6 +161,12 @@ namespace SOS.Import.Repositories.Destination
         /// <inheritdoc />
         public async Task<bool> AddManyAsync(IEnumerable<TEntity> items)
         {
+            return await AddManyAsync(items, MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection)
+        {
             var entities = items?.ToArray();
             if (!entities?.Any() ?? true)
             {
@@ -150,7 +179,7 @@ namespace SOS.Import.Repositories.Destination
 
             while (batch?.Any() ?? false)
             {
-                success = success && await AddBatchAsync(batch);
+                success = success && await AddBatchAsync(batch, mongoCollection);
                 count++;
                 batch = entities.Skip(_batchSize * count).Take(_batchSize).ToArray();
             }
@@ -161,9 +190,15 @@ namespace SOS.Import.Repositories.Destination
         /// <inheritdoc />
         public async Task<bool> AddOrUpdateAsync(TEntity item)
         {
+            return await AddOrUpdateAsync(item, MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> AddOrUpdateAsync(TEntity item, IMongoCollection<TEntity> mongoCollection)
+        {
             var filter = Builders<TEntity>.Filter.Eq("_id", item.Id);
 
-            var entity = await MongoCollection.Find(filter).FirstOrDefaultAsync();
+            var entity = await mongoCollection.Find(filter).FirstOrDefaultAsync();
             if (entity == null)
             {
                 return await AddAsync(item);
@@ -175,10 +210,16 @@ namespace SOS.Import.Repositories.Destination
         /// <inheritdoc />
         public async Task<bool> AddCollectionAsync()
         {
+            return await AddCollectionAsync(_collectionName);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> AddCollectionAsync(string collectionName)
+        {
             try
             {
                 // Create the collection
-                await Database.CreateCollectionAsync(_collectionName);
+                await Database.CreateCollectionAsync(collectionName);
 
                 return true;
             }
@@ -192,10 +233,16 @@ namespace SOS.Import.Repositories.Destination
         /// <inheritdoc />
         public async Task<bool> DeleteAsync(TKey id)
         {
+            return await DeleteAsync(id, MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DeleteAsync(TKey id, IMongoCollection<TEntity> mongoCollection)
+        {
             try
             {
                 var removeFilter = Builders<TEntity>.Filter.Eq("_id", id);
-                var deleteResult = await MongoCollection.DeleteOneAsync(removeFilter);
+                var deleteResult = await mongoCollection.DeleteOneAsync(removeFilter);
 
                 return deleteResult.IsAcknowledged && deleteResult.DeletedCount > 0;
             }
@@ -210,10 +257,16 @@ namespace SOS.Import.Repositories.Destination
         /// <inheritdoc />
         public async Task<bool> DeleteCollectionAsync()
         {
+            return await DeleteCollectionAsync(_collectionName);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DeleteCollectionAsync(string collectionName)
+        {
             try
             {
                 // Create the collection
-                await Database.DropCollectionAsync(_collectionName);
+                await Database.DropCollectionAsync(collectionName);
 
                 return true;
             }
@@ -227,14 +280,22 @@ namespace SOS.Import.Repositories.Destination
         /// <inheritdoc />
         public async Task<bool> DeleteManyAsync(IEnumerable<TKey> ids)
         {
+            return await DeleteManyAsync(ids, MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DeleteManyAsync(IEnumerable<TKey> ids, IMongoCollection<TEntity> mongoCollection)
+        {
             try
             {
-                var res = await MongoCollection.Find(x => ids.Contains(x.Id)).ToListAsync();
+                var res = await mongoCollection.Find(x => ids.Contains(x.Id)).ToListAsync();
                 if (res != null && res.Any())
                 {
                     var removeFilter = Builders<TEntity>.Filter.In("_id", res.Select(x=>x.Id));
-                    var deleteResult = await Database.GetCollection<TEntity>(typeof(TEntity).Name)
+                    var deleteResult = await mongoCollection // todo - is this correct?
                         .DeleteManyAsync(removeFilter);
+                    //var deleteResult = await Database.GetCollection<TEntity>(typeof(TEntity).Name)
+                    //    .DeleteManyAsync(removeFilter);
                     return deleteResult.IsAcknowledged && deleteResult.DeletedCount > 0;
                 }
 
@@ -251,9 +312,15 @@ namespace SOS.Import.Repositories.Destination
         /// <inheritdoc />
         public async Task<IEnumerable<TEntity>> GetBatchAsync(int skip)
         {
+            return await GetBatchAsync(skip, MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TEntity>> GetBatchAsync(int skip, IMongoCollection<TEntity> mongoCollection)
+        {
             try
             {
-                var res = await MongoCollection
+                var res = await mongoCollection
                     .Find(FilterDefinition<TEntity>.Empty)
                     //.Sort(Builders<TEntity>.Sort.Descending("id"))
                     .Skip(skip)
@@ -273,18 +340,29 @@ namespace SOS.Import.Repositories.Destination
         /// <inheritdoc />
         public async Task<List<TEntity>> GetAllAsync()
         {
-            var res = await MongoCollection.AsQueryable().ToListAsync();
+            return await GetAllAsync(MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<List<TEntity>> GetAllAsync(IMongoCollection<TEntity> mongoCollection)
+        {
+            var res = await mongoCollection.AsQueryable().ToListAsync();
 
             return res;
         }
 
-
         /// <inheritdoc />
         public async Task<bool> UpdateAsync(TKey id, TEntity entity)
         {
+            return await UpdateAsync(id, entity, MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> UpdateAsync(TKey id, TEntity entity, IMongoCollection<TEntity> mongoCollection)
+        {
             try
             {
-                var updateResult = await MongoCollection.ReplaceOneAsync(
+                var updateResult = await mongoCollection.ReplaceOneAsync(
                     x => x.Id.Equals(id),
                     entity,
                     new ReplaceOptions {IsUpsert = true});
