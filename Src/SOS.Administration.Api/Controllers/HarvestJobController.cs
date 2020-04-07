@@ -276,7 +276,7 @@ namespace SOS.Administration.Api.Controllers
                 await model.DwcaFile.CopyToAsync(stream).ConfigureAwait(false);
 
                 // process uploaded file
-                BackgroundJob.Enqueue<IDwcArchiveHarvestJob>(job => job.RunAsync(filePath, dataProvider.Id, JobCancellationToken.Null));
+                BackgroundJob.Enqueue<IDwcArchiveHarvestJob>(job => job.RunAsync(dataProvider.Id, filePath, JobCancellationToken.Null));
                 return new OkObjectResult("Started DwC-A harvest job");
                
             }

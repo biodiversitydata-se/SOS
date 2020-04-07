@@ -6,9 +6,15 @@ namespace SOS.Import.DarwinCore.Factories
 {
     public static class DwcEventFactory
     {
-        public static DwcEvent Create(IRow row, string filename, int idIndex)
+        public static DwcEvent Create(IRow row, DwcaDatasetInfo datasetInfo, int idIndex)
         {
-            var dwcEvent = new DwcEvent { DwcArchiveFilename = filename };
+            var dwcEvent = new DwcEvent();
+            if (datasetInfo != null)
+            {
+                dwcEvent.DataProviderId = datasetInfo.DataProviderId;
+                dwcEvent.DataProviderIdentifier = datasetInfo.DataProviderIdentifier;
+                dwcEvent.DwcArchiveFilename = datasetInfo.ArchiveFilename;
+            }
             foreach (FieldType fieldType in row.FieldMetaData)
             {
                 var val = row[fieldType.Index];

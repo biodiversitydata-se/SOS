@@ -27,25 +27,21 @@ namespace SOS.Import.DarwinCore
         /// Reads a occurrence based DwC-A, and returns observations in batches.
         /// </summary>
         /// <param name="archiveReader"></param>
+        /// <param name="datasetInfo"></param>
         /// <param name="batchSize"></param>
-        /// <param name="filename"></param>
         /// <returns></returns>
         public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
-            ArchiveReader archiveReader, 
-            int batchSize,
-            string filename = null)
+            ArchiveReader archiveReader,
+            DwcaDatasetInfo datasetInfo,
+            int batchSize)
         {
-            if (filename == null)
-            {
-                filename = Path.GetFileName(archiveReader.FileName);
-            }
             IAsyncFileReader occurrenceFileReader = archiveReader.GetAsyncCoreFile();
             int idIndex = occurrenceFileReader.GetIdIndex();
             List<DwcObservationVerbatim> occurrenceRecords = new List<DwcObservationVerbatim>();
 
             await foreach (IRow row in occurrenceFileReader.GetDataRowsAsync())
             {
-                var occurrenceRecord = DwcObservationVerbatimFactory.Create(row, filename, idIndex);
+                var occurrenceRecord = DwcObservationVerbatimFactory.Create(row, datasetInfo, idIndex);
                 occurrenceRecords.Add(occurrenceRecord);
 
                 if (occurrenceRecords.Count % batchSize == 0)
@@ -62,17 +58,12 @@ namespace SOS.Import.DarwinCore
 
         public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
             ArchiveReader archiveReader,
-            string filename = null)
+            DwcaDatasetInfo datasetInfo)
         {
             const int batchSize = 100000;
-            if (filename == null)
-            {
-                filename = Path.GetFileName(archiveReader.FileName);
-            }
             var observationsBatches = ReadArchiveInBatchesAsync(
                 archiveReader,
-                batchSize,
-                filename);
+                datasetInfo, batchSize);
             List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
             await foreach (List<DwcObservationVerbatim> observationsBatch in observationsBatches)
             {

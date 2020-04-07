@@ -14,10 +14,26 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// </summary>
         public ObjectId Id { get; set; }
 
+        /// <summary>
+        /// The Record Id used in the DwC-A CSV file.
+        /// </summary>
         [BsonIgnore]
         public string RecordId { get; set; }
 
+        /// <summary>
+        /// DwC-A file name.
+        /// </summary>
         public string DwcArchiveFilename { get; set; }
+
+        /// <summary>
+        /// Data provider id.
+        /// </summary>
+        public int DataProviderId { get; set; }
+
+        /// <summary>
+        /// Data provider identifier.
+        /// </summary>
+        public string DataProviderIdentifier { get; set; }
 
         /// <summary>
         /// Audubon media linked to the event.

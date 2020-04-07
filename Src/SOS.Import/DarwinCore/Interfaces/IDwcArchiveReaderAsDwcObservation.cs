@@ -10,7 +10,7 @@ namespace SOS.Import.DarwinCore.Interfaces
     {
         IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader,
-            int batchSize,
-            string filename);
+            DwcaDatasetInfo datasetInfo,
+            int batchSize);
     }
 }
