@@ -23,7 +23,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
                 Records = LoadObservations(fileName)
             };
             stub
-                .Setup(pdcr => pdcr.ScrollAsync(It.IsAny<SearchFilter>(), null))
+                .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
                 .ReturnsAsync(observations);
 
             return stub;
@@ -33,7 +33,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
         {
             var stub = new Mock<IProcessedObservationRepository>();
             stub
-                .Setup(pdcr => pdcr.ScrollAsync(It.IsAny<SearchFilter>(), null))
+                .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
                 .ReturnsAsync(new ScrollResult<ProcessedObservation>
                 {
                     Records = new[] { observation }

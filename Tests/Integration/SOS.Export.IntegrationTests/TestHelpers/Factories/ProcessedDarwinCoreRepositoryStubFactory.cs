@@ -18,12 +18,9 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
         public static Mock<IProcessedObservationRepository> Create(string fileName)
         {
             var stub = new Mock<IProcessedObservationRepository>();
-            var observations = new ScrollResult<ProcessedObservation>
-            {
-                Records = LoadObservations(fileName)
-            };
+            var observations = LoadObservations(fileName);
             stub
-                .Setup(pdcr => pdcr.GetChunkAsync(It.IsAny<SearchFilter>(), 0, It.IsAny<int>()))
+                .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
                 .ReturnsAsync(observations);
 
             return stub;
@@ -33,13 +30,13 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
         {
             var stub = new Mock<IProcessedObservationRepository>();
             stub
-                .Setup(pdcr => pdcr.GetChunkAsync(It.IsAny<SearchFilter>(), 0, It.IsAny<int>()))
-                .ReturnsAsync(new[] { observation });
+                .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
+                .ReturnsAsync(new ScrollResult<ProcessedObservation> { Records = new[] { observation }});
 
             return stub;
         }
 
-        private static Export.Repositories.Interfaces.IProcessedObservationRepository.ScrollObservationResults LoadObservations(string fileName)
+        private static ScrollResult<ProcessedObservation> LoadObservations(string fileName)
         {
             string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
@@ -50,7 +47,7 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
             };
 
             var observations = JsonConvert.DeserializeObject<List<ProcessedObservation>>(str, serializerSettings);
-            return new Export.Repositories.Interfaces.IProcessedObservationRepository.ScrollObservationResults { Documents = observations };
+            return new ScrollResult<ProcessedObservation> { Records = observations };
         }
     }
 }

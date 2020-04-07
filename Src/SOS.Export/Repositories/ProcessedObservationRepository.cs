@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -37,31 +36,48 @@ namespace SOS.Export.Repositories
             _batchSize = exportClient.BatchSize;
         }
 
-        public async Task<IEnumerable<ProcessedProject>> GetProjectParameters(
-            FilterBase filter, 
-            int skip,
-            int take)
+        public async Task<ScrollResult<ProcessedProject>> ScrollProjectParametersAsync(
+            FilterBase filter,
+            string scrollId)
         {
-            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
-                .Index(CollectionName.ToLower())
-                .Source(s => s
-                    .Includes(i => i
-                        .Field("projects")))
-                .From(skip)
-                .Size(take)
-                .Query(q => q
-                    .Bool(b => b
-                        .Filter(filter.ToProjectParameterQuery()))));
+            ISearchResponse<dynamic> searchResponse;
+            if (string.IsNullOrEmpty(scrollId))
+            {
+                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                    .Index(CollectionName.ToLower())
+                    .Source(s => s
+                        .Includes(i => i
+                            .Field("projects")))
+                    .Query(q => q
+                        .Bool(b => b
+                            .Filter(filter.ToProjectParameterQuery())
+                        )
+                    )
+                    .Scroll(ScrollTimeOut)
+                    .Size(_batchSize)
+                );
+
+            }
+            else
+            {
+                searchResponse = await _elasticClient
+                    .ScrollAsync<dynamic>(ScrollTimeOut, scrollId);
+            }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
-           return searchResponse.Documents
-                .Select(po => (ProcessedObservation)JsonConvert.DeserializeObject<ProcessedObservation>(JsonConvert.SerializeObject(po)))
-                .SelectMany(p => p.Projects);
+            return new ScrollResult<ProcessedProject>
+            {
+                Records = searchResponse.Documents
+                    .Select(po => (ProcessedObservation)JsonConvert.DeserializeObject<ProcessedObservation>(JsonConvert.SerializeObject(po)))
+                    .SelectMany(p => p.Projects),
+                ScrollId = searchResponse.ScrollId,
+                TotalCount = searchResponse.HitsMetadata.Total.Value
+            };
         }
 
         /// <inheritdoc />
-        public async Task<ScrollResult<ProcessedObservation>> ScrollAsync(FilterBase filter, string scrollId)
+        public async Task<ScrollResult<ProcessedObservation>> ScrollObservationsAsync(FilterBase filter, string scrollId)
         {
             if (!filter?.IsFilterActive ?? true)
             {

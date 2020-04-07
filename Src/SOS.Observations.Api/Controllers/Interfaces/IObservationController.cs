@@ -10,18 +10,18 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IObservationController
     {
         /// <summary>
-        /// Get chunk of sightings 
+        /// Search for observations by provided filter. 
         /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
+        /// <param name="filter">Filter used to limit the search</param>
+        /// <param name="skip">Start index of returned observations</param>
+        /// <param name="take">End index of returned observations</param>
+        /// <returns>List of matching observations</returns>
         Task<IActionResult> GetChunkAsync(SearchFilter filter, int skip, int take);
 
         /// <summary>
-        /// Get field mappings.
+        /// Field mappings are used for properties with multiple acceptable fixed values. E.g gender can have the values: male, female...
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of filed mappings</returns>
         Task<IActionResult> GetFieldMappingAsync();
     }
 }
