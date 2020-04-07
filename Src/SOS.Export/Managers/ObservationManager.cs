@@ -64,7 +64,7 @@ namespace SOS.Export.Managers
         {
             try
             {
-                var processInfo = await _processInfoRepository.GetAsync(_processInfoRepository.CollectionName);
+                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.CollectionName);
                 
                 var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     filter,

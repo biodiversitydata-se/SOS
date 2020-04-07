@@ -23,7 +23,7 @@ namespace SOS.Export.Repositories
         /// <param name="logger"></param>
         public ProcessedFieldMappingRepository(
             IExportClient client,
-            ILogger<ProcessedFieldMappingRepository> logger) : base(client, true, logger)
+            ILogger<ProcessedFieldMappingRepository> logger) : base(client, false, logger)
         {
             
         }

@@ -26,7 +26,6 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            const int nrObservations = 10;
             const string filePath = @"c:\temp\TenProcessedTestObservations.json";
             var exportConfiguration = GetExportConfiguration();
             var elasticClient = new ElasticClient();
@@ -42,8 +41,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var chunkResult = await processedObservationRepository.StartGetChunkAsync(new SearchFilter(), 0, nrObservations);
-            var observations = chunkResult.Documents;            
+            var observations = await processedObservationRepository.ScrollAsync(new SearchFilter(), null);
 
             var serializerSettings = new JsonSerializerSettings()
             {
@@ -52,6 +50,5 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             var strJson = JsonConvert.SerializeObject(observations, serializerSettings);
             System.IO.File.WriteAllText(filePath, strJson, Encoding.UTF8);
         }
-
     }
 }

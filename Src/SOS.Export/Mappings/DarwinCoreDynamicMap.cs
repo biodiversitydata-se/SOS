@@ -1019,7 +1019,7 @@ namespace SOS.Export.Mappings
         public static Dictionary<FieldDescriptionId, Expression<Func<DarwinCore, object>>> CreateFieldMappingDictionary()
         {
             var dic = new Dictionary<FieldDescriptionId, Expression<Func<DarwinCore, object>>>();
-
+            
             // Occurrence
             dic.Add(FieldDescriptionId.OccurrenceID, m => m.Occurrence.OccurrenceID);
             dic.Add(FieldDescriptionId.CatalogNumber, m => m.Occurrence.CatalogNumber);
@@ -1227,7 +1227,7 @@ namespace SOS.Export.Mappings
             dic.Add(FieldDescriptionId.OrganismRemarks, m => m.Organism.OrganismRemarks);
             dic.Add(FieldDescriptionId.OrganismScope, m => m.Organism.OrganismScope);
             dic.Add(FieldDescriptionId.PreviousIdentifications, m => m.Organism.PreviousIdentifications);
-
+            
             return dic;
         }
     }
