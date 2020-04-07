@@ -9,6 +9,6 @@ namespace SOS.Lib.Jobs.Import
         /// Run DwC-A harvest
         /// </summary>
         /// <returns></returns>
-        Task<bool> RunAsync(string archivePath, int dataProviderId, IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(int dataProviderId, string archivePath, IJobCancellationToken cancellationToken);
     }
 }

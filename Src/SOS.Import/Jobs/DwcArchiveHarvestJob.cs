@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Import.DarwinCore;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Managers.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
@@ -37,11 +38,20 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(string archivePath, int dataProviderId, IJobCancellationToken  cancellationToken)
+        public async Task<bool> RunAsync(
+            int dataProviderId, 
+            string archivePath,
+            IJobCancellationToken cancellationToken)
         {
             _logger.LogInformation("Start DwC-A Harvest Job");
             var dataProvider = await _dataProviderManager.TryGetDataProviderAsync(dataProviderId);
-            var result = await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, dataProvider.Id, dataProvider.Identifier, cancellationToken);
+            var datasetInfo = new DwcaDatasetInfo
+            {
+                DataProviderId = dataProvider.Id,
+                DataProviderIdentifier = dataProvider.Identifier,
+                ArchiveFilename = System.IO.Path.GetFileName(archivePath)
+            };
+            var result = await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, datasetInfo, cancellationToken);
             _logger.LogInformation($"End DwC-A Harvest Job. Status: {result.Status}");
 
             // Save harvest info

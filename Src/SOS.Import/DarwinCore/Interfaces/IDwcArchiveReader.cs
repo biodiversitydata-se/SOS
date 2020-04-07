@@ -13,20 +13,24 @@ namespace SOS.Import.DarwinCore.Interfaces
         /// Reads a DwC-A file and returns the observations in batches.
         /// </summary>
         /// <param name="archiveReader"></param>
+        /// <param name="datasetInfo"></param>
         /// <param name="batchSize"></param>
         /// <returns></returns>
         IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
-            ArchiveReader archiveReader, 
+            ArchiveReader archiveReader,
+            DwcaDatasetInfo datasetInfo,
             int batchSize);
 
         /// <summary>
         /// Reads a Sampling Event DwC-A and returns the events in batches.
         /// </summary>
         /// <param name="archiveReader"></param>
+        /// <param name="datasetInfo"></param>
         /// <param name="batchSize"></param>
         /// <returns></returns>
         IAsyncEnumerable<List<DwcEvent>> ReadSamplingEventArchiveInBatchesAsDwcEventAsync(
             ArchiveReader archiveReader,
+            DwcaDatasetInfo datasetInfo,
             int batchSize);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
+using SOS.Import.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Harvesters.Observations.Interfaces
@@ -12,8 +13,7 @@ namespace SOS.Import.Harvesters.Observations.Interfaces
         /// <returns></returns>
         Task<HarvestInfo> HarvestObservationsAsync(
             string archivePath,
-            int dataProviderId,
-            string dataProviderIdentifier,
+            DwcaDatasetInfo datasetInfo,
             IJobCancellationToken cancellationToken);
     }
 }

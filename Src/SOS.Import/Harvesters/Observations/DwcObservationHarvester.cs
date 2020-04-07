@@ -51,15 +51,14 @@ namespace SOS.Import.Harvesters.Observations
             _dwcArchiveReader = dwcArchiveReader ?? throw new ArgumentNullException(nameof(dwcArchiveReader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        
+
         /// <summary>
         /// Harvest DwC Archive observations
         /// </summary>
         /// <returns></returns>
         public async Task<HarvestInfo> HarvestObservationsAsync(
-            string archivePath, 
-            int dataProviderId,
-            string dataProviderIdentifier,
+            string archivePath,
+            DwcaDatasetInfo datasetInfo,
             IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(nameof(DwcObservationVerbatim), DataSet.Dwc, DateTime.Now);
@@ -74,7 +73,7 @@ namespace SOS.Import.Harvesters.Observations
                 await _dwcArchiveVerbatimRepository.AddCollectionAsync();
                 int observationCount = 0;
                 using var archiveReader = new ArchiveReader(archivePath);
-                var observationBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, BatchSize);
+                var observationBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, datasetInfo, BatchSize);
                 await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
@@ -89,7 +88,7 @@ namespace SOS.Import.Harvesters.Observations
                     _logger.LogDebug("Start storing DwC-A events");
                     await _dwcArchiveEventRepository.DeleteCollectionAsync();
                     await _dwcArchiveEventRepository.AddCollectionAsync();
-                    var eventBatches = _dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archiveReader, BatchSize);
+                    var eventBatches = _dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archiveReader, datasetInfo, BatchSize);
                     await foreach (List<DwcEvent> eventBatch in eventBatches)
                     {
                         cancellationToken?.ThrowIfCancellationRequested();

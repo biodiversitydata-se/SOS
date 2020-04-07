@@ -23,17 +23,26 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-occurrence-emof-lifewatch-artportalen.zip";
             var dwcArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
-
+            var datasetInfo = new DwcaDatasetInfo
+            {
+                DataProviderId = 100,
+                DataProviderIdentifier = "TestLifeWatchArtportalen",
+                ArchiveFilename = Path.GetFileName(archivePath)
+            };
+            
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcArchiveReader.ReadArchiveAsync(archiveReader);
+            var observations = await dwcArchiveReader.ReadArchiveAsync(archiveReader, datasetInfo);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             observations.Count.Should().Be(35670);
+            observations.First().DataProviderId.Should().Be(datasetInfo.DataProviderId);
+            observations.First().DataProviderIdentifier.Should().Be(datasetInfo.DataProviderIdentifier);
+            observations.First().DwcArchiveFilename.Should().Be(datasetInfo.ArchiveFilename);
         }
 
         [Fact]
@@ -44,12 +53,18 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-occurrence-multimedia-verbatimoccurrence.zip";
             var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+            var datasetInfo = new DwcaDatasetInfo
+            {
+                DataProviderId = 101,
+                DataProviderIdentifier = "TestMultimedia",
+                ArchiveFilename = Path.GetFileName(archivePath)
+            };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader);
+            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader, datasetInfo);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -70,12 +85,18 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-occurrence-audubonmedia-rrel-cumv_amph.zip";
             var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+            var datasetInfo = new DwcaDatasetInfo
+            {
+                DataProviderId = 102,
+                DataProviderIdentifier = "TestAudubonMedia",
+                ArchiveFilename = Path.GetFileName(archivePath)
+            };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader);
+            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader, datasetInfo);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -102,12 +123,18 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-occurrence-emof-lifewatch.zip";
             var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+            var datasetInfo = new DwcaDatasetInfo
+            {
+                DataProviderId = 103,
+                DataProviderIdentifier = "TestLifeWatchEmof",
+                ArchiveFilename = Path.GetFileName(archivePath)
+            };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader);
+            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader, datasetInfo);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -124,13 +151,20 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/measurementorfact/bdrs1.zip";
             var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+            var datasetInfo = new DwcaDatasetInfo
+            {
+                DataProviderId = 104,
+                DataProviderIdentifier = "TestMeasurementOrFact",
+                ArchiveFilename = Path.GetFileName(archivePath)
+            };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            using var archiveReader = new ArchiveReader("./resources/dwca/measurementorfact/bdrs1.zip");
-            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader);
+            using var archiveReader = new ArchiveReader(archivePath);
+            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader, datasetInfo);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -155,12 +189,18 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             const string archivePath = @"C:\DwC-A\SOS dev\dwca-nrm-ringedbirds-v19.3.zip";
             const int batchSize = 50000;
             const int totalNrObservationsToRead = 150000;
+            var datasetInfo = new DwcaDatasetInfo
+            {
+                DataProviderId = 105,
+                DataProviderIdentifier = "TestRingedBirds",
+                ArchiveFilename = Path.GetFileName(archivePath)
+            };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             using var archiveReader = new ArchiveReader(archivePath);
-            var observationsBatches = dwcOccurrenceArchiveReader.ReadArchiveInBatchesAsync(archiveReader, batchSize);
+            var observationsBatches = dwcOccurrenceArchiveReader.ReadArchiveInBatchesAsync(archiveReader, datasetInfo, batchSize);
             List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
             await foreach (List<DwcObservationVerbatim> observationsBatch in observationsBatches)
             {

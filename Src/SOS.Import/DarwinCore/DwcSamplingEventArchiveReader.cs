@@ -32,13 +32,13 @@ namespace SOS.Import.DarwinCore
         /// Reads a sampling event based DwC-A, and returns events in batches.
         /// </summary>
         /// <param name="archiveReader"></param>
+        /// <param name="datasetInfo"></param>
         /// <param name="batchSize"></param>
-        /// <param name="filename"></param>
         /// <returns></returns>
         public async IAsyncEnumerable<List<DwcEvent>> ReadArchiveInBatchesAsync(
-            ArchiveReader archiveReader, 
-            int batchSize,
-            string filename)
+            ArchiveReader archiveReader,
+            DwcaDatasetInfo datasetInfo,
+            int batchSize)
         {
             var occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Event);
             int idIndex = occurrenceFileReader.GetIdIndex();
@@ -46,7 +46,7 @@ namespace SOS.Import.DarwinCore
 
             await foreach (IRow row in occurrenceFileReader.GetDataRowsAsync())
             {
-                var eventRecord = DwcEventFactory.Create(row, filename, idIndex);
+                var eventRecord = DwcEventFactory.Create(row, datasetInfo, idIndex);
                 eventRecords.Add(eventRecord);
 
                 if (eventRecords.Count % batchSize == 0)
@@ -65,21 +65,16 @@ namespace SOS.Import.DarwinCore
         /// Reads a sampling event based DwC-A.
         /// </summary>
         /// <param name="archiveReader"></param>
-        /// <param name="filename"></param>
+        /// <param name="datasetInfo"></param>
         /// <returns></returns>
         public async Task<List<DwcEvent>> ReadArchiveAsync(
             ArchiveReader archiveReader,
-            string filename = null)
+            DwcaDatasetInfo datasetInfo)
         {
             const int batchSize = 100000;
-            if (filename == null)
-            {
-                filename = Path.GetFileName(archiveReader.FileName);
-            }
             var observationsBatches = ReadArchiveInBatchesAsync(
                 archiveReader,
-                batchSize,
-                filename);
+                datasetInfo, batchSize);
             List<DwcEvent> dwcEvents = new List<DwcEvent>();
             await foreach (List<DwcEvent> observationsBatch in observationsBatches)
             {
