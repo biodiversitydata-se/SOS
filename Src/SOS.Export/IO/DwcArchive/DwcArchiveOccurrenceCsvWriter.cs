@@ -52,7 +52,7 @@ namespace SOS.Export.IO.DwcArchive
                 var darwinCoreMap = new DarwinCoreDynamicMap(fieldDescriptions);
                 var fieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
                 var valueMappingDictionaries = fieldMappings.ToDictionary(m => m.Id, m => m.CreateValueDictionary());
-                var scrollResult = await processedObservationRepository.ScrollAsync(filter, null);
+                var scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, null);
 
                 while (scrollResult?.Records?.Any() ?? false)
                 {
@@ -61,7 +61,7 @@ namespace SOS.Export.IO.DwcArchive
                     ResolveFieldMappedValues(processedObservations, valueMappingDictionaries);
                     await WriteOccurrenceCsvAsync(stream, processedObservations.ToDarwinCore(), darwinCoreMap);
 
-                    scrollResult = await processedObservationRepository.ScrollAsync(filter, scrollResult.ScrollId);
+                    scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
 
                 return true;

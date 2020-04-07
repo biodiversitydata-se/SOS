@@ -9,17 +9,17 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IExportController
     {
         /// <summary>
-        /// Run export DOI job
+        /// Request of a Darwin Core Archive file with observations based on provided filter 
         /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="email"></param>
-        /// <returns></returns>
+        /// <param name="filter">Filter criteria used to limit observations returned</param>
+        /// <param name="email">Email address used to inform you that the file is ready to pick up</param>
+        /// <returns>Job id that can be used to see current status of the file creation process</returns>
         IActionResult RunExportJob(ExportFilter filter, string email);
 
         /// <summary>
         /// Get status of export job
         /// </summary>
-        /// <param name="jobId"></param>
+        /// <param name="jobId">Job id returned when export was requested</param>
         /// <returns></returns>
         IActionResult GetExportStatus(string jobId);
     }

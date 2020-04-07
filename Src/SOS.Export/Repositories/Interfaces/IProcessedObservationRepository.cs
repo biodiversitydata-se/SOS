@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
@@ -11,13 +10,12 @@ namespace SOS.Export.Repositories.Interfaces
     public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, string>
     {
         /// <summary>
-        /// Get project parameters.
+        ///  Get project parameters.
         /// </summary>
         /// <param name="filter"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
+        /// <param name="scrollId"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessedProject>> GetProjectParameters(FilterBase filter, int skip, int take);
+        Task<ScrollResult<ProcessedProject>> ScrollProjectParametersAsync(FilterBase filter, string scrollId);
 
         /// <summary>
         /// Get observation by scroll
@@ -25,6 +23,6 @@ namespace SOS.Export.Repositories.Interfaces
         /// <param name="filter"></param>
         /// <param name="scrollId"></param>
         /// <returns></returns>
-        Task<ScrollResult<ProcessedObservation>> ScrollAsync(FilterBase filter, string scrollId);
+        Task<ScrollResult<ProcessedObservation>> ScrollObservationsAsync(FilterBase filter, string scrollId);
     }
 }

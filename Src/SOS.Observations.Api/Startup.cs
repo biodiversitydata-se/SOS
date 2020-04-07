@@ -98,7 +98,7 @@ namespace SOS.Observations.Api
 
             // Configure swagger
             services.AddSwaggerGen(
-                options =>
+                options => 
                 {
                     options.SwaggerDoc("v1",
                         new OpenApiInfo
