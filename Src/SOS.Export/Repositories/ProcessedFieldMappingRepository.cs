@@ -19,11 +19,11 @@ namespace SOS.Export.Repositories
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="client"></param>
+        /// <param name="exportClient"></param>
         /// <param name="logger"></param>
         public ProcessedFieldMappingRepository(
-            IExportClient client,
-            ILogger<ProcessedFieldMappingRepository> logger) : base(client, false, logger)
+            IExportClient exportClient,
+            ILogger<ProcessedFieldMappingRepository> logger) : base(exportClient, false, logger)
         {
             
         }

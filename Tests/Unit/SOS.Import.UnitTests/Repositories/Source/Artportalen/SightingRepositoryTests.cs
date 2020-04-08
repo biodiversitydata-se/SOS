@@ -4,13 +4,12 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services.Interfaces;
 using Xunit;
 
-namespace SOS.Import.UnitTests.Repositories
+namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 {
     /// <summary>
     /// Test sighting repository
@@ -19,6 +18,10 @@ namespace SOS.Import.UnitTests.Repositories
     {
         private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
         private readonly Mock<ILogger<SightingRepository>> _loggerMock;
+
+        private SightingRepository TestObject => new SightingRepository(
+            _artportalenDataServiceMock.Object,
+            _loggerMock.Object);
 
         /// <summary>
         /// Constructor
@@ -35,9 +38,7 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public void ConstructorTest()
         {
-            new SightingRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object).Should().NotBeNull();
+            TestObject.Should().NotBeNull();
 
             Action create = () => new SightingRepository(
                 null,
@@ -69,11 +70,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var SightingRepository = new SightingRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await SightingRepository.GetChunkAsync(0, 10);
+            var result = await TestObject.GetChunkAsync(0, 10);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -94,11 +91,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var SightingRepository = new SightingRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await SightingRepository.GetChunkAsync(0, 10);
+            var result = await TestObject.GetChunkAsync(0, 10);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -113,23 +106,19 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetProjectIdsAsyncSuccess()
         {
-            var projectIds = new []
+            var projectIds = new List<(int SightingId, int ProjectId)>()
             {
-                new Tuple<int, int>(1, 1),
-                new Tuple<int, int>(1, 2)
+                (1,1),
+                (1,2)
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<(int SightingId, int ProjectId)>(It.IsAny<string>(), null))
                 .ReturnsAsync(projectIds);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var SightingRepository = new SightingRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await SightingRepository.GetProjectIdsAsync();
+            var result = await TestObject.GetProjectIdsAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -144,17 +133,13 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public async Task GetProjectIdsAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
-                .Throws<Exception>();
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<(int SightingId, int ProjectId)>(It.IsAny<string>(), null))
+               .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var SightingRepository = new SightingRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await SightingRepository.GetProjectIdsAsync();
+            var result = await TestObject.GetProjectIdsAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -180,11 +165,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var SightingRepository = new SightingRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await SightingRepository.GetIdSpanAsync();
+            var result = await TestObject.GetIdSpanAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -205,11 +186,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var SightingRepository = new SightingRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await SightingRepository.GetIdSpanAsync();
+            var result = await TestObject.GetIdSpanAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

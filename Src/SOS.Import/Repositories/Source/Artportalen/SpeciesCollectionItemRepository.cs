@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Services.Interfaces;
 

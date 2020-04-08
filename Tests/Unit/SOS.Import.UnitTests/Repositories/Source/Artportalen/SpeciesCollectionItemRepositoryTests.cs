@@ -1,80 +1,75 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services.Interfaces;
 using Xunit;
 
-namespace SOS.Import.UnitTests.Repositories
+namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 {
     /// <summary>
-    /// Project tests
+    /// Test site repository
     /// </summary>
-    public class ProjectRepositoryTests
+    public class SpeciesCollectionItemRepositoryTests
     {
         private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
-        private readonly Mock<ILogger<ProjectRepository>> _loggerMock;
+        private readonly Mock<ILogger<SpeciesCollectionItemRepository>> _loggerMock;
+
+        private SpeciesCollectionItemRepository TestObject => new SpeciesCollectionItemRepository(
+            _artportalenDataServiceMock.Object,
+            _loggerMock.Object);
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ProjectRepositoryTests()
+        public SpeciesCollectionItemRepositoryTests()
         {
             _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
-            _loggerMock = new Mock<ILogger<ProjectRepository>>();
+            _loggerMock = new Mock<ILogger<SpeciesCollectionItemRepository>>();
         }
 
         /// <summary>
-        /// Test the constructor
+        /// Constructor tests
         /// </summary>
         [Fact]
         public void ConstructorTest()
         {
-            new ProjectRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object).Should().NotBeNull();
+            TestObject.Should().NotBeNull();
 
-            Action create = () => new ProjectRepository(
+            Action create = () => new SpeciesCollectionItemRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenDataService");
 
-            create = () => new ProjectRepository(
+            create = () => new SpeciesCollectionItemRepository(
                 _artportalenDataServiceMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
-
         /// <summary>
-        /// Test get projects success
+        /// Test get sites success
         /// </summary>
         /// <returns></returns>
         [Fact]
         public async Task GetAsyncSuccess()
         {
-            IEnumerable<ProjectEntity> projects = new []
+            var speciesCollectionItemEntities = new []
             {
-                    new ProjectEntity { Id = 1, Name = "Project 1" },
-                    new ProjectEntity { Id = 2, Name = "Project 2" }
+                    new SpeciesCollectionItemEntity(),
+                    new SpeciesCollectionItemEntity()
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<ProjectEntity>(It.IsAny<string>(), null))
-                .ReturnsAsync(projects);
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<SpeciesCollectionItemEntity>(It.IsAny<string>(), null))
+                .ReturnsAsync(speciesCollectionItemEntities);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var ProjectRepository = new ProjectRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await ProjectRepository.GetProjectsAsync();
+            var result = await TestObject.GetAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -83,31 +78,24 @@ namespace SOS.Import.UnitTests.Repositories
         }
 
         /// <summary>
-        /// Test get projects fail
+        /// Test get sites fail
         /// </summary>
         /// <returns></returns>
         [Fact]
         public async Task GetAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<ProjectEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<SpeciesCollectionItemEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var ProjectRepository = new ProjectRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await ProjectRepository.GetProjectsAsync();
-            
+            var result = await TestObject.GetAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
             result.Should().BeNull();
         }
-
-
     }
 }

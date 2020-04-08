@@ -4,14 +4,13 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Constants;
 using Xunit;
 
-namespace SOS.Import.UnitTests.Repositories
+namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 {
     /// <summary>
     /// Meta data repository tests
@@ -20,6 +19,10 @@ namespace SOS.Import.UnitTests.Repositories
     {
         private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
         private readonly Mock<ILogger<MetadataRepository>> _loggerMock;
+
+        private MetadataRepository TestObject => new MetadataRepository(
+            _artportalenDataServiceMock.Object,
+            _loggerMock.Object);
 
         /// <summary>
         /// Constructor
@@ -36,9 +39,7 @@ namespace SOS.Import.UnitTests.Repositories
         [Fact]
         public void ConstructorTest()
         {
-            new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object).Should().NotBeNull();
+            TestObject.Should().NotBeNull();
 
             Action create = () => new MetadataRepository(
                 null,
@@ -71,11 +72,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetActivitiesAsync();
+            var result = await TestObject.GetActivitiesAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -96,11 +93,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetActivitiesAsync();
+            var result = await TestObject.GetActivitiesAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -129,11 +122,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetBiotopesAsync();
+            var result = await TestObject.GetBiotopesAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -154,11 +143,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetBiotopesAsync();
+            var result = await TestObject.GetBiotopesAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -187,11 +172,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetGendersAsync();
+            var result = await TestObject.GetGendersAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -212,11 +193,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetGendersAsync();
+            var result = await TestObject.GetGendersAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -245,11 +222,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetStagesAsync();
+            var result = await TestObject.GetStagesAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -270,11 +243,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetStagesAsync();
+            var result = await TestObject.GetStagesAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -303,11 +272,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetSubstratesAsync();
+            var result = await TestObject.GetSubstratesAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -328,11 +293,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetSubstratesAsync();
+            var result = await TestObject.GetSubstratesAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -361,11 +322,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetUnitsAsync();
+            var result = await TestObject.GetUnitsAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -386,11 +343,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetUnitsAsync();
+            var result = await TestObject.GetUnitsAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -419,11 +372,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetValidationStatusAsync();
+            var result = await TestObject.GetValidationStatusAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -444,11 +393,7 @@ namespace SOS.Import.UnitTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var metadataRepository = new MetadataRepository(
-                _artportalenDataServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await metadataRepository.GetValidationStatusAsync();
+            var result = await TestObject.GetValidationStatusAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

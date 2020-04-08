@@ -14,12 +14,11 @@ using SOS.Export.Enums;
 using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Managers;
-using SOS.Export.MongoDb;
+using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories;
 using SOS.Export.UnitTests.TestHelpers.Builders;
 using SOS.Export.UnitTests.TestHelpers.Factories;
 using SOS.Lib.Models.Search;
-using SOS.TestHelpers.Helpers;
 using Xunit;
 
 namespace SOS.Export.UnitTests.IO.DwcArchive
@@ -223,7 +222,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             var writer = new DwcArchiveOccurrenceCsvWriter(
                 ProcessedFieldMappingRepositoryStubFactory.Create().Object,
                 new TaxonManager(
-                    new ProcessedTaxonRepository(new Mock<ExportClient>().Object, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonManager>>().Object),
+                    new ProcessedTaxonRepository(new Mock<IExportClient>().Object, new Mock<ILogger<ProcessedTaxonRepository>>().Object), new Mock<ILogger<TaxonManager>>().Object),
                 new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object);
             return writer;
         }

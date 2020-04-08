@@ -60,10 +60,11 @@ namespace SOS.Export.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private async Task<string> CreateDWCExportAsync(ExportFilter filter, string fileName, IJobCancellationToken cancellationToken)
+        private async Task<string> CreateDWCExportAsync(ExportFilter filter, IJobCancellationToken cancellationToken)
         {
             try
             {
+                var fileName = Guid.NewGuid().ToString();
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.CollectionName);
                 
                 var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
@@ -86,8 +87,24 @@ namespace SOS.Export.Managers
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to export sightings");
-                return null;
+                throw;
             }
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> ExportAllAsync(IJobCancellationToken cancellationToken)
+        {
+            return await ExportAllAsync(
+                FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
+                cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> ExportAllAsync(
+            IEnumerable<FieldDescription> fieldDescriptions,
+            IJobCancellationToken cancellationToken)
+        {
+            return await ExportDWCAsync(new ExportFilter(), cancellationToken);
         }
 
         /// <inheritdoc />
@@ -96,8 +113,7 @@ namespace SOS.Export.Managers
             var zipFilePath = "";
             try
             {
-                var fileName = Guid.NewGuid().ToString();
-                zipFilePath = await CreateDWCExportAsync(filter, fileName, cancellationToken);
+                zipFilePath = await CreateDWCExportAsync(filter, cancellationToken);
 
                 // Make sure container exists
                 var container = $"sos-{DateTime.Now.Year}";
@@ -124,8 +140,7 @@ namespace SOS.Export.Managers
             var zipFilePath = "";
             try
             {
-                var fileName = Guid.NewGuid().ToString();
-                zipFilePath = await CreateDWCExportAsync(filter, fileName, cancellationToken);
+                zipFilePath = await CreateDWCExportAsync(filter, cancellationToken);
 
                 // zend file to user
                 return await _zendToService.SendFile(emailAddress, JsonConvert.SerializeObject(filter), zipFilePath);
@@ -139,22 +154,6 @@ namespace SOS.Export.Managers
             {
                 _fileService.DeleteFile(zipFilePath);
             }
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> ExportAllAsync(IJobCancellationToken cancellationToken)
-        {
-            return await ExportAllAsync(
-                FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(), 
-                cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> ExportAllAsync(
-            IEnumerable<FieldDescription> fieldDescriptions, 
-            IJobCancellationToken cancellationToken)
-        {
-            return await ExportDWCAsync(new ExportFilter(), cancellationToken);
         }
     }
 }

@@ -14,6 +14,11 @@ namespace SOS.Lib.Factories
 
         public static TaxonTree<IBasicTaxon> CreateTaxonTree(IEnumerable<IBasicTaxon> taxa)
         {
+            if (!taxa?.Any() ?? true)
+            {
+                return null;
+            }
+
             var taxonById = taxa.ToDictionary(m => m.Id, m => m);
             var treeNodeById = CreateTaxonTreeNodeDictionary(taxonById);
             var rootNode = treeNodeById[BiotaTaxonId];

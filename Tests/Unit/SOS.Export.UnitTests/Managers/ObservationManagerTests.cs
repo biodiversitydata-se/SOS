@@ -9,6 +9,8 @@ using SOS.Export.Managers;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Models.Search;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Managers
@@ -22,9 +24,22 @@ namespace SOS.Export.UnitTests.Managers
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
         private readonly Mock<IFileService> _fileServiceMock;
-        private readonly Mock<IBlobStorageService> _blobStorageService;
+        private readonly Mock<IBlobStorageService> _blobStorageServiceMock;
         private readonly Mock<IZendToService> _zendToServiceMock;
         private readonly Mock<ILogger<ObservationManager>> _loggerMock;
+
+        /// <summary>
+        /// Return object to be tested
+        /// </summary>
+        private ObservationManager TestObject => new ObservationManager(
+            _dwcArchiveFileWriterMock.Object,
+            _processedObservationRepositoryMock.Object,
+            _processInfoRepositoryMock.Object,
+            _fileServiceMock.Object,
+            _blobStorageServiceMock.Object,
+            _zendToServiceMock.Object,
+            new FileDestination { Path = "test" },
+            _loggerMock.Object);
 
         /// <summary>
         /// Constructor
@@ -35,7 +50,7 @@ namespace SOS.Export.UnitTests.Managers
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
             _fileServiceMock = new Mock<IFileService>();
-            _blobStorageService = new Mock<IBlobStorageService>();
+            _blobStorageServiceMock = new Mock<IBlobStorageService>();
             _zendToServiceMock = new Mock<IZendToService>();
             _loggerMock = new Mock<ILogger<ObservationManager>>();
         }
@@ -47,22 +62,14 @@ namespace SOS.Export.UnitTests.Managers
         [Trait("Category", "Unit")]
         public void ConstructorTest()
         {
-            new ObservationManager(
-                _dwcArchiveFileWriterMock.Object,
-                _processedObservationRepositoryMock.Object,
-                _processInfoRepositoryMock.Object,
-                _fileServiceMock.Object,
-                _blobStorageService.Object,
-                _zendToServiceMock.Object,
-                new FileDestination { Path = "test" },
-                _loggerMock.Object).Should().NotBeNull();
+            TestObject.Should().NotBeNull();
 
             Action create = () => new ObservationManager(
                 null,
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
-                _blobStorageService.Object,
+                _blobStorageServiceMock.Object,
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
@@ -73,7 +80,7 @@ namespace SOS.Export.UnitTests.Managers
                 null,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
-                _blobStorageService.Object,
+                _blobStorageServiceMock.Object,
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
@@ -84,7 +91,7 @@ namespace SOS.Export.UnitTests.Managers
                 _processedObservationRepositoryMock.Object,
                 null,
                 _fileServiceMock.Object,
-                _blobStorageService.Object,
+                _blobStorageServiceMock.Object,
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
@@ -95,7 +102,7 @@ namespace SOS.Export.UnitTests.Managers
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 null,
-                _blobStorageService.Object,
+                _blobStorageServiceMock.Object,
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
@@ -118,7 +125,7 @@ namespace SOS.Export.UnitTests.Managers
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
-                _blobStorageService.Object,
+                _blobStorageServiceMock.Object,
                 null,
                 new FileDestination { Path = "test" },
                 _loggerMock.Object);
@@ -129,7 +136,7 @@ namespace SOS.Export.UnitTests.Managers
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
-                _blobStorageService.Object,
+                _blobStorageServiceMock.Object,
                 _zendToServiceMock.Object,
                 null,
                 _loggerMock.Object);
@@ -140,7 +147,7 @@ namespace SOS.Export.UnitTests.Managers
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
-                _blobStorageService.Object,
+                _blobStorageServiceMock.Object,
                 _zendToServiceMock.Object,
                 new FileDestination { Path = "test" },
                 null);
@@ -148,12 +155,50 @@ namespace SOS.Export.UnitTests.Managers
         }
 
         /// <summary>
-        /// Make a successful test of aggregation
+        /// Make a successful test of export all
         /// </summary>
         /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task ExportAllAsyncSuccess()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _processInfoRepositoryMock.Setup(pir => pir.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new ProcessInfo("id", DateTime.Now));
+
+            _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
+                    It.IsAny<FilterBase>(), 
+                    It.IsAny<string>(), 
+                    _processedObservationRepositoryMock.Object, 
+                    It.IsAny<ProcessInfo>(),
+                    It.IsAny<string>(),
+                    JobCancellationToken.Null
+                    )
+            ).ReturnsAsync("filePath");
+
+            _blobStorageServiceMock.Setup(bss => bss.CreateContainerAsync(It.IsAny<string>()));
+            _blobStorageServiceMock.Setup(bss => bss.UploadBlobAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            _fileServiceMock.Setup(blss => blss.DeleteFile(It.IsAny<string>()));
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observationManager = TestObject;
+
+            var result = await observationManager.ExportAllAsync(JobCancellationToken.Null);
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeTrue();
+        }
 
         /// <summary>
-        /// Test aggregation fail
+        /// Test export all fail
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -163,22 +208,165 @@ namespace SOS.Export.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Throws(new Exception());
+            _processInfoRepositoryMock.Setup(pir => pir.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new ProcessInfo("id", DateTime.Now));
+
+            _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
+                    It.IsAny<FilterBase>(),
+                    It.IsAny<string>(),
+                    _processedObservationRepositoryMock.Object,
+                    It.IsAny<ProcessInfo>(),
+                    It.IsAny<string>(),
+                    JobCancellationToken.Null
+                )
+            ).ReturnsAsync("filePath");
+
+            _blobStorageServiceMock.Setup(bss => bss.CreateContainerAsync(It.IsAny<string>()));
+            _blobStorageServiceMock.Setup(bss => bss.UploadBlobAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(false);
+
+            _fileServiceMock.Setup(blss => blss.DeleteFile(It.IsAny<string>()));
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationManager = new ObservationManager(
-                _dwcArchiveFileWriterMock.Object,
-                _processedObservationRepositoryMock.Object,
-                _processInfoRepositoryMock.Object,
-                _fileServiceMock.Object,
-                _blobStorageService.Object,
-                _zendToServiceMock.Object,
-                new FileDestination { Path = "test" },
-                _loggerMock.Object);
+            var observationManager = TestObject;
 
             var result = await observationManager.ExportAllAsync(JobCancellationToken.Null);
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeFalse();
+        }
+
+        /// <summary>
+        /// Test export all throws
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task ExportAllAsyncThrows()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _processInfoRepositoryMock.Setup(pir => pir.GetAsync(It.IsAny<string>()))
+                .Throws(new Exception("Error"));
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observationManager = TestObject;
+
+            var result = await observationManager.ExportAllAsync(JobCancellationToken.Null);
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeFalse();
+        }
+
+        /// <summary>
+        /// Make a successful test of export all
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task ExportDWCAsyncSuccess()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _processInfoRepositoryMock.Setup(pir => pir.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new ProcessInfo("id", DateTime.Now));
+
+            _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
+                    It.IsAny<FilterBase>(),
+                    It.IsAny<string>(),
+                    _processedObservationRepositoryMock.Object,
+                    It.IsAny<ProcessInfo>(),
+                    It.IsAny<string>(),
+                    JobCancellationToken.Null
+                    )
+            ).ReturnsAsync("filePath");
+
+            _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observationManager = TestObject;
+
+            var result = await observationManager.ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeTrue();
+        }
+
+        /// <summary>
+        /// Test export all fail
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task ExportDWCAsyncFail()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _processInfoRepositoryMock.Setup(pir => pir.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new ProcessInfo("id", DateTime.Now));
+
+            _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
+                    It.IsAny<FilterBase>(),
+                    It.IsAny<string>(),
+                    _processedObservationRepositoryMock.Object,
+                    It.IsAny<ProcessInfo>(),
+                    It.IsAny<string>(),
+                    JobCancellationToken.Null
+                )
+            ).ReturnsAsync("filePath");
+
+            _zendToServiceMock.Setup(blss => blss.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(false);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observationManager = TestObject;
+
+            var result = await observationManager.ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeFalse();
+        }
+
+        /// <summary>
+        /// Test export all throws
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task ExportDWCAsyncThrows()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _processInfoRepositoryMock.Setup(pir => pir.GetAsync(It.IsAny<string>()))
+                .Throws(new Exception("Error"));
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observationManager = TestObject;
+
+            var result = await observationManager.ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

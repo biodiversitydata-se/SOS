@@ -2,33 +2,28 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Nest;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Repositories
 {
-    public class ProcessedObservationRepositoryTests
+    public class ProcessedTaxonRepositoryTests
     {
-        
-        private readonly Mock<IElasticClient> _elasticClient;
         private readonly Mock<IExportClient> _exportClient;
-        private readonly Mock<ILogger<ProcessedObservationRepository>> _loggerMock;
+        private readonly Mock<ILogger<ProcessedTaxonRepository>> _loggerMock;
 
-        private ProcessedObservationRepository TestObject => new ProcessedObservationRepository(
-            _elasticClient.Object,
+        private ProcessedTaxonRepository TestObject => new ProcessedTaxonRepository(
             _exportClient.Object,
             _loggerMock.Object);
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ProcessedObservationRepositoryTests()
+        public ProcessedTaxonRepositoryTests()
         {
-            _elasticClient = new Mock<IElasticClient>();
             _exportClient = new Mock<IExportClient>();
-            _loggerMock = new Mock<ILogger<ProcessedObservationRepository>>();
+            _loggerMock = new Mock<ILogger<ProcessedTaxonRepository>>();
         }
 
         /// <summary>
@@ -40,21 +35,12 @@ namespace SOS.Export.UnitTests.Repositories
         {
             TestObject.Should().NotBeNull();
 
-            Action create = () => new ProcessedObservationRepository(
-                null,
-                _exportClient.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("elasticClient");
-
-            create = () => new ProcessedObservationRepository(
-                _elasticClient.Object,
+            Action create = () => new ProcessedTaxonRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("exportClient");
 
-
-            create = () => new ProcessedObservationRepository(
-                _elasticClient.Object,
+            create = () => new ProcessedTaxonRepository(
                 _exportClient.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
