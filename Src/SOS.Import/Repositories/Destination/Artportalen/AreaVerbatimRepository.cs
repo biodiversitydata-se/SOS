@@ -11,7 +11,7 @@ namespace SOS.Import.Repositories.Destination.Artportalen
     /// <summary>
     /// Area repository
     /// </summary>
-    public class AreaVerbatimRepository : VerbatimDbConfiguration<Area, int>, Interfaces.IAreaVerbatimRepository
+    public class AreaVerbatimRepository : VerbatimRepository<Area, int>, Interfaces.IAreaVerbatimRepository
     {
         /// <summary>
         /// Constructor

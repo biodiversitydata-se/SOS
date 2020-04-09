@@ -21,6 +21,12 @@ namespace SOS.Import.UnitTests.Harvesters
         private readonly Mock<ITaxonAttributeService> _taxonAttributeServiceMock;
         private readonly Mock<ILogger<TaxonHarvester>> _loggerMock;
 
+        private TaxonHarvester TestObject => new TaxonHarvester(
+            _taxonVerbatimRepositoryMock.Object,
+            _taxonServiceMock.Object,
+            _taxonAttributeServiceMock.Object,
+            _loggerMock.Object);
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -38,11 +44,7 @@ namespace SOS.Import.UnitTests.Harvesters
         [Fact]
         public void ConstructorTest()
         {
-            new TaxonHarvester(
-                _taxonVerbatimRepositoryMock.Object,
-                _taxonServiceMock.Object,
-                _taxonAttributeServiceMock.Object,
-                _loggerMock.Object).Should().NotBeNull();
+            TestObject.Should().NotBeNull();
 
             Action create = () => new TaxonHarvester(
                 null,
@@ -72,8 +74,6 @@ namespace SOS.Import.UnitTests.Harvesters
                 _taxonAttributeServiceMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-
-           
         }
 
         /// <summary>
@@ -109,13 +109,7 @@ namespace SOS.Import.UnitTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var taxonHarvester = new TaxonHarvester(
-                _taxonVerbatimRepositoryMock.Object,
-                _taxonServiceMock.Object,
-                _taxonAttributeServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await taxonHarvester.HarvestAsync();
+            var result = await TestObject.HarvestAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -140,13 +134,7 @@ namespace SOS.Import.UnitTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var taxonHarvester = new TaxonHarvester(
-                _taxonVerbatimRepositoryMock.Object,
-                _taxonServiceMock.Object,
-                _taxonAttributeServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await taxonHarvester.HarvestAsync();
+            var result = await TestObject.HarvestAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

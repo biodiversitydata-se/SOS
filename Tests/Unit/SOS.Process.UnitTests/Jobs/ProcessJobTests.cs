@@ -10,7 +10,6 @@ using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
 using SOS.Process.Managers.Interfaces;
@@ -39,6 +38,20 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<ILogger<ProcessJob>> _loggerMock;
 
+        private ProcessJob TestObject => new ProcessJob(
+            _darwinCoreRepository.Object,
+            _processInfoRepository.Object,
+            _harvestInfoRepository.Object,
+            _clamPortalProcessor.Object,
+            _kulProcessor.Object,
+            _artportalenProcessor.Object,
+            _taxonProcessedRepository.Object,
+            _instanceManager.Object,
+            _copyFieldMappingsJob.Object,
+            _processTaxaJob.Object,
+            _areaHelper.Object,
+            _loggerMock.Object);
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -65,19 +78,7 @@ namespace SOS.Process.UnitTests.Jobs
         [Fact]
         public void ConstructorTest()
         {
-            new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object).Should().NotBeNull();
+            TestObject.Should().NotBeNull();
 
             Action create = () => new ProcessJob(
                 null,
@@ -316,22 +317,8 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var job = new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-
             var sources = (byte) ObservationProvider.Artportalen + (byte)ObservationProvider.ClamPortal + (byte)ObservationProvider.KUL;
-            var result = await job.RunAsync(sources, false, false, true, JobCancellationToken.Null);
+            var result = await TestObject.RunAsync(sources, false, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -353,22 +340,8 @@ namespace SOS.Process.UnitTests.Jobs
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var job = new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-
-            var result = await job.RunAsync(It.IsAny<int>(), false, false, true, JobCancellationToken.Null);
+            //----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.RunAsync(It.IsAny<int>(), false, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -391,21 +364,7 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var job = new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-
-            var result = await job.RunAsync(It.IsAny<int>(), false, false, true, JobCancellationToken.Null);
+            var result = await TestObject.RunAsync(It.IsAny<int>(), false, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

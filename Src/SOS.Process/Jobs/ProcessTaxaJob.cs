@@ -9,7 +9,6 @@ using SOS.Lib.Factories;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;

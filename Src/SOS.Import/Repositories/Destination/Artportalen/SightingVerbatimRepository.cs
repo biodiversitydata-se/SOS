@@ -7,7 +7,7 @@ namespace SOS.Import.Repositories.Destination.Artportalen
     /// <summary>
     /// Species data service
     /// </summary>
-    public class SightingVerbatimRepository : VerbatimDbConfiguration<ArtportalenVerbatimObservation, int>, Interfaces.ISightingVerbatimRepository
+    public class SightingVerbatimRepository : VerbatimRepository<ArtportalenVerbatimObservation, int>, Interfaces.ISightingVerbatimRepository
     {
         /// <summary>
         /// Constructor

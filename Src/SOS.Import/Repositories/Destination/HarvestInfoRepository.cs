@@ -4,7 +4,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Repositories.Destination
 {
-    public class HarvestInfoRepository : VerbatimDbConfiguration<HarvestInfo, string>, Interfaces.IHarvestInfoRepository
+    public class HarvestInfoRepository : VerbatimRepository<HarvestInfo, string>, Interfaces.IHarvestInfoRepository
     {
         /// <summary>
         /// Constructor

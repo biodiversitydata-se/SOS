@@ -4,14 +4,12 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters;
 using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Harvesters
@@ -24,6 +22,11 @@ namespace SOS.Import.UnitTests.Harvesters
         private readonly Mock<IAreaRepository> _areaRepositoryMock;
         private readonly Mock<AreaVerbatimRepository> _areaVerbatimRepository;
         private readonly Mock<ILogger<AreaHarvester>> _loggerMock;
+
+        private AreaHarvester TestObject => new AreaHarvester(
+            _areaRepositoryMock.Object,
+            _areaVerbatimRepository.Object,
+            _loggerMock.Object);
 
         /// <summary>
         /// Constructor
@@ -41,10 +44,7 @@ namespace SOS.Import.UnitTests.Harvesters
         [Fact]
         public void ConstructorTest()
         {
-            new AreaHarvester(
-                _areaRepositoryMock.Object,
-                _areaVerbatimRepository.Object,
-                _loggerMock.Object).Should().NotBeNull();
+            TestObject.Should().NotBeNull();
 
             Action create = () => new AreaHarvester(
                 null,
@@ -89,12 +89,7 @@ namespace SOS.Import.UnitTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var areaHarvester = new AreaHarvester(
-                _areaRepositoryMock.Object,
-                _areaVerbatimRepository.Object,
-                _loggerMock.Object);
-
-            var result = await areaHarvester.HarvestAreasAsync();
+            var result = await TestObject.HarvestAreasAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -116,12 +111,7 @@ namespace SOS.Import.UnitTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var areaHarvester = new AreaHarvester(
-                _areaRepositoryMock.Object,
-                _areaVerbatimRepository.Object,
-                _loggerMock.Object);
-
-            var result = await areaHarvester.HarvestAreasAsync();
+            var result = await TestObject.HarvestAreasAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

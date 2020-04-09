@@ -21,7 +21,7 @@ namespace SOS.Lib.Factories
 
             var taxonById = taxa.ToDictionary(m => m.Id, m => m);
             var treeNodeById = CreateTaxonTreeNodeDictionary(taxonById);
-            var rootNode = treeNodeById[BiotaTaxonId];
+            treeNodeById.TryGetValue(BiotaTaxonId, out var rootNode);
             var tree = new TaxonTree<IBasicTaxon>(rootNode, treeNodeById);
             return tree;
         }

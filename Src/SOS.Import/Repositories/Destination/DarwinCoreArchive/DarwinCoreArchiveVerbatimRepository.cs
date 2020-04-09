@@ -11,7 +11,7 @@ namespace SOS.Import.Repositories.Destination.DarwinCoreArchive
     /// <summary>
     /// DwC-A observation repository
     /// </summary>
-    public class DarwinCoreArchiveVerbatimRepository : VerbatimDbConfiguration<DwcObservationVerbatim, ObjectId>, Interfaces.IDarwinCoreArchiveVerbatimRepository
+    public class DarwinCoreArchiveVerbatimRepository : VerbatimRepository<DwcObservationVerbatim, ObjectId>, Interfaces.IDarwinCoreArchiveVerbatimRepository
     {
         /// <summary>
         /// Constructor

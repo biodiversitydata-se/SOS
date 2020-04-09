@@ -4,7 +4,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Repositories.Destination
 {
-    public class DataProviderRepository : VerbatimDbConfiguration<DataProvider, int>, Interfaces.IDataProviderRepostitory
+    public class DataProviderRepository : VerbatimRepository<DataProvider, int>, Interfaces.IDataProviderRepostitory
     {
         /// <summary>
         /// Constructor

@@ -7,7 +7,7 @@ namespace SOS.Import.Repositories.Destination.Taxon
     /// <summary>
     /// Clam verbatim repository
     /// </summary>
-    public class TaxonVerbatimRepository : VerbatimDbConfiguration<DarwinCoreTaxon, int>, Interfaces.ITaxonVerbatimRepository
+    public class TaxonVerbatimRepository : VerbatimRepository<DarwinCoreTaxon, int>, Interfaces.ITaxonVerbatimRepository
     {
         /// <summary>
         /// Constructor

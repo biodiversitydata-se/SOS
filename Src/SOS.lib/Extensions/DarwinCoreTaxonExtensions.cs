@@ -14,9 +14,9 @@ namespace SOS.Lib.Extensions
         {
             return new ProcessedTaxon
             {
-                DyntaxaTaxonId = sourceTaxon.DynamicProperties.DyntaxaTaxonId,
-                ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties.ParentDyntaxaTaxonId,
-                SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds,
+                DyntaxaTaxonId = sourceTaxon.DynamicProperties?.DyntaxaTaxonId ?? 0,
+                ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties?.ParentDyntaxaTaxonId,
+                SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties?.SecondaryParentDyntaxaTaxonIds,
                 VernacularNames = sourceTaxon.VernacularNames?.ToTaxonVernacularNames(),
                 AcceptedNameUsage = sourceTaxon.AcceptedNameUsage,
                 AcceptedNameUsageID = sourceTaxon.AcceptedNameUsageID,

@@ -1,134 +1,138 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Export.Managers;
-using SOS.Export.Repositories.Interfaces;
-using SOS.Lib.Models.Processed.Observation;
+using SOS.Import.Harvesters.Observations.Interfaces;
+using SOS.Import.Jobs;
+using SOS.Import.Repositories.Destination.Interfaces;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.Verbatim.Shared;
 using Xunit;
 
-namespace SOS.Export.UnitTests.Managers
+namespace SOS.Import.UnitTests.Managers
 {
-    /// <summary>
-    /// Tests for observation manager
-    /// </summary>
-    public class TaxonManagerTests
+    public class KulHarvestJobTests
     {
-        private readonly Mock<IProcessedTaxonRepository> _processedTaxonRepositoryMock;
-        private readonly Mock<ILogger<TaxonManager>> _loggerMock;
+        private readonly Mock<IKulObservationHarvester> _kulObservationHarvesterMock;
+        private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
+        private readonly Mock<ILogger<KulHarvestJob>> _loggerMock;
 
-        /// <summary>
-        /// Return object to be tested
-        /// </summary>
-        private TaxonManager TestObject => new TaxonManager(
-            _processedTaxonRepositoryMock.Object,
+        private KulHarvestJob TestObject => new KulHarvestJob(
+            _kulObservationHarvesterMock.Object,
+            _harvestInfoRepositoryMock.Object,
             _loggerMock.Object);
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public TaxonManagerTests()
+        public KulHarvestJobTests()
         {
-            _processedTaxonRepositoryMock = new Mock<IProcessedTaxonRepository>();
-            _loggerMock = new Mock<ILogger<TaxonManager>>();
+            _kulObservationHarvesterMock = new Mock<IKulObservationHarvester>();
+            _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
+            _loggerMock = new Mock<ILogger<KulHarvestJob>>();
         }
 
         /// <summary>
         /// Test constructor
         /// </summary>
         [Fact]
-        [Trait("Category", "Unit")]
         public void ConstructorTest()
         {
             TestObject.Should().NotBeNull();
 
-            Action create = () => new TaxonManager(
-                null,
+            Action create = () => new KulHarvestJob(
+               null,
+                _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedTaxonRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("kulObservationHarvester");
 
-            create = () => new TaxonManager(
-                _processedTaxonRepositoryMock.Object,
+            create = () => new KulHarvestJob(
+                _kulObservationHarvesterMock.Object,
+               null,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
+
+            create = () => new KulHarvestJob(
+                _kulObservationHarvesterMock.Object,
+                _harvestInfoRepositoryMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
         /// <summary>
-        /// Make a successful taxon tree
+        /// Run harvest job successfully
         /// </summary>
         /// <returns></returns>
         [Fact]
-        [Trait("Category", "Unit")]
-        public async Task TaxonTreeSuccess()
+        public async Task RunAsyncSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedTaxonRepositoryMock.Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i == 0), It.IsAny<int>()))
-                .ReturnsAsync(new[] { new ProcessedBasicTaxon() });
-            _processedTaxonRepositoryMock.Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i != 0), It.IsAny<int>()))
-                .ReturnsAsync(new ProcessedBasicTaxon[0]);
+            _kulObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(JobCancellationToken.Null))
+                .ReturnsAsync(new HarvestInfo("id", DataSet.Taxa, DateTime.Now){ Status = RunStatus.Success});
 
+            _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var tree = TestObject.TaxonTree;
+            var result = await TestObject.RunAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            tree.Root.TaxonId.Should().Be(0);
+            result.Should().BeTrue();
         }
 
         /// <summary>
-        /// Test taxon tree fail
+        /// Fail to run harvest job
         /// </summary>
         /// <returns></returns>
         [Fact]
-        [Trait("Category", "Unit")]
-        public async Task TaxonTreeFail()
+        public async Task AddDataProviderFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedTaxonRepositoryMock.Setup(pir => pir.GetBasicTaxonChunkAsync(It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(new ProcessedBasicTaxon[0]);
+            _kulObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(JobCancellationToken.Null))
+                .ReturnsAsync(new HarvestInfo("id", DataSet.Taxa, DateTime.Now) { Status = RunStatus.Failed });
 
+            _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var tree = TestObject.TaxonTree;
+            Func<Task> act = async () => { await TestObject.RunAsync(JobCancellationToken.Null); };
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            tree.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
-        /// Test taxon tree throws
+        /// Harvest job throw exception
         /// </summary>
         /// <returns></returns>
         [Fact]
-        [Trait("Category", "Unit")]
-        public async Task TaxonTreeThrows()
+        public async Task AddDataProviderException()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedTaxonRepositoryMock.Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i == 0), It.IsAny<int>()))
-                .Throws<Exception>();
-
+            _kulObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(JobCancellationToken.Null))
+               .Throws<Exception>();
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var tree = TestObject.TaxonTree;
+            Func<Task> act = async () => { await TestObject.RunAsync(JobCancellationToken.Null); };
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            tree.Should().BeNull();
+            await act.Should().ThrowAsync<Exception>();
         }
+
     }
 }

@@ -187,9 +187,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationManager = TestObject;
-
-            var result = await observationManager.ExportAllAsync(JobCancellationToken.Null);
+            var result = await TestObject.ExportAllAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -230,9 +228,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationManager = TestObject;
-
-            var result = await observationManager.ExportAllAsync(JobCancellationToken.Null);
+            var result = await TestObject.ExportAllAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -257,9 +253,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationManager = TestObject;
-
-            var result = await observationManager.ExportAllAsync(JobCancellationToken.Null);
+            var result = await TestObject.ExportAllAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -297,9 +291,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationManager = TestObject;
-
-            var result = await observationManager.ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
+            var result = await TestObject.ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -337,9 +329,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationManager = TestObject;
-
-            var result = await observationManager.ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
+             var result = await TestObject.ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -364,9 +354,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var observationManager = TestObject;
-
-            var result = await observationManager.ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
+            var result = await TestObject.ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
