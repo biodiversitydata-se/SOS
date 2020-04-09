@@ -10,7 +10,7 @@ namespace SOS.Lib.Models.Search
     public class FilterBase
     {
         /// <summary>
-        /// Counties to match
+        /// Counties to match. Queryable values are available in Field Mappings.
         /// </summary>
         public IEnumerable<int> CountyIds { get; set; }
 
@@ -18,12 +18,12 @@ namespace SOS.Lib.Models.Search
         public GeometryFilter GeometryFilter { get; set; }
 
         /// <summary>
-        /// Sighting last date
+        /// Observation end date specified in the ISO 8601 standard.
         /// </summary>
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        /// True if any filter property is set
+        /// True if any filter property is set.
         /// </summary>
         public bool IsFilterActive =>
             (CountyIds?.Any() ?? false) ||
@@ -39,47 +39,49 @@ namespace SOS.Lib.Models.Search
             (TaxonIds?.Any() ?? false);
 
         /// <summary>
-        /// Municipalities to match
+        /// Municipalities to match. Queryable values are available in Field Mappings.
         /// </summary>
         public IEnumerable<int> MunicipalityIds { get; set; }
 
         /// <summary>
-        /// True to return only validated sightings
+        /// True to return only validated sightings.
         /// </summary>
         public bool? OnlyValidated { get; set; }
 
         /// <summary>
-        /// True to return only positive sightings, false to return negative sightings, null to return both positive and negative sightings
+        /// True to return only positive sightings, false to return negative sightings, null to return both positive and negative sightings.
+        /// 
+        /// An negative observation is an observation that was expected to be found but wasn't.
         /// </summary>
         public bool? PositiveSightings { get; set; }
 
         /// <summary>
-        /// Provinces to match
+        /// Provinces to match. Queryable values are available in Field Mappings.
         /// </summary>
         public IEnumerable<int> ProvinceIds { get; set; }
 
         /// <summary>
-        /// Redlist categories to match
+        /// Redlist categories to match. Queryable values are available in Field Mappings.
         /// </summary>
         public IEnumerable<string> RedListCategories { get; set; }
 
         /// <summary>
-        /// Gender to match
+        /// Gender to match. Queryable values are available in Field Mappings.
         /// </summary>
         public IEnumerable<int> GenderIds { get; set; }
 
         /// <summary>
-        /// Sighting first date
+        /// Observation start date specified in the ISO 8601 standard.
         /// </summary>
         public DateTime? StartDate { get; set; }
 
         /// <summary>
-        /// Taxon id's to match
+        /// Taxa to match. Queryable values are available in Field Mappings.
         /// </summary>
         public IEnumerable<int> TaxonIds { get; set; }
 
         /// <summary>
-        /// Decides whether to search for exact taxonIds or
+        /// Decides whether to search for the exact taxa or
         /// for the hierarchical underlying taxa.
         /// </summary>
         public bool IncludeUnderlyingTaxa { get; set; }
@@ -91,6 +93,8 @@ namespace SOS.Lib.Models.Search
 
         /// <summary>
         /// Field mapping translation culture code.
+        /// 
+        /// Available values.
         /// sv-SE (Swedish)
         /// en-GB (English)
         /// </summary>
