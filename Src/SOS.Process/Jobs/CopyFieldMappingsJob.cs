@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
-using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -14,18 +13,18 @@ namespace SOS.Process.Jobs
     public class CopyFieldMappingsJob : ProcessJobBase, ICopyFieldMappingsJob
     {
         private readonly IFieldMappingVerbatimRepository _fieldMappingVerbatimRepository;
-        private readonly IProcessedFieldMappingRepository _fieldMappingProcessedRepository;
+        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly ILogger<CopyFieldMappingsJob> _logger;
 
         public CopyFieldMappingsJob(
             IFieldMappingVerbatimRepository fieldMappingVerbatimRepository,
-            IProcessedFieldMappingRepository fieldMappingProcessedRepository,
+            IProcessedFieldMappingRepository processedFieldMappingRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IProcessInfoRepository processInfoRepository,
             ILogger<CopyFieldMappingsJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _fieldMappingVerbatimRepository = fieldMappingVerbatimRepository ?? throw new ArgumentNullException(nameof(fieldMappingVerbatimRepository));
-            _fieldMappingProcessedRepository = fieldMappingProcessedRepository ?? throw new ArgumentNullException(nameof(fieldMappingProcessedRepository));
+            _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -42,7 +41,7 @@ namespace SOS.Process.Jobs
             }
 
             _logger.LogDebug("Start deleting field mappings");
-            if (!await _fieldMappingProcessedRepository.DeleteCollectionAsync())
+            if (!await _processedFieldMappingRepository.DeleteCollectionAsync())
             {
                 _logger.LogError("Failed to delete field mappings data");
                 return false;
@@ -50,7 +49,7 @@ namespace SOS.Process.Jobs
             _logger.LogDebug("Finish deleting field mappings");
 
             _logger.LogDebug("Start copy field mappings");
-            var success = await _fieldMappingProcessedRepository.AddManyAsync(fieldMappings);
+            var success = await _processedFieldMappingRepository.AddManyAsync(fieldMappings);
             _logger.LogDebug("Finish copy field mappings");
 
             _logger.LogDebug("Start updating process info for field mappings");

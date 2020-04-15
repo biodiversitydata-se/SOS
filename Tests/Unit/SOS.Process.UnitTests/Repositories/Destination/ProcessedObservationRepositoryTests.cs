@@ -34,25 +34,12 @@ namespace SOS.Process.UnitTests.Repositories.Destination
         [Fact]
         public void ConstructorTest()
         {
-            new ProcessedObservationRepository(
-                _processClient.Object,
-                _invalidObservationRepositoryMock.Object,
-                _loggerMock.Object,
-                _elasticClient.Object).Should().NotBeNull();
-
             Action create = () => new ProcessedObservationRepository(
                 null,
                 _invalidObservationRepositoryMock.Object,
                 _loggerMock.Object,
                 _elasticClient.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
-
-            create = () => new ProcessedObservationRepository(
-                _processClient.Object,
-               null,
-                _loggerMock.Object,
-                _elasticClient.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("invalidObservationRepository");
 
             create = () => new ProcessedObservationRepository(
                 _processClient.Object,

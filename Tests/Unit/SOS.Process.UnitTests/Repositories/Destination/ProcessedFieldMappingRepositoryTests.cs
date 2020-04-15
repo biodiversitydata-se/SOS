@@ -8,18 +8,18 @@ using Xunit;
 
 namespace SOS.Process.UnitTests.Repositories.Destination
 {
-    public class ProcessInfoRepositoryTests
+    public class ProcessedFieldMappingRepositoryTests
     {
         private readonly Mock<IProcessClient> _processClient;
-        private readonly Mock<ILogger<ProcessInfoRepository>> _loggerMock;
+        private readonly Mock<ILogger<ProcessedFieldMappingRepository>> _loggerMock;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ProcessInfoRepositoryTests()
+        public ProcessedFieldMappingRepositoryTests()
         {
             _processClient = new Mock<IProcessClient>();
-            _loggerMock = new Mock<ILogger<ProcessInfoRepository>>();
+            _loggerMock = new Mock<ILogger<ProcessedFieldMappingRepository>>();
         }
 
         /// <summary>
@@ -28,12 +28,17 @@ namespace SOS.Process.UnitTests.Repositories.Destination
         [Fact]
         public void ConstructorTest()
         {
-            Action create = () => new ProcessInfoRepository(
+            Action create = () => new ProcessedFieldMappingRepository(
+                _processClient.Object,
+                _loggerMock.Object);
+            create.Should().Throw<NullReferenceException>();
+
+           create = () => new ProcessedFieldMappingRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
 
-            create = () => new ProcessInfoRepository(
+            create = () => new ProcessedFieldMappingRepository(
                 _processClient.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");

@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
+using MongoDB.Driver;
 using Moq;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Verbatim.ClamPortal;
+using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Process.Helpers.Interfaces;
-using SOS.Process.Processors.ClamPortal;
+using SOS.Process.Processors.Kul;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
@@ -20,16 +21,16 @@ namespace SOS.Process.UnitTests.Processors
     /// <summary>
     /// Tests for Clam Portal processor
     /// </summary>
-    public class ClamPortalObservationProcessorTests
+    public class KULObservationProcessorTests
     {
-        private readonly Mock<IClamObservationVerbatimRepository> _clamObservationVerbatimRepositoryMock;
+        private readonly Mock<IKulObservationVerbatimRepository> _kulObservationVerbatimRepositoryMock;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
-        private readonly Mock<ILogger<ClamPortalObservationProcessor>> _loggerMock;
+        private readonly Mock<ILogger<KulObservationProcessor>> _loggerMock;
 
-        private ClamPortalObservationProcessor TestObject => new ClamPortalObservationProcessor(
-            _clamObservationVerbatimRepositoryMock.Object,
+        private KulObservationProcessor TestObject => new KulObservationProcessor(
+            _kulObservationVerbatimRepositoryMock.Object,
             _areaHelper.Object,
             _processedObservationRepositoryMock.Object,
             _fieldMappingResolverHelperMock.Object,
@@ -38,13 +39,13 @@ namespace SOS.Process.UnitTests.Processors
         /// <summary>
         /// Constructor
         /// </summary>
-        public ClamPortalObservationProcessorTests()
+        public KULObservationProcessorTests()
         {
-            _clamObservationVerbatimRepositoryMock = new Mock<IClamObservationVerbatimRepository>();
+            _kulObservationVerbatimRepositoryMock = new Mock<IKulObservationVerbatimRepository>();
             _areaHelper = new Mock<IAreaHelper>();
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
-            _loggerMock = new Mock<ILogger<ClamPortalObservationProcessor>>();
+            _loggerMock = new Mock<ILogger<KulObservationProcessor>>();
         }
 
         /// <summary>
@@ -55,33 +56,33 @@ namespace SOS.Process.UnitTests.Processors
         {
             TestObject.Should().NotBeNull();
 
-            Action create = () => new ClamPortalObservationProcessor(
+            Action create = () => new KulObservationProcessor(
                 null,
                 _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamObservationVerbatimRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("kulObservationVerbatimRepository");
 
 
-            create = () => new ClamPortalObservationProcessor(
-                _clamObservationVerbatimRepositoryMock.Object,
+            create = () => new KulObservationProcessor(
+                _kulObservationVerbatimRepositoryMock.Object,
                 null,
                 _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
 
-            create = () => new ClamPortalObservationProcessor(
-                 _clamObservationVerbatimRepositoryMock.Object,
+            create = () => new KulObservationProcessor(
+                 _kulObservationVerbatimRepositoryMock.Object,
                  _areaHelper.Object,
                 null,
                  _fieldMappingResolverHelperMock.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("DarwinCoreRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
 
-            create = () => new ClamPortalObservationProcessor(
-                _clamObservationVerbatimRepositoryMock.Object,
+            create = () => new KulObservationProcessor(
+                _kulObservationVerbatimRepositoryMock.Object,
                 _areaHelper.Object,
                 _processedObservationRepositoryMock.Object,
                 _fieldMappingResolverHelperMock.Object,
@@ -99,13 +100,24 @@ namespace SOS.Process.UnitTests.Processors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty, ObjectId.Empty))
-                .ReturnsAsync(new[] { new ClamObservationVerbatim
-                {
-                    DyntaxaTaxonId = 0
-                } });
+            var mockCursor = new Mock<IAsyncCursor<KulObservationVerbatim>>();
+            mockCursor.Setup(_ => _.Current).Returns(new List<KulObservationVerbatim>()); 
+            mockCursor
+                .SetupSequence(_ => _.MoveNext(It.IsAny<CancellationToken>()))
+                .Returns(true)
+                .Returns(false);
+            mockCursor
+                .SetupSequence(_ => _.MoveNextAsync(It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(true))
+                .Returns(Task.FromResult(false));
+
+            _kulObservationVerbatimRepositoryMock.Setup(r => r.GetAllByCursorAsync())
+                .ReturnsAsync(mockCursor.Object);
 
             _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<ProcessedObservation>>()));
+
+            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<ObservationProvider>()))
+                .ReturnsAsync(true);
 
             _processedObservationRepositoryMock.Setup(r => r.AddManyAsync(It.IsAny<ICollection<ProcessedObservation>>()))
                 .ReturnsAsync(1);
@@ -159,7 +171,7 @@ namespace SOS.Process.UnitTests.Processors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _clamObservationVerbatimRepositoryMock.Setup(r => r.GetBatchAsync(ObjectId.Empty, ObjectId.Empty))
+            _kulObservationVerbatimRepositoryMock.Setup(r => r.GetAllByCursorAsync())
                 .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
             // Act

@@ -8,22 +8,22 @@ using Xunit;
 
 namespace SOS.Process.UnitTests.Repositories.Source
 {
-    public class ArtportalenVerbatimRepositoryTests
+    public class TaxonVerbatimRepositoryTests
     {
         private readonly Mock<IVerbatimClient> _processClient;
-        private readonly Mock<ILogger<ArtportalenVerbatimRepository>> _loggerMock;
+        private readonly Mock<ILogger<TaxonVerbatimRepository>> _loggerMock;
 
-        private ArtportalenVerbatimRepository TestObject => new ArtportalenVerbatimRepository(
+        private TaxonVerbatimRepository TestObject => new TaxonVerbatimRepository(
             _processClient.Object,
             _loggerMock.Object);
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ArtportalenVerbatimRepositoryTests()
+        public TaxonVerbatimRepositoryTests()
         {
             _processClient = new Mock<IVerbatimClient>();
-            _loggerMock = new Mock<ILogger<ArtportalenVerbatimRepository>>();
+            _loggerMock = new Mock<ILogger<TaxonVerbatimRepository>>();
         }
 
         /// <summary>
@@ -34,12 +34,12 @@ namespace SOS.Process.UnitTests.Repositories.Source
         {
             TestObject.Should().NotBeNull();
 
-            Action create = () => new ArtportalenVerbatimRepository(
+            Action create = () => new TaxonVerbatimRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
 
-            create = () => new ArtportalenVerbatimRepository(
+            create = () => new TaxonVerbatimRepository(
                 _processClient.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");

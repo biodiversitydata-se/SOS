@@ -30,6 +30,14 @@ namespace SOS.Process.UnitTests.Processors
         private readonly ProcessConfiguration _processConfiguration;
         private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
 
+        private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
+            _artportalenVerbatimRepository.Object,
+            _processedObservationRepositoryMock.Object,
+            _processedFieldMappingRepositoryMock.Object,
+            _fieldMappingResolverHelperMock.Object,
+            _processConfiguration,
+            _loggerMock.Object);
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -49,13 +57,7 @@ namespace SOS.Process.UnitTests.Processors
         [Fact]
         public void ConstructorTest()
         {
-            new ArtportalenObservationProcessor(
-                _artportalenVerbatimRepository.Object,
-                _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
-                _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
-                _loggerMock.Object).Should().NotBeNull();
+            TestObject.Should().NotBeNull();
 
             Action create = () => new ArtportalenObservationProcessor(
                 null,
@@ -73,7 +75,7 @@ namespace SOS.Process.UnitTests.Processors
                 _fieldMappingResolverHelperMock.Object,
                 _processConfiguration,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("DarwinCoreRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
 
             create = () => new ArtportalenObservationProcessor(
                 _artportalenVerbatimRepository.Object,
@@ -127,15 +129,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenProcessor = new ArtportalenObservationProcessor(
-                _artportalenVerbatimRepository.Object,
-                _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
-                _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
-                _loggerMock.Object);
-
-            var result = await artportalenProcessor.ProcessAsync(taxa, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(taxa, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -157,15 +151,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenProcessor = new ArtportalenObservationProcessor(
-                _artportalenVerbatimRepository.Object,
-                _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
-                _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
-                _loggerMock.Object);
-
-            var result = await artportalenProcessor.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -189,15 +175,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenProcessor = new ArtportalenObservationProcessor(
-                _artportalenVerbatimRepository.Object,
-                _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
-                _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
-                _loggerMock.Object);
-
-            var result = await artportalenProcessor.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

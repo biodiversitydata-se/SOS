@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Process.Database.Interfaces;
 

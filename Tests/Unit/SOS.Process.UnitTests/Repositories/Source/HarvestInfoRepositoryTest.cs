@@ -8,22 +8,22 @@ using Xunit;
 
 namespace SOS.Process.UnitTests.Repositories.Source
 {
-    public class ArtportalenVerbatimRepositoryTests
+    public class HarvestInfoRepositoryTests
     {
         private readonly Mock<IVerbatimClient> _processClient;
-        private readonly Mock<ILogger<ArtportalenVerbatimRepository>> _loggerMock;
+        private readonly Mock<ILogger<HarvestInfoRepository>> _loggerMock;
 
-        private ArtportalenVerbatimRepository TestObject => new ArtportalenVerbatimRepository(
+        private HarvestInfoRepository TestObject => new HarvestInfoRepository(
             _processClient.Object,
             _loggerMock.Object);
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ArtportalenVerbatimRepositoryTests()
+        public HarvestInfoRepositoryTests()
         {
             _processClient = new Mock<IVerbatimClient>();
-            _loggerMock = new Mock<ILogger<ArtportalenVerbatimRepository>>();
+            _loggerMock = new Mock<ILogger<HarvestInfoRepository>>();
         }
 
         /// <summary>
@@ -34,12 +34,12 @@ namespace SOS.Process.UnitTests.Repositories.Source
         {
             TestObject.Should().NotBeNull();
 
-            Action create = () => new ArtportalenVerbatimRepository(
+            Action create = () => new HarvestInfoRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
 
-            create = () => new ArtportalenVerbatimRepository(
+            create = () => new HarvestInfoRepository(
                 _processClient.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");

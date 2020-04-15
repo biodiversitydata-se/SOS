@@ -2,6 +2,11 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.0</TargetFramework>
     </PropertyGroup>
+    <ItemGroup>
+      <Compile Remove="Factories\**" />
+      <EmbeddedResource Remove="Factories\**" />
+      <None Remove="Factories\**" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Autofac" Version="5.1.2" />
@@ -20,7 +25,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Factories\" />
       <Folder Include="Properties\" />
     </ItemGroup>
 

@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="JsonConverters\**" />
+    <EmbeddedResource Remove="JsonConverters\**" />
+    <None Remove="JsonConverters\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Hangfire.Core" Version="1.7.10" />
     <PackageReference Include="MailKit" Version="2.6.0" />
     <PackageReference Include="Microsoft.SqlServer.Types" Version="14.0.1016.290" />
@@ -14,10 +20,6 @@
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="ProjNet" Version="2.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="JsonConverters\" />
   </ItemGroup>
 
 </Project>
