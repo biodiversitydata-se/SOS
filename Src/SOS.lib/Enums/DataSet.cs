@@ -11,6 +11,8 @@
         ArtportalenObservations,
         ClamPortalObservations,
         KULObservations,
-        Dwc
+        Dwc,
+        NorsObservations,
+        SersObservations
     }
 }

@@ -28,6 +28,16 @@ namespace SOS.Lib.Configuration.Import
         public KulServiceConfiguration KulServiceConfiguration { get; set; }
 
         /// <summary>
+        /// NORS configuration
+        /// </summary>
+        public NorsServiceConfiguration NorsServiceConfiguration { get; set; }
+
+        /// <summary>
+        /// NORS configuration
+        /// </summary>
+        public SersServiceConfiguration SersServiceConfiguration { get; set; }
+
+        /// <summary>
         /// taxon attribute service configuration
         /// </summary>
         public TaxonAttributeServiceConfiguration TaxonAttributeServiceConfiguration { get; set; }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Verbatim.Kul

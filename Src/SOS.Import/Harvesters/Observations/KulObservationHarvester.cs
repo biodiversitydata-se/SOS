@@ -36,7 +36,7 @@ namespace SOS.Import.Harvesters.Observations
             ILogger<KulObservationHarvester> logger)
         {
             _kulObservationService = kulObservationService ?? throw new ArgumentNullException(nameof(kulObservationService));
-            _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository)); ;
+            _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository));
             _kulServiceConfiguration = kulServiceConfiguration ?? throw new ArgumentNullException(nameof(kulServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }

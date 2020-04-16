@@ -50,6 +50,34 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult RunKulHarvestJob();
 
         /// <summary>
+        /// Add daily harvest of sightings from NORS
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult AddDailyNorsHarvestJob(int hour, int minute);
+
+        /// <summary>
+        /// Run NORS sightings harvest
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunNorsHarvestJob();
+
+        /// <summary>
+        /// Add daily harvest of sightings from SERS
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult AddDailySersHarvestJob(int hour, int minute);
+
+        /// <summary>
+        /// Run SERS sightings harvest
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunSersHarvestJob();
+
+        /// <summary>
         /// Add daily harvest of sightings from species data portal
         /// </summary>
         /// <param name="hour"></param>

@@ -34,44 +34,6 @@ namespace SOS.Administration.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        #region Clam Portal
-        /// <inheritdoc />
-        [HttpPost("ClamPortal/Schedule/Daily")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailyClamPortalHarvestJob([FromQuery]int hour, [FromQuery]int minute)
-        {
-            try
-            {
-                RecurringJob.AddOrUpdate<IClamPortalHarvestJob>(nameof(IClamPortalHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
-                return new OkObjectResult("Clam Portal harvest job added");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Adding clam Portal harvest job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpPost("ClamPortal/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunClamPortalHarvestJob()
-        {
-            try
-            {
-                BackgroundJob.Enqueue<IClamPortalHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Started clam Portal harvest job");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Running clam Portal harvest job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-        #endregion Clam Tree Portal
-
         #region Areas
         /// <inheritdoc />
         [HttpPost("Areas/Schedule/Daily")]
@@ -109,44 +71,6 @@ namespace SOS.Administration.Api.Controllers
             }
         }
         #endregion Geo
-
-        #region KUL
-        /// <inheritdoc />
-        [HttpPost("KUL/Schedule/Daily")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailyKulHarvestJob([FromQuery]int hour, [FromQuery]int minute)
-        {
-            try
-            {
-                RecurringJob.AddOrUpdate<IKulHarvestJob>(nameof(IKulHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
-                return new OkObjectResult("KUL harvest job added");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Adding KUL harvest job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpPost("KUL/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunKulHarvestJob()
-        {
-            try
-            {
-                BackgroundJob.Enqueue<IKulHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Started KUL harvest job");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Running KUL harvest job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-        #endregion KUL
 
         #region Artportalen
         /// <inheritdoc />
@@ -186,6 +110,223 @@ namespace SOS.Administration.Api.Controllers
         }
         #endregion Artportalen
 
+        #region Clam Portal
+        /// <inheritdoc />
+        [HttpPost("ClamPortal/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailyClamPortalHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<IClamPortalHarvestJob>(nameof(IClamPortalHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("Clam Portal harvest job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding clam Portal harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("ClamPortal/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunClamPortalHarvestJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IClamPortalHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
+                return new OkObjectResult("Started clam Portal harvest job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running clam Portal harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        #endregion Clam Tree Portal
+
+        #region DwC-A
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost("DwcArchive/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> RunDwcArchiveHarvestJob([FromForm]UploadDwcArchiveModelDto model)
+        {
+            try
+            {
+                var dataProvider = await _dataProviderManager.TryGetDataProviderAsync(model.DataProviderId);
+                if (dataProvider == null)
+                {
+                    return new BadRequestObjectResult($"No data provider exist with Id={model.DataProviderId}");
+                }
+
+                if (model.DwcaFile.Length == 0)
+                {
+                    return new BadRequestObjectResult("No file content");
+                }
+
+                //var filePath = Path.GetTempFileName();
+                var filePath = System.IO.Path.Combine(Path.GetTempPath(), model.DwcaFile.FileName);
+                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+                await using var stream = new FileStream(filePath, FileMode.Create);
+                await model.DwcaFile.CopyToAsync(stream).ConfigureAwait(false);
+
+                // process uploaded file
+                BackgroundJob.Enqueue<IDwcArchiveHarvestJob>(job => job.RunAsync(dataProvider.Id, filePath, JobCancellationToken.Null));
+                return new OkObjectResult("Started DwC-A harvest job");
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running DwC-A harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        #endregion DwC-A
+
+        #region FieldMapping
+        /// <inheritdoc />
+        [HttpPost("FieldMapping/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunImportFieldMappingJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IFieldMappingImportJob>(job => job.RunAsync());
+                return new OkObjectResult("Started import field mapping job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running import field mapping job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        #endregion FieldMapping
+
+        #region KUL
+        /// <inheritdoc />
+        [HttpPost("KUL/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailyKulHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<IKulHarvestJob>(nameof(IKulHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("KUL harvest job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding KUL harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("KUL/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunKulHarvestJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IKulHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
+                return new OkObjectResult("Started KUL harvest job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running KUL harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        #endregion KUL
+
+        #region NORS
+        /// <inheritdoc />
+        [HttpPost("NORS/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailyNorsHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<IKulHarvestJob>(nameof(INorsHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("NORS harvest job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding NORS harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("NORS/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunNorsHarvestJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<INorsHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
+                return new OkObjectResult("Started NORS harvest job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running NORS harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        #endregion NORS
+
+        #region SERS
+        /// <inheritdoc />
+        [HttpPost("SERS/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailySersHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<ISersHarvestJob>(nameof(ISersHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("SERS harvest job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding SERS harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("SERS/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunSersHarvestJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<ISersHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
+                return new OkObjectResult("Started SERS harvest job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running SERS harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        #endregion SERS
+
         #region Taxon
         /// <inheritdoc />
         [HttpPost("Taxon/Schedule/Daily")]
@@ -224,69 +365,8 @@ namespace SOS.Administration.Api.Controllers
         }
         #endregion Taxon
 
-        #region FieldMapping
-        /// <inheritdoc />
-        [HttpPost("FieldMapping/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunImportFieldMappingJob()
-        {
-            try
-            {
-                BackgroundJob.Enqueue<IFieldMappingImportJob>(job => job.RunAsync());
-                return new OkObjectResult("Started import field mapping job");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Running import field mapping job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-        #endregion FieldMapping
+       
 
-        #region DwC-A
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [HttpPost("DwcArchive/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [IgnoreAntiforgeryToken]
-        public async Task<IActionResult> RunDwcArchiveHarvestJob([FromForm]UploadDwcArchiveModelDto model)
-        {
-            try
-            {
-                var dataProvider = await _dataProviderManager.TryGetDataProviderAsync(model.DataProviderId);
-                if (dataProvider == null)
-                {
-                    return new BadRequestObjectResult($"No data provider exist with Id={model.DataProviderId}");
-                }
 
-                if (model.DwcaFile.Length == 0)
-                {
-                    return new BadRequestObjectResult("No file content");
-                }
-                
-                //var filePath = Path.GetTempFileName();
-                var filePath = System.IO.Path.Combine(Path.GetTempPath(), model.DwcaFile.FileName);
-                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
-                await using var stream = new FileStream(filePath, FileMode.Create);
-                await model.DwcaFile.CopyToAsync(stream).ConfigureAwait(false);
-
-                // process uploaded file
-                BackgroundJob.Enqueue<IDwcArchiveHarvestJob>(job => job.RunAsync(dataProvider.Id, filePath, JobCancellationToken.Null));
-                return new OkObjectResult("Started DwC-A harvest job");
-               
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Running DwC-A harvest job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        #endregion DwC-A
     }
 }

@@ -68,10 +68,7 @@ namespace SOS.Hangfire.JobServer
                     // If Development mode, add secrets stored on developer machine 
                     // (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
                     // In production you should store the secret values as environment variables.
-                    if (_env == "dev" || _env == "local")
-                    {
-                        configuration.AddUserSecrets<Program>();
-                    }
+                    configuration.AddUserSecrets<Program>();
                 })
                 .ConfigureLogging((hostingContext, logging) =>
                 {
