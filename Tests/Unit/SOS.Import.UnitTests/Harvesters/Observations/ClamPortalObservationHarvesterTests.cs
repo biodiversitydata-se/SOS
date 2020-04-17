@@ -20,6 +20,11 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         private readonly Mock<IClamObservationService> _clamObservationServiceMock;
         private readonly Mock<ILogger<ClamPortalObservationHarvester>> _loggerMock;
 
+        private ClamPortalObservationHarvester TestObject => new ClamPortalObservationHarvester(
+            _clamObservationVerbatimRepositoryMock.Object,
+            _clamObservationServiceMock.Object,
+            _loggerMock.Object);
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -36,10 +41,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         [Fact]
         public void ConstructorTest()
         {
-            new ClamPortalObservationHarvester(
-                _clamObservationVerbatimRepositoryMock.Object,
-                _clamObservationServiceMock.Object,
-                _loggerMock.Object).Should().NotBeNull();
+            TestObject.Should().NotBeNull();
 
             Action create = () => new ClamPortalObservationHarvester(
                 null,
@@ -86,12 +88,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamPortalObservationHarvester = new ClamPortalObservationHarvester(
-                _clamObservationVerbatimRepositoryMock.Object,
-                _clamObservationServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await clamPortalObservationHarvester.HarvestClamsAsync(JobCancellationToken.Null);
+            var result = await TestObject.HarvestClamsAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -115,12 +112,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamPortalObservationHarvester = new ClamPortalObservationHarvester(
-                _clamObservationVerbatimRepositoryMock.Object,
-                _clamObservationServiceMock.Object,
-                _loggerMock.Object);
-
-            var result = await clamPortalObservationHarvester.HarvestClamsAsync(JobCancellationToken.Null);
+            var result = await TestObject.HarvestClamsAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

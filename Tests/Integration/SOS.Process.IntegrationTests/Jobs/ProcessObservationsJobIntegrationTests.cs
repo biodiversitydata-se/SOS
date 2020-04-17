@@ -18,6 +18,8 @@ using SOS.Process.Managers;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.Processors.ClamPortal;
 using SOS.Process.Processors.Kul;
+using SOS.Process.Processors.Nors;
+using SOS.Process.Processors.Sers;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Source;
 using Xunit;
@@ -93,6 +95,18 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<KulObservationProcessor>());
+            var norsProcessor = new NorsObservationProcessor(
+                new NorsObservationVerbatimRepository(verbatimClient, new NullLogger<NorsObservationVerbatimRepository>()),
+                areaHelper,
+                processedObservationRepository,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                new NullLogger<NorsObservationProcessor>());
+            var sersProcessor = new SersObservationProcessor(
+                new SersObservationVerbatimRepository(verbatimClient, new NullLogger<SersObservationVerbatimRepository>()),
+                areaHelper,
+                processedObservationRepository,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                new NullLogger<SersObservationProcessor>());
             var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
                 processedObservationRepository,
@@ -114,6 +128,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 harvestInfoRepository,
                 clamPortalProcessor,
                 kulProcessor,
+                norsProcessor,
+                sersProcessor,
                 artportalenProcessor,
                 taxonProcessedRepository,
                 instanceManager,

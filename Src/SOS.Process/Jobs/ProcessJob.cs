@@ -14,6 +14,8 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Nors;
+using SOS.Lib.Models.Verbatim.Sers;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Interfaces;
@@ -31,6 +33,8 @@ namespace SOS.Process.Jobs
         private readonly IArtportalenObservationProcessor _artportalenObservationProcessor;
         private readonly IClamPortalObservationProcessor _clamPortalObservationProcessor;
         private readonly IKulObservationProcessor _kulObservationProcessor;
+        private readonly INorsObservationProcessor _norsObservationProcessor;
+        private readonly ISersObservationProcessor _sersObservationProcessor;
         private readonly IInstanceManager _instanceManager;
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly ICopyFieldMappingsJob _copyFieldMappingsJob;
@@ -46,6 +50,8 @@ namespace SOS.Process.Jobs
         /// <param name="harvestInfoRepository"></param>
         /// <param name="clamPortalObservationProcessor"></param>
         /// <param name="kulObservationProcessor"></param>
+        /// <param name="norsObservationProcessor"></param>
+        /// <param name="sersObservationProcessor"></param>
         /// <param name="artportalenObservationProcessor"></param>
         /// <param name="processedTaxonRepository"></param>
         /// <param name="instanceManager"></param>
@@ -59,6 +65,8 @@ namespace SOS.Process.Jobs
             IHarvestInfoRepository harvestInfoRepository,
             IClamPortalObservationProcessor clamPortalObservationProcessor,
             IKulObservationProcessor kulObservationProcessor,
+            INorsObservationProcessor norsObservationProcessor,
+            ISersObservationProcessor sersObservationProcessor,
             IArtportalenObservationProcessor artportalenObservationProcessor,
             IProcessedTaxonRepository processedTaxonRepository,
             IInstanceManager instanceManager,
@@ -70,6 +78,8 @@ namespace SOS.Process.Jobs
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _clamPortalObservationProcessor = clamPortalObservationProcessor ?? throw new ArgumentNullException(nameof(clamPortalObservationProcessor));
             _kulObservationProcessor = kulObservationProcessor ?? throw new ArgumentNullException(nameof(kulObservationProcessor));
+            _norsObservationProcessor = norsObservationProcessor ?? throw new ArgumentNullException(nameof(norsObservationProcessor));
+            _sersObservationProcessor = sersObservationProcessor ?? throw new ArgumentNullException(nameof(sersObservationProcessor));
             _artportalenObservationProcessor = artportalenObservationProcessor ?? throw new ArgumentNullException(nameof(artportalenObservationProcessor));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
             _copyFieldMappingsJob = copyFieldMappingsJob ?? throw new ArgumentNullException(nameof(copyFieldMappingsJob));
@@ -150,7 +160,7 @@ namespace SOS.Process.Jobs
                     {nameof(Area), DataSet.Areas},
                     {nameof(ProcessedTaxon), DataSet.Taxa}
                 });
-               
+
                 // Add Artportalen import if first bit is set
                 if ((sources & (int)ObservationProvider.Artportalen) > 0)
                 {
@@ -175,7 +185,7 @@ namespace SOS.Process.Jobs
                         metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
                     providersInfo.Add(ObservationProvider.ClamPortal, providerInfo);
                 }
-                
+
                 if ((sources & (int)ObservationProvider.KUL) > 0)
                 {
                     processTasks.Add(ObservationProvider.KUL, _kulObservationProcessor.ProcessAsync(taxonById, cancellationToken));
@@ -187,11 +197,35 @@ namespace SOS.Process.Jobs
                         metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
                     providersInfo.Add(ObservationProvider.KUL, providerInfo);
                 }
-                
+
+                if ((sources & (int)ObservationProvider.NORS) > 0)
+                {
+                    processTasks.Add(ObservationProvider.NORS, _norsObservationProcessor.ProcessAsync(taxonById, cancellationToken));
+
+                    // Get harvest info and create a provider info object  that we can add processing info to later
+                    var harvestInfo = await GetHarvestInfoAsync(nameof(NorsObservationVerbatim));
+                    var providerInfo = CreateProviderInfo(DataSet.NorsObservations, harvestInfo, start);
+                    providerInfo.MetadataInfo =
+                        metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
+                    providersInfo.Add(ObservationProvider.NORS, providerInfo);
+                }
+
+                if ((sources & (int)ObservationProvider.SERS) > 0)
+                {
+                    processTasks.Add(ObservationProvider.SERS, _sersObservationProcessor.ProcessAsync(taxonById, cancellationToken));
+
+                    // Get harvest info and create a provider info object  that we can add processing info to later
+                    var harvestInfo = await GetHarvestInfoAsync(nameof(SersObservationVerbatim));
+                    var providerInfo = CreateProviderInfo(DataSet.SersObservations, harvestInfo, start);
+                    providerInfo.MetadataInfo =
+                        metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
+                    providersInfo.Add(ObservationProvider.SERS, providerInfo);
+                }
+
                 // Run all tasks async
                 await Task.WhenAll(processTasks.Values);
 
-               var success = processTasks.Values.All(t => t.Result.Status == RunStatus.Success);
+                var success = processTasks.Values.All(t => t.Result.Status == RunStatus.Success);
 
                 // Update provider info from process result
                 foreach (var task in processTasks)
@@ -210,15 +244,15 @@ namespace SOS.Process.Jobs
                 _logger.LogDebug("Finish updating process info for observations");
 
                 // If some task/s failed and it was not Artportalen, Try to copy provider data from active instance
-                if (!success 
-                    && copyFromActiveOnFail 
-                    && processTasks.ContainsKey(ObservationProvider.Artportalen) 
+                if (!success
+                    && copyFromActiveOnFail
+                    && processTasks.ContainsKey(ObservationProvider.Artportalen)
                     && processTasks[ObservationProvider.Artportalen].Result.Status == RunStatus.Success)
                 {
                     var copyTasks = processTasks
                         .Where(t => t.Value.Result.Status == RunStatus.Failed)
                         .Select(t => _instanceManager.CopyProviderDataAsync(t.Key)).ToArray();
-                    
+
                     await Task.WhenAll(copyTasks);
 
                     success = copyTasks.All(t => t.Result);

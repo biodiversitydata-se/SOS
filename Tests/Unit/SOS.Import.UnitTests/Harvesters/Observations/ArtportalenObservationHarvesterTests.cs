@@ -5,7 +5,6 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters.Observations;
 using SOS.Import.Repositories.Destination.Artportalen;
@@ -36,6 +35,19 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         private readonly Mock<SpeciesCollectionItemRepository> _speciesCollectionItemRepository;
         private readonly Mock<ILogger<ArtportalenObservationHarvester>> _loggerMock;
 
+        private ArtportalenObservationHarvester TestObject => new ArtportalenObservationHarvester(
+            _artportalenConfiguration,
+            _metadataRepositoryMock.Object,
+            _projectRepositoryMock.Object,
+            _sightingRepositoryMock.Object,
+            _siteRepositoryMockMock.Object,
+            _sightingVerbatimRepository.Object,
+            _personRepository.Object,
+            _organizationRepository.Object,
+            _sightingRelationRepository.Object,
+            _speciesCollectionItemRepository.Object,
+            _loggerMock.Object);
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -60,18 +72,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         [Fact]
         public void ConstructorTest()
         {
-            new ArtportalenObservationHarvester(
-                _artportalenConfiguration,
-                _metadataRepositoryMock.Object,
-                _projectRepositoryMock.Object,
-                _sightingRepositoryMock.Object,
-                _siteRepositoryMockMock.Object,
-                _sightingVerbatimRepository.Object,
-                _personRepository.Object,
-                _organizationRepository.Object, 
-                _sightingRelationRepository.Object, 
-                _speciesCollectionItemRepository.Object,
-                _loggerMock.Object).Should().NotBeNull();
+           TestObject.Should().NotBeNull();
 
             Action create = () => new ArtportalenObservationHarvester(
                 null,
@@ -206,20 +207,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenObservationHarvester = new ArtportalenObservationHarvester(
-                _artportalenConfiguration,
-                _metadataRepositoryMock.Object,
-                _projectRepositoryMock.Object,
-                _sightingRepositoryMock.Object,
-                _siteRepositoryMockMock.Object,
-                _sightingVerbatimRepository.Object,
-                _personRepository.Object,
-                _organizationRepository.Object,
-                _sightingRelationRepository.Object,
-                _speciesCollectionItemRepository.Object,
-                _loggerMock.Object);
-
-            var result = await artportalenObservationHarvester.HarvestSightingsAsync(JobCancellationToken.Null);
+            var result = await TestObject.HarvestSightingsAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -242,20 +230,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var artportalenObservationHarvester = new ArtportalenObservationHarvester(
-                _artportalenConfiguration,
-                _metadataRepositoryMock.Object,
-                _projectRepositoryMock.Object,
-                _sightingRepositoryMock.Object,
-                _siteRepositoryMockMock.Object,
-                _sightingVerbatimRepository.Object,
-                _personRepository.Object,
-                _organizationRepository.Object,
-                _sightingRelationRepository.Object,
-                _speciesCollectionItemRepository.Object,
-                _loggerMock.Object);
-
-            var result = await artportalenObservationHarvester.HarvestSightingsAsync(JobCancellationToken.Null);
+            var result = await TestObject.HarvestSightingsAsync(JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MongoDB.Bson;
-using MongoDB.Driver.GeoJsonObjectModel;
 using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;

@@ -10,6 +10,10 @@ using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Models.Verbatim.ClamPortal;
+using SOS.Lib.Models.Verbatim.Kul;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
 using SOS.Process.Managers.Interfaces;
@@ -33,6 +37,8 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IProcessTaxaJob> _processTaxaJob;
         private readonly Mock<IClamPortalObservationProcessor> _clamPortalProcessor;
         private readonly Mock<IKulObservationProcessor> _kulProcessor;
+        private readonly Mock<INorsObservationProcessor> _norsProcessor;
+        private readonly Mock<ISersObservationProcessor> _sersProcessor;
         private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
         private readonly Mock<IProcessedTaxonRepository> _taxonProcessedRepository;
         private readonly Mock<IAreaHelper> _areaHelper;
@@ -44,6 +50,8 @@ namespace SOS.Process.UnitTests.Jobs
             _harvestInfoRepository.Object,
             _clamPortalProcessor.Object,
             _kulProcessor.Object,
+            _norsProcessor.Object,
+            _sersProcessor.Object,
             _artportalenProcessor.Object,
             _taxonProcessedRepository.Object,
             _instanceManager.Object,
@@ -66,6 +74,8 @@ namespace SOS.Process.UnitTests.Jobs
             _processTaxaJob = new Mock<IProcessTaxaJob>();
             _clamPortalProcessor = new Mock<IClamPortalObservationProcessor>();
             _kulProcessor = new Mock<IKulObservationProcessor>();
+            _norsProcessor = new Mock<INorsObservationProcessor>();
+            _sersProcessor = new Mock<ISersObservationProcessor>();
             _artportalenProcessor = new Mock<IArtportalenObservationProcessor>();
             _taxonProcessedRepository = new Mock<IProcessedTaxonRepository>();
             _areaHelper = new Mock<IAreaHelper>();
@@ -86,6 +96,8 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessor.Object,
                 _kulProcessor.Object,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -93,7 +105,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("darwinCoreRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
 
             create = () => new ProcessJob(
                 _darwinCoreRepository.Object,
@@ -101,6 +113,8 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessor.Object,
                 _kulProcessor.Object,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -116,21 +130,8 @@ namespace SOS.Process.UnitTests.Jobs
                 null,
                 _clamPortalProcessor.Object,
                 _kulProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
-
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -146,6 +147,8 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 null,
                 _kulProcessor.Object,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -161,6 +164,8 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessor.Object,
                 null,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -177,13 +182,15 @@ namespace SOS.Process.UnitTests.Jobs
                 _clamPortalProcessor.Object,
                 _kulProcessor.Object,
                 null,
+                _sersProcessor.Object,
+                _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
                 _copyFieldMappingsJob.Object,
                 _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenProcessFactory");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("norsObservationProcessor");
 
             create = () => new ProcessJob(
                 _darwinCoreRepository.Object,
@@ -191,6 +198,42 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessor.Object,
                 _kulProcessor.Object,
+                _norsProcessor.Object,
+                null,
+                _artportalenProcessor.Object,
+                _taxonProcessedRepository.Object,
+                _instanceManager.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
+                _areaHelper.Object,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sersObservationProcessor");
+
+            create = () => new ProcessJob(
+                _darwinCoreRepository.Object,
+                _processInfoRepository.Object,
+                _harvestInfoRepository.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
+                null,
+                _taxonProcessedRepository.Object,
+                _instanceManager.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
+                _areaHelper.Object,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenObservationProcessor");
+
+            create = () => new ProcessJob(
+                _darwinCoreRepository.Object,
+                _processInfoRepository.Object,
+                _harvestInfoRepository.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
                 _artportalenProcessor.Object,
                 null,
                 _instanceManager.Object,
@@ -198,7 +241,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("taxonProcessedRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedTaxonRepository");
 
             create = () => new ProcessJob(
                 _darwinCoreRepository.Object,
@@ -206,6 +249,8 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessor.Object,
                 _kulProcessor.Object,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 null,
@@ -213,7 +258,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _processTaxaJob.Object,
                 _areaHelper.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("instanceFactory");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("instanceManager");
 
             create = () => new ProcessJob(
                 _darwinCoreRepository.Object,
@@ -221,6 +266,8 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessor.Object,
                 _kulProcessor.Object,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -236,6 +283,8 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessor.Object,
                 _kulProcessor.Object,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -250,7 +299,9 @@ namespace SOS.Process.UnitTests.Jobs
                 _processInfoRepository.Object,
                 _harvestInfoRepository.Object,
                 _clamPortalProcessor.Object,
-                _kulProcessor.Object,
+                _kulProcessor.Object, 
+                _norsProcessor.Object,
+                _sersProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -266,6 +317,8 @@ namespace SOS.Process.UnitTests.Jobs
                 _harvestInfoRepository.Object,
                 _clamPortalProcessor.Object,
                 _kulProcessor.Object,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -286,6 +339,11 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            _copyFieldMappingsJob.Setup(r => r.RunAsync())
+                .ReturnsAsync(true);
+            _processTaxaJob.Setup(r => r.RunAsync())
+                .ReturnsAsync(true);
+
             _taxonProcessedRepository.Setup(r => r.GetAllAsync())
                 .ReturnsAsync(new List<ProcessedTaxon>
                 {
@@ -294,12 +352,19 @@ namespace SOS.Process.UnitTests.Jobs
 
             _darwinCoreRepository.Setup(r => r.VerifyCollectionAsync());
 
+
+            _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenVerbatimObservation)))
+                .ReturnsAsync(new HarvestInfo(nameof(ArtportalenVerbatimObservation), DataSet.ArtportalenObservations, DateTime.Now));
             _artportalenProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(ObservationProvider.Artportalen, DateTime.Now, DateTime.Now, 1));
 
+            _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ClamObservationVerbatim)))
+                .ReturnsAsync(new HarvestInfo(nameof(ClamObservationVerbatim), DataSet.ClamPortalObservations, DateTime.Now));
             _clamPortalProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(ObservationProvider.ClamPortal, DateTime.Now, DateTime.Now, 1));
 
+            _harvestInfoRepository.Setup(r => r.GetAsync(nameof(KulObservationVerbatim)))
+                .ReturnsAsync(new HarvestInfo(nameof(KulObservationVerbatim), DataSet.KULObservations, DateTime.Now));
             _kulProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(ObservationProvider.KUL, DateTime.Now, DateTime.Now, 1));
 

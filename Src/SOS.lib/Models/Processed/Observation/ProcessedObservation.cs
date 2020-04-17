@@ -193,6 +193,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public ProcessedOccurrence Occurrence { get; set; }
 
         /// <summary>
+        /// A particular organism or defined group of organisms considered to be taxonomically homogeneous.
+        /// </summary>
+      /*  [Object]
+        public ProcessedOrganism Organism { get; set; }
+        */
+        /// <summary>
         /// The name (or acronym) in use by the institution having
         /// ownership of the object(s) or information referred
         /// to in the record.

@@ -19,6 +19,11 @@ namespace SOS.Import.UnitTests.Services
         private readonly ClamServiceConfiguration _clamServiceConfiguration;
         private readonly Mock<ILogger<ClamObservationService>> _loggerMock;
 
+        private ClamObservationService TestObject => new ClamObservationService(
+            _httpClientService.Object,
+            _clamServiceConfiguration,
+            _loggerMock.Object);
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -35,10 +40,7 @@ namespace SOS.Import.UnitTests.Services
         [Fact]
         public void ConstructorTest()
         {
-            new ClamObservationService(
-                _httpClientService.Object,
-                _clamServiceConfiguration,
-                _loggerMock.Object).Should().NotBeNull();
+            TestObject.Should().NotBeNull();
 
             Action create = () => new ClamObservationService(
                 null,
@@ -78,12 +80,7 @@ namespace SOS.Import.UnitTests.Services
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamObservationService = new ClamObservationService(
-                _httpClientService.Object,
-                _clamServiceConfiguration,
-                _loggerMock.Object);
-
-            var result = await clamObservationService.GetClamObservationsAsync();
+            var result = await TestObject.GetClamObservationsAsync();
           
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -103,16 +100,10 @@ namespace SOS.Import.UnitTests.Services
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
 
-
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var clamObservationService = new ClamObservationService(
-                _httpClientService.Object,
-                _clamServiceConfiguration,
-                _loggerMock.Object);
-
-            var result = await clamObservationService.GetClamObservationsAsync();
+            var result = await TestObject.GetClamObservationsAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

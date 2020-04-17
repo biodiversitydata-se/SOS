@@ -21,6 +21,11 @@ namespace SOS.Import.UnitTests.Services
         private readonly TaxonServiceConfiguration _taxonServiceConfiguration;
         private readonly Mock<ILogger<TaxonService>> _loggerMock;
 
+        private TaxonService TestObject => new TaxonService(
+            _taxonServiceProxyMock.Object,
+            _taxonServiceConfiguration,
+            _loggerMock.Object);
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -37,10 +42,7 @@ namespace SOS.Import.UnitTests.Services
         [Fact]
         public void ConstructorTest()
         {
-            new TaxonService(
-                _taxonServiceProxyMock.Object, 
-                _taxonServiceConfiguration,
-                _loggerMock.Object).Should().NotBeNull();
+            TestObject.Should().NotBeNull();
 
             Action create = () => new TaxonService(
                 _taxonServiceProxyMock.Object,
@@ -70,12 +72,7 @@ namespace SOS.Import.UnitTests.Services
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var TaxonService = new TaxonService(
-                _taxonServiceProxyMock.Object, 
-                _taxonServiceConfiguration,
-                _loggerMock.Object);
-
-            var result = await TaxonService.GetTaxaAsync();
+            var result = await TestObject.GetTaxaAsync();
           
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -99,12 +96,7 @@ namespace SOS.Import.UnitTests.Services
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var TaxonService = new TaxonService(
-                _taxonServiceProxyMock.Object, 
-                new TaxonServiceConfiguration{BaseAddress = "Tom"}, 
-                _loggerMock.Object);
-
-            var result = await TaxonService.GetTaxaAsync();
+            var result = await TestObject.GetTaxaAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

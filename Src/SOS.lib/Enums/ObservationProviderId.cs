@@ -7,6 +7,8 @@
     {
         Artportalen = 1,
         ClamPortal = 2,
-        KUL = 4
+        KUL = 4,
+        NORS = 8,
+        SERS = 16
     }
 }

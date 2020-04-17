@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Threading.Tasks;
 using FluentAssertions;
-using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Jobs;
-using SOS.Import.Repositories.Destination.Interfaces;
-using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
-using SOS.Lib.Models.Verbatim.Shared;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Managers
@@ -21,8 +15,9 @@ namespace SOS.Import.UnitTests.Managers
         private readonly Mock<IArtportalenHarvestJob> _artportalenHarvestJobMock;
         private readonly Mock<IClamPortalHarvestJob> _clamPortalHarvestJobMock;
         private readonly Mock<IKulHarvestJob> _kulHarvestJobMock;
+        private readonly Mock<INorsHarvestJob> _norsHarvestJobMock;
+        private readonly Mock<ISersHarvestJob> _sersHarvestJobMock;
         private readonly Mock<ILogger<ObservationsHarvestJob>> _loggerMock;
-
 
         private ObservationsHarvestJob TestObject => new ObservationsHarvestJob(
             _taxonHarvestJobMock.Object,
@@ -30,6 +25,8 @@ namespace SOS.Import.UnitTests.Managers
             _artportalenHarvestJobMock.Object,
             _clamPortalHarvestJobMock.Object,
             _kulHarvestJobMock.Object,
+            _norsHarvestJobMock.Object,
+            _sersHarvestJobMock.Object,
             _loggerMock.Object);
 
         /// <summary>
@@ -59,6 +56,8 @@ namespace SOS.Import.UnitTests.Managers
                _artportalenHarvestJobMock.Object,
                _clamPortalHarvestJobMock.Object,
                _kulHarvestJobMock.Object,
+               _norsHarvestJobMock.Object,
+               _sersHarvestJobMock.Object,
                _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("taxonHarvestJob");
 
@@ -68,6 +67,8 @@ namespace SOS.Import.UnitTests.Managers
                 _artportalenHarvestJobMock.Object,
                 _clamPortalHarvestJobMock.Object,
                 _kulHarvestJobMock.Object,
+                _norsHarvestJobMock.Object,
+                _sersHarvestJobMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("fieldMappingImportJob");
 
@@ -77,6 +78,8 @@ namespace SOS.Import.UnitTests.Managers
                null,
                 _clamPortalHarvestJobMock.Object,
                 _kulHarvestJobMock.Object,
+                _norsHarvestJobMock.Object,
+                _sersHarvestJobMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenHarvestJob");
 
@@ -86,6 +89,8 @@ namespace SOS.Import.UnitTests.Managers
                 _artportalenHarvestJobMock.Object,
                 null,
                 _kulHarvestJobMock.Object,
+                _norsHarvestJobMock.Object,
+                _sersHarvestJobMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamPortalHarvestJob");
 
@@ -95,6 +100,8 @@ namespace SOS.Import.UnitTests.Managers
                 _artportalenHarvestJobMock.Object,
                 _clamPortalHarvestJobMock.Object,
                 null,
+                _norsHarvestJobMock.Object,
+                _sersHarvestJobMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("kulHarvestJob");
 
@@ -104,6 +111,30 @@ namespace SOS.Import.UnitTests.Managers
                 _artportalenHarvestJobMock.Object,
                 _clamPortalHarvestJobMock.Object,
                 _kulHarvestJobMock.Object,
+               null,
+                _sersHarvestJobMock.Object,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("norsHarvestJob");
+
+            create = () => new ObservationsHarvestJob(
+                _taxonHarvestJobMock.Object,
+                _fieldMappingImportJobMock.Object,
+                _artportalenHarvestJobMock.Object,
+                _clamPortalHarvestJobMock.Object,
+                _kulHarvestJobMock.Object,
+                _norsHarvestJobMock.Object,
+               null,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sersHarvestJob");
+
+            create = () => new ObservationsHarvestJob(
+                _taxonHarvestJobMock.Object,
+                _fieldMappingImportJobMock.Object,
+                _artportalenHarvestJobMock.Object,
+                _clamPortalHarvestJobMock.Object,
+                _kulHarvestJobMock.Object,
+                _norsHarvestJobMock.Object,
+                _sersHarvestJobMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }

@@ -77,7 +77,7 @@ namespace SOS.Process.Jobs
             {
                 var processInfo = await GetProcessInfoAsync(id.Key);
 
-                if (processInfo != null)
+                if (processInfo?.ProvidersInfo != null)
                 {
                     providerInfo.Add(processInfo.ProvidersInfo?.FirstOrDefault(p=> p.Provider == id.Value));
                 }
