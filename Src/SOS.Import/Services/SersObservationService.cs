@@ -9,6 +9,7 @@ namespace SOS.Import.Services
 {
     public class SersObservationService : Interfaces.ISersObservationService
     {
+        private readonly ISpeciesObservationChangeService _speciesObservationChangeServiceClient;
         private readonly SersServiceConfiguration _sersServiceConfiguration;
         private readonly ILogger<SersObservationService> _logger;
 
@@ -17,17 +18,20 @@ namespace SOS.Import.Services
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="sersServiceConfiguration"></param>
-        public SersObservationService(ILogger<SersObservationService> logger, SersServiceConfiguration sersServiceConfiguration)
+        public SersObservationService(
+            ISpeciesObservationChangeService speciesObservationChangeServiceClient,
+            SersServiceConfiguration sersServiceConfiguration,
+            ILogger<SersObservationService> logger)
         {
-            _logger = logger;
-            _sersServiceConfiguration = sersServiceConfiguration;
+            _speciesObservationChangeServiceClient = speciesObservationChangeServiceClient ?? throw new ArgumentNullException(nameof(speciesObservationChangeServiceClient));
+            _sersServiceConfiguration = sersServiceConfiguration ?? throw new ArgumentNullException(nameof(sersServiceConfiguration));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
         public async Task<IEnumerable<SersService.WebSpeciesObservation>> GetAsync(int getFromId)
         {
-            var client = new SpeciesObservationChangeServiceClient();
-            var result = await client.GetSpeciesObservationChangeAsSpeciesAsync(
+            var result = await _speciesObservationChangeServiceClient.GetSpeciesObservationChangeAsSpeciesAsync(
                 _sersServiceConfiguration.Token,
                 DateTime.MinValue, 
                 false,
@@ -37,7 +41,7 @@ namespace SOS.Import.Services
                 true,
                 _sersServiceConfiguration.MaxReturnedChangesInOnePage);
 
-            _logger.LogDebug($"Getting (max { _sersServiceConfiguration.MaxReturnedChangesInOnePage }) observations from SERS Service: From id: { getFromId }, Created: {result.CreatedSpeciesObservations.Length}, Updated: {result.UpdatedSpeciesObservations.Length}, Deleted: {result.DeletedSpeciesObservationGuids.Length}");
+            _logger.LogDebug($"Getting (max { _sersServiceConfiguration.MaxReturnedChangesInOnePage }) observations from SERS Service: From id: { getFromId }, Created: {result.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result.DeletedSpeciesObservationGuids?.Length ?? 0}");
 
             return result.CreatedSpeciesObservations;
         }

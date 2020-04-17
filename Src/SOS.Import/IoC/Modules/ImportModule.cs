@@ -145,7 +145,11 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<TaxonServiceProxy>().As<ITaxonServiceProxy>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonService>().As<ITaxonService>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonAttributeService>().As<ITaxonAttributeService>().InstancePerLifetimeScope();
-            
+
+            // Service Clients
+            builder.RegisterType<KulService.SpeciesObservationChangeServiceClient>().As<KulService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
+            builder.RegisterType<NorsService.SpeciesObservationChangeServiceClient>().As<NorsService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
+            builder.RegisterType<SersService.SpeciesObservationChangeServiceClient>().As<SersService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ArtportalenHarvestJob>().As<IArtportalenHarvestJob>().InstancePerLifetimeScope();

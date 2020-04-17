@@ -9,19 +9,29 @@ namespace SOS.Import.Services
 {
     public class KulObservationService : Interfaces.IKulObservationService
     {
+        private readonly ISpeciesObservationChangeService _speciesObservationChangeServiceClient;
         private readonly KulServiceConfiguration _kulServiceConfiguration;
         private readonly ILogger<KulObservationService> _logger;
 
-        public KulObservationService(ILogger<KulObservationService> logger, KulServiceConfiguration kulServiceConfiguration)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="speciesObservationChangeServiceClient"></param>
+        /// <param name="kulServiceConfiguration"></param>
+        /// <param name="logger"></param>
+        public KulObservationService(
+            ISpeciesObservationChangeService speciesObservationChangeServiceClient,
+            KulServiceConfiguration kulServiceConfiguration, 
+            ILogger<KulObservationService> logger)
         {
-            _logger = logger;
-            _kulServiceConfiguration = kulServiceConfiguration;
+            _speciesObservationChangeServiceClient = speciesObservationChangeServiceClient ?? throw new ArgumentNullException(nameof(speciesObservationChangeServiceClient));
+            _kulServiceConfiguration = kulServiceConfiguration ?? throw new ArgumentNullException(nameof(kulServiceConfiguration));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<IEnumerable<KulService.WebSpeciesObservation>> GetAsync(DateTime changedFrom, DateTime changedTo)
+        public async Task<IEnumerable<WebSpeciesObservation>> GetAsync(DateTime changedFrom, DateTime changedTo)
         {
-            KulService.SpeciesObservationChangeServiceClient client = new SpeciesObservationChangeServiceClient();
-            var result = await client.GetSpeciesObservationChangeAsSpeciesAsync(
+            var result = await _speciesObservationChangeServiceClient.GetSpeciesObservationChangeAsSpeciesAsync(
                 _kulServiceConfiguration.Token,
                 changedFrom,
                 true,
@@ -31,7 +41,7 @@ namespace SOS.Import.Services
                 false,
                 _kulServiceConfiguration.MaxReturnedChangesInOnePage);
 
-            _logger.LogDebug($"Getting observations from KUL Service: ChangedFrom: {changedFrom.ToShortDateString()}, ChangedTo: {changedTo.ToShortDateString()}, Created: {result.CreatedSpeciesObservations.Length}, Updated: {result.UpdatedSpeciesObservations.Length}, Deleted: {result.DeletedSpeciesObservationGuids.Length}");
+            _logger.LogDebug($"Getting observations from KUL Service: ChangedFrom: {changedFrom.ToShortDateString()}, ChangedTo: {changedTo.ToShortDateString()}, Created: {result.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result.DeletedSpeciesObservationGuids?.Length ?? 0}");
 
             return result.CreatedSpeciesObservations;
         }
