@@ -2,7 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using KulService;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Import.Services;
 using Xunit;
@@ -20,8 +22,9 @@ namespace SOS.Import.IntegrationTests.Services
             //-----------------------------------------------------------------------------------------------------------
             var importConfiguration = GetImportConfiguration();
             var kulObservationService = new KulObservationService(
-                new Mock<ILogger<KulObservationService>>().Object, 
-                importConfiguration.KulServiceConfiguration);
+                new SpeciesObservationChangeServiceClient(),
+                importConfiguration.KulServiceConfiguration,
+                new NullLogger<KulObservationService>());
             var changedFrom = new DateTime(2015,1,1);
             var changedTo = changedFrom.AddYears(1);
 

@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
+using KulService;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Import.Harvesters.Observations;
 using SOS.Import.MongoDb;
@@ -28,8 +30,9 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
 
             var kulObservationService = new KulObservationService(
-                new Mock<ILogger<KulObservationService>>().Object, 
-                importConfiguration.KulServiceConfiguration);
+                new SpeciesObservationChangeServiceClient(),
+                importConfiguration.KulServiceConfiguration,
+                new NullLogger<KulObservationService>());
             
             var kulObservationVerbatimRepository = new KulObservationVerbatimRepository(
                 new ImportClient(
@@ -38,11 +41,11 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                     importConfiguration.VerbatimDbConfiguration.BatchSize), 
                 new Mock<ILogger<KulObservationVerbatimRepository>>().Object);
 
-        var kulObservationHarvester = new KulObservationHarvester(
-                kulObservationService,
-                kulObservationVerbatimRepository, 
-                importConfiguration.KulServiceConfiguration,
-                new Mock<ILogger<KulObservationHarvester>>().Object);
+            var kulObservationHarvester = new KulObservationHarvester(
+                    kulObservationService,
+                    kulObservationVerbatimRepository, 
+                    importConfiguration.KulServiceConfiguration,
+                    new Mock<ILogger<KulObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -68,9 +71,10 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
            
             var kulObservationHarvester = new KulObservationHarvester(
                 new KulObservationService(
-                    new Mock<ILogger<KulObservationService>>().Object,
-                    importConfiguration.KulServiceConfiguration),
-                new Mock<IKulObservationVerbatimRepository>().Object,
+                new SpeciesObservationChangeServiceClient(),
+                importConfiguration.KulServiceConfiguration,
+                new NullLogger<KulObservationService>()),
+            new Mock<IKulObservationVerbatimRepository>().Object,
                 importConfiguration.KulServiceConfiguration,
                 new Mock<ILogger<KulObservationHarvester>>().Object);
 
