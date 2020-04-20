@@ -18,6 +18,17 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="skip">Start index of returned observations</param>
         /// <param name="take">End index of returned observations</param>
         /// <returns>List of matching observations</returns>
+        /// <example>
+        /// Get all observations within 100m of provided point
+        /// "geometryFilter": {
+        /// "maxDistanceFromPoint": 100,
+        /// "geometry": {
+        ///         "coordinates": [ 12.3456(lon), 78.9101112(lat) ],
+        ///         "type": "Point"
+        ///     },
+        ///     "usePointAccuracy": false
+        /// }
+        /// </example>
         Task<IActionResult> GetChunkAsync(SearchFilter filter, int skip, int take);
 
         /// <summary>

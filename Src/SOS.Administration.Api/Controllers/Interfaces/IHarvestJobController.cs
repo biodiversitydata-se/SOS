@@ -50,6 +50,20 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult RunKulHarvestJob();
 
         /// <summary>
+        /// Add daily harvest of sightings from MVM
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult AddDailyMvmHarvestJob(int hour, int minute);
+
+        /// <summary>
+        /// Run MVM sightings harvest
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunMvmHarvestJob();
+
+        /// <summary>
         /// Add daily harvest of sightings from NORS
         /// </summary>
         /// <param name="hour"></param>

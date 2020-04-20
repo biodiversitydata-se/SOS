@@ -55,11 +55,11 @@ namespace SOS.Observations.Api.Repositories
                         .Filter(query))));
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
-
             return new PagedResult<dynamic>
             {
                 Records = searchResponse.Documents,
-                //Records = searchResponse.Hits,
+                Skip = skip,
+                Take = take,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
         }

@@ -25,6 +25,8 @@ using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Destination.Kul;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
+using SOS.Import.Repositories.Destination.Mvm;
+using SOS.Import.Repositories.Destination.Mvm.Interfaces;
 using SOS.Import.Repositories.Destination.Nors;
 using SOS.Import.Repositories.Destination.Nors.Interfaces;
 using SOS.Import.Repositories.Destination.Sers;
@@ -51,6 +53,8 @@ namespace SOS.Import.IoC.Modules
                 builder.RegisterInstance(Configuration.ClamServiceConfiguration).As<ClamServiceConfiguration>().SingleInstance();
             if (Configuration.KulServiceConfiguration != null)
                 builder.RegisterInstance(Configuration.KulServiceConfiguration).As<KulServiceConfiguration>().SingleInstance();
+            if (Configuration.MvmServiceConfiguration != null)
+                builder.RegisterInstance(Configuration.MvmServiceConfiguration).As<MvmServiceConfiguration>().SingleInstance();
             if (Configuration.NorsServiceConfiguration != null)
                 builder.RegisterInstance(Configuration.NorsServiceConfiguration).As<NorsServiceConfiguration>().SingleInstance();
             if (Configuration.SersServiceConfiguration != null)
@@ -97,6 +101,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationVerbatimRepository>().As<IKulObservationVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<MvmObservationVerbatimRepository>().As<IMvmObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationVerbatimRepository>().As<INorsObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationVerbatimRepository>().As<ISersObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingVerbatimRepository>().As<ISightingVerbatimRepository>().InstancePerLifetimeScope();
@@ -110,6 +115,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<DwcObservationHarvester>().As<IDwcObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingHarvester>().As<IFieldMappingHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationHarvester>().As<IKulObservationHarvester>().InstancePerLifetimeScope();
+            builder.RegisterType<MvmObservationHarvester>().As<IMvmObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationHarvester>().As<INorsObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationHarvester>().As<ISersObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonHarvester>().As<ITaxonHarvester>().InstancePerLifetimeScope();
@@ -140,6 +146,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<ClamObservationService>().As<IClamObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<HttpClientService>().As<IHttpClientService>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationService>().As<IKulObservationService>().InstancePerLifetimeScope();
+            builder.RegisterType<MvmObservationService>().As<IMvmObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationService>().As<INorsObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationService>().As<ISersObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonServiceProxy>().As<ITaxonServiceProxy>().InstancePerLifetimeScope();
@@ -148,6 +155,7 @@ namespace SOS.Import.IoC.Modules
 
             // Service Clients
             builder.RegisterType<KulService.SpeciesObservationChangeServiceClient>().As<KulService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
+            builder.RegisterType<MvmService.SpeciesObservationChangeServiceClient>().As<MvmService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
             builder.RegisterType<NorsService.SpeciesObservationChangeServiceClient>().As<NorsService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
             builder.RegisterType<SersService.SpeciesObservationChangeServiceClient>().As<SersService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
 
@@ -158,7 +166,8 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<FieldMappingImportJob>().As<IFieldMappingImportJob>().InstancePerLifetimeScope();
             builder.RegisterType<GeoAreasHarvestJob>().As<IGeoAreasHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<KulHarvestJob>().As<IKulHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<NorsHarvestJob>().As<INorsHarvestJob>().InstancePerLifetimeScope(); 
+            builder.RegisterType<MvmHarvestJob>().As<IMvmHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<NorsHarvestJob>().As<INorsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<SersHarvestJob>().As<ISersHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationsHarvestJob>().As<IObservationsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonHarvestJob>().As<ITaxonHarvestJob>().InstancePerLifetimeScope();

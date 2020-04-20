@@ -30,6 +30,11 @@ namespace SOS.Lib.Configuration.Import
         /// <summary>
         /// NORS configuration
         /// </summary>
+        public MvmServiceConfiguration MvmServiceConfiguration { get; set; }
+
+        /// <summary>
+        /// NORS configuration
+        /// </summary>
         public NorsServiceConfiguration NorsServiceConfiguration { get; set; }
 
         /// <summary>
