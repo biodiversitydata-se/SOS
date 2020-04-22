@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Models.Shared;
 
@@ -20,12 +21,25 @@ namespace SOS.Lib.Models.Search
         /// If point and accuracy is greater tha 0, sightings inside circle (center point + buffer (accuracy)) will be returned
         /// If polygon, sightings inside polygon will be returned
         /// </summary>
-        public InputGeometry Geometry { get; set; }
+        public IEnumerable<InputGeometry> Geometries { get; set; }
 
-        public bool IsValid => (Geometry?.IsValid ?? false) && 
-                               (Geometry.Type.Equals("Point", StringComparison.CurrentCultureIgnoreCase) && MaxDistanceFromPoint > 0.0 ||
-                                new []{ "polygon", "multipolygon"}.Contains(Geometry.Type.ToLower()) && MaxDistanceFromPoint >= 0.0);
-
+        public bool IsValid
+        {
+            get
+            {
+                foreach (var geom in Geometries)
+                {
+                     var valid =  (geom?.IsValid ?? false) &&
+                                  (geom.Type.Equals("Point", StringComparison.CurrentCultureIgnoreCase) && MaxDistanceFromPoint > 0.0 ||
+                                   new[] { "polygon", "multipolygon" }.Contains(geom.Type.ToLower()) && MaxDistanceFromPoint >= 0.0);
+                    if (!valid)
+                    {
+                        return valid;
+                    }
+                }
+                return true;
+            }
+        }
         /// <summary>
         /// If true, use Point accuracy when searching
         /// </summary>

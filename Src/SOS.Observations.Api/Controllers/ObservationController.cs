@@ -21,6 +21,7 @@ namespace SOS.Observations.Api.Controllers
     {
         private readonly IObservationManager _observationManager;
         private readonly IFieldMappingManager _fieldMappingManager;
+        private readonly IAreaManager _areaManager;
         private readonly ILogger<ObservationController> _logger;
         private const int MaxBatchSize = 1000;
         private const int ElasticSearchMaxRecords = 10000;
@@ -34,10 +35,12 @@ namespace SOS.Observations.Api.Controllers
         public ObservationController(
             IObservationManager observationManager, 
             IFieldMappingManager fieldMappingManager,
+            IAreaManager areaManager,
             ILogger<ObservationController> logger)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
+            _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -98,6 +101,22 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting field mappings");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        /// <inheritdoc />
+        [HttpGet("Areas")]
+        [ProducesResponseType(typeof(PagedAreas), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetAreasAsync([FromQuery]int skip = 0, [FromQuery]int take = 100)
+        {
+            try
+            {
+                return new OkObjectResult(await _areaManager.GetAreasAsync(skip, take));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting areas");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

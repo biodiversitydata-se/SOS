@@ -27,9 +27,11 @@ namespace SOS.Lib.UnitTests.Models.Search
                 {
                     MaxDistanceFromPoint = 50,
                     UsePointAccuracy = true,
-                    Geometry = new InputGeometry
-                    {
-                        Coordinates = new ArrayList(){ new[] { new double[] { 1, 2 }, new double[] { 3, 4 } } } 
+                    Geometries = new List<InputGeometry>(){
+                        new InputGeometry
+                        {
+                            Coordinates = new ArrayList(){ new[] { new double[] { 1, 2 }, new double[] { 3, 4 } } }
+                        }
                     }
                 },
                 EndDate = currentDate
@@ -61,9 +63,11 @@ namespace SOS.Lib.UnitTests.Models.Search
                 {
                     MaxDistanceFromPoint = 50,
                     UsePointAccuracy = true,
-                    Geometry = new InputGeometry
-                    {
-                        Coordinates = new ArrayList(){ new[] { new double[] { 1, 2 }, new double[] { 3, 4 } } } 
+                    Geometries = new List<InputGeometry>(){
+                        new InputGeometry
+                        {
+                            Coordinates = new ArrayList(){ new[] { new double[] { 1, 2 }, new double[] { 3, 4 } } }
+                        }
                     }
                 },
                 EndDate = currentDate

@@ -7,7 +7,7 @@ using SOS.Lib.Models.Search;
 namespace SOS.Lib.Extensions
 {
     public static class SearchExtensions
-    {
+    {        
         private static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateQuery(FilterBase filter)
         {
             var queryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
@@ -24,43 +24,46 @@ namespace SOS.Lib.Extensions
 
             if (filter.GeometryFilter?.IsValid ?? false)
             {
-                switch (filter.GeometryFilter.Geometry.Type.ToLower())
+                foreach (var geom in filter.GeometryFilter.Geometries)
                 {
-                    case "point":
-                        queryContainers.Add(q => q
-                            .GeoDistance(gd => gd
-                                .Field("location.pointLocation")
-                                .DistanceType(GeoDistanceType.Arc)
-                                .Location(filter.GeometryFilter.Geometry.ToGeoLocation())
-                                .Distance(filter.GeometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
-                                .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
-                            )
-                        );
+                    switch (geom.Type.ToLower())
+                    {
+                        case "point":
+                            queryContainers.Add(q => q
+                                .GeoDistance(gd => gd
+                                    .Field("location.pointLocation")
+                                    .DistanceType(GeoDistanceType.Arc)
+                                    .Location(geom.ToGeoLocation())
+                                    .Distance(filter.GeometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
+                                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
+                                )
+                            );
 
-                        break;
-                    case "polygon":
-                    case "multipolygon":
-                        if (filter.GeometryFilter.UsePointAccuracy)
-                        {
-                            queryContainers.Add(q => q
-                                .GeoShape(gd => gd
-                                    .Field("location.pointWithBuffer")
-                                    .Shape(s => filter.GeometryFilter.Geometry.ToGeoShape())
-                                    .Relation(GeoShapeRelation.Intersects)
-                                )
-                            );
-                        }
-                        else
-                        {
-                            queryContainers.Add(q => q
-                                .GeoShape(gd => gd
-                                    .Field("location.point")
-                                    .Shape(s => filter.GeometryFilter.Geometry.ToGeoShape())
-                                    .Relation(GeoShapeRelation.Within)
-                                )
-                            );
-                        }
-                        break;
+                            break;
+                        case "polygon":
+                        case "multipolygon":
+                            if (filter.GeometryFilter.UsePointAccuracy)
+                            {
+                                queryContainers.Add(q => q
+                                    .GeoShape(gd => gd
+                                        .Field("location.pointWithBuffer")
+                                        .Shape(s => geom.ToGeoShape())
+                                        .Relation(GeoShapeRelation.Intersects)
+                                    )
+                                );
+                            }
+                            else
+                            {
+                                queryContainers.Add(q => q
+                                    .GeoShape(gd => gd
+                                        .Field("location.point")
+                                        .Shape(s => geom.ToGeoShape())
+                                        .Relation(GeoShapeRelation.Within)
+                                    )
+                                );
+                            }
+                            break;
+                    }
                 }
             }
 

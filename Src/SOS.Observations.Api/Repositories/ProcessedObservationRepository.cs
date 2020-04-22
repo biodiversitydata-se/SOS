@@ -45,6 +45,8 @@ namespace SOS.Observations.Api.Repositories
             var query = filter.ToQuery();
             query = AddInternalFilters(filter, query);
 
+            var excludeQuery = CreateExcludeQuery(filter);
+
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(CollectionName.ToLower())
                 .Source(filter.OutputFields.ToProjection())
@@ -52,6 +54,7 @@ namespace SOS.Observations.Api.Repositories
                 .Size(take)
                 .Query(q => q
                     .Bool(b => b
+                        .MustNot(excludeQuery)
                         .Filter(query))));
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -63,7 +66,43 @@ namespace SOS.Observations.Api.Repositories
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
         }
+        private static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateExcludeQuery(FilterBase filter)
+        {
+            var queryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
 
+            if (filter.GeometryFilter?.IsValid ?? false)
+            {
+                foreach (var geom in filter.GeometryFilter.Geometries)
+                {
+                    switch (geom.Type.ToLower())
+                    {
+                        case "holepolygon":
+                            if (filter.GeometryFilter.UsePointAccuracy)
+                            {
+                                queryContainers.Add(q => q
+                                    .GeoShape(gd => gd
+                                        .Field("location.pointWithBuffer")
+                                        .Shape(s => geom.ToGeoShape())
+                                        .Relation(GeoShapeRelation.Intersects)
+                                    )
+                                );
+                            }
+                            else
+                            {
+                                queryContainers.Add(q => q
+                                    .GeoShape(gd => gd
+                                        .Field("location.point")
+                                        .Shape(s => geom.ToGeoShape())
+                                        .Relation(GeoShapeRelation.Within)
+                                    )
+                                );
+                            }
+                            break;
+                    }
+                }
+            }
+            return queryContainers;
+        }
         private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddInternalFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
         {
             var queryInternal = query.ToList();

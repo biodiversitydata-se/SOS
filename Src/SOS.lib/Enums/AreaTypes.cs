@@ -8,6 +8,7 @@
         Province = 16,
         EconomicZoneOfSweden = 18,
         Parish = 19,
-        County = 21
+        County = 21,
+        NatureType = 22
     }
 }
