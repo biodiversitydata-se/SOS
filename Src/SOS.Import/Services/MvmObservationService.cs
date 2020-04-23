@@ -10,22 +10,22 @@ namespace SOS.Import.Services
     public class MvmObservationService : Interfaces.IMvmObservationService
     {
         private readonly ISpeciesObservationChangeService _speciesObservationChangeServiceClient;
-        private readonly KulServiceConfiguration _kulServiceConfiguration;
-        private readonly ILogger<KulObservationService> _logger;
+        private readonly MvmServiceConfiguration _mvmServiceConfiguration;
+        private readonly ILogger<MvmObservationService> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="speciesObservationChangeServiceClient"></param>
-        /// <param name="kulServiceConfiguration"></param>
+        /// <param name="mvmServiceConfiguration"></param>
         /// <param name="logger"></param>
         public MvmObservationService(
             ISpeciesObservationChangeService speciesObservationChangeServiceClient,
-            KulServiceConfiguration kulServiceConfiguration,
-            ILogger<KulObservationService> logger)
+            MvmServiceConfiguration mvmServiceConfiguration,
+            ILogger<MvmObservationService> logger)
         {
             _speciesObservationChangeServiceClient = speciesObservationChangeServiceClient ?? throw new ArgumentNullException(nameof(speciesObservationChangeServiceClient));
-            _kulServiceConfiguration = kulServiceConfiguration ?? throw new ArgumentNullException(nameof(kulServiceConfiguration));
+            _mvmServiceConfiguration = mvmServiceConfiguration ?? throw new ArgumentNullException(nameof(mvmServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -33,16 +33,16 @@ namespace SOS.Import.Services
         {
             /*SymmetricSecurityBindingElement
             var result = await _speciesObservationChangeServiceClient.GetSpeciesObservationChangeAsSpecies(
-                _kulServiceConfiguration.Token,
+                _mvmServiceConfiguration.Token,
                 DateTime.MinValue,
                 false,
                 DateTime.MaxValue,
                 false,
                 getFromId,
                 true,
-                _kulServiceConfiguration.MaxReturnedChangesInOnePage);
+                _mvmServiceConfiguration.MaxReturnedChangesInOnePage);
 
-            _logger.LogDebug($"Getting observations from KUL Service: From id: { getFromId }, Created: {result.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result.DeletedSpeciesObservationGuids?.Length ?? 0}");
+            _logger.LogDebug($"Getting observations from MVM Service: From id: { getFromId }, Created: {result.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result.DeletedSpeciesObservationGuids?.Length ?? 0}");
             
             return  result.CreatedSpeciesObservations;*/
 

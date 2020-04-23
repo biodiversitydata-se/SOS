@@ -92,6 +92,20 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult RunSersHarvestJob();
 
         /// <summary>
+        /// Add daily harvest of sightings from SHARK
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult AddDailySharkHarvestJob(int hour, int minute);
+
+        /// <summary>
+        /// Run SHARK sightings harvest
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunSharkHarvestJob();
+
+        /// <summary>
         /// Add daily harvest of sightings from species data portal
         /// </summary>
         /// <param name="hour"></param>

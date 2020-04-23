@@ -14,6 +14,7 @@
         Dwc,
         NorsObservations,
         SersObservations,
-        MvmObservations
+        MvmObservations,
+        SharkObservations
     }
 }

@@ -2,7 +2,9 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -173,6 +175,15 @@ namespace SOS.Import.Services
             }
 
             return default(T);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<byte>> ReadFileDataAsync(Uri requestUri)
+        {
+            using var client = new HttpClient();
+            using var response = await client.GetAsync(requestUri); 
+            
+            return response.StatusCode == HttpStatusCode.OK ? await response.Content.ReadAsByteArrayAsync() : null;
         }
     }
 

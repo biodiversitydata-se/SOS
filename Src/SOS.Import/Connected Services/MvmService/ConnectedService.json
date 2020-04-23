@@ -1,6 +1,6 @@
 ﻿{
   "ProviderId": "Microsoft.VisualStudio.ConnectedService.Wcf",
-  "Version": "15.0.31022.994",
+  "Version": "15.0.40203.910",
   "ExtendedData": {
     "inputs": [
       "http://miljodata.slu.se/mvm/ws/SpeciesObservationChangeService.svc"
