@@ -31,22 +31,23 @@ namespace SOS.Import.Services
 
         public async Task<IEnumerable<WebSpeciesObservation>> GetAsync(int getFromId)
         {
-            /*SymmetricSecurityBindingElement
-            var result = await _speciesObservationChangeServiceClient.GetSpeciesObservationChangeAsSpecies(
-                _mvmServiceConfiguration.Token,
-                DateTime.MinValue,
-                false,
-                DateTime.MaxValue,
-                false,
-                getFromId,
-                true,
-                _mvmServiceConfiguration.MaxReturnedChangesInOnePage);
+            var ready = await _speciesObservationChangeServiceClient.IsReadyToUseAsync(new IsReadyToUseRequest() { });                        
+            var result = await _speciesObservationChangeServiceClient.GetSpeciesObservationChangeAsSpeciesAsync(new GetSpeciesObservationChangeAsSpeciesRequest() 
+                { 
+                    token = _mvmServiceConfiguration.Token,
+                    changedFrom = DateTime.MinValue,
+                    isChangedFromSpecified=false,
+                    changedTo = DateTime.MaxValue,
+                    isChangedToSpecified = false,
+                    changeId = getFromId,
+                    isChangedIdSpecified = true,
+                    maxReturnedChanges = _mvmServiceConfiguration.MaxReturnedChangesInOnePage
+                }
+            );
 
-            _logger.LogDebug($"Getting observations from MVM Service: From id: { getFromId }, Created: {result.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result.DeletedSpeciesObservationGuids?.Length ?? 0}");
+            _logger.LogDebug($"Getting observations from MVM Service: From id: { getFromId }, Created: {result.GetSpeciesObservationChangeAsSpeciesResult?.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result.GetSpeciesObservationChangeAsSpeciesResult?.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result.GetSpeciesObservationChangeAsSpeciesResult?.DeletedSpeciesObservationGuids?.Length ?? 0}");
             
-            return  result.CreatedSpeciesObservations;*/
-
-            return null;
+            return  result.GetSpeciesObservationChangeAsSpeciesResult.CreatedSpeciesObservations;            
         }
     }
 }

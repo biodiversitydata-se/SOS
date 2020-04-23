@@ -36,6 +36,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingManager"></param>
         /// <param name="taxonManager"></param>
+        /// <param name="areaManager"></param>
         /// <param name="logger"></param>
         public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
@@ -140,6 +141,7 @@ namespace SOS.Observations.Api.Managers
                         var geom = ((GeoJsonMultiPolygon<GeoJson2DGeographicCoordinates>)area.Geometry);
                         foreach (var polygon in geom.Coordinates.Polygons)
                         {
+                            //create the polygon
                             var inputGeom = new InputGeometry();
                             inputGeom.Type = "polygon";
                             inputGeom.Coordinates = new System.Collections.ArrayList();
@@ -174,6 +176,7 @@ namespace SOS.Observations.Api.Managers
                                 }
                             }
                         }
+                        //if we already have a geometry filter then we can just add the area polygons onto those
                         if(preparedFilter.GeometryFilter.Geometries != null)
                         {
                             var list = preparedFilter.GeometryFilter.Geometries.ToList();
