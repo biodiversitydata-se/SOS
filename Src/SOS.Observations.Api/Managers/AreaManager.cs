@@ -11,7 +11,7 @@ using SOS.Lib.Models.Search;
 namespace SOS.Observations.Api.Managers
 {
     /// <summary>
-    /// Process info manager
+    /// Area manager
     /// </summary>
     public class AreaManager : Interfaces.IAreaManager
     {
@@ -22,7 +22,7 @@ namespace SOS.Observations.Api.Managers
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="processInfoRepository"></param>
+        /// <param name="areaRepository"></param>
         /// <param name="logger"></param>
         public AreaManager(
             IAreaRepository areaRepository,
@@ -48,6 +48,7 @@ namespace SOS.Observations.Api.Managers
                 return null;
             }
         }
+        /// <inheritdoc />
         public async Task<PagedAreas> GetAreasAsync(int skip, int take)
         {
             try

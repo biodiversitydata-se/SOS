@@ -8,15 +8,21 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Observations.Api.Managers.Interfaces
 {
     /// <summary>
-    /// Process information manager
+    /// Area manager
     /// </summary>
     public interface IAreaManager
     {
         /// <summary>
-        /// Get process information 
+        /// Get information about a single area
         /// </summary>
         /// <returns></returns>
         Task<Area> GetAreaAsync(int areaId);
+        /// <summary>
+        /// Get all the areas
+        /// </summary>
+        /// <param name="skip">Skip this many</param>
+        /// <param name="take">Limit on how many to return</param>
+        /// <returns></returns>
         Task<PagedAreas> GetAreasAsync(int skip, int take);
     }
 }

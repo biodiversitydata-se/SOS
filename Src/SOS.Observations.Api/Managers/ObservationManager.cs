@@ -85,11 +85,13 @@ namespace SOS.Observations.Api.Managers
                     preparedFilter.TaxonIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
                 }
             }
+            // handle the area ids search
             if(preparedFilter.AreaIds != null && preparedFilter.AreaIds.Any())
             {
                 var area = await _areaManager.GetAreaAsync(preparedFilter.AreaIds.First());
                 if (area != null)
                 {
+                    //if we already have the info needed for the search we skip polygon searches
                     if (area.AreaType == AreaType.County ||
                         area.AreaType == AreaType.Municipality ||
                         area.AreaType == AreaType.Province)
@@ -125,6 +127,7 @@ namespace SOS.Observations.Api.Managers
                             preparedFilter.ProvinceIds = list;
                         }
                     }
+                    // we need to use the geometry filter
                     else
                     {
                         var geomList = new List<Lib.Models.Shared.InputGeometry>();

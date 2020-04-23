@@ -8,7 +8,10 @@
         Province = 16,
         EconomicZoneOfSweden = 18,
         Parish = 19,
-        County = 21,
-        NatureType = 22
+        Spa = 20,
+        County = 21,        
+        ProtectedNature = 22,
+        Sci = 26,
+        WaterArea = 27
     }
 }

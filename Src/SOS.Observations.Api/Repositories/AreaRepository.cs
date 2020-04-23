@@ -13,7 +13,7 @@ using SOS.Observations.Api.Repositories.Interfaces;
 namespace SOS.Observations.Api.Repositories
 {
     /// <summary>
-    /// Process information repository
+    /// Area repository
     /// </summary>
     public class AreaRepository : ProcessBaseRepository<Area, int>, IAreaRepository
     {
@@ -27,7 +27,7 @@ namespace SOS.Observations.Api.Repositories
             ILogger<AreaRepository> logger) : base(client, false, logger)
         {
         }
-
+        /// <inheritdoc />
         public async Task<InternalAreas> GetAllPagedAsync(int skip, int take)
         {
             var total = await this.MongoCollection.AsQueryable<Area>().CountAsync();
