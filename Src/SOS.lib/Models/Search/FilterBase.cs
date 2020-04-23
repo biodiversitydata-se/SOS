@@ -36,7 +36,8 @@ namespace SOS.Lib.Models.Search
             (RedListCategories?.Any() ?? false) ||
             (GenderIds?.Any() ?? false) ||
             (StartDate != null) ||
-            (TaxonIds?.Any() ?? false);
+            (TaxonIds?.Any() ?? false) ||
+            (AreaIds?.Any() ?? false);
 
         /// <summary>
         /// Municipalities to match. Queryable values are available in Field Mappings.
@@ -99,6 +100,7 @@ namespace SOS.Lib.Models.Search
         /// en-GB (English)
         /// </summary>
         public string TranslationCultureCode { get; set; } = "en-GB";
+        public IEnumerable<int> AreaIds { get; set; }
 
         public FilterBase Clone()
         {

@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver.GeoJsonObjectModel;
+using Newtonsoft.Json.Linq;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -19,6 +24,7 @@ namespace SOS.Observations.Api.Managers
     {
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IFieldMappingManager _fieldMappingManager;
+        private readonly IAreaManager _areaManager;
         private readonly ITaxonManager _taxonManager;
         private readonly ILogger<ObservationManager> _logger;
         
@@ -34,12 +40,14 @@ namespace SOS.Observations.Api.Managers
         public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingManager fieldMappingManager,
+            IAreaManager areaManager,
             ITaxonManager taxonManager,
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
+            _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -48,7 +56,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                filter = PrepareFilter(filter);
+                filter = await PrepareFilter(filter);
 
                 var processedObservations = (await _processedObservationRepository.GetChunkAsync(filter, skip, take));
                 ProcessLocalizedFieldMappings(filter, processedObservations.Records);
@@ -62,7 +70,7 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        private SearchFilter PrepareFilter(SearchFilter filter)
+        private async Task<SearchFilter> PrepareFilter(SearchFilter filter)
         {
             var preparedFilter = filter.Clone();
 
@@ -75,6 +83,108 @@ namespace SOS.Observations.Api.Managers
                 else
                 {
                     preparedFilter.TaxonIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
+                }
+            }
+            // handle the area ids search
+            if(preparedFilter.AreaIds != null && preparedFilter.AreaIds.Any())
+            {
+                var area = await _areaManager.GetAreaAsync(preparedFilter.AreaIds.First());
+                if (area != null)
+                {
+                    //if we already have the info needed for the search we skip polygon searches
+                    if (area.AreaType == AreaType.County ||
+                        area.AreaType == AreaType.Municipality ||
+                        area.AreaType == AreaType.Province)
+                    {
+                        if (area.AreaType == AreaType.County)
+                        {
+                            if (preparedFilter.CountyIds == null)
+                            {
+                                preparedFilter.CountyIds = new List<int>();
+                            }
+                            var list = preparedFilter.CountyIds.ToList();
+                            list.Add(area.FeatureId);
+                            preparedFilter.CountyIds = list;
+                        }
+                        else if (area.AreaType == AreaType.Municipality)
+                        {
+                            if (preparedFilter.MunicipalityIds == null)
+                            {
+                                preparedFilter.MunicipalityIds = new List<int>();
+                            }
+                            var list = preparedFilter.MunicipalityIds.ToList();
+                            list.Add(area.FeatureId);
+                            preparedFilter.MunicipalityIds = list;
+                        }
+                        else if (area.AreaType == AreaType.Province)
+                        {
+                            if (preparedFilter.ProvinceIds == null)
+                            {
+                                preparedFilter.ProvinceIds = new List<int>();
+                            }
+                            var list = preparedFilter.ProvinceIds.ToList();
+                            list.Add(area.FeatureId);
+                            preparedFilter.ProvinceIds = list;
+                        }
+                    }
+                    // we need to use the geometry filter
+                    else
+                    {
+                        var geomList = new List<Lib.Models.Shared.InputGeometry>();
+                        if (preparedFilter.GeometryFilter == null) 
+                        {                            
+                            preparedFilter.GeometryFilter = new GeometryFilter();
+                            preparedFilter.GeometryFilter.MaxDistanceFromPoint = 0;
+                        }                                                                      
+
+                        var geom = ((GeoJsonMultiPolygon<GeoJson2DGeographicCoordinates>)area.Geometry);
+                        foreach (var polygon in geom.Coordinates.Polygons)
+                        {
+                            var inputGeom = new InputGeometry();
+                            inputGeom.Type = "polygon";
+                            inputGeom.Coordinates = new System.Collections.ArrayList();
+                            var str = "[";
+                            foreach (var coord in polygon.Exterior.Positions)
+                            {
+                                str += $"[{coord.Longitude.ToString(CultureInfo.InvariantCulture)}, {coord.Latitude.ToString(CultureInfo.InvariantCulture)}],";
+                                
+                            }
+                            str = str.Substring(0, str.Length - 1);
+                            inputGeom.Coordinates.Add(JsonDocument.Parse(str + "]").RootElement);
+                            geomList.Add(inputGeom);
+
+                            //add the holes
+                            if (polygon.Holes != null && polygon.Holes.Count > 0)
+                            {
+                                foreach(var hole in polygon.Holes)
+                                {
+                                    var inputHoleGeom = new InputGeometry();
+                                    inputHoleGeom.Type = "holepolygon";
+                                    inputHoleGeom.Coordinates = new System.Collections.ArrayList();
+                                    str = "[";
+
+                                    foreach (var coord in hole.Positions)
+                                    {
+                                        str += $"[{coord.Longitude.ToString(CultureInfo.InvariantCulture)}, {coord.Latitude.ToString(CultureInfo.InvariantCulture)}],";
+                                    }
+                                    str = str.Substring(0, str.Length - 1);
+                                    inputHoleGeom.Coordinates.Add(JsonDocument.Parse(str + "]").RootElement);
+                                    geomList.Add(inputHoleGeom);
+
+                                }
+                            }
+                        }
+                        if(preparedFilter.GeometryFilter.Geometries != null)
+                        {
+                            var list = preparedFilter.GeometryFilter.Geometries.ToList();
+                            list.AddRange(geomList);
+                            preparedFilter.GeometryFilter.Geometries = list;
+                        }
+                        else 
+                        {                            
+                            preparedFilter.GeometryFilter.Geometries = geomList;
+                        }
+                    }
                 }
             }
 
