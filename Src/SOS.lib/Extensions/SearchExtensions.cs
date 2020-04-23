@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nest;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Extensions
@@ -69,10 +70,10 @@ namespace SOS.Lib.Extensions
 
             if (filter.EndDate.HasValue)
             {
-                queryContainers.Add((QueryContainerDescriptor<dynamic> q) => q
-                    .Range(r => r
+                queryContainers.Add(q => q
+                    .DateRange(r => r
                         .Field("event.endDate")
-                        .LessThanOrEquals(filter.EndDate.Value.ToUniversalTime().Ticks)
+                        .LessThanOrEquals(filter.EndDate.Value.ToUniversalTime())
                     )
                 );
             }
@@ -132,9 +133,9 @@ namespace SOS.Lib.Extensions
             if (filter.StartDate.HasValue)
             {
                 queryContainers.Add(q => q
-                    .Range(r => r
+                    .DateRange(r => r
                         .Field("event.startDate")
-                        .GreaterThanOrEquals(filter.StartDate.Value.ToUniversalTime().Ticks)
+                        .GreaterThanOrEquals(filter.StartDate.Value.ToUniversalTime())
                     )
                 );
             }
