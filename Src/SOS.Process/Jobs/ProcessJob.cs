@@ -18,7 +18,11 @@ using SOS.Lib.Models.Verbatim.Nors;
 using SOS.Lib.Models.Verbatim.Sers;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Managers.Interfaces;
-using SOS.Process.Processors.Interfaces;
+using SOS.Process.Processors.Artportalen.Interfaces;
+using SOS.Process.Processors.ClamPortal.Interfaces;
+using SOS.Process.Processors.Kul.Interfaces;
+using SOS.Process.Processors.Nors.Interfaces;
+using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 

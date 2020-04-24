@@ -148,7 +148,7 @@ namespace SOS.Process.Processors.Artportalen
                     RecordedBy = verbatimObservation.Observers,
                     RecordNumber = verbatimObservation.Label,
                     Remarks = verbatimObservation.Comment,
-                    OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
+                    Status = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
                     ? new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Absent }
                     : new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Present },
                     URL = $"http://www.artportalen.se/sighting/{verbatimObservation.Id}"

@@ -140,7 +140,7 @@ namespace SOS.Lib.Extensions
                 LifeStage = source.LifeStage?.Value,
                 OccurrenceID = source.Id,
                 OccurrenceRemarks = source.Remarks,
-                OccurrenceStatus = source.OccurrenceStatus?.Value,
+                OccurrenceStatus = source.Status?.Value,
                 OrganismQuantity = source.OrganismQuantity?.ToString(),
                 OrganismQuantityType = source.OrganismQuantity.HasValue ? source.OrganismQuantityUnit?.Value ?? "Individuals" : null,
                 OtherCatalogNumbers = source.OtherCatalogNumbers,

@@ -211,7 +211,7 @@ namespace SOS.Observations.Api.Managers
                     ResolveFieldMappedValue(observation.Location?.Country, FieldMappingFieldId.Country);
                     ResolveFieldMappedValue(observation.Location?.Continent, FieldMappingFieldId.Continent);
                     ResolveFieldMappedValue(observation.Occurrence?.EstablishmentMeans, FieldMappingFieldId.EstablishmentMeans);
-                    ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatus, FieldMappingFieldId.OccurrenceStatus);
+                    ResolveFieldMappedValue(observation.Occurrence?.Status, FieldMappingFieldId.OccurrenceStatus);
                 }
             }
             else // dynamic objects is returned when OutputFields is used
@@ -238,7 +238,7 @@ namespace SOS.Observations.Api.Managers
                         {
                             var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
                             ResolveFieldMappedValue(occurrenceDictionary, FieldMappingFieldId.EstablishmentMeans, nameof(ProcessedObservation.Occurrence.EstablishmentMeans));
-                            ResolveFieldMappedValue(occurrenceDictionary, FieldMappingFieldId.OccurrenceStatus, nameof(ProcessedObservation.Occurrence.OccurrenceStatus));
+                            ResolveFieldMappedValue(occurrenceDictionary, FieldMappingFieldId.OccurrenceStatus, nameof(ProcessedObservation.Occurrence.Status));
                         }
                     }
                 }

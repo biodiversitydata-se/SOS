@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MongoDB.Bson;
-using MongoDB.Driver.GeoJsonObjectModel;
 using Nest;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
@@ -10,16 +8,17 @@ using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Verbatim.Kul;
+using SOS.Lib.Models.Verbatim.Shark;
+using SOS.Process.Constants;
 
-namespace SOS.Process.Processors.Kul
+namespace SOS.Process.Processors.Shark
 {
-    public class KulObservationFactory
+    public class SharkObservationFactory
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
 
-        public KulObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
+        public SharkObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
         {
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
         }
@@ -29,17 +28,17 @@ namespace SOS.Process.Processors.Kul
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<KulObservationVerbatim> verbatims)
+        public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<SharkObservationVerbatim> verbatims)
         {
             return verbatims.Select(CreateProcessedObservation);
         }
 
         /// <summary>
-        /// Cast KUL observation verbatim to ProcessedObservation
+        /// Cast Shark observation verbatim to ProcessedObservation
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        public ProcessedObservation CreateProcessedObservation(KulObservationVerbatim verbatim)
+        public ProcessedObservation CreateProcessedObservation(SharkObservationVerbatim verbatim)
         {
             Point wgs84Point = null;
             if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
@@ -49,45 +48,45 @@ namespace SOS.Process.Processors.Kul
 
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
 
-            var obs = new ProcessedObservation(ObservationProvider.KUL)
+            var obs = new ProcessedObservation(ObservationProvider.SHARK)
             {
                 BasisOfRecordId = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ObservationProvider.KUL.ToString()}",
-                DatasetName = "KUL",
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ ObservationProvider.SHARK.ToString() }",
+                DatasetName = verbatim.DatasetName,
                 Event = new ProcessedEvent
                 {
-                    EndDate = verbatim.End.ToUniversalTime(),
-                    StartDate = verbatim.Start.ToUniversalTime(),
-                    VerbatimEndDate = verbatim.End,
-                    VerbatimStartDate = verbatim.Start
+                    EndDate = verbatim.EventDate.ToUniversalTime(),
+                    StartDate = verbatim.EventDate.ToUniversalTime(),
+                    VerbatimEndDate = verbatim.EventDate,
+                    VerbatimStartDate = verbatim.EventDate
                 },
                 Identification = new ProcessedIdentification
                 {
+                    IdentifiedBy = verbatim.AnalyticalLaboratoryCode,
                     Validated = true,
                     UncertainDetermination = false
                 },
                 Location = new ProcessedLocation
                 {
-                    CoordinateUncertaintyInMeters = verbatim.CoordinateUncertaintyInMeters ?? DefaultCoordinateUncertaintyInMeters,
-                    CountryCode = verbatim.CountryCode,
+                    CoordinateUncertaintyInMeters = DefaultCoordinateUncertaintyInMeters,
+                    CountryCode = CountryCode.Sweden,
                     DecimalLatitude = verbatim.DecimalLatitude,
                     DecimalLongitude = verbatim.DecimalLongitude,
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Continent = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
                     Country = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
-                    Locality = verbatim.Locality,
+                    MaximumDepthInMeters = verbatim.MaximumDepthInMeters,
+                    MinimumDepthInMeters = verbatim.MinimumDepthInMeters,
                     Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
                     PointLocation = wgs84Point?.ToGeoLocation(),
-                    PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoShape(),
+                    PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(ProcessConstants.DefaultAccuracyInMeters)?.ToGeoShape(),
                     VerbatimLatitude = verbatim.DecimalLatitude,
                     VerbatimLongitude = verbatim.DecimalLongitude
                 },
-                Modified = verbatim.Start,
                 Occurrence = new ProcessedOccurrence
                 {
                     CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
                     Id = verbatim.OccurrenceId,
-                    IndividualCount = verbatim.IndividualCount?.ToString(),
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
                     IsNotRediscoveredObservation = false,
@@ -95,12 +94,21 @@ namespace SOS.Process.Processors.Kul
                     RecordedBy = verbatim.RecordedBy,
                     Status = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
                 },
-                OwnerInstitutionCode = verbatim.Owner,
+                OwnerInstitutionCode = verbatim.OwnerInstitutionCode,
                 ProtectionLevel = GetProtectionLevel(),
-                ReportedBy = verbatim.ReportedBy,
-                ReportedDate = verbatim.Start,
+                ReportedBy = verbatim.ReportingInstitutionCode,
                 Taxon = taxon
             };
+
+            /*
+            DataType
+            SamplerType
+            Species
+            ReportingInstitutionCode ?
+            AnalyticalLaboratoryCode ?
+            Status => Occurrence.Status ?
+
+             */
 
             return obs;
         }

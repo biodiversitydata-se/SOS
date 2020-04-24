@@ -105,7 +105,7 @@ namespace SOS.Process.Processors.ClamPortal
                     OrganismQuantityUnit = GetOrganismQuantityUnitIdFromString(verbatimObservation.QuantityUnit),
                     RecordedBy = verbatimObservation.RecordedBy,
                     Remarks = verbatimObservation.OccurrenceRemarks,
-                    OccurrenceStatus = GetOccurrenceStatusIdFromString(verbatimObservation.OccurrenceStatus)
+                    Status = GetOccurrenceStatusIdFromString(verbatimObservation.OccurrenceStatus)
                 },
                 Projects = string.IsNullOrEmpty(verbatimObservation.ProjectName) ? null : new[]
                 {

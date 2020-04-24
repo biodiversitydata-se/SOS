@@ -53,7 +53,7 @@ namespace SOS.Lib.Models.Verbatim.Shark
         /// <summary>
         /// Dyntaxa taxon id
         /// </summary>
-        public int DyntaxaTaxonID { get; set; }
+        public int DyntaxaTaxonId { get; set; }
 
         /// <summary>
         /// Date of event
@@ -84,12 +84,12 @@ namespace SOS.Lib.Models.Verbatim.Shark
         /// <summary>
         /// Maximum depth in meters
         /// </summary>
-        public double MaximumDepthInMeters { get; set; }
+        public double? MaximumDepthInMeters { get; set; }
 
         /// <summary>
         /// Minimum depth in meters
         /// </summary>
-        public double MinimumDepthInMeters { get; set; }
+        public double? MinimumDepthInMeters { get; set; }
 
         /// <summary>
         /// Month

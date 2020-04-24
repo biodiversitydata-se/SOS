@@ -9,6 +9,7 @@
         ClamPortal = 2,
         KUL = 4,
         NORS = 8,
-        SERS = 16
+        SERS = 16,
+        SHARK = 32
     }
 }
