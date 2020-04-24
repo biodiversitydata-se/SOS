@@ -16,6 +16,7 @@ using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Nors;
 using SOS.Lib.Models.Verbatim.Sers;
+using SOS.Lib.Models.Verbatim.Shark;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
@@ -23,6 +24,7 @@ using SOS.Process.Processors.ClamPortal.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
 using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Processors.Sers.Interfaces;
+using SOS.Process.Processors.Shark.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
@@ -39,6 +41,7 @@ namespace SOS.Process.Jobs
         private readonly IKulObservationProcessor _kulObservationProcessor;
         private readonly INorsObservationProcessor _norsObservationProcessor;
         private readonly ISersObservationProcessor _sersObservationProcessor;
+        private readonly ISharkObservationProcessor _sharkObservationProcessor;
         private readonly IInstanceManager _instanceManager;
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly ICopyFieldMappingsJob _copyFieldMappingsJob;
@@ -71,6 +74,7 @@ namespace SOS.Process.Jobs
             IKulObservationProcessor kulObservationProcessor,
             INorsObservationProcessor norsObservationProcessor,
             ISersObservationProcessor sersObservationProcessor,
+            ISharkObservationProcessor sharkObservationProcessor,
             IArtportalenObservationProcessor artportalenObservationProcessor,
             IProcessedTaxonRepository processedTaxonRepository,
             IInstanceManager instanceManager,
@@ -84,6 +88,7 @@ namespace SOS.Process.Jobs
             _kulObservationProcessor = kulObservationProcessor ?? throw new ArgumentNullException(nameof(kulObservationProcessor));
             _norsObservationProcessor = norsObservationProcessor ?? throw new ArgumentNullException(nameof(norsObservationProcessor));
             _sersObservationProcessor = sersObservationProcessor ?? throw new ArgumentNullException(nameof(sersObservationProcessor));
+            _sharkObservationProcessor = sharkObservationProcessor ?? throw new ArgumentNullException(nameof(sharkObservationProcessor));
             _artportalenObservationProcessor = artportalenObservationProcessor ?? throw new ArgumentNullException(nameof(artportalenObservationProcessor));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
             _copyFieldMappingsJob = copyFieldMappingsJob ?? throw new ArgumentNullException(nameof(copyFieldMappingsJob));
@@ -224,6 +229,18 @@ namespace SOS.Process.Jobs
                     providerInfo.MetadataInfo =
                         metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
                     providersInfo.Add(ObservationProvider.SERS, providerInfo);
+                }
+
+                if ((sources & (int)ObservationProvider.SHARK) > 0)
+                {
+                    processTasks.Add(ObservationProvider.SHARK, _sharkObservationProcessor.ProcessAsync(taxonById, cancellationToken));
+
+                    // Get harvest info and create a provider info object  that we can add processing info to later
+                    var harvestInfo = await GetHarvestInfoAsync(nameof(SharkObservationVerbatim));
+                    var providerInfo = CreateProviderInfo(DataSet.SharkObservations, harvestInfo, start);
+                    providerInfo.MetadataInfo =
+                        metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
+                    providersInfo.Add(ObservationProvider.SHARK, providerInfo);
                 }
 
                 // Run all tasks async

@@ -20,6 +20,8 @@ using SOS.Process.Processors.Nors;
 using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Processors.Sers;
 using SOS.Process.Processors.Sers.Interfaces;
+using SOS.Process.Processors.Shark;
+using SOS.Process.Processors.Shark.Interfaces;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
@@ -69,6 +71,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<KulObservationVerbatimRepository>().As<IKulObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationVerbatimRepository>().As<INorsObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationVerbatimRepository>().As<ISersObservationVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<SharkObservationVerbatimRepository>().As<ISharkObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonVerbatimRepository>().As<ITaxonVerbatimRepository>().InstancePerLifetimeScope();
             
 
@@ -80,13 +83,14 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedAreaRepository>().As<IProcessedAreaRepository>().InstancePerLifetimeScope();
 
-            // Add factories
+            // Add processors
             builder.RegisterType<ArtportalenObservationProcessor>().As<IArtportalenObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<ClamPortalObservationProcessor>().As<IClamPortalObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationProcessor>().As<IKulObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationProcessor>().As<INorsObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationProcessor>().As<ISersObservationProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<SharkObservationProcessor>().As<ISharkObservationProcessor>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();

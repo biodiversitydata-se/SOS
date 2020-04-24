@@ -22,6 +22,7 @@ using SOS.Process.Processors.ClamPortal.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
 using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Processors.Sers.Interfaces;
+using SOS.Process.Processors.Shark.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
@@ -43,6 +44,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IKulObservationProcessor> _kulProcessor;
         private readonly Mock<INorsObservationProcessor> _norsProcessor;
         private readonly Mock<ISersObservationProcessor> _sersProcessor;
+        private readonly Mock<ISharkObservationProcessor> _sharkProcessor;
         private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
         private readonly Mock<IProcessedTaxonRepository> _taxonProcessedRepository;
         private readonly Mock<IAreaHelper> _areaHelper;
@@ -56,6 +58,7 @@ namespace SOS.Process.UnitTests.Jobs
             _kulProcessor.Object,
             _norsProcessor.Object,
             _sersProcessor.Object,
+            _sharkProcessor.Object,
             _artportalenProcessor.Object,
             _taxonProcessedRepository.Object,
             _instanceManager.Object,
@@ -80,6 +83,7 @@ namespace SOS.Process.UnitTests.Jobs
             _kulProcessor = new Mock<IKulObservationProcessor>();
             _norsProcessor = new Mock<INorsObservationProcessor>();
             _sersProcessor = new Mock<ISersObservationProcessor>();
+            _sharkProcessor = new Mock<ISharkObservationProcessor>();
             _artportalenProcessor = new Mock<IArtportalenObservationProcessor>();
             _taxonProcessedRepository = new Mock<IProcessedTaxonRepository>();
             _areaHelper = new Mock<IAreaHelper>();
@@ -102,6 +106,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessor.Object,
                 _norsProcessor.Object,
                 _sersProcessor.Object,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -119,6 +124,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessor.Object,
                 _norsProcessor.Object,
                 _sersProcessor.Object,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -136,6 +142,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessor.Object,
                 _norsProcessor.Object,
                 _sersProcessor.Object,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -153,6 +160,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessor.Object,
                 _norsProcessor.Object,
                 _sersProcessor.Object,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -170,6 +178,7 @@ namespace SOS.Process.UnitTests.Jobs
                 null,
                 _norsProcessor.Object,
                 _sersProcessor.Object,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -187,6 +196,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessor.Object,
                 null,
                 _sersProcessor.Object,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -204,6 +214,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessor.Object,
                 _norsProcessor.Object,
                 null,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -222,6 +233,25 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 null,
+                _artportalenProcessor.Object,
+                _taxonProcessedRepository.Object,
+                _instanceManager.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
+                _areaHelper.Object,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sharkObservationProcessor");
+
+            create = () => new ProcessJob(
+                _darwinCoreRepository.Object,
+                _processInfoRepository.Object,
+                _harvestInfoRepository.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
+                _sharkProcessor.Object,
+                null,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
                 _copyFieldMappingsJob.Object,
@@ -238,6 +268,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessor.Object,
                 _norsProcessor.Object,
                 _sersProcessor.Object,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 null,
                 _instanceManager.Object,
@@ -255,6 +286,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessor.Object,
                 _norsProcessor.Object,
                 _sersProcessor.Object,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 null,
@@ -272,6 +304,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessor.Object,
                 _norsProcessor.Object,
                 _sersProcessor.Object,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -289,6 +322,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessor.Object,
                 _norsProcessor.Object,
                 _sersProcessor.Object,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -306,6 +340,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessor.Object, 
                 _norsProcessor.Object,
                 _sersProcessor.Object,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -323,6 +358,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _kulProcessor.Object,
                 _norsProcessor.Object,
                 _sersProcessor.Object,
+                _sharkProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
