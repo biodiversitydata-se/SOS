@@ -9,6 +9,6 @@ namespace SOS.Lib.Models.Search
     public class PagedAreas
     {
        public IEnumerable<PagedArea> Areas { get; set; }
-       public int TotalCount { get; set; }
+       public long TotalCount { get; set; }
     }
 }

@@ -24,6 +24,6 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="skip">Skip this many</param>
         /// <param name="take">Take this many areas</param>
         /// <returns></returns>
-        public Task<InternalAreas> GetAllPagedAsync(int skip, int take);
+        public Task<InternalAreas> GetPagedAsync(string searchString, int skip, int take);
     }
 }

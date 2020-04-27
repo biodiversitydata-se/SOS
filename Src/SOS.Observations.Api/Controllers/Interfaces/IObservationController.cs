@@ -43,9 +43,10 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <summary>
         /// Gets all the areas used for searching via areaId in the /search call                
         /// </summary>
+        /// <param name="searchString">Filter areas by this string</param>
         /// <param name="skip">Start index of returned areas</param>
         /// <param name="take">End index of returned areas</param>
         /// <returns>List of Areas</returns>
-        Task<IActionResult> GetAreasAsync(int skip = 0, int take = 100);
+        Task<IActionResult> GetAreasAsync(string searchString = "", int skip = 0, int take = 100);
     }
 }

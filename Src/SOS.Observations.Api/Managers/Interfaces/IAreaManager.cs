@@ -23,6 +23,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="skip">Skip this many</param>
         /// <param name="take">Limit on how many to return</param>
         /// <returns></returns>
-        Task<PagedAreas> GetAreasAsync(int skip, int take);
+        Task<PagedAreas> GetAreasAsync(string searchString, int skip, int take);
     }
 }

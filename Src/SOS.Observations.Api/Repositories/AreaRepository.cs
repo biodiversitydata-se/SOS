@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -28,10 +29,20 @@ namespace SOS.Observations.Api.Repositories
         {
         }
         /// <inheritdoc />
-        public async Task<InternalAreas> GetAllPagedAsync(int skip, int take)
+        public async Task<InternalAreas> GetPagedAsync(string searchString, int skip, int take)
         {
-            var total = await this.MongoCollection.AsQueryable<Area>().CountAsync();
-            var result = await this.MongoCollection.AsQueryable<Area>().Skip(skip).Take(take).ToListAsync();
+            var builder = Builders<Area>.Filter;
+            FilterDefinition<Area> filter;
+            if (string.IsNullOrEmpty(searchString))
+            {
+                filter = builder.Empty;
+            }
+            else
+            {
+                filter = builder.Regex("Name", new MongoDB.Bson.BsonRegularExpression(".*" + searchString + "*.","i"));
+            }
+            var total = await this.MongoCollection.Find(filter).CountDocumentsAsync();
+            var result = await this.MongoCollection.Find(filter).Skip(skip).Limit(take).ToListAsync();
             InternalAreas area = new InternalAreas();
             area.TotalCount = total;
             area.Areas = result;

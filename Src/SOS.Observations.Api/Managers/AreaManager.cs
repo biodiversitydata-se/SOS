@@ -49,11 +49,11 @@ namespace SOS.Observations.Api.Managers
             }
         }
         /// <inheritdoc />
-        public async Task<PagedAreas> GetAreasAsync(int skip, int take)
+        public async Task<PagedAreas> GetAreasAsync(string searchString, int skip, int take)
         {
             try
             {
-                var areas = await _areaRepository.GetAllPagedAsync(skip, take);
+                var areas = await _areaRepository.GetPagedAsync(searchString, skip, take);
                 var pagedAreas = new PagedAreas();
                 pagedAreas.TotalCount = areas.TotalCount;
                 var pagedAreaList = new List<PagedArea>();
