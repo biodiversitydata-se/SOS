@@ -197,52 +197,30 @@ namespace SOS.Observations.Api.Managers
         private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)
         {
             if (!filter.TranslateFieldMappedValues) return;
+           
+            foreach (var observation in processedObservations)
+            {
+                if (observation is IDictionary<string, object> obs)
+                {
+                    ResolveFieldMappedValue(obs, FieldMappingFieldId.BasisOfRecord, nameof(ProcessedObservation.BasisOfRecordId));
+                    ResolveFieldMappedValue(obs, FieldMappingFieldId.Type, nameof(ProcessedObservation.TypeId));
+                    ResolveFieldMappedValue(obs, FieldMappingFieldId.AccessRights, nameof(ProcessedObservation.AccessRightsId));
+                    ResolveFieldMappedValue(obs, FieldMappingFieldId.Institution, nameof(ProcessedObservation.InstitutionId));
 
-            if (filter.OutputFields == null || !filter.OutputFields.Any()) // ProcessedObservation objects is returned wen OutputFields is not used.
-            {
-                var observations = processedObservations.Cast<ProcessedObservation>();
-                foreach (var observation in observations)
-                {
-                    ResolveFieldMappedValue(observation.BasisOfRecordId, FieldMappingFieldId.BasisOfRecord);
-                    ResolveFieldMappedValue(observation.TypeId, FieldMappingFieldId.Type);
-                    ResolveFieldMappedValue(observation.AccessRightsId, FieldMappingFieldId.AccessRights);
-                    ResolveFieldMappedValue(observation.InstitutionId, FieldMappingFieldId.Institution);
-                    ResolveFieldMappedValue(observation.Location?.County, FieldMappingFieldId.County);
-                    ResolveFieldMappedValue(observation.Location?.Municipality, FieldMappingFieldId.Municipality);
-                    ResolveFieldMappedValue(observation.Location?.Province, FieldMappingFieldId.Province);
-                    ResolveFieldMappedValue(observation.Location?.Parish, FieldMappingFieldId.Parish);
-                    ResolveFieldMappedValue(observation.Location?.Country, FieldMappingFieldId.Country);
-                    ResolveFieldMappedValue(observation.Location?.Continent, FieldMappingFieldId.Continent);
-                    ResolveFieldMappedValue(observation.Occurrence?.EstablishmentMeans, FieldMappingFieldId.EstablishmentMeans);
-                    ResolveFieldMappedValue(observation.Occurrence?.Status, FieldMappingFieldId.OccurrenceStatus);
-                }
-            }
-            else // dynamic objects is returned when OutputFields is used
-            {
-                foreach (var observation in processedObservations)
-                {
-                    if (observation is IDictionary<string, object> obs)
+                    if (obs.TryGetValue(nameof(ProcessedObservation.Location), out object locationObject))
                     {
-                        ResolveFieldMappedValue(obs, FieldMappingFieldId.BasisOfRecord, nameof(ProcessedObservation.BasisOfRecordId));
-                        ResolveFieldMappedValue(obs, FieldMappingFieldId.Type, nameof(ProcessedObservation.TypeId));
-                        ResolveFieldMappedValue(obs, FieldMappingFieldId.AccessRights, nameof(ProcessedObservation.AccessRightsId));
-                        ResolveFieldMappedValue(obs, FieldMappingFieldId.Institution, nameof(ProcessedObservation.InstitutionId));
+                        var locationDictionary = locationObject as IDictionary<string, object>;
+                        ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.County, nameof(ProcessedObservation.Location.County));
+                        ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Municipality, nameof(ProcessedObservation.Location.Municipality));
+                        ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Province, nameof(ProcessedObservation.Location.Province));
+                        ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Parish, nameof(ProcessedObservation.Location.Parish));
+                    }
 
-                        if (obs.TryGetValue(nameof(ProcessedObservation.Location), out object locationObject))
-                        {
-                            var locationDictionary = locationObject as IDictionary<string, object>;
-                            ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.County, nameof(ProcessedObservation.Location.County));
-                            ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Municipality, nameof(ProcessedObservation.Location.Municipality));
-                            ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Province, nameof(ProcessedObservation.Location.Province));
-                            ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.Parish, nameof(ProcessedObservation.Location.Parish));
-                        }
-
-                        if (obs.TryGetValue(nameof(ProcessedObservation.Occurrence), out object occurrenceObject))
-                        {
-                            var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-                            ResolveFieldMappedValue(occurrenceDictionary, FieldMappingFieldId.EstablishmentMeans, nameof(ProcessedObservation.Occurrence.EstablishmentMeans));
-                            ResolveFieldMappedValue(occurrenceDictionary, FieldMappingFieldId.OccurrenceStatus, nameof(ProcessedObservation.Occurrence.Status));
-                        }
+                    if (obs.TryGetValue(nameof(ProcessedObservation.Occurrence), out object occurrenceObject))
+                    {
+                        var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
+                        ResolveFieldMappedValue(occurrenceDictionary, FieldMappingFieldId.EstablishmentMeans, nameof(ProcessedObservation.Occurrence.EstablishmentMeans));
+                        ResolveFieldMappedValue(occurrenceDictionary, FieldMappingFieldId.OccurrenceStatus, nameof(ProcessedObservation.Occurrence.Status));
                     }
                 }
             }
@@ -251,16 +229,8 @@ namespace SOS.Observations.Api.Managers
         private void ProcessLocalizedFieldMappings(SearchFilter filter, IEnumerable<dynamic> processedObservations)
         {
             if (!filter.TranslateFieldMappedValues) return;
-            string cultureCode = filter.TranslationCultureCode;
-            if (filter.OutputFields == null || !filter.OutputFields.Any()) // ProcessedObservation objects is returned wen OutputFields is not used.
-            {
-                var observations = processedObservations.Cast<ProcessedObservation>();
-                ProcessLocalizedFieldMappedReturnValues(observations, cultureCode);
-            }
-            else // dynamic objects is returned when OutputFields is used
-            {
-                ProcessLocalizedFieldMappedReturnValues(processedObservations, cultureCode);
-            }
+            string cultureCode = filter.TranslationCultureCode;           
+            ProcessLocalizedFieldMappedReturnValues(processedObservations, cultureCode);            
         }
 
         private void ProcessLocalizedFieldMappedReturnValues(
@@ -290,7 +260,7 @@ namespace SOS.Observations.Api.Managers
                 {
                     if (observation is IDictionary<string, object> obs)
                     {
-                        if (obs.TryGetValue(nameof(ProcessedObservation.Occurrence), out object occurrenceObject))
+                        if (obs.TryGetValue(nameof(ProcessedObservation.Occurrence).ToLower(), out object occurrenceObject))
                         {
                             var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
                             TranslateLocalizedValue(occurrenceDictionary, FieldMappingFieldId.Activity, nameof(ProcessedObservation.Occurrence.Activity), cultureCode);
@@ -299,14 +269,14 @@ namespace SOS.Observations.Api.Managers
                             TranslateLocalizedValue(occurrenceDictionary, FieldMappingFieldId.Unit, nameof(ProcessedObservation.Occurrence.OrganismQuantityUnit), cultureCode);
                         }
 
-                        if (obs.TryGetValue(nameof(ProcessedObservation.Event), out object eventObject))
+                        if (obs.TryGetValue(nameof(ProcessedObservation.Event).ToLower(), out object eventObject))
                         {
                             var eventDictionary = eventObject as IDictionary<string, object>;
                             TranslateLocalizedValue(eventDictionary, FieldMappingFieldId.Biotope, nameof(ProcessedObservation.Event.Biotope), cultureCode);
                             TranslateLocalizedValue(eventDictionary, FieldMappingFieldId.Substrate, nameof(ProcessedObservation.Event.Substrate), cultureCode);
                         }
 
-                        if (obs.TryGetValue(nameof(ProcessedObservation.Identification), out object identificationObject))
+                        if (obs.TryGetValue(nameof(ProcessedObservation.Identification).ToLower(), out object identificationObject))
                         {
                             var identificationDictionary = identificationObject as IDictionary<string, object>;
                             TranslateLocalizedValue(identificationDictionary, FieldMappingFieldId.ValidationStatus, nameof(ProcessedObservation.Identification.ValidationStatusId), cultureCode);
@@ -371,13 +341,13 @@ namespace SOS.Observations.Api.Managers
             string cultureCode)
         {
             if (observationNode == null) return;
-
-            if (observationNode.ContainsKey(fieldName))
+            var lowerCaseName = Char.ToLower(fieldName[0]) + fieldName.Substring(1);
+            if (observationNode.ContainsKey(lowerCaseName))
             {
-                if (observationNode[fieldName] is IDictionary<string, object> fieldNode && fieldNode.ContainsKey("Value") && fieldNode.ContainsKey("_id"))
+                if (observationNode[lowerCaseName] is IDictionary<string, object> fieldNode && fieldNode.ContainsKey("id"))
                 {
-                    int id = (int)fieldNode["_id"];
-                    if (id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId && _fieldMappingManager.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, id, out var translatedValue))
+                    Int64 id = (Int64)fieldNode["id"];
+                    if (id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId && _fieldMappingManager.TryGetTranslatedValue(fieldMappingFieldId, cultureCode, (int)id, out var translatedValue))
                     {
                         fieldNode["Value"] = translatedValue;
                     }
