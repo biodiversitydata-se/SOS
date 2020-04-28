@@ -251,6 +251,44 @@ namespace SOS.Administration.Api.Controllers
         }
         #endregion KUL
 
+        #region MVM
+        /// <inheritdoc />
+        [HttpPost("MVM/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailyMvmHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<IMvmHarvestJob>(nameof(IMvmHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("MVM harvest job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding MVM harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("MVM/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunMvmHarvestJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IMvmHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
+                return new OkObjectResult("Started MVM harvest job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running MVM harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        #endregion MVM
+
         #region NORS
         /// <inheritdoc />
         [HttpPost("NORS/Schedule/Daily")]
@@ -260,7 +298,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<IKulHarvestJob>(nameof(INorsHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<INorsHarvestJob>(nameof(INorsHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("NORS harvest job added");
             }
             catch (Exception e)
@@ -327,6 +365,44 @@ namespace SOS.Administration.Api.Controllers
         }
         #endregion SERS
 
+        #region SHARK
+        /// <inheritdoc />
+        [HttpPost("SHARK/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailySharkHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<ISharkHarvestJob>(nameof(ISharkHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("SHARK harvest job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding SHARK harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("SHARK/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunSharkHarvestJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<ISharkHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
+                return new OkObjectResult("Started SHARK harvest job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running SHARK harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        #endregion SHARK
+
         #region Taxon
         /// <inheritdoc />
         [HttpPost("Taxon/Schedule/Daily")]
@@ -364,9 +440,5 @@ namespace SOS.Administration.Api.Controllers
             }
         }
         #endregion Taxon
-
-       
-
-
     }
 }

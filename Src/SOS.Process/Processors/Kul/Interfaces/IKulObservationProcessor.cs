@@ -1,4 +1,6 @@
-﻿namespace SOS.Process.Processors.Interfaces
+﻿using SOS.Process.Processors.Interfaces;
+
+namespace SOS.Process.Processors.Kul.Interfaces
 {
     /// <summary>
     /// KUL observation processor

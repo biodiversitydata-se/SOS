@@ -30,12 +30,14 @@ namespace SOS.Observations.Api.IoC.Modules
             // Add factories
             builder.RegisterType<ObservationManager>().As<IObservationManager>().SingleInstance(); // InstancePerLifetimeScope?
             builder.RegisterType<ProcessInfoManager>().As<IProcessInfoManager>().SingleInstance(); // InstancePerLifetimeScope
+			builder.RegisterType<AreaManager>().As<IAreaManager>().SingleInstance(); // InstancePerLifetimeScope
             builder.RegisterType<TaxonManager>().As<ITaxonManager>().SingleInstance();
             builder.RegisterType<FieldMappingManager>().As<IFieldMappingManager>().SingleInstance();
 
             // Repositories mongo
             builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>().SingleInstance();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().SingleInstance();
+            builder.RegisterType<AreaRepository>().As<IAreaRepository>().SingleInstance();
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().SingleInstance();
             builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>().SingleInstance();
         }

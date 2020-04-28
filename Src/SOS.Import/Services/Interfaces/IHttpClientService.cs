@@ -61,5 +61,12 @@ namespace SOS.Import.Services.Interfaces
         /// <param name="requestUri"></param>
         /// <returns></returns>
         Task<T> DeleteDataAsync<T>(Uri requestUri);
+
+        /// <summary>
+        /// Get file data
+        /// </summary>
+        /// <param name="requestUri"></param>
+        /// <returns></returns>
+        Task<IEnumerable<byte>> ReadFileDataAsync(Uri requestUri);
     }
 }

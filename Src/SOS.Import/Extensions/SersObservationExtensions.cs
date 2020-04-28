@@ -24,45 +24,25 @@ namespace SOS.Import.Extensions
         public static SersObservationVerbatim ToVerbatim(this SersService.WebSpeciesObservation entity)
         {
             var observation = new SersObservationVerbatim();
-            observation.ReportedBy = entity.Fields[(int)SersObservationFieldsId.ReportedBy].Value;
-            observation.Modified = entity.Fields[(int)SersObservationFieldsId.Modified].Value;
-            observation.Owner = entity.Fields[(int)SersObservationFieldsId.Owner].Value;
-            observation.IndividualId = entity.Fields[(int)SersObservationFieldsId.IndividualId].Value;
-            observation.RecordedBy = entity.Fields[(int)SersObservationFieldsId.RecordedBy].Value;
-            observation.OccurrenceId = entity.Fields[(int)SersObservationFieldsId.OccurrenceId].Value;
-            observation.DecimalLongitude = entity.Fields[(int)SersObservationFieldsId.DecimalLongitude].Value.WebParseDouble();
-            observation.DecimalLatitude = entity.Fields[(int)SersObservationFieldsId.DecimalLatitude].Value.WebParseDouble();
-            observation.CoordinateUncertaintyInMeters = entity.Fields[(int)SersObservationFieldsId.CoordinateUncertaintyInMeters].Value.WebParseInt32();
-            observation.Start = entity.Fields[(int)SersObservationFieldsId.Start].Value.WebParseDateTime();
-            observation.End = entity.Fields[(int)SersObservationFieldsId.End].Value.WebParseDateTime();
-            observation.ScientificName = entity.Fields[(int)SersObservationFieldsId.ScientificName].Value;
-            observation.DyntaxaTaxonId = entity.Fields[(int)SersObservationFieldsId.DyntaxaTaxonId].Value.WebParseInt32();
-            observation.Municipality = entity.Fields[(int)SersObservationFieldsId.Municipality].Value;
-            observation.County = entity.Fields[(int)SersObservationFieldsId.County].Value;
-            observation.Locality = entity.Fields[(int)SersObservationFieldsId.Locality].Value;
-            observation.LocationId = entity.Fields[(int)SersObservationFieldsId.LocationId].Value;
+            observation.ReportedBy = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.ReportedBy)?.Value;
+            observation.Modified = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.Modified)?.Value;
+            observation.Owner = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.Owner)?.Value;
+            observation.IndividualId = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.OccurrenceID)?.Value;
+            observation.RecordedBy = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.RecordedBy)?.Value;
+            observation.OccurrenceId = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.OccurrenceID)?.Value;
+            observation.DecimalLongitude = entity.Fields.First(p => p.Property.Id == SersService.SpeciesObservationPropertyId.DecimalLongitude).Value.WebParseDouble();
+            observation.DecimalLatitude = entity.Fields.First(p => p.Property.Id == SersService.SpeciesObservationPropertyId.DecimalLatitude).Value.WebParseDouble();
+            observation.CoordinateUncertaintyInMeters = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.CoordinateUncertaintyInMeters)?.Value?.WebParseInt32();
+            observation.Start = entity.Fields.First(p => p.Property.Id == SersService.SpeciesObservationPropertyId.Start).Value.WebParseDateTime();
+            observation.End = entity.Fields.First(p => p.Property.Id == SersService.SpeciesObservationPropertyId.End).Value.WebParseDateTime();
+            observation.ScientificName = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.ScientificName)?.Value;
+            observation.DyntaxaTaxonId = entity.Fields.First(p => p.Property.Id == SersService.SpeciesObservationPropertyId.DyntaxaTaxonID).Value.WebParseInt32();
+            observation.Municipality = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.Municipality)?.Value;
+            observation.County = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.County)?.Value;
+            observation.Locality = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.Locality)?.Value;
+            observation.LocationId = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.LocationId)?.Value;
+            
             return observation;
-        }
-
-        private enum SersObservationFieldsId
-        {
-            ReportedBy = 0,
-            Modified = 1,
-            Owner = 2,
-            IndividualId = 3,
-            RecordedBy = 4,
-            OccurrenceId = 5,
-            DecimalLongitude = 6,
-            DecimalLatitude = 7,
-            CoordinateUncertaintyInMeters = 8,
-            Start = 9,
-            End = 10,
-            ScientificName = 11,
-            DyntaxaTaxonId = 12,
-            Municipality = 13,
-            County = 14,
-            Locality = 15,
-            LocationId = 16
         }
     }
 }

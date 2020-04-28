@@ -50,6 +50,20 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult RunKulHarvestJob();
 
         /// <summary>
+        /// Add daily harvest of sightings from MVM
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult AddDailyMvmHarvestJob(int hour, int minute);
+
+        /// <summary>
+        /// Run MVM sightings harvest
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunMvmHarvestJob();
+
+        /// <summary>
         /// Add daily harvest of sightings from NORS
         /// </summary>
         /// <param name="hour"></param>
@@ -76,6 +90,20 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         IActionResult RunSersHarvestJob();
+
+        /// <summary>
+        /// Add daily harvest of sightings from SHARK
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult AddDailySharkHarvestJob(int hour, int minute);
+
+        /// <summary>
+        /// Run SHARK sightings harvest
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunSharkHarvestJob();
 
         /// <summary>
         /// Add daily harvest of sightings from species data portal

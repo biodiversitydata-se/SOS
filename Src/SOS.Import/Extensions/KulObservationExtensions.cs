@@ -23,44 +23,25 @@ namespace SOS.Import.Extensions
         /// <returns></returns>
         public static KulObservationVerbatim ToVerbatim(this KulService.WebSpeciesObservation entity)
         {
-            KulObservationVerbatim observation = new KulObservationVerbatim();
-            observation.ReportedBy = entity.Fields[(int)KulObservationFieldsId.ReportedBy].Value;
-            observation.Owner = entity.Fields[(int)KulObservationFieldsId.Owner].Value;
-            observation.RecordedBy = entity.Fields[(int)KulObservationFieldsId.RecordedBy].Value;
-            observation.OccurrenceId = entity.Fields[(int)KulObservationFieldsId.OccurrenceId].Value;
-            observation.DecimalLongitude = entity.Fields[(int)KulObservationFieldsId.DecimalLongitude].Value.WebParseDouble();
-            observation.DecimalLatitude = entity.Fields[(int)KulObservationFieldsId.DecimalLatitude].Value.WebParseDouble();
-            observation.CoordinateUncertaintyInMeters = entity.Fields[(int)KulObservationFieldsId.CoordinateUncertaintyInMeters].Value.WebParseInt32();
-            observation.Start = entity.Fields[(int)KulObservationFieldsId.Start].Value.WebParseDateTime();
-            observation.End = entity.Fields[(int)KulObservationFieldsId.End].Value.WebParseDateTime();
-            observation.Locality = entity.Fields[(int)KulObservationFieldsId.Locality].Value;
-            observation.DyntaxaTaxonId = entity.Fields[(int)KulObservationFieldsId.DyntaxaTaxonId].Value.WebParseInt32();
-            observation.VerbatimScientificName = entity.Fields[(int)KulObservationFieldsId.VerbatimScientificName].Value;
-            observation.TaxonRemarks = entity.Fields[(int)KulObservationFieldsId.TaxonRemarks].Value;
-            observation.IndividualCount = entity.Fields[(int)KulObservationFieldsId.IndividualCount].Value.WebParseInt32();
-            observation.CountryCode = entity.Fields[(int)KulObservationFieldsId.CountryCode].Value;
-            observation.AssociatedOccurrences = entity.Fields[(int)KulObservationFieldsId.AssociatedOccurrences].Value;
+            var observation = new KulObservationVerbatim();
+            observation.ReportedBy = entity.Fields.FirstOrDefault(p => p.Property.Id == KulService.SpeciesObservationPropertyId.ReportedBy)?.Value;
+            observation.Owner = entity.Fields.FirstOrDefault(p => p.Property.Id == KulService.SpeciesObservationPropertyId.Owner)?.Value;
+            observation.RecordedBy = entity.Fields.FirstOrDefault(p => p.Property.Id == KulService.SpeciesObservationPropertyId.RecordedBy)?.Value;
+            observation.OccurrenceId = entity.Fields.FirstOrDefault(p => p.Property.Id == KulService.SpeciesObservationPropertyId.OccurrenceID)?.Value;
+            observation.DecimalLongitude = entity.Fields.First(p => p.Property.Id == KulService.SpeciesObservationPropertyId.DecimalLongitude).Value.WebParseDouble();
+            observation.DecimalLatitude = entity.Fields.First(p => p.Property.Id == KulService.SpeciesObservationPropertyId.DecimalLatitude).Value.WebParseDouble();
+            observation.CoordinateUncertaintyInMeters = entity.Fields.FirstOrDefault(p => p.Property.Id == KulService.SpeciesObservationPropertyId.CoordinateUncertaintyInMeters)?.Value?.WebParseInt32();
+            observation.Start = entity.Fields.First(p => p.Property.Id == KulService.SpeciesObservationPropertyId.Start).Value.WebParseDateTime();
+            observation.End = entity.Fields.First(p => p.Property.Id == KulService.SpeciesObservationPropertyId.End).Value.WebParseDateTime();
+            observation.Locality = entity.Fields.FirstOrDefault(p => p.Property.Id == KulService.SpeciesObservationPropertyId.Locality)?.Value;
+            observation.DyntaxaTaxonId = entity.Fields.First(p => p.Property.Id == KulService.SpeciesObservationPropertyId.DyntaxaTaxonID).Value.WebParseInt32();
+            observation.VerbatimScientificName = entity.Fields.First(p => p.Property.Id == KulService.SpeciesObservationPropertyId.VerbatimScientificName).Value;
+            observation.TaxonRemarks = entity.Fields.First(p => p.Property.Id == KulService.SpeciesObservationPropertyId.TaxonRemarks).Value;
+            observation.IndividualCount = entity.Fields.First(p => p.Property.Id == KulService.SpeciesObservationPropertyId.IndividualCount).Value.WebParseInt32();
+            observation.CountryCode = entity.Fields.First(p => p.Property.Id == KulService.SpeciesObservationPropertyId.CountryCode).Value;
+            observation.AssociatedOccurrences = entity.Fields.First(p => p.Property.Id == KulService.SpeciesObservationPropertyId.AssociatedOccurrences).Value;
+            
             return observation;
-        }
-
-        private enum KulObservationFieldsId
-        {
-            ReportedBy = 0,
-            Owner = 1,
-            RecordedBy = 2,
-            OccurrenceId = 3,
-            DecimalLongitude = 4,
-            DecimalLatitude = 5,
-            CoordinateUncertaintyInMeters = 6,
-            Start = 7,
-            End = 8,
-            Locality = 9,
-            DyntaxaTaxonId = 10,
-            VerbatimScientificName = 11,
-            TaxonRemarks = 12,
-            IndividualCount = 13,
-            CountryCode = 14,
-            AssociatedOccurrences = 15
         }
     }
 }

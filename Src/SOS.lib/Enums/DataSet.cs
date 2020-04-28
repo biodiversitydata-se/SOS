@@ -13,6 +13,8 @@
         KULObservations,
         Dwc,
         NorsObservations,
-        SersObservations
+        SersObservations,
+        MvmObservations,
+        SharkObservations
     }
 }

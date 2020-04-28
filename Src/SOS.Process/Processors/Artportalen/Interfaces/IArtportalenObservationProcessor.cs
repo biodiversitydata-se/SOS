@@ -1,4 +1,6 @@
-﻿namespace SOS.Process.Processors.Interfaces
+﻿using SOS.Process.Processors.Interfaces;
+
+namespace SOS.Process.Processors.Artportalen.Interfaces
 {
     /// <summary>
     /// Artportalen observation processor

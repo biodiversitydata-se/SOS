@@ -24,45 +24,25 @@ namespace SOS.Import.Extensions
         public static NorsObservationVerbatim ToVerbatim(this NorsService.WebSpeciesObservation entity)
         {
             var observation = new NorsObservationVerbatim();
-            observation.ReportedBy = entity.Fields[(int)NorsObservationFieldsId.ReportedBy].Value;
-            observation.Modified = entity.Fields[(int)NorsObservationFieldsId.Modified].Value;
-            observation.Owner = entity.Fields[(int)NorsObservationFieldsId.Owner].Value;
-            observation.IndividualId = entity.Fields[(int)NorsObservationFieldsId.IndividualId].Value;
-            observation.RecordedBy = entity.Fields[(int)NorsObservationFieldsId.RecordedBy].Value;
-            observation.OccurrenceId = entity.Fields[(int)NorsObservationFieldsId.OccurrenceId].Value;
-            observation.DecimalLongitude = entity.Fields[(int)NorsObservationFieldsId.DecimalLongitude].Value.WebParseDouble();
-            observation.DecimalLatitude = entity.Fields[(int)NorsObservationFieldsId.DecimalLatitude].Value.WebParseDouble();
-            observation.CoordinateUncertaintyInMeters = entity.Fields[(int)NorsObservationFieldsId.CoordinateUncertaintyInMeters].Value.WebParseInt32();
-            observation.Start = entity.Fields[(int)NorsObservationFieldsId.Start].Value.WebParseDateTime();
-            observation.End = entity.Fields[(int)NorsObservationFieldsId.End].Value.WebParseDateTime();
-            observation.ScientificName = entity.Fields[(int)NorsObservationFieldsId.ScientificName].Value;
-            observation.DyntaxaTaxonId = entity.Fields[(int)NorsObservationFieldsId.DyntaxaTaxonId].Value.WebParseInt32();
-            observation.Municipality = entity.Fields[(int)NorsObservationFieldsId.Municipality].Value;
-            observation.County = entity.Fields[(int)NorsObservationFieldsId.County].Value;
-            observation.Locality = entity.Fields[(int)NorsObservationFieldsId.Locality].Value;
-            observation.LocationId = entity.Fields[(int)NorsObservationFieldsId.LocationId].Value;
+            observation.ReportedBy = entity.Fields.FirstOrDefault(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.ReportedBy)?.Value;
+            observation.Modified = entity.Fields.FirstOrDefault(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.Modified)?.Value;
+            observation.Owner = entity.Fields.FirstOrDefault(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.Owner)?.Value;
+            observation.IndividualId = entity.Fields.FirstOrDefault(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.OccurrenceID)?.Value;
+            observation.RecordedBy = entity.Fields.FirstOrDefault(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.RecordedBy)?.Value;
+            observation.OccurrenceId = entity.Fields.FirstOrDefault(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.OccurrenceID)?.Value;
+            observation.DecimalLongitude = entity.Fields.First(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.DecimalLongitude).Value.WebParseDouble();
+            observation.DecimalLatitude = entity.Fields.First(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.DecimalLatitude).Value.WebParseDouble();
+            observation.CoordinateUncertaintyInMeters = entity.Fields.FirstOrDefault(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.CoordinateUncertaintyInMeters)?.Value?.WebParseInt32();
+            observation.Start = entity.Fields.First(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.Start).Value.WebParseDateTime();
+            observation.End = entity.Fields.First(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.End).Value.WebParseDateTime();
+            observation.ScientificName = entity.Fields.FirstOrDefault(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.ScientificName)?.Value;
+            observation.DyntaxaTaxonId = entity.Fields.First(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.DyntaxaTaxonID).Value.WebParseInt32();
+            observation.Municipality = entity.Fields.FirstOrDefault(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.Municipality)?.Value;
+            observation.County = entity.Fields.FirstOrDefault(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.County)?.Value;
+            observation.Locality = entity.Fields.FirstOrDefault(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.Locality)?.Value;
+            observation.LocationId = entity.Fields.FirstOrDefault(p => p.Property.Id == NorsService.SpeciesObservationPropertyId.LocationId)?.Value;
             return observation;
-        }
 
-        private enum NorsObservationFieldsId
-        {
-            ReportedBy = 0,
-            Modified = 1,
-            Owner = 2,
-            IndividualId = 3,
-            RecordedBy = 4,
-            OccurrenceId = 5,
-            DecimalLongitude = 6,
-            DecimalLatitude = 7,
-            CoordinateUncertaintyInMeters = 8,
-            Start = 9,
-            End = 10,
-            ScientificName = 11,
-            DyntaxaTaxonId = 12,
-            Municipality = 13,
-            County = 14,
-            Locality = 15,
-            LocationId = 16
         }
     }
 }

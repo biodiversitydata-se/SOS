@@ -30,12 +30,22 @@ namespace SOS.Lib.Configuration.Import
         /// <summary>
         /// NORS configuration
         /// </summary>
-        public NorsServiceConfiguration NorsServiceConfiguration { get; set; }
+        public MvmServiceConfiguration MvmServiceConfiguration { get; set; }
 
         /// <summary>
         /// NORS configuration
         /// </summary>
+        public NorsServiceConfiguration NorsServiceConfiguration { get; set; }
+
+        /// <summary>
+        /// SERS configuration
+        /// </summary>
         public SersServiceConfiguration SersServiceConfiguration { get; set; }
+
+        /// <summary>
+        /// SHARK configuration
+        /// </summary>
+        public SharkServiceConfiguration SharkServiceConfiguration { get; set; }
 
         /// <summary>
         /// taxon attribute service configuration

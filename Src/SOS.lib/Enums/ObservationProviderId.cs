@@ -10,6 +10,7 @@
         KUL = 4,
         NORS = 8,
         SERS = 16,
-        Dwca = 32
+        SHARK = 32,
+        Dwca = 64
     }
 }

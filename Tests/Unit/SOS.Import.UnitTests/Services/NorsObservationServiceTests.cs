@@ -14,12 +14,12 @@ namespace SOS.Import.UnitTests.Services
     public class NorsObservationServiceTests
     {
         private readonly Mock<ISpeciesObservationChangeService> _speciesObservationChangeServiceMock;
-        private readonly NorsServiceConfiguration _clamServiceConfiguration;
+        private readonly NorsServiceConfiguration _norsServiceConfiguration;
         private readonly Mock<ILogger<NorsObservationService>> _loggerMock;
 
         private NorsObservationService TestObject => new NorsObservationService(
             _speciesObservationChangeServiceMock.Object,
-            _clamServiceConfiguration,
+            _norsServiceConfiguration,
             _loggerMock.Object);
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace SOS.Import.UnitTests.Services
         public NorsObservationServiceTests()
         {
             _speciesObservationChangeServiceMock = new Mock<ISpeciesObservationChangeService>();
-            _clamServiceConfiguration = new NorsServiceConfiguration{ MaxNumberOfSightingsHarvested = 10, MaxReturnedChangesInOnePage = 10 };
+            _norsServiceConfiguration = new NorsServiceConfiguration{ MaxNumberOfSightingsHarvested = 10, MaxReturnedChangesInOnePage = 10 };
             _loggerMock = new Mock<ILogger<NorsObservationService>>();
         }
 
@@ -42,7 +42,7 @@ namespace SOS.Import.UnitTests.Services
 
             Action create = () => new NorsObservationService(
                 null,
-                _clamServiceConfiguration,
+                _norsServiceConfiguration,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("speciesObservationChangeServiceClient");
 
@@ -54,7 +54,7 @@ namespace SOS.Import.UnitTests.Services
 
             create = () => new NorsObservationService(
                 _speciesObservationChangeServiceMock.Object,
-                _clamServiceConfiguration,
+                _norsServiceConfiguration,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }

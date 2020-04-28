@@ -1,4 +1,6 @@
-﻿namespace SOS.Process.Processors.Interfaces
+﻿using SOS.Process.Processors.Interfaces;
+
+namespace SOS.Process.Processors.Nors.Interfaces
 {
     /// <summary>
     /// NORS observation processor

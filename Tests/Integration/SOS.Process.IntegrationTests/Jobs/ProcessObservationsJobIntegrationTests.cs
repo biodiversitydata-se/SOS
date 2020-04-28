@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using FluentAssertions;
 using Hangfire;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using Nest;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
@@ -20,6 +16,7 @@ using SOS.Process.Processors.ClamPortal;
 using SOS.Process.Processors.Kul;
 using SOS.Process.Processors.Nors;
 using SOS.Process.Processors.Sers;
+using SOS.Process.Processors.Shark;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
@@ -142,6 +139,12 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<SersObservationProcessor>());
+            var sharkProcessor = new SharkObservationProcessor(
+                new SharkObservationVerbatimRepository(verbatimClient, new NullLogger<SharkObservationVerbatimRepository>()),
+                areaHelper,
+                processedObservationRepository,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                new NullLogger<SharkObservationProcessor>());
             var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
                 processedObservationRepository,
@@ -165,6 +168,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 kulProcessor,
                 norsProcessor,
                 sersProcessor,
+                sharkProcessor,
                 artportalenProcessor,
                 taxonProcessedRepository,
                 instanceManager,
