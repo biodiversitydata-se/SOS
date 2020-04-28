@@ -13,6 +13,8 @@ using SOS.Process.Mappings.Interfaces;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Processors.ClamPortal;
+using SOS.Process.Processors.DarwinCoreArchive;
+using SOS.Process.Processors.Interfaces;
 using SOS.Process.Processors.ClamPortal.Interfaces;
 using SOS.Process.Processors.Kul;
 using SOS.Process.Processors.Kul.Interfaces;
@@ -65,6 +67,7 @@ namespace SOS.Process.IoC.Modules
             // Repositories source
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenVerbatimRepository>().As<IArtportalenVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<DwcaVerbatimRepository>().As<IDwcaVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingVerbatimRepository>().As<IFieldMappingVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
@@ -73,7 +76,6 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<SersObservationVerbatimRepository>().As<ISersObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationVerbatimRepository>().As<ISharkObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonVerbatimRepository>().As<ITaxonVerbatimRepository>().InstancePerLifetimeScope();
-            
 
             // Repositories destination 
             builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>().InstancePerLifetimeScope();
@@ -85,6 +87,7 @@ namespace SOS.Process.IoC.Modules
 
             // Add processors
             builder.RegisterType<ArtportalenObservationProcessor>().As<IArtportalenObservationProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<DwcaObservationProcessor>().As<IDwcaObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<ClamPortalObservationProcessor>().As<IClamPortalObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationProcessor>().As<IKulObservationProcessor>().InstancePerLifetimeScope();

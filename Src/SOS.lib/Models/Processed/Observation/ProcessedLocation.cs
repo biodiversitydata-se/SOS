@@ -24,9 +24,8 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// A decimal representation of the precision of the coordinates
         /// given in the DecimalLatitude and DecimalLongitude.
-        /// This property is currently not used.
         /// </summary>
-        public int? CoordinatePrecision { get; set; }
+        public double? CoordinatePrecision { get; set; }
 
         /// <summary>
         /// The horizontal distance (in meters) from the given
@@ -43,7 +42,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// in which the Location occurs.
         /// Recommended best practice is to use a controlled
         /// vocabulary such as the Getty Thesaurus of Geographic Names.
-        /// This property is currently not used.
         /// </summary>
         /// <remarks>
         /// This value is field mapped.
@@ -61,7 +59,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Location occurs.
         /// Recommended best practice is to use ISO 3166-1-alpha-2
         /// country codes.
-        /// This property is currently not used.
         /// </summary>
         public string CountryCode { get; set; }
 
@@ -90,6 +87,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public ProcessedFieldMapValue Municipality { get; set; }
         
         /// <summary>
+        /// The original municipality value from data provider.
+        /// </summary>
+        public string VerbatimMunicipality { get; set; }
+
+        /// <summary>
         /// Parish ('socken' in swedish).
         /// </summary>
         /// <remarks>
@@ -112,6 +114,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public ProcessedFieldMapValue Province { get; set; }
 
         /// <summary>
+        /// The original StateProvince value from data provider.
+        /// </summary>
+        public string VerbatimProvince { get; set; }
+
+        /// <summary>
         /// Darwin Core term name: decimalLatitude.
         /// Definition in Darwin Core:
         /// The geographic latitude (in decimal degrees, using
@@ -120,7 +127,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// are north of the Equator, negative values are south of it.
         /// Legal values lie between -90 and 90, inclusive.
         /// </summary>
-        public double DecimalLatitude { get; set; }
+        public double? DecimalLatitude { get; set; }
 
         /// <summary>
         /// Darwin Core term name: decimalLongitude.
@@ -132,7 +139,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// values are west of it. Legal values lie between -180
         /// and 180, inclusive.
         /// </summary>
-        public double DecimalLongitude { get; set; }
+        public double? DecimalLongitude { get; set; }
 
         /// <summary>
         /// Darwin Core term name: footprintSpatialFit.
@@ -148,7 +155,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// not that same point. If both the original and the given
         /// georeference are the same point, the footprintSpatialFit
         /// is 1.
-        /// This property is currently not used.
         /// </summary>
         public string FootprintSpatialFit { get; set; }
 
@@ -160,7 +166,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// the decimalLatitude and decimalLongitude, even if it is
         /// the same as for the footprintWKT - use the geodeticDatum
         /// instead.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string FootprintSRS { get; set; }
@@ -172,7 +177,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// A Location may have both a point-radius representation
         /// (see decimalLatitude) and a footprint representation,
         /// and they may differ from each other.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string FootprintWKT { get; set; }
@@ -189,7 +193,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// controlled vocabulary for the name or code of the
         /// ellipsoid, if known. If none of these is known, use the
         /// value "unknown".
-        /// This property is currently not used.
         /// </summary>
         public string GeodeticDatum { get; set; }
 
@@ -198,7 +201,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// A list (concatenated and separated) of names of people,
         /// groups, or organizations who determined the georeference
         /// (spatial representation) the Location.
-        /// This property is currently not used.
         /// </summary>
         public string GeoreferencedBy { get; set; }
 
@@ -207,7 +209,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// The date on which the Location was georeferenced.
         /// Recommended best practice is to use an encoding scheme,
         /// such as ISO 8601:2004(E).
-        /// This property is currently not used.
         /// </summary>
         public string GeoreferencedDate { get; set; }
 
@@ -216,7 +217,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// A description or reference to the methods used to
         /// determine the spatial footprint, coordinates, and
         /// uncertainties.
-        /// This property is currently not used.
         /// </summary>
         public string GeoreferenceProtocol { get; set; }
 
@@ -226,7 +226,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// determination, explaining assumptions made in addition
         /// or opposition to the those formalized in the method
         /// referred to in georeferenceProtocol.
-        /// This property is currently not used.
         /// </summary>
         public string GeoreferenceRemarks { get; set; }
 
@@ -236,7 +235,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// or other resources used to georeference the Location,
         /// described specifically enough to allow anyone in the
         /// future to use the same resources.
-        /// This property is currently not used.
         /// </summary>
         public string GeoreferenceSources { get; set; }
 
@@ -246,7 +244,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// georeference has been verified to represent the best
         /// possible spatial description. Recommended best practice
         /// is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         public string GeoreferenceVerificationStatus { get; set; }
 
@@ -255,7 +252,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// A list (concatenated and separated) of geographic
         /// names less specific than the information captured
         /// in the locality term.
-        /// This property is currently not used.
         /// </summary>
         public string HigherGeography { get; set; }
 
@@ -266,7 +262,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Recommended best practice is to use an
         /// persistent identifier from a controlled vocabulary
         /// such as the Getty Thesaurus of Geographic Names.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string HigherGeographyID { get; set; }
@@ -276,7 +271,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// The name of the island on or near which the Location occurs.
         /// Recommended best practice is to use a controlled
         /// vocabulary such as the Getty Thesaurus of Geographic Names.
-        /// This property is currently not used.
         /// </summary>
         public string Island { get; set; }
 
@@ -285,7 +279,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// The name of the island group in which the Location occurs.
         /// Recommended best practice is to use a controlled
         /// vocabulary such as the Getty Thesaurus of Geographic Names.
-        /// This property is currently not used.
         /// </summary>
         public string IslandGroup { get; set; }
 
@@ -306,7 +299,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Information about the source of this Location information.
         /// Could be a publication (gazetteer), institution,
         /// or team of individuals.
-        /// This property is currently not used.
         /// </summary>
         public string LocationAccordingTo { get; set; }
 
@@ -316,22 +308,19 @@ namespace SOS.Lib.Models.Processed.Observation
         /// (data associated with dcterms:Location).
         /// May be a global unique identifier or an identifier
         /// specific to the data set.
-        /// This property is currently not used.
         /// </summary>
-        public string Id { get; set; }
+        public string LocationId { get; set; }
 
         /// <summary>
         /// Darwin Core term name: locationRemarks.
         /// Comments or notes about the Location.
-        /// This property is currently not used.
         /// </summary>
-        public string Remarks { get; set; }
+        public string LocationRemarks { get; set; }
 
         /// <summary>
         /// Darwin Core term name: maximumDepthInMeters.
         /// The greater depth of a range of depth below
         /// the local surface, in meters.
-        /// This property is currently not used.
         /// </summary>
         public double? MaximumDepthInMeters { get; set; }
 
@@ -344,7 +333,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// are given, the reference surface is the location given
         /// by the depth, otherwise the reference surface is the
         /// location given by the elevation.
-        /// This property is currently not used.
         /// </summary>
         public double? MaximumDistanceAboveSurfaceInMeters { get; set; }
 
@@ -352,7 +340,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Darwin Core term name: maximumElevationInMeters.
         /// The upper limit of the range of elevation (altitude,
         /// usually above sea level), in meters.
-        /// This property is currently not used.
         /// </summary>
         public double? MaximumElevationInMeters { get; set; }
 
@@ -360,7 +347,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Darwin Core term name: minimumDepthInMeters.
         /// The lesser depth of a range of depth below the
         /// local surface, in meters.
-        /// This property is currently not used.
         /// </summary>
         public double? MinimumDepthInMeters { get; set; }
 
@@ -373,7 +359,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// If depth measures are given, the reference surface is
         /// the location given by the depth, otherwise the reference
         /// surface is the location given by the elevation.
-        /// This property is currently not used.
         /// </summary>
         public double? MinimumDistanceAboveSurfaceInMeters { get; set; }
 
@@ -381,7 +366,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Darwin Core term name: minimumElevationInMeters.
         /// The lower limit of the range of elevation (altitude,
         /// usually above sea level), in meters.
-        /// This property is currently not used.
         /// </summary>
         public double? MinimumElevationInMeters { get; set; }
 
@@ -428,7 +412,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// is not that same point (without uncertainty). If both the
         /// original and the given georeference are the same point,
         /// the pointRadiusSpatialFit is 1.
-        /// This property is currently not used.
         /// </summary>
         public string PointRadiusSpatialFit { get; set; }
 
@@ -441,12 +424,21 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? ProvincePartIdByCoordinate { get; set; }
 
         /// <summary>
+        /// Darwin Core term name: verbatimCoordinates.
+        /// The verbatim original spatial coordinates of the Location.
+        /// The coordinate ellipsoid, geodeticDatum, or full
+        /// Spatial Reference System (SRS) for these coordinates
+        /// should be stored in verbatimSRS and the coordinate
+        /// system should be stored in verbatimCoordinateSystem.
+        /// </summary>
+        public string VerbatimCoordinates { get; set; }
+
+        /// <summary>
         /// Darwin Core term name: verbatimCoordinateSystem.
         /// The spatial coordinate system for the verbatimLatitude
         /// and verbatimLongitude or the verbatimCoordinates of the
         /// Location.
         /// Recommended best practice is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         public string VerbatimCoordinateSystem { get; set; }
 
@@ -454,17 +446,15 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Darwin Core term name: verbatimDepth.
         /// The original description of the
         /// depth below the local surface.
-        /// This property is currently not used.
         /// </summary>
-        public int? VerbatimDepth { get; set; }
+        public string VerbatimDepth { get; set; }
 
         /// <summary>
         /// Darwin Core term name: verbatimElevation.
         /// The original description of the elevation (altitude,
         /// usually above sea level) of the Location.
-        /// This property is currently not used.
         /// </summary>
-        public int? VerbatimElevation { get; set; }
+        public string VerbatimElevation { get; set; }
 
         /// <summary>
         /// Darwin Core term name: verbatimLatitude.
@@ -473,14 +463,12 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Spatial Reference System (SRS) for these coordinates
         /// should be stored in verbatimSRS and the coordinate
         /// system should be stored in verbatimCoordinateSystem.
-        /// This property is currently not used.
         /// </summary>
-        public double VerbatimLatitude { get; set; }
+        public double? VerbatimLatitude { get; set; }
 
         /// <summary>
         /// Darwin Core term name: verbatimLocality.
         /// The original textual description of the place.
-        /// This property is currently not used.
         /// </summary>
         public string VerbatimLocality { get; set; }
 
@@ -491,9 +479,8 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Spatial Reference System (SRS) for these coordinates
         /// should be stored in verbatimSRS and the coordinate
         /// system should be stored in verbatimCoordinateSystem.
-        /// This property is currently not used.
         /// </summary>
-        public double VerbatimLongitude { get; set; }
+        public double? VerbatimLongitude { get; set; }
 
         /// <summary>
         /// Darwin Core term name: verbatimSRS.
@@ -508,7 +495,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Otherwise use a controlled vocabulary for the name or
         /// code of the ellipsoid, if known. If none of these is
         /// known, use the value "unknown".
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string VerbatimSRS { get; set; }
@@ -518,7 +504,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// The name of the water body in which the Location occurs.
         /// Recommended best practice is to use a controlled
         /// vocabulary such as the Getty Thesaurus of Geographic Names.
-        /// This property is currently not used.
         /// </summary>
         public string WaterBody { get; set; }
     }

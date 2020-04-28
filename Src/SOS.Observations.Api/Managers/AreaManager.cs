@@ -50,11 +50,11 @@ namespace SOS.Observations.Api.Managers
             }
         }
         /// <inheritdoc />
-        public async Task<PagedResult<ExternalArea>> GetAreasAsync(AreaType areaType, string nameFilter, int skip, int take)
+        public async Task<PagedResult<ExternalArea>> GetAreasAsync(AreaType areaType, string searchString, int skip, int take)
         {
             try
             {
-                var result = await _areaRepository.GetAreasAsync(areaType, nameFilter, skip, take);
+                var result = await _areaRepository.GetAreasAsync(areaType, searchString, skip, take);
 
                 return new PagedResult<ExternalArea>
                 {

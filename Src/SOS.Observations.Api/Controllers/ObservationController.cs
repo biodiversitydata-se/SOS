@@ -110,11 +110,11 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("Areas")]
         [ProducesResponseType(typeof(PagedResult<ExternalArea>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAreasAsync([FromQuery] AreaType areaType, [FromQuery]string nameFilter, [FromQuery]int skip = 0, [FromQuery]int take = 100)
+        public async Task<IActionResult> GetAreasAsync([FromQuery] AreaType areaType, [FromQuery]string searchString, [FromQuery]int skip = 0, [FromQuery]int take = 100)
         {
             try 
             {
-                return new OkObjectResult(await _areaManager.GetAreasAsync(areaType, nameFilter, skip, take));
+                return new OkObjectResult(await _areaManager.GetAreasAsync(areaType, searchString, skip, take));
             }
             catch (Exception e)
             {

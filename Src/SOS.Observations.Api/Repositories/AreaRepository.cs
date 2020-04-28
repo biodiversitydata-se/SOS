@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Lib.Enums;
@@ -29,7 +30,7 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<Area>> GetAreasAsync(AreaType areaType, string nameFilter, int skip, int take)
+        public async Task<PagedResult<Area>> GetAreasAsync(AreaType areaType, string searchString, int skip, int take)
         {
             var filters = new List<FilterDefinition<Area>>();
 
@@ -37,12 +38,12 @@ namespace SOS.Observations.Api.Repositories
                 .Eq(f => f
                     .AreaType, areaType));
 
-            if (!string.IsNullOrEmpty(nameFilter))
+            if (!string.IsNullOrEmpty(searchString))
             {
                 filters.Add(Builders<Area>.Filter
                     .Where(f => f
                         .Name.ToLower()
-                        .Contains(nameFilter.ToLower())));
+                        .Contains(searchString.ToLower())));
             }
 
             var filter = Builders<Area>.Filter.And(filters);

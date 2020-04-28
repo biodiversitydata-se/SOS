@@ -21,7 +21,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Builders
 
         public ProcessedObservationBuilder WithOccurrenceRemarks(string occurrenceRemarks)
         {
-            return With(entity => entity.Occurrence.Remarks = occurrenceRemarks);
+            return With(entity => entity.Occurrence.OccurrenceRemarks = occurrenceRemarks);
         }
 
         protected override ProcessedObservation CreateEntity()

@@ -101,9 +101,9 @@ namespace SOS.Export.IO.DwcArchive
         {
             foreach (var observation in processedObservations)
             {
-                ResolveFieldMappedValue(observation.BasisOfRecordId, valueMappingDictionaries[FieldMappingFieldId.BasisOfRecord]);
-                ResolveFieldMappedValue(observation.TypeId, valueMappingDictionaries[FieldMappingFieldId.Type]);
-                ResolveFieldMappedValue(observation.AccessRightsId, valueMappingDictionaries[FieldMappingFieldId.AccessRights]);
+                ResolveFieldMappedValue(observation.BasisOfRecord, valueMappingDictionaries[FieldMappingFieldId.BasisOfRecord]);
+                ResolveFieldMappedValue(observation.Type, valueMappingDictionaries[FieldMappingFieldId.Type]);
+                ResolveFieldMappedValue(observation.AccessRights, valueMappingDictionaries[FieldMappingFieldId.AccessRights]);
                 ResolveFieldMappedValue(observation.InstitutionId, valueMappingDictionaries[FieldMappingFieldId.Institution]);
                 ResolveFieldMappedValue(observation.Location?.County, valueMappingDictionaries[FieldMappingFieldId.County]);
                 ResolveFieldMappedValue(observation.Location?.Municipality, valueMappingDictionaries[FieldMappingFieldId.Municipality]);
@@ -113,13 +113,13 @@ namespace SOS.Export.IO.DwcArchive
                 ResolveFieldMappedValue(observation.Location?.Continent, valueMappingDictionaries[FieldMappingFieldId.Continent]);
                 ResolveFieldMappedValue(observation.Event?.Biotope, valueMappingDictionaries[FieldMappingFieldId.Biotope]);
                 ResolveFieldMappedValue(observation.Event?.Substrate, valueMappingDictionaries[FieldMappingFieldId.Substrate]);
-                ResolveFieldMappedValue(observation.Identification?.ValidationStatusId, valueMappingDictionaries[FieldMappingFieldId.ValidationStatus]);
+                ResolveFieldMappedValue(observation.Identification?.ValidationStatus, valueMappingDictionaries[FieldMappingFieldId.ValidationStatus]);
                 ResolveFieldMappedValue(observation.Occurrence?.LifeStage, valueMappingDictionaries[FieldMappingFieldId.LifeStage]);
                 ResolveFieldMappedValue(observation.Occurrence?.Activity, valueMappingDictionaries[FieldMappingFieldId.Activity]);
                 ResolveFieldMappedValue(observation.Occurrence?.Gender, valueMappingDictionaries[FieldMappingFieldId.Gender]);
                 ResolveFieldMappedValue(observation.Occurrence?.OrganismQuantityUnit, valueMappingDictionaries[FieldMappingFieldId.Unit]);
                 ResolveFieldMappedValue(observation.Occurrence?.EstablishmentMeans, valueMappingDictionaries[FieldMappingFieldId.EstablishmentMeans]);
-                ResolveFieldMappedValue(observation.Occurrence?.Status, valueMappingDictionaries[FieldMappingFieldId.OccurrenceStatus]);
+                ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatus, valueMappingDictionaries[FieldMappingFieldId.OccurrenceStatus]);
             }
         }
 

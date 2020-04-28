@@ -13,7 +13,6 @@
         /// The date on which the subject was identified as
         /// representing the Taxon. Recommended best practice is
         /// to use an encoding scheme, such as ISO 8601:2004(E).
-        /// This property is currently not used.
         /// </summary>
         public string DateIdentified { get; set; }
 
@@ -23,7 +22,6 @@
         /// information associated with the assignment of a scientific
         /// name). May be a global unique identifier or an identifier
         /// specific to the data set.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string IdentificationID { get; set; }
@@ -40,7 +38,6 @@
         /// A list (concatenated and separated) of references
         /// (publication, global unique identifier, URI) used in
         /// the Identification.
-        /// This property is currently not used.
         /// </summary>
         public string IdentificationReferences { get; set; }
 
@@ -59,7 +56,6 @@
         /// identification has been verified to be correct.
         /// Recommended best practice is to use a controlled vocabulary
         /// such as that used in HISPID/ABCD.
-        /// This property is currently not used.
         /// </summary>
         public string IdentificationVerificationStatus { get; set; }
 
@@ -76,7 +72,6 @@
         /// A list (concatenated and separated) of nomenclatural
         /// types (type status, typified scientific name, publication)
         /// applied to the subject.
-        /// This property is currently not used.
         /// </summary>
         public string TypeStatus { get; set; }
     }

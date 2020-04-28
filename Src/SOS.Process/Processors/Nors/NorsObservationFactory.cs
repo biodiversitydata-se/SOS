@@ -6,6 +6,7 @@ using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Nors;
@@ -49,15 +50,14 @@ namespace SOS.Process.Processors.Nors
 
             var obs = new ProcessedObservation(ObservationProvider.NORS)
             {
-                BasisOfRecordId = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
+                BasisOfRecord = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ ObservationProvider.NORS.ToString() }",
                 DatasetName = "NORS",
                 Event = new ProcessedEvent
                 {
                     EndDate = verbatim.End.ToUniversalTime(),
                     StartDate = verbatim.Start.ToUniversalTime(),
-                    VerbatimEndDate = verbatim.End,
-                    VerbatimStartDate = verbatim.Start
+                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.Start, verbatim.End)
                 },
                 Identification = new ProcessedIdentification
                 {
@@ -84,13 +84,13 @@ namespace SOS.Process.Processors.Nors
                 Occurrence = new ProcessedOccurrence
                 {
                     CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
-                    Id = verbatim.OccurrenceId,
+                    OccurrenceId = verbatim.OccurrenceId,
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
                     RecordedBy = verbatim.RecordedBy,
-                    Status = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
+                    OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
                 },
                 OwnerInstitutionCode = verbatim.Owner,
                 ProtectionLevel = GetProtectionLevel(),

@@ -21,10 +21,10 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// Get areas matching provided filter
         /// </summary>
         /// <param name="areaType"></param>
-        /// <param name="nameFilter"></param>
+        /// <param name="searchString"></param>
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<PagedResult<ExternalArea>> GetAreasAsync(AreaType areaType, string nameFilter, int skip, int take);
+        Task<PagedResult<ExternalArea>> GetAreasAsync(AreaType areaType, string searchString, int skip, int take);
     }
 }

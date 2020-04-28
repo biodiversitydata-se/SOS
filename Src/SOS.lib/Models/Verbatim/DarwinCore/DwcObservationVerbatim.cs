@@ -239,7 +239,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// For Darwin Core, recommended best practice is
         /// to use the name of the class that defines the
         /// root of the record.
-        /// This property is currently not used.
         /// </summary>
         public string Type { get; set; }
         #endregion
@@ -1125,7 +1124,7 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         /// global unique identifier, construct one from a combination of identifiers
         /// in the record that will most closely make the materialSampleID globally unique.
         /// </summary>
-        public string MaterialSampleID;
+        public string MaterialSampleID { get; set; }
 
         #endregion
 

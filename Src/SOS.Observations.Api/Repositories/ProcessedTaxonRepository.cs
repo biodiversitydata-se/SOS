@@ -20,7 +20,7 @@ namespace SOS.Observations.Api.Repositories
         /// <param name="logger"></param>
         public ProcessedTaxonRepository(
             IProcessClient client,
-            ILogger<ProcessBaseRepository<ProcessedTaxon, int>> logger) : base(client, true, logger)
+            ILogger<ProcessBaseRepository<ProcessedTaxon, int>> logger) : base(client, false, logger)
         {
         }
 

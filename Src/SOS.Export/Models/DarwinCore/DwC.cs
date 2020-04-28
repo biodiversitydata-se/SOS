@@ -40,7 +40,6 @@ namespace SOS.Export.Models.DarwinCore
         /// Recommended practice is to include sufficient
         /// bibliographic detail to identify the resource as
         /// unambiguously as possible.
-        /// This property is currently not used.
         /// </summary>
         public string BibliographicCitation { get; set; }
 
@@ -68,7 +67,6 @@ namespace SOS.Export.Models.DarwinCore
         /// complete than in its original form.
         /// Suggests that alternative data of higher quality
         /// may be available on request.
-        /// This property is currently not used.
         /// </summary>
         public string DataGeneralizations { get; set; }
 
@@ -100,7 +98,6 @@ namespace SOS.Export.Models.DarwinCore
         /// Darwin Core term name: informationWithheld.
         /// Additional information that exists, but that has
         /// not been shared in the given record.
-        /// This property is currently not used.
         /// </summary>
         public string InformationWithheld { get; set; }
 
@@ -109,7 +106,6 @@ namespace SOS.Export.Models.DarwinCore
         /// The name (or acronym) in use by the institution
         /// having custody of the object(s) or information
         /// referred to in the record.
-        /// Currently this property has the value ArtDatabanken.
         /// </summary>
         public string InstitutionCode { get; set; }
 
@@ -117,7 +113,6 @@ namespace SOS.Export.Models.DarwinCore
         /// Darwin Core term name: institutionID.
         /// An identifier for the institution having custody of 
         /// the object(s) or information referred to in the record.
-        /// This property is currently not used.
         /// </summary>
         public string InstitutionID { get; set; }
 
@@ -126,7 +121,6 @@ namespace SOS.Export.Models.DarwinCore
         /// A language of the resource.
         /// Recommended best practice is to use a controlled
         /// vocabulary such as RFC 4646 [RFC4646].
-        /// This property is currently not used.
         /// </summary>
         public string Language { get; set; }
 
@@ -152,7 +146,6 @@ namespace SOS.Export.Models.DarwinCore
         /// The name (or acronym) in use by the institution having
         /// ownership of the object(s) or information referred
         /// to in the record.
-        /// This property is currently not used.
         /// </summary>
         public string OwnerInstitutionCode { get; set; }
 
@@ -160,7 +153,6 @@ namespace SOS.Export.Models.DarwinCore
         /// Darwin Core term name: dcterms:references.
         /// A related resource that is referenced, cited,
         /// or otherwise pointed to by the described resource.
-        /// This property is currently not used.
         /// </summary>
         public string References { get; set; }
 
@@ -170,7 +162,6 @@ namespace SOS.Export.Models.DarwinCore
         /// Typically, rights information includes a statement
         /// about various property rights associated with the resource,
         /// including intellectual property rights.
-        /// This property is currently not used.
         /// </summary>
         public string Rights { get; set; }
 
@@ -178,7 +169,6 @@ namespace SOS.Export.Models.DarwinCore
         /// Darwin Core term name: dcterms:rightsHolder.
         /// A person or organization owning or
         /// managing rights over the resource.
-        /// This property is currently not used.
         /// </summary>
         public string RightsHolder { get; set; }
 
@@ -188,7 +178,6 @@ namespace SOS.Export.Models.DarwinCore
         /// For Darwin Core, recommended best practice is
         /// to use the name of the class that defines the
         /// root of the record.
-        /// This property is currently not used.
         /// </summary>
         public string Type { get; set; }
     }

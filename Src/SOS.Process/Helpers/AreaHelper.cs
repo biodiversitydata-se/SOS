@@ -123,12 +123,12 @@ namespace SOS.Process.Helpers
         /// <inheritdoc />
         public void AddAreaDataToProcessedObservation(ProcessedObservation processedObservation)
         {
-            if (processedObservation.Location == null || processedObservation.Location.DecimalLatitude.Equals(0) && processedObservation.Location.DecimalLongitude.Equals(0))
+            if (processedObservation.Location == null || !processedObservation.Location.DecimalLatitude.HasValue || !processedObservation.Location.DecimalLongitude.HasValue)
             {
                 return;
             }
 
-            var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude, processedObservation.Location.DecimalLatitude);
+            var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude.Value, processedObservation.Location.DecimalLatitude.Value);
             processedObservation.Location.County = ProcessedFieldMapValue.Create(positionLocation.County?.Id);
             processedObservation.Location.Municipality = ProcessedFieldMapValue.Create(positionLocation.Municipality?.Id);
             processedObservation.Location.Parish = ProcessedFieldMapValue.Create(positionLocation.Parish?.Id);

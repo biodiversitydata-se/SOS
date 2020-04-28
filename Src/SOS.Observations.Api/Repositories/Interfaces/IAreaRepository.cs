@@ -22,9 +22,10 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// Get all the areas, paged
         /// </summary>
         /// <param name="areaType">Skip this many</param>
+        /// <param name="searchString">Skip this many</param>
         /// <param name="skip">Skip this many</param>
         /// <param name="take">Take this many areas</param>
         /// <returns></returns>
-        public Task<PagedResult<Area>> GetAreasAsync(AreaType areaType, string nameFilter, int skip, int take);
+        public Task<PagedResult<Area>> GetAreasAsync(AreaType areaType, string searchString, int skip, int take);
     }
 }

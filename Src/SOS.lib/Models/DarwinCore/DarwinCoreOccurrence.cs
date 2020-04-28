@@ -13,7 +13,6 @@
         /// A list (concatenated and separated) of identifiers
         /// (publication, global unique identifier, URI) of
         /// media associated with the Occurrence.
-        /// This property is currently not used.
         /// </summary>
         public string AssociatedMedia { get; set; }
 
@@ -22,7 +21,6 @@
         /// A list (concatenated and separated) of identifiers of
         /// other Occurrence records and their associations to
         /// this Occurrence.
-        /// This property is currently not used.
         /// </summary>
         public string AssociatedOccurrences { get; set; }
 
@@ -32,7 +30,6 @@
         /// (publication, bibliographic reference, global unique
         /// identifier, URI) of literature associated with
         /// the Occurrence.
-        /// This property is currently not used.
         /// </summary>
         public string AssociatedReferences { get; set; }
 
@@ -41,7 +38,6 @@
         /// A list (concatenated and separated) of identifiers of
         /// other Occurrence records and their associations to
         /// this Occurrence.
-        /// This property is currently not used.
         /// </summary>
         public string AssociatedSequences { get; set; }
 
@@ -49,7 +45,6 @@
         /// Darwin Core term name: associatedTaxa.
         /// A list (concatenated and separated) of identifiers or
         /// names of taxa and their associations with the Occurrence.
-        /// This property is currently not used.
         /// </summary>
         public string AssociatedTaxa { get; set; }
 
@@ -73,7 +68,6 @@
         /// The current state of a specimen with respect to the
         /// collection identified in collectionCode or collectionID.
         /// Recommended best practice is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         public string Disposition { get; set; }
 
@@ -83,7 +77,6 @@
         /// represented in the Occurrence became established at the
         /// location.
         /// Recommended best practice is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         public string EstablishmentMeans { get; set; }
 
@@ -101,7 +94,6 @@
         /// Meant to accommodate resampling of the same individual
         /// or group for monitoring purposes. May be a global unique
         /// identifier or an identifier specific to a data set.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string IndividualID { get; set; }
@@ -147,7 +139,6 @@
         /// A statement about the presence or absence of a Taxon at a
         /// Location.
         /// Recommended best practice is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         public string OccurrenceStatus { get; set; }
 
@@ -157,7 +148,6 @@
         /// alternate fully qualified catalog numbers or other
         /// human-used identifiers for the same Occurrence,
         /// whether in the current or any other data set or collection.
-        /// This property is currently not used.
         /// </summary>
         public string OtherCatalogNumbers { get; set; }
 
@@ -187,7 +177,6 @@
         /// Darwin Core term name: preparations.
         /// A list (concatenated and separated) of preparations
         /// and preservation methods for a specimen.
-        /// This property is currently not used.
         /// </summary>
         public string Preparations { get; set; }
 
@@ -195,7 +184,6 @@
         /// Darwin Core term name: previousIdentifications.
         /// A list (concatenated and separated) of previous
         /// assignments of names to the Occurrence.
-        /// This property is currently not used.
         /// </summary>
         public string PreviousIdentifications { get; set; }
 
@@ -214,7 +202,6 @@
         /// An identifier given to the Occurrence at the time it was
         /// recorded. Often serves as a link between field notes and
         /// an Occurrence record, such as a specimen collector's number.
-        /// This property is currently not used.
         /// </summary>
         public string RecordNumber { get; set; }
 
@@ -223,7 +210,6 @@
         /// The reproductive condition of the biological individual(s)
         /// represented in the Occurrence.
         /// Recommended best practice is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         public string ReproductiveCondition { get; set; }
 
