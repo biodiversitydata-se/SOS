@@ -4,6 +4,7 @@ using Elasticsearch.Net;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using Nest;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;

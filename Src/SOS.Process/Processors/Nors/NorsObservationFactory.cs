@@ -90,7 +90,7 @@ namespace SOS.Process.Processors.Nors
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
                     RecordedBy = verbatim.RecordedBy,
-                    Status = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
+                    OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
                 },
                 OwnerInstitutionCode = verbatim.Owner,
                 ProtectionLevel = GetProtectionLevel(),

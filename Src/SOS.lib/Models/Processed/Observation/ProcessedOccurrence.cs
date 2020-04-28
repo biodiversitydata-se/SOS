@@ -262,7 +262,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue Status { get; set; }
+        public ProcessedFieldMapValue OccurrenceStatus { get; set; }
 
         /// <summary>
         /// URL to occurrence
