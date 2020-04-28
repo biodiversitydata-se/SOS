@@ -17,7 +17,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// The full name, with authorship and date information
         /// if known, of the currently valid (zoological) or
         /// accepted (botanical) taxon.
-        /// This property is currently not used.
         /// </summary>
         public string AcceptedNameUsage { get; set; }
 
@@ -26,7 +25,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// An identifier for the name usage (documented meaning of
         /// the name according to a source) of the currently valid
         /// (zoological) or accepted (botanical) taxon.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string AcceptedNameUsageID { get; set; }
@@ -35,7 +33,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Darwin Core term name: class.
         /// The full scientific name of the class in which
         /// the taxon is classified.
-        /// This property is currently not used.
         /// </summary>
         public string Class { get; set; }
 
@@ -49,7 +46,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Darwin Core term name: family.
         /// The full scientific name of the family in which
         /// the taxon is classified.
-        /// This property is currently not used.
         /// </summary>
         public string Family { get; set; }
 
@@ -57,7 +53,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Darwin Core term name: genus.
         /// The full scientific name of the genus in which
         /// the taxon is classified.
-        /// This property is currently not used.
         /// </summary>
         public string Genus { get; set; }
 
@@ -69,7 +64,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Recommended best practice is to order the list
         /// starting with the highest rank and separating the names
         /// for each rank with a semi-colon (";").
-        /// This property is currently not used.
         /// </summary>
         public string HigherClassification { get; set; }
 
@@ -83,7 +77,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Darwin Core term name: infraspecificEpithet.
         /// The name of the lowest or terminal infraspecific epithet
         /// of the scientificName, excluding any rank designation.
-        /// This property is currently not used.
         /// </summary>
         public string InfraspecificEpithet { get; set; }
 
@@ -91,7 +84,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Darwin Core term name: kingdom.
         /// The full scientific name of the kingdom in which the
         /// taxon is classified.
-        /// This property is currently not used.
         /// </summary>
         public string Kingdom { get; set; }
 
@@ -104,7 +96,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// For taxa that result from identifications, a reference
         /// to the keys, monographs, experts and other sources should
         /// be given.
-        /// This property is currently not used.
         /// </summary>
         public string NameAccordingTo { get; set; }
 
@@ -113,7 +104,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// An identifier for the source in which the specific
         /// taxon concept circumscription is defined or implied.
         /// See nameAccordingTo.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string NameAccordingToID { get; set; }
@@ -123,7 +113,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// A reference for the publication in which the
         /// scientificName was originally established under the rules
         /// of the associated nomenclaturalCode.
-        /// This property is currently not used.
         /// </summary>
         public string NamePublishedIn { get; set; }
 
@@ -132,7 +121,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// An identifier for the publication in which the
         /// scientificName was originally established under the
         /// rules of the associated nomenclaturalCode.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string NamePublishedInID { get; set; }
@@ -141,7 +129,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Darwin Core term name: namePublishedInYear.
         /// The four-digit year in which the scientificName
         /// was published.
-        /// This property is currently not used.
         /// </summary>
         public string NamePublishedInYear { get; set; }
 
@@ -151,7 +138,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// ambiregnal name) under which the scientificName is
         /// constructed.
         /// Recommended best practice is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         public string NomenclaturalCode { get; set; }
 
@@ -162,7 +148,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// nomenclature. It is based essentially on an algorithm
         /// according to the business rules of the code.
         /// It requires no taxonomic opinion.
-        /// This property is currently not used.
         /// </summary>
         public string NomenclaturalStatus { get; set; }
 
@@ -170,7 +155,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Darwin Core term name: order.
         /// The full scientific name of the order in which
         /// the taxon is classified.
-        /// This property is currently not used.
         /// </summary>
         public string Order { get; set; }
 
@@ -182,7 +166,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// The basionym (botany) or basonym (bacteriology) of the
         /// scientificName or the senior/earlier homonym for replaced
         /// names.
-        /// This property is currently not used.
         /// </summary>
         public string OriginalNameUsage { get; set; }
 
@@ -192,7 +175,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// the name according to a source) in which the terminal
         /// element of the scientificName was originally established
         /// under the rules of the associated nomenclaturalCode.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string OriginalNameUsageID { get; set; }
@@ -203,7 +185,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// if known, of the direct, most proximate higher-rank
         /// parent taxon (in a classification) of the most specific
         /// element of the scientificName.
-        /// This property is currently not used.
         /// </summary>
         public string ParentNameUsage { get; set; }
 
@@ -214,7 +195,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// most proximate higher-rank parent taxon
         /// (in a classification) of the most specific
         /// element of the scientificName.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string ParentNameUsageID { get; set; }
@@ -223,7 +203,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Darwin Core term name: phylum.
         /// The full scientific name of the phylum or division
         /// in which the taxon is classified.
-        /// This property is currently not used.
         /// </summary>
         public string Phylum { get; set; }
 
@@ -245,7 +224,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// The authorship information for the scientificName
         /// formatted according to the conventions of the applicable
         /// nomenclaturalCode.
-        /// This property is currently not used.
         /// </summary>
         public string ScientificNameAuthorship { get; set; }
 
@@ -253,7 +231,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Darwin Core term name: scientificNameID.
         /// An identifier for the nomenclatural (not taxonomic)
         /// details of a scientific name.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string ScientificNameID { get; set; }
@@ -262,7 +239,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Darwin Core term name: specificEpithet.
         /// The name of the first or species epithet of
         /// the scientificName.
-        /// This property is currently not used.
         /// </summary>
         public string SpecificEpithet { get; set; }
 
@@ -271,7 +247,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// The full scientific name of the subgenus in which
         /// the taxon is classified. Values should include the
         /// genus to avoid homonym confusion.
-        /// This property is currently not used.
         /// </summary>
         public string Subgenus { get; set; }
 
@@ -282,7 +257,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// In SwedishSpeciesObservationSOAPService this property
         /// has the same value as property TaxonID. 
         /// GUID in Dyntaxa is used as value for this property.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string TaxonConceptID { get; set; }
@@ -309,7 +283,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// It must be linked to a specific taxonomic reference that
         /// defines the concept.
         /// Recommended best practice is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         public string TaxonomicStatus { get; set; }
 
@@ -318,14 +291,12 @@ namespace SOS.Lib.Models.DarwinCore
         /// The taxonomic rank of the most specific name in the
         /// scientificName. Recommended best practice is to use
         /// a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         public string TaxonRank { get; set; }
 
         /// <summary>
         /// Darwin Core term name: taxonRemarks.
         /// Comments or notes about the taxon or name.
-        /// This property is currently not used.
         /// </summary>
         public string TaxonRemarks { get; set; }
 
@@ -333,7 +304,6 @@ namespace SOS.Lib.Models.DarwinCore
         /// Darwin Core term name: verbatimTaxonRank.
         /// The taxonomic rank of the most specific name in the
         /// scientificName as it appears in the original record.
-        /// This property is currently not used.
         /// </summary>
         public string VerbatimTaxonRank { get; set; }
 

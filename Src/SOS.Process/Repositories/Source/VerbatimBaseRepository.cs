@@ -58,22 +58,45 @@ namespace SOS.Process.Repositories.Source
         /// Get client
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName);
+        protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(_collectionName);
+
+        protected IMongoCollection<TEntity> GetMongoCollection(string collectionName)
+        {
+            return Database.GetCollection<TEntity>(collectionName);
+        }
 
         /// <inheritdoc />
         public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync()
         {
-            return await MongoCollection.FindAsync(FilterDefinition<TEntity>.Empty);
+            return await GetAllByCursorAsync(MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync(IMongoCollection<TEntity> mongoCollection)
+        {
+            return await mongoCollection.FindAsync(FilterDefinition<TEntity>.Empty);
         }
 
         /// <inheritdoc />
         public async Task<List<TEntity>> GetAllAsync()
         {
-            return await MongoCollection.AsQueryable().ToListAsync();
+            return await GetAllAsync(MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<List<TEntity>> GetAllAsync(IMongoCollection<TEntity> mongoCollection)
+        {
+            return await mongoCollection.AsQueryable().ToListAsync();
         }
 
         /// <inheritdoc />
         public async Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId)
+        {
+            return await GetBatchAsync(startId, endId, MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId, IMongoCollection<TEntity> mongoCollection)
         {
             try
             {
@@ -83,7 +106,7 @@ namespace SOS.Process.Repositories.Source
                     Builders<TEntity>.Filter.Lte(d => d.Id, endId)
                 };
 
-                var res = await MongoCollection
+                var res = await mongoCollection
                     .Find(Builders<TEntity>.Filter.And(filters))
                     .ToListAsync();
 
@@ -100,16 +123,22 @@ namespace SOS.Process.Repositories.Source
         /// <inheritdoc />
         public async Task<Tuple<TKey, TKey>> GetIdSpanAsync()
         {
+            return await GetIdSpanAsync(MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<Tuple<TKey, TKey>> GetIdSpanAsync(IMongoCollection<TEntity> mongoCollection)
+        {
             try
             {
-                var min = await MongoCollection
+                var min = await mongoCollection
                     .Find(FilterDefinition<TEntity>.Empty)
                     .Project(d => d.Id)
                     .Sort(Builders<TEntity>.Sort.Ascending("_id"))
                     .Limit(1)
                     .FirstOrDefaultAsync();
 
-                var max = await MongoCollection
+                var max = await mongoCollection
                     .Find(FilterDefinition<TEntity>.Empty)
                     .Project(d => d.Id)
                     .Sort(Builders<TEntity>.Sort.Descending("_id"))

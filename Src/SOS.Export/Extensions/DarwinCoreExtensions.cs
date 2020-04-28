@@ -421,7 +421,7 @@ namespace SOS.Export.Extensions
             row.MeasurementType = projectParameter.Name;
             row.MeasurementValue = projectParameter.Value;
             row.MeasurementUnit = projectParameter.Unit;
-            row.MeasurementDeterminedDate = DwcFormattingHelper.CreateDateIntervalString(project.StartDate, project.EndDate);
+            row.MeasurementDeterminedDate = DwcFormatter.CreateDateIntervalString(project.StartDate, project.EndDate);
             row.MeasurementMethod = GetMeasurementMethodDescription(project);
             row.MeasurementRemarks = projectParameter.Description;
 

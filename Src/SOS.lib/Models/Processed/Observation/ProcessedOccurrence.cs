@@ -17,13 +17,13 @@ namespace SOS.Lib.Models.Processed.Observation
         /// This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue Activity { get; set; }
+        public ProcessedFieldMapValue 
+            Activity { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of identifiers
         /// (publication, global unique identifier, URI) of
         /// media associated with the Occurrence.
-        /// This property is currently not used.
         /// </summary>
         public string AssociatedMedia { get; set; }
 
@@ -31,7 +31,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// A list (concatenated and separated) of identifiers of
         /// other Occurrence records and their associations to
         /// this Occurrence.
-        /// This property is currently not used.
         /// </summary>
         public string AssociatedOccurrences { get; set; }
 
@@ -40,7 +39,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// (publication, bibliographic reference, global unique
         /// identifier, URI) of literature associated with
         /// the Occurrence.
-        /// This property is currently not used.
         /// </summary>
         public string AssociatedReferences { get; set; }
 
@@ -48,14 +46,12 @@ namespace SOS.Lib.Models.Processed.Observation
         /// A list (concatenated and separated) of identifiers of
         /// other Occurrence records and their associations to
         /// this Occurrence.
-        /// This property is currently not used.
         /// </summary>
         public string AssociatedSequences { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of identifiers or
         /// names of taxa and their associations with the Occurrence.
-        /// This property is currently not used.
         /// </summary>
         public string AssociatedTaxa { get; set; }
 
@@ -81,7 +77,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// The current state of a specimen with respect to the
         /// collection identified in collectionCode or collectionID.
         /// Recommended best practice is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         public string Disposition { get; set; }
 
@@ -109,7 +104,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Meant to accommodate resampling of the same individual
         /// or group for monitoring purposes. May be a global unique
         /// identifier or an identifier specific to a data set.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string IndividualID { get; set; }
@@ -174,19 +168,18 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Red list database: urn:lsid:artdata.slu.se:SpeciesObservation:{id}
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string Id { get; set; }
+        public string OccurrenceId { get; set; }
 
         /// <summary>
         /// Comments or notes about the Occurrence.
         /// </summary>
-        public string Remarks { get; set; }
+        public string OccurrenceRemarks { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of previous or
         /// alternate fully qualified catalog numbers or other
         /// human-used identifiers for the same Occurrence,
         /// whether in the current or any other data set or collection.
-        /// This property is currently not used.
         /// </summary>
         public string OtherCatalogNumbers { get; set; }
 
@@ -199,7 +192,13 @@ namespace SOS.Lib.Models.Processed.Observation
         /// 12.5 (organismQuantity) with %biomass (organismQuantityType).
         /// r (organismQuantity) with BraunBlanquetScale (organismQuantityType).
         /// </example>
-        public int? OrganismQuantity { get; set; }
+        public string OrganismQuantity { get; set; }
+
+        /// <summary>
+        /// The quantity of organisms as integer.
+        /// </summary>
+        /// <remarks>Not defined in DwC</remarks>
+        public int? OrganismQuantityInt { get; set; }
 
         /// <summary>
         /// The type of quantification system used for the quantity of organisms.
@@ -218,14 +217,12 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// A list (concatenated and separated) of preparations
         /// and preservation methods for a specimen.
-        /// This property is currently not used.
         /// </summary>
         public string Preparations { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of previous
         /// assignments of names to the Occurrence.
-        /// This property is currently not used.
         /// </summary>
         public string PreviousIdentifications { get; set; }
 
@@ -242,7 +239,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// An identifier given to the Occurrence at the time it was
         /// recorded. Often serves as a link between field notes and
         /// an Occurrence record, such as a specimen collector's number.
-        /// This property is currently not used.
         /// </summary>
         public string RecordNumber { get; set; }
 
@@ -261,7 +257,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// A statement about the presence or absence of a Taxon at a
         /// Location.
         /// Recommended best practice is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         /// <remarks>
         /// This value is field mapped.

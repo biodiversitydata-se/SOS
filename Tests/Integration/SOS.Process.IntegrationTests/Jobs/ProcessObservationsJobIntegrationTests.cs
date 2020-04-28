@@ -21,6 +21,7 @@ using SOS.Process.Processors.Kul;
 using SOS.Process.Processors.Nors;
 using SOS.Process.Processors.Sers;
 using SOS.Process.Repositories.Destination;
+using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
 using Xunit;
 
@@ -34,7 +35,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var processJob = CreateProcessJob();
+            var processJob = CreateProcessJob(storeProcessed: false);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -52,7 +53,32 @@ namespace SOS.Process.IntegrationTests.Jobs
             result.Should().BeTrue();
         }
 
-        private ProcessJob CreateProcessJob()
+
+        [Fact]
+        public async Task Run_process_job_for_dwca()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var processJob = CreateProcessJob(storeProcessed: false);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await processJob.RunAsync(
+                (int)ObservationProvider.Dwca,
+                false,
+                false,
+                false,
+                JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Should().BeTrue();
+        }
+
+        private ProcessJob CreateProcessJob(bool storeProcessed)
         {
             var processConfiguration = GetProcessConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
@@ -79,7 +105,16 @@ namespace SOS.Process.IntegrationTests.Jobs
             var fieldMappingVerbatimRepository = new FieldMappingVerbatimRepository(verbatimClient, new NullLogger<FieldMappingVerbatimRepository>());
             var taxonProcessedRepository = new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
             var invalidObservationRepository = new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
-            var processedObservationRepository = new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>(), elasticClient);
+            IProcessedObservationRepository processedObservationRepository;
+            if (storeProcessed)
+            {
+                processedObservationRepository = new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>(), elasticClient);
+            }
+            else
+            {
+                processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
+            }
+
             var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository = new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
             var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());

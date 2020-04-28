@@ -17,6 +17,6 @@
         /// <example>
         /// 06809dc5-f143-459a-be1a-6f03e63fc083
         /// </example>
-        public string MaterialSampleID { get; set; }
+        public string MaterialSampleId { get; set; }
     }
 }

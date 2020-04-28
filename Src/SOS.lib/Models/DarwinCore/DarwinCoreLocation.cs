@@ -14,7 +14,6 @@
         /// Recommended best practice is to use a controlled
         /// vocabulary such as the Getty Thesaurus of Geographi
         /// Names or the ISO 3166 Continent code.
-        /// This property is currently not used.
         /// </summary>
         public string Continent { get; set; }
 
@@ -22,7 +21,6 @@
         /// Darwin Core term name: CoordinatePrecision.
         /// A decimal representation of the precision of the coordinates
         /// given in the DecimalLatitude and DecimalLongitude.
-        /// This property is currently not used.
         /// </summary>
         public string CoordinatePrecision { get; set; }
 
@@ -43,7 +41,6 @@
         /// in which the Location occurs.
         /// Recommended best practice is to use a controlled
         /// vocabulary such as the Getty Thesaurus of Geographic Names.
-        /// This property is currently not used.
         /// </summary>
         public string Country { get; set; }
 
@@ -53,7 +50,6 @@
         /// Location occurs.
         /// Recommended best practice is to use ISO 3166-1-alpha-2
         /// country codes.
-        /// This property is currently not used.
         /// </summary>
         public string CountryCode { get; set; }
 
@@ -75,7 +71,7 @@
         /// are north of the Equator, negative values are south of it.
         /// Legal values lie between -90 and 90, inclusive.
         /// </summary>
-        public double DecimalLatitude { get; set; }
+        public double? DecimalLatitude { get; set; }
 
         /// <summary>
         /// Darwin Core term name: decimalLongitude.
@@ -87,7 +83,7 @@
         /// values are west of it. Legal values lie between -180
         /// and 180, inclusive.
         /// </summary>
-        public double DecimalLongitude { get; set; }
+        public double? DecimalLongitude { get; set; }
 
         /// <summary>
         /// Darwin Core term name: footprintSpatialFit.
@@ -103,7 +99,6 @@
         /// not that same point. If both the original and the given
         /// georeference are the same point, the footprintSpatialFit
         /// is 1.
-        /// This property is currently not used.
         /// </summary>
         public string FootprintSpatialFit { get; set; }
 
@@ -115,7 +110,6 @@
         /// the decimalLatitude and decimalLongitude, even if it is
         /// the same as for the footprintWKT - use the geodeticDatum
         /// instead.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string FootprintSRS { get; set; }
@@ -127,7 +121,6 @@
         /// A Location may have both a point-radius representation
         /// (see decimalLatitude) and a footprint representation,
         /// and they may differ from each other.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string FootprintWKT { get; set; }
@@ -144,7 +137,6 @@
         /// controlled vocabulary for the name or code of the
         /// ellipsoid, if known. If none of these is known, use the
         /// value "unknown".
-        /// This property is currently not used.
         /// </summary>
         public string GeodeticDatum { get; set; }
 
@@ -153,7 +145,6 @@
         /// A list (concatenated and separated) of names of people,
         /// groups, or organizations who determined the georeference
         /// (spatial representation) the Location.
-        /// This property is currently not used.
         /// </summary>
         public string GeoreferencedBy { get; set; }
 
@@ -162,7 +153,6 @@
         /// The date on which the Location was georeferenced.
         /// Recommended best practice is to use an encoding scheme,
         /// such as ISO 8601:2004(E).
-        /// This property is currently not used.
         /// </summary>
         public string GeoreferencedDate { get; set; }
 
@@ -171,7 +161,6 @@
         /// A description or reference to the methods used to
         /// determine the spatial footprint, coordinates, and
         /// uncertainties.
-        /// This property is currently not used.
         /// </summary>
         public string GeoreferenceProtocol { get; set; }
 
@@ -181,7 +170,6 @@
         /// determination, explaining assumptions made in addition
         /// or opposition to the those formalized in the method
         /// referred to in georeferenceProtocol.
-        /// This property is currently not used.
         /// </summary>
         public string GeoreferenceRemarks { get; set; }
 
@@ -191,7 +179,6 @@
         /// or other resources used to georeference the Location,
         /// described specifically enough to allow anyone in the
         /// future to use the same resources.
-        /// This property is currently not used.
         /// </summary>
         public string GeoreferenceSources { get; set; }
 
@@ -201,7 +188,6 @@
         /// georeference has been verified to represent the best
         /// possible spatial description. Recommended best practice
         /// is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         public string GeoreferenceVerificationStatus { get; set; }
 
@@ -210,7 +196,6 @@
         /// A list (concatenated and separated) of geographic
         /// names less specific than the information captured
         /// in the locality term.
-        /// This property is currently not used.
         /// </summary>
         public string HigherGeography { get; set; }
 
@@ -221,7 +206,6 @@
         /// Recommended best practice is to use an
         /// persistent identifier from a controlled vocabulary
         /// such as the Getty Thesaurus of Geographic Names.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string HigherGeographyID { get; set; }
@@ -231,7 +215,6 @@
         /// The name of the island on or near which the Location occurs.
         /// Recommended best practice is to use a controlled
         /// vocabulary such as the Getty Thesaurus of Geographic Names.
-        /// This property is currently not used.
         /// </summary>
         public string Island { get; set; }
 
@@ -240,7 +223,6 @@
         /// The name of the island group in which the Location occurs.
         /// Recommended best practice is to use a controlled
         /// vocabulary such as the Getty Thesaurus of Geographic Names.
-        /// This property is currently not used.
         /// </summary>
         public string IslandGroup { get; set; }
 
@@ -261,7 +243,6 @@
         /// Information about the source of this Location information.
         /// Could be a publication (gazetteer), institution,
         /// or team of individuals.
-        /// This property is currently not used.
         /// </summary>
         public string LocationAccordingTo { get; set; }
 
@@ -271,14 +252,12 @@
         /// (data associated with dcterms:Location).
         /// May be a global unique identifier or an identifier
         /// specific to the data set.
-        /// This property is currently not used.
         /// </summary>
         public string LocationID { get; set; }
 
         /// <summary>
         /// Darwin Core term name: locationRemarks.
         /// Comments or notes about the Location.
-        /// This property is currently not used.
         /// </summary>
         public string LocationRemarks { get; set; }
 
@@ -286,7 +265,6 @@
         /// Darwin Core term name: maximumDepthInMeters.
         /// The greater depth of a range of depth below
         /// the local surface, in meters.
-        /// This property is currently not used.
         /// </summary>
         public string MaximumDepthInMeters { get; set; }
 
@@ -299,7 +277,6 @@
         /// are given, the reference surface is the location given
         /// by the depth, otherwise the reference surface is the
         /// location given by the elevation.
-        /// This property is currently not used.
         /// </summary>
         public string MaximumDistanceAboveSurfaceInMeters { get; set; }
 
@@ -307,7 +284,6 @@
         /// Darwin Core term name: maximumElevationInMeters.
         /// The upper limit of the range of elevation (altitude,
         /// usually above sea level), in meters.
-        /// This property is currently not used.
         /// </summary>
         public string MaximumElevationInMeters { get; set; }
 
@@ -315,7 +291,6 @@
         /// Darwin Core term name: minimumDepthInMeters.
         /// The lesser depth of a range of depth below the
         /// local surface, in meters.
-        /// This property is currently not used.
         /// </summary>
         public string MinimumDepthInMeters { get; set; }
 
@@ -328,7 +303,6 @@
         /// If depth measures are given, the reference surface is
         /// the location given by the depth, otherwise the reference
         /// surface is the location given by the elevation.
-        /// This property is currently not used.
         /// </summary>
         public string MinimumDistanceAboveSurfaceInMeters { get; set; }
 
@@ -336,7 +310,6 @@
         /// Darwin Core term name: minimumElevationInMeters.
         /// The lower limit of the range of elevation (altitude,
         /// usually above sea level), in meters.
-        /// This property is currently not used.
         /// </summary>
         public string MinimumElevationInMeters { get; set; }
 
@@ -366,7 +339,6 @@
         /// is not that same point (without uncertainty). If both the
         /// original and the given georeference are the same point,
         /// the pointRadiusSpatialFit is 1.
-        /// This property is currently not used.
         /// </summary>
         public string PointRadiusSpatialFit { get; set; }
 
@@ -386,7 +358,6 @@
         /// Spatial Reference System (SRS) for these coordinates
         /// should be stored in verbatimSRS and the coordinate
         /// system should be stored in verbatimCoordinateSystem.
-        /// This property is currently not used.
         /// </summary>
         public string VerbatimCoordinates { get; set; }
 
@@ -396,7 +367,6 @@
         /// and verbatimLongitude or the verbatimCoordinates of the
         /// Location.
         /// Recommended best practice is to use a controlled vocabulary.
-        /// This property is currently not used.
         /// </summary>
         public string VerbatimCoordinateSystem { get; set; }
 
@@ -404,7 +374,6 @@
         /// Darwin Core term name: verbatimDepth.
         /// The original description of the
         /// depth below the local surface.
-        /// This property is currently not used.
         /// </summary>
         public string VerbatimDepth { get; set; }
 
@@ -412,7 +381,6 @@
         /// Darwin Core term name: verbatimElevation.
         /// The original description of the elevation (altitude,
         /// usually above sea level) of the Location.
-        /// This property is currently not used.
         /// </summary>
         public string VerbatimElevation { get; set; }
 
@@ -423,14 +391,12 @@
         /// Spatial Reference System (SRS) for these coordinates
         /// should be stored in verbatimSRS and the coordinate
         /// system should be stored in verbatimCoordinateSystem.
-        /// This property is currently not used.
         /// </summary>
         public string VerbatimLatitude { get; set; }
 
         /// <summary>
         /// Darwin Core term name: verbatimLocality.
         /// The original textual description of the place.
-        /// This property is currently not used.
         /// </summary>
         public string VerbatimLocality { get; set; }
 
@@ -441,7 +407,6 @@
         /// Spatial Reference System (SRS) for these coordinates
         /// should be stored in verbatimSRS and the coordinate
         /// system should be stored in verbatimCoordinateSystem.
-        /// This property is currently not used.
         /// </summary>
         public string VerbatimLongitude { get; set; }
 
@@ -458,7 +423,6 @@
         /// Otherwise use a controlled vocabulary for the name or
         /// code of the ellipsoid, if known. If none of these is
         /// known, use the value "unknown".
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
         public string VerbatimSRS { get; set; }
@@ -468,7 +432,6 @@
         /// The name of the water body in which the Location occurs.
         /// Recommended best practice is to use a controlled
         /// vocabulary such as the Getty Thesaurus of Geographic Names.
-        /// This property is currently not used.
         /// </summary>
         public string WaterBody { get; set; }
     }

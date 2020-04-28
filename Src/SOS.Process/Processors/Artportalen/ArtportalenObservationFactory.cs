@@ -10,6 +10,7 @@ using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -71,12 +72,12 @@ namespace SOS.Process.Processors.Artportalen
 
             var obs = new ProcessedObservation(ObservationProvider.Artportalen)
             {
-                AccessRightsId =
+                AccessRights =
                 !verbatimObservation.ProtectedBySystem && verbatimObservation.HiddenByProvider.HasValue &&
                 verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now
                     ? new ProcessedFieldMapValue { Id = (int)AccessRightsId.FreeUsage }
                     : new ProcessedFieldMapValue { Id = (int)AccessRightsId.NotForPublicUsage },
-                BasisOfRecordId = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
+                BasisOfRecord = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
                 ? new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation }
                 : new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.PreservedSpecimen },
                 CollectionCode = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
@@ -94,8 +95,7 @@ namespace SOS.Process.Processors.Artportalen
                     StartDate = verbatimObservation.StartDate?.ToUniversalTime(),
                     SubstrateSpeciesDescription = verbatimObservation.SubstrateSpeciesDescription,
                     SubstrateDescription = GetSubstrateDescription(verbatimObservation, _taxa),
-                    VerbatimEndDate = verbatimObservation.EndDate,
-                    VerbatimStartDate = verbatimObservation.StartDate
+                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatimObservation.StartDate, verbatimObservation.EndDate)
                 },
                 Identification = new ProcessedIdentification
                 {
@@ -116,7 +116,7 @@ namespace SOS.Process.Processors.Artportalen
                     DecimalLongitude = verbatimObservation.Site?.Point?.Coordinates?.Longitude ?? 0,
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Locality = verbatimObservation.Site?.Name,
-                    Id = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}",
+                    LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}",
                     MaximumDepthInMeters = verbatimObservation.MaxDepth,
                     MaximumElevationInMeters = verbatimObservation.MaxHeight,
                     MinimumDepthInMeters = verbatimObservation.MinDepth,
@@ -138,16 +138,17 @@ namespace SOS.Process.Processors.Artportalen
                     BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon),
                     CatalogNumber = verbatimObservation.Id.ToString(),
                     //EstablishmentMeansId = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
-                    Id = $"urn:lsid:artportalen.se:Sighting:{verbatimObservation.Id}",
+                    OccurrenceId = $"urn:lsid:artportalen.se:Sighting:{verbatimObservation.Id}",
                     IndividualCount = verbatimObservation.Quantity?.ToString() ?? "",
                     IsNaturalOccurrence = !verbatimObservation.Unspontaneous,
                     IsNeverFoundObservation = verbatimObservation.NotPresent,
                     IsNotRediscoveredObservation = verbatimObservation.NotRecovered,
                     IsPositiveObservation = !(verbatimObservation.NotPresent || verbatimObservation.NotRecovered),
-                    OrganismQuantity = verbatimObservation.Quantity,
+                    OrganismQuantityInt = verbatimObservation.Quantity,
+                    OrganismQuantity = verbatimObservation.Quantity.ToString(),
                     RecordedBy = verbatimObservation.Observers,
                     RecordNumber = verbatimObservation.Label,
-                    Remarks = verbatimObservation.Comment,
+                    OccurrenceRemarks = verbatimObservation.Comment,
                     OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
                     ? new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Absent }
                     : new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Present },
@@ -161,8 +162,14 @@ namespace SOS.Process.Processors.Artportalen
                 ReportedDate = verbatimObservation.ReportedDate,
                 RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas",
                 Taxon = taxon,
-                TypeId = null
+                Type = null
             };
+
+            // Set dependent properties
+            var biotope = obs.Event.Biotope?.Value;
+            obs.Event.Habitat = (biotope != null
+                ? $"{biotope}{(string.IsNullOrEmpty(obs.Event.BiotopeDescription) ? "" : " # ")}{obs.Event.BiotopeDescription}"
+                : obs.Event.BiotopeDescription).WithMaxLength(255);
 
             // Get field mapping values
             obs.Occurrence.Gender = GetSosId(verbatimObservation.Gender?.Id, _fieldMappings[FieldMappingFieldId.Gender]);
@@ -173,10 +180,10 @@ namespace SOS.Process.Processors.Artportalen
             obs.Location.Parish = GetSosId(verbatimObservation.Site?.Parish?.Id, _fieldMappings[FieldMappingFieldId.Parish]);
             obs.Event.Biotope = GetSosId(verbatimObservation?.Bioptope?.Id, _fieldMappings[FieldMappingFieldId.Biotope]);
             obs.Event.Substrate = GetSosId(verbatimObservation?.Bioptope?.Id, _fieldMappings[FieldMappingFieldId.Substrate]);
-            obs.Identification.ValidationStatusId = GetSosId(verbatimObservation?.ValidationStatus?.Id, _fieldMappings[FieldMappingFieldId.ValidationStatus]);
+            obs.Identification.ValidationStatus = GetSosId(verbatimObservation?.ValidationStatus?.Id, _fieldMappings[FieldMappingFieldId.ValidationStatus]);
             obs.Occurrence.LifeStage = GetSosId(verbatimObservation?.Stage?.Id, _fieldMappings[FieldMappingFieldId.LifeStage]);
             obs.InstitutionId = GetSosId(verbatimObservation?.OwnerOrganization?.Id, _fieldMappings[FieldMappingFieldId.Institution]);
-            obs.Occurrence.OrganismQuantityUnit = GetSosId(verbatimObservation?.Unit?.Id, _fieldMappings[FieldMappingFieldId.Unit]);
+            obs.Occurrence.OrganismQuantityUnit = GetSosId(verbatimObservation?.Unit?.Id, _fieldMappings[FieldMappingFieldId.Unit],(int)UnitId.Individuals); // todo - if verbatimObservation.Unit is null, should the value be set to "Individuals"? This is how it works in SSOS.
             return obs;
         }
 
@@ -185,14 +192,20 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="val"></param>
         /// <param name="sosIdByProviderValue"></param>
+        /// <param name="defaultValue"></param>
         /// <returns></returns>
-        private static ProcessedFieldMapValue GetSosId(int? val, IDictionary<object, int> sosIdByProviderValue)
+        private static ProcessedFieldMapValue GetSosId(int? val, IDictionary<object, int> sosIdByProviderValue, int? defaultValue = null)
         {
             if (!val.HasValue || sosIdByProviderValue == null) return null;
 
             if (sosIdByProviderValue.TryGetValue(val.Value, out var sosId))
             {
                 return new ProcessedFieldMapValue { Id = sosId };
+            }
+
+            if (defaultValue.HasValue)
+            {
+                return new ProcessedFieldMapValue { Id = defaultValue.Value };
             }
 
             return new ProcessedFieldMapValue { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };

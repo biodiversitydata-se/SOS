@@ -32,30 +32,32 @@ namespace SOS.Lib.Models.Processed.Observation
         /// A list (concatenated and separated) of identifiers
         /// (publication, global unique identifier, URI) of
         /// media associated with the Occurrence.
-        /// This property is currently not used.
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string Id { get; set; }
+        public string EventId { get; set; }
 
         /// <summary>
         /// Comments or notes about the Event.
         /// </summary>
-        public string Remarks { get; set; }
+        public string EventRemarks { get; set; }
 
         /// <summary>
         /// One of a) an indicator of the existence of, b) a
         /// reference to (publication, URI), or c) the text of
         /// notes taken in the field about the Event.
-        /// This property is currently not used.
         /// </summary>
         public string FieldNotes { get; set; }
 
         /// <summary>
         /// An identifier given to the event in the field. Often 
         /// serves as a link between field notes and the Event.
-        /// This property is currently not used.
         /// </summary>
         public string FieldNumber { get; set; }
+
+        /// <summary>
+        /// A category or description of the habitat in which the Event occurred.
+        /// </summary>
+        public string Habitat { get; set; }
 
         /// <summary>
         /// An identifier for the set of information associated with an Event (something that occurs at a place and time).
@@ -64,7 +66,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <example>
         /// A1 (parentEventID to identify the main Whittaker Plot in nested samples, each with its own eventID - A1:1, A1:2).
         /// </example>
-        public string ParentId { get; set; }
+        public string ParentEventId { get; set; }
 
         /// <summary>
         /// Quality of substrate
@@ -73,14 +75,12 @@ namespace SOS.Lib.Models.Processed.Observation
 
         /// <summary>
         /// The amount of effort expended during an Event.
-        /// This property is currently not used.
         /// </summary>
         public string SamplingEffort { get; set; }
 
         /// <summary>
         /// The name of, reference to, or description of the
         /// method or protocol used during an Event.
-        /// This property is currently not used.
         /// </summary>
         public string SamplingProtocol { get; set; }
 
@@ -132,15 +132,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? SubstrateSpeciesId { get; set; }
 
         /// <summary>
-        /// Verbatim end date
+        /// The verbatim original representation of the date and time information for an Event.
+        /// Examples: spring 1910, Marzo 2002, 1999-03-XX, 17IV1934
         /// </summary>
-        [Date]
-        public DateTime? VerbatimEndDate { get; set; }
-
-        /// <summary>
-        /// Verbatim start date
-        /// </summary>
-        [Date]
-        public DateTime? VerbatimStartDate { get; set; }
+        public string VerbatimEventDate { get; set; }
     }
 }

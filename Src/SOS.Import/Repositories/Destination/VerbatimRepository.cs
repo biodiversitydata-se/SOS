@@ -62,8 +62,7 @@ namespace SOS.Import.Repositories.Destination
         /// Get client
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName)
-            .WithWriteConcern(new WriteConcern(w: 1, journal: true ));
+        protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(_collectionName);
 
         protected IMongoCollection<TEntity> GetMongoCollection(string collectionName)
         {

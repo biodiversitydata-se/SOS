@@ -20,10 +20,22 @@ namespace SOS.Process.Repositories.Source.Interfaces
         Task<IAsyncCursor<TEntity>> GetAllByCursorAsync();
 
         /// <summary>
+        /// Get cursor to all documents in collection
+        /// </summary>
+        /// <returns></returns>
+        Task<IAsyncCursor<TEntity>> GetAllByCursorAsync(IMongoCollection<TEntity> mongoCollection);
+
+        /// <summary>
         /// Get all documents in collection.
         /// </summary>
         /// <returns></returns>
         Task<List<TEntity>> GetAllAsync();
+
+        /// <summary>
+        /// Get all documents in collection.
+        /// </summary>
+        /// <returns></returns>
+        Task<List<TEntity>> GetAllAsync(IMongoCollection<TEntity> mongoCollection);
 
         /// <summary>
         /// Get document batch
@@ -34,9 +46,24 @@ namespace SOS.Process.Repositories.Source.Interfaces
         Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId);
 
         /// <summary>
+        /// Get document batch
+        /// </summary>
+        /// <param name="startId"></param>
+        /// <param name="endId"></param>
+        /// <param name="mongoCollection"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId, IMongoCollection<TEntity> mongoCollection);
+
+        /// <summary>
         /// Get min and max id in collection
         /// </summary>
         /// <returns></returns>
         Task<Tuple<TKey, TKey>> GetIdSpanAsync();
+
+        /// <summary>
+        /// Get min and max id in collection
+        /// </summary>
+        /// <returns></returns>
+        Task<Tuple<TKey, TKey>> GetIdSpanAsync(IMongoCollection<TEntity> mongoCollection);
     }
 }

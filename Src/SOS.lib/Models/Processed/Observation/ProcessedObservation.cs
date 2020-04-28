@@ -25,6 +25,7 @@ namespace SOS.Lib.Models.Processed.Observation
         {
         }
 
+        #region Record level
         /// <summary>
         /// Information about who can access the resource or
         /// an indication of its security status.
@@ -36,7 +37,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue AccessRightsId { get; set; }
+        public ProcessedFieldMapValue AccessRights { get; set; }
 
         /// <summary>
         /// The specific nature of the data record -
@@ -49,7 +50,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue BasisOfRecordId { get; set; }
+        public ProcessedFieldMapValue BasisOfRecord { get; set; }
 
         /// <summary>
         /// A bibliographic reference for the resource as a statement
@@ -58,7 +59,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Recommended practice is to include sufficient
         /// bibliographic detail to identify the resource as
         /// unambiguously as possible.
-        /// This property is currently not used.
         /// </summary>
         public string BibliographicCitation { get; set; }
 
@@ -83,7 +83,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// complete than in its original form.
         /// Suggests that alternative data of higher quality
         /// may be available on request.
-        /// This property is currently not used.
         /// </summary>
         public string DataGeneralizations { get; set; }
 
@@ -101,11 +100,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public string DatasetName { get; set; }
 
         /// <summary>
-        /// The category of information pertaining to an event (an 
-        /// action that occurs at a place and during a period of time).
+        /// A list of additional measurements, facts, characteristics, or assertions about the record.
+        /// Meant to provide a mechanism for structured content.
+        /// Recommended best practice is to use a key:value encoding schema for a data interchange format such as JSON.
         /// </summary>
-        [Object]
-        public ProcessedEvent Event { get; set; }
+        public string DynamicProperties { get; set; }
 
         /// <summary>
         /// Unique id, Omit to automatically generate an id on insert (best performance)
@@ -113,18 +112,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Id { get; set; }
 
         /// <summary>
-        /// The category of information pertaining to taxonomic
-        /// determinations (the assignment of a scientific name).
-        /// </summary>
-        [Object]
-        public ProcessedIdentification Identification { get; set; }
-
-        /// <summary>
         /// Additional information that exists, but that has
         /// not been shared in the given record.
-        /// This property is currently not used.
         /// </summary>
         public string InformationWithheld { get; set; }
+
+        /// <summary>
+        /// The name (or acronym) in use by the institution having custody of
+        /// the object(s) or information referred to in the record.
+        /// </summary>
+        public string InstitutionCode { get; set; }
 
         /// <summary>
         /// The name (or acronym) in use by the institution
@@ -147,34 +144,17 @@ namespace SOS.Lib.Models.Processed.Observation
         /// A language of the resource.
         /// Recommended best practice is to use a controlled
         /// vocabulary such as RFC 4646 [RFC4646].
-        /// This property is currently not used.
         /// </summary>
         public string Language { get; set; }
 
         /// <summary>
+        /// A legal document giving official permission to do something with the resource.
         /// </summary>
         /// <example>
         /// http://creativecommons.org/publicdomain/zero/1.0/legalcode,
         /// http://creativecommons.org/licenses/by/4.0/legalcode
         /// </example>
         public string License { get; set; }
-
-        /// <summary>
-        /// A spatial region or named place. For Darwin Core,
-        /// a set of terms describing a place, whether named or not.
-        /// </summary>
-        [Object]
-        public ProcessedLocation Location { get; set; }
-
-        /// <summary>
-        /// A physical result of a sampling (or subsampling) event. In biological collections, the material sample is typically collected, and either preserved or destructively processed.
-        /// </summary>
-        /// <example>
-        /// A whole organism preserved in a collection. A part of an organism isolated for some purpose. A soil sample. A marine microbial sample.
-        /// </example>
-        [Object]
-        public ProcessedMaterialSample MaterialSample { get; set; }
-
 
         /// <summary>
         /// The most recent date-time on which the resource was changed.
@@ -185,32 +165,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public DateTime? Modified { get; set; }
 
         /// <summary>
-        /// The category of information pertaining to evidence of
-        /// an occurrence in nature, in a collection, or in a
-        /// dataset (specimen, observation, etc.).
-        /// </summary>
-        [Object]
-        public ProcessedOccurrence Occurrence { get; set; }
-
-        /// <summary>
-        /// A particular organism or defined group of organisms considered to be taxonomically homogeneous.
-        /// </summary>
-      /*  [Object]
-        public ProcessedOrganism Organism { get; set; }
-        */
-        /// <summary>
         /// The name (or acronym) in use by the institution having
         /// ownership of the object(s) or information referred
         /// to in the record.
-        /// This property is currently not used.
         /// </summary>
         public string OwnerInstitutionCode { get; set; }
-
-        /// <summary>
-        /// Projects connected to sighting
-        /// </summary>
-        [Nested]
-        public IEnumerable<ProcessedProject> Projects { get; set; }
 
         /// <summary>
         /// Protection level
@@ -226,7 +185,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// A related resource that is referenced, cited,
         /// or otherwise pointed to by the described resource.
-        /// This property is currently not used.
         /// </summary>
         public string References { get; set; }
 
@@ -251,16 +209,85 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Typically, rights information includes a statement
         /// about various property rights associated with the resource,
         /// including intellectual property rights.
-        /// This property is currently not used.
         /// </summary>
         public string Rights { get; set; }
 
         /// <summary>
         /// A person or organization owning or
         /// managing rights over the resource.
-        /// This property is currently not used.
         /// </summary>
         public string RightsHolder { get; set; }
+
+        /// <summary>
+        /// The nature or genre of the resource.
+        /// For Darwin Core, recommended best practice is
+        /// to use the name of the class that defines the
+        /// root of the record.
+        /// </summary>
+        /// <remarks>
+        /// This value is field mapped.
+        /// </remarks>
+        [Object]
+        public ProcessedFieldMapValue Type { get; set; }
+        #endregion Record level
+
+        /// <summary>
+        /// The category of information pertaining to an event (an 
+        /// action that occurs at a place and during a period of time).
+        /// </summary>
+        [Object]
+        public ProcessedEvent Event { get; set; }
+
+        /// <summary>
+        /// Geological information, such as stratigraphy, that qualifies a region or place.
+        /// </summary>
+        [Object]
+        public ProcessedGeologicalContext GeologicalContext { get; set; }
+
+        /// <summary>
+        /// The category of information pertaining to taxonomic
+        /// determinations (the assignment of a scientific name).
+        /// </summary>
+        [Object]
+        public ProcessedIdentification Identification { get; set; }
+
+        /// <summary>
+        /// A spatial region or named place. For Darwin Core,
+        /// a set of terms describing a place, whether named or not.
+        /// </summary>
+        [Object]
+        public ProcessedLocation Location { get; set; }
+
+        /// <summary>
+        /// A physical result of a sampling (or subsampling) event. In biological collections,
+        /// the material sample is typically collected, and either preserved or destructively processed.
+        /// </summary>
+        /// <example>
+        /// A whole organism preserved in a collection. A part of an organism isolated for some purpose.
+        /// A soil sample. A marine microbial sample.
+        /// </example>
+        [Object]
+        public ProcessedMaterialSample MaterialSample { get; set; }
+
+        /// <summary>
+        /// The category of information pertaining to evidence of
+        /// an occurrence in nature, in a collection, or in a
+        /// dataset (specimen, observation, etc.).
+        /// </summary>
+        [Object]
+        public ProcessedOccurrence Occurrence { get; set; }
+
+        /// <summary>
+        /// A particular organism or defined group of organisms considered to be taxonomically homogeneous.
+        /// </summary>
+        [Object]
+        public ProcessedOrganism Organism { get; set; }
+
+        /// <summary>
+        /// Projects connected to sighting
+        /// </summary>
+        [Nested]
+        public IEnumerable<ProcessedProject> Projects { get; set; }
 
         /// <summary>
         /// The category of information pertaining to taxonomic names,
@@ -268,18 +295,5 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [Object]
         public ProcessedTaxon Taxon { get; set; }
-
-        /// <summary>
-        /// The nature or genre of the resource.
-        /// For Darwin Core, recommended best practice is
-        /// to use the name of the class that defines the
-        /// root of the record.
-        /// This property is currently not used.
-        /// </summary>
-        /// <remarks>
-        /// This value is field mapped.
-        /// </remarks>
-        [Object]
-        public ProcessedFieldMapValue TypeId { get; set; }
     }
 }

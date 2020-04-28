@@ -5,8 +5,28 @@ using System.Text;
 
 namespace SOS.Lib.Helpers
 {
-    public static class DwcFormattingHelper
+    public static class DwcFormatter
     {
+        /// <summary>
+        /// Create a date formatted according to the ISO 8601 standard.
+        /// </summary>
+        /// <param name="date">The date.</param>
+        /// <returns>A date that is formatted according to the ISO 8601 standard.</returns>
+        public static string CreateDateString(DateTime? date)
+        {
+            return date?.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ssK", CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Create a time formatted according to the ISO 8601 standard.
+        /// </summary>
+        /// <param name="date">The date.</param>
+        /// <returns>A time that is formatted according to the ISO 8601 standard.</returns>
+        public static string CreateTimeString(DateTime? date)
+        {
+            return date?.ToUniversalTime().ToString("HH:mm:ssK", CultureInfo.InvariantCulture);
+        }
+
         /// <summary>
         /// Create a date interval formatting according to the ISO 8601 standard.
         /// </summary>

@@ -7,6 +7,7 @@ using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.ClamPortal;
@@ -50,8 +51,8 @@ namespace SOS.Process.Processors.ClamPortal
 
             return new ProcessedObservation(ObservationProvider.ClamPortal)
             {
-                AccessRightsId = GetAccessRightsIdFromString(verbatimObservation.AccessRights),
-                BasisOfRecordId = GetBasisOfRecordIdFromString(verbatimObservation.BasisOfRecord),
+                AccessRights = GetAccessRightsIdFromString(verbatimObservation.AccessRights),
+                BasisOfRecord = GetBasisOfRecordIdFromString(verbatimObservation.BasisOfRecord),
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ObservationProvider.ClamPortal.ToString()}",
                 DatasetName = "Träd och musselportalen",
                 Event = new ProcessedEvent
@@ -59,13 +60,12 @@ namespace SOS.Process.Processors.ClamPortal
                     EndDate = verbatimObservation.ObservationDate.ToUniversalTime(),
                     SamplingProtocol = verbatimObservation.SurveyMethod,
                     StartDate = verbatimObservation.ObservationDate.ToUniversalTime(),
-                    VerbatimEndDate = verbatimObservation.ObservationDate,
-                    VerbatimStartDate = verbatimObservation.ObservationDate
+                    VerbatimEventDate = DwcFormatter.CreateDateString(verbatimObservation.ObservationDate)
                 },
                 Identification = new ProcessedIdentification
                 {
                     Validated = verbatimObservation.IdentificationVerificationStatus.Equals(ValidatedObservationStringValue, StringComparison.CurrentCultureIgnoreCase),
-                    ValidationStatusId = GetValidationStatusIdFromString(verbatimObservation.IdentificationVerificationStatus),
+                    ValidationStatus = GetValidationStatusIdFromString(verbatimObservation.IdentificationVerificationStatus),
                     UncertainDetermination = verbatimObservation.UncertainDetermination != 0
                 },
                 InstitutionId = GetOrganizationIdFromString(verbatimObservation.InstitutionCode),
@@ -78,12 +78,12 @@ namespace SOS.Process.Processors.ClamPortal
                     DecimalLatitude = verbatimObservation.DecimalLatitude,
                     DecimalLongitude = verbatimObservation.DecimalLongitude,
                     GeodeticDatum = GeodeticDatum.Wgs84,
-                    Id = verbatimObservation.LocationId,
+                    LocationId = verbatimObservation.LocationId,
                     Locality = verbatimObservation.Locality,
                     Point = (PointGeoShape)wgs84Point?.ToGeoShape(),
                     PointLocation = wgs84Point?.ToGeoLocation(),
                     PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatimObservation.CoordinateUncertaintyInMeters)?.ToGeoShape(),
-                    Remarks = verbatimObservation.LocationRemarks,
+                    LocationRemarks = verbatimObservation.LocationRemarks,
                     MaximumDepthInMeters = verbatimObservation.MaximumDepthInMeters,
                     VerbatimLatitude = verbatimObservation.DecimalLatitude,
                     VerbatimLongitude = verbatimObservation.DecimalLongitude,
@@ -94,17 +94,18 @@ namespace SOS.Process.Processors.ClamPortal
                 Occurrence = new ProcessedOccurrence
                 {
                     CatalogNumber = verbatimObservation.CatalogNumber.ToString(),
-                    Id = verbatimObservation.OccurrenceId,
+                    OccurrenceId = verbatimObservation.OccurrenceId,
                     IndividualCount = verbatimObservation.IndividualCount,
                     IsNaturalOccurrence = verbatimObservation.IsNaturalOccurrence,
                     IsNeverFoundObservation = verbatimObservation.IsNeverFoundObservation,
                     IsNotRediscoveredObservation = verbatimObservation.IsNotRediscoveredObservation,
                     IsPositiveObservation = verbatimObservation.IsPositiveObservation,
                     LifeStage = GetLifeStageIdFromString(verbatimObservation.LifeStage),
-                    OrganismQuantity = verbatimObservation.Quantity,
+                    OrganismQuantityInt = verbatimObservation.Quantity,
+                    OrganismQuantity = verbatimObservation.Quantity.ToString(),
                     OrganismQuantityUnit = GetOrganismQuantityUnitIdFromString(verbatimObservation.QuantityUnit),
                     RecordedBy = verbatimObservation.RecordedBy,
-                    Remarks = verbatimObservation.OccurrenceRemarks,
+                    OccurrenceRemarks = verbatimObservation.OccurrenceRemarks,
                     OccurrenceStatus = GetOccurrenceStatusIdFromString(verbatimObservation.OccurrenceStatus)
                 },
                 Projects = string.IsNullOrEmpty(verbatimObservation.ProjectName) ? null : new[]

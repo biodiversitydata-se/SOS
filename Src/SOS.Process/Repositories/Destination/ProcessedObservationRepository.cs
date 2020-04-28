@@ -52,7 +52,7 @@ namespace SOS.Process.Repositories.Destination
 
             foreach (var item in items)
             {
-                var invalidObservation = new InvalidObservation(item.DatasetId, item.DatasetName, item.Occurrence.Id);
+                var invalidObservation = new InvalidObservation(item.DatasetId, item.DatasetName, item.Occurrence.OccurrenceId);
 
                 if (item.Taxon == null)
                 {

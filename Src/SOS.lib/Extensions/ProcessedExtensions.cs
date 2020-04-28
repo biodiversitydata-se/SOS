@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Nest;
 using SOS.Lib.Constants;
+using SOS.Lib.Helpers;
 using  SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 
@@ -19,18 +21,26 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
-            var biotope = source.Biotope?.Value;
             return new DarwinCoreEvent
             {
-                EventDate = $"{source.StartDate?.ToString("s")}Z" ?? "",
-                EventTime = source.StartDate?.ToUniversalTime().ToString("HH':'mm':'ss''K") ?? "",
-                Habitat = (biotope != null
-                    ? $"{biotope}{(string.IsNullOrEmpty(source.BiotopeDescription) ? "" : " # ")}{source.BiotopeDescription}"
-                    : source.BiotopeDescription).WithMaxLength(255),
+                EventDate = DwcFormatter.CreateDateIntervalString(source.StartDate, source.EndDate),
+                EventTime = DwcFormatter.CreateTimeIntervalString(source.StartDate, source.EndDate),
+                Habitat = source.Habitat,
                 SamplingProtocol = source.SamplingProtocol,
-                VerbatimEventDate =
-                    $"{(source.StartDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? "")}{(source.StartDate.HasValue && source.EndDate.HasValue ? "-" : "")}{(source.EndDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? "")}"
-
+                VerbatimEventDate = source.VerbatimEventDate,
+                Day = source.StartDate?.Day,
+                Month = source.StartDate?.Month,
+                Year = source.StartDate?.Year,
+                StartDayOfYear = source.StartDate?.DayOfYear,
+                EndDayOfYear = source.EndDate?.DayOfYear,
+                EventID = source.EventId,
+                EventRemarks = source.EventRemarks,
+                FieldNotes = source.FieldNotes,
+                FieldNumber = source.FieldNumber,
+                ParentEventID = source.ParentEventId,
+                SampleSizeUnit = source.SampleSizeUnit,
+                SampleSizeValue = source.SampleSizeValue,
+                SamplingEffort = source.SamplingEffort
             };
         }
         #endregion Event
@@ -45,13 +55,13 @@ namespace SOS.Lib.Extensions
 
             return new DarwinCoreIdentification
             {
-                IdentificationVerificationStatus = source.ValidationStatusId?.Value,
+                IdentificationVerificationStatus = source.ValidationStatus?.Value,
                 IdentifiedBy = source.IdentifiedBy,
-                IdentificationReferences = source.References,
-                IdentificationRemarks = source.Remarks,
-                IdentificationID = source.Id,
-                IdentificationQualifier = source.Qualifier,
-                DateIdentified = $"{source.DateIdentified.ToString("s")}Z" ?? "",
+                IdentificationReferences = source.IdentificationReferences,
+                IdentificationRemarks = source.IdentificationRemarks,
+                IdentificationID = source.IdentificationId,
+                IdentificationQualifier = source.IdentificationQualifier,
+                DateIdentified = source.DateIdentified.HasValue ? $"{source.DateIdentified.Value.ToString("s")}Z" ?? "" : null,
                 TypeStatus = source.TypeStatus
             };
         }
@@ -65,7 +75,6 @@ namespace SOS.Lib.Extensions
                 return null;
             }
 
-            // todo - initialize the Value property for field mapped types.
             return new DarwinCoreLocation
             {
                 Continent = source.Continent?.Value,
@@ -92,8 +101,8 @@ namespace SOS.Lib.Extensions
                 IslandGroup = source.IslandGroup,
                 Locality = source.Locality,
                 LocationAccordingTo = source.LocationAccordingTo,
-                LocationID = source.Id,
-                LocationRemarks = source.Remarks,
+                LocationID = source.LocationId,
+                LocationRemarks = source.LocationRemarks,
                 MaximumDepthInMeters = source.MaximumDepthInMeters?.ToString(),
                 MaximumDistanceAboveSurfaceInMeters = source.MaximumDistanceAboveSurfaceInMeters?.ToString(),
                 MaximumElevationInMeters = source.MaximumElevationInMeters?.ToString(),
@@ -105,11 +114,11 @@ namespace SOS.Lib.Extensions
                 StateProvince = source.Province?.Value,
                 VerbatimCoordinates = null,
                 VerbatimCoordinateSystem = source.VerbatimCoordinateSystem,
-                VerbatimDepth = source.VerbatimDepth?.ToString(),
-                VerbatimElevation = source.VerbatimElevation?.ToString(),
-                VerbatimLatitude = source.VerbatimLatitude.ToString("0.0###########"),
+                VerbatimDepth = source.VerbatimDepth,
+                VerbatimElevation = source.VerbatimElevation,
+                VerbatimLatitude = source.VerbatimLatitude?.ToString("0.0###########"),
                 VerbatimLocality = source.VerbatimLocality,
-                VerbatimLongitude = source.VerbatimLongitude.ToString("0.0###########"),
+                VerbatimLongitude = source.VerbatimLongitude?.ToString("0.0###########"),
                 VerbatimSRS = source.VerbatimSRS,
                 WaterBody = source.WaterBody
             };
@@ -138,11 +147,11 @@ namespace SOS.Lib.Extensions
                 IndividualCount = source.IndividualCount,
                 IndividualID = source.IndividualID,
                 LifeStage = source.LifeStage?.Value,
-                OccurrenceID = source.Id,
-                OccurrenceRemarks = source.Remarks,
+                OccurrenceID = source.OccurrenceId,
+                OccurrenceRemarks = source.OccurrenceRemarks,
                 OccurrenceStatus = source.OccurrenceStatus?.Value,
-                OrganismQuantity = source.OrganismQuantity?.ToString(),
-                OrganismQuantityType = source.OrganismQuantity.HasValue ? source.OrganismQuantityUnit?.Value ?? "Individuals" : null,
+                OrganismQuantity = source.OrganismQuantity,
+                OrganismQuantityType = source.OrganismQuantityUnit?.Value,
                 OtherCatalogNumbers = source.OtherCatalogNumbers,
                 RecordedBy = source.RecordedBy,
                 ReproductiveCondition = source.Activity?.Value,
@@ -166,9 +175,9 @@ namespace SOS.Lib.Extensions
 
             return new DarwinCore
             {
-                AccessRights = processedObservation.AccessRightsId?.Value,
-                BasisOfRecord = processedObservation.BasisOfRecordId?.Value,
-                BibliographicCitation = processedObservation.BasisOfRecordId?.Value,
+                AccessRights = processedObservation.AccessRights?.Value,
+                BasisOfRecord = processedObservation.BasisOfRecord?.Value,
+                BibliographicCitation = processedObservation.BasisOfRecord?.Value,
                 CollectionCode = processedObservation.CollectionCode,
                 CollectionID = processedObservation.CollectionId,
                 DataGeneralizations = processedObservation.DataGeneralizations,
@@ -189,7 +198,7 @@ namespace SOS.Lib.Extensions
                 Rights = processedObservation.Rights,
                 RightsHolder = processedObservation.RightsHolder,
                 Taxon = processedObservation.Taxon.ToDarwinCore(),
-                Type = processedObservation.TypeId?.Value
+                Type = processedObservation.Type?.Value
             };
         }
 
