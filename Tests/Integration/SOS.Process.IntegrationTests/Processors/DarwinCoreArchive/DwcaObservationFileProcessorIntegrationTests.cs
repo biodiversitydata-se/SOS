@@ -91,10 +91,6 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 processConfiguration.ProcessedDbConfiguration.DatabaseName,
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
-            //var dwcaVerbatimRepository = new DwcaVerbatimRepository(
-            //    verbatimClient,
-            //    new NullLogger<DwcaVerbatimRepository>());
-
             var mockCursor = new Mock<IAsyncCursor<DwcObservationVerbatim>>();
             mockCursor.Setup(_ => _.Current).Returns(dwcObservationVerbatims); //<-- Note the entities here
             mockCursor
@@ -105,25 +101,9 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 .SetupSequence(_ => _.MoveNextAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(true))
                 .Returns(Task.FromResult(false));
-
-            //mockMongoCollectionAdapter
-            //    .Setup(x => x.FindAsync(
-            //        It.IsAny<Expression<Func<Entity, bool>>>(),
-            //        null,
-            //        It.IsAny<CancellationToken>()
-            //    ))
-            //    .ReturnsAsync(mockCursor.Object); //<-- return the cursor here.
-
-
-            //var dwcAsyncCursorMock = new Mock<IAsyncCursor<DwcObservationVerbatim>>();
-            //dwcAsyncCursorMock.Setup(m => m.Current).Returns()
             var dwcaVerbatimRepository = new Mock<IDwcaVerbatimRepository>();
             dwcaVerbatimRepository.Setup(m => m.GetAllByCursorAsync(It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(mockCursor.Object);
-            //using IAsyncCursor<DwcObservationVerbatim> cursor = await _dwcaVerbatimRepository.GetAllByCursorAsync(dataProviderId, dataProviderIdentifier);
-            //stub.Setup(m => m.GetDwcaFileAsync(It.IsAny<string>()))
-            //    .ReturnsAsync(zipStream);
-
             var invalidObservationRepository = new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             IProcessedObservationRepository processedObservationRepository;
             if (storeProcessedObservations)
