@@ -36,22 +36,6 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
         }
 
         [Fact]
-        public void Fact_about_behavior_to_test()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var dwcaType = typeof(DwcObservationVerbatim);
-            var dwcaProperties = dwcaType.GetProperties();
-            foreach (var dwcaProperty in dwcaProperties)
-            {
-                _testOutputHelper.WriteLine($"obs.{dwcaProperty.Name} = verbatimObservation.{dwcaProperty.Name};");
-            }
-
-          
-        }
-
-        [Fact]
         public async Task Process_Dwca_observations()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -109,6 +93,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processedObservationRepository,
                 processedFieldMappingRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                new AreaHelper(new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()), processedFieldMappingRepository), 
                 processConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
         }
