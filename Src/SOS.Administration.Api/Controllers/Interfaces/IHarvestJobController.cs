@@ -138,5 +138,19 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         IActionResult RunImportFieldMappingJob();
+
+        /// <summary>
+        /// Add daily harvest of sightings from Virtual Herbarium
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult AddDailyVirtualHerbariumHarvestJob(int hour, int minute);
+
+        /// <summary>
+        /// Run Virtual Herbarium sightings harvest
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunVirtualHerbariumHarvestJob();
     }
 }

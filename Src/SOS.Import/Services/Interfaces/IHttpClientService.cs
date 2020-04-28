@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SOS.Import.Services.Interfaces
@@ -7,7 +8,7 @@ namespace SOS.Import.Services.Interfaces
     /// <summary>
     /// Class for sending http requests
     /// </summary>
-    public interface IHttpClientService
+    public interface IHttpClientService : IDisposable
     {
         /// <summary>
         /// Get requests
@@ -25,7 +26,15 @@ namespace SOS.Import.Services.Interfaces
         /// <param name="headerData"></param>
         /// <returns></returns>
         Task<T> GetDataAsync<T>(Uri requestUri, Dictionary<string, string> headerData);
-        
+
+        /// <summary>
+        /// Get file data stream
+        /// </summary>
+        /// <param name="requestUri"></param>
+        /// <param name="headerData"></param>
+        /// <returns></returns>
+        Task<Stream> GetFileStreamAsync(Uri requestUri, Dictionary<string, string> headerData = null);
+
         /// <summary>
         /// Post request
         /// </summary>
@@ -62,11 +71,5 @@ namespace SOS.Import.Services.Interfaces
         /// <returns></returns>
         Task<T> DeleteDataAsync<T>(Uri requestUri);
 
-        /// <summary>
-        /// Get file data
-        /// </summary>
-        /// <param name="requestUri"></param>
-        /// <returns></returns>
-        Task<IEnumerable<byte>> ReadFileDataAsync(Uri requestUri);
     }
 }

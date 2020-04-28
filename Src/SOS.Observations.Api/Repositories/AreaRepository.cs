@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Database.Interfaces;
@@ -27,15 +27,43 @@ namespace SOS.Observations.Api.Repositories
             ILogger<AreaRepository> logger) : base(client, false, logger)
         {
         }
+
         /// <inheritdoc />
-        public async Task<InternalAreas> GetAllPagedAsync(int skip, int take)
+        public async Task<PagedResult<Area>> GetAreasAsync(AreaType areaType, string nameFilter, int skip, int take)
         {
-            var total = await this.MongoCollection.AsQueryable<Area>().CountAsync();
-            var result = await this.MongoCollection.AsQueryable<Area>().Skip(skip).Take(take).ToListAsync();
-            InternalAreas area = new InternalAreas();
-            area.TotalCount = total;
-            area.Areas = result;
-            return area;
+            var filters = new List<FilterDefinition<Area>>();
+
+            filters.Add(Builders<Area>.Filter
+                .Eq(f => f
+                    .AreaType, areaType));
+
+            if (!string.IsNullOrEmpty(nameFilter))
+            {
+                filters.Add(Builders<Area>.Filter
+                    .Where(f => f
+                        .Name.ToLower()
+                        .Contains(nameFilter.ToLower())));
+            }
+
+            var filter = Builders<Area>.Filter.And(filters);
+
+            var total = await MongoCollection
+                .Find(filter)
+                .CountDocumentsAsync();
+            
+            var result = await MongoCollection
+                .Find(filter)
+                .Skip(skip)
+                .Limit(take)
+                .ToListAsync();
+
+            return new PagedResult<Area>
+            {
+                Records = result,
+                Skip = skip,
+                Take = take,
+                TotalCount = total
+            };
         }
 
         /// <inheritdoc />

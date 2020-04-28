@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -40,15 +40,18 @@ namespace SOS.Import.Services
         {
             try
             {
-                var fileData = await _httpClientService.ReadFileDataAsync(uri);
+                await using var fileStream = await _httpClientService.GetFileStreamAsync(uri);
 
-                if (fileData == null)
+                if (!fileStream?.CanRead ?? true)
                 {
                     _logger.LogError($"Failed to get data from Shark ({uri.PathAndQuery})");
                     return null;
                 }
 
-                var json = Encoding.UTF8.GetString(Encoding.Convert(Encoding.UTF7, Encoding.UTF8, fileData.ToArray()));
+                using var streamReader = new StreamReader(fileStream, Encoding.UTF8);
+                var json = await streamReader.ReadToEndAsync();
+                fileStream.Close();
+
                 return JsonConvert.DeserializeObject<SharkJsonFile>(json);
             }
             catch (Exception e)
@@ -61,13 +64,13 @@ namespace SOS.Import.Services
         /// <inheritdoc />
         public async Task<SharkJsonFile> GetAsync(string dataSetName)
         {
-            return await GetDataAsync(new Uri($"{ _sharkServiceConfiguration.WebServiceAddress }/{ dataSetName }/data.json?page=1&per_page=1"));
+            return await GetDataAsync(new Uri($"{ _sharkServiceConfiguration.BaseAddress }/datasets/{ dataSetName }/data.json?page=1&per_page=1"));
         }
 
         /// <inheritdoc />
         public async Task<SharkJsonFile> GetDataSetsAsync()
         {
-            return await GetDataAsync(new Uri($"{ _sharkServiceConfiguration.WebServiceAddress }/table.json"));
+            return await GetDataAsync(new Uri($"{ _sharkServiceConfiguration.BaseAddress }/datasets/table.json"));
         }
     }
 }

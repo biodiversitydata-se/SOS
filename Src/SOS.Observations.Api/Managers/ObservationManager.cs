@@ -131,7 +131,7 @@ namespace SOS.Observations.Api.Managers
                     // we need to use the geometry filter
                     else
                     {
-                        var geomList = new List<Lib.Models.Shared.InputGeometry>();
+                        var geomList = new List<Lib.Models.Shared.GeometryGeoJson>();
                         if (preparedFilter.GeometryFilter == null) 
                         {                            
                             preparedFilter.GeometryFilter = new GeometryFilter();
@@ -142,7 +142,7 @@ namespace SOS.Observations.Api.Managers
                         foreach (var polygon in geom.Coordinates.Polygons)
                         {
                             //create the polygon
-                            var inputGeom = new InputGeometry();
+                            var inputGeom = new GeometryGeoJson();
                             inputGeom.Type = "polygon";
                             inputGeom.Coordinates = new System.Collections.ArrayList();
                             var str = "[";
@@ -160,7 +160,7 @@ namespace SOS.Observations.Api.Managers
                             {
                                 foreach(var hole in polygon.Holes)
                                 {
-                                    var inputHoleGeom = new InputGeometry();
+                                    var inputHoleGeom = new GeometryGeoJson();
                                     inputHoleGeom.Type = "holepolygon";
                                     inputHoleGeom.Coordinates = new System.Collections.ArrayList();
                                     str = "[";

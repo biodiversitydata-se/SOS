@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Linq;
+﻿using System.Collections;
 
 namespace SOS.Lib.Models.Shared
 {
-    public class InputGeometry
+    public class GeometryGeoJson
     {
         /// <summary>
         /// Geometry coordinates
@@ -14,6 +12,8 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         /// Simple check to check if geometry looks ok
         /// </summary>
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public bool IsValid  {
             get
             {

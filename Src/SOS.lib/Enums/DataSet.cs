@@ -15,6 +15,7 @@
         NorsObservations,
         SersObservations,
         MvmObservations,
-        SharkObservations
+        SharkObservations,
+        VirtualHerbariumObservations
     }
 }

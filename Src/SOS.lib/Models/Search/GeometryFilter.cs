@@ -21,7 +21,7 @@ namespace SOS.Lib.Models.Search
         /// If point and accuracy is greater tha 0, sightings inside circle (center point + buffer (accuracy)) will be returned
         /// If polygon, sightings inside polygon will be returned
         /// </summary>
-        public IEnumerable<InputGeometry> Geometries { get; set; }
+        public IEnumerable<GeometryGeoJson> Geometries { get; set; }
 
         public bool IsValid
         {

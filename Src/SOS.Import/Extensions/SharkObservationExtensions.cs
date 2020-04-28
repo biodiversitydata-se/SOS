@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using SOS.Lib.Models.Verbatim.Shark;
 
 namespace SOS.Import.Extensions
@@ -40,7 +37,6 @@ namespace SOS.Import.Extensions
         private static SharkObservationVerbatim ToVerbatim(this IReadOnlyList<string> rowData, IDictionary<string, int> propertyMapping)
         {
             var observation = new SharkObservationVerbatim();
-            var observationType = observation.GetType();
             foreach (var propertyName in propertyMapping)
             {
                 if (string.IsNullOrEmpty(rowData[propertyName.Value]))
@@ -48,22 +44,11 @@ namespace SOS.Import.Extensions
                     continue;
                 }
 
-                var property = observationType.GetProperty(propertyName.Key,
-                    BindingFlags.SetProperty | BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-
-                if (property == null)
-                {
-                    continue;
-                }
-
-                var propertyType = property.PropertyType;
-                var underlyingType = Nullable.GetUnderlyingType(propertyType);
-
-                property.SetValue(observation,
-                    Convert.ChangeType(rowData[propertyName.Value], underlyingType ?? propertyType,
-                        CultureInfo.InvariantCulture));
+                observation.SetProperty(propertyName.Key, rowData[propertyName.Value]);
             }
             return observation;
         }
+
+       
     }
 }

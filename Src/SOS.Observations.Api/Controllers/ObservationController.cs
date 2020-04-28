@@ -4,11 +4,13 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Models.Area;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -106,13 +108,13 @@ namespace SOS.Observations.Api.Controllers
         }
         /// <inheritdoc />
         [HttpGet("Areas")]
-        [ProducesResponseType(typeof(PagedAreas), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResult<ExternalArea>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAreasAsync([FromQuery]int skip = 0, [FromQuery]int take = 100)
+        public async Task<IActionResult> GetAreasAsync([FromQuery] AreaType areaType, [FromQuery]string nameFilter, [FromQuery]int skip = 0, [FromQuery]int take = 100)
         {
-            try
+            try 
             {
-                return new OkObjectResult(await _areaManager.GetAreasAsync(skip, take));
+                return new OkObjectResult(await _areaManager.GetAreasAsync(areaType, nameFilter, skip, take));
             }
             catch (Exception e)
             {

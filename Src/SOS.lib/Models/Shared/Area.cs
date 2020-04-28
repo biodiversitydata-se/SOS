@@ -11,7 +11,7 @@ namespace SOS.Lib.Models.Shared
         /// <param name="areaType"></param>
         public Area(AreaType areaType) : base(areaType)
         {
-            
+           
         }
 
         /// <summary>

@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Processed.ProcessInfo;
+﻿using System.Threading.Tasks;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
+using SOS.Observations.Api.Models.Area;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {
@@ -17,12 +16,15 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<Area> GetAreaAsync(int areaId);
+
         /// <summary>
-        /// Get all the areas
+        /// Get areas matching provided filter
         /// </summary>
-        /// <param name="skip">Skip this many</param>
-        /// <param name="take">Limit on how many to return</param>
+        /// <param name="areaType"></param>
+        /// <param name="nameFilter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
         /// <returns></returns>
-        Task<PagedAreas> GetAreasAsync(int skip, int take);
+        Task<PagedResult<ExternalArea>> GetAreasAsync(AreaType areaType, string nameFilter, int skip, int take);
     }
 }

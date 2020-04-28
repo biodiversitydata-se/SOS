@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,6 +83,26 @@ namespace SOS.Lib.Extensions
             var exteriorRing = GeoJson.LinearRingCoordinates(polygon.ExteriorRing.Coordinates.Select(er => GeoJson.Geographic(er.X, er.Y)).ToArray());
             var holes = polygon.Holes.Select(h => GeoJson.LinearRingCoordinates(h.Coordinates.Select(er => GeoJson.Geographic(er.X, er.Y)).ToArray())).ToArray();
             var coordinates = GeoJson.PolygonCoordinates(exteriorRing, holes);
+
+            return coordinates;
+        }
+
+        /// <summary>
+        /// Cast GeoJson polygon coordinates to array list
+        /// </summary>
+        /// <param name="polygonCoordinates"></param>
+        /// <returns></returns>
+        private static ArrayList ToArrayList(this GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates> polygonCoordinates)
+        {
+            var coordinates = new ArrayList();
+            var exteriorRing = polygonCoordinates.Exterior.Positions.Select(p => new[] { p.Longitude, p.Latitude });
+            var holes = polygonCoordinates.Holes.Select(h => h.Positions.Select(p => new[] { p.Longitude, p.Latitude }))?.ToArray();
+
+            coordinates.Add(exteriorRing);
+            if (holes?.Any() ?? false)
+            {
+                coordinates.AddRange(holes);
+            }
 
             return coordinates;
         }
@@ -285,12 +306,53 @@ namespace SOS.Lib.Extensions
             return new GeoLocation(point.Coordinates.Latitude, point.Coordinates.Longitude);
         }
 
+        public static GeometryGeoJson ToGeoJson(this GeoJsonGeometry<GeoJson2DGeographicCoordinates> geometry)
+        {
+            if (geometry == null)
+            {
+                return null;
+            }
+
+            switch (geometry.Type)
+            {
+                case GeoJsonObjectType.Point:
+                    var point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)geometry;
+                   
+                    return new GeometryGeoJson
+                    {
+                        Coordinates = new ArrayList { new[] { point.Coordinates.Longitude, point.Coordinates.Latitude } },
+                        Type = "Point"
+                    };
+                case GeoJsonObjectType.Polygon:
+                    var polygon = (GeoJsonPolygon<GeoJson2DGeographicCoordinates>)geometry;
+
+                    return new GeometryGeoJson
+                    {
+                        Coordinates = polygon.Coordinates.ToArrayList(),
+                        Type = "Polygon"
+                    };
+                case GeoJsonObjectType.MultiPolygon:
+                    var multipolygon = (GeoJsonMultiPolygon<GeoJson2DGeographicCoordinates>)geometry;
+
+                    var coordinates = new ArrayList();
+                    coordinates.AddRange(multipolygon.Coordinates.Polygons.Select(p => p.ToArrayList()).ToArray());
+
+                    return new GeometryGeoJson
+                        {
+                            Coordinates = coordinates,
+                            Type = "Polygon"
+                        };
+                default:
+                    return null;
+            }
+        }
+
         /// <summary>
-        /// Cast input geometry (point) to geo location
+        /// Cast geojson geometry (point) to geo location
         /// </summary>
         /// <param name="geometry"></param>
         /// <returns></returns>
-        public static GeoLocation ToGeoLocation(this InputGeometry geometry)
+        public static GeoLocation ToGeoLocation(this GeometryGeoJson geometry)
         {
             if (!geometry.IsValid || geometry.Type?.ToLower() != "point")
             {
@@ -309,11 +371,11 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Cast input geometry to Geo shape
+        /// Cast geojson geometry to Geo shape
         /// </summary>
         /// <param name="geometry"></param>
         /// <returns></returns>
-        public static IGeoShape ToGeoShape(this InputGeometry geometry)
+        public static IGeoShape ToGeoShape(this GeometryGeoJson geometry)
         {
             if (!geometry.IsValid)
             {

@@ -2,9 +2,9 @@
 
 namespace SOS.Lib.Configuration.Import
 {
-    public class SharkServiceConfiguration : RestServiceConfiguration
+    public class VirtualHerbariumServiceConfiguration : RestServiceConfiguration
     {
-        // <summary>
+        /// <summary>
         /// The number of sightings that should be harvested.
         /// If set to null all sightings will be fetched.
         /// </summary>
