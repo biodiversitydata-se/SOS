@@ -27,8 +27,8 @@ namespace SOS.Lib.UnitTests.Models.Search
                 {
                     MaxDistanceFromPoint = 50,
                     UsePointAccuracy = true,
-                    Geometries = new List<InputGeometry>(){
-                        new InputGeometry
+                    Geometries = new List<GeometryGeoJson>(){
+                        new GeometryGeoJson
                         {
                             Coordinates = new ArrayList(){ new[] { new double[] { 1, 2 }, new double[] { 3, 4 } } }
                         }
@@ -63,8 +63,8 @@ namespace SOS.Lib.UnitTests.Models.Search
                 {
                     MaxDistanceFromPoint = 50,
                     UsePointAccuracy = true,
-                    Geometries = new List<InputGeometry>(){
-                        new InputGeometry
+                    Geometries = new List<GeometryGeoJson>(){
+                        new GeometryGeoJson
                         {
                             Coordinates = new ArrayList(){ new[] { new double[] { 1, 2 }, new double[] { 3, 4 } } }
                         }

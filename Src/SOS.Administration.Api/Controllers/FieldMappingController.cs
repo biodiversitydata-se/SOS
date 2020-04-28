@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -8,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Harvesters.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers.Interfaces;
 
 namespace SOS.Administration.Api.Controllers

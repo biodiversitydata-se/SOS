@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Lib.Models.Shared;
-using System.Collections.Generic;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Models.Area;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -49,30 +50,29 @@ namespace SOS.Observations.Api.Managers
             }
         }
         /// <inheritdoc />
-        public async Task<PagedAreas> GetAreasAsync(string searchString, int skip, int take)
+        public async Task<PagedResult<ExternalArea>> GetAreasAsync(AreaType areaType, string searchString, int skip, int take)
         {
             try
             {
-                var areas = await _areaRepository.GetPagedAsync(searchString, skip, take);
-                var pagedAreas = new PagedAreas();
-                pagedAreas.TotalCount = areas.TotalCount;
-                var pagedAreaList = new List<PagedArea>();
-                foreach(var area in areas.Areas)
+                var result = await _areaRepository.GetAreasAsync(areaType, searchString, skip, take);
+
+                return new PagedResult<ExternalArea>
                 {
-                    var pagedArea = new PagedArea()
+                    Records =  result.Records.Select(r => new ExternalArea
                     {
-                        Id = area.Id,
-                        Name = area.Name,
-                        AreaType = area.AreaType.ToString(),                        
-                    };
-                    pagedAreaList.Add(pagedArea);
-                }
-                pagedAreas.Areas = pagedAreaList;
-                return pagedAreas;
+                        AreaType = r.AreaType.ToString(),
+                        Geometry = r.Geometry.ToGeoJson(),
+                        Id = r.Id,
+                        Name = r.Name
+                    }),
+                    Skip = result.Skip,
+                    Take = result.Take,
+                    TotalCount = result.TotalCount
+                };
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get current process info");
+                _logger.LogError(e, "Failed to get paged list of areas");
                 return null;
             }
         }

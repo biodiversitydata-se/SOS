@@ -35,6 +35,8 @@ using SOS.Import.Repositories.Destination.Shark;
 using SOS.Import.Repositories.Destination.Shark.Interfaces;
 using SOS.Import.Repositories.Destination.Taxon;
 using SOS.Import.Repositories.Destination.Taxon.Interfaces;
+using SOS.Import.Repositories.Destination.VirtualHerbarium;
+using SOS.Import.Repositories.Destination.VirtualHerbarium.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services;
@@ -48,6 +50,8 @@ namespace SOS.Import.IoC.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+
             // Add configuration
             if (Configuration.ArtportalenConfiguration != null)
                 builder.RegisterInstance(Configuration.ArtportalenConfiguration).As<ArtportalenConfiguration>().SingleInstance();
@@ -67,6 +71,8 @@ namespace SOS.Import.IoC.Modules
                 builder.RegisterInstance(Configuration.TaxonAttributeServiceConfiguration).As<TaxonAttributeServiceConfiguration>().SingleInstance();
             if (Configuration.TaxonServiceConfiguration != null)
                 builder.RegisterInstance(Configuration.TaxonServiceConfiguration).As<TaxonServiceConfiguration>().SingleInstance();
+            if (Configuration.VirtualHerbariumServiceConfiguration != null)
+                builder.RegisterInstance(Configuration.VirtualHerbariumServiceConfiguration).As<VirtualHerbariumServiceConfiguration>().SingleInstance();
 
             // Init mongodb
             if (Configuration.VerbatimDbConfiguration != null)
@@ -111,7 +117,8 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SharkObservationVerbatimRepository>().As<ISharkObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingVerbatimRepository>().As<ISightingVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonVerbatimRepository>().As<ITaxonVerbatimRepository>().InstancePerLifetimeScope();
-            
+            builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>().As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
+
 
             // Add harvesters
             builder.RegisterType<AreaHarvester>().As<IAreaHarvester>().InstancePerLifetimeScope();
@@ -125,7 +132,8 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SersObservationHarvester>().As<ISersObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationHarvester>().As<ISharkObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonHarvester>().As<ITaxonHarvester>().InstancePerLifetimeScope();
-            
+            builder.RegisterType<VirtualHerbariumObservationHarvester>().As<IVirtualHerbariumObservationHarvester>().InstancePerLifetimeScope();
+
             // Add factories
             builder.RegisterType<ActivityFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<GenderFieldMappingFactory>().InstancePerLifetimeScope();
@@ -159,6 +167,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<TaxonServiceProxy>().As<ITaxonServiceProxy>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonService>().As<ITaxonService>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonAttributeService>().As<ITaxonAttributeService>().InstancePerLifetimeScope();
+            builder.RegisterType<VirtualHerbariumObservationService>().As<IVirtualHerbariumObservationService>().InstancePerLifetimeScope();
 
             // Service Clients
             builder.RegisterType<KulService.SpeciesObservationChangeServiceClient>().As<KulService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
@@ -179,6 +188,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SharkHarvestJob>().As<ISharkHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationsHarvestJob>().As<IObservationsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonHarvestJob>().As<ITaxonHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<VirtualHerbariumHarvestJob>().As<IVirtualHerbariumHarvestJob>().InstancePerLifetimeScope();
         }
     }
 }

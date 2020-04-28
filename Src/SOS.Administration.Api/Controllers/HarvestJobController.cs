@@ -440,5 +440,43 @@ namespace SOS.Administration.Api.Controllers
             }
         }
         #endregion Taxon
+
+        #region Virtual Herbarium
+        /// <inheritdoc />
+        [HttpPost("VirtualHerbarium/Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailyVirtualHerbariumHarvestJob(int hour, int minute)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<IVirtualHerbariumHarvestJob>(nameof(IVirtualHerbariumHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("Virtual Herbarium harvest job added");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Adding Virtual Herbarium harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("VirtualHerbarium/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunVirtualHerbariumHarvestJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IVirtualHerbariumHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
+                return new OkObjectResult("Started Virtual Herbarium harvest job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running Virtual Herbarium harvest job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        #endregion Virtual Herbarium
     }
 }

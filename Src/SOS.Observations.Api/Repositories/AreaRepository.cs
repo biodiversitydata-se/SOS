@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Database.Interfaces;
@@ -28,25 +25,43 @@ namespace SOS.Observations.Api.Repositories
             ILogger<AreaRepository> logger) : base(client, false, logger)
         {
         }
+
         /// <inheritdoc />
-        public async Task<InternalAreas> GetPagedAsync(string searchString, int skip, int take)
+        public async Task<PagedResult<Area>> GetAreasAsync(AreaType areaType, string searchString, int skip, int take)
         {
-            var builder = Builders<Area>.Filter;
-            FilterDefinition<Area> filter;
-            if (string.IsNullOrEmpty(searchString))
+            var filters = new List<FilterDefinition<Area>>();
+
+            filters.Add(Builders<Area>.Filter
+                .Eq(f => f
+                    .AreaType, areaType));
+
+            if (!string.IsNullOrEmpty(searchString))
             {
-                filter = builder.Empty;
+                filters.Add(Builders<Area>.Filter
+                    .Where(f => f
+                        .Name.ToLower()
+                        .Contains(searchString.ToLower())));
             }
-            else
+
+            var filter = Builders<Area>.Filter.And(filters);
+
+            var total = await MongoCollection
+                .Find(filter)
+                .CountDocumentsAsync();
+            
+            var result = await MongoCollection
+                .Find(filter)
+                .Skip(skip)
+                .Limit(take)
+                .ToListAsync();
+
+            return new PagedResult<Area>
             {
-                filter = builder.Regex("Name", new MongoDB.Bson.BsonRegularExpression(".*" + searchString + "*.","i"));
-            }
-            var total = await this.MongoCollection.Find(filter).CountDocumentsAsync();
-            var result = await this.MongoCollection.Find(filter).Skip(skip).Limit(take).ToListAsync();
-            InternalAreas area = new InternalAreas();
-            area.TotalCount = total;
-            area.Areas = result;
-            return area;
+                Records = result,
+                Skip = skip,
+                Take = take,
+                TotalCount = total
+            };
         }
 
         /// <inheritdoc />

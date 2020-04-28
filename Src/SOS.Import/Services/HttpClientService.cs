@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -14,15 +15,50 @@ namespace SOS.Import.Services
     /// <inheritdoc />
     public class HttpClientService : Interfaces.IHttpClientService
     {
-        private readonly ILogger<HttpClientService> _logger;
+        /// <summary>
+        /// Disposed
+        /// </summary>
+        private bool _disposed;
 
+        private readonly HttpClient _httpClient; 
+        private readonly ILogger<HttpClientService> _logger;
+        
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="logger"></param>
         public HttpClientService(ILogger<HttpClientService> logger)
         {
-            _logger = logger;
+            _httpClient = new HttpClient();
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <summary>
+        /// Dispose
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                _httpClient.Dispose();
+            }
+
+            _disposed = true;
+        }
+
+        /// <summary>
+        /// Dispose
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <inheritdoc />
@@ -39,20 +75,18 @@ namespace SOS.Import.Services
             {
                 try
                 {
-                    using var httpClient = new HttpClient
-                    {
-                        Timeout = TimeSpan.FromMinutes(30)
-                    };
+                    _httpClient.Timeout = TimeSpan.FromMinutes(30);
+                    _httpClient.DefaultRequestHeaders.Clear();
 
                     if (headerData?.Any() ?? false)
                     {
                         foreach (var data in headerData)
                         {
-                            httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
+                            _httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
                         }
                     }
 
-                    var httpResponseMessage = await httpClient.GetAsync(requestUri);
+                    var httpResponseMessage = await _httpClient.GetAsync(requestUri);
                     var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<T>(jsonString);
 
@@ -69,6 +103,22 @@ namespace SOS.Import.Services
         }
 
         /// <inheritdoc />
+        public async Task<Stream> GetFileStreamAsync(Uri requestUri, Dictionary<string, string> headerData = null)
+        {
+            _httpClient.DefaultRequestHeaders.Clear();
+
+            if (headerData?.Any() ?? false)
+            {
+                foreach (var data in headerData)
+                {
+                    _httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
+                }
+            }
+            var response = await _httpClient.GetAsync(requestUri);
+            return response.StatusCode == HttpStatusCode.OK ? await response.Content.ReadAsStreamAsync() : null;
+        }
+
+        /// <inheritdoc />
         public async Task<T> PostDataAsync<T>(Uri requestUri, object model)
         {
             return await PostDataAsync<T>(requestUri, model, null);
@@ -82,20 +132,18 @@ namespace SOS.Import.Services
             {
                 try
                 {
-                    using var httpClient = new HttpClient
-                    {
-                        Timeout = TimeSpan.FromMinutes(30)
-                    };
+                    _httpClient.Timeout = TimeSpan.FromMinutes(30);
+                    _httpClient.DefaultRequestHeaders.Clear();
 
                     if (headerData?.Any() ?? false)
                     {
                         foreach (var data in headerData)
                         {
-                            httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
+                            _httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
                         }
                     }
 
-                    var httpResponseMessage = await httpClient.PostAsync(requestUri, new JsonContent(model));
+                    var httpResponseMessage = await _httpClient.PostAsync(requestUri, new JsonContent(model));
                     var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
 
                     return JsonConvert.DeserializeObject<T>(jsonString);
@@ -126,12 +174,10 @@ namespace SOS.Import.Services
             {
                 try
                 {
-                    using var httpClient = new HttpClient
-                    {
-                        Timeout = TimeSpan.FromMinutes(30)
-                    };
-                    
-                    var httpResponseMessage = await httpClient.PutAsync(requestUri, new JsonContent(model));
+                    _httpClient.Timeout = TimeSpan.FromMinutes(30);
+                    _httpClient.DefaultRequestHeaders.Clear();
+
+                    var httpResponseMessage = await _httpClient.PutAsync(requestUri, new JsonContent(model));
                     var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<T>(jsonString);
                 }
@@ -155,11 +201,10 @@ namespace SOS.Import.Services
             {
                 try
                 {
-                    using var httpClient = new HttpClient
-                    {
-                        Timeout = TimeSpan.FromMinutes(30)
-                    };
-                    var httpResponseMessage = await httpClient.DeleteAsync(requestUri);
+                    _httpClient.Timeout = TimeSpan.FromMinutes(30);
+                    _httpClient.DefaultRequestHeaders.Clear();
+
+                    var httpResponseMessage = await _httpClient.DeleteAsync(requestUri);
                     var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<T>(jsonString);
 
@@ -174,15 +219,6 @@ namespace SOS.Import.Services
             }
 
             return default(T);
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<byte>> ReadFileDataAsync(Uri requestUri)
-        {
-            using var client = new HttpClient();
-            using var response = await client.GetAsync(requestUri); 
-            
-            return response.StatusCode == HttpStatusCode.OK ? await response.Content.ReadAsByteArrayAsync() : null;
         }
     }
 
