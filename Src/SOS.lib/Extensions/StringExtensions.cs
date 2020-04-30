@@ -118,6 +118,12 @@ namespace SOS.Lib.Extensions
         /// <returns>True if the Boolean value could be parsed.</returns>
         public static bool TryParseBoolean(this string value, out bool result, bool trim = true)
         {
+            if (value == null)
+            {
+                result = default;
+                return false;
+            }
+
             if (trim)
             {
                 return bool.TryParse(value.Trim(), out result);
@@ -157,6 +163,12 @@ namespace SOS.Lib.Extensions
         /// <returns>True if the DateTime could be parsed.</returns>
         public static bool TryParseDateTime(this string value, out DateTime result, bool trim = true)
         {
+            if (value == null)
+            {
+                result = default;
+                return false;
+            }
+
             if (trim)
             {
                 return DateTime.TryParse(value.Trim(), out result);
@@ -196,6 +208,12 @@ namespace SOS.Lib.Extensions
         /// <returns>True if the Int32 could be parsed.</returns>
         public static bool TryParseInt(this string value, out int result, bool trim = true)
         {
+            if (value == null)
+            {
+                result = default;
+                return false;
+            }
+
             if (trim)
             {
                 return int.TryParse(value.Trim(), out result);
@@ -235,6 +253,12 @@ namespace SOS.Lib.Extensions
         /// <returns>True if the Int64 could be parsed.</returns>
         public static bool TryParseLong(this string value, out long result, bool trim = true)
         {
+            if (value == null)
+            {
+                result = default;
+                return false;
+            }
+
             if (trim)
             {
                 return long.TryParse(value.Trim(), out result);

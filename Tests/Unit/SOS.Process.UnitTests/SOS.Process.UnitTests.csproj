@@ -50,7 +50,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Resources\AllProcessedBasicTaxa.msgpck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\FieldMappings.msgpck">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\MammaliaProcessedTaxa.msgpck">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Regions\Counties.geojson">

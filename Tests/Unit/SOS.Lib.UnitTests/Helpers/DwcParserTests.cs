@@ -106,9 +106,11 @@ namespace SOS.Lib.UnitTests.Helpers
         public static IEnumerable<object[]> DwcEventDateTestData =>
                     new List<object[]>
                     {
+                new object[] { null, null, null, null, false, null, null },
                 new object[] { "a", "b", "c", "d", false, null, null },
                 new object[] { "1971", "1971", "", "", true, new DateTime(1971, 1, 1), new DateTime(1971, 12, 31) }, // 1971 (some time in the year 1971)
                 new object[] { "", "1971", "", "", true, new DateTime(1971, 1, 1), new DateTime(1971, 12, 31) }, // 1971 (some time in the year 1971)
+                new object[] { null, "1971", "", "", true, new DateTime(1971, 1, 1), new DateTime(1971, 12, 31) }, // 1971 (some time in the year 1971)
                 new object[] { "1906-06", "1906", "6", "", true, new DateTime(1906, 6, 1), new DateTime(1906, 6, 30) }, // 1906-06 (some time in June 1906)
                 new object[] { "", "1906", "6", "", true, new DateTime(1906, 6, 1), new DateTime(1906, 6, 30) }, // 1906-06 (some time in June 1906)
                 new object[] { "1809-02-12", "1809", "02", "12", true, new DateTime(1809, 2, 12), new DateTime(1809, 2, 12) }, // 1809-02-12 (some time during 12 February 1809)

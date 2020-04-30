@@ -719,7 +719,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="allFieldMappings"></param>
         /// <param name="convertValuesToLowercase"></param>
         /// <returns></returns>
-        private static IDictionary<FieldMappingFieldId, IDictionary<object, int>> GetFieldMappingsDictionary(
+        public static IDictionary<FieldMappingFieldId, IDictionary<object, int>> GetFieldMappingsDictionary(
             ExternalSystemId externalSystemId,
             ICollection<FieldMapping> allFieldMappings,
             bool convertValuesToLowercase)

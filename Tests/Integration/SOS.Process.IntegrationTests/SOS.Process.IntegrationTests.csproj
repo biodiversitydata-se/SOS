@@ -49,10 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TestHelpers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="Resources\Dwca\dwca-event-mof-swedish-butterfly-monitoring.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

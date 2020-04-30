@@ -31,8 +31,8 @@ namespace SOS.Process.IntegrationTests.Helpers
             {
                 Location = new ProcessedLocation
                 {
-                    DecimalLatitude = TestHelpers.Gis.Coordinates.TranasMunicipality.Latitude,
-                    DecimalLongitude = TestHelpers.Gis.Coordinates.TranasMunicipality.Longitude
+                    DecimalLatitude = Coordinates.TranasMunicipality.Latitude,
+                    DecimalLongitude = Coordinates.TranasMunicipality.Longitude
                 }
             };
             observations.Add(observation);
