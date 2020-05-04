@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Enums;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 { 
@@ -253,6 +254,39 @@ namespace SOS.Import.Repositories.Source.Artportalen
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting validation status");
+                return null;
+            }
+        }
+        /// <inheritdoc />
+        public async Task<IEnumerable<MetadataEntity>> GetAreaTypesAsync()
+        {
+            try
+            {
+                const string query = @"
+                    SELECT 
+                        Id,
+                        Name AS Translation,
+                        'sv-SE' AS CultureCode 
+                    FROM
+                        AreaDataset 
+                    WHERE 
+                        CountryIsoCode = 752 AND Id IN @AreaTypes
+                    UNION
+                    SELECT 
+                        Id,
+                        Name AS Translation,
+                        'en-GB' AS CultureCode 
+                    FROM
+                        AreaDataset 
+                    WHERE 
+                        CountryIsoCode = 752 AND Id IN @AreaTypes";
+
+                var areaTypes = (int[])Enum.GetValues(typeof(AreaType));
+                return await QueryAsync<MetadataEntity>(query, new { AreaTypes = areaTypes });
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting area types status");
                 return null;
             }
         }
