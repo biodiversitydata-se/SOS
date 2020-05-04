@@ -14,5 +14,11 @@ namespace SOS.Import.Services.Interfaces
         /// <param name="pageSize"></param>
         /// <returns></returns>
         Task<XDocument> GetAsync(DateTime from, int pageIndex, int pageSize);
+
+        /// <summary>
+        /// Get list of localities
+        /// </summary>
+        /// <returns></returns>
+        Task<XDocument> GetLocalitiesAsync();
     }
 }

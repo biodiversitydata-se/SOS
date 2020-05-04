@@ -31,7 +31,8 @@ public enum FieldMappingFieldId
     OccurrenceStatus = 15,
     AccessRights = 16,
     Country = 17,
-    Type = 18
+    Type = 18,
+	AreaType = 19
 }
 ```
 
