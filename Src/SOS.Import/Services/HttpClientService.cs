@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -114,6 +115,7 @@ namespace SOS.Import.Services
                     _httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
                 }
             }
+            
             var response = await _httpClient.GetAsync(requestUri);
             return response.StatusCode == HttpStatusCode.OK ? await response.Content.ReadAsStreamAsync() : null;
         }

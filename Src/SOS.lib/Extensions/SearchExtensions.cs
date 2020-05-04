@@ -206,6 +206,7 @@ namespace SOS.Lib.Extensions
         {
             var projection = new SourceFilterDescriptor<dynamic>()
                    .Excludes(e => e
+                       .Field("defects")
                        .Field("location.point")
                        .Field("location.pointLocation")
                        .Field("location.pointWithBuffer")

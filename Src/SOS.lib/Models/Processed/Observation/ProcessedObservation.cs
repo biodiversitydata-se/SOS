@@ -239,6 +239,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public ProcessedEvent Event { get; set; }
 
         /// <summary>
+        /// List of defects found in harvest
+        /// </summary>
+        [Object]
+        public IDictionary<string, string> Defects { get; set; }
+
+        /// <summary>
         /// Geological information, such as stratigraphy, that qualifies a region or place.
         /// </summary>
         [Object]
