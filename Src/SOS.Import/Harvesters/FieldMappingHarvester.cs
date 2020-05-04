@@ -71,6 +71,7 @@ namespace SOS.Import.Harvesters
             AccessRightsFieldMappingFactory accessRightsFieldMappingFactory,
             OccurrenceStatusFieldMappingFactory occurrenceStatusFieldMappingFactory,
             EstablishmentMeansFieldMappingFactory establishmentMeansFieldMappingFactory,
+            AreaTypeFieldMappingFactory areaTypeFieldMappingFactory,
             ILogger<FieldMappingHarvester> logger)
         {
             _fieldMappingRepository = fieldMappingRepository ?? throw new ArgumentNullException(nameof(fieldMappingRepository));
@@ -95,7 +96,8 @@ namespace SOS.Import.Harvesters
                 {FieldMappingFieldId.Country, countryFieldMappingFactory},
                 {FieldMappingFieldId.AccessRights, accessRightsFieldMappingFactory},
                 {FieldMappingFieldId.OccurrenceStatus, occurrenceStatusFieldMappingFactory},
-                {FieldMappingFieldId.EstablishmentMeans, establishmentMeansFieldMappingFactory}
+                {FieldMappingFieldId.EstablishmentMeans, establishmentMeansFieldMappingFactory},
+                {FieldMappingFieldId.AreaType, areaTypeFieldMappingFactory}
             };
         }
 

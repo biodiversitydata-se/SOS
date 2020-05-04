@@ -57,5 +57,11 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<MetadataEntity>> GetValidationStatusAsync();
+
+        /// <summary>
+        /// Gets all area types
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<MetadataEntity>> GetAreaTypesAsync();
     }
 }

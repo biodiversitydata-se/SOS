@@ -41,13 +41,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Src\External\DwC-A_dotnet\DwC-A_dotnet.csproj" />
+    <ProjectReference Include="..\..\..\Src\SOS.Import\SOS.Import.csproj" />
     <ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
     <ProjectReference Include="..\..\..\Src\SOS.Process\SOS.Process.csproj" />
     <ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TestHelpers\" />
+    <None Update="Resources\Dwca\dwca-event-mof-swedish-butterfly-monitoring.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

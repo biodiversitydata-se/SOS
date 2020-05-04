@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using DwC_A;
 using DwC_A.Terms;
 using Microsoft.Extensions.Logging;
@@ -35,17 +36,54 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <inheritdoc />
+        public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
+            ArchiveReader archiveReader,
+            DwcaDatasetInfo datasetInfo)
+        {
+            const int batchSize = 100000;
+            var observationsBatches = ReadArchiveInBatchesAsync(
+                archiveReader,
+                datasetInfo, 
+                batchSize);
+            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
+            await foreach (List<DwcObservationVerbatim> observationsBatch in observationsBatches)
+            {
+                observations.AddRange(observationsBatch);
+            }
+
+            return observations;
+        }
+
+        /// <inheritdoc />
         public async IAsyncEnumerable<List<DwcEvent>> ReadSamplingEventArchiveInBatchesAsDwcEventAsync(
             ArchiveReader archiveReader,
             DwcaDatasetInfo datasetInfo,
             int batchSize)
         {
-            var filename = System.IO.Path.GetFileName(archiveReader.FileName);
             var dwcSamplingEventArchiveReader = new DwcSamplingEventArchiveReader(_logger);
             await foreach (var batch in dwcSamplingEventArchiveReader.ReadArchiveInBatchesAsync(archiveReader, datasetInfo, batchSize))
             {
                 yield return batch;
             }
+        }
+
+        /// <inheritdoc />
+        public async Task<List<DwcEvent>> ReadSamplingEventArchiveAsDwcEventAsync(
+            ArchiveReader archiveReader,
+            DwcaDatasetInfo datasetInfo)
+        {
+            const int batchSize = 100000;
+            var observationsBatches = ReadSamplingEventArchiveInBatchesAsDwcEventAsync(
+                archiveReader,
+                datasetInfo,
+                batchSize);
+            List<DwcEvent> events = new List<DwcEvent>();
+            await foreach (List<DwcEvent> observationsBatch in observationsBatches)
+            {
+                events.AddRange(observationsBatch);
+            }
+
+            return events;
         }
 
         private IDwcArchiveReaderAsDwcObservation CreateOccurrenceReader(string rowType)

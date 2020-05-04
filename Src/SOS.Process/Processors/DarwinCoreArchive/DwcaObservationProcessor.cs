@@ -24,6 +24,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private readonly IDwcaVerbatimRepository _dwcaVerbatimRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly ProcessConfiguration _processConfiguration;
+        private readonly IAreaHelper _areaHelper;
         public override ObservationProvider DataProvider => ObservationProvider.Dwca;
 
         /// <summary>
@@ -33,6 +34,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="processedObservationRepository"></param>
         /// <param name="processedFieldMappingRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
+        /// <param name="areaHelper"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="logger"></param>
         public DwcaObservationProcessor(
@@ -40,11 +42,13 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IProcessedObservationRepository processedObservationRepository,
             IProcessedFieldMappingRepository processedFieldMappingRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
             ILogger<DwcaObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, logger)
         {
             _dwcaVerbatimRepository = dwcaVerbatimRepository ?? throw new ArgumentNullException(nameof(dwcaVerbatimRepository));
             _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _processConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
 
             if (processConfiguration == null)
@@ -73,19 +77,23 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             const int dataProviderId = 6; // todo - change
             const string dataProviderIdentifier = "BirdRinging"; // todo - change
             var verbatimCount = 0;
-            var observationFactory = await DwcaObservationFactory.CreateAsync(taxa, _processedFieldMappingRepository);
+            var observationFactory = await DwcaObservationFactory.CreateAsync(
+                taxa, 
+                _processedFieldMappingRepository,
+                _areaHelper);
             ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
             using var cursor = await _dwcaVerbatimRepository.GetAllByCursorAsync(dataProviderId, dataProviderIdentifier);
 
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
-                sightings.Add(observationFactory.CreateProcessedObservation(verbatimObservation));
+                var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                sightings.Add(processedObservation);
                 if (IsBatchFilledToLimit(sightings.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     verbatimCount += await CommitBatchAsync(sightings);
-                    Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
+                    Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
                 }
             });
 
@@ -94,7 +102,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             {
                 cancellationToken?.ThrowIfCancellationRequested();
                 verbatimCount += await CommitBatchAsync(sightings);
-                Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
+                Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
             }
 
             return verbatimCount;

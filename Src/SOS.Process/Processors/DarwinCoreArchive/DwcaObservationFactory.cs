@@ -15,6 +15,7 @@ using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
 using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
@@ -28,27 +29,31 @@ namespace SOS.Process.Processors.DarwinCoreArchive
     {
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
         private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
+        private readonly IAreaHelper _areaHelper;
 
         public DwcaObservationFactory(
             IDictionary<int, ProcessedTaxon> taxa,
-            IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings)
+            IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings,
+            IAreaHelper areaHelper)
         {
             {
                 _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
                 _fieldMappings = fieldMappings ?? throw new ArgumentNullException(nameof(fieldMappings));
+                _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             }
         }
 
         public static async Task<DwcaObservationFactory> CreateAsync(
             IDictionary<int, ProcessedTaxon> taxa,
-            IProcessedFieldMappingRepository processedFieldMappingRepository)
+            IProcessedFieldMappingRepository processedFieldMappingRepository, 
+            IAreaHelper areaHelper)
         {
             var allFieldMappings = await processedFieldMappingRepository.GetAllAsync();
             var fieldMappings = GetFieldMappingsDictionary(
                 ExternalSystemId.DarwinCore, 
                 allFieldMappings.ToArray(),
                 convertValuesToLowercase: true);
-            return new DwcaObservationFactory(taxa, fieldMappings);
+            return new DwcaObservationFactory(taxa, fieldMappings, areaHelper);
         }
 
         public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<DwcObservationVerbatim> verbatimObservations)
@@ -86,7 +91,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
             // Record level
             obs.AccessRights = GetSosId(verbatimObservation.AccessRights, _fieldMappings[FieldMappingFieldId.AccessRights]);
-            obs.BasisOfRecord = GetSosId(verbatimObservation.AccessRights, _fieldMappings[FieldMappingFieldId.BasisOfRecord]);
+            obs.BasisOfRecord = GetSosId(verbatimObservation.BasisOfRecord, _fieldMappings[FieldMappingFieldId.BasisOfRecord]);
             obs.BibliographicCitation = verbatimObservation.BibliographicCitation;
             obs.CollectionCode = verbatimObservation.CollectionCode;
             obs.CollectionId = verbatimObservation.CollectionID;
@@ -134,6 +139,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             // Taxon
             obs.Taxon = CreateProcessedTaxon(verbatimObservation);
 
+            _areaHelper.AddAreaDataToProcessedObservation(obs);
             return obs;
 
             // Code from ArtportalenObservationFactory
@@ -261,7 +267,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private ProcessedIdentification CreateProcessedIdentification(DwcObservationVerbatim verbatimObservation)
         {
             var processedIdentification = new ProcessedIdentification();
-            processedIdentification.DateIdentified = verbatimObservation.DateIdentified.ParseDateTime();
+            processedIdentification.DateIdentified = verbatimObservation.DateIdentified?.ParseDateTime();
             processedIdentification.IdentificationId = verbatimObservation.IdentificationID;
             processedIdentification.IdentificationQualifier = verbatimObservation.IdentificationQualifier;
             processedIdentification.IdentificationReferences = verbatimObservation.IdentificationReferences;
@@ -283,7 +289,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 defaultValue: (int)ContinentId.Europe, 
                 mappingNotFoundLogic: MappingNotFoundLogic.UseDefaultValue);
             processedLocation.CoordinatePrecision = verbatimObservation.CoordinatePrecision.ParseDouble();
-            processedLocation.CoordinateUncertaintyInMeters = verbatimObservation.CoordinateUncertaintyInMeters.ParseInt();
+            processedLocation.CoordinateUncertaintyInMeters = verbatimObservation.CoordinateUncertaintyInMeters?.ParseInt();
             processedLocation.Country = GetSosId(
                 verbatimObservation.Country, 
                 _fieldMappings[FieldMappingFieldId.Country], 
@@ -713,7 +719,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="allFieldMappings"></param>
         /// <param name="convertValuesToLowercase"></param>
         /// <returns></returns>
-        private static IDictionary<FieldMappingFieldId, IDictionary<object, int>> GetFieldMappingsDictionary(
+        public static IDictionary<FieldMappingFieldId, IDictionary<object, int>> GetFieldMappingsDictionary(
             ExternalSystemId externalSystemId,
             ICollection<FieldMapping> allFieldMappings,
             bool convertValuesToLowercase)

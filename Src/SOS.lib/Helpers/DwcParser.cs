@@ -30,6 +30,11 @@ namespace SOS.Lib.Helpers
             out DateTime? startDate, 
             out DateTime? endDate)
         {
+            if (string.IsNullOrEmpty(eventDate))
+            {
+                return TryParseEventDate(year, month, day, out startDate, out endDate);
+            }
+
             string[] dateParts = eventDate.Split("/");
             if (dateParts.Length == 2) // Interval
             {

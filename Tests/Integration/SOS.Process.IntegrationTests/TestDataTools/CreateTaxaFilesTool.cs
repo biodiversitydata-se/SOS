@@ -7,6 +7,7 @@ using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Factories;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Process.Database;
 using SOS.Process.Jobs;
@@ -60,6 +61,34 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             var basicTaxa = taxa.ToProcessedBasicTaxa();
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
             byte[] bin = MessagePackSerializer.Serialize(basicTaxa, options);
+            System.IO.File.WriteAllBytes(filePath, bin);
+        }
+
+        /// <summary>
+        /// Creates a Message pack file with a list of ProcessedBasicTaxon.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Tool")]
+        public async Task Create_list_of_mammalia_ProcessedTaxon_as_MessagePackFile()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const int MammaliaTaxonId = 4000107;
+            const string filePath = @"c:\temp\MammaliaProcessedTaxa.msgpck";
+            var taxonProcessedRepository = CreateTaxonProcessedRepository();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            IEnumerable<ProcessedTaxon> taxa = await taxonProcessedRepository.GetAllAsync();
+            var basicTaxa = taxa.ToProcessedBasicTaxa();
+            var tree = TaxonTreeFactory.CreateTaxonTree(basicTaxa);
+            IEnumerable<int> mammaliaTaxonIds = tree.GetUnderlyingTaxonIds(MammaliaTaxonId, true);
+            var mammaliaProcessedTaxa = taxa.Where(m => mammaliaTaxonIds.Contains(m.DyntaxaTaxonId));
+            var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
+            byte[] bin = MessagePackSerializer.Serialize(mammaliaProcessedTaxa, options);
             System.IO.File.WriteAllBytes(filePath, bin);
         }
 
