@@ -60,6 +60,7 @@ namespace SOS.Lib.Extensions
             {
                 case CoordinateSys.WebMercator:
                     return @"PROJCS[""Google Mercator"",GEOGCS[""WGS 84"",DATUM[""World Geodetic System 1984"",SPHEROID[""WGS 84"", 6378137.0, 298.257223563, AUTHORITY[""EPSG"",""7030""]],AUTHORITY[""EPSG"",""6326""]],PRIMEM[""Greenwich"", 0.0, AUTHORITY[""EPSG"",""8901""]],UNIT[""degree"", 0.017453292519943295], AXIS[""Geodetic latitude"", NORTH], AXIS[""Geodetic longitude"", EAST], AUTHORITY[""EPSG"",""4326""]], PROJECTION[""Mercator_1SP""], PARAMETER[""semi_minor"", 6378137.0], PARAMETER[""latitude_of_origin"", 0.0], PARAMETER[""central_meridian"", 0.0], PARAMETER[""scale_factor"", 1.0], PARAMETER[""false_easting"", 0.0], PARAMETER[""false_northing"", 0.0], UNIT[""m"", 1.0], AXIS[""Easting"", EAST], AXIS[""Northing"", NORTH], AUTHORITY[""EPSG"",""900913""]]";
+                    //return @"PROJCS[""WGS 84 / Pseudo - Mercator"",GEOGCS[""WGS 84"",DATUM[""WGS_1984"",SPHEROID[""WGS 84"",6378137,298.257223563,AUTHORITY[""EPSG"",""7030""]],AUTHORITY[""EPSG"",""6326""]],PRIMEM[""Greenwich"",0,AUTHORITY[""EPSG"",""8901""]],UNIT[""degree"",0.0174532925199433,AUTHORITY[""EPSG"",""9122""]],AUTHORITY[""EPSG"",""4326""]],PROJECTION[""Mercator_1SP""],PARAMETER[""central_meridian"",0],PARAMETER[""scale_factor"",1],PARAMETER[""false_easting"",0],PARAMETER[""false_northing"",0],UNIT[""metre"",1,AUTHORITY[""EPSG"",""9001""]],AXIS[""X"",EAST],AXIS[""Y"",NORTH],EXTENSION[""PROJ4"","" + proj = merc + a = 6378137 + b = 6378137 + lat_ts = 0.0 + lon_0 = 0.0 + x_0 = 0.0 + y_0 = 0 + k = 1.0 + units = m + nadgrids = @null + wktext + no_defs""],AUTHORITY[""EPSG"",""3857""]]";
                 case CoordinateSys.Rt90_25_gon_v:
                     return @"PROJCS[""SWEREF99 / RT90 2.5 gon V emulation"", GEOGCS[""SWEREF99"", DATUM[""SWEREF99"", SPHEROID[""GRS 1980"",6378137.0,298.257222101, AUTHORITY[""EPSG"",""7019""]], TOWGS84[0.0,0.0,0.0,0.0,0.0,0.0,0.0], AUTHORITY[""EPSG"",""6619""]], PRIMEM[""Greenwich"",0.0, AUTHORITY[""EPSG"",""8901""]], UNIT[""degree"",0.017453292519943295], AXIS[""Geodetic latitude"",NORTH], AXIS[""Geodetic longitude"",EAST], AUTHORITY[""EPSG"",""4619""]], PROJECTION[""Transverse Mercator""], PARAMETER[""central_meridian"",15.806284529444449], PARAMETER[""latitude_of_origin"",0.0], PARAMETER[""scale_factor"",1.00000561024], PARAMETER[""false_easting"",1500064.274], PARAMETER[""false_northing"",-667.711], UNIT[""m"",1.0], AXIS[""Northing"",NORTH], AXIS[""Easting"",EAST], AUTHORITY[""EPSG"",""3847""]]";
                 case CoordinateSys.SWEREF99:
@@ -68,9 +69,111 @@ namespace SOS.Lib.Extensions
                     return @"PROJCS[""SWEREF99 TM"", GEOGCS[""SWEREF99"", DATUM[""D_SWEREF99"", SPHEROID[""GRS_1980"",6378137,298.257222101]], PRIMEM[""Greenwich"",0], UNIT[""Degree"",0.017453292519943295]], PROJECTION[""Transverse_Mercator""], PARAMETER[""latitude_of_origin"",0], PARAMETER[""central_meridian"",15], PARAMETER[""scale_factor"",0.9996], PARAMETER[""false_easting"",500000], PARAMETER[""false_northing"",0], UNIT[""Meter"",1]]";
                 case CoordinateSys.WGS84:
                     return @"GEOGCS[""GCS_WGS_1984"", DATUM[""WGS_1984"", SPHEROID[""WGS_1984"",6378137,298.257223563]], PRIMEM[""Greenwich"",0], UNIT[""Degree"",0.017453292519943295]]";
+                case CoordinateSys.ETRS89:
+                    return @"PROJCS[""ETRS89 / LAEA Europe"",GEOGCS[""ETRS89"",DATUM[""European_Terrestrial_Reference_System_1989"",SPHEROID[""GRS 1980"",6378137,298.257222101,AUTHORITY[""EPSG"",""7019""]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[""EPSG"",""6258""]],PRIMEM[""Greenwich"",0,AUTHORITY[""EPSG"",""8901""]],UNIT[""degree"",0.0174532925199433,AUTHORITY[""EPSG"",""9122""]],AUTHORITY[""EPSG"",""4258""]],PROJECTION[""Lambert_Azimuthal_Equal_Area""],PARAMETER[""latitude_of_center"",52],PARAMETER[""longitude_of_center"",10],PARAMETER[""false_easting"",4321000],PARAMETER[""false_northing"",3210000],UNIT[""metre"",1,AUTHORITY[""EPSG"",""9001""]],AUTHORITY[""EPSG"",""3035""]]";
                 default:
                     throw new ArgumentException("Not handled coordinate system id " + coordinateSystem);
             }
+        }
+
+        /// <summary>
+        /// Get the EPSG code for the specified coordinate system.
+        /// </summary>
+        /// <param name="coordinateSystem">The coordinate system.</param>
+        /// <returns>The EPSG code.</returns>
+        public static string EpsgCode(this CoordinateSys coordinateSystem)
+        {
+            return $"EPSG:{coordinateSystem.Srid()}";
+        }
+
+        /// <summary>
+        /// Gets the Srid for the specified coordinate system.
+        /// </summary>
+        /// <param name="coordinateSystem">The coordinate system.</param>
+        /// <returns>The Srid.</returns>
+        public static int Srid(this CoordinateSys coordinateSystem)
+        {
+            return (int)coordinateSystem; // the enum value is the same as SRID.
+        }
+
+        /// <summary>
+        /// Parse coordinate system.
+        /// </summary>
+        /// <param name="strCoordinateSystem"></param>
+        /// <returns></returns>
+        public static CoordinateSys? ParseCoordinateSystem(string strCoordinateSystem)
+        {
+            var result = TryParseCoordinateSystem(strCoordinateSystem, out CoordinateSys coordinateSystem);
+            if (result) return coordinateSystem;
+            return null;
+        }
+
+        /// <summary>
+        /// Try parse coordinate system.
+        /// </summary>
+        /// <param name="strCoordinateSystem"></param>
+        /// <param name="coordinateSystem"></param>
+        /// <returns></returns>
+        public static bool TryParseCoordinateSystem(string strCoordinateSystem, out CoordinateSys coordinateSystem)
+        {
+            strCoordinateSystem = strCoordinateSystem.Trim();
+
+            if (strCoordinateSystem.Equals("epsg:3006", StringComparison.OrdinalIgnoreCase))
+            {
+                coordinateSystem = CoordinateSys.SWEREF99_TM;
+                return true;
+            }
+
+            if (strCoordinateSystem.Equals("epsg:3021", StringComparison.OrdinalIgnoreCase))
+            {
+                coordinateSystem = CoordinateSys.Rt90_25_gon_v;
+                return true;
+            }
+
+            if (strCoordinateSystem.Equals("epsg:3857", StringComparison.OrdinalIgnoreCase))
+            {
+                coordinateSystem = CoordinateSys.WebMercator;
+                return true;
+            }
+
+            if (strCoordinateSystem.Equals("epsg:900913", StringComparison.OrdinalIgnoreCase))
+            {
+                coordinateSystem = CoordinateSys.WebMercator;
+                return true;
+            }
+
+            if (strCoordinateSystem.Equals("epsg:4326", StringComparison.OrdinalIgnoreCase))
+            {
+                coordinateSystem = CoordinateSys.WGS84;
+                return true;
+            }
+
+            if (strCoordinateSystem.Equals("wgs84", StringComparison.OrdinalIgnoreCase))
+            {
+                coordinateSystem = CoordinateSys.WGS84;
+                return true;
+            }
+
+            if (strCoordinateSystem.Equals("wgs 84", StringComparison.OrdinalIgnoreCase))
+            {
+                coordinateSystem = CoordinateSys.WGS84;
+                return true;
+            }
+
+            if (strCoordinateSystem.Equals("epsg:4619", StringComparison.OrdinalIgnoreCase))
+            {
+                coordinateSystem = CoordinateSys.SWEREF99;
+                return true;
+            }
+
+            if (strCoordinateSystem.Equals("epsg:3035", StringComparison.OrdinalIgnoreCase))
+            {
+                coordinateSystem = CoordinateSys.ETRS89;
+                return true;
+            }
+
+            coordinateSystem = default;
+            return false;
         }
 
         /// <summary>

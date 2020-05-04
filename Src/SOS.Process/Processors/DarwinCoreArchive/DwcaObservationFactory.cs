@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using Nest;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
@@ -337,7 +338,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedLocation.VerbatimSRS = verbatimObservation.VerbatimSRS;
             processedLocation.WaterBody = verbatimObservation.WaterBody;
 
-            // todo - do we want to save verbatim coordinates in this way?
             if (!processedLocation.VerbatimLatitude.HasValue &&
                 !processedLocation.VerbatimLongitude.HasValue &&
                 string.IsNullOrWhiteSpace(processedLocation.VerbatimSRS))
@@ -347,12 +347,30 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 processedLocation.VerbatimSRS = processedLocation.GeodeticDatum;
             }
 
-            // todo - handle conversion of coordinates from different coordinate systems (GeodeticDatum).
-            //Point = (PointGeoShape)wgs84Point?.ToGeoShape(),
-            //PointLocation = wgs84Point?.ToGeoLocation(),
-            //PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoShape(),
+            Point wgs84Point = null;
+            if (string.IsNullOrWhiteSpace(processedLocation.GeodeticDatum)) // Assume WGS84 if GeodeticDatum is empty.
+            {
+                wgs84Point = new Point(processedLocation.DecimalLongitude.Value, processedLocation.DecimalLatitude.Value);
+            }
+            else
+            {
+                var originalPoint = new Point(processedLocation.DecimalLongitude.Value, processedLocation.DecimalLatitude.Value);
+                if (GISExtensions.TryParseCoordinateSystem(processedLocation.GeodeticDatum, out CoordinateSys coordinateSystem))
+                {
+                    wgs84Point = (Point)originalPoint.Transform(coordinateSystem, CoordinateSys.WGS84);
+                    processedLocation.DecimalLongitude = wgs84Point.X;
+                    processedLocation.DecimalLatitude = wgs84Point.Y;
+                }
+            }
+
+            processedLocation.GeodeticDatum = CoordinateSys.WGS84.EpsgCode();
+            processedLocation.Point = (PointGeoShape) wgs84Point?.ToGeoShape();
+            processedLocation.PointLocation = wgs84Point?.ToGeoLocation();
+            processedLocation.PointWithBuffer = (PolygonGeoShape) wgs84Point?.ToCircle(processedLocation.CoordinateUncertaintyInMeters)?.ToGeoShape();
             return processedLocation;
         }
+
+        
 
         private double? ParseDouble(string strValue, string fieldName)
         {

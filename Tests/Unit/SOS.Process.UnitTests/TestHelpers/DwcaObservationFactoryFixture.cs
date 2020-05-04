@@ -34,7 +34,6 @@ namespace SOS.Process.UnitTests.TestHelpers
 
         private DwcaObservationFactory CreateDwcaObservationFactory()
         {
-            var sp = Stopwatch.StartNew();
             var mammaliaTaxa = MessagePackHelper.CreateListFromMessagePackFile<ProcessedTaxon>(@"Resources\MammaliaProcessedTaxa.msgpck");
             var mammaliaTaxonByTaxonId = mammaliaTaxa.ToDictionary(t => t.Id, t => t);
             var processedAreaRepositoryStub = ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);
@@ -44,7 +43,6 @@ namespace SOS.Process.UnitTests.TestHelpers
                 mammaliaTaxonByTaxonId, 
                 processedFieldMappingRepository.Object,
                 areaHelper).Result;
-            sp.Stop();
             return factory;
         }
     }

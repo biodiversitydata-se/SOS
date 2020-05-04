@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace SOS.Lib.Extensions
@@ -37,6 +38,16 @@ namespace SOS.Lib.Extensions
             }
 
             return value.Substring(0, Math.Min(value.Length, maxLength));
+        }
+
+        public static bool ContainsAny(this string strValue, StringComparison stringComparison, params string[] list)
+        {
+            return list.Any(s => s.Equals(strValue, stringComparison));
+        }
+
+        public static bool ContainsAny(this string strValue, params string[] list)
+        {
+            return list.Any(s => s.Equals(strValue, StringComparison.OrdinalIgnoreCase));
         }
 
         /// <summary>
