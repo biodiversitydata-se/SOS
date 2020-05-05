@@ -11,6 +11,7 @@
         NORS = 8,
         SERS = 16,
         SHARK = 32,
-        Dwca = 64
+        Dwca = 64,
+        VirtualHerbarium = 128
     }
 }

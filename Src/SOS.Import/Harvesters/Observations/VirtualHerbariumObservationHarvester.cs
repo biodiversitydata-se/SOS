@@ -73,7 +73,7 @@ namespace SOS.Import.Harvesters.Observations
                     if (_virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         nrSightingsHarvested >= _virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
-               //         break;
+                        break;
                     }
 
                     var verbatims = observations.ToVerbatims(localities)?.ToArray();

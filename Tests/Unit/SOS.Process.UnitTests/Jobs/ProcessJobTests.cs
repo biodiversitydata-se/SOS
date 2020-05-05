@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Processed;
@@ -14,6 +16,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Process.Helpers;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
 using SOS.Process.Managers.Interfaces;
@@ -23,7 +26,10 @@ using SOS.Process.Processors.Kul.Interfaces;
 using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark.Interfaces;
+using SOS.Process.Processors.VirtualHerbarium;
+using SOS.Process.Processors.VirtualHerbarium.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Process.Repositories.Source;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
 
@@ -45,6 +51,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<INorsObservationProcessor> _norsProcessor;
         private readonly Mock<ISersObservationProcessor> _sersProcessor;
         private readonly Mock<ISharkObservationProcessor> _sharkProcessor;
+        private readonly Mock<IVirtualHerbariumObservationProcessor> _virtualHerbariumProcessor;
         private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
         private readonly Mock<IProcessedTaxonRepository> _taxonProcessedRepository;
         private readonly Mock<IAreaHelper> _areaHelper;
@@ -59,6 +66,7 @@ namespace SOS.Process.UnitTests.Jobs
             _norsProcessor.Object,
             _sersProcessor.Object,
             _sharkProcessor.Object,
+            _virtualHerbariumProcessor.Object,
             _artportalenProcessor.Object,
             _taxonProcessedRepository.Object,
             _instanceManager.Object,
@@ -107,6 +115,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -125,6 +134,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -143,6 +153,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -161,6 +172,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -179,6 +191,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -197,6 +210,7 @@ namespace SOS.Process.UnitTests.Jobs
                 null,
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -215,6 +229,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 null,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -233,6 +248,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 null,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -252,6 +268,27 @@ namespace SOS.Process.UnitTests.Jobs
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
                 null,
+                _artportalenProcessor.Object,
+                _taxonProcessedRepository.Object,
+                _instanceManager.Object,
+                _copyFieldMappingsJob.Object,
+                _processTaxaJob.Object,
+                _areaHelper.Object,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("virtualHerbariumObservationProcessor");
+
+
+            create = () => new ProcessJob(
+                _darwinCoreRepository.Object,
+                _processInfoRepository.Object,
+                _harvestInfoRepository.Object,
+                _clamPortalProcessor.Object,
+                _kulProcessor.Object,
+                _norsProcessor.Object,
+                _sersProcessor.Object,
+                _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
+                null,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
                 _copyFieldMappingsJob.Object,
@@ -269,6 +306,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 null,
                 _instanceManager.Object,
@@ -287,6 +325,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 null,
@@ -305,6 +344,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -323,6 +363,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -341,6 +382,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,
@@ -359,6 +401,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _norsProcessor.Object,
                 _sersProcessor.Object,
                 _sharkProcessor.Object,
+                _virtualHerbariumProcessor.Object,
                 _artportalenProcessor.Object,
                 _taxonProcessedRepository.Object,
                 _instanceManager.Object,

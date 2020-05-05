@@ -24,6 +24,8 @@ using SOS.Process.Processors.Sers;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark;
 using SOS.Process.Processors.Shark.Interfaces;
+using SOS.Process.Processors.VirtualHerbarium;
+using SOS.Process.Processors.VirtualHerbarium.Interfaces;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
@@ -75,6 +77,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<NorsObservationVerbatimRepository>().As<INorsObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationVerbatimRepository>().As<ISersObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationVerbatimRepository>().As<ISharkObservationVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>().As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonVerbatimRepository>().As<ITaxonVerbatimRepository>().InstancePerLifetimeScope();
 
             // Repositories destination 
@@ -94,6 +97,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<NorsObservationProcessor>().As<INorsObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationProcessor>().As<ISersObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationProcessor>().As<ISharkObservationProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<VirtualHerbariumObservationProcessor>().As<IVirtualHerbariumObservationProcessor>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();

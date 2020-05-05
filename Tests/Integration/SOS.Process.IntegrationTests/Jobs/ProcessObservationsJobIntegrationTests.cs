@@ -18,6 +18,7 @@ using SOS.Process.Processors.Kul;
 using SOS.Process.Processors.Nors;
 using SOS.Process.Processors.Sers;
 using SOS.Process.Processors.Shark;
+using SOS.Process.Processors.VirtualHerbarium;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
@@ -146,6 +147,12 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<SharkObservationProcessor>());
+            var virtualHrbariumProcessor = new VirtualHerbariumObservationProcessor(
+                new VirtualHerbariumObservationVerbatimRepository(verbatimClient, new NullLogger<VirtualHerbariumObservationVerbatimRepository>()),
+                areaHelper,
+                processedObservationRepository,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                new NullLogger<VirtualHerbariumObservationProcessor>());
             var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
                 processedObservationRepository,
@@ -170,6 +177,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 norsProcessor,
                 sersProcessor,
                 sharkProcessor,
+                virtualHrbariumProcessor,
                 artportalenProcessor,
                 taxonProcessedRepository,
                 instanceManager,

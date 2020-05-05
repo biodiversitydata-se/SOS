@@ -9,16 +9,16 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Verbatim.Kul;
+using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 
-namespace SOS.Process.Processors.Kul
+namespace SOS.Process.Processors.VirtualHerbarium
 {
-    public class KulObservationFactory
+    public class VirtualHerbariumObservationFactory
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
 
-        public KulObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
+        public VirtualHerbariumObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
         {
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
         }
@@ -28,36 +28,49 @@ namespace SOS.Process.Processors.Kul
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<KulObservationVerbatim> verbatims)
+        public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<VirtualHerbariumObservationVerbatim> verbatims)
         {
             return verbatims.Select(CreateProcessedObservation);
         }
 
         /// <summary>
-        /// Cast KUL observation verbatim to ProcessedObservation
+        /// Cast Virtual Herbarium observation verbatim to ProcessedObservation
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        public ProcessedObservation CreateProcessedObservation(KulObservationVerbatim verbatim)
+        public ProcessedObservation CreateProcessedObservation(VirtualHerbariumObservationVerbatim verbatim)
         {
             Point wgs84Point = null;
             if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
             {
-                wgs84Point = new Point(verbatim.DecimalLongitude, verbatim.DecimalLatitude) { SRID = (int)CoordinateSys.WGS84 };
+                var sweRef99Point = new Point(verbatim.DecimalLongitude, verbatim.DecimalLatitude) { SRID = (int)CoordinateSys.SWEREF99_TM };
+                wgs84Point = (Point)sweRef99Point.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
             }
 
-            _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
+            _taxa.TryGetValue(verbatim.DyntaxaId, out var taxon);
 
-            var obs = new ProcessedObservation(ObservationProvider.KUL)
+            var defects = new Dictionary<string, string>();
+            DateTime? dateCollected = null;
+            if (DateTime.TryParse(verbatim.DateCollected, out var date))
+            {
+                dateCollected = date;
+            }
+            else // In correct date, add it to defects
+            {
+                defects.Add("DateCollected", verbatim.DateCollected);
+            }
+            
+            var obs = new ProcessedObservation(ObservationProvider.VirtualHerbarium)
             {
                 BasisOfRecord = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ObservationProvider.KUL.ToString()}",
-                DatasetName = "KUL",
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ ObservationProvider.VirtualHerbarium.ToString() }",
+                DatasetName = "Virtual Herbarium",
+                Defects = defects.Count == 0 ? null : defects,
                 Event = new ProcessedEvent
                 {
-                    EndDate = verbatim.End.ToUniversalTime(),
-                    StartDate = verbatim.Start.ToUniversalTime(),
-                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.Start, verbatim.End)
+                    EndDate = dateCollected?.ToUniversalTime(),
+                    StartDate = dateCollected?.ToUniversalTime(),
+                    VerbatimEventDate = DwcFormatter.CreateDateString(dateCollected)
                 },
                 Identification = new ProcessedIdentification
                 {
@@ -66,51 +79,36 @@ namespace SOS.Process.Processors.Kul
                 },
                 Location = new ProcessedLocation
                 {
-                    CoordinateUncertaintyInMeters = verbatim.CoordinateUncertaintyInMeters ?? DefaultCoordinateUncertaintyInMeters,
-                    CountryCode = verbatim.CountryCode,
+                    CoordinateUncertaintyInMeters = verbatim.CoordinatePrecision,
+                    CountryCode = CountryCode.Sweden,
                     DecimalLatitude = verbatim.DecimalLatitude,
                     DecimalLongitude = verbatim.DecimalLongitude,
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Continent = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
                     Country = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
-                    Locality = verbatim.Locality,
                     Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
                     PointLocation = wgs84Point?.ToGeoLocation(),
-                    PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoShape(),
+                    PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatim.CoordinatePrecision)?.ToGeoShape(),
                     VerbatimLatitude = verbatim.DecimalLatitude,
                     VerbatimLongitude = verbatim.DecimalLongitude
                 },
-                Modified = verbatim.Start,
                 Occurrence = new ProcessedOccurrence
                 {
-                    CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
-                    OccurrenceId = verbatim.OccurrenceId,
-                    IndividualCount = verbatim.IndividualCount?.ToString(),
+                    OccurrenceId = verbatim.AccessionNo,
                     IsNaturalOccurrence = true,
-                    IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
+                    IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,
-                    IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
-                    RecordedBy = verbatim.RecordedBy,
-                    OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
+                    IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
+                    OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId),
+                    RecordedBy = verbatim.Collector,
+                    OccurrenceRemarks = verbatim.Notes
                 },
-                OwnerInstitutionCode = verbatim.Owner,
+                OwnerInstitutionCode = verbatim.InstitutionCode,
                 ProtectionLevel = GetProtectionLevel(),
-                ReportedBy = verbatim.ReportedBy,
-                ReportedDate = verbatim.Start,
                 Taxon = taxon
             };
 
             return obs;
-        }
-
-        /// <summary>
-        /// Creates occurrence id.
-        /// </summary>
-        /// <returns>The Catalog Number.</returns>
-        private string GetCatalogNumber(string occurrenceId)
-        {
-            int pos = occurrenceId.LastIndexOf(":", StringComparison.Ordinal);
-            return occurrenceId.Substring(pos + 1);
         }
 
         /// <summary>
