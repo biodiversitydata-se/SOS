@@ -18,14 +18,14 @@ namespace SOS.Observations.Api.Controllers
     /// <summary>
     /// Observation controller
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
-    public class ObservationController : ControllerBase, IObservationController
+    public class ObservationsController : ControllerBase, IObservationsController
     {
         private readonly IObservationManager _observationManager;
         private readonly IFieldMappingManager _fieldMappingManager;
         private readonly IAreaManager _areaManager;
-        private readonly ILogger<ObservationController> _logger;
+        private readonly ILogger<ObservationsController> _logger;
         private const int MaxBatchSize = 1000;
         private const int ElasticSearchMaxRecords = 10000;
 
@@ -35,11 +35,11 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="observationManager"></param>
         /// <param name="fieldMappingManager"></param>
         /// <param name="logger"></param>
-        public ObservationController(
+        public ObservationsController(
             IObservationManager observationManager, 
             IFieldMappingManager fieldMappingManager,
             IAreaManager areaManager,
-            ILogger<ObservationController> logger)
+            ILogger<ObservationsController> logger)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
@@ -110,22 +110,6 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Error getting field mappings");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
-        }
-        /// <inheritdoc />
-        [HttpGet("Areas")]
-        [ProducesResponseType(typeof(PagedResult<ExternalArea>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAreasAsync([FromQuery] AreaType areaType, [FromQuery]string searchString, [FromQuery]int skip = 0, [FromQuery]int take = 100)
-        {
-            try 
-            {
-                return new OkObjectResult(await _areaManager.GetAreasAsync(areaType, searchString, skip, take));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting areas");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
+        }    
     }
 }

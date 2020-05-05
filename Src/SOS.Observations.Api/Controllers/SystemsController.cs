@@ -12,19 +12,19 @@ namespace SOS.Observations.Api.Controllers
     /// <summary>
     /// Sighting controller
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
-    public class SystemController : ControllerBase, ISystemController
+    public class SystemsController : ControllerBase, ISystemsController
     {
         private readonly IProcessInfoManager _processInfoManager;
-        private readonly ILogger<SystemController> _logger;
+        private readonly ILogger<SystemsController> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="processInfoManager"></param>
         /// <param name="logger"></param>
-        public SystemController(IProcessInfoManager processInfoManager, ILogger<SystemController> logger)
+        public SystemsController(IProcessInfoManager processInfoManager, ILogger<SystemsController> logger)
         {
             _processInfoManager = processInfoManager ?? throw new ArgumentNullException(nameof(processInfoManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

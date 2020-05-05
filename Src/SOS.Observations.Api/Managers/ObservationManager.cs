@@ -89,7 +89,7 @@ namespace SOS.Observations.Api.Managers
             // handle the area ids search
             if(preparedFilter.AreaIds != null && preparedFilter.AreaIds.Any())
             {
-                var area = await _areaManager.GetAreaAsync(preparedFilter.AreaIds.First());
+                var area = await _areaManager.GetAreaInternalAsync(preparedFilter.AreaIds.First());
                 if (area != null)
                 {
                     //if we already have the info needed for the search we skip polygon searches

@@ -12,10 +12,16 @@ namespace SOS.Observations.Api.Managers.Interfaces
     public interface IAreaManager
     {
         /// <summary>
-        /// Get information about a single area
+        /// Get information about a single area, used for internal calls
         /// </summary>
         /// <returns></returns>
-        Task<Area> GetAreaAsync(int areaId);
+        Task<Area> GetAreaInternalAsync(int areaId);
+
+        /// <summary>
+        /// Get zipped json bytes with an area json file
+        /// </summary>
+        /// <returns></returns>
+        Task<byte[]> GetZipppedAreaAsync(int areaId);
 
         /// <summary>
         /// Get areas matching provided filter
@@ -25,6 +31,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<PagedResult<ExternalArea>> GetAreasAsync(AreaType areaType, string searchString, int skip, int take);
+        Task<PagedResult<ExternalSimpleArea>> GetAreasAsync(AreaType areaType, string searchString, int skip, int take);
     }
 }
