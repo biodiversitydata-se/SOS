@@ -7,6 +7,7 @@ using SOS.Process.Helpers;
 using SOS.Process.Processors.DarwinCoreArchive;
 using SOS.Process.UnitTests.TestHelpers.Factories;
 using SOS.TestHelpers.Helpers;
+using Xunit;
 
 namespace SOS.Process.UnitTests.TestHelpers
 {
@@ -34,7 +35,6 @@ namespace SOS.Process.UnitTests.TestHelpers
 
         private DwcaObservationFactory CreateDwcaObservationFactory()
         {
-            var sp = Stopwatch.StartNew();
             var mammaliaTaxa = MessagePackHelper.CreateListFromMessagePackFile<ProcessedTaxon>(@"Resources\MammaliaProcessedTaxa.msgpck");
             var mammaliaTaxonByTaxonId = mammaliaTaxa.ToDictionary(t => t.Id, t => t);
             var processedAreaRepositoryStub = ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);
@@ -44,8 +44,15 @@ namespace SOS.Process.UnitTests.TestHelpers
                 mammaliaTaxonByTaxonId, 
                 processedFieldMappingRepository.Object,
                 areaHelper).Result;
-            sp.Stop();
             return factory;
         }
+    }
+
+    [CollectionDefinition("DwcaObservationFactory collection")]
+    public class DwcaObservationFactoryCollection : ICollectionFixture<DwcaObservationFactoryFixture>
+    {
+        // This class has no code, and is never created. Its purpose is simply
+        // to be the place to apply [CollectionDefinition] and all the
+        // ICollectionFixture<> interfaces.
     }
 }

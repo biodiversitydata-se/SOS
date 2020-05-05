@@ -6,7 +6,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using Nest;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Constants;
+using SOS.Lib.DataStructures;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
@@ -27,7 +29,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
     /// </summary>
     public class DwcaObservationFactory
     {
-        private readonly IDictionary<int, ProcessedTaxon> _taxa;
+        private readonly IDictionary<int, ProcessedTaxon> _taxonByTaxonId;
+        HashMapDictionary<string, ProcessedTaxon> _taxonByScientificName;
+
         private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
         private readonly IAreaHelper _areaHelper;
 
@@ -37,9 +41,15 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IAreaHelper areaHelper)
         {
             {
-                _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
+                _taxonByTaxonId = taxa ?? throw new ArgumentNullException(nameof(taxa));
                 _fieldMappings = fieldMappings ?? throw new ArgumentNullException(nameof(fieldMappings));
                 _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+
+                _taxonByScientificName = new HashMapDictionary<string, ProcessedTaxon>();
+                foreach (var processedTaxon in _taxonByTaxonId.Values)
+                {
+                    _taxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
+                }
             }
         }
 
@@ -337,7 +347,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedLocation.VerbatimSRS = verbatimObservation.VerbatimSRS;
             processedLocation.WaterBody = verbatimObservation.WaterBody;
 
-            // todo - do we want to save verbatim coordinates in this way?
             if (!processedLocation.VerbatimLatitude.HasValue &&
                 !processedLocation.VerbatimLongitude.HasValue &&
                 string.IsNullOrWhiteSpace(processedLocation.VerbatimSRS))
@@ -347,12 +356,30 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 processedLocation.VerbatimSRS = processedLocation.GeodeticDatum;
             }
 
-            // todo - handle conversion of coordinates from different coordinate systems (GeodeticDatum).
-            //Point = (PointGeoShape)wgs84Point?.ToGeoShape(),
-            //PointLocation = wgs84Point?.ToGeoLocation(),
-            //PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoShape(),
+            Point wgs84Point = null;
+            if (string.IsNullOrWhiteSpace(processedLocation.GeodeticDatum)) // Assume WGS84 if GeodeticDatum is empty.
+            {
+                wgs84Point = new Point(processedLocation.DecimalLongitude.Value, processedLocation.DecimalLatitude.Value);
+            }
+            else
+            {
+                var originalPoint = new Point(processedLocation.DecimalLongitude.Value, processedLocation.DecimalLatitude.Value);
+                if (GISExtensions.TryParseCoordinateSystem(processedLocation.GeodeticDatum, out CoordinateSys coordinateSystem))
+                {
+                    wgs84Point = (Point)originalPoint.Transform(coordinateSystem, CoordinateSys.WGS84);
+                    processedLocation.DecimalLongitude = wgs84Point.X;
+                    processedLocation.DecimalLatitude = wgs84Point.Y;
+                }
+            }
+
+            processedLocation.GeodeticDatum = CoordinateSys.WGS84.EpsgCode();
+            processedLocation.Point = (PointGeoShape) wgs84Point?.ToGeoShape();
+            processedLocation.PointLocation = wgs84Point?.ToGeoLocation();
+            processedLocation.PointWithBuffer = (PolygonGeoShape) wgs84Point?.ToCircle(processedLocation.CoordinateUncertaintyInMeters)?.ToGeoShape();
             return processedLocation;
         }
+
+        
 
         private double? ParseDouble(string strValue, string fieldName)
         {
@@ -391,13 +418,18 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedOccurrence.RecordNumber = verbatimObservation.RecordNumber;
             processedOccurrence.Activity = ProcessedFieldMapValue.Create(verbatimObservation.ReproductiveCondition); // todo - create DarwinCore field mapping for FieldMappingFieldId.Activity.
             processedOccurrence.Gender = GetSosId(verbatimObservation.Sex, _fieldMappings[FieldMappingFieldId.Gender]);
+            processedOccurrence.IsNaturalOccurrence = true;
+            processedOccurrence.IsNeverFoundObservation = false; // todo - Add the following logic? dyntaxaTaxonId == 0; // Set to False if DyntaxaTaxonId from provider is greater than 0 and True if DyntaxaTaxonId is 0.
+            processedOccurrence.IsNotRediscoveredObservation = false;
+            processedOccurrence.IsPositiveObservation = true; // todo - Add the following logic? dyntaxaTaxonId != 0; // Set to True if DyntaxaTaxonId from provider is greater than 0 and False if DyntaxaTaxonId is 0.
+            if (processedOccurrence.OccurrenceStatus?.Id == (int)OccurrenceStatusId.Absent)
+            {
+                processedOccurrence.IsPositiveObservation = false;
+                processedOccurrence.IsNeverFoundObservation = true;
+            }
 
             // todo - handle the following fields:
             // processedOccurrence.BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon),
-            // processedOccurrence.IsNaturalOccurrence = !verbatimObservation.Unspontaneous,
-            // processedOccurrence.IsNeverFoundObservation = verbatimObservation.NotPresent,
-            // processedOccurrence.IsNotRediscoveredObservation = verbatimObservation.NotRecovered,
-            // processedOccurrence.IsPositiveObservation = !(verbatimObservation.NotPresent || verbatimObservation.NotRecovered),
             // processedOccurrence.URL = $"http://www.artportalen.se/sighting/{verbatimObservation.Id}"
 
             return processedOccurrence;
@@ -406,41 +438,112 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private ProcessedTaxon CreateProcessedTaxon(DwcObservationVerbatim verbatimObservation)
         {
             ProcessedTaxon processedTaxon = new ProcessedTaxon();
-            processedTaxon.AcceptedNameUsage = verbatimObservation.AcceptedNameUsage;
-            processedTaxon.AcceptedNameUsageID = verbatimObservation.AcceptedNameUsageID;
-            processedTaxon.Class = verbatimObservation.Class;
-            processedTaxon.Family = verbatimObservation.Family;
-            processedTaxon.Genus = verbatimObservation.Genus;
-            processedTaxon.HigherClassification = verbatimObservation.HigherClassification;
-            processedTaxon.InfraspecificEpithet = verbatimObservation.InfraspecificEpithet;
-            processedTaxon.Kingdom = verbatimObservation.Kingdom;
-            processedTaxon.NameAccordingTo = verbatimObservation.NameAccordingTo;
-            processedTaxon.NameAccordingToID = verbatimObservation.NameAccordingToID;
-            processedTaxon.NamePublishedIn = verbatimObservation.NamePublishedIn;
-            processedTaxon.NamePublishedInId = verbatimObservation.NamePublishedInID;
-            processedTaxon.NamePublishedInYear = verbatimObservation.NamePublishedInYear;
-            processedTaxon.NomenclaturalCode = verbatimObservation.NomenclaturalCode;
-            processedTaxon.NomenclaturalStatus = verbatimObservation.NomenclaturalStatus;
-            processedTaxon.Order = verbatimObservation.Order;
-            processedTaxon.OriginalNameUsage = verbatimObservation.OriginalNameUsage;
-            processedTaxon.OriginalNameUsageId = verbatimObservation.OriginalNameUsageID;
-            processedTaxon.ParentNameUsage = verbatimObservation.ParentNameUsage;
-            processedTaxon.ParentNameUsageId = verbatimObservation.ParentNameUsageID;
-            processedTaxon.Phylum = verbatimObservation.Phylum;
-            processedTaxon.ScientificName = verbatimObservation.ScientificName;
-            processedTaxon.ScientificNameAuthorship = verbatimObservation.ScientificNameAuthorship;
-            processedTaxon.ScientificNameId = verbatimObservation.ScientificNameID;
-            processedTaxon.SpecificEpithet = verbatimObservation.SpecificEpithet;
-            processedTaxon.Subgenus = verbatimObservation.Subgenus;
-            processedTaxon.TaxonConceptId = verbatimObservation.TaxonConceptID;
-            processedTaxon.TaxonId = verbatimObservation.TaxonID;
-            processedTaxon.TaxonomicStatus = verbatimObservation.TaxonomicStatus;
-            processedTaxon.TaxonRank = verbatimObservation.TaxonRank;
-            processedTaxon.TaxonRemarks = verbatimObservation.TaxonRemarks;
-            processedTaxon.VerbatimTaxonRank = verbatimObservation.VerbatimTaxonRank;
-            processedTaxon.VernacularName = verbatimObservation.VernacularName;
+            // Get all taxon values from Dyntaxa instead of the provided DarwinCore data.
+            TryGetTaxonInformation(
+                processedTaxon,
+                verbatimObservation.TaxonID,
+                verbatimObservation.ScientificName,
+                verbatimObservation.ScientificNameAuthorship,
+                verbatimObservation.VernacularName,
+                verbatimObservation.Kingdom,
+                verbatimObservation.TaxonRank);
 
             return processedTaxon;
+
+            //processedTaxon.AcceptedNameUsage = verbatimObservation.AcceptedNameUsage;
+            //processedTaxon.AcceptedNameUsageID = verbatimObservation.AcceptedNameUsageID;
+            //processedTaxon.Class = verbatimObservation.Class;
+            //processedTaxon.Family = verbatimObservation.Family;
+            //processedTaxon.Genus = verbatimObservation.Genus;
+            //processedTaxon.HigherClassification = verbatimObservation.HigherClassification;
+            //processedTaxon.InfraspecificEpithet = verbatimObservation.InfraspecificEpithet;
+            //processedTaxon.Kingdom = verbatimObservation.Kingdom;
+            //processedTaxon.NameAccordingTo = verbatimObservation.NameAccordingTo;
+            //processedTaxon.NameAccordingToID = verbatimObservation.NameAccordingToID;
+            //processedTaxon.NamePublishedIn = verbatimObservation.NamePublishedIn;
+            //processedTaxon.NamePublishedInId = verbatimObservation.NamePublishedInID;
+            //processedTaxon.NamePublishedInYear = verbatimObservation.NamePublishedInYear;
+            //processedTaxon.NomenclaturalCode = verbatimObservation.NomenclaturalCode;
+            //processedTaxon.NomenclaturalStatus = verbatimObservation.NomenclaturalStatus;
+            //processedTaxon.Order = verbatimObservation.Order;
+            //processedTaxon.OriginalNameUsage = verbatimObservation.OriginalNameUsage;
+            //processedTaxon.OriginalNameUsageId = verbatimObservation.OriginalNameUsageID;
+            //processedTaxon.ParentNameUsage = verbatimObservation.ParentNameUsage;
+            //processedTaxon.ParentNameUsageId = verbatimObservation.ParentNameUsageID;
+            //processedTaxon.Phylum = verbatimObservation.Phylum;
+            //processedTaxon.ScientificName = verbatimObservation.ScientificName;
+            //processedTaxon.ScientificNameAuthorship = verbatimObservation.ScientificNameAuthorship;
+            //processedTaxon.ScientificNameId = verbatimObservation.ScientificNameID;
+            //processedTaxon.SpecificEpithet = verbatimObservation.SpecificEpithet;
+            //processedTaxon.Subgenus = verbatimObservation.Subgenus;
+            //processedTaxon.TaxonConceptId = verbatimObservation.TaxonConceptID;
+            //processedTaxon.TaxonId = verbatimObservation.TaxonID;
+            //processedTaxon.TaxonomicStatus = verbatimObservation.TaxonomicStatus;
+            //processedTaxon.TaxonRank = verbatimObservation.TaxonRank;
+            //processedTaxon.TaxonRemarks = verbatimObservation.TaxonRemarks;
+            //processedTaxon.VerbatimTaxonRank = verbatimObservation.VerbatimTaxonRank;
+            //processedTaxon.VernacularName = verbatimObservation.VernacularName;
+        }
+
+        private void TryGetTaxonInformation(
+            ProcessedTaxon processedTaxon, 
+            string taxonId, 
+            string scientificName, 
+            string scientificNameAuthorship, 
+            string vernacularName, 
+            string kingdom, 
+            string taxonRank)
+        {
+            ProcessedTaxon taxon = null;
+            if (_taxonByScientificName.TryGetValues(scientificName?.ToLower(), out List<ProcessedTaxon> result))
+            {
+                if (result.Count == 1)
+                {
+                    taxon = result.First();
+                }
+                else
+                {
+                    // todo - find out the correct taxon.
+                }
+            }
+
+            if (taxon != null)
+            {
+                processedTaxon.DyntaxaTaxonId = taxon.DyntaxaTaxonId;
+                processedTaxon.AcceptedNameUsage = taxon.AcceptedNameUsage;
+                processedTaxon.AcceptedNameUsageID = taxon.AcceptedNameUsageID;
+                processedTaxon.Class = taxon.Class;
+                processedTaxon.Family = taxon.Family;
+                processedTaxon.Genus = taxon.Genus;
+                processedTaxon.HigherClassification = taxon.HigherClassification;
+                processedTaxon.InfraspecificEpithet = taxon.InfraspecificEpithet;
+                processedTaxon.Kingdom = taxon.Kingdom;
+                processedTaxon.NameAccordingTo = taxon.NameAccordingTo;
+                processedTaxon.NameAccordingToID = taxon.NameAccordingToID;
+                processedTaxon.NamePublishedIn = taxon.NamePublishedIn;
+                processedTaxon.NamePublishedInId = taxon.NamePublishedInId;
+                processedTaxon.NamePublishedInYear = taxon.NamePublishedInYear;
+                processedTaxon.NomenclaturalCode = taxon.NomenclaturalCode;
+                processedTaxon.NomenclaturalStatus = taxon.NomenclaturalStatus;
+                processedTaxon.Order = taxon.Order;
+                processedTaxon.OriginalNameUsage = taxon.OriginalNameUsage;
+                processedTaxon.OriginalNameUsageId = taxon.OriginalNameUsageId;
+                processedTaxon.ParentNameUsage = taxon.ParentNameUsage;
+                processedTaxon.ParentNameUsageId = taxon.ParentNameUsageId;
+                processedTaxon.Phylum = taxon.Phylum;
+                processedTaxon.ScientificName = taxon.ScientificName;
+                processedTaxon.ScientificNameAuthorship = taxon.ScientificNameAuthorship;
+                processedTaxon.ScientificNameId = taxon.ScientificNameId;
+                processedTaxon.SpecificEpithet = taxon.SpecificEpithet;
+                processedTaxon.Subgenus = taxon.Subgenus;
+                processedTaxon.TaxonConceptId = taxon.TaxonConceptId;
+                processedTaxon.TaxonId = taxon.TaxonId;
+                processedTaxon.TaxonomicStatus = taxon.TaxonomicStatus;
+                processedTaxon.TaxonRank = taxon.TaxonRank;
+                processedTaxon.TaxonRemarks = taxon.TaxonRemarks;
+                processedTaxon.VerbatimTaxonRank = taxon.VerbatimTaxonRank;
+                processedTaxon.VernacularName = taxon.VernacularName;
+            }
         }
 
         //private ProcessedFieldMapValue GetSosId(string val,

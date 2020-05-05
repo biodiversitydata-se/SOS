@@ -116,6 +116,9 @@
     <None Update="Resources\FieldMappings\ActivityFieldMapping.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\FieldMappings\AreaTypeFieldMapping.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\FieldMappings\BasisOfRecordFieldMapping.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

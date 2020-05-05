@@ -1,5 +1,8 @@
 ﻿using System.Globalization;
+using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.TestHelpers.Gis;
 
 namespace SOS.TestHelpers.Helpers.Builders
 {
@@ -43,6 +46,45 @@ namespace SOS.TestHelpers.Helpers.Builders
         public DwcObservationVerbatimBuilder WithOccurrenceRemarks(string occurrenceRemarks)
         {
             return With(entity => entity.OccurrenceRemarks = occurrenceRemarks);
+        }
+
+        public DwcObservationVerbatimBuilder WithSex(string sex)
+        {
+            return With(entity => entity.Sex = sex);
+        }
+
+        public DwcObservationVerbatimBuilder WithLifeStage(string lifeStage)
+        {
+            return With(entity => entity.LifeStage = lifeStage);
+        }
+
+        public DwcObservationVerbatimBuilder WithReproductiveCondition(string reproductiveCondition)
+        {
+            return With(entity => entity.ReproductiveCondition = reproductiveCondition);
+        }
+
+        public DwcObservationVerbatimBuilder WithBehavior(string behavior)
+        {
+            return With(entity => entity.Behavior = behavior);
+        }
+
+        public DwcObservationVerbatimBuilder WithOccurrenceStatus(string occurrenceStatus)
+        {
+            return With(entity => entity.OccurrenceStatus = occurrenceStatus);
+        }
+
+        public DwcObservationVerbatimBuilder WithScientificName(string scientificName)
+        {
+            return With(entity => entity.ScientificName = scientificName);
+        }
+
+        public DwcObservationVerbatimBuilder WithDefaultValues()
+        {
+            WithGeodeticDatum(CoordinateSys.WGS84.EpsgCode());
+            WithDecimalLatitude(Coordinates.TranasMunicipality.Latitude);
+            WithDecimalLongitude(Coordinates.TranasMunicipality.Longitude);
+            
+            return this;
         }
 
         protected override DwcObservationVerbatim CreateEntity()
