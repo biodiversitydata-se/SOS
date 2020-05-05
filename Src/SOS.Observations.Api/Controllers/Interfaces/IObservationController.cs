@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Enum;
 
 namespace SOS.Observations.Api.Controllers.Interfaces
 {
@@ -30,7 +31,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         ///     "usePointAccuracy": false
         /// }
         /// </example>
-        Task<IActionResult> GetChunkAsync(SearchFilter filter, int skip, int take);
+        Task<IActionResult> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder);
 
         /// <summary>
         /// Field Mappings are used for properties with multiple acceptable fixed values but limited by other contraints then permitted by

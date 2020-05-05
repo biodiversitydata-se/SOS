@@ -9,6 +9,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Controllers.Interfaces;
+using SOS.Observations.Api.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Models.Area;
 
@@ -51,7 +52,11 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(PagedResult<ProcessedObservation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetChunkAsync([FromBody] SearchFilter filter, [FromQuery]int skip = 0, [FromQuery]int take = 100)
+        public async Task<IActionResult> GetChunkAsync([FromBody] SearchFilter filter, 
+            [FromQuery]int skip = 0, 
+            [FromQuery]int take = 100, 
+            [FromQuery]string sortBy = "" , 
+            [FromQuery]SearchSortOrder sortOrder = SearchSortOrder.Asc)
         {
             try
             {
@@ -70,7 +75,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest($"Skip + take ");
                 }
 
-                return new OkObjectResult(await _observationManager.GetChunkAsync(filter, skip, take));
+                return new OkObjectResult(await _observationManager.GetChunkAsync(filter, skip, take, sortBy, sortOrder));
             }
             catch (Exception e)
             {

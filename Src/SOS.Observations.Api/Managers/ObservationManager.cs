@@ -6,12 +6,12 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.GeoJsonObjectModel;
-using Newtonsoft.Json.Linq;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
+using SOS.Observations.Api.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -53,13 +53,13 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
+        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder)
         {
             try
             {
                 filter = await PrepareFilter(filter);
 
-                var processedObservations = (await _processedObservationRepository.GetChunkAsync(filter, skip, take));
+                var processedObservations = (await _processedObservationRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder));
                 ProcessLocalizedFieldMappings(filter, processedObservations.Records);
                 ProcessNonLocalizedFieldMappings(filter, processedObservations.Records);
                 return processedObservations;

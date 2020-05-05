@@ -8,6 +8,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Database.Interfaces;
+using SOS.Observations.Api.Enum;
 using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Repositories
@@ -35,7 +36,7 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
+        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder)
         {
             if (!filter?.IsFilterActive ?? true)
             {
@@ -47,6 +48,12 @@ namespace SOS.Observations.Api.Repositories
 
             var excludeQuery = CreateExcludeQuery(filter);
 
+            var sortDescriptor = new SortDescriptor<dynamic>();
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                sortDescriptor.Field(sortBy, sortOrder == SearchSortOrder.Desc ? SortOrder.Descending : SortOrder.Ascending);
+            }
+
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(CollectionName.ToLower())
                 .Source(filter.OutputFields.ToProjection())
@@ -55,7 +62,11 @@ namespace SOS.Observations.Api.Repositories
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery)
-                        .Filter(query))));
+                        .Filter(query)
+                    )
+                )
+                .Sort(s => sortDescriptor)
+            );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
             return new PagedResult<dynamic>
