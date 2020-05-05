@@ -15,13 +15,14 @@ using SOS.TestHelpers.Gis;
 using SOS.TestHelpers.Helpers.Builders;
 using Xunit;
 
-namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
+namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFactory
 {
-    public class DwcaObservationFactoryTests : IClassFixture<DwcaObservationFactoryFixture>
+    [CollectionDefinition("DwcaObservationFactory collection")]
+    public class LocationTests : IClassFixture<DwcaObservationFactoryFixture>
     {
         private readonly DwcaObservationFactoryFixture _fixture;
 
-        public DwcaObservationFactoryTests(DwcaObservationFactoryFixture fixture)
+        public LocationTests(DwcaObservationFactoryFixture fixture)
         {
             _fixture = fixture;
         }
@@ -37,7 +38,6 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
                 .WithDecimalLatitude("58.01540")
                 .WithDecimalLongitude("14.98998")
                 .WithGeodeticDatum("EPSG:4326")
-                .WithCoordinateUncertaintyInMeters(100)
                 .Build();
             
             //-----------------------------------------------------------------------------------------------------------
@@ -64,7 +64,6 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
                 .WithDecimalLatitude("58.01540")
                 .WithDecimalLongitude("14.98998")
                 .WithGeodeticDatum("WGS 84")
-                .WithCoordinateUncertaintyInMeters(100)
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -92,7 +91,6 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
                 .WithDecimalLatitude("58.01540")
                 .WithDecimalLongitude("14.98998")
                 .WithGeodeticDatum(null)
-                .WithCoordinateUncertaintyInMeters(100)
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -119,7 +117,6 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
                 .WithDecimalLatitude(Coordinates.TranasMunicipality.Sweref99TmY)
                 .WithDecimalLongitude(Coordinates.TranasMunicipality.Sweref99TmX)
                 .WithGeodeticDatum(CoordinateSys.SWEREF99_TM.EpsgCode())
-                .WithCoordinateUncertaintyInMeters(100)
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -149,7 +146,6 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
                 .WithDecimalLatitude(Coordinates.TranasMunicipality.RT90Y)
                 .WithDecimalLongitude(Coordinates.TranasMunicipality.RT90X)
                 .WithGeodeticDatum(CoordinateSys.Rt90_25_gon_v.EpsgCode())
-                .WithCoordinateUncertaintyInMeters(100)
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -179,7 +175,6 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
                 .WithDecimalLatitude(Coordinates.TranasMunicipality.WebMercatorY)
                 .WithDecimalLongitude(Coordinates.TranasMunicipality.WebMercatorX)
                 .WithGeodeticDatum(CoordinateSys.WebMercator.EpsgCode())
-                .WithCoordinateUncertaintyInMeters(100)
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -197,5 +192,35 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
             result.Location.VerbatimLongitude.Should().BeApproximately(Coordinates.TranasMunicipality.WebMercatorX, 0.0001);
             result.Location.VerbatimLatitude.Should().BeApproximately(Coordinates.TranasMunicipality.WebMercatorY, 0.0001);
         }
+
+        [Fact]
+        public void Etrs89_coordinates_are_converted_to_WGS84()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var builder = new DwcObservationVerbatimBuilder();
+            var dwcaObservation = builder
+                .WithDecimalLatitude(Coordinates.TranasMunicipality.Etrs89Y)
+                .WithDecimalLongitude(Coordinates.TranasMunicipality.Etrs89X)
+                .WithGeodeticDatum(CoordinateSys.ETRS89.EpsgCode())
+                .Build();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Location.DecimalLatitude.Should().BeApproximately(Coordinates.TranasMunicipality.Latitude, 0.0001);
+            result.Location.DecimalLongitude.Should().BeApproximately(Coordinates.TranasMunicipality.Longitude, 0.0001);
+            result.Location.GeodeticDatum.Should().Be(CoordinateSys.WGS84.EpsgCode());
+            result.Location.VerbatimSRS.Should().Be(CoordinateSys.ETRS89.EpsgCode());
+            result.Location.VerbatimLongitude.Should().BeApproximately(Coordinates.TranasMunicipality.Etrs89X, 0.0001);
+            result.Location.VerbatimLatitude.Should().BeApproximately(Coordinates.TranasMunicipality.Etrs89Y, 0.0001);
+        }
+
     }
 }
