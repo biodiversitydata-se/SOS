@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using Nest;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
@@ -70,6 +69,26 @@ namespace SOS.Process.Processors.Artportalen
                 taxon.IndividualId = verbatimObservation.URL;
             }
 
+            // Add time to start date if it exists
+            var startDate = verbatimObservation.StartDate.HasValue && verbatimObservation.StartTime.HasValue ? 
+                new DateTime(verbatimObservation.StartDate.Value.Year,
+                    verbatimObservation.StartDate.Value.Month,
+                    verbatimObservation.StartDate.Value.Day,
+                    verbatimObservation.StartTime.Value.Hours,
+                    verbatimObservation.StartTime.Value.Minutes,
+                    verbatimObservation.StartTime.Value.Seconds) : 
+                verbatimObservation.StartDate;
+
+            // Add time to end date if it exists
+            var endDate = verbatimObservation.EndDate.HasValue && verbatimObservation.EndTime.HasValue ?
+                new DateTime(verbatimObservation.EndDate.Value.Year,
+                    verbatimObservation.EndDate.Value.Month,
+                    verbatimObservation.EndDate.Value.Day,
+                    verbatimObservation.EndTime.Value.Hours,
+                    verbatimObservation.EndTime.Value.Minutes,
+                    verbatimObservation.EndTime.Value.Seconds) :
+                verbatimObservation.EndDate;
+
             var obs = new ProcessedObservation(ObservationProvider.Artportalen)
             {
                 AccessRights =
@@ -89,13 +108,13 @@ namespace SOS.Process.Processors.Artportalen
                 Event = new ProcessedEvent
                 {
                     BiotopeDescription = verbatimObservation.BiotopeDescription,
-                    EndDate = verbatimObservation.EndDate?.ToUniversalTime(),
+                    EndDate = endDate?.ToUniversalTime(),
                     QuantityOfSubstrate = verbatimObservation.QuantityOfSubstrate,
                     SamplingProtocol = GetSamplingProtocol(verbatimObservation.Projects),
-                    StartDate = verbatimObservation.StartDate?.ToUniversalTime(),
+                    StartDate = startDate?.ToUniversalTime(),
                     SubstrateSpeciesDescription = verbatimObservation.SubstrateSpeciesDescription,
                     SubstrateDescription = GetSubstrateDescription(verbatimObservation, _taxa),
-                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatimObservation.StartDate, verbatimObservation.EndDate)
+                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate, endDate)
                 },
                 Identification = new ProcessedIdentification
                 {
@@ -128,7 +147,7 @@ namespace SOS.Process.Processors.Artportalen
                     VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0,
                     VerbatimCoordinateSystem = "EPSG:3857"
                 },
-                Modified = verbatimObservation.EndDate ?? verbatimObservation.ReportedDate,
+                Modified = endDate ?? verbatimObservation.ReportedDate,
                 Occurrence = new ProcessedOccurrence
                 {
                     AssociatedMedia = verbatimObservation.HasImages
