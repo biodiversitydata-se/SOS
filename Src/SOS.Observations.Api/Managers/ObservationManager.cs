@@ -104,7 +104,7 @@ namespace SOS.Observations.Api.Managers
                                 preparedFilter.CountyIds = new List<int>();
                             }
                             var list = preparedFilter.CountyIds.ToList();
-                            list.Add(area.FeatureId);
+                            list.Add(area.Id);
                             preparedFilter.CountyIds = list;
                         }
                         else if (area.AreaType == AreaType.Municipality)
@@ -114,7 +114,7 @@ namespace SOS.Observations.Api.Managers
                                 preparedFilter.MunicipalityIds = new List<int>();
                             }
                             var list = preparedFilter.MunicipalityIds.ToList();
-                            list.Add(area.FeatureId);
+                            list.Add(area.Id);
                             preparedFilter.MunicipalityIds = list;
                         }
                         else if (area.AreaType == AreaType.Province)
@@ -124,7 +124,7 @@ namespace SOS.Observations.Api.Managers
                                 preparedFilter.ProvinceIds = new List<int>();
                             }
                             var list = preparedFilter.ProvinceIds.ToList();
-                            list.Add(area.FeatureId);
+                            list.Add(area.Id);
                             preparedFilter.ProvinceIds = list;
                         }
                     }
