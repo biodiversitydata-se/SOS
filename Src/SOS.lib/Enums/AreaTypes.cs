@@ -11,7 +11,7 @@
         Spa = 20,
         County = 21,        
         ProtectedNature = 22,
-        Sci = 26,
+        //Sci = 26,
         WaterArea = 27
     }
 }

@@ -65,7 +65,7 @@ namespace SOS.Process.UnitTests.TestHelpers
             return new Area(areaType)
             {
                 Id = int.Parse(feature.Attributes["id"].ToString()),
-                FeatureId = int.Parse(feature.Attributes["nativeId"].ToString()),
+                FeatureId = feature.Attributes["nativeId"].ToString(),
                 Geometry = feature.Geometry.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoJsonGeometry(),
                 Name = feature.Attributes["name"].ToString()
             };
