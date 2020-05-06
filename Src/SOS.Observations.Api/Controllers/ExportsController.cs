@@ -13,16 +13,16 @@ namespace SOS.Observations.Api.Controllers
     /// Import job controller
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
-    public class ExportController : ControllerBase, Interfaces.IExportController
+    [Route("[controller]")]
+    public class ExportsController : ControllerBase, Interfaces.IExportsController
     {
-        private readonly ILogger<ExportController> _logger;
+        private readonly ILogger<ExportsController> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="logger"></param>
-        public ExportController(ILogger<ExportController> logger)
+        public ExportsController(ILogger<ExportsController> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }

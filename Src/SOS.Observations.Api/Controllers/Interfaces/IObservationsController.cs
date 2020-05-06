@@ -9,7 +9,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     /// <summary>
     /// Sighting controller interface
     /// </summary>
-    public interface IObservationController
+    public interface IObservationsController
     {
         /// <summary>
         /// Search for observations by the provided filter. All permitted values are either specified in the Field Mappings object
@@ -40,16 +40,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// Field Mappings also describe the different possible query parameters available in searches.
         /// </summary>
         /// <returns>List of Field Mappings</returns>
-        Task<IActionResult> GetFieldMappingAsync();
-
-        /// <summary>
-        /// Gets all the areas used for searching via areaId in the /search call                
-        /// </summary>
-        /// <param name="areaType">Filter used to limit number of areas returned</param>
-        /// <param name="searchString">Filter used to limit number of areas returned</param>
-        /// <param name="skip">Start index of returned areas</param>
-        /// <param name="take">End index of returned areas</param>
-        /// <returns>List of Areas</returns>
-        Task<IActionResult> GetAreasAsync(AreaType areaType, string searchString, int skip = 0, int take = 100);
+        Task<IActionResult> GetFieldMappingAsync();      
     }
 }
