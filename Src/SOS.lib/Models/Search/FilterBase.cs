@@ -88,18 +88,14 @@ namespace SOS.Lib.Models.Search
         public bool IncludeUnderlyingTaxa { get; set; }
 
         /// <summary>
-        /// Decides whether field mapped fields, in addition to its Id value, also should return its associated value.
-        /// </summary>
-        public bool TranslateFieldMappedValues { get; set; } = false;
-
-        /// <summary>
         /// Field mapping translation culture code.
         /// 
         /// Available values.
         /// sv-SE (Swedish)
         /// en-GB (English)
         /// </summary>
-        public string TranslationCultureCode { get; set; } = "en-GB";
+        public string FieldTranslationCultureCode { get; set; }
+
         public IEnumerable<int> AreaIds { get; set; }
 
         public FilterBase Clone()

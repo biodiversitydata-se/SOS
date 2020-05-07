@@ -196,8 +196,11 @@ namespace SOS.Observations.Api.Managers
 
         private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)
         {
-            if (!filter.TranslateFieldMappedValues) return;
-           
+            if (string.IsNullOrEmpty(filter.FieldTranslationCultureCode))
+            {
+                return;
+            }
+            
             foreach (var observation in processedObservations)
             {
                 if (observation is IDictionary<string, object> obs)
@@ -228,9 +231,12 @@ namespace SOS.Observations.Api.Managers
 
         private void ProcessLocalizedFieldMappings(SearchFilter filter, IEnumerable<dynamic> processedObservations)
         {
-            if (!filter.TranslateFieldMappedValues) return;
-            string cultureCode = filter.TranslationCultureCode;           
-            ProcessLocalizedFieldMappedReturnValues(processedObservations, cultureCode);            
+            if (string.IsNullOrEmpty(filter.FieldTranslationCultureCode))
+            {
+                return;
+            }
+
+            ProcessLocalizedFieldMappedReturnValues(processedObservations, filter.FieldTranslationCultureCode);            
         }
 
         private void ProcessLocalizedFieldMappedReturnValues(

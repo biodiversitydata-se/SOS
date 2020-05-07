@@ -66,9 +66,9 @@ namespace SOS.Import.Harvesters.Observations
                 await _kulObservationVerbatimRepository.AddCollectionAsync();
                 _logger.LogInformation("Finish empty collection for KUL verbatim collection");
 
-                DateTime changedFrom = new DateTime(_kulServiceConfiguration.StartHarvestYear, 1, 1);
-                DateTime changedToEnd = DateTime.Now;
-                int nrSightingsHarvested = 0;
+                var changedFrom = new DateTime(_kulServiceConfiguration.StartHarvestYear, 1, 1);
+                var changedToEnd = DateTime.Now;
+                var nrSightingsHarvested = 0;
 
                 // Loop until all sightings are fetched.
                 while (changedFrom < changedToEnd)

@@ -70,17 +70,18 @@ namespace SOS.Import.Harvesters.Observations
                 while (observations != null)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    if (_virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        nrSightingsHarvested >= _virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested)
-                    {
-                        break;
-                    }
 
                     var verbatims = observations.ToVerbatims(localities)?.ToArray();
                     nrSightingsHarvested += verbatims?.Count() ?? 0;
 
                     // Add sightings to MongoDb
                     await _virtualHerbariumObservationVerbatimRepository.AddManyAsync(verbatims);
+
+                    if (_virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        nrSightingsHarvested >= _virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested)
+                    {
+                        break;
+                    }
 
                     pageIndex++;
                     _logger.LogInformation($"Start getting observations page: { pageIndex }");

@@ -44,7 +44,7 @@ namespace SOS.Import.Jobs
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(result);
 
-            return result.Status == RunStatus.Success ? true : throw new Exception("Field Mapping Import Job failed");
+            return result.Status == RunStatus.Success && result.Count > 0 ? true : throw new Exception("Field Mapping Import Job failed");
         }
     }
 }

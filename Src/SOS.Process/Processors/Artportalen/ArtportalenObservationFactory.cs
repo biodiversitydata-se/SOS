@@ -68,25 +68,15 @@ namespace SOS.Process.Processors.Artportalen
             {
                 taxon.IndividualId = verbatimObservation.URL;
             }
-
+            
             // Add time to start date if it exists
-            var startDate = verbatimObservation.StartDate.HasValue && verbatimObservation.StartTime.HasValue ? 
-                new DateTime(verbatimObservation.StartDate.Value.Year,
-                    verbatimObservation.StartDate.Value.Month,
-                    verbatimObservation.StartDate.Value.Day,
-                    verbatimObservation.StartTime.Value.Hours,
-                    verbatimObservation.StartTime.Value.Minutes,
-                    verbatimObservation.StartTime.Value.Seconds) : 
-                verbatimObservation.StartDate;
+            var startDate = verbatimObservation.StartDate.HasValue && verbatimObservation.StartTime.HasValue  ?
+                verbatimObservation.StartDate.Value.ToLocalTime() + verbatimObservation.StartTime : 
+                verbatimObservation.StartDate.Value;
 
             // Add time to end date if it exists
             var endDate = verbatimObservation.EndDate.HasValue && verbatimObservation.EndTime.HasValue ?
-                new DateTime(verbatimObservation.EndDate.Value.Year,
-                    verbatimObservation.EndDate.Value.Month,
-                    verbatimObservation.EndDate.Value.Day,
-                    verbatimObservation.EndTime.Value.Hours,
-                    verbatimObservation.EndTime.Value.Minutes,
-                    verbatimObservation.EndTime.Value.Seconds) :
+                verbatimObservation.EndDate.Value.ToLocalTime() + verbatimObservation.EndTime :
                 verbatimObservation.EndDate;
 
             var obs = new ProcessedObservation(ObservationProvider.Artportalen)

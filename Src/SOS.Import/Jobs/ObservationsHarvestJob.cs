@@ -19,8 +19,11 @@ namespace SOS.Import.Jobs
         private readonly IArtportalenHarvestJob _artportalenHarvestJob;
         private readonly IClamPortalHarvestJob _clamPortalHarvestJob;
         private readonly IKulHarvestJob _kulHarvestJob;
+        private readonly IMvmHarvestJob _mvmHarvestJob;
         private readonly INorsHarvestJob _norsHarvestJob;
         private readonly ISersHarvestJob _sersHarvestJob;
+        private readonly ISharkHarvestJob _sharkHarvestJob;
+        private readonly IVirtualHerbariumHarvestJob _virtualHerbariumHarvestJob;
         private readonly ILogger<ObservationsHarvestJob> _logger;
 
         /// <summary>
@@ -31,8 +34,11 @@ namespace SOS.Import.Jobs
         /// <param name="artportalenHarvestJob"></param>
         /// <param name="clamPortalHarvestJob"></param>
         /// <param name="kulHarvestJob"></param>
+        /// <param name="mvmHarvestJob"></param>
         /// <param name="norsHarvestJob"></param>
         /// <param name="sersHarvestJob"></param>
+        /// <param name="sharkHarvestJob"></param>
+        /// <param name="virtualHerbariumHarvestJob"></param>
         /// <param name="logger"></param>
         public ObservationsHarvestJob(
             ITaxonHarvestJob taxonHarvestJob,
@@ -40,8 +46,11 @@ namespace SOS.Import.Jobs
             IArtportalenHarvestJob artportalenHarvestJob,
             IClamPortalHarvestJob clamPortalHarvestJob,
             IKulHarvestJob kulHarvestJob,
+            IMvmHarvestJob mvmHarvestJob,
             INorsHarvestJob norsHarvestJob,
             ISersHarvestJob sersHarvestJob,
+            ISharkHarvestJob sharkHarvestJob,
+            IVirtualHerbariumHarvestJob virtualHerbariumHarvestJob,
             ILogger<ObservationsHarvestJob> logger)
         {
             _taxonHarvestJob = taxonHarvestJob ?? throw new ArgumentNullException(nameof(taxonHarvestJob));
@@ -49,8 +58,11 @@ namespace SOS.Import.Jobs
             _artportalenHarvestJob = artportalenHarvestJob ?? throw new ArgumentNullException(nameof(artportalenHarvestJob));
             _clamPortalHarvestJob = clamPortalHarvestJob ?? throw new ArgumentNullException(nameof(clamPortalHarvestJob));
             _kulHarvestJob = kulHarvestJob ?? throw new ArgumentNullException(nameof(kulHarvestJob));
+            _mvmHarvestJob = mvmHarvestJob ?? throw new ArgumentNullException(nameof(mvmHarvestJob));
             _norsHarvestJob = norsHarvestJob ?? throw new ArgumentNullException(nameof(norsHarvestJob));
             _sersHarvestJob = sersHarvestJob ?? throw new ArgumentNullException(nameof(sersHarvestJob));
+            _sharkHarvestJob = sharkHarvestJob ?? throw new ArgumentNullException(nameof(sharkHarvestJob));
+            _virtualHerbariumHarvestJob = virtualHerbariumHarvestJob ?? throw new ArgumentNullException(nameof(virtualHerbariumHarvestJob));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -85,18 +97,39 @@ namespace SOS.Import.Jobs
                 harvestTasks.Add(DataSet.KULObservations, _kulHarvestJob.RunAsync(cancellationToken));
             }
 
-            // Add NORS import if third bit is set
+            // Add NORS import if fourth bit is set
             if ((harvestSources & (int)ObservationProvider.NORS) > 0)
             {
                 _logger.LogDebug("Added NORS harvest");
                 harvestTasks.Add(DataSet.NorsObservations, _norsHarvestJob.RunAsync(cancellationToken));
             }
 
-            // Add SERS import if third bit is set
+            // Add SERS import if fifth bit is set
             if ((harvestSources & (int)ObservationProvider.SERS) > 0)
             {
                 _logger.LogDebug("Added SERS harvest");
                 harvestTasks.Add(DataSet.SersObservations, _sersHarvestJob.RunAsync(cancellationToken));
+            }
+
+            // Add SHARK import if sixth bit is set
+            if ((harvestSources & (int)ObservationProvider.SHARK) > 0)
+            {
+                _logger.LogDebug("Added SHARK harvest");
+                harvestTasks.Add(DataSet.SharkObservations, _sharkHarvestJob.RunAsync(cancellationToken));
+            }
+
+            // Add Virtual Herbarium import if eight bit is set
+            if ((harvestSources & (int)ObservationProvider.VirtualHerbarium) > 0)
+            {
+                _logger.LogDebug("Added Virtual Herbarium harvest");
+                harvestTasks.Add(DataSet.VirtualHerbariumObservations, _virtualHerbariumHarvestJob.RunAsync(cancellationToken));
+            }
+
+            // Add Virtual Herbarium import if night bit is set
+            if ((harvestSources & (int)ObservationProvider.MVM) > 0)
+            {
+                _logger.LogDebug("Added MVM harvest");
+                harvestTasks.Add(DataSet.MvmObservations, _mvmHarvestJob.RunAsync(cancellationToken));
             }
 
             // Run all tasks async

@@ -18,6 +18,8 @@ using SOS.Process.Processors.Interfaces;
 using SOS.Process.Processors.ClamPortal.Interfaces;
 using SOS.Process.Processors.Kul;
 using SOS.Process.Processors.Kul.Interfaces;
+using SOS.Process.Processors.Mvm;
+using SOS.Process.Processors.Mvm.Interfaces;
 using SOS.Process.Processors.Nors;
 using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Processors.Sers;
@@ -74,6 +76,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<FieldMappingVerbatimRepository>().As<IFieldMappingVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationVerbatimRepository>().As<IKulObservationVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<MvmObservationVerbatimRepository>().As<IMvmObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationVerbatimRepository>().As<INorsObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationVerbatimRepository>().As<ISersObservationVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationVerbatimRepository>().As<ISharkObservationVerbatimRepository>().InstancePerLifetimeScope();
@@ -94,6 +97,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ClamPortalObservationProcessor>().As<IClamPortalObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationProcessor>().As<IKulObservationProcessor>().InstancePerLifetimeScope();
+            builder.RegisterType<MvmObservationProcessor>().As<IMvmObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationProcessor>().As<INorsObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationProcessor>().As<ISersObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationProcessor>().As<ISharkObservationProcessor>().InstancePerLifetimeScope();

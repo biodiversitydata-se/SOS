@@ -61,6 +61,10 @@ namespace SOS.Process.Jobs
             //var success = await CopyAreas();
             _logger.LogDebug("Finish copy areas");
 
+            _logger.LogDebug("Start indexing areas");
+            await _processedAreaRepository.CreateIndexAsync();
+            _logger.LogDebug("Finish indexing areas");
+
             _logger.LogDebug("Start updating process info for areas");
             var harvestInfo = await GetHarvestInfoAsync(nameof(Area));
             var providerInfo = CreateProviderInfo(DataSet.Areas, harvestInfo,  start, DateTime.Now, success ? RunStatus.Success : RunStatus.Failed, areas.Count);

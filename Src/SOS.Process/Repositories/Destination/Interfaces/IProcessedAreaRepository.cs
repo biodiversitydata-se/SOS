@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Lib.Models.Processed;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Process.Repositories.Destination.Interfaces
 {
@@ -19,5 +14,11 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<List<AreaBase>> GetAllAreaBaseAsync();
+
+        /// <summary>
+        /// Create indexes
+        /// </summary>
+        /// <returns></returns>
+        Task CreateIndexAsync();
     }
 }
