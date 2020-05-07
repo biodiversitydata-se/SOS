@@ -104,7 +104,7 @@ namespace SOS.Observations.Api.Managers
                                 preparedFilter.CountyIds = new List<int>();
                             }
                             var list = preparedFilter.CountyIds.ToList();
-                            list.Add(area.FeatureId);
+                            list.Add(area.Id);
                             preparedFilter.CountyIds = list;
                         }
                         else if (area.AreaType == AreaType.Municipality)
@@ -114,7 +114,7 @@ namespace SOS.Observations.Api.Managers
                                 preparedFilter.MunicipalityIds = new List<int>();
                             }
                             var list = preparedFilter.MunicipalityIds.ToList();
-                            list.Add(area.FeatureId);
+                            list.Add(area.Id);
                             preparedFilter.MunicipalityIds = list;
                         }
                         else if (area.AreaType == AreaType.Province)
@@ -124,7 +124,7 @@ namespace SOS.Observations.Api.Managers
                                 preparedFilter.ProvinceIds = new List<int>();
                             }
                             var list = preparedFilter.ProvinceIds.ToList();
-                            list.Add(area.FeatureId);
+                            list.Add(area.Id);
                             preparedFilter.ProvinceIds = list;
                         }
                     }
@@ -136,48 +136,23 @@ namespace SOS.Observations.Api.Managers
                         {                            
                             preparedFilter.GeometryFilter = new GeometryFilter();
                             preparedFilter.GeometryFilter.MaxDistanceFromPoint = 0;
-                        }                                                                      
+                        }
 
-                        var geom = ((GeoJsonMultiPolygon<GeoJson2DGeographicCoordinates>)area.Geometry);
-                        foreach (var polygon in geom.Coordinates.Polygons)
+                        if (area.Geometry.Type == GeoJsonObjectType.MultiPolygon)
                         {
-                            //create the polygon
-                            var inputGeom = new GeometryGeoJson();
-                            inputGeom.Type = "polygon";
-                            inputGeom.Coordinates = new System.Collections.ArrayList();
-                            var str = "[";
-                            foreach (var coord in polygon.Exterior.Positions)
+                            var geom = (GeoJsonMultiPolygon<GeoJson2DGeographicCoordinates>)area.Geometry;
+                            foreach (var polygon in geom.Coordinates.Polygons)
                             {
-                                str += $"[{coord.Longitude.ToString(CultureInfo.InvariantCulture)}, {coord.Latitude.ToString(CultureInfo.InvariantCulture)}],";
-                                
-                            }
-                            str = str.Substring(0, str.Length - 1);
-                            inputGeom.Coordinates.Add(JsonDocument.Parse(str + "]").RootElement);
-                            geomList.Add(inputGeom);
-
-                            //add the holes
-                            if (polygon.Holes != null && polygon.Holes.Count > 0)
-                            {
-                                foreach(var hole in polygon.Holes)
-                                {
-                                    var inputHoleGeom = new GeometryGeoJson();
-                                    inputHoleGeom.Type = "holepolygon";
-                                    inputHoleGeom.Coordinates = new System.Collections.ArrayList();
-                                    str = "[";
-
-                                    foreach (var coord in hole.Positions)
-                                    {
-                                        str += $"[{coord.Longitude.ToString(CultureInfo.InvariantCulture)}, {coord.Latitude.ToString(CultureInfo.InvariantCulture)}],";
-                                    }
-                                    str = str.Substring(0, str.Length - 1);
-                                    inputHoleGeom.Coordinates.Add(JsonDocument.Parse(str + "]").RootElement);
-                                    geomList.Add(inputHoleGeom);
-
-                                }
-                            }
+                                CreatePolygon(geomList, polygon);                                
+                            }                          
+                        }                        
+                        else if (area.Geometry.Type == GeoJsonObjectType.Polygon)
+                        {
+                            var coordinates = ((GeoJsonPolygon<GeoJson2DGeographicCoordinates>)area.Geometry).Coordinates;
+                            CreatePolygon(geomList, coordinates);
                         }
                         //if we already have a geometry filter then we can just add the area polygons onto those
-                        if(preparedFilter.GeometryFilter.Geometries != null)
+                        if (preparedFilter.GeometryFilter.Geometries != null)
                         {
                             var list = preparedFilter.GeometryFilter.Geometries.ToList();
                             list.AddRange(geomList);
@@ -192,6 +167,44 @@ namespace SOS.Observations.Api.Managers
             }
 
             return preparedFilter;
+        }
+
+        private static void CreatePolygon(List<GeometryGeoJson> geomList, GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates> coordinates)
+        {
+            //create the polygon
+            var inputGeom = new GeometryGeoJson();
+            inputGeom.Type = "polygon";
+            inputGeom.Coordinates = new System.Collections.ArrayList();
+            var str = "[";
+            foreach (var coord in coordinates.Exterior.Positions)
+            {
+                str += $"[{coord.Longitude.ToString(CultureInfo.InvariantCulture)}, {coord.Latitude.ToString(CultureInfo.InvariantCulture)}],";
+
+            }
+            str = str.Substring(0, str.Length - 1);
+            inputGeom.Coordinates.Add(JsonDocument.Parse(str + "]").RootElement);
+            geomList.Add(inputGeom);
+
+            //add the holes
+            if (coordinates.Holes != null && coordinates.Holes.Count > 0)
+            {
+                foreach (var hole in coordinates.Holes)
+                {
+                    var inputHoleGeom = new GeometryGeoJson();
+                    inputHoleGeom.Type = "holepolygon";
+                    inputHoleGeom.Coordinates = new System.Collections.ArrayList();
+                    str = "[";
+
+                    foreach (var coord in hole.Positions)
+                    {
+                        str += $"[{coord.Longitude.ToString(CultureInfo.InvariantCulture)}, {coord.Latitude.ToString(CultureInfo.InvariantCulture)}],";
+                    }
+                    str = str.Substring(0, str.Length - 1);
+                    inputHoleGeom.Coordinates.Add(JsonDocument.Parse(str + "]").RootElement);
+                    geomList.Add(inputHoleGeom);
+
+                }
+            }
         }
 
         private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)

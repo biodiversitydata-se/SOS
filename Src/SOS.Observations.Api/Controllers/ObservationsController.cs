@@ -34,6 +34,7 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="fieldMappingManager"></param>
+        /// <param name="areaManager"></param>
         /// <param name="logger"></param>
         public ObservationsController(
             IObservationManager observationManager, 

@@ -31,7 +31,7 @@ namespace SOS.Lib.Models.Search
                 {
                      var valid =  (geom?.IsValid ?? false) &&
                                   (geom.Type.Equals("Point", StringComparison.CurrentCultureIgnoreCase) && MaxDistanceFromPoint > 0.0 ||
-                                   new[] { "polygon", "multipolygon" }.Contains(geom.Type.ToLower()) && MaxDistanceFromPoint >= 0.0);
+                                   new[] { "polygon", "multipolygon", "holepolygon" }.Contains(geom.Type.ToLower()) && MaxDistanceFromPoint >= 0.0);
                     if (!valid)
                     {
                         return valid;

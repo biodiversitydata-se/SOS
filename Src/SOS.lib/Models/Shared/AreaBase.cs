@@ -32,7 +32,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         /// Feature Id.
         /// </summary>
-        public int FeatureId { get; set; }
+        public string FeatureId { get; set; }
         
         /// <summary>
         /// Parent Id.

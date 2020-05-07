@@ -8,7 +8,7 @@ namespace SOS.Process.Mappings.Interfaces
 {
     public interface IAreaNameMapper
     {
-        Dictionary<string, int> BuildCountyFeatureIdByNameMapper(IEnumerable<Area> countyAreas);
-        Dictionary<string, int> BuildProvinceFeatureIdByNameMapper(IEnumerable<Area> provinceAreas);
+        Dictionary<string, string> BuildCountyFeatureIdByNameMapper(IEnumerable<Area> countyAreas);
+        Dictionary<string, string> BuildProvinceFeatureIdByNameMapper(IEnumerable<Area> provinceAreas);
     }
 }

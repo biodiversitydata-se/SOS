@@ -463,6 +463,7 @@ namespace SOS.Process.Processors.Artportalen
                 case FieldMappingFieldId.ValidationStatus:
                 case FieldMappingFieldId.Biotope:
                 case FieldMappingFieldId.Institution:
+                case FieldMappingFieldId.AreaType:
                 case FieldMappingFieldId.Unit:
                     return "Id";
                 default:

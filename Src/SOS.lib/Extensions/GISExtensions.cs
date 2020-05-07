@@ -220,8 +220,7 @@ namespace SOS.Lib.Extensions
         {
             return polygon.Select(r =>
                   r.Select(p => new GeoCoordinate(p.ElementAt(1), p.ElementAt(0))));
-        }
-
+        }        
         /// <summary>
         /// Cast polygon to shape coordinates
         /// </summary>
@@ -493,18 +492,37 @@ namespace SOS.Lib.Extensions
 
                     return new PointGeoShape(new GeoCoordinate(coordinates[1], coordinates[0]));
                 case "polygon":
-                    var polygon = geometry.Coordinates.ToArray()
-                        .Select(ring =>
-                            ((JsonElement)ring).EnumerateArray().Select(point => point.EnumerateArray().Select(nmr => nmr.GetDouble())));
-
-                    return new PolygonGeoShape(polygon.ToGeoShapePolygonCoordinates());
+                case "holepolygon":
+                    var listPolygons = new List<List<GeoCoordinate>>();                    
+                    foreach(JsonElement polygon in geometry.Coordinates)
+                    {
+                        var listPolygon = new List<GeoCoordinate>();                        
+                        foreach(var coord in polygon.EnumerateArray())
+                        {                            
+                            var coordArray = coord.EnumerateArray();                                                        
+                            listPolygon.Add(new GeoCoordinate(coordArray.ElementAt(1).GetDouble(), coordArray.ElementAt(0).GetDouble()));                            
+                        }
+                        listPolygons.Add(listPolygon);
+                    }                    
+                    return  new PolygonGeoShape(listPolygons);                    
                 case "multipolygon":
-                    var multipolygon = geometry.Coordinates.ToArray()
-                        .Select(polygon => ((JsonElement)polygon).EnumerateArray()
-                            .Select(ring =>
-                                ring.EnumerateArray().Select(point => point.EnumerateArray().Select(nmr => nmr.GetDouble()))));
-
-                    return new MultiPolygonGeoShape(multipolygon.Select(p => p.ToGeoShapePolygonCoordinates()));
+                    var listMultiPolygons = new List<List<List<GeoCoordinate>>>();
+                    foreach (JsonElement multiPolygon in geometry.Coordinates)
+                    {
+                        var listMultiPolygon = new List<List<GeoCoordinate>>();
+                        foreach (var polygon in multiPolygon.EnumerateArray())
+                        {
+                            var listPolygon = new List<GeoCoordinate>();
+                            foreach (var coord in polygon.EnumerateArray())
+                            {
+                                var coordArray = coord.EnumerateArray();
+                                listPolygon.Add(new GeoCoordinate(coordArray.ElementAt(1).GetDouble(), coordArray.ElementAt(0).GetDouble()));
+                            }
+                            listMultiPolygon.Add(listPolygon);
+                        }
+                        listMultiPolygons.Add(listMultiPolygon);
+                    }                    
+                    return new MultiPolygonGeoShape(listMultiPolygons);
                 default:
                     return null;
             }
