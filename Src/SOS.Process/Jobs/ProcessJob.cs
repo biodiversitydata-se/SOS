@@ -14,6 +14,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Mvm;
 using SOS.Lib.Models.Verbatim.Nors;
 using SOS.Lib.Models.Verbatim.Sers;
 using SOS.Lib.Models.Verbatim.Shark;
@@ -23,6 +24,7 @@ using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Processors.ClamPortal.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
+using SOS.Process.Processors.Mvm.Interfaces;
 using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark.Interfaces;
@@ -41,6 +43,7 @@ namespace SOS.Process.Jobs
         private readonly IArtportalenObservationProcessor _artportalenObservationProcessor;
         private readonly IClamPortalObservationProcessor _clamPortalObservationProcessor;
         private readonly IKulObservationProcessor _kulObservationProcessor;
+        private readonly IMvmObservationProcessor _mvmObservationProcessor;
         private readonly INorsObservationProcessor _norsObservationProcessor;
         private readonly ISersObservationProcessor _sersObservationProcessor;
         private readonly ISharkObservationProcessor _sharkObservationProcessor;
@@ -60,6 +63,7 @@ namespace SOS.Process.Jobs
         /// <param name="harvestInfoRepository"></param>
         /// <param name="clamPortalObservationProcessor"></param>
         /// <param name="kulObservationProcessor"></param>
+        /// <param name="mvmObservationProcessor"></param>
         /// <param name="norsObservationProcessor"></param>
         /// <param name="sersObservationProcessor"></param>
         /// <param name="sharkObservationProcessor"></param>
@@ -77,6 +81,7 @@ namespace SOS.Process.Jobs
             IHarvestInfoRepository harvestInfoRepository,
             IClamPortalObservationProcessor clamPortalObservationProcessor,
             IKulObservationProcessor kulObservationProcessor,
+            IMvmObservationProcessor mvmObservationProcessor,
             INorsObservationProcessor norsObservationProcessor,
             ISersObservationProcessor sersObservationProcessor,
             ISharkObservationProcessor sharkObservationProcessor,
@@ -92,6 +97,7 @@ namespace SOS.Process.Jobs
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _clamPortalObservationProcessor = clamPortalObservationProcessor ?? throw new ArgumentNullException(nameof(clamPortalObservationProcessor));
             _kulObservationProcessor = kulObservationProcessor ?? throw new ArgumentNullException(nameof(kulObservationProcessor));
+            _mvmObservationProcessor = mvmObservationProcessor ?? throw new ArgumentNullException(nameof(mvmObservationProcessor));
             _norsObservationProcessor = norsObservationProcessor ?? throw new ArgumentNullException(nameof(norsObservationProcessor));
             _sersObservationProcessor = sersObservationProcessor ?? throw new ArgumentNullException(nameof(sersObservationProcessor));
             _sharkObservationProcessor = sharkObservationProcessor ?? throw new ArgumentNullException(nameof(sharkObservationProcessor));
@@ -212,6 +218,18 @@ namespace SOS.Process.Jobs
                     providerInfo.MetadataInfo =
                         metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
                     providersInfo.Add(ObservationProvider.KUL, providerInfo);
+                }
+
+                if ((sources & (int)ObservationProvider.MVM) > 0)
+                {
+                    processTasks.Add(ObservationProvider.MVM, _mvmObservationProcessor.ProcessAsync(taxonById, cancellationToken));
+
+                    // Get harvest info and create a provider info object  that we can add processing info to later
+                    var harvestInfo = await GetHarvestInfoAsync(nameof(MvmObservationVerbatim));
+                    var providerInfo = CreateProviderInfo(DataSet.MvmObservations, harvestInfo, start);
+                    providerInfo.MetadataInfo =
+                        metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
+                    providersInfo.Add(ObservationProvider.MVM, providerInfo);
                 }
 
                 if ((sources & (int)ObservationProvider.NORS) > 0)
