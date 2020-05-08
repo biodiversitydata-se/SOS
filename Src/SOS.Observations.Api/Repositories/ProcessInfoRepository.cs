@@ -25,7 +25,7 @@ namespace SOS.Observations.Api.Repositories
         /// <inheritdoc />
         public async Task<ProcessInfo> GetProcessInfoAsync(bool current)
         {
-            return await GetAsync(current ? CollectionName : InactiveCollectionName);
+            return await GetAsync($"ProcessedObservation-{ (current ? ActiveInstance : ActiveInstance == 1 ? 0 : 1) }");
         }
     }
 }
