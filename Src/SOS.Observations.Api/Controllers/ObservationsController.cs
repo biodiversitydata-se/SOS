@@ -9,6 +9,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Controllers.Interfaces;
+using SOS.Observations.Api.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Models.Area;
 
@@ -17,14 +18,14 @@ namespace SOS.Observations.Api.Controllers
     /// <summary>
     /// Observation controller
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
-    public class ObservationController : ControllerBase, IObservationController
+    public class ObservationsController : ControllerBase, IObservationsController
     {
         private readonly IObservationManager _observationManager;
         private readonly IFieldMappingManager _fieldMappingManager;
         private readonly IAreaManager _areaManager;
-        private readonly ILogger<ObservationController> _logger;
+        private readonly ILogger<ObservationsController> _logger;
         private const int MaxBatchSize = 1000;
         private const int ElasticSearchMaxRecords = 10000;
 
@@ -33,12 +34,13 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="fieldMappingManager"></param>
+        /// <param name="areaManager"></param>
         /// <param name="logger"></param>
-        public ObservationController(
+        public ObservationsController(
             IObservationManager observationManager, 
             IFieldMappingManager fieldMappingManager,
             IAreaManager areaManager,
-            ILogger<ObservationController> logger)
+            ILogger<ObservationsController> logger)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
@@ -51,7 +53,11 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(PagedResult<ProcessedObservation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetChunkAsync([FromBody] SearchFilter filter, [FromQuery]int skip = 0, [FromQuery]int take = 100)
+        public async Task<IActionResult> GetChunkAsync([FromBody] SearchFilter filter, 
+            [FromQuery]int skip = 0, 
+            [FromQuery]int take = 100, 
+            [FromQuery]string sortBy = "" , 
+            [FromQuery]SearchSortOrder sortOrder = SearchSortOrder.Asc)
         {
             try
             {
@@ -70,7 +76,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest($"Skip + take ");
                 }
 
-                return new OkObjectResult(await _observationManager.GetChunkAsync(filter, skip, take));
+                return new OkObjectResult(await _observationManager.GetChunkAsync(filter, skip, take, sortBy, sortOrder));
             }
             catch (Exception e)
             {
@@ -105,22 +111,6 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Error getting field mappings");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
-        }
-        /// <inheritdoc />
-        [HttpGet("Areas")]
-        [ProducesResponseType(typeof(PagedResult<ExternalArea>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAreasAsync([FromQuery] AreaType areaType, [FromQuery]string searchString, [FromQuery]int skip = 0, [FromQuery]int take = 100)
-        {
-            try 
-            {
-                return new OkObjectResult(await _areaManager.GetAreasAsync(areaType, searchString, skip, take));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting areas");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
+        }    
     }
 }

@@ -22,7 +22,9 @@ namespace SOS.Lib.Models.Shared
                     case "point":
                         return Coordinates?.Count == 2 && !Coordinates[0].Equals(0) && !Coordinates[1].Equals(0);
                     case "polygon":
-                        return Coordinates?.Count > 2;
+                        return Coordinates?.Count != 0;
+                    case "holepolygon":
+                        return Coordinates?.Count != 0;
                     case "multipolygon":
                         return Coordinates?.Count != 0;
                     default:

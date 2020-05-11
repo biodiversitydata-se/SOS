@@ -6,7 +6,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     /// <summary>
     /// System controller interface
     /// </summary>
-    public interface ISystemController
+    public interface ISystemsController
     {
         /// <summary>
         /// Get information about observation processing

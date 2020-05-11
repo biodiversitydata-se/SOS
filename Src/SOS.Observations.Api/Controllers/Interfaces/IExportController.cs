@@ -6,7 +6,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     /// <summary>
     /// Export job controller
     /// </summary>
-    public interface IExportController
+    public interface IExportsController
     {
         /// <summary>
         /// Request of a Darwin Core Archive file with observations based on provided filter 

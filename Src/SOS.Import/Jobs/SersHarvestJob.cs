@@ -40,7 +40,7 @@ namespace SOS.Import.Jobs
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(result);
 
-            return result.Status.Equals(RunStatus.Success) ? true : throw new Exception("SERS Harvest Job failed");
+            return result.Status.Equals(RunStatus.Success) && result.Count > 0 ? true : throw new Exception("SERS Harvest Job failed");
         }
     }
 }

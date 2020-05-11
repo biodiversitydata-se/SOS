@@ -6,12 +6,12 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.GeoJsonObjectModel;
-using Newtonsoft.Json.Linq;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
+using SOS.Observations.Api.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -53,13 +53,13 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take)
+        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder)
         {
             try
             {
                 filter = await PrepareFilter(filter);
 
-                var processedObservations = (await _processedObservationRepository.GetChunkAsync(filter, skip, take));
+                var processedObservations = (await _processedObservationRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder));
                 ProcessLocalizedFieldMappings(filter, processedObservations.Records);
                 ProcessNonLocalizedFieldMappings(filter, processedObservations.Records);
                 return processedObservations;
@@ -89,7 +89,7 @@ namespace SOS.Observations.Api.Managers
             // handle the area ids search
             if(preparedFilter.AreaIds != null && preparedFilter.AreaIds.Any())
             {
-                var area = await _areaManager.GetAreaAsync(preparedFilter.AreaIds.First());
+                var area = await _areaManager.GetAreaInternalAsync(preparedFilter.AreaIds.First());
                 if (area != null)
                 {
                     //if we already have the info needed for the search we skip polygon searches
@@ -104,7 +104,7 @@ namespace SOS.Observations.Api.Managers
                                 preparedFilter.CountyIds = new List<int>();
                             }
                             var list = preparedFilter.CountyIds.ToList();
-                            list.Add(area.FeatureId);
+                            list.Add(area.Id);
                             preparedFilter.CountyIds = list;
                         }
                         else if (area.AreaType == AreaType.Municipality)
@@ -114,7 +114,7 @@ namespace SOS.Observations.Api.Managers
                                 preparedFilter.MunicipalityIds = new List<int>();
                             }
                             var list = preparedFilter.MunicipalityIds.ToList();
-                            list.Add(area.FeatureId);
+                            list.Add(area.Id);
                             preparedFilter.MunicipalityIds = list;
                         }
                         else if (area.AreaType == AreaType.Province)
@@ -124,7 +124,7 @@ namespace SOS.Observations.Api.Managers
                                 preparedFilter.ProvinceIds = new List<int>();
                             }
                             var list = preparedFilter.ProvinceIds.ToList();
-                            list.Add(area.FeatureId);
+                            list.Add(area.Id);
                             preparedFilter.ProvinceIds = list;
                         }
                     }
@@ -136,48 +136,23 @@ namespace SOS.Observations.Api.Managers
                         {                            
                             preparedFilter.GeometryFilter = new GeometryFilter();
                             preparedFilter.GeometryFilter.MaxDistanceFromPoint = 0;
-                        }                                                                      
+                        }
 
-                        var geom = ((GeoJsonMultiPolygon<GeoJson2DGeographicCoordinates>)area.Geometry);
-                        foreach (var polygon in geom.Coordinates.Polygons)
+                        if (area.Geometry.Type == GeoJsonObjectType.MultiPolygon)
                         {
-                            //create the polygon
-                            var inputGeom = new GeometryGeoJson();
-                            inputGeom.Type = "polygon";
-                            inputGeom.Coordinates = new System.Collections.ArrayList();
-                            var str = "[";
-                            foreach (var coord in polygon.Exterior.Positions)
+                            var geom = (GeoJsonMultiPolygon<GeoJson2DGeographicCoordinates>)area.Geometry;
+                            foreach (var polygon in geom.Coordinates.Polygons)
                             {
-                                str += $"[{coord.Longitude.ToString(CultureInfo.InvariantCulture)}, {coord.Latitude.ToString(CultureInfo.InvariantCulture)}],";
-                                
-                            }
-                            str = str.Substring(0, str.Length - 1);
-                            inputGeom.Coordinates.Add(JsonDocument.Parse(str + "]").RootElement);
-                            geomList.Add(inputGeom);
-
-                            //add the holes
-                            if (polygon.Holes != null && polygon.Holes.Count > 0)
-                            {
-                                foreach(var hole in polygon.Holes)
-                                {
-                                    var inputHoleGeom = new GeometryGeoJson();
-                                    inputHoleGeom.Type = "holepolygon";
-                                    inputHoleGeom.Coordinates = new System.Collections.ArrayList();
-                                    str = "[";
-
-                                    foreach (var coord in hole.Positions)
-                                    {
-                                        str += $"[{coord.Longitude.ToString(CultureInfo.InvariantCulture)}, {coord.Latitude.ToString(CultureInfo.InvariantCulture)}],";
-                                    }
-                                    str = str.Substring(0, str.Length - 1);
-                                    inputHoleGeom.Coordinates.Add(JsonDocument.Parse(str + "]").RootElement);
-                                    geomList.Add(inputHoleGeom);
-
-                                }
-                            }
+                                CreatePolygon(geomList, polygon);                                
+                            }                          
+                        }                        
+                        else if (area.Geometry.Type == GeoJsonObjectType.Polygon)
+                        {
+                            var coordinates = ((GeoJsonPolygon<GeoJson2DGeographicCoordinates>)area.Geometry).Coordinates;
+                            CreatePolygon(geomList, coordinates);
                         }
                         //if we already have a geometry filter then we can just add the area polygons onto those
-                        if(preparedFilter.GeometryFilter.Geometries != null)
+                        if (preparedFilter.GeometryFilter.Geometries != null)
                         {
                             var list = preparedFilter.GeometryFilter.Geometries.ToList();
                             list.AddRange(geomList);
@@ -194,10 +169,51 @@ namespace SOS.Observations.Api.Managers
             return preparedFilter;
         }
 
+        private static void CreatePolygon(List<GeometryGeoJson> geomList, GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates> coordinates)
+        {
+            //create the polygon
+            var inputGeom = new GeometryGeoJson();
+            inputGeom.Type = "polygon";
+            inputGeom.Coordinates = new System.Collections.ArrayList();
+            var str = "[";
+            foreach (var coord in coordinates.Exterior.Positions)
+            {
+                str += $"[{coord.Longitude.ToString(CultureInfo.InvariantCulture)}, {coord.Latitude.ToString(CultureInfo.InvariantCulture)}],";
+
+            }
+            str = str.Substring(0, str.Length - 1);
+            inputGeom.Coordinates.Add(JsonDocument.Parse(str + "]").RootElement);
+            geomList.Add(inputGeom);
+
+            //add the holes
+            if (coordinates.Holes != null && coordinates.Holes.Count > 0)
+            {
+                foreach (var hole in coordinates.Holes)
+                {
+                    var inputHoleGeom = new GeometryGeoJson();
+                    inputHoleGeom.Type = "holepolygon";
+                    inputHoleGeom.Coordinates = new System.Collections.ArrayList();
+                    str = "[";
+
+                    foreach (var coord in hole.Positions)
+                    {
+                        str += $"[{coord.Longitude.ToString(CultureInfo.InvariantCulture)}, {coord.Latitude.ToString(CultureInfo.InvariantCulture)}],";
+                    }
+                    str = str.Substring(0, str.Length - 1);
+                    inputHoleGeom.Coordinates.Add(JsonDocument.Parse(str + "]").RootElement);
+                    geomList.Add(inputHoleGeom);
+
+                }
+            }
+        }
+
         private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)
         {
-            if (!filter.TranslateFieldMappedValues) return;
-           
+            if (string.IsNullOrEmpty(filter.FieldTranslationCultureCode))
+            {
+                return;
+            }
+            
             foreach (var observation in processedObservations)
             {
                 if (observation is IDictionary<string, object> obs)
@@ -228,9 +244,12 @@ namespace SOS.Observations.Api.Managers
 
         private void ProcessLocalizedFieldMappings(SearchFilter filter, IEnumerable<dynamic> processedObservations)
         {
-            if (!filter.TranslateFieldMappedValues) return;
-            string cultureCode = filter.TranslationCultureCode;           
-            ProcessLocalizedFieldMappedReturnValues(processedObservations, cultureCode);            
+            if (string.IsNullOrEmpty(filter.FieldTranslationCultureCode))
+            {
+                return;
+            }
+
+            ProcessLocalizedFieldMappedReturnValues(processedObservations, filter.FieldTranslationCultureCode);            
         }
 
         private void ProcessLocalizedFieldMappedReturnValues(

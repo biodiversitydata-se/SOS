@@ -18,9 +18,9 @@ namespace SOS.Process.Mappings
         public Dictionary<string, string> CountyNameByCountyNameSpelling { get; }
         public Dictionary<string, string> ProvinceNameByProvinceNameSpelling { get; }
 
-        public Dictionary<string, int> BuildCountyFeatureIdByNameMapper(IEnumerable<Area> countyAreas)
+        public Dictionary<string, string> BuildCountyFeatureIdByNameMapper(IEnumerable<Area> countyAreas)
         {
-            Dictionary<string, int> countyIdByNames = new Dictionary<string, int>();
+            Dictionary<string, string> countyIdByNames = new Dictionary<string, string>();
             var countyAreaByName = countyAreas.ToDictionary(x => x.Name, x => x);
             foreach (var pair in CountyNameByCountyNameSpelling)
             {
@@ -31,9 +31,9 @@ namespace SOS.Process.Mappings
             return countyIdByNames;
         }
 
-        public Dictionary<string, int> BuildProvinceFeatureIdByNameMapper(IEnumerable<Area> provinceAreas)
+        public Dictionary<string, string> BuildProvinceFeatureIdByNameMapper(IEnumerable<Area> provinceAreas)
         {
-            Dictionary<string, int> provinceIdByNames = new Dictionary<string, int>();
+            Dictionary<string, string> provinceIdByNames = new Dictionary<string, string>();
             var countyAreaByName = provinceAreas.ToDictionary(x => x.Name, x => x);
             foreach (var pair in ProvinceNameByProvinceNameSpelling)
             {

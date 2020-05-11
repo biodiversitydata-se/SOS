@@ -74,18 +74,20 @@ namespace SOS.Import.Harvesters.Observations
                 while (sightings?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        nrSightingsHarvested >= _norsServiceConfiguration.MaxNumberOfSightingsHarvested)
-                    {
-                        break;
-                    }
+                    
                     var aggregates = sightings.ToVerbatims().ToArray();
                     nrSightingsHarvested += aggregates.Length;
 
                     // Add sightings to MongoDb
                     await _norsObservationVerbatimRepository.AddManyAsync(aggregates);
 
-                    var regex = new Regex(@"\d+$");// new Regex(@"(?!.*:).+");
+                    if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        nrSightingsHarvested >= _norsServiceConfiguration.MaxNumberOfSightingsHarvested)
+                    {
+                        break;
+                    }
+
+                    var regex = new Regex(@"\d+$");
 
                     var maxId = aggregates.Select(a => int.Parse(regex.Match(a.IndividualId).Value)).Max();
                     sightings = await _norsObservationService.GetAsync(maxId);

@@ -15,9 +15,11 @@ using SOS.Process.Managers;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.Processors.ClamPortal;
 using SOS.Process.Processors.Kul;
+using SOS.Process.Processors.Mvm;
 using SOS.Process.Processors.Nors;
 using SOS.Process.Processors.Sers;
 using SOS.Process.Processors.Shark;
+using SOS.Process.Processors.VirtualHerbarium;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
@@ -128,6 +130,12 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<KulObservationProcessor>());
+            var mvmProcessor = new MvmObservationProcessor(
+                new MvmObservationVerbatimRepository(verbatimClient, new NullLogger<MvmObservationVerbatimRepository>()),
+                areaHelper,
+                processedObservationRepository,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                new NullLogger<MvmObservationProcessor>());
             var norsProcessor = new NorsObservationProcessor(
                 new NorsObservationVerbatimRepository(verbatimClient, new NullLogger<NorsObservationVerbatimRepository>()),
                 areaHelper,
@@ -146,6 +154,12 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<SharkObservationProcessor>());
+            var virtualHrbariumProcessor = new VirtualHerbariumObservationProcessor(
+                new VirtualHerbariumObservationVerbatimRepository(verbatimClient, new NullLogger<VirtualHerbariumObservationVerbatimRepository>()),
+                areaHelper,
+                processedObservationRepository,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                new NullLogger<VirtualHerbariumObservationProcessor>());
             var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
                 processedObservationRepository,
@@ -167,9 +181,11 @@ namespace SOS.Process.IntegrationTests.Jobs
                 harvestInfoRepository,
                 clamPortalProcessor,
                 kulProcessor,
+                mvmProcessor,
                 norsProcessor,
                 sersProcessor,
                 sharkProcessor,
+                virtualHrbariumProcessor,
                 artportalenProcessor,
                 taxonProcessedRepository,
                 instanceManager,

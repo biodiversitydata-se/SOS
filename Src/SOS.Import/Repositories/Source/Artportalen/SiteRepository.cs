@@ -32,7 +32,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 const string query = @"
                 SELECT 
 	                s.Id,
-	                s.Name,
+	                ISNULL(s.PresentationName, s.Name) AS Name,
 	                s.XCoord,
 	                s.YCoord,
                     s.Accuracy,

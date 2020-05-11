@@ -27,7 +27,7 @@ namespace SOS.Import.Entities.Artportalen
         /// <summary>
         /// Feature Id.
         /// </summary>
-        public int FeatureId { get; set; }
+        public string FeatureId { get; set; }
 
         /// <summary>
         /// Parent Id.

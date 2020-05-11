@@ -42,5 +42,22 @@ namespace SOS.Process.Repositories.Destination
 
             return res;
         }
+
+        /// <inheritdoc />
+        public async Task CreateIndexAsync()
+        {
+            var indexModels = new List<CreateIndexModel<Area>>()
+            {
+                new CreateIndexModel<Area>(
+                    Builders<Area>.IndexKeys.Ascending(a => a.Name)),
+                new CreateIndexModel<Area>(
+                    Builders<Area>.IndexKeys.Ascending(a => a.AreaType)),
+                new CreateIndexModel<Area>(
+                    Builders<Area>.IndexKeys.Geo2DSphere(a => a.Geometry))
+            };
+
+            Logger.LogDebug("Creating Area indexes");
+            await MongoCollection.Indexes.CreateManyAsync(indexModels);
+        }
     }
 }

@@ -31,7 +31,6 @@ namespace SOS.Import.Services
 
         public async Task<IEnumerable<WebSpeciesObservation>> GetAsync(int getFromId)
         {
-            var ready = await _speciesObservationChangeServiceClient.IsReadyToUseAsync(new IsReadyToUseRequest() { });                        
             var result = await _speciesObservationChangeServiceClient.GetSpeciesObservationChangeAsSpeciesAsync(new GetSpeciesObservationChangeAsSpeciesRequest() 
                 { 
                     token = _mvmServiceConfiguration.Token,
