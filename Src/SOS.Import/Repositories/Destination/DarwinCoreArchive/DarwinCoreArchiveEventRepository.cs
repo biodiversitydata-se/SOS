@@ -49,6 +49,11 @@ namespace SOS.Import.Repositories.Destination.DarwinCoreArchive
         public async Task<bool> AddManyAsync(IEnumerable<DwcEvent> items, DwcaDatasetInfo datasetInfo)
         {
             string collectionName = GetCollectionName(datasetInfo);
+            return await AddManyAsync(items, collectionName);
+        }
+
+        public async Task<bool> AddManyAsync(IEnumerable<DwcEvent> items, string collectionName)
+        {
             var mongoCollection = base.GetMongoCollection(collectionName);
             return await base.AddManyAsync(items, mongoCollection);
         }

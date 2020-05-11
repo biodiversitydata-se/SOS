@@ -15,5 +15,6 @@ namespace SOS.Import.Repositories.Destination.DarwinCoreArchive.Interfaces
         Task<bool> DeleteCollectionAsync(DwcaDatasetInfo datasetInfo);
         Task<bool> AddCollectionAsync(DwcaDatasetInfo datasetInfo);
         Task<bool> AddManyAsync(IEnumerable<DwcEvent> items, DwcaDatasetInfo datasetInfo);
+        Task<bool> AddManyAsync(IEnumerable<DwcEvent> items, string collectionName);
     }
 }
