@@ -15,6 +15,7 @@ using SOS.Process.Managers;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.Processors.ClamPortal;
 using SOS.Process.Processors.Kul;
+using SOS.Process.Processors.Mvm;
 using SOS.Process.Processors.Nors;
 using SOS.Process.Processors.Sers;
 using SOS.Process.Processors.Shark;
@@ -129,6 +130,12 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<KulObservationProcessor>());
+            var mvmProcessor = new MvmObservationProcessor(
+                new MvmObservationVerbatimRepository(verbatimClient, new NullLogger<MvmObservationVerbatimRepository>()),
+                areaHelper,
+                processedObservationRepository,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                new NullLogger<MvmObservationProcessor>());
             var norsProcessor = new NorsObservationProcessor(
                 new NorsObservationVerbatimRepository(verbatimClient, new NullLogger<NorsObservationVerbatimRepository>()),
                 areaHelper,
@@ -174,6 +181,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 harvestInfoRepository,
                 clamPortalProcessor,
                 kulProcessor,
+                mvmProcessor,
                 norsProcessor,
                 sersProcessor,
                 sharkProcessor,
