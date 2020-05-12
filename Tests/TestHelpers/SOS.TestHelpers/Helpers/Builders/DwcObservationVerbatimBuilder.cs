@@ -1,6 +1,8 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.TestHelpers.Gis;
 
@@ -76,6 +78,21 @@ namespace SOS.TestHelpers.Helpers.Builders
         public DwcObservationVerbatimBuilder WithScientificName(string scientificName)
         {
             return With(entity => entity.ScientificName = scientificName);
+        }
+
+        public DwcObservationVerbatimBuilder WithDateIdentified(string dateIdentified)
+        {
+            return With(entity => entity.DateIdentified = dateIdentified);
+        }
+
+        public DwcObservationVerbatimBuilder WithDateIdentified(DateTime dateIdentified)
+        {
+            return With(entity => entity.DateIdentified = DwcFormatter.CreateDateString(dateIdentified));
+        }
+
+        public DwcObservationVerbatimBuilder WithIdentificationVerificationStatus(string identificationVerificationStatus)
+        {
+            return With(entity => entity.IdentificationVerificationStatus = identificationVerificationStatus);
         }
 
         public DwcObservationVerbatimBuilder WithDefaultValues()

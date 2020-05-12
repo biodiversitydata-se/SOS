@@ -8,6 +8,10 @@ namespace SOS.Lib.DataStructures
     /// </summary>
     /// <typeparam name="TKey">Key type</typeparam>
     /// <typeparam name="TValue">Value type</typeparam>
+    /// <remarks>
+    /// An alternative (perhaps faster) data structure to use, could be C5 MultiHashDictionary:
+    /// https://github.com/sestoft/C5/blob/master/C5.UserGuideExamples/MultiDictionary.cs
+    /// </remarks>
     public class HashMapDictionary<TKey, TValue> : IEnumerable
     {
         private readonly System.Collections.Concurrent.ConcurrentDictionary<TKey, List<TValue>> _keyValue = new System.Collections.Concurrent.ConcurrentDictionary<TKey, List<TValue>>();

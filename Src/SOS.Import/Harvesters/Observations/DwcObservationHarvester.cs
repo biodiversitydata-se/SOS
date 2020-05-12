@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -111,6 +112,92 @@ namespace SOS.Import.Harvesters.Observations
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed harvest of DwC Archive");
+                harvestInfo.Status = RunStatus.Failed;
+            }
+            return harvestInfo;
+        }
+
+        /// <summary>
+        /// Harvest DwC Archive observations
+        /// </summary>
+        /// <returns></returns>
+        public async Task<HarvestInfo> HarvestMultipleDwcaFilesAsync(
+            string[] filePaths,
+            bool emptyCollectionsBeforeHarvest,
+            IJobCancellationToken cancellationToken)
+        {
+            var harvestInfo = new HarvestInfo(nameof(DwcObservationVerbatim), DataSet.Dwc, DateTime.Now);
+            string latestFilePath = "";
+            try
+            {
+                string occurrenceCollectionName = nameof(DwcObservationVerbatim);
+                string eventCollectionName = nameof(DwcEvent);
+                ConventionRegistry.Register("IgnoreIfNull",
+                    new ConventionPack {new IgnoreIfNullConvention(true)},
+                    t => true);
+
+                _logger.LogDebug("Start storing DwC-A observations");
+                if (emptyCollectionsBeforeHarvest)
+                {
+                    await _dwcArchiveVerbatimRepository.DeleteCollectionAsync(occurrenceCollectionName);
+                    await _dwcArchiveVerbatimRepository.AddCollectionAsync(occurrenceCollectionName);
+                    await _dwcArchiveVerbatimRepository.DeleteCollectionAsync(eventCollectionName);
+                    await _dwcArchiveVerbatimRepository.AddCollectionAsync(eventCollectionName);
+                }
+
+                int observationCount = 0;
+                foreach (var filePath in filePaths)
+                {
+                    latestFilePath = filePath;
+                    var datasetInfo = new DwcaDatasetInfo
+                    {
+                        ArchiveFilename = filePath,
+                        DataProviderIdentifier = Path.GetFileNameWithoutExtension(filePath),
+                        DataProviderId = -1 // Unknown
+                    };
+
+                    using var archiveReader = new ArchiveReader(filePath);
+                    var observationBatches =
+                        _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, datasetInfo, BatchSize);
+                    await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
+                    {
+                        cancellationToken?.ThrowIfCancellationRequested();
+                        observationCount += verbatimObservationsBatch.Count;
+                        await _dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch, occurrenceCollectionName);
+                    }
+
+                    // Read and store events
+                    if (archiveReader.IsSamplingEventCore)
+                    {
+                        _logger.LogDebug("Start storing DwC-A events");
+                        var eventBatches =
+                            _dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archiveReader, datasetInfo,
+                                BatchSize);
+                        await foreach (List<DwcEvent> eventBatch in eventBatches)
+                        {
+                            cancellationToken?.ThrowIfCancellationRequested();
+                            await _dwcArchiveEventRepository.AddManyAsync(eventBatch, eventCollectionName);
+                        }
+
+                    }
+                }
+
+                _logger.LogDebug("Finish storing DwC-A observations");
+                _logger.LogDebug("Finish storing DwC-A events");
+
+                // Update harvest info
+                harvestInfo.End = DateTime.Now;
+                harvestInfo.Status = RunStatus.Success;
+                harvestInfo.Count = observationCount;
+            }
+            catch (JobAbortedException e)
+            {
+                _logger.LogError(e, "Canceled harvest of DwC Archive");
+                harvestInfo.Status = RunStatus.Canceled;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Failed harvest of DwC Archive '{latestFilePath}'");
                 harvestInfo.Status = RunStatus.Failed;
             }
             return harvestInfo;
