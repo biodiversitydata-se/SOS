@@ -9,7 +9,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 10
+        "FeatureId": "10"
       }
     },
     {
@@ -18,7 +18,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 20
+        "FeatureId": "20"
       }
     },
     {
@@ -27,7 +27,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 9
+        "FeatureId": "9"
       }
     },
     {
@@ -36,7 +36,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 21
+        "FeatureId": "21"
       }
     },
     {
@@ -45,7 +45,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 13
+        "FeatureId": "13"
       }
     },
     {
@@ -54,7 +54,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 23
+        "FeatureId": "23"
       }
     },
     {
@@ -63,7 +63,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 6
+        "FeatureId": "6"
       }
     },
     {
@@ -72,7 +72,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 8
+        "FeatureId": "8"
       }
     },
     {
@@ -81,7 +81,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 7
+        "FeatureId": "7"
       }
     },
     {
@@ -90,7 +90,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 25
+        "FeatureId": "25"
       }
     },
     {
@@ -99,7 +99,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 12
+        "FeatureId": "12"
       }
     },
     {
@@ -108,7 +108,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 1
+        "FeatureId": "1"
       }
     },
     {
@@ -117,7 +117,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 4
+        "FeatureId": "4"
       }
     },
     {
@@ -126,7 +126,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 3
+        "FeatureId": "3"
       }
     },
     {
@@ -135,7 +135,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 17
+        "FeatureId": "17"
       }
     },
     {
@@ -144,7 +144,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 24
+        "FeatureId": "24"
       }
     },
     {
@@ -153,7 +153,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 5
+        "FeatureId": "5"
       }
     },
     {
@@ -162,7 +162,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 22
+        "FeatureId": "22"
       }
     },
     {
@@ -171,7 +171,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 19
+        "FeatureId": "19"
       }
     },
     {
@@ -180,7 +180,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 14
+        "FeatureId": "14"
       }
     },
     {
@@ -189,7 +189,7 @@
       "Localized": false,
       "Extra": {
         "AreaDatasetId": 21,
-        "FeatureId": 18
+        "FeatureId": "18"
       }
     }
   ],
@@ -296,147 +296,147 @@
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 10
+                "FeatureId": "10"
               },
               "SosId": 1
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 20
+                "FeatureId": "20"
               },
               "SosId": 2
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 9
+                "FeatureId": "9"
               },
               "SosId": 3
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 21
+                "FeatureId": "21"
               },
               "SosId": 4
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 13
+                "FeatureId": "13"
               },
               "SosId": 5
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 23
+                "FeatureId": "23"
               },
               "SosId": 6
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 6
+                "FeatureId": "6"
               },
               "SosId": 7
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 8
+                "FeatureId": "8"
               },
               "SosId": 8
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 7
+                "FeatureId": "7"
               },
               "SosId": 9
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 25
+                "FeatureId": "25"
               },
               "SosId": 10
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 12
+                "FeatureId": "12"
               },
               "SosId": 11
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 1
+                "FeatureId": "1"
               },
               "SosId": 12
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 4
+                "FeatureId": "4"
               },
               "SosId": 13
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 3
+                "FeatureId": "3"
               },
               "SosId": 14
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 17
+                "FeatureId": "17"
               },
               "SosId": 15
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 24
+                "FeatureId": "24"
               },
               "SosId": 16
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 5
+                "FeatureId": "5"
               },
               "SosId": 17
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 22
+                "FeatureId": "22"
               },
               "SosId": 18
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 19
+                "FeatureId": "19"
               },
               "SosId": 19
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 14
+                "FeatureId": "14"
               },
               "SosId": 20
             },
             {
               "Value": {
                 "AreaDatasetId": 21,
-                "FeatureId": 18
+                "FeatureId": "18"
               },
               "SosId": 21
             }
@@ -447,87 +447,87 @@
           "Description": "The key is FeatureId",
           "Values": [
             {
-              "Value": 10,
+              "Value": "10",
               "SosId": 1
             },
             {
-              "Value": 20,
+              "Value": "20",
               "SosId": 2
             },
             {
-              "Value": 9,
+              "Value": "9",
               "SosId": 3
             },
             {
-              "Value": 21,
+              "Value": "21",
               "SosId": 4
             },
             {
-              "Value": 13,
+              "Value": "13",
               "SosId": 5
             },
             {
-              "Value": 23,
+              "Value": "23",
               "SosId": 6
             },
             {
-              "Value": 6,
+              "Value": "6",
               "SosId": 7
             },
             {
-              "Value": 8,
+              "Value": "8",
               "SosId": 8
             },
             {
-              "Value": 7,
+              "Value": "7",
               "SosId": 9
             },
             {
-              "Value": 25,
+              "Value": "25",
               "SosId": 10
             },
             {
-              "Value": 12,
+              "Value": "12",
               "SosId": 11
             },
             {
-              "Value": 1,
+              "Value": "1",
               "SosId": 12
             },
             {
-              "Value": 4,
+              "Value": "4",
               "SosId": 13
             },
             {
-              "Value": 3,
+              "Value": "3",
               "SosId": 14
             },
             {
-              "Value": 17,
+              "Value": "17",
               "SosId": 15
             },
             {
-              "Value": 24,
+              "Value": "24",
               "SosId": 16
             },
             {
-              "Value": 5,
+              "Value": "5",
               "SosId": 17
             },
             {
-              "Value": 22,
+              "Value": "22",
               "SosId": 18
             },
             {
-              "Value": 19,
+              "Value": "19",
               "SosId": 19
             },
             {
-              "Value": 14,
+              "Value": "14",
               "SosId": 20
             },
             {
-              "Value": 18,
+              "Value": "18",
               "SosId": 21
             }
           ]

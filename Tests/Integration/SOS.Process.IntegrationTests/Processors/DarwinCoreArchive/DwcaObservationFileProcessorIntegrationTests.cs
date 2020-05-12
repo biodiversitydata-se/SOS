@@ -71,6 +71,37 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             processingStatus.Status.Should().Be(RunStatus.Success);
         }
 
+        [Fact]
+        public async Task Process_SHARK_observations()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/SHARK_Zooplankton_NAT_DwC-A.zip";
+            var datasetInfo = new DwcaDatasetInfo
+            {
+                DataProviderId = 101,
+                DataProviderIdentifier = "TestSHARK"
+            };
+            var dwcaReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            using var archiveReader = new ArchiveReader(archivePath);
+            List<DwcObservationVerbatim> observations = await dwcaReader.ReadArchiveAsync(archiveReader, datasetInfo);
+            var dwcaProcessor = CreateDwcaObservationProcessor(storeProcessedObservations: false, dwcObservationVerbatims: observations);
+            var taxonByTaxonId = await GetTaxonDictionaryAsync();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var processingStatus = await dwcaProcessor.ProcessAsync(
+                taxonByTaxonId, JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            processingStatus.Status.Should().Be(RunStatus.Success);
+        }
+
+
         private DwcaObservationProcessor CreateDwcaObservationProcessor(
             bool storeProcessedObservations,
             List<DwcObservationVerbatim> dwcObservationVerbatims)

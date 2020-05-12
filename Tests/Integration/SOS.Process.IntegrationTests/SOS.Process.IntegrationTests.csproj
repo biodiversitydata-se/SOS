@@ -52,6 +52,9 @@
     <None Update="Resources\Dwca\dwca-event-mof-swedish-butterfly-monitoring.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Dwca\SHARK_Zooplankton_NAT_DwC-A.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

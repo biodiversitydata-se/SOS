@@ -124,21 +124,6 @@
       ]
     },
     {
-      "Id": 26,
-      "Value": "Sci",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Sci"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Sci"
-        }
-      ]
-    },
-    {
       "Id": 27,
       "Value": "Vattenområde",
       "Localized": true,
@@ -194,10 +179,6 @@
             {
               "Value": 22,
               "SosId": 22
-            },
-            {
-              "Value": 26,
-              "SosId": 26
             },
             {
               "Value": 27,
