@@ -88,7 +88,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
-                .ReturnsAsync(new List<WebSpeciesObservation>());
+                .ReturnsAsync(new Tuple<long, IEnumerable<WebSpeciesObservation>>(1, new List<WebSpeciesObservation>()));
 
             _sersObservationVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())
                 .ReturnsAsync(true);

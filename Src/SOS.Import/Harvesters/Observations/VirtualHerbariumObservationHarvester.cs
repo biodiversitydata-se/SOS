@@ -48,7 +48,6 @@ namespace SOS.Import.Harvesters.Observations
 
             try
             {
-                var start = DateTime.Now;
                 _logger.LogInformation("Start harvesting sightings for Virtual Herbarium data provider");
 
                 // Make sure we have an empty collection.
@@ -60,19 +59,25 @@ namespace SOS.Import.Harvesters.Observations
                 var localitiesXml = await _virtualHerbariumObservationService.GetLocalitiesAsync();
                 var localities = localitiesXml.ToLocalityDictionary();
 
-                var pageIndex = 1;
+                var pageIndex = 1990;
                 var nrSightingsHarvested = 0;
                 var fromDate = new DateTime(1628, 1, 1);
                 _logger.LogInformation($"Start getting observations page: { pageIndex }");
                 var observations = await _virtualHerbariumObservationService.GetAsync(fromDate, pageIndex, 10000);
                 _logger.LogInformation($"Finish getting observations page: { pageIndex }");
 
-                while (observations != null)
+                while (true)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     var verbatims = observations.ToVerbatims(localities)?.ToArray();
-                    nrSightingsHarvested += verbatims?.Count() ?? 0;
+                    
+                    if ((verbatims?.Length ?? 0) == 0)
+                    {
+                        break;
+                    }
+
+                    nrSightingsHarvested += verbatims.Count();
 
                     // Add sightings to MongoDb
                     await _virtualHerbariumObservationVerbatimRepository.AddManyAsync(verbatims);

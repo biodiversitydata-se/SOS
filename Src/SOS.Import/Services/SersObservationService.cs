@@ -29,7 +29,7 @@ namespace SOS.Import.Services
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<SersService.WebSpeciesObservation>> GetAsync(int getFromId)
+        public async Task<Tuple<long, IEnumerable<WebSpeciesObservation>>> GetAsync(long getFromId)
         {
             var result = await _speciesObservationChangeServiceClient.GetSpeciesObservationChangeAsSpeciesAsync(
                 _sersServiceConfiguration.Token,
@@ -43,7 +43,7 @@ namespace SOS.Import.Services
 
             _logger.LogDebug($"Getting (max { _sersServiceConfiguration.MaxReturnedChangesInOnePage }) observations from SERS Service: From id: { getFromId }, Created: {result.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result.DeletedSpeciesObservationGuids?.Length ?? 0}");
 
-            return result.CreatedSpeciesObservations;
+            return new Tuple<long, IEnumerable<WebSpeciesObservation>>(result.MaxChangeId, result.CreatedSpeciesObservations);
         }
     }
 }

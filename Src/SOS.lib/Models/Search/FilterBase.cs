@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.Search
 {
@@ -55,6 +56,11 @@ namespace SOS.Lib.Models.Search
         /// An negative observation is an observation that was expected to be found but wasn't.
         /// </summary>
         public bool? PositiveSightings { get; set; }
+
+        /// <summary>
+        /// Only get data from these providers
+        /// </summary>
+        public IEnumerable<ObservationProvider> Providers { get; set; }
 
         /// <summary>
         /// Provinces to match. Queryable values are available in Field Mappings.
