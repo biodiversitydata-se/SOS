@@ -82,7 +82,7 @@ namespace SOS.Import.UnitTests.Services
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Count().Should().Be(0);
+            result.Item2.Count().Should().Be(0);
         }
 
         /// <summary>

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nest;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Extensions
@@ -108,6 +107,16 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .Term(m => m.Field("occurrence.isPositiveObservation").Value(filter.PositiveSightings.Value)));
+            }
+
+            if (filter.Providers?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field("provider")
+                        .Terms(filter.Providers)
+                    )
+                );
             }
 
             if (filter.ProvinceIds?.Any() ?? false)

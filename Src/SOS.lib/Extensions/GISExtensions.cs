@@ -442,8 +442,8 @@ namespace SOS.Lib.Extensions
                     return new GeometryGeoJson
                         {
                             Coordinates = coordinates,
-                            Type = "Polygon"
-                        };
+                            Type = "MultiPolygon"
+                    };
                 default:
                     return null;
             }
