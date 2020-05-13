@@ -112,6 +112,36 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             harvestInfo.Status.Should().Be(RunStatus.Success);
         }
 
+        [Fact]
+        public async Task Harvest_SHARK_dwca()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/SHARK_Zooplankton_NAT_DwC-A.zip";
+            var datasetInfo = new DwcaDatasetInfo
+            {
+                DataProviderId = 103,
+                DataProviderIdentifier = "TestSHARK",
+                ArchiveFilename = System.IO.Path.GetFileName(archivePath)
+            };
+            var dwcObservationHarvester = CreateDwcObservationHarvester();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
+                archivePath,
+                datasetInfo,
+                JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            harvestInfo.Status.Should().Be(RunStatus.Success);
+        }
+
+
         private DwcObservationHarvester CreateDwcObservationHarvester()
         {
             var importConfiguration = GetImportConfiguration();

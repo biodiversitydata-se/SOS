@@ -301,5 +301,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [Object]
         public ProcessedTaxon Taxon { get; set; }
+
+        //public string VerbatimObservation { get; set; } // todo - this could be used to store the orginal verbatim observation.
     }
 }

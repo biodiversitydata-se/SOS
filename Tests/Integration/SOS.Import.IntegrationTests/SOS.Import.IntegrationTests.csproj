@@ -87,6 +87,9 @@
     <None Update="Resources\Dwca\SHARK_Zooplankton_NAT_DwC-A.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Dwca\SHARK_Zooplankton_NAT_DwC-A_with_subfolder.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\dyntaxa.custom.dwca.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

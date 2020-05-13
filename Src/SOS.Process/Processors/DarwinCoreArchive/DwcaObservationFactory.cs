@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using Nest;
 using NetTopologySuite.Geometries;
+using Newtonsoft.Json;
 using SOS.Lib.Constants;
 using SOS.Lib.DataStructures;
 using SOS.Lib.Enums;
@@ -84,6 +85,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             }
 
             var obs = new ProcessedObservation(ObservationProvider.Dwca);
+            //StoreVerbatimObservation(obs, verbatimObservation); // todo - this could be used to store the original verbatim observation
 
             // Other
             //obs.Id = verbatimObservation.Id;
@@ -191,6 +193,17 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             // obs.Event.Substrate = GetSosId(verbatimObservation?.Bioptope?.Id, _fieldMappings[FieldMappingFieldId.Substrate]);
 
             //return obs;
+        }
+
+        private static void StoreVerbatimObservation(ProcessedObservation obs, DwcObservationVerbatim verbatimObservation)
+        {
+            //obs.VerbatimObservation = JsonConvert.SerializeObject(
+            //    verbatimObservation,
+            //    Formatting.Indented,
+            //    new JsonSerializerSettings()
+            //    {
+            //        NullValueHandling = NullValueHandling.Ignore
+            //    });
         }
 
         private ProcessedOrganism CreateProcessedOrganism(DwcObservationVerbatim verbatimObservation)
