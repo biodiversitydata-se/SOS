@@ -92,7 +92,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processConfiguration.ProcessedDbConfiguration.DatabaseName,
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
             var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
-            return new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration());
+            return new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration() { LocalizationCultureCode = "sv-SE", ResolveValues = true });
         }
 
         public class CompareObservation
