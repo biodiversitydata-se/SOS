@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml;
-using CsvHelper;
-using CsvHelper.Configuration;
 using SOS.Export.Services.Interfaces;
 
 namespace SOS.Export.Services
@@ -39,7 +32,7 @@ namespace SOS.Export.Services
         /// <inheritdoc />
         public void DeleteFile(string path)
         {
-            if (File.Exists(path))
+            if (!string.IsNullOrEmpty(path) && File.Exists(path))
             {
                 File.Delete(path);
             }
@@ -48,7 +41,7 @@ namespace SOS.Export.Services
         /// <inheritdoc />
         public void DeleteFolder(string path)
         {
-            if (Directory.Exists(path))
+            if (string.IsNullOrEmpty(path) && Directory.Exists(path))
             {
                 Directory.Delete(path, true);
             }

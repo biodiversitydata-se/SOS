@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,8 +19,6 @@ namespace SOS.Import.Services
         /// Disposed
         /// </summary>
         private bool _disposed;
-
-        private readonly HttpClient _httpClient; 
         private readonly ILogger<HttpClientService> _logger;
         
         /// <summary>
@@ -30,8 +27,26 @@ namespace SOS.Import.Services
         /// <param name="logger"></param>
         public HttpClientService(ILogger<HttpClientService> logger)
         {
-            _httpClient = new HttpClient();
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        private HttpClient GetClient(Dictionary<string, string> headerData = null)
+        {
+            var httpClient = new HttpClient
+            {
+                Timeout = TimeSpan.FromMinutes(30),
+                DefaultRequestHeaders = { }
+            };
+
+            if (headerData?.Any() ?? false)
+            {
+                foreach (var data in headerData)
+                {
+                    httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
+                }
+            }
+
+            return httpClient;
         }
 
         /// <summary>
@@ -47,7 +62,6 @@ namespace SOS.Import.Services
 
             if (disposing)
             {
-                _httpClient.Dispose();
             }
 
             _disposed = true;
@@ -74,20 +88,10 @@ namespace SOS.Import.Services
             var attempts = 0;
             while (attempts < 3)
             {
+                var httpClient = GetClient(headerData);
                 try
                 {
-                    _httpClient.Timeout = TimeSpan.FromMinutes(30);
-                    _httpClient.DefaultRequestHeaders.Clear();
-
-                    if (headerData?.Any() ?? false)
-                    {
-                        foreach (var data in headerData)
-                        {
-                            _httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
-                        }
-                    }
-
-                    var httpResponseMessage = await _httpClient.GetAsync(requestUri);
+                    var httpResponseMessage = await httpClient.GetAsync(requestUri);
                     var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<T>(jsonString);
 
@@ -99,6 +103,10 @@ namespace SOS.Import.Services
                     Thread.Sleep(1000);
                     attempts++;
                 }
+                finally
+                {
+                    httpClient.Dispose();
+                }
             }
             return default(T);
         }
@@ -106,17 +114,9 @@ namespace SOS.Import.Services
         /// <inheritdoc />
         public async Task<Stream> GetFileStreamAsync(Uri requestUri, Dictionary<string, string> headerData = null)
         {
-            _httpClient.DefaultRequestHeaders.Clear();
+            var httpClient = GetClient(headerData);
 
-            if (headerData?.Any() ?? false)
-            {
-                foreach (var data in headerData)
-                {
-                    _httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
-                }
-            }
-            
-            var response = await _httpClient.GetAsync(requestUri);
+            var response = await httpClient.GetAsync(requestUri);
             return response.StatusCode == HttpStatusCode.OK ? await response.Content.ReadAsStreamAsync() : null;
         }
 
@@ -132,20 +132,10 @@ namespace SOS.Import.Services
             var attempts = 0;
             while (attempts < 3)
             {
+                var httpClient = GetClient(headerData);
                 try
                 {
-                    _httpClient.Timeout = TimeSpan.FromMinutes(30);
-                    _httpClient.DefaultRequestHeaders.Clear();
-
-                    if (headerData?.Any() ?? false)
-                    {
-                        foreach (var data in headerData)
-                        {
-                            _httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
-                        }
-                    }
-
-                    var httpResponseMessage = await _httpClient.PostAsync(requestUri, new JsonContent(model));
+                    var httpResponseMessage = await httpClient.PostAsync(requestUri, new JsonContent(model));
                     var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
 
                     return JsonConvert.DeserializeObject<T>(jsonString);
@@ -163,6 +153,10 @@ namespace SOS.Import.Services
                     Thread.Sleep(1000);
                     attempts++;
                 }
+                finally
+                {
+                    httpClient.Dispose();
+                }
             }
 
             return default(T);
@@ -174,12 +168,10 @@ namespace SOS.Import.Services
             var attempts = 0;
             while (attempts < 3)
             {
+                var httpClient = GetClient();
                 try
                 {
-                    _httpClient.Timeout = TimeSpan.FromMinutes(30);
-                    _httpClient.DefaultRequestHeaders.Clear();
-
-                    var httpResponseMessage = await _httpClient.PutAsync(requestUri, new JsonContent(model));
+                    var httpResponseMessage = await httpClient.PutAsync(requestUri, new JsonContent(model));
                     var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<T>(jsonString);
                 }
@@ -189,6 +181,10 @@ namespace SOS.Import.Services
 
                     Thread.Sleep(1000);
                     attempts++;
+                }
+                finally
+                {
+                    httpClient.Dispose();
                 }
             }
 
@@ -198,15 +194,14 @@ namespace SOS.Import.Services
         /// <inheritdoc />
         public async Task<T> DeleteDataAsync<T>(Uri requestUri)
         {
+           
             var attempts = 0;
             while (attempts < 3)
             {
+                var httpClient = GetClient();
                 try
                 {
-                    _httpClient.Timeout = TimeSpan.FromMinutes(30);
-                    _httpClient.DefaultRequestHeaders.Clear();
-
-                    var httpResponseMessage = await _httpClient.DeleteAsync(requestUri);
+                    var httpResponseMessage = await httpClient.DeleteAsync(requestUri);
                     var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<T>(jsonString);
 
@@ -217,6 +212,10 @@ namespace SOS.Import.Services
 
                     Thread.Sleep(1000);
                     attempts++;
+                }
+                finally
+                {
+                    httpClient.Dispose();
                 }
             }
 

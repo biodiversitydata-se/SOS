@@ -108,8 +108,8 @@ namespace SOS.Process.Processors.Nors
         /// <returns>The Catalog Number.</returns>
         private string GetCatalogNumber(string occurrenceId)
         {
-            int pos = occurrenceId.LastIndexOf(":", StringComparison.Ordinal);
-            return occurrenceId.Substring(pos + 1);
+            var pos = occurrenceId?.LastIndexOf(":", StringComparison.Ordinal) ?? -1;
+            return pos == -1 ? null : occurrenceId?.Substring(pos + 1);
         }
 
         /// <summary>

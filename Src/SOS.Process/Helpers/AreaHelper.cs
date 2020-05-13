@@ -27,7 +27,6 @@ namespace SOS.Process.Helpers
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly STRtree<IFeature> _strTree;
         private readonly IDictionary<string, PositionLocation> _featureCache;
-        private IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappingsByFeatureId;
         private IDictionary<FieldMappingFieldId, Dictionary<int, FieldMappingValue>> _fieldMappingValueById;
         private const string CacheFileName = "positionAreas.json";
 
@@ -66,7 +65,7 @@ namespace SOS.Process.Helpers
         {
             // Get field mappings
             var fieldMappings = (await _processedFieldMappingRepository.GetAllAsync()).ToArray();
-            _fieldMappingsByFeatureId = GetGeoRegionFieldMappingDictionaries(fieldMappings);
+    
             _fieldMappingValueById = fieldMappings.ToDictionary(m => m.Id,
                 m => m.Values.ToDictionary(v => v.Id, v => v));
 
@@ -153,13 +152,17 @@ namespace SOS.Process.Helpers
                 {
                     foreach (var feature in features)
                     {
+                        int.TryParse(feature.Attributes.GetOptionalValue("id").ToString(), out var id);
+                        int.TryParse(feature.Attributes.GetOptionalValue("featureId").ToString(), out var featureId);
+                        Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(), out var areaType);
+                        
                         var area = new ProcessedArea
                         {
-                            Id = (int) feature.Attributes.GetOptionalValue("id"),
-                            FeatureId = (int) feature.Attributes.GetOptionalValue("featureId"),
+                            Id = id,
+                            FeatureId = featureId,
                             Name = (string) feature.Attributes.GetOptionalValue("name")
                         };
-                        switch ((AreaType) feature.Attributes.GetOptionalValue("areaType"))
+                        switch ((AreaType)areaType)
                         {
                             case AreaType.County:
                                 positionLocation.County = area;
@@ -180,7 +183,10 @@ namespace SOS.Process.Helpers
                     }
                 }
 
-                _featureCache.Add(key, positionLocation);
+                if (!_featureCache.ContainsKey(key))
+                {
+                    _featureCache.Add(key, positionLocation);
+                }
             }
 
             return positionLocation;

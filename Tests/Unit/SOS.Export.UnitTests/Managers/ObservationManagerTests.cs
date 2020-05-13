@@ -160,7 +160,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <returns></returns>
         [Fact]
         [Trait("Category", "Unit")]
-        public async Task ExportAllAsyncSuccess()
+        public async Task ExportAndStoreAsyncSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -187,7 +187,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAllAsync(JobCancellationToken.Null);
+            var result = await TestObject.ExportAndStoreAsync(null,It.IsAny<string>(), It.IsAny<string>(), JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -201,7 +201,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <returns></returns>
         [Fact]
         [Trait("Category", "Unit")]
-        public async Task ExportAllAsyncFail()
+        public async Task ExportAndStoreAsyncFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -228,7 +228,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAllAsync(JobCancellationToken.Null);
+            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -242,7 +242,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <returns></returns>
         [Fact]
         [Trait("Category", "Unit")]
-        public async Task ExportAllAsyncThrows()
+        public async Task ExportAndStoreAsyncThrows()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -253,7 +253,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAllAsync(JobCancellationToken.Null);
+            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -267,7 +267,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <returns></returns>
         [Fact]
         [Trait("Category", "Unit")]
-        public async Task ExportDWCAsyncSuccess()
+        public async Task ExportAndSendAsyncSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -291,7 +291,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
+            var result = await TestObject.ExportAndSendAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -305,7 +305,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <returns></returns>
         [Fact]
         [Trait("Category", "Unit")]
-        public async Task ExportDWCAsyncFail()
+        public async Task ExportAndSendAsyncFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -329,7 +329,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-             var result = await TestObject.ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
+             var result = await TestObject.ExportAndSendAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -343,7 +343,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <returns></returns>
         [Fact]
         [Trait("Category", "Unit")]
-        public async Task ExportDWCAsyncThrows()
+        public async Task ExportAndSendAsyncThrows()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -354,7 +354,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
+            var result = await TestObject.ExportAndSendAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

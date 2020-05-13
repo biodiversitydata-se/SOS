@@ -40,6 +40,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// <returns></returns>
         public ProcessedObservation CreateProcessedObservation(VirtualHerbariumObservationVerbatim verbatim)
         {
+            
             Point wgs84Point = null;
             if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
             {
@@ -59,7 +60,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
             {
                 defects.Add("DateCollected", verbatim.DateCollected);
             }
-            
+
             var obs = new ProcessedObservation(ObservationProvider.VirtualHerbarium)
             {
                 BasisOfRecord = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
@@ -86,7 +87,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Continent = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
                     Country = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
-                    Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
+                    Point = (PointGeoShape)wgs84Point?.ToGeoShape(),
                     PointLocation = wgs84Point?.ToGeoLocation(),
                     PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatim.CoordinatePrecision)?.ToGeoShape(),
                     VerbatimLatitude = verbatim.DecimalLatitude,

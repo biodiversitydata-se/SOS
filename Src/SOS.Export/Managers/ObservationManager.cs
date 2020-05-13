@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive.Interfaces;
-using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
@@ -60,11 +59,17 @@ namespace SOS.Export.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private async Task<string> CreateDWCExportAsync(ExportFilter filter, IJobCancellationToken cancellationToken)
+        /// <summary>
+        /// Create a Darwin Core Archive file
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="fileName"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>Path to created file</returns>
+        private async Task<string> CreateDWCExportAsync(ExportFilter filter, string fileName, IJobCancellationToken cancellationToken)
         {
             try
             {
-                var fileName = Guid.NewGuid().ToString();
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.CollectionName);
                 
                 var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
@@ -91,67 +96,50 @@ namespace SOS.Export.Managers
             }
         }
 
-        /// <inheritdoc />
-        public async Task<bool> ExportAllAsync(IJobCancellationToken cancellationToken)
-        {
-            return await ExportAllAsync(
-                FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
-                cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> ExportAllAsync(
-            IEnumerable<FieldDescription> fieldDescriptions,
-            IJobCancellationToken cancellationToken)
-        {
-            return await ExportDWCAsync(new ExportFilter(), cancellationToken);
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> ExportDWCAsync(ExportFilter filter, IJobCancellationToken cancellationToken)
-        {
-            var zipFilePath = "";
-            try
-            {
-                zipFilePath = await CreateDWCExportAsync(filter, cancellationToken);
-
-                // Make sure container exists
-                var container = $"sos-{DateTime.Now.Year}";
-                await _blobStorageService.CreateContainerAsync(container);
-
-                // Upload file to blob storage
-                return await _blobStorageService.UploadBlobAsync(zipFilePath, container);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to export sightings");
-                return false;
-            }
-            finally
-            {
-                // Remove local file
-                _fileService.DeleteFile(zipFilePath);
-            }
-        }
-
-        public async Task<bool> ExportDWCAsync(ExportFilter filter, string emailAddress,
+        public async Task<bool> ExportAndSendAsync(ExportFilter filter, string emailAddress,
             IJobCancellationToken cancellationToken)
         {
             var zipFilePath = "";
             try
             {
-                zipFilePath = await CreateDWCExportAsync(filter, cancellationToken);
+                zipFilePath = await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken);
 
                 // zend file to user
                 return await _zendToService.SendFile(emailAddress, JsonConvert.SerializeObject(filter), zipFilePath);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to export sightings");
+                _logger.LogError(e, "Failed to export and send sightings");
                 return false;
             }
             finally
             {
+                _fileService.DeleteFile(zipFilePath);
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName, IJobCancellationToken cancellationToken)
+        {
+            var zipFilePath = "";
+            try
+            {
+                zipFilePath = await CreateDWCExportAsync(filter, fileName, cancellationToken);
+
+                // Make sure container exists
+                await _blobStorageService.CreateContainerAsync(blobStorageContainer);
+
+                // Upload file to blob storage
+                return await _blobStorageService.UploadBlobAsync(zipFilePath, blobStorageContainer);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export and store sightings");
+                return false;
+            }
+            finally
+            {
+                // Remove local file
                 _fileService.DeleteFile(zipFilePath);
             }
         }

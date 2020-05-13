@@ -11,10 +11,10 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <summary>
         /// Request of a Darwin Core Archive file with observations based on provided filter 
         /// </summary>
-        /// <param name="filter">Filter criteria used to limit observations returned</param>
-        /// <param name="email">Email address used to inform you when the file is ready to pick up</param>
-        /// <returns>Job id that can be used to see current status of the file creation process</returns>
-        IActionResult RunExportJob(ExportFilter filter, string email);
+        /// <param name="filter"></param>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        IActionResult RunExportAndSendJob([FromBody] ExportFilter filter, [FromQuery] string email);
 
         /// <summary>
         /// Get status of export job

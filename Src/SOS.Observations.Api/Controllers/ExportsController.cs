@@ -32,23 +32,22 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunExportJob([FromBody]ExportFilter filter, [FromQuery]string email)
+        public IActionResult RunExportAndSendJob([FromBody]ExportFilter filter, [FromQuery]string email)
         {
             try
             {
-                var emailRegex = new Regex(@"^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
-
                 if (string.IsNullOrEmpty(email))
                 {
                     return BadRequest("You must provide a e-mail address");
                 }
 
+                var emailRegex = new Regex(@"^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
                 if (!emailRegex.IsMatch(email))
                 {
                     return BadRequest("Not a valid e-mail");
                 }
 
-                return new OkObjectResult(BackgroundJob.Enqueue<IExportJob>(job => job.RunAsync(filter, email, JobCancellationToken.Null)));
+                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job => job.RunAsync(filter, email, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {

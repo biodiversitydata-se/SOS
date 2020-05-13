@@ -304,8 +304,10 @@ namespace SOS.Process.Jobs
                 // If some task/s failed and it was not Artportalen, Try to copy provider data from active instance
                 if (!success
                     && copyFromActiveOnFail
-                    && processTasks.ContainsKey(ObservationProvider.Artportalen)
-                    && processTasks[ObservationProvider.Artportalen].Result.Status == RunStatus.Success)
+                    && (
+                        !processTasks.ContainsKey(ObservationProvider.Artportalen) 
+                        || processTasks[ObservationProvider.Artportalen].Result.Status == RunStatus.Success)
+                    )
                 {
                     var copyTasks = processTasks
                         .Where(t => t.Value.Result.Status == RunStatus.Failed)

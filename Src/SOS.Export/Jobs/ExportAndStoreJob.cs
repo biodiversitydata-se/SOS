@@ -12,37 +12,37 @@ namespace SOS.Export.Jobs
     /// <summary>
     /// Artportalen harvest
     /// </summary>
-    public class ExportJob : IExportJob
+    public class ExportAndStoreJob : IExportAndStoreJob
     {
         private readonly IObservationManager _observationManager;
-        private readonly ILogger<ExportJob> _logger;
+        private readonly ILogger<ExportAndStoreJob> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="logger"></param>
-        public ExportJob(IObservationManager observationManager, ILogger<ExportJob> logger)
+        public ExportAndStoreJob(IObservationManager observationManager, ILogger<ExportAndStoreJob> logger)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(ExportFilter filter, string email, IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(ExportFilter filter, string blobStorageContainer, string fileName, IJobCancellationToken cancellationToken)
         {
             try
             {
-                _logger.LogInformation("Start export job");
-                var success = await _observationManager.ExportDWCAsync(filter, email, cancellationToken);
+                _logger.LogInformation("Start export and store job");
+                var success = await _observationManager.ExportAndStoreAsync(filter, blobStorageContainer, fileName, cancellationToken);
 
-                _logger.LogInformation($"End export job. Success: {success}");
+                _logger.LogInformation($"End export and store job. Success: {success}");
                 
-                return success ? true : throw new Exception("Export Job failed");
+                return success ? true : throw new Exception("Export and store job failed");
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation("Export job was cancelled.");
+                _logger.LogInformation("Export and store job was cancelled.");
                 return false;
             }
         }
