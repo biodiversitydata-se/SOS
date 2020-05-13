@@ -153,14 +153,13 @@ namespace SOS.Process.Helpers
                     foreach (var feature in features)
                     {
                         int.TryParse(feature.Attributes.GetOptionalValue("id").ToString(), out var id);
-                        int.TryParse(feature.Attributes.GetOptionalValue("featureId").ToString(), out var featureId);
                         Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(), out var areaType);
                         
                         var area = new ProcessedArea
                         {
                             Id = id,
-                            FeatureId = featureId,
-                            Name = (string) feature.Attributes.GetOptionalValue("name")
+                            FeatureId = feature.Attributes.GetOptionalValue("featureId")?.ToString(),
+                            Name = feature.Attributes.GetOptionalValue("name")?.ToString()
                         };
                         switch ((AreaType)areaType)
                         {
