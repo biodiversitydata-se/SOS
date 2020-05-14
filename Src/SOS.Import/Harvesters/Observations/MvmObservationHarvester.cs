@@ -69,11 +69,11 @@ namespace SOS.Import.Harvesters.Observations
                 var nrSightingsHarvested = 0;
                 var result = await _mvmObservationService.GetAsync(0);
                 var maxId = result?.Item1 ?? 0;
-                var sightings = result?.Item2;
-
+                
                 // Loop until all sightings are fetched.
-                while (sightings?.Any() ?? false)
+                while (maxId != 0)
                 {
+                    var sightings = result?.Item2;
                     cancellationToken?.ThrowIfCancellationRequested();
                     
                     var aggregates = sightings.ToVerbatims().ToArray();
@@ -85,12 +85,11 @@ namespace SOS.Import.Harvesters.Observations
                     if (_mvmServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         nrSightingsHarvested >= _mvmServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
-                        break;
+                      //  break;
                     }
 
-                    result = await _mvmObservationService.GetAsync(maxId);
+                    result = await _mvmObservationService.GetAsync(maxId + 1);
                     maxId = result?.Item1 ?? 0;
-                    sightings = result.Item2;
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for MVM data provider");

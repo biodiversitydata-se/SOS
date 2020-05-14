@@ -27,7 +27,7 @@ namespace SOS.Import.Extensions
             observation.ReportedBy = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.ReportedBy)?.Value;
             observation.Modified = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.Modified)?.Value;
             observation.Owner = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.Owner)?.Value;
-            observation.IndividualId = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.OccurrenceID)?.Value;
+            observation.IndividualId = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.IndividualID)?.Value;
             observation.RecordedBy = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.RecordedBy)?.Value;
             observation.OccurrenceId = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.OccurrenceID)?.Value;
             observation.DecimalLongitude = entity.Fields.First(p => p.Property.Id == SersService.SpeciesObservationPropertyId.DecimalLongitude).Value.WebParseDouble();
