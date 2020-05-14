@@ -55,13 +55,17 @@ namespace SOS.Process.Processors.VirtualHerbarium
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
+                
                 var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
+
                 observations.Add(processedObservation);
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+
                     verbatimCount += await CommitBatchAsync(observations);
+
                     observations.Clear();
                     Logger.LogDebug($"Virtual Herbarium Sightings processed: {verbatimCount}");
                 }

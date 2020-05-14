@@ -9,21 +9,24 @@ namespace SOS.Administration.Api.Controllers.Interfaces
     public interface IExportJobController
     {
         /// <summary>
-        /// Run export job
+        ///  Run export job
         /// </summary>
         /// <param name="filter"></param>
-        /// <param name="email"></param>
+        /// <param name="blobStorageContainer"></param>
+        /// <param name="fileName"></param>
         /// <returns></returns>
-        IActionResult RunDarwinCoreExportJob(ExportFilter filter, string email);
+        IActionResult RunExportAndStoreJob([FromBody]ExportFilter filter, [FromQuery]string blobStorageContainer, [FromQuery]string fileName);
 
         /// <summary>
         /// Schedule daily export job
         /// </summary>
         /// <param name="filter"></param>
-        /// <param name="email"></param>
+        /// <param name="blobStorageContainer"></param>
+        /// <param name="fileName"></param>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult ScheduleDailyDarwinCoreExportJob(ExportFilter filter, string email, int hour, int minute);
+        IActionResult ScheduleDailyExportAndStoreJob(ExportFilter filter, string blobStorageContainer, string fileName,
+            int hour, int minute);
     }
 }

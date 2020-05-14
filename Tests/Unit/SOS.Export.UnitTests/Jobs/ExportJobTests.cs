@@ -14,25 +14,25 @@ namespace SOS.Export.UnitTests.Jobs
     /// <summary>
     /// Tests for observation manager
     /// </summary>
-    public class ExportJobTests
+    public class ExportAndSendJobTests
     {
         private readonly Mock<IObservationManager> _observationManager;
-        private readonly Mock<ILogger<ExportJob>> _loggerMock;
+        private readonly Mock<ILogger<ExportAndSendJob>> _loggerMock;
 
         /// <summary>
         /// Return object to be tested
         /// </summary>
-        private ExportJob TestObject => new ExportJob(
+        private ExportAndSendJob TestObject => new ExportAndSendJob(
             _observationManager.Object,
             _loggerMock.Object);
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public ExportJobTests()
+        public ExportAndSendJobTests()
         {
             _observationManager = new Mock<IObservationManager>();
-            _loggerMock = new Mock<ILogger<ExportJob>>();
+            _loggerMock = new Mock<ILogger<ExportAndSendJob>>();
         }
 
         /// <summary>
@@ -44,12 +44,12 @@ namespace SOS.Export.UnitTests.Jobs
         {
             TestObject.Should().NotBeNull();
 
-            Action create = () => new ExportJob(
+            Action create = () => new ExportAndSendJob(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("observationManager");
 
-            create = () => new ExportJob(
+            create = () => new ExportAndSendJob(
                 _observationManager.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
@@ -68,7 +68,7 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             _observationManager
                 .Setup(blss => blss
-                    .ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null)
+                    .ExportAndSendAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null)
                 )
                 .ReturnsAsync(true);
 
@@ -99,7 +99,7 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             _observationManager
                 .Setup(blss => blss
-                    .ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null)
+                    .ExportAndSendAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null)
                 )
                 .ReturnsAsync(false);
 
@@ -125,7 +125,7 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             _observationManager
                 .Setup(blss => blss
-                    .ExportDWCAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null)
+                    .ExportAndSendAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null)
                 )
                 .Throws(new Exception());
 

@@ -31,7 +31,7 @@ namespace SOS.Export.IntegrationTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            bool result = await observationManager.ExportAllAsync(JobCancellationToken.Null);
+            bool result = await observationManager.ExportAndStoreAsync(null, "Test", "all", JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

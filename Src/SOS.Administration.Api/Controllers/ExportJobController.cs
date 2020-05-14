@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Text.RegularExpressions;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -32,23 +31,21 @@ namespace SOS.Administration.Api.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunDarwinCoreExportJob([FromBody]ExportFilter filter, [FromQuery]string email)
+        public IActionResult RunExportAndStoreJob([FromBody]ExportFilter filter, [FromQuery]string blobStorageContainer, [FromQuery]string fileName)
         {
             try
             {
-                var emailRegex = new Regex(@"^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
-
-                if (string.IsNullOrEmpty(email))
+                if (string.IsNullOrEmpty(blobStorageContainer))
                 {
-                    return BadRequest("You must provide a e-mail address");
+                    return BadRequest("You must provide a container");
                 }
 
-                if (!emailRegex.IsMatch(email))
+                if (string.IsNullOrEmpty(fileName))
                 {
-                    return BadRequest("Not a valid e-mail");
+                    return BadRequest("You must provide a file name");
                 }
 
-                return new OkObjectResult(BackgroundJob.Enqueue<IExportJob>(job => job.RunAsync(filter, email, JobCancellationToken.Null)));
+                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndStoreJob>(job => job.RunAsync(filter, blobStorageContainer, fileName, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
@@ -57,18 +54,25 @@ namespace SOS.Administration.Api.Controllers
             }
         }
 
-
-
         /// <inheritdoc />
         [HttpPost("DarwinCore/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult ScheduleDailyDarwinCoreExportJob([FromBody]ExportFilter filter, [FromQuery]string email, [FromQuery]int hour, [FromQuery]int minute)
+        public IActionResult ScheduleDailyExportAndStoreJob([FromBody]ExportFilter filter, [FromQuery]string blobStorageContainer, [FromQuery]string fileName, [FromQuery]int hour, [FromQuery]int minute)
         {
             try
             {
+                if (string.IsNullOrEmpty(blobStorageContainer))
+                {
+                    return BadRequest("You must provide a container");
+                }
 
-                RecurringJob.AddOrUpdate<IExportJob>(nameof(IExportJob), job => job.RunAsync(filter, email, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    return BadRequest("You must provide a file name");
+                }
+
+                RecurringJob.AddOrUpdate<IExportAndStoreJob>(nameof(IExportAndStoreJob), job => job.RunAsync(filter, blobStorageContainer, fileName, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult($"Export Darwin Core Job Scheduled.");
             }
             catch (Exception e)

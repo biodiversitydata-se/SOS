@@ -29,9 +29,9 @@ namespace SOS.Import.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<IEnumerable<WebSpeciesObservation>> GetAsync(int getFromId)
+        public async Task<Tuple<long, IEnumerable<WebSpeciesObservation>>> GetAsync(long getFromId)
         {
-            var result = await _speciesObservationChangeServiceClient.GetSpeciesObservationChangeAsSpeciesAsync(new GetSpeciesObservationChangeAsSpeciesRequest() 
+            var response = await _speciesObservationChangeServiceClient.GetSpeciesObservationChangeAsSpeciesAsync(new GetSpeciesObservationChangeAsSpeciesRequest
                 { 
                     token = _mvmServiceConfiguration.Token,
                     changedFrom = DateTime.MinValue,
@@ -44,9 +44,10 @@ namespace SOS.Import.Services
                 }
             );
 
-            _logger.LogDebug($"Getting observations from MVM Service: From id: { getFromId }, Created: {result.GetSpeciesObservationChangeAsSpeciesResult?.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result.GetSpeciesObservationChangeAsSpeciesResult?.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result.GetSpeciesObservationChangeAsSpeciesResult?.DeletedSpeciesObservationGuids?.Length ?? 0}");
-            
-            return  result.GetSpeciesObservationChangeAsSpeciesResult.CreatedSpeciesObservations;            
+            var result = response?.GetSpeciesObservationChangeAsSpeciesResult;
+
+            _logger.LogDebug($"Getting observations from MVM Service: From id: { getFromId }, Created: {result?.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result?.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result?.DeletedSpeciesObservationGuids?.Length ?? 0}");
+            return new Tuple<long, IEnumerable<WebSpeciesObservation>>(result.MaxChangeId, result.CreatedSpeciesObservations);
         }
     }
 }

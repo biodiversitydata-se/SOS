@@ -7,15 +7,16 @@ namespace SOS.Lib.Jobs.Export
     /// <summary>
     /// Interface for DOI export job
     /// </summary>
-    public interface IExportJob
+    public interface IExportAndStoreJob
     {
         /// <summary>
-        /// Run DOI export job
+        /// Export a file and store it in blob storage
         /// </summary>
         /// <param name="filter"></param>
-        /// <param name="email"></param>
+        /// <param name="blobStorageContainer"></param>
+        /// <param name="fileName"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> RunAsync(ExportFilter filter, string email, IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(ExportFilter filter, string blobStorageContainer, string fileName, IJobCancellationToken cancellationToken);
     }
 }

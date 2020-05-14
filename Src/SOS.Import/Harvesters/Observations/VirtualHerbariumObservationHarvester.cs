@@ -59,7 +59,7 @@ namespace SOS.Import.Harvesters.Observations
                 var localitiesXml = await _virtualHerbariumObservationService.GetLocalitiesAsync();
                 var localities = localitiesXml.ToLocalityDictionary();
 
-                var pageIndex = 1990;
+                var pageIndex = 1;
                 var nrSightingsHarvested = 0;
                 var fromDate = new DateTime(1628, 1, 1);
                 _logger.LogInformation($"Start getting observations page: { pageIndex }");

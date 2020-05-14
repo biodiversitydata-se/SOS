@@ -79,11 +79,6 @@ namespace SOS.Export.Repositories
         /// <inheritdoc />
         public async Task<ScrollResult<ProcessedObservation>> ScrollObservationsAsync(FilterBase filter, string scrollId)
         {
-            if (!filter?.IsFilterActive ?? true)
-            {
-                return null;
-            }
-
             ISearchResponse<dynamic> searchResponse;
             if (string.IsNullOrEmpty(scrollId))
             {
@@ -94,16 +89,15 @@ namespace SOS.Export.Repositories
                         .Field("location.pointWithBuffer")
                     );
 
-
                 searchResponse = await _elasticClient
                     .SearchAsync<dynamic>(s => s
                         .Index(CollectionName.ToLower())
                         .Source(p => projection)
-                        .Query(q => q
+                       /* .Query(q => q
                             .Bool(b => b
                                 .Filter(filter.ToQuery())
                             )
-                        )
+                        )*/
                         .Scroll(ScrollTimeOut)
                         .Size(_batchSize)
                     );
