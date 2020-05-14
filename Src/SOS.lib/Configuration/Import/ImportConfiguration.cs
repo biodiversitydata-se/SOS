@@ -23,6 +23,11 @@ namespace SOS.Lib.Configuration.Import
         public MongoDbConfiguration VerbatimDbConfiguration { get; set; }
 
         /// <summary>
+        /// Resource db
+        /// </summary>
+        public MongoDbConfiguration ResourceDbConfiguration { get; set; }
+
+        /// <summary>
         /// KUL Service/repository configuration.
         /// </summary>
         public KulServiceConfiguration KulServiceConfiguration { get; set; }

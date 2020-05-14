@@ -27,19 +27,21 @@ namespace SOS.Observations.Api.IoC.Modules
             var processClient = new ProcessClient(processedSettings, MongoDbConfiguration.DatabaseName, MongoDbConfiguration.BatchSize);
             builder.RegisterInstance(processClient).As<IProcessClient>().SingleInstance();
 
-            // Add factories
+            // Add managers
             builder.RegisterType<ObservationManager>().As<IObservationManager>().SingleInstance(); // InstancePerLifetimeScope?
             builder.RegisterType<ProcessInfoManager>().As<IProcessInfoManager>().SingleInstance(); // InstancePerLifetimeScope
 			builder.RegisterType<AreaManager>().As<IAreaManager>().SingleInstance(); // InstancePerLifetimeScope
             builder.RegisterType<TaxonManager>().As<ITaxonManager>().SingleInstance();
             builder.RegisterType<FieldMappingManager>().As<IFieldMappingManager>().SingleInstance();
+            builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().SingleInstance();
 
-            // Repositories mongo
+            // Add repositories
             builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>().SingleInstance();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().SingleInstance();
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().SingleInstance();
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().SingleInstance();
             builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>().SingleInstance();
+            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().SingleInstance();
         }
     }
 }

@@ -19,11 +19,18 @@ namespace SOS.Lib.Models.Verbatim.Shared
         [JsonConverter(typeof(StringEnumConverter))]
         public DataSet DataType { get; set; }
         public string Name { get; set; }
+        public string SwedishName { get; set; }
         public string Organization { get; set; }
+        public string SwedishOrganization { get; set; }
         public string Description { get; set; }
+        public string SwedishDescription { get; set; }
         public string Url { get; set; }
         public string ContactPerson { get; set; }
         public string ContactEmail { get; set; }
+        public string DownloadUrl { get; set; }
+        //public bool IncludeInSearchByDefault { get; set; }
+        //public bool ActiveHarvesting { get; set; }
+
         [JsonIgnore]
         public int PublicObservations { get; set; }
         [JsonIgnore]

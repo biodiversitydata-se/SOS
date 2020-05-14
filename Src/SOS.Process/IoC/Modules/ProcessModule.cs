@@ -95,13 +95,15 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ArtportalenObservationProcessor>().As<IArtportalenObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<DwcaObservationProcessor>().As<IDwcaObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<ClamPortalObservationProcessor>().As<IClamPortalObservationProcessor>().InstancePerLifetimeScope();
-            builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationProcessor>().As<IKulObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<MvmObservationProcessor>().As<IMvmObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationProcessor>().As<INorsObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationProcessor>().As<ISersObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationProcessor>().As<ISharkObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationProcessor>().As<IVirtualHerbariumObservationProcessor>().InstancePerLifetimeScope();
+
+            // Add managers
+            builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ActivateInstanceJob>().As<IActivateInstanceJob>().InstancePerLifetimeScope();

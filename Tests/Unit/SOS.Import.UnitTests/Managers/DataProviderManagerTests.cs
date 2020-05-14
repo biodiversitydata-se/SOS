@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Managers;
 using SOS.Import.Repositories.Destination.Interfaces;
+using SOS.Import.Repositories.Resource.Interfaces;
 using SOS.Lib.Models.Verbatim.Shared;
 using Xunit;
 
@@ -12,7 +13,7 @@ namespace SOS.Import.UnitTests.Managers
 {
     public class DataProviderManagerTests
     {
-        private readonly Mock<IDataProviderRepostitory> _dataProviderRepositoryMock;
+        private readonly Mock<IDataProviderRepository> _dataProviderRepositoryMock;
         private readonly Mock<ILogger<DataProviderManager>> _loggerMock;
 
         private DataProviderManager TestObject => new DataProviderManager(
@@ -24,7 +25,7 @@ namespace SOS.Import.UnitTests.Managers
         /// </summary>
         public DataProviderManagerTests()
         {
-            _dataProviderRepositoryMock = new Mock<IDataProviderRepostitory>();
+            _dataProviderRepositoryMock = new Mock<IDataProviderRepository>();
             _loggerMock = new Mock<ILogger<DataProviderManager>>();
         }
 

@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Process.Repositories.Destination.Interfaces
+namespace SOS.Import.Repositories.Resource.Interfaces
 {
     /// <summary>
     /// Processed data class
     /// </summary>
-    public interface IProcessBaseRepository<TEntity, in TKey> : IDisposable where TEntity : IEntity<TKey>
+    public interface IResourceRepositoryBase<TEntity, in TKey> : IDisposable where TEntity : IEntity<TKey>
     {
         /// <summary>
         /// Get 0 or 1 depending of witch instance to update
@@ -62,6 +62,19 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         Task<bool> AddOrUpdateAsync(TEntity item);
 
         int BatchSize { get; }
+
+        /// <summary>
+        /// Checks if the collection exists.
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> CheckIfCollectionExistsAsync();
+
+        /// <summary>
+        /// Checks if the specified collection exists.
+        /// </summary>
+        /// <param name="collectionName"></param>
+        /// <returns></returns>
+        Task<bool> CheckIfCollectionExistsAsync(string collectionName);
 
         /// <summary>
         /// Remove
