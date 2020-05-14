@@ -70,6 +70,7 @@ namespace SOS.Import.Harvesters.Observations
                 var result = await _norsObservationService.GetAsync(0);
                 var maxId = result?.Item1 ?? 0;
                 var sightings = result?.Item2;
+
                 // Loop until all sightings are fetched.
                 while (sightings?.Any() ?? false)
                 {

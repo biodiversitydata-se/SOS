@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -68,7 +67,9 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogInformation("Finish empty collection for MVM verbatim collection");
 
                 var nrSightingsHarvested = 0;
-                var sightings = await _mvmObservationService.GetAsync(0);
+                var result = await _mvmObservationService.GetAsync(0);
+                var maxId = result?.Item1 ?? 0;
+                var sightings = result?.Item2;
 
                 // Loop until all sightings are fetched.
                 while (sightings?.Any() ?? false)
@@ -87,10 +88,9 @@ namespace SOS.Import.Harvesters.Observations
                         break;
                     }
 
-                    var regex = new Regex(@"\d+$");
-
-                    var maxId = aggregates.Select(a => int.Parse(regex.Match(a.IndividualId).Value)).Max();
-                    sightings = await _mvmObservationService.GetAsync(maxId);
+                    result = await _mvmObservationService.GetAsync(maxId);
+                    maxId = result?.Item1 ?? 0;
+                    sightings = result.Item2;
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for MVM data provider");
