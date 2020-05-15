@@ -85,7 +85,7 @@ namespace SOS.Import.Harvesters.Observations
                     if (_mvmServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         nrSightingsHarvested >= _mvmServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
-                      //  break;
+                        break;
                     }
 
                     result = await _mvmObservationService.GetAsync(maxId + 1);

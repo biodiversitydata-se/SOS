@@ -41,7 +41,7 @@ namespace SOS.Export.Services
         /// <inheritdoc />
         public void DeleteFolder(string path)
         {
-            if (string.IsNullOrEmpty(path) && Directory.Exists(path))
+            if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
             {
                 Directory.Delete(path, true);
             }
