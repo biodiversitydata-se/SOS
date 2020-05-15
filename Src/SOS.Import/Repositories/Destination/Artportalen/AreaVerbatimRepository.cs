@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
 using SOS.Import.MongoDb.Interfaces;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
+using JsonSerializer = System.Text.Json.JsonSerializer;
+
 
 namespace SOS.Import.Repositories.Destination.Artportalen
 {
@@ -32,7 +35,7 @@ namespace SOS.Import.Repositories.Destination.Artportalen
                 new CreateIndexModel<Area>(Builders<Area>.IndexKeys.Ascending(a => a.AreaType)),
                 new CreateIndexModel<Area>(Builders<Area>.IndexKeys.Geo2DSphere(a => a.Geometry))
             };
-
+             
             await MongoCollection.Indexes.CreateManyAsync(indexModels);
         }
     }
