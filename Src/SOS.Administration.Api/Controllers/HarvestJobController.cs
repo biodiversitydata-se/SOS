@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Models;
 using SOS.Import.Managers.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
 
 namespace SOS.Administration.Api.Controllers
@@ -157,17 +158,21 @@ namespace SOS.Administration.Api.Controllers
         [HttpPost("DwcArchive/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> RunDwcArchiveHarvestJob([FromForm]UploadDwcArchiveModelDto model)
         {
             try
             {
-                var dataProvider = await _dataProviderManager.TryGetDataProviderAsync(model.DataProviderId);
+                var dataProvider = await _dataProviderManager.GetDataProviderByIdAsync(model.DataProviderId);
                 if (dataProvider == null)
                 {
                     return new BadRequestObjectResult($"No data provider exist with Id={model.DataProviderId}");
                 }
-
+                if (dataProvider.DataType != DataSet.DwcA)
+                {
+                    return new BadRequestObjectResult($"The data provider \"{dataProvider.Name} [Id={dataProvider.Id}, Identfier={dataProvider.Identifier}]\" is not a DwC-A provider");
+                }
                 if (model.DwcaFile.Length == 0)
                 {
                     return new BadRequestObjectResult("No file content");
