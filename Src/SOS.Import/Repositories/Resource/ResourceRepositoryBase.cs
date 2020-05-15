@@ -5,25 +5,25 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using SOS.Import.MongoDb.Interfaces;
+using SOS.Import.Repositories.Resource.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Process.Database.Interfaces;
-using SOS.Process.Repositories.Destination.Interfaces;
 
-namespace SOS.Process.Repositories.Destination
+namespace SOS.Import.Repositories.Resource
 {
     /// <summary>
-    /// Base class for cosmos db repositories
+    /// Base class for repositories using MongoDb resource db.
     /// </summary>
-    public class ProcessBaseRepository<TEntity, TKey> : IProcessBaseRepository<TEntity, TKey> where TEntity : IEntity<TKey>
+    public class ResourceRepositoryBase<TEntity, TKey> : IResourceRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
     {
         /// <summary>
         /// Logger 
         /// </summary>
-        protected readonly ILogger<ProcessBaseRepository<TEntity, TKey>> Logger;
+        protected readonly ILogger<ResourceRepositoryBase<TEntity, TKey>> Logger;
 
-        private readonly IProcessClient _client;
+        private readonly IResourceDbClient _client;
         private readonly bool _toggleable;
         protected string _collectionName;
 
@@ -38,7 +38,7 @@ namespace SOS.Process.Repositories.Destination
         private bool _disposed;
 
 
-        private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
+        private readonly string _collectionNameConfiguration = nameof(ProcessedConfiguration);
 
         /// <summary>
         /// Constructor
@@ -46,10 +46,10 @@ namespace SOS.Process.Repositories.Destination
         /// <param name="client"></param>
         /// <param name="toggleable"></param>
         /// <param name="logger"></param>
-        public ProcessBaseRepository(
-            IProcessClient client,
+        public ResourceRepositoryBase(
+            IResourceDbClient client,
             bool toggleable,
-            ILogger<ProcessBaseRepository<TEntity, TKey>> logger
+            ILogger<ResourceRepositoryBase<TEntity, TKey>> logger
         )
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
@@ -348,6 +348,26 @@ namespace SOS.Process.Repositories.Destination
 
                 return false;
             }
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> CheckIfCollectionExistsAsync()
+        {
+            return await CheckIfCollectionExistsAsync(_collectionName);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> CheckIfCollectionExistsAsync(string collectionName)
+        {
+            //filter by collection name
+            var exists = await (await Database
+                    .ListCollectionNamesAsync(new ListCollectionNamesOptions
+                    {
+                        Filter = new BsonDocument("name", _collectionName)
+                    }))
+                .AnyAsync();
+
+            return exists;
         }
 
         /// <inheritdoc />

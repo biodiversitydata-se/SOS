@@ -62,7 +62,7 @@ namespace SOS.Import.Harvesters.Observations
             DwcaDatasetInfo datasetInfo,
             IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(DwcObservationVerbatim), DataSet.Dwc, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(DwcObservationVerbatim), DataSet.DwcA, DateTime.Now);
             try
             {
                 ConventionRegistry.Register("IgnoreIfNull",
@@ -126,7 +126,7 @@ namespace SOS.Import.Harvesters.Observations
             bool emptyCollectionsBeforeHarvest,
             IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(DwcObservationVerbatim), DataSet.Dwc, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(DwcObservationVerbatim), DataSet.DwcA, DateTime.Now);
             string latestFilePath = "";
             try
             {

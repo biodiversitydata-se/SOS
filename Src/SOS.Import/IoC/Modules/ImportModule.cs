@@ -37,6 +37,8 @@ using SOS.Import.Repositories.Destination.Taxon;
 using SOS.Import.Repositories.Destination.Taxon.Interfaces;
 using SOS.Import.Repositories.Destination.VirtualHerbarium;
 using SOS.Import.Repositories.Destination.VirtualHerbarium.Interfaces;
+using SOS.Import.Repositories.Resource;
+using SOS.Import.Repositories.Resource.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services;
@@ -74,7 +76,7 @@ namespace SOS.Import.IoC.Modules
             if (Configuration.VirtualHerbariumServiceConfiguration != null)
                 builder.RegisterInstance(Configuration.VirtualHerbariumServiceConfiguration).As<VirtualHerbariumServiceConfiguration>().SingleInstance();
 
-            // Init mongodb
+            // Init verbatim mongodb
             if (Configuration.VerbatimDbConfiguration != null)
             {
                 var importSettings = Configuration.VerbatimDbConfiguration.GetMongoDbSettings();
@@ -83,6 +85,17 @@ namespace SOS.Import.IoC.Modules
                     Configuration.VerbatimDbConfiguration.DatabaseName,
                     Configuration.VerbatimDbConfiguration.BatchSize);
                 builder.RegisterInstance(importClient).As<IImportClient>().SingleInstance();
+            }
+
+            // Init resource mongodb
+            if (Configuration.ResourceDbConfiguration != null)
+            {
+                var resourceDbSettings = Configuration.ResourceDbConfiguration.GetMongoDbSettings();
+                var resourceDbClient = new ResourceDbClient(
+                    resourceDbSettings,
+                    Configuration.ResourceDbConfiguration.DatabaseName,
+                    Configuration.ResourceDbConfiguration.BatchSize);
+                builder.RegisterInstance(resourceDbClient).As<IResourceDbClient>().SingleInstance();
             }
 
             // Darwin Core
@@ -107,7 +120,7 @@ namespace SOS.Import.IoC.Modules
             // Repositories destination
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepostitory>().InstancePerLifetimeScope();
+            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationVerbatimRepository>().As<IKulObservationVerbatimRepository>().InstancePerLifetimeScope();

@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Managers.Interfaces;
-using SOS.Lib.Enums;
-using SOS.Lib.Models.Shared;
-using SOS.Process.Helpers.Interfaces;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -37,16 +32,22 @@ namespace SOS.Administration.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Initialize the DataProvider collection with default data providers.
+        /// </summary>
+        /// <param name="forceOverwriteIfCollectionExist">If the DataProvider collection already exists, set forceOverwriteIfCollectionExist to true if you want to overwrite this collection with default data.</param>
+        /// <returns></returns>
         [HttpPost("CreateDefaultDataProviders")]
         [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CreateDefaultDataprovidersAsync()
+        public async Task<IActionResult> CreateDefaultDataprovidersAsync([FromQuery]bool forceOverwriteIfCollectionExist = false)
         {
             try
             {
-                await _dataProviderManager.InitDefaultDataProviders();
-                return new OkObjectResult("Default data providers created");
+                var result = await _dataProviderManager.InitDefaultDataProviders(forceOverwriteIfCollectionExist);
+                if (result.IsFailure) return BadRequest(result.Error);
+                return Ok(result.Value);
             }
             catch (Exception e)
             {

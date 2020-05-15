@@ -12,7 +12,8 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <summary>
         /// Initialize the DataProvider collection with default data providers.
         /// </summary>
+        /// <param name="forceOverwriteIfCollectionExist">If the DataProvider collection already exists, set forceOverwriteIfCollectionExist to true if you want to overwrite this collection with default data.</param>
         /// <returns></returns>
-        Task<IActionResult> CreateDefaultDataprovidersAsync();
+        Task<IActionResult> CreateDefaultDataprovidersAsync(bool forceOverwriteIfCollectionExist = false);
     }
 }
