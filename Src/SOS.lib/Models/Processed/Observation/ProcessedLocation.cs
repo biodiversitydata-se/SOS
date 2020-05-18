@@ -292,6 +292,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// from the original to correct perceived errors or
         /// standardize the description.
         /// </summary>
+        [Keyword]
         public string Locality { get; set; }
 
         /// <summary>
