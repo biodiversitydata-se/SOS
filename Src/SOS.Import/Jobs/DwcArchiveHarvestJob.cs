@@ -44,7 +44,16 @@ namespace SOS.Import.Jobs
             IJobCancellationToken cancellationToken)
         {
             _logger.LogInformation("Start DwC-A Harvest Job");
-            var dataProvider = await _dataProviderManager.TryGetDataProviderAsync(dataProviderId);
+            var dataProvider = await _dataProviderManager.GetDataProviderByIdAsync(dataProviderId);
+            if (dataProvider == null)
+            {
+                throw new Exception($"Data provider not found for dataProviderId={dataProviderId}");
+            }
+            if (dataProvider.DataType != DataSet.DwcA)
+            {
+                throw new Exception($"The data provider \"{dataProvider.Name} [Id={dataProvider.Id}, Identfier={dataProvider.Identifier}]\" is not a DwC-A provider");
+            }
+
             var datasetInfo = new DwcaDatasetInfo
             {
                 DataProviderId = dataProvider.Id,

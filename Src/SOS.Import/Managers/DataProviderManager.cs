@@ -61,7 +61,7 @@ namespace SOS.Import.Managers
             return Result.Success(returnDescription);
         }
 
-        public async Task<DataProvider> TryGetDataProviderAsync(int id)
+        public async Task<DataProvider> GetDataProviderByIdAsync(int id)
         {
             var dataProviders = await _dataProviderRepository.GetAllAsync();
             var dataProvider = dataProviders.FirstOrDefault(provider => provider.Id == id);

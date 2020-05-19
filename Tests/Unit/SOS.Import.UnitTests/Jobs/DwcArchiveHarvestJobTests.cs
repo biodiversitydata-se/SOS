@@ -86,7 +86,7 @@ namespace SOS.Import.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _dataProviderManagerMock.Setup(ts => ts.TryGetDataProviderAsync(It.IsAny<int>()))
+            _dataProviderManagerMock.Setup(ts => ts.GetDataProviderByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync(new DataProvider());
 
             _dwcObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<DwcaDatasetInfo>(), JobCancellationToken.Null))
@@ -114,7 +114,7 @@ namespace SOS.Import.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _dataProviderManagerMock.Setup(ts => ts.TryGetDataProviderAsync(It.IsAny<int>()))
+            _dataProviderManagerMock.Setup(ts => ts.GetDataProviderByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync(new DataProvider());
 
             _dwcObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<DwcaDatasetInfo>(), JobCancellationToken.Null))
@@ -142,7 +142,7 @@ namespace SOS.Import.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _dataProviderManagerMock.Setup(ts => ts.TryGetDataProviderAsync(It.IsAny<int>()))
+            _dataProviderManagerMock.Setup(ts => ts.GetDataProviderByIdAsync(It.IsAny<int>()))
                .Throws<Exception>();
             //-----------------------------------------------------------------------------------------------------------
             // Act

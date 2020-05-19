@@ -191,6 +191,7 @@ namespace SOS.Lib.Models.Processed.Observation
         // <summary>
         /// Name of the person that reported the species observation.
         /// </summary>
+        [Keyword]
         public string ReportedBy { get; set; }
 
         // <summary>
