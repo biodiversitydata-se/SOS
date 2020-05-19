@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using SOS.Import.Entities.Artportalen;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Extensions
 {
@@ -36,24 +34,6 @@ namespace SOS.Import.Extensions
             {
                 Id = entity.Id,
                 FeatureId = entity.FeatureId,
-                ParentId = entity.ParentId,
-                Geometry = entity.Polygon?.ToGeometry().Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoJsonGeometry(),
-                Name = entity.Name
-            };
-        }
-
-        /// <summary>
-        /// Cast area entity to model 
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        public static AreaBase ToAreaBaseVerbatim(this AreaEntity entity)
-        {
-            return new AreaBase((AreaType)entity.AreaDatasetId)
-            {
-                Id = entity.Id,
-                FeatureId = entity.FeatureId,
-                ParentId = entity.ParentId,
                 Name = entity.Name
             };
         }

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Process.Helpers.Interfaces
 {
@@ -14,6 +10,6 @@ namespace SOS.Process.Helpers.Interfaces
         /// and returns the result in a zip file.
         /// </summary>
         /// <returns></returns>
-        Task<byte[]> CreateDiffZipFile(AreaBase[] generatedAreas);
+        Task<byte[]> CreateDiffZipFile(Area[] generatedAreas);
     }
 }

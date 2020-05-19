@@ -3,16 +3,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Models.Area;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using Newtonsoft.Json;
 using System.Text;
+using SOS.Lib.Extensions;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -59,10 +58,11 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 var area = await GetAreaInternalAsync(areaId);
+                var geometry = await _areaRepository.GetGeometryAsync(areaId);
                 var externalArea = new ExternalArea
                 {                    
                     AreaType = area.AreaType.ToString(),
-                    Geometry = area.Geometry.ToGeoJson(),
+                    Geometry = geometry.ToGeoJson(),
                     Id = area.Id,
                     Name = area.Name                    
                 };

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SOS.Lib.Models.Shared;
+using Nest;
 
 namespace SOS.Lib.Models.Search
 {
@@ -10,6 +10,14 @@ namespace SOS.Lib.Models.Search
     /// </summary>
     public class GeometryFilter
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public GeometryFilter()
+        {
+            Geometries = new List<IGeoShape>();
+        }
+
         /// <summary>
         /// Add buffer to geometry
         /// </summary>
@@ -21,7 +29,7 @@ namespace SOS.Lib.Models.Search
         /// If point and accuracy is greater tha 0, sightings inside circle (center point + buffer (accuracy)) will be returned
         /// If polygon, sightings inside polygon will be returned
         /// </summary>
-        public IEnumerable<GeometryGeoJson> Geometries { get; set; }
+        public ICollection<IGeoShape> Geometries { get; set; }
 
         public bool IsValid
         {
@@ -29,9 +37,9 @@ namespace SOS.Lib.Models.Search
             {
                 foreach (var geom in Geometries)
                 {
-                     var valid =  (geom?.IsValid ?? false) &&
+                     var valid =  geom != null &&
                                   (geom.Type.Equals("Point", StringComparison.CurrentCultureIgnoreCase) && MaxDistanceFromPoint > 0.0 ||
-                                   new[] { "polygon", "multipolygon", "holepolygon" }.Contains(geom.Type.ToLower()) && MaxDistanceFromPoint >= 0.0);
+                                   new[] { "polygon", "multipolygon" }.Contains(geom.Type.ToLower()) && MaxDistanceFromPoint >= 0.0);
                     if (!valid)
                     {
                         return valid;

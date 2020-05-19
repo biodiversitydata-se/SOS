@@ -2,7 +2,7 @@
 
 namespace SOS.Lib.Models.Shared
 {
-    public class GeometryGeoJson
+    public class GeoJsonGeometry
     {
         /// <summary>
         /// Geometry coordinates

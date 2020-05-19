@@ -1,8 +1,10 @@
-﻿using SOS.Lib.Enums;
-using SOS.Lib.Models.Shared;
+﻿using SOS.Lib.Models.Shared;
 
 namespace SOS.Observations.Api.Models.Area
 {
+    /// <summary>
+    /// Area used external
+    /// </summary>
     public class ExternalArea
     {
         /// <summary>
@@ -13,7 +15,7 @@ namespace SOS.Observations.Api.Models.Area
         /// <summary>
         /// Area geometry
         /// </summary>
-        public GeometryGeoJson Geometry { get; set; }
+        public GeoJsonGeometry Geometry { get; set; }
 
         /// <summary>
         /// Area Id

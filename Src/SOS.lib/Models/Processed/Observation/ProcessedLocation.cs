@@ -1,5 +1,4 @@
 ﻿using Nest;
-using Newtonsoft.Json;
 
 namespace SOS.Lib.Models.Processed.Observation
 {

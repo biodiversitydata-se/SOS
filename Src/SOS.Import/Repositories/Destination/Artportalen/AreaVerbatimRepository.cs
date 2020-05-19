@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using Nest;
 using SOS.Import.MongoDb.Interfaces;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using JsonSerializer = System.Text.Json.JsonSerializer;
-
 
 namespace SOS.Import.Repositories.Destination.Artportalen
 {
@@ -16,6 +17,9 @@ namespace SOS.Import.Repositories.Destination.Artportalen
     /// </summary>
     public class AreaVerbatimRepository : VerbatimRepository<Area, int>, Interfaces.IAreaVerbatimRepository
     {
+        private readonly GridFSBucket _gridFSBucket;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -25,18 +29,34 @@ namespace SOS.Import.Repositories.Destination.Artportalen
             IImportClient importClient,
             ILogger<AreaVerbatimRepository> logger) : base(importClient, logger)
         {
+            _jsonSerializerOptions = new JsonSerializerOptions();
+            _jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
+
+            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = nameof(Area) });
         }
 
         /// <inheritdoc />
-        public async Task CreateIndexAsync()
+        public async Task DropGeometriesAsync()
         {
-            var indexModels = new List<CreateIndexModel<Area>>
+            await _gridFSBucket.DropAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> StoreGeometriesAsync(IDictionary<int, IGeoShape> areaGeometries)
+        {
+            var serializeOptions = new JsonSerializerOptions();
+            serializeOptions.Converters.Add(new GeoShapeConverter());
+
+            foreach (var geometry in areaGeometries)
             {
-                new CreateIndexModel<Area>(Builders<Area>.IndexKeys.Ascending(a => a.AreaType)),
-                new CreateIndexModel<Area>(Builders<Area>.IndexKeys.Geo2DSphere(a => a.Geometry))
-            };
-             
-            await MongoCollection.Indexes.CreateManyAsync(indexModels);
+                var fileName = $"geometry-{geometry.Key}";
+                var geometryString = JsonSerializer.Serialize(geometry.Value, serializeOptions);
+                var byteArray = Encoding.UTF8.GetBytes(geometryString);
+
+                await _gridFSBucket.UploadFromBytesAsync(fileName, byteArray);
+            }
+
+            return true;
         }
     }
 }

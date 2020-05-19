@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
-using SOS.Process.Extensions;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
@@ -78,7 +77,14 @@ namespace SOS.Process.Helpers
             var areas = await _processedAreaRepository.GetAllAsync();
             foreach (var area in areas)
             {
-                var feature = area.ToFeature();
+                var geometry = await _processedAreaRepository.GetGeometryAsync(area.Id);
+                var attributes = new Dictionary<string, object>();
+                attributes.Add("id", area.Id);
+                attributes.Add("name", area.Name);
+                attributes.Add("areaType", area.AreaType);
+                attributes.Add("featureId", area.FeatureId);
+
+                var feature = geometry.ToFeature(attributes);
                 _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
             }
 

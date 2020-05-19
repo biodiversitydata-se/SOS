@@ -1,12 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
+using Nest;
 using SOS.Lib.Enums;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Database.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Observations.Api.Repositories
 {
@@ -15,15 +21,21 @@ namespace SOS.Observations.Api.Repositories
     /// </summary>
     public class AreaRepository : ProcessBaseRepository<Area, int>, IAreaRepository
     {
+        private readonly GridFSBucket _gridFSBucket;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
         public AreaRepository(
-            IProcessClient client, 
+            IProcessClient client,
             ILogger<AreaRepository> logger) : base(client, false, logger)
         {
+            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = nameof(Area) });
+            _jsonSerializerOptions = new JsonSerializerOptions();
+            _jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
         }
 
         /// <inheritdoc />
@@ -48,7 +60,7 @@ namespace SOS.Observations.Api.Repositories
             var total = await MongoCollection
                 .Find(filter)
                 .CountDocumentsAsync();
-            
+
             var result = await MongoCollection
                 .Find(filter)
                 .Skip(skip)
@@ -68,6 +80,15 @@ namespace SOS.Observations.Api.Repositories
         public async Task<Area> GetAreaAsync(int areaId)
         {
             return await GetAsync(areaId);
+        }
+
+        /// <inheritdoc />
+        public async Task<IGeoShape> GetGeometryAsync(int areaId)
+        {
+            var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync($"geometry-{ areaId }");
+            var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+
+            return JsonSerializer.Deserialize<IGeoShape>(utfString, _jsonSerializerOptions);
         }
     }
 }

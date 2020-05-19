@@ -20,6 +20,7 @@ using Microsoft.OpenApi.Models;
 using Nest;
 using NLog.Web;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.JsonConverters;
 using SOS.Observations.Api.Swagger;
 
 namespace SOS.Observations.Api
@@ -88,6 +89,12 @@ namespace SOS.Observations.Api
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
+                });
+
             // Add Mvc Core services
             services.AddMvcCore(option => { option.EnableEndpointRouting = false; })
                 .AddApiExplorer()

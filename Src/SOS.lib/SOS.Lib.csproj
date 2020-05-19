@@ -5,12 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="JsonConverters\**" />
-    <EmbeddedResource Remove="JsonConverters\**" />
-    <None Remove="JsonConverters\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Hangfire.Core" Version="1.7.11" />
     <PackageReference Include="MailKit" Version="2.6.0" />
     <PackageReference Include="Microsoft.SqlServer.Types" Version="14.0.1016.290" />

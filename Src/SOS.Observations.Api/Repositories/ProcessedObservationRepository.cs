@@ -93,7 +93,7 @@ namespace SOS.Observations.Api.Repositories
                                 queryContainers.Add(q => q
                                     .GeoShape(gd => gd
                                         .Field("location.pointWithBuffer")
-                                        .Shape(s => geom.ToGeoShape())
+                                        .Shape(s => geom)
                                         .Relation(GeoShapeRelation.Intersects)
                                     )
                                 );
@@ -103,7 +103,7 @@ namespace SOS.Observations.Api.Repositories
                                 queryContainers.Add(q => q
                                     .GeoShape(gd => gd
                                         .Field("location.point")
-                                        .Shape(s => geom.ToGeoShape())
+                                        .Shape(s => geom)
                                         .Relation(GeoShapeRelation.Within)
                                     )
                                 );
