@@ -145,11 +145,14 @@ namespace SOS.Observations.Api.Repositories
                 if (internalFilter.ProjectId.HasValue)
                 {
                     queryInternal.Add(q => q
-                        .Match(t => t
-                            .Field(new Field("projects.id"))
-                            .Query(internalFilter.ProjectId.ToString())
+                        .Nested(n=>n
+                            .Path("projects")
+                            .Query(q=>q
+                                .Match(m=>m
+                                .Field(new Field("projects.id"))
+                                .Query(internalFilter.ProjectId.ToString())
                         )
-                    );
+                    )));
                 }
                 if (internalFilter.UserId.HasValue)
                 {
