@@ -79,5 +79,9 @@
         /// Y coordinate of site
         /// </summary>
         public int YCoord { get; set; }
+        /// <summary>
+        /// Parent side id, exposed only to the internal api
+        /// </summary>
+        public int? ParentSiteId { get; set; }
     }
 }

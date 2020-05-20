@@ -55,7 +55,7 @@ namespace SOS.Observations.Api.Repositories
             }            
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(CollectionName.ToLower())
-                .Source(filter.OutputFields.ToProjection())
+                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
                 .From(skip)
                 .Size(take)
                 .Query(q => q

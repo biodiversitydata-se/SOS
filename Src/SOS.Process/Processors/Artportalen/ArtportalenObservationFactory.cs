@@ -136,7 +136,8 @@ namespace SOS.Process.Processors.Artportalen
                     PointWithBuffer = (PolygonGeoShape)verbatimObservation.Site?.PointWithBuffer.ToGeoShape(),
                     VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord : 0,
                     VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0,
-                    VerbatimCoordinateSystem = "EPSG:3857"
+                    VerbatimCoordinateSystem = "EPSG:3857",
+                    ParentLocationId = verbatimObservation.Site?.ParentSiteId
                 },
                 Modified = endDate ?? verbatimObservation.ReportedDate,
                 Occurrence = new ProcessedOccurrence

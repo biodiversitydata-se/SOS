@@ -131,5 +131,9 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// Water Area
         /// </summary>
         public GeographicalArea WaterArea { get; set; }
+        /// <summary>
+        /// The parent site id
+        /// </summary>
+        public int? ParentSiteId { get; set; }
 }
 }
