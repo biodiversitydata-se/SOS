@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -76,11 +77,11 @@ namespace SOS.Observations.Api.Managers
             }
         }
         /// <inheritdoc />
-        public async Task<PagedResult<ExternalSimpleArea>> GetAreasAsync(AreaType areaType, string searchString, int skip, int take)
+        public async Task<PagedResult<ExternalSimpleArea>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip, int take)
         {
             try
             {
-                var result = await _areaRepository.GetAreasAsync(areaType, searchString, skip, take);
+                var result = await _areaRepository.GetAreasAsync(areaTypes, searchString, skip, take);
 
                 return new PagedResult<ExternalSimpleArea>
                 {

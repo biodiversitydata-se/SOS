@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -39,14 +40,15 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<Area>> GetAreasAsync(AreaType areaType, string searchString, int skip, int take)
+        public async Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip, int take)
         {
             var filters = new List<FilterDefinition<Area>>();
 
-            filters.Add(Builders<Area>.Filter
-                .Eq(f => f
-                    .AreaType, areaType));
-
+            if (areaTypes?.Any() ?? false)
+            {
+                filters.Add(Builders<Area>.Filter.In(a => a.AreaType, areaTypes));
+            }
+            
             if (!string.IsNullOrEmpty(searchString))
             {
                 filters.Add(Builders<Area>.Filter
@@ -55,7 +57,7 @@ namespace SOS.Observations.Api.Repositories
                         .Contains(searchString.ToLower())));
             }
 
-            var filter = Builders<Area>.Filter.And(filters);
+            var filter = filters.Count == 0 ? Builders<Area>.Filter.Empty : Builders<Area>.Filter.And(filters);
 
             var total = await MongoCollection
                 .Find(filter)
