@@ -52,8 +52,7 @@ namespace SOS.Observations.Api.Repositories
             if (!string.IsNullOrEmpty(sortBy))
             {
                 sortDescriptor.Field(sortBy, sortOrder == SearchSortOrder.Desc ? SortOrder.Descending : SortOrder.Ascending);
-            }
-
+            }            
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(CollectionName.ToLower())
                 .Source(filter.OutputFields.ToProjection())
@@ -162,6 +161,16 @@ namespace SOS.Observations.Api.Repositories
                             .Terms(internalFilter.UserId)
                         )
                     );
+                }
+                if(internalFilter.BoundingBox != null)
+                {
+                    queryInternal.Add(q => q
+                            .GeoBoundingBox(g => g
+                            .Field(new Field("location.pointLocation"))
+                            .BoundingBox(internalFilter.BoundingBox[1],
+                                         internalFilter.BoundingBox[0],                                                                                 
+                                         internalFilter.BoundingBox[3],
+                                         internalFilter.BoundingBox[2])));
                 }
             }
             return queryInternal;
