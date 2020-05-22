@@ -464,7 +464,8 @@ namespace SOS.Import.Extensions
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
-                VerbatimCoordinateSystem = CoordinateSys.WebMercator
+                VerbatimCoordinateSystem = CoordinateSys.WebMercator,
+                ParentSiteId = entity.ParentSiteId
             };
         }
 

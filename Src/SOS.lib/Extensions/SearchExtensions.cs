@@ -211,16 +211,26 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="fields"></param>
         /// <returns></returns>
-        public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> fields)
+        public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> fields, bool isInternal)
         {
-            var projection = new SourceFilterDescriptor<dynamic>()
-                   .Excludes(e => e
-                       .Field("defects")
-                       .Field("location.point")
-                       .Field("location.pointLocation")
-                       .Field("location.pointWithBuffer")
-               );
-
+            var projection = new SourceFilterDescriptor<dynamic>();
+            if (isInternal)
+            {
+                projection.Excludes(e => e
+                  .Field("defects")
+                  .Field("location.point")
+                  .Field("location.pointLocation")
+                  .Field("location.pointWithBuffer")) ;
+            }
+            else {
+                projection.Excludes(e => e
+                    .Field("defects")
+                    .Field("location.point")
+                    .Field("location.pointLocation")
+                    .Field("location.pointWithBuffer")                    
+                    .Field("location.parentLocationId")
+                );
+            }
             if (fields?.Any() ?? false)
             {
                 projection.Includes(i => i
