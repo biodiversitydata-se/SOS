@@ -21,6 +21,7 @@ namespace SOS.Observations.Api.Controllers
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="configuration"></param>
         /// <param name="logger"></param>
         public ExportsController(ILogger<ExportsController> logger)
         {

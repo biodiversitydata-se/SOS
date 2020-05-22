@@ -31,7 +31,7 @@ namespace SOS.Export.IntegrationTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            bool result = await observationManager.ExportAndStoreAsync(null, "Test", "all", JobCancellationToken.Null);
+            bool result = await observationManager.ExportAndStoreAsync(null, "Test", "all", false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -57,6 +57,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>());
             ObservationManager observationManager = new ObservationManager(
+                new DOIRepository(exportClient, new Mock<ILogger<DOIRepository>>().Object), 
                 dwcArchiveFileWriter,
                 new ProcessedObservationRepository(
                     elasticClient, 

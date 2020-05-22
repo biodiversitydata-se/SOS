@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -10,6 +9,7 @@ using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Models.DOI;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Export.Managers
@@ -19,6 +19,7 @@ namespace SOS.Export.Managers
     /// </summary>
     public class ObservationManager : Interfaces.IObservationManager
     {
+        private readonly IDOIRepository _doiRepository;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
         private readonly IFileService _fileService;
@@ -31,14 +32,17 @@ namespace SOS.Export.Managers
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="doiRepository"></param>
         /// <param name="dwcArchiveFileWriter"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="fileService"></param>
+        /// <param name="blobStorageService"></param>
         /// <param name="zendToService"></param>
         /// <param name="fileDestination"></param>
         /// <param name="logger"></param>
         public ObservationManager(
+            IDOIRepository doiRepository,
             IDwcArchiveFileWriter dwcArchiveFileWriter,
             IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
@@ -49,6 +53,7 @@ namespace SOS.Export.Managers
 
             ILogger<ObservationManager> logger)
         {
+            _doiRepository = doiRepository ?? throw new ArgumentNullException(nameof(doiRepository));
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
@@ -119,18 +124,38 @@ namespace SOS.Export.Managers
         }
 
         /// <inheritdoc />
-        public async Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName, IJobCancellationToken cancellationToken)
+        public async Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName, bool isDOI, IJobCancellationToken cancellationToken)
         {
             var zipFilePath = "";
             try
             {
                 zipFilePath = await CreateDWCExportAsync(filter, fileName, cancellationToken);
 
+                // Blob Storage Containers must be in lower case
+                blobStorageContainer = blobStorageContainer.ToLower();
+
                 // Make sure container exists
                 await _blobStorageService.CreateContainerAsync(blobStorageContainer);
 
                 // Upload file to blob storage
-                return await _blobStorageService.UploadBlobAsync(zipFilePath, blobStorageContainer);
+                var success = await _blobStorageService.UploadBlobAsync(zipFilePath, blobStorageContainer);
+                
+                // If upload was successful and it's a DOI
+                if (success && isDOI)
+                {
+                    var doi = new DOI
+                    {
+                        Container = blobStorageContainer,
+                        Id = Guid.Parse(fileName),
+                        Filter = filter,
+                        Created = DateTime.Now,
+                        CreatedBy = "Todo"
+                    };
+
+                    return await _doiRepository.AddAsync(doi);
+                };
+
+                return success;
             }
             catch (Exception e)
             {

@@ -54,6 +54,7 @@ namespace SOS.Observations.Api.Managers
                 return null;
             }
         }
+
         public async Task<byte[]> GetZipppedAreaAsync(int areaId)
         {
             try
@@ -76,6 +77,7 @@ namespace SOS.Observations.Api.Managers
                 return null;
             }
         }
+
         /// <inheritdoc />
         public async Task<PagedResult<ExternalSimpleArea>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip, int take)
         {

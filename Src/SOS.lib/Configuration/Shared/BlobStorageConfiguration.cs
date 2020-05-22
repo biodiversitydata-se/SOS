@@ -1,4 +1,4 @@
-﻿namespace SOS.Lib.Configuration.Export
+﻿namespace SOS.Lib.Configuration.Shared
 {
      /// <summary>
      /// Settings for blob storage
@@ -14,6 +14,11 @@
         /// Storage connection string
         /// </summary>
         public string ConnectionString { get; set; }
+
+        /// <summary>
+        /// Name of DOI container
+        /// </summary>
+        public string DOI_Container { get; set; }
 
         /// <summary>
         /// Storage key

@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
 using SOS.Observations.Api.Database;
 using SOS.Observations.Api.Database.Interfaces;
@@ -6,6 +7,8 @@ using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
+using SOS.Observations.Services;
+using SOS.Observations.Services.Interfaces;
 
 namespace SOS.Observations.Api.IoC.Modules
 {
@@ -14,8 +17,8 @@ namespace SOS.Observations.Api.IoC.Modules
     /// </summary>
     public class SearchModule : Module
     {
-        public MongoDbConfiguration MongoDbConfiguration { get; set; }
-
+        public ObservationApiConfiguration ObservationApiConfiguration { get; set; }
+        
         /// <summary>
         /// Load event
         /// </summary>
@@ -23,25 +26,33 @@ namespace SOS.Observations.Api.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             // Processed Mongo Db
-            var processedSettings = MongoDbConfiguration.GetMongoDbSettings();
-            var processClient = new ProcessClient(processedSettings, MongoDbConfiguration.DatabaseName, MongoDbConfiguration.BatchSize);
+            var processedDbConfiguration = ObservationApiConfiguration.ProcessedDbConfiguration;
+            var processedSettings = processedDbConfiguration.GetMongoDbSettings();
+            var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName, processedDbConfiguration.BatchSize);
             builder.RegisterInstance(processClient).As<IProcessClient>().SingleInstance();
 
+            // Add configuration
+            builder.RegisterInstance(ObservationApiConfiguration.BlobStorageConfiguration).As<BlobStorageConfiguration>().SingleInstance();
+
             // Add managers
+            builder.RegisterType<AreaManager>().As<IAreaManager>().SingleInstance(); // InstancePerLifetimeScope
+            builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().SingleInstance();
+            builder.RegisterType<DOIManager>().As<IDOIManager>().SingleInstance();
+            builder.RegisterType<FieldMappingManager>().As<IFieldMappingManager>().SingleInstance();
             builder.RegisterType<ObservationManager>().As<IObservationManager>().SingleInstance(); // InstancePerLifetimeScope?
             builder.RegisterType<ProcessInfoManager>().As<IProcessInfoManager>().SingleInstance(); // InstancePerLifetimeScope
-			builder.RegisterType<AreaManager>().As<IAreaManager>().SingleInstance(); // InstancePerLifetimeScope
             builder.RegisterType<TaxonManager>().As<ITaxonManager>().SingleInstance();
-            builder.RegisterType<FieldMappingManager>().As<IFieldMappingManager>().SingleInstance();
-            builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().SingleInstance();
-
+            
             // Add repositories
+            builder.RegisterType<AreaRepository>().As<IAreaRepository>().SingleInstance();
+            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().SingleInstance();
+            builder.RegisterType<DOIRepository>().As<IDOIRepository>().SingleInstance();
             builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>().SingleInstance();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().SingleInstance();
-            builder.RegisterType<AreaRepository>().As<IAreaRepository>().SingleInstance();
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().SingleInstance();
             builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>().SingleInstance();
-            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().SingleInstance();
+
+            builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().SingleInstance();
         }
     }
 }

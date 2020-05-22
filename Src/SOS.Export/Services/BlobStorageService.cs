@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.Export;
+using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Export.Services
 {
@@ -61,18 +61,6 @@ namespace SOS.Export.Services
 
                 return false;
             }
-        }
-
-        /// <inheritdoc />
-        public async Task<FileStream> GetBlobAsync(string container, string blobName)
-        {
-            var cloudBlobContainer = _cloudBlobClient.GetContainerReference(container);
-            var cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(blobName);
-
-            FileStream stream = null;
-            await cloudBlockBlob.DownloadToStreamAsync(stream);
-
-            return stream;
         }
 
         /// <inheritdoc />

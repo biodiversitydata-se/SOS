@@ -14,14 +14,21 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Nest;
 using NLog.Web;
-using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.JsonConverters;
+using SOS.Observations.Api.Database;
+using SOS.Observations.Api.Database.Interfaces;
+using SOS.Observations.Api.Managers;
+using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Repositories;
+using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Observations.Api.Swagger;
+using SOS.Observations.Services;
+using SOS.Observations.Services.Interfaces;
 
 namespace SOS.Observations.Api
 {
@@ -57,12 +64,7 @@ namespace SOS.Observations.Api
                 .AddEnvironmentVariables();
 
             //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
-            if (env.IsDevelopment() ||
-                _environment == "dev" ||
-                _environment == "local")
-            {
-                builder.AddUserSecrets<Startup>();
-            }
+            builder.AddUserSecrets<Startup>();
 
             Configuration = builder.Build();
         }
@@ -89,6 +91,8 @@ namespace SOS.Observations.Api
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
+            var observationApiConfiguration = Configuration.GetSection("ObservationApiConfiguration").Get<ObservationApiConfiguration>();
+
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -128,7 +132,7 @@ namespace SOS.Observations.Api
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Hangfire
-            var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<MongoDbConfiguration>();
+            var mongoConfiguration = observationApiConfiguration.HangfireDbConfiguration;
 
             services.AddHangfire(configuration =>
                 configuration
@@ -147,11 +151,40 @@ namespace SOS.Observations.Api
                         })
             );
 
-
             //setup the elastic search configuration
-            var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+            var elasticConfiguration = observationApiConfiguration.SearchDbConfiguration;
             var uris = elasticConfiguration.Hosts.Select(u => new Uri(u));
             services.AddSingleton<IElasticClient>(new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))));
+
+            // Processed Mongo Db
+            var processedDbConfiguration = observationApiConfiguration.ProcessedDbConfiguration;
+            var processedSettings = processedDbConfiguration.GetMongoDbSettings();
+            var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName, processedDbConfiguration.BatchSize);
+            services.AddSingleton<IProcessClient>(processClient);
+
+            // Add configuration
+            services.AddSingleton(observationApiConfiguration.BlobStorageConfiguration);
+
+            // Add managers
+            services.AddSingleton<IAreaManager, AreaManager>();
+            services.AddSingleton<IDataProviderManager, DataProviderManager>();
+            services.AddSingleton<IDOIManager, DOIManager>();
+            services.AddSingleton<IFieldMappingManager, FieldMappingManager>();
+            services.AddSingleton<IObservationManager, ObservationManager>();
+            services.AddSingleton<IProcessInfoManager, ProcessInfoManager>();
+            services.AddSingleton<ITaxonManager, TaxonManager>();
+           
+            // Add repositories
+            services.AddSingleton<IAreaRepository, AreaRepository>();
+            services.AddSingleton<IDataProviderRepository, DataProviderRepository>();
+            services.AddSingleton<IDOIRepository, DOIRepository>();
+            services.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
+            services.AddSingleton<IProcessInfoRepository, ProcessInfoRepository>();
+            services.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();
+            services.AddSingleton<IProcessedFieldMappingRepository, ProcessedFieldMappingRepository>();
+
+            // Add services
+            services.AddSingleton<IBlobStorageService, BlobStorageService>();
         }
 
         /// <summary>

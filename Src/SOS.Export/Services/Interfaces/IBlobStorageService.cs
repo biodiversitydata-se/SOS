@@ -16,14 +16,6 @@ namespace SOS.Export.Services.Interfaces
         Task<bool> CreateContainerAsync(string name);
 
         /// <summary>
-        /// Get file stream from storage
-        /// </summary>
-        /// <param name="container"></param>
-        /// <param name="blobName"></param>
-        /// <returns></returns>
-        Task<FileStream> GetBlobAsync(string container, string blobName);
-
-        /// <summary>
         /// Upload blob to storage
         /// </summary>
         /// <param name="sourcePath"></param>

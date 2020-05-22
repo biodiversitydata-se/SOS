@@ -11,12 +11,7 @@ namespace SOS.Lib.Models.Search
     /// </summary>
     public class FilterBase
     {
-        public IGeoShape x { get; set; }
-        /// <summary>
-        /// Counties to match. Queryable values are available in Field Mappings.
-        /// </summary>
         public IEnumerable<int> CountyIds { get; set; }
-
 
         public GeometryFilter GeometryFilter { get; set; }
 
