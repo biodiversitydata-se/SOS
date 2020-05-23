@@ -1,5 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using SOS.Lib.Models.Processed.Validation;
 using SOS.Process.Database.Interfaces;
 
@@ -21,6 +24,21 @@ namespace SOS.Process.Repositories.Destination
         ) : base(client, true, logger)
         {
             
+        }
+
+        /// <inheritdoc />
+        public async Task CreateIndexAsync()
+        {
+            var indexModels = new List<CreateIndexModel<InvalidObservation>>()
+            {
+                new CreateIndexModel<InvalidObservation>(
+                    Builders<InvalidObservation>.IndexKeys.Ascending(io => io.DatasetName)),
+                new CreateIndexModel<InvalidObservation>(
+                    Builders<InvalidObservation>.IndexKeys.Ascending(io => io.OccurrenceID))
+            };
+
+            Logger.LogDebug("Creating Area indexes");
+            await MongoCollection.Indexes.CreateManyAsync(indexModels);
         }
     }
 }
