@@ -18,6 +18,7 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
@@ -50,15 +51,15 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             const string archivePath = "./resources/dwca/SHARK_Zooplankton_NAT_DwC-A.zip";
             const string savePath = @"c:\temp\SharkObservationsCompare.json";
             if (File.Exists(savePath)) File.Delete(savePath);
-            var datasetInfo = new DwcaDatasetInfo
+            var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
-                DataProviderId = 101,
-                DataProviderIdentifier = "TestSHARK"
+                Id = 101,
+                Identifier = "TestSHARK"
             };
             var fieldMappingResolverHelper = CreateFieldMappingResolverHelper();
             var dwcaReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
             using var archiveReader = new ArchiveReader(archivePath);
-            List<DwcObservationVerbatim> observations = await dwcaReader.ReadArchiveAsync(archiveReader, datasetInfo);
+            List<DwcObservationVerbatim> observations = await dwcaReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
             var observationComparisions = new List<CompareObservation>();
 
             //-----------------------------------------------------------------------------------------------------------

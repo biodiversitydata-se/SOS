@@ -1,6 +1,18 @@
 ﻿using System;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Models.Verbatim.ClamPortal;
+using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.Lib.Models.Verbatim.Kul;
+using SOS.Lib.Models.Verbatim.Mvm;
+using SOS.Lib.Models.Verbatim.Nors;
+using SOS.Lib.Models.Verbatim.Sers;
+using SOS.Lib.Models.Verbatim.Shark;
+using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 
 namespace SOS.Lib.Models.Verbatim.Shared
 {
@@ -47,6 +59,34 @@ namespace SOS.Lib.Models.Verbatim.Shared
         /// <summary>
         /// Running status
         /// </summary>
+        [BsonRepresentation(BsonType.String)]
         public RunStatus Status { get; set; }
+
+        public static string GetIdFromDataProvider(DataProvider dataProvider)
+        {
+            switch (dataProvider.Type)
+            {
+                case DataSet.DwcA:
+                    return $"{nameof(DwcObservationVerbatim)}-{dataProvider.Identifier}";
+                case DataSet.ArtportalenObservations:
+                    return nameof(ArtportalenVerbatimObservation);
+                case DataSet.ClamPortalObservations:
+                    return nameof(ClamObservationVerbatim);
+                case DataSet.SharkObservations:
+                    return nameof(SharkObservationVerbatim);
+                case DataSet.KULObservations:
+                    return nameof(KulObservationVerbatim);
+                case DataSet.NorsObservations:
+                    return nameof(NorsObservationVerbatim);
+                case DataSet.SersObservations:
+                    return nameof(SersObservationVerbatim);
+                case DataSet.MvmObservations:
+                    return nameof(MvmObservationVerbatim);
+                case DataSet.VirtualHerbariumObservations:
+                    return nameof(VirtualHerbariumObservationVerbatim);
+                default:
+                    return dataProvider.Type.ToString();
+            }
+        }
     }
 }

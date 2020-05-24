@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Process.Repositories.Destination.Interfaces
 {
@@ -11,6 +13,10 @@ namespace SOS.Process.Repositories.Destination.Interfaces
     /// </summary>
     public interface IProcessedObservationRepository : IProcessBaseRepository<ProcessedObservation, string>
     {
+        public string IndexName { get; }
+
+        Task<bool> ClearCollectionAsync();
+
         /// <summary>
         /// Add many items 
         /// </summary>
@@ -19,23 +25,23 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         new Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items);
 
         /// <summary>
-        /// Copy provider data from active instance to inactive instance
+        /// Copy provider data from active instance to inactive instance.
         /// </summary>
-        /// <param name="provider"></param>
+        /// <param name="dataProvider"></param>
         /// <returns></returns>
-        Task<bool> CopyProviderDataAsync(ObservationProvider provider);
+        Task<bool> CopyProviderDataAsync(DataProvider dataProvider);
+
+        /// <summary>
+        /// Delete provider data.
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <returns></returns>
+        Task<bool> DeleteProviderDataAsync(DataProvider dataProvider);
 
         /// <summary>
         /// Create search index
         /// </summary>
         /// <returns></returns>
         Task CreateIndexAsync();
-
-        /// <summary>
-        /// Delete provider data
-        /// </summary>
-        /// <param name="provider"></param>
-        /// <returns></returns>
-        Task<bool> DeleteProviderDataAsync(ObservationProvider provider);
     }
 }

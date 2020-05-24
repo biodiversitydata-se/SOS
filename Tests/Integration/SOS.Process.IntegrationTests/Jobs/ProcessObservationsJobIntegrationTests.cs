@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using FluentAssertions;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Nest;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
@@ -14,6 +16,7 @@ using SOS.Process.Jobs;
 using SOS.Process.Managers;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.Processors.ClamPortal;
+using SOS.Process.Processors.DarwinCoreArchive;
 using SOS.Process.Processors.Kul;
 using SOS.Process.Processors.Mvm;
 using SOS.Process.Processors.Nors;
@@ -41,7 +44,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result = await processJob.RunAsync(
-                (int)ObservationProvider.Artportalen, 
+                new List<string> {DataProviderIdentifiers.Artportalen}, 
                 false,
                 false, 
                 false,
@@ -55,7 +58,7 @@ namespace SOS.Process.IntegrationTests.Jobs
 
 
         [Fact]
-        public async Task Run_process_job_for_dwca()
+        public async Task Run_process_job_for_butterflymonitoring_dwca()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -66,7 +69,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result = await processJob.RunAsync(
-                (int)ObservationProvider.Dwca,
+                new List<string> { DataProviderIdentifiers.ButterflyMonitoring },
                 false,
                 false,
                 false,
@@ -174,7 +177,18 @@ namespace SOS.Process.IntegrationTests.Jobs
 
             var copyFieldMappingsJob = new CopyFieldMappingsJob(fieldMappingVerbatimRepository, processedFieldMappingRepository, harvestInfoRepository, processInfoRepository, new NullLogger<CopyFieldMappingsJob>());
             var processTaxaJob = new ProcessTaxaJob(taxonVerbatimRepository, taxonProcessedRepository, harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());
-            
+            var dwcaProcessor = new DwcaObservationProcessor(
+                new DwcaVerbatimRepository(verbatimClient, new NullLogger<DwcaVerbatimRepository>()),
+                processedObservationRepository,
+                processedFieldMappingRepository,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                areaHelper,
+                processConfiguration,
+                new NullLogger<DwcaObservationProcessor>());
+
+            var dataProviderManager = new DataProviderManager(
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), new NullLogger<DataProviderManager>());
+
             var processJob = new ProcessJob(
                 processedObservationRepository,
                 processInfoRepository,
@@ -187,6 +201,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 sharkProcessor,
                 virtualHrbariumProcessor,
                 artportalenProcessor,
+                dwcaProcessor,
+                dataProviderManager,
                 taxonProcessedRepository,
                 instanceManager,
                 copyFieldMappingsJob,

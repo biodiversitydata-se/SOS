@@ -1,4 +1,6 @@
 ﻿using System;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.Processed
@@ -8,10 +10,21 @@ namespace SOS.Lib.Models.Processed
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="provider"></param>
-        protected ProcessingStatus(ObservationProvider provider)
+        /// <param name="type"></param>
+        protected ProcessingStatus(DataSet type)
         {
-            DataProvider = provider;
+            Type = type;
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="dataProviderIdentifier"></param>
+        /// <param name="type"></param>
+        protected ProcessingStatus(string dataProviderIdentifier, DataSet type)
+        {
+            DataProviderIdentifier = dataProviderIdentifier;
+            Type = type;
         }
 
         /// <summary>
@@ -20,9 +33,15 @@ namespace SOS.Lib.Models.Processed
         public int Count { get; set; }
 
         /// <summary>
-        /// Id of data provider
+        /// Data provider identifier
         /// </summary>
-        public ObservationProvider DataProvider { get; }
+        public string DataProviderIdentifier { get; set; }
+
+        /// <summary>
+        /// Type
+        /// </summary>
+        [BsonRepresentation(BsonType.String)]
+        public DataSet Type { get; }
 
         /// <summary>
         /// Harvest end date and time
@@ -37,16 +56,18 @@ namespace SOS.Lib.Models.Processed
         /// <summary>
         /// Running status
         /// </summary>
+        [BsonRepresentation(BsonType.String)]
         public RunStatus Status { get; set; }
 
 
         public static ProcessingStatus Success(
-            ObservationProvider dataProvider,
+            string dataProviderIdentifier,
+            DataSet type,
             DateTime start,
             DateTime end,
             int count)
         {
-            return new ProcessingStatus(dataProvider)
+            return new ProcessingStatus(dataProviderIdentifier, type)
             {
                 Status = RunStatus.Success,
                 Start = start,
@@ -56,11 +77,12 @@ namespace SOS.Lib.Models.Processed
         }
 
         public static ProcessingStatus Failed(
-            ObservationProvider dataProvider,
+            string dataProviderIdentifier,
+            DataSet type,
             DateTime start,
             DateTime end)
         {
-            return new ProcessingStatus(dataProvider)
+            return new ProcessingStatus(dataProviderIdentifier, type)
             {
                 Status = RunStatus.Failed,
                 Start = start,
@@ -69,17 +91,17 @@ namespace SOS.Lib.Models.Processed
         }
 
         public static ProcessingStatus Cancelled(
-            ObservationProvider dataProvider,
+            string dataProviderIdentifier,
+            DataSet type,
             DateTime start,
             DateTime end)
         {
-            return new ProcessingStatus(dataProvider)
+            return new ProcessingStatus(dataProviderIdentifier, type)
             {
                 Status = RunStatus.Canceled,
                 Start = start,
                 End = end
             };
         }
-
     }
 }

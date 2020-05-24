@@ -25,6 +25,8 @@ namespace SOS.Import.Repositories.Destination
         /// </summary>
         protected readonly IMongoDatabase Database;
 
+        protected readonly IMongoClient Client;
+
         /// <summary>
         /// Disposed
         /// </summary>
@@ -48,6 +50,7 @@ namespace SOS.Import.Repositories.Destination
                 throw new ArgumentNullException(nameof(importClient));
             }
 
+            Client = importClient;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Database = importClient.GetDatabase();

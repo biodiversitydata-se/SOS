@@ -1,33 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using MessagePack;
-using MessagePack.Resolvers;
-using Microsoft.Extensions.Logging.Abstractions;
-using NetTopologySuite.Features;
-using NetTopologySuite.IO;
 using Newtonsoft.Json;
-using SOS.Import.MongoDb;
-using SOS.Import.Repositories.Destination.Artportalen;
-using SOS.Import.Repositories.Destination.FieldMappings;
-using SOS.Import.Repositories.Destination.Taxon;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
-using SOS.TestHelpers.IO;
-using SOS.TestHelpers.JsonConverters;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.TestDataTools
 {
     public class CreateDefaultDataProvidersTool : TestBase
     {
-
-
-
         [Fact]
         public void CreateDefaultDataProvidersJsonFile()
         {
@@ -40,21 +23,22 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // Select order and set Id.
             var dataProviders = new List<DataProvider>()
             {
-                dataProviderByIdentifier["Artportalen"],
-                dataProviderByIdentifier["ClamGateway"],
-                dataProviderByIdentifier["KUL"],
-                dataProviderByIdentifier["MVM"],
-                dataProviderByIdentifier["NORS"],
-                dataProviderByIdentifier["SERS"],
-                dataProviderByIdentifier["VirtualHerbarium"],
-                dataProviderByIdentifier["SHARK"],
-                dataProviderByIdentifier["BirdRingingCentre"],
-                dataProviderByIdentifier["EntomologicalCollection"],
-                dataProviderByIdentifier["MalaiseTrap"],
-                dataProviderByIdentifier["Porpoises"],
-                dataProviderByIdentifier["ButterflyMonitoring"],
-                dataProviderByIdentifier["SharkZooplankton"]
+                dataProviderByIdentifier[DataProviderIdentifiers.Artportalen],
+                dataProviderByIdentifier[DataProviderIdentifiers.ClamGateway],
+                dataProviderByIdentifier[DataProviderIdentifiers.KUL],
+                dataProviderByIdentifier[DataProviderIdentifiers.MVM],
+                dataProviderByIdentifier[DataProviderIdentifiers.NORS],
+                dataProviderByIdentifier[DataProviderIdentifiers.SERS],
+                dataProviderByIdentifier[DataProviderIdentifiers.VirtualHerbarium],
+                dataProviderByIdentifier[DataProviderIdentifiers.SHARK],
+                dataProviderByIdentifier[DataProviderIdentifiers.BirdRingingCentre],
+                dataProviderByIdentifier[DataProviderIdentifiers.EntomologicalCollection],
+                dataProviderByIdentifier[DataProviderIdentifiers.MalaiseTrap],
+                dataProviderByIdentifier[DataProviderIdentifiers.Porpoises],
+                dataProviderByIdentifier[DataProviderIdentifiers.ButterflyMonitoring],
+                dataProviderByIdentifier[DataProviderIdentifiers.SharkZooplankton]
             };
+
             for (var i = 0; i < dataProviders.Count; i++)
             {
                 dataProviders[i].Id = i+1;
@@ -73,7 +57,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             {
                 new DataProvider
                 {
-                    Identifier = "Artportalen",
+                    Identifier = DataProviderIdentifiers.Artportalen,
                     Name = "Species Observation System (Artportalen)",
                     SwedishName = "Artportalen",
                     Organization = "SLU Swedish Species Information Centre (SLU Artdatabanken)",
@@ -83,11 +67,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Stephen Coulson",
                     ContactEmail = "stephen.coulson@slu.se",
                     Url = "https://www.artportalen.se/",
-                    DataType = DataSet.ArtportalenObservations
+                    Type = DataSet.ArtportalenObservations,
+                    IsActive = true,
+                    IncludeInScheduledHarvest = true,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
-                    Identifier = "ClamGateway",
+                    Identifier = DataProviderIdentifiers.ClamGateway,
                     Name = "Clam Gateway",
                     SwedishName = "Musselportalen",
                     Organization = "SLU Swedish Species Information Centre (SLU Artdatabanken)",
@@ -97,11 +84,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Eddie Von Wachenfeldt",
                     ContactEmail = "eddie.vonwachenfeldt@slu.se",
                     Url = "http://musselportalen.se/",
-                    DataType = DataSet.ClamPortalObservations
+                    Type = DataSet.ClamPortalObservations,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
-                    Identifier = "KUL",
+                    Identifier = DataProviderIdentifiers.KUL,
                     Name = "The database for coastal fish (KUL)",
                     SwedishName = "Kustfiskdatabasen (KUL)",
                     Organization = "Department of Aquatic Resources, Institute of Coastal Research, SLU",
@@ -111,13 +101,16 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Peter Ljungberg",
                     ContactEmail = "peter.ljungberg@slu.se",
                     Url = "https://www.slu.se/kul/",
-                    DataType = DataSet.KULObservations
+                    Type = DataSet.KULObservations,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
+                    Identifier = DataProviderIdentifiers.MVM,
                     Name = "MVM",
                     SwedishName = "MVM",
-                    Identifier = "MVM",
                     Organization = "Environmental data MVM, SLU",
                     SwedishOrganization = "Miljödata MVM, SLU",
                     Description = "Contains fresh water and benthic species observation data. Administered by SLU.",
@@ -125,11 +118,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Lars Sonesten",
                     ContactEmail = "Lars.Sonesten@slu.se",
                     Url = "http://miljodata.slu.se/mvm/",
-                    DataType = DataSet.MvmObservations
+                    Type = DataSet.MvmObservations,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
-                    Identifier = "NORS",
+                    Identifier = DataProviderIdentifiers.NORS,
                     Name = "The National Register of Survey test-fishing (NORS)",
                     SwedishName = "Sjöprovfiskedatabasen NORS",
                     Organization = "Department of Aquatic Resources, SLU",
@@ -139,11 +135,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Anders Kinnerbäck",
                     ContactEmail = "anders.kinnerback@slu.se",
                     Url = "http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/national-register-of-survey-test-fishing-nors/",
-                    DataType = DataSet.NorsObservations
+                    Type = DataSet.NorsObservations,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
-                    Identifier = "SERS",
+                    Identifier = DataProviderIdentifiers.SERS,
                     Name = "The Database for electrofishing in streams (SERS)",
                     SwedishName = "Elfiskeregistret SERS",
                     Organization = "Department of Aquatic Resources, SLU",
@@ -153,11 +152,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Berit Sers",
                     ContactEmail = "berit.sers@slu.se",
                     Url = "http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/database-for-testfishing-in-streams/",
-                    DataType = DataSet.SersObservations
+                    Type = DataSet.SersObservations,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
-                    Identifier = "VirtualHerbarium",
+                    Identifier = DataProviderIdentifiers.VirtualHerbarium,
                     Name = "Swedish Virtual Herbarium",
                     SwedishName = "Virtuella Herbariet",
                     Organization = "Umeå University",
@@ -167,11 +169,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Nils Ericson",
                     ContactEmail = "mossnisse@hotmail.com",
                     Url = "http://herbarium.emg.umu.se",
-                    DataType = DataSet.VirtualHerbariumObservations
+                    Type = DataSet.VirtualHerbariumObservations,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
-                    Identifier = "SHARK",
+                    Identifier = DataProviderIdentifiers.SHARK,
                     Name = "Shark SMHI",
                     SwedishName = "Shark SMHI",
                     Organization = "SMHI",
@@ -181,11 +186,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Patrik Strömberg",
                     ContactEmail = "patrik.stromberg@smhi.se",
                     Url = "http://sharkweb.smhi.se/",
-                    DataType = DataSet.SharkObservations
+                    Type = DataSet.SharkObservations,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
-                    Identifier = "BirdRingingCentre",
+                    Identifier = DataProviderIdentifiers.BirdRingingCentre,
                     Name = "Bird ringing centre in Sweden via GBIF",
                     SwedishName = "Ringmärkningscentralen via GBIF",
                     Organization = "Swedish Museum of Natural History",
@@ -196,11 +204,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "-",
                     Url = "http://www.nrm.se/forskningochsamlingar/miljoforskningochovervakning/ringmarkningscentralen.214.html",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
-                    DataType = DataSet.DwcA
+                    Type = DataSet.DwcA,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
-                    Identifier = "EntomologicalCollection",
+                    Identifier = DataProviderIdentifiers.EntomologicalCollection,
                     Name = "Entomological Collections (NHRS) from GBIF",
                     SwedishName = "Entomologiska samlingarna (NHRS) via GBIF",
                     Organization = "Swedish Museum of Natural History",
@@ -211,11 +222,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "-",
                     Url = "http://www.gbif.org/dataset/9940af5a-3271-4e6a-ad71-ced986b9a9a5",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
-                    DataType = DataSet.DwcA
+                    Type = DataSet.DwcA,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
-                    Identifier = "MalaiseTrap",
+                    Identifier = DataProviderIdentifiers.MalaiseTrap,
                     Name = "Swedish Malaise Trap Project (SMTP) from GBIF",
                     SwedishName = "Svenska Malaisefälle projektet (SMTP) via GBIF",
                     Organization = "Foundation Station Linné",
@@ -226,11 +240,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "",
                     Url = "http://www.gbif.org/dataset/38c1351d-9cfe-42c0-97da-02d2c8be141c",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=smtp-nrm",
-                    DataType = DataSet.DwcA
+                    Type = DataSet.DwcA,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
-                    Identifier = "Porpoises",
+                    Identifier = DataProviderIdentifiers.Porpoises,
                     Name = "Porpoises (NRM) via GBIF",
                     SwedishName = "Tumlare (NRM) via GBIF",
                     Organization = "Swedish Museum of Natural History",
@@ -241,11 +258,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "-",
                     Url = "http://www.gbif.org/dataset/6aa7c400-0c66-11dd-84d2-b8a03c50a862",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
-                    DataType = DataSet.DwcA
+                    Type = DataSet.DwcA,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
-                    Identifier = "ButterflyMonitoring",
+                    Identifier = DataProviderIdentifiers.ButterflyMonitoring,
                     Name = "Swedish Butterfly Monitoring Scheme (SeBMS)",
                     SwedishName = "Svensk Dagfjärilsövervakning",
                     Organization = "Lund University",
@@ -256,11 +276,14 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "-",
                     Url = "https://www.dagfjarilar.lu.se/",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=lu_sebms",
-                    DataType = DataSet.DwcA
+                    Type = DataSet.DwcA,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 },
                 new DataProvider
                 {
-                    Identifier = "SharkZooplankton",
+                    Identifier = DataProviderIdentifiers.SharkZooplankton,
                     Name = "SHARK - National zooplankton monitoring in Sweden since 1979",
                     Organization = "Swedish Meterological and Hydrological Institute (SMHI)",
                     SwedishOrganization = "SMHI, Sveriges meteorologiska och hydrologiska institut",
@@ -270,7 +293,10 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "shark@smhi.se",
                     Url = "http://sharkdata.se/",
                     DownloadUrl = "",
-                    DataType = DataSet.DwcA
+                    Type = DataSet.DwcA,
+                    IsActive = false,
+                    IncludeInScheduledHarvest = false,
+                    DataQualityIsApproved = true
                 }
             };
 

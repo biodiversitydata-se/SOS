@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -20,7 +22,7 @@ namespace SOS.Process.Processors.Mvm
     {
         private readonly IMvmObservationVerbatimRepository _mvmObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override ObservationProvider DataProvider => ObservationProvider.MVM;
+        public override DataSet Type => DataSet.MvmObservations;
 
         /// <summary>
         /// Constructor
@@ -42,6 +44,7 @@ namespace SOS.Process.Processors.Mvm
         }
        
         protected override async Task<int> ProcessObservations(
+            DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
@@ -60,7 +63,7 @@ namespace SOS.Process.Processors.Mvm
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    verbatimCount += await CommitBatchAsync(observations);
+                    verbatimCount += await CommitBatchAsync(dataProvider, observations);
                     observations.Clear();
                     Logger.LogDebug($"MVM Sightings processed: {verbatimCount}");
                 }
@@ -70,7 +73,7 @@ namespace SOS.Process.Processors.Mvm
             if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                verbatimCount += await CommitBatchAsync(observations);
+                verbatimCount += await CommitBatchAsync(dataProvider, observations);
                 Logger.LogDebug($"MVM Sightings processed: {verbatimCount}");
             }
 

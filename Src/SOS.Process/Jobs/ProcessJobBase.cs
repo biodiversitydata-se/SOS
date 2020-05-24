@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Jobs.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -21,7 +22,8 @@ namespace SOS.Process.Jobs
         /// </summary>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="processInfoRepository"></param>
-        protected ProcessJobBase(IHarvestInfoRepository harvestInfoRepository,
+        protected ProcessJobBase(
+            IHarvestInfoRepository harvestInfoRepository,
             IProcessInfoRepository processInfoRepository)
         {
             _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
@@ -31,16 +33,22 @@ namespace SOS.Process.Jobs
         /// <summary>
         /// Create a provider info object
         /// </summary>
-        /// <param name="provider"></param>
+        /// <param name="type"></param>
         /// <param name="harvestInfo"></param>
         /// <param name="processStart"></param>
         /// <param name="processEnd"></param>
         /// <param name="processStatus"></param>
         /// <param name="processCount"></param>
         /// <returns></returns>
-        protected ProviderInfo CreateProviderInfo(DataSet provider, HarvestInfo harvestInfo, DateTime processStart, DateTime? processEnd = null, RunStatus? processStatus = null, int? processCount = null )
+        protected ProviderInfo CreateProviderInfo(
+            DataSet type, 
+            HarvestInfo harvestInfo, 
+            DateTime processStart, 
+            DateTime? processEnd = null, 
+            RunStatus? processStatus = null, 
+            int? processCount = null )
         {
-            return new ProviderInfo(provider)
+            return new ProviderInfo(type)
             {
                 HarvestCount = harvestInfo?.Count,
                 HarvestEnd = harvestInfo?.End,
@@ -52,6 +60,28 @@ namespace SOS.Process.Jobs
                 ProcessStatus = processStatus
             };
         }
+
+        protected ProviderInfo CreateProviderInfo(
+            DataProvider dataProvider, 
+            HarvestInfo harvestInfo, 
+            DateTime processStart, 
+            DateTime? processEnd = null, 
+            RunStatus? processStatus = null, 
+            int? processCount = null)
+        {
+            return new ProviderInfo(dataProvider)
+            {
+                HarvestCount = harvestInfo?.Count,
+                HarvestEnd = harvestInfo?.End,
+                HarvestStart = harvestInfo?.Start,
+                HarvestStatus = harvestInfo?.Status,
+                ProcessCount = processCount,
+                ProcessEnd = processEnd,
+                ProcessStart = processStart,
+                ProcessStatus = processStatus
+            };
+        }
+
 
         /// <inheritdoc />
         public async Task<HarvestInfo> GetHarvestInfoAsync(string id)
@@ -79,7 +109,7 @@ namespace SOS.Process.Jobs
 
                 if (processInfo?.ProvidersInfo != null)
                 {
-                    providerInfo.Add(processInfo.ProvidersInfo?.FirstOrDefault(p=> p.Provider == id.Value));
+                    providerInfo.Add(processInfo.ProvidersInfo?.FirstOrDefault(p=> p.DataProviderType == id.Value));
                 }
             }
 

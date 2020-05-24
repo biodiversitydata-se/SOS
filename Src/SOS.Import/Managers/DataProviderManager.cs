@@ -10,6 +10,8 @@ using Nest;
 using Newtonsoft.Json;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Resource.Interfaces;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using Result = CSharpFunctionalExtensions.Result;
 
@@ -57,7 +59,7 @@ namespace SOS.Import.Managers
             await _dataProviderRepository.DeleteCollectionAsync();
             await _dataProviderRepository.AddCollectionAsync();
             await _dataProviderRepository.AddManyAsync(dataProviders);
-            var returnDescription = collectionExists ? "DataProvider collection was created and initialized with default data providers. Existing data was overwritten." : "DataProvider collection was created and initialized with default data providers.";
+            var returnDescription = collectionExists ? "DataProvider collection was created and initialized with default data providers. Existing data were overwritten." : "DataProvider collection was created and initialized with default data providers.";
             return Result.Success(returnDescription);
         }
 
@@ -66,6 +68,66 @@ namespace SOS.Import.Managers
             var dataProviders = await _dataProviderRepository.GetAllAsync();
             var dataProvider = dataProviders.FirstOrDefault(provider => provider.Id == id);
             return dataProvider;
+        }
+
+        public async Task<List<DataProvider>> GetAllDataProviders()
+        {
+            return await _dataProviderRepository.GetAllAsync();
+        }
+
+        public async Task<DataProvider> GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier)
+        {
+            var allDataProviders = await _dataProviderRepository.GetAllAsync();
+            return GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier, allDataProviders);
+        }
+
+        private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier, List<DataProvider> allDataProviders)
+        {
+            if (int.TryParse(dataProviderIdOrIdentifier, out int id))
+            {
+                return allDataProviders.FirstOrDefault(provider => provider.Id == id);
+            }
+
+            return allDataProviders.FirstOrDefault(provider => provider.Identifier.Equals(dataProviderIdOrIdentifier, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public async Task<DataProvider> GetDataProviderByIdentifier(string identifier)
+        {
+            var allDataProviders = await _dataProviderRepository.GetAllAsync();
+            return allDataProviders.FirstOrDefault(provider => provider.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public async Task<DataProvider> GetDataProviderByType(DataSet type)
+        {
+            if (type == DataSet.DwcA) throw new ArgumentException("Can't decide which data provider to return because there exists multiple data providers of DwC-A type.");
+            var allDataProviders = await _dataProviderRepository.GetAllAsync();
+            var dataProvider = allDataProviders.Single(provider => provider.Type == type);
+            return dataProvider;
+        }
+
+        public async Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(List<string> dataProviderIdOrIdentifiers)
+        {
+            var parsedDataProviders = new List<Result<DataProvider>>();
+            var allDataProviders = await _dataProviderRepository.GetAllAsync();
+            foreach (var dataProviderIdOrIdentifier in dataProviderIdOrIdentifiers)
+            {
+                var dataProvider = GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier, allDataProviders);
+                if (dataProvider != null)
+                {
+                    parsedDataProviders.Add(Result.Success(dataProvider));
+                }
+                else
+                {
+                    parsedDataProviders.Add(Result.Failure<DataProvider>($"There is no data provider that has Id or Identifier = \"{dataProviderIdOrIdentifier}\""));
+                }
+            }
+
+            return parsedDataProviders;
+        }
+
+        public async Task<bool> UpdateHarvestInfo(int dataProviderId, HarvestInfo harvestInfo)
+        {
+            return await _dataProviderRepository.UpdateHarvestInfo(dataProviderId, harvestInfo);
         }
     }
 }

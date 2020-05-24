@@ -7,6 +7,8 @@ using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
@@ -37,7 +39,7 @@ namespace SOS.Process.Repositories.Destination
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
         }
 
-        private string IndexName => _collectionName.ToLower();
+        public string IndexName => _collectionName.ToLower();
 
         /// <summary>
         /// Validate Darwin core.
@@ -150,17 +152,17 @@ namespace SOS.Process.Repositories.Destination
         }
 
         /// <inheritdoc />
-        public async Task<bool> CopyProviderDataAsync(ObservationProvider provider)
+        public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)
         {
             // Get data from active instance
             SetCollectionName(ActiveInstance);
 
             var source = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
                 .Index(IndexName)
-                    .Query(q => q
-                        .Term(t => t
-                            .Field(f => f.Provider)
-                            .Value(provider))));
+                .Query(q => q
+                    .Term(t => t
+                        .Field(f => f.DataProviderId)
+                        .Value(dataProvider.Id))));
 
             // switch to inactive instance and add data 
             SetCollectionName(InActiveInstance);
@@ -169,12 +171,11 @@ namespace SOS.Process.Repositories.Destination
             var indexResult = WriteToElastic(source.Documents.ToList());
             Logger.LogDebug($"Finished copying provider data to search");
 
-
             return (indexResult.TotalNumberOfFailedBuffers == 0);
         }
 
         /// <inheritdoc />
-        public async Task<bool> DeleteProviderDataAsync(ObservationProvider provider)
+        public async Task<bool> DeleteProviderDataAsync(DataProvider dataProvider)
         {
             try
             {
@@ -183,9 +184,8 @@ namespace SOS.Process.Repositories.Destination
                     .Index(IndexName)
                     .Query(q => q
                         .Term(t => t
-                            .Field(f => f.Provider)
-                            .Value(provider))));
-
+                            .Field(f => f.DataProviderId)
+                            .Value(dataProvider.Id))));
 
                 return res.IsValid;
             }
@@ -194,6 +194,12 @@ namespace SOS.Process.Repositories.Destination
                 Logger.LogError(e.ToString());
                 return false;
             }
+        }
+
+        public async Task<bool> ClearCollectionAsync()
+        {
+            await DeleteCollectionAsync();
+            return await AddCollectionAsync();
         }
 
         public override async Task<bool> DeleteCollectionAsync()

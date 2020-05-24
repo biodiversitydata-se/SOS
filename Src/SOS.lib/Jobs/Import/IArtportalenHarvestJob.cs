@@ -3,12 +3,8 @@ using Hangfire;
 
 namespace SOS.Lib.Jobs.Import
 {
-    public interface IArtportalenHarvestJob
+    public interface IArtportalenHarvestJob : IHarvestJob
     {
-        /// <summary>
-        /// Run Artportalen harvest
-        /// </summary>
-        /// <returns></returns>
-        Task<bool> RunAsync(IJobCancellationToken cancellationToken);
+
     }
 }

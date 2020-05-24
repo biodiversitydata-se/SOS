@@ -3,9 +3,9 @@
 namespace SOS.Administration.Api.Controllers.Interfaces
 {
     /// <summary>
-    /// Import job controller
+    /// Harvest observations job controller
     /// </summary>
-    public interface IHarvestJobController
+    public interface IHarvestObservationJobController
     {
         /// <summary>
         /// Add daily harvest of sightings from clam/tree portal
@@ -20,20 +20,6 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         IActionResult RunClamPortalHarvestJob();
-
-        /// <summary>
-        /// Add daily harvest of geo data
-        /// </summary>
-        /// <param name="hour"></param>
-        /// <param name="minute"></param>
-        /// <returns></returns>
-        IActionResult AddDailyGeoAreasHarvestJob(int hour, int minute);
-
-        /// <summary>
-        /// Run geo data harvest
-        /// </summary>
-        /// <returns></returns>
-        IActionResult RunGeoAreasHarvestJob();
 
         /// <summary>
         /// Add daily harvest of sightings from KUL
@@ -118,26 +104,6 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         IActionResult RunArtportalenHarvestJob();
-
-        /// <summary>
-        /// Schedule daily taxon harvest job
-        /// </summary>
-        /// <param name="hour"></param>
-        /// <param name="minute"></param>
-        /// <returns></returns>
-        IActionResult AddDailyTaxonHarvestJob(int hour, int minute);
-
-        /// <summary>
-        /// Run taxon harvest
-        /// </summary>
-        /// <returns></returns>
-        IActionResult RunTaxonHarvestJob();
-
-        /// <summary>
-        /// Run import field mapping.
-        /// </summary>
-        /// <returns></returns>
-        IActionResult RunImportFieldMappingJob();
 
         /// <summary>
         /// Add daily harvest of sightings from Virtual Herbarium

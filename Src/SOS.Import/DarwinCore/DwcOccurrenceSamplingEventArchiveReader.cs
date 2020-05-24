@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using NetTopologySuite.Operation.Buffer;
 using SOS.Import.DarwinCore.Factories;
 using SOS.Import.Harvesters.Observations;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Import.DarwinCore
@@ -32,12 +33,12 @@ namespace SOS.Import.DarwinCore
         /// Reads a sampling event based DwC-A, and returns observations in batches.
         /// </summary>
         /// <param name="archiveReader"></param>
-        /// <param name="datasetInfo"></param>
+        /// <param name="idIdentifierTuple"></param>
         /// <param name="batchSize"></param>
         /// <returns></returns>
         public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader,
-            DwcaDatasetInfo datasetInfo,
+            IIdIdentifierTuple idIdentifierTuple,
             int batchSize)
         {
             IAsyncFileReader occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Occurrence);
@@ -47,7 +48,7 @@ namespace SOS.Import.DarwinCore
 
             await foreach (IRow row in occurrenceFileReader.GetDataRowsAsync())
             {
-                var occurrenceRecord = DwcObservationVerbatimFactory.Create(row, datasetInfo, idIndex);
+                var occurrenceRecord = DwcObservationVerbatimFactory.Create(row, idIdentifierTuple, idIndex);
                 occurrenceRecords.Add(occurrenceRecord);
 
                 if (occurrenceRecords.Count % batchSize == 0)
@@ -64,12 +65,13 @@ namespace SOS.Import.DarwinCore
 
         public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
             ArchiveReader archiveReader,
-            DwcaDatasetInfo datasetInfo)
+            IIdIdentifierTuple idIdentifierTuple)
         {
             const int batchSize = 100000;
             var observationsBatches = ReadArchiveInBatchesAsync(
                 archiveReader,
-                datasetInfo, batchSize);
+                idIdentifierTuple, 
+                batchSize);
             List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
             await foreach (List<DwcObservationVerbatim> observationsBatch in observationsBatches)
             {

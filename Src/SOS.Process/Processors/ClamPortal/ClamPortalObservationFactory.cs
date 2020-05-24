@@ -49,11 +49,11 @@ namespace SOS.Process.Processors.ClamPortal
 
             _taxa.TryGetValue(verbatimObservation.DyntaxaTaxonId ?? -1, out var taxon);
 
-            return new ProcessedObservation(ObservationProvider.ClamPortal)
+            return new ProcessedObservation()
             {
                 AccessRights = GetAccessRightsIdFromString(verbatimObservation.AccessRights),
                 BasisOfRecord = GetBasisOfRecordIdFromString(verbatimObservation.BasisOfRecord),
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ObservationProvider.ClamPortal.ToString()}",
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.ClamGateway}",
                 DatasetName = "Träd och musselportalen",
                 Event = new ProcessedEvent
                 {

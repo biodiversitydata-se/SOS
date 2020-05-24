@@ -10,6 +10,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -51,50 +52,55 @@ namespace SOS.Process.UnitTests.Processors
             _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
         }
 
-        /// <summary>
-        /// Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
+        // todo - delete test?
+        // This test doesn't add any value to the unit test suite due to the following reasons:
+        // 1) The constructor is always invoked by dependency injection, which means that this test adds no protection against regressions (bugs).
+        // 2) This test tests the code implementation details and not the behavior of the system.
+        //
+        ///// <summary>
+        ///// Test constructor
+        ///// </summary>
+        //[Fact]
+        //public void ConstructorTest()
+        //{
+        //    TestObject.Should().NotBeNull();
 
-            Action create = () => new ArtportalenObservationProcessor(
-                null,
-                _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
-                _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenVerbatimRepository");
+        //    Action create = () => new ArtportalenObservationProcessor(
+        //        null,
+        //        _processedObservationRepositoryMock.Object,
+        //        _processedFieldMappingRepositoryMock.Object,
+        //        _fieldMappingResolverHelperMock.Object,
+        //        _processConfiguration,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenVerbatimRepository");
 
-            create = () => new ArtportalenObservationProcessor(
-                _artportalenVerbatimRepository.Object,
-                null,
-                _processedFieldMappingRepositoryMock.Object,
-                _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
+        //    create = () => new ArtportalenObservationProcessor(
+        //        _artportalenVerbatimRepository.Object,
+        //        null,
+        //        _processedFieldMappingRepositoryMock.Object,
+        //        _fieldMappingResolverHelperMock.Object,
+        //        _processConfiguration,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
 
-            create = () => new ArtportalenObservationProcessor(
-                _artportalenVerbatimRepository.Object,
-                _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
-                _fieldMappingResolverHelperMock.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processConfiguration");
+        //    create = () => new ArtportalenObservationProcessor(
+        //        _artportalenVerbatimRepository.Object,
+        //        _processedObservationRepositoryMock.Object,
+        //        _processedFieldMappingRepositoryMock.Object,
+        //        _fieldMappingResolverHelperMock.Object,
+        //        null,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processConfiguration");
 
-            create = () => new ArtportalenObservationProcessor(
-                _artportalenVerbatimRepository.Object,
-                _processedObservationRepositoryMock.Object,
-                _processedFieldMappingRepositoryMock.Object,
-                _fieldMappingResolverHelperMock.Object,
-                _processConfiguration,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
+        //    create = () => new ArtportalenObservationProcessor(
+        //        _artportalenVerbatimRepository.Object,
+        //        _processedObservationRepositoryMock.Object,
+        //        _processedFieldMappingRepositoryMock.Object,
+        //        _fieldMappingResolverHelperMock.Object,
+        //        _processConfiguration,
+        //        null);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
+        //}
 
         /// <summary>
         /// Make a successful test of processing
@@ -116,6 +122,12 @@ namespace SOS.Process.UnitTests.Processors
             _processedObservationRepositoryMock.Setup(r => r.AddManyAsync(It.IsAny<ICollection<ProcessedObservation>>()))
                 .ReturnsAsync(1);
 
+            var dataProvider = new DataProvider
+            {
+                Name = "Artportalen",
+                Type = DataSet.ArtportalenObservations
+            };
+
             var taxa = new Dictionary<int, ProcessedTaxon>
             {
                 { 0, new ProcessedTaxon { Id = 0, TaxonId = "0", ScientificName = "Biota" } }
@@ -129,7 +141,8 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(taxa, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, taxa, JobCancellationToken.Null);
+            
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -147,15 +160,20 @@ namespace SOS.Process.UnitTests.Processors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-           
+            var dataProvider = new DataProvider
+            {
+                Name = "Artportalen",
+                Type = DataSet.ArtportalenObservations
+            };
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, null, JobCancellationToken.Null);
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
             result.Status.Should().Be(RunStatus.Failed);
         }
 
@@ -169,13 +187,19 @@ namespace SOS.Process.UnitTests.Processors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            var dataProvider = new DataProvider
+            {
+                Name = "Artportalen",
+                Type = DataSet.ArtportalenObservations
+            };
 
             _artportalenVerbatimRepository.Setup(r => r.GetBatchAsync(0, 0))
                 .ThrowsAsync(new Exception("Failed"));
+            
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, null, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

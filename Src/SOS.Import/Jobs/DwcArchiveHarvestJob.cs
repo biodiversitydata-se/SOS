@@ -8,14 +8,15 @@ using SOS.Import.Managers.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Import.Jobs
 {
     public class DwcArchiveHarvestJob : IDwcArchiveHarvestJob
     {
         private readonly IDwcObservationHarvester _dwcObservationHarvester;
-        private readonly IDataProviderManager _dataProviderManager;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
+        private readonly IDataProviderManager _dataProviderManager;
         private readonly ILogger<DwcArchiveHarvestJob> _logger;
 
         /// <summary>
@@ -47,26 +48,26 @@ namespace SOS.Import.Jobs
             var dataProvider = await _dataProviderManager.GetDataProviderByIdAsync(dataProviderId);
             if (dataProvider == null)
             {
-                throw new Exception($"Data provider not found for dataProviderId={dataProviderId}");
+                throw new Exception($"Data provider with Id={dataProviderId} is not found");
             }
-            if (dataProvider.DataType != DataSet.DwcA)
+            if (dataProvider.Type != DataSet.DwcA)
             {
-                throw new Exception($"The data provider \"{dataProvider.Name} [Id={dataProvider.Id}, Identfier={dataProvider.Identifier}]\" is not a DwC-A provider");
+                throw new Exception($"The data provider \"{dataProvider}\" is not a DwC-A provider");
             }
 
-            var datasetInfo = new DwcaDatasetInfo
-            {
-                DataProviderId = dataProvider.Id,
-                DataProviderIdentifier = dataProvider.Identifier,
-                ArchiveFilename = System.IO.Path.GetFileName(archivePath)
-            };
-            var result = await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, datasetInfo, cancellationToken);
-            _logger.LogInformation($"End DwC-A Harvest Job. Status: {result.Status}");
+            var harvestInfoResult = await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, dataProvider, cancellationToken);
+            _logger.LogInformation($"End DwC-A Harvest Job. Status: {harvestInfoResult.Status}");
 
             // Save harvest info
-            await _harvestInfoRepository.AddOrUpdateAsync(result);
+            await _harvestInfoRepository.AddOrUpdateAsync(harvestInfoResult); // todo - decide whether we should store harvestInfo in two places or not.
+            await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult); 
+            return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0 ? true : throw new Exception("DwC-A Harvest Job failed");
+        }
 
-            return result.Status.Equals(RunStatus.Success) && result.Count > 0 ? true : throw new Exception("DwC-A Harvest Job failed");
+        public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
+        {
+            // todo - implement DwC-A harvest from DataProvider.DownloadUrl
+            return false;
         }
     }
 }

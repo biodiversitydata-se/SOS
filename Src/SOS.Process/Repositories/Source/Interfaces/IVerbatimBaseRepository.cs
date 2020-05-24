@@ -14,6 +14,19 @@ namespace SOS.Process.Repositories.Source.Interfaces
     public interface IVerbatimBaseRepository<TEntity, TKey> : IDisposable where TEntity : IEntity<TKey>
     {
         /// <summary>
+        /// Checks if the collection exists.
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> CheckIfCollectionExistsAsync();
+
+        /// <summary>
+        /// Checks if the specified collection exists.
+        /// </summary>
+        /// <param name="collectionName"></param>
+        /// <returns></returns>
+        Task<bool> CheckIfCollectionExistsAsync(string collectionName);
+
+        /// <summary>
         /// Get cursor to all documents in collection
         /// </summary>
         /// <returns></returns>
@@ -23,7 +36,7 @@ namespace SOS.Process.Repositories.Source.Interfaces
         /// Get cursor to all documents in collection
         /// </summary>
         /// <returns></returns>
-        Task<IAsyncCursor<TEntity>> GetAllByCursorAsync(IMongoCollection<TEntity> mongoCollection);
+        Task<IAsyncCursor<TEntity>> GetAllByCursorAsync(IMongoCollection<TEntity> mongoCollection, bool noCursorTimeout = false);
 
         /// <summary>
         /// Get all documents in collection.

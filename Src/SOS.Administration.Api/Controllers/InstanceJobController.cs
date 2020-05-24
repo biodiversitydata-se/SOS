@@ -1,41 +1,55 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Import.Managers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 
 namespace SOS.Administration.Api.Controllers
 {
     /// <summary>
-    /// Import job controller
+    /// Instance job controller
     /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class InstanceJobController : ControllerBase, Interfaces.IInstanceJobController
     {
+        private readonly IDataProviderManager _dataProviderManager;
         private readonly ILogger<InstanceJobController> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
-        public InstanceJobController(ILogger<InstanceJobController> logger)
+        public InstanceJobController(
+            IDataProviderManager dataProviderManager,
+            ILogger<InstanceJobController> logger)
         {
+            _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
         [HttpPost("Copy")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult RunCopyProviderData(ObservationProvider provider)
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> RunCopyDataProviderData([FromQuery]string dataProviderIdOrIdentifier)
         {
             try
             {
-                BackgroundJob.Enqueue<ICopyProviderDataJob>(job => job.RunAsync(provider));
-                return new OkObjectResult("Started copy provider data job");
+                var dataProvider = await _dataProviderManager.GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier);
+                if (dataProvider == null)
+                {
+                    return new BadRequestObjectResult($"No data provider exist with Id or Identifier={dataProviderIdOrIdentifier}");
+                }
+
+                BackgroundJob.Enqueue<ICopyProviderDataJob>(job => job.RunAsync(dataProvider.Id));
+                return new OkObjectResult($"Started copy provider data job for {dataProvider}");
             }
             catch (Exception e)
             {

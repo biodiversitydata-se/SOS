@@ -3,7 +3,10 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Managers;
 using SOS.Process.Repositories.Destination.Interfaces;
 using Xunit;
@@ -70,13 +73,13 @@ namespace SOS.Process.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<ObservationProvider>()))
+            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
 
-            _processedObservationRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<ObservationProvider>()))
+            _processedObservationRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
             
-            _processInfoRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<ObservationProvider>()))
+            _processInfoRepositoryMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -87,7 +90,7 @@ namespace SOS.Process.UnitTests.Managers
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await instanceManager.CopyProviderDataAsync(ObservationProvider.Artportalen);
+            var result = await instanceManager.CopyProviderDataAsync(new DataProvider {Id=1, Identifier = DataProviderIdentifiers.Artportalen});
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -115,7 +118,7 @@ namespace SOS.Process.UnitTests.Managers
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await instanceManager.CopyProviderDataAsync(ObservationProvider.Artportalen);
+            var result = await instanceManager.CopyProviderDataAsync(new DataProvider { Id = 1, Identifier = DataProviderIdentifiers.Artportalen });
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -133,7 +136,7 @@ namespace SOS.Process.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<ObservationProvider>()))
+            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ThrowsAsync(new Exception("Failed"));
 
             //-----------------------------------------------------------------------------------------------------------
@@ -144,7 +147,7 @@ namespace SOS.Process.UnitTests.Managers
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
 
-            var result = await instanceManager.CopyProviderDataAsync(ObservationProvider.Artportalen);
+            var result = await instanceManager.CopyProviderDataAsync(new DataProvider { Id = 1, Identifier = DataProviderIdentifiers.Artportalen });
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

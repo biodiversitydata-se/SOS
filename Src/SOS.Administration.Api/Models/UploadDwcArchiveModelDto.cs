@@ -8,9 +8,9 @@ namespace SOS.Administration.Api.Models
     public class UploadDwcArchiveModelDto
     {
         /// <summary>
-        /// Data provider id.
+        /// Data provider id or identifier.
         /// </summary>
-        public int DataProviderId { get; set; }
+        public string DataProviderIdOrIdentifier { get; set; }
 
         /// <summary>
         /// DwC-A file.

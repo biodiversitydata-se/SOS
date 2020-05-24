@@ -22,9 +22,9 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         string ActiveCollectionName { get; }
 
         /// <summary>
-        /// Name of in active collection
+        /// Name of inactive collection
         /// </summary>
-        string InActiveCollectionName { get; }
+        string InactiveCollectionName { get; }
 
         /// <summary>
         /// Add one item

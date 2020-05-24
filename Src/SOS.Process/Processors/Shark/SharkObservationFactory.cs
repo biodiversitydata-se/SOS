@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nest;
 using NetTopologySuite.Geometries;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
@@ -49,10 +50,10 @@ namespace SOS.Process.Processors.Shark
 
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
 
-            var obs = new ProcessedObservation(ObservationProvider.SHARK)
+            var obs = new ProcessedObservation
             {
                 BasisOfRecord = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ ObservationProvider.SHARK.ToString() }",
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ DataProviderIdentifiers.SHARK }",
                 DatasetName = verbatim.DatasetName,
                 Event = new ProcessedEvent
                 {

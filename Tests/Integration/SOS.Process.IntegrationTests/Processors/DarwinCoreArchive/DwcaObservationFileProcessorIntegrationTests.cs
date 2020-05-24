@@ -18,11 +18,13 @@ using SOS.Import.DarwinCore;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
+using SOS.Process.Processors;
 using SOS.Process.Processors.DarwinCoreArchive;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -49,21 +51,21 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
-            var datasetInfo = new DwcaDatasetInfo
+            var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
-                DataProviderId = 100, DataProviderIdentifier = "TestButterflyMonitoring"
+                Id = 100, 
+                Identifier = "TestButterflyMonitoring"
             };
             var dwcaReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
             using var archiveReader = new ArchiveReader(archivePath);
-            List<DwcObservationVerbatim> observations = await dwcaReader.ReadArchiveAsync(archiveReader, datasetInfo);
+            List<DwcObservationVerbatim> observations = await dwcaReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
             var dwcaProcessor = CreateDwcaObservationProcessor(storeProcessedObservations: false, dwcObservationVerbatims: observations);
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var processingStatus = await dwcaProcessor.ProcessAsync(
-                taxonByTaxonId, JobCancellationToken.Null);
+            var processingStatus = await dwcaProcessor.ProcessAsync(null, taxonByTaxonId, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -78,22 +80,21 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/SHARK_Zooplankton_NAT_DwC-A.zip";
-            var datasetInfo = new DwcaDatasetInfo
+            var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
-                DataProviderId = 101,
-                DataProviderIdentifier = "TestSHARK"
+                Id = 101,
+                Identifier = "TestSHARK"
             };
             var dwcaReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
             using var archiveReader = new ArchiveReader(archivePath);
-            List<DwcObservationVerbatim> observations = await dwcaReader.ReadArchiveAsync(archiveReader, datasetInfo);
+            List<DwcObservationVerbatim> observations = await dwcaReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
             var dwcaProcessor = CreateDwcaObservationProcessor(storeProcessedObservations: false, dwcObservationVerbatims: observations);
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var processingStatus = await dwcaProcessor.ProcessAsync(
-                taxonByTaxonId, JobCancellationToken.Null);
+            var processingStatus = await dwcaProcessor.ProcessAsync(null, taxonByTaxonId, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -159,7 +160,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
         private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock()
         {
             var mock = new Mock<IProcessedObservationRepository>();
-            mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<ObservationProvider>())).ReturnsAsync(true);
+            mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>())).ReturnsAsync(true);
             mock.Setup(m => m.BatchSize).Returns(100000);
             return mock;
         }

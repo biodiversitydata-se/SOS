@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Lib.Models.Processed.ProcessInfo
 {
@@ -12,11 +16,21 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="provider"></param>
-        public ProviderInfo(DataSet provider)
+        /// <param name="dataProviderType"></param>
+        public ProviderInfo(DataSet dataProviderType)
         {
-            Provider = provider;
+            DataProviderType = dataProviderType;
         }
+
+        public ProviderInfo(DataProvider dataProvider)
+        {
+            DataProviderId = dataProvider.Id;
+            DataProviderIdentifier = dataProvider.Identifier;
+        }
+
+        public int? DataProviderId { get; set; }
+
+        public string DataProviderIdentifier { get; set; }
 
         /// <summary>
         /// Number of items harvested
@@ -36,6 +50,7 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// <summary>
         /// Status of harvest
         /// </summary>
+        [BsonRepresentation(BsonType.String)]
         public RunStatus? HarvestStatus { get; set; }
 
         /// <summary>
@@ -56,12 +71,14 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// <summary>
         /// Status of processing
         /// </summary>
+        [BsonRepresentation(BsonType.String)]
         public RunStatus? ProcessStatus { get; set; }
 
         /// <summary>
         /// Id of data provider
         /// </summary>
-        public DataSet Provider { get; private set; }
+        [BsonRepresentation(BsonType.String)]
+        public DataSet DataProviderType { get; private set; }
 
         /// <summary>
         /// Provider information about meta data

@@ -80,7 +80,7 @@ namespace SOS.Export.IO.DwcArchive
 
             // Add verbatim info attributes
             var providerAttribute = doc.CreateAttribute("provider");
-            providerAttribute.Value = providerInfo.Provider.ToString();
+            providerAttribute.Value = providerInfo.DataProviderType.ToString();
             providerInfoNode.Attributes.Append(providerAttribute);
 
             var harvestCountAttribute = doc.CreateAttribute("harvest-count");

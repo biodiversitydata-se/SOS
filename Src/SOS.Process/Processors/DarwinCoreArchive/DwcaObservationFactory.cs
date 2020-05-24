@@ -84,7 +84,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 return null;
             }
 
-            var obs = new ProcessedObservation(ObservationProvider.Dwca);
+            var obs = new ProcessedObservation();
             //StoreVerbatimObservation(obs, verbatimObservation); // todo - this could be used to store the original verbatim observation
 
             // Other
@@ -151,7 +151,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             // Taxon
             obs.Taxon = CreateProcessedTaxon(verbatimObservation);
 
-            _areaHelper.AddAreaDataToProcessedObservation(obs);
+            // Temporarily remove
+            obs.IsInEconomicZoneOfSweden = true;
+            //_areaHelper.AddAreaDataToProcessedObservation(obs);
             return obs;
 
             // Code from ArtportalenObservationFactory
@@ -415,7 +417,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedOccurrence.AssociatedSequences = verbatimObservation.AssociatedSequences;
             processedOccurrence.AssociatedTaxa = verbatimObservation.AssociatedTaxa;
             processedOccurrence.Behavior = verbatimObservation.Behavior;
-            processedOccurrence.CatalogNumber = verbatimObservation.CatalogNumber;
+            processedOccurrence.CatalogNumber = verbatimObservation.CatalogNumber ?? verbatimObservation.OccurrenceID;
             processedOccurrence.Disposition = verbatimObservation.Disposition;
             processedOccurrence.EstablishmentMeans = GetSosId(verbatimObservation.EstablishmentMeans, _fieldMappings[FieldMappingFieldId.EstablishmentMeans]);
             processedOccurrence.IndividualCount = verbatimObservation.IndividualCount; 

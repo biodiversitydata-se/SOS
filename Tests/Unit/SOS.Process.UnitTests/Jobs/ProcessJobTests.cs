@@ -5,6 +5,7 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Processed;
@@ -19,6 +20,7 @@ using SOS.Process.Jobs;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Processors.ClamPortal.Interfaces;
+using SOS.Process.Processors.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
 using SOS.Process.Processors.Mvm.Interfaces;
 using SOS.Process.Processors.Nors.Interfaces;
@@ -51,6 +53,8 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IVirtualHerbariumObservationProcessor> _virtualHerbariumProcessor;
         private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
         private readonly Mock<IProcessedTaxonRepository> _taxonProcessedRepository;
+        private readonly Mock<IDataProviderManager> _dataProviderManager;
+        private readonly Mock<IDwcaObservationProcessor> _dwcaObservationProcessor;
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<ILogger<ProcessJob>> _loggerMock;
 
@@ -66,6 +70,8 @@ namespace SOS.Process.UnitTests.Jobs
             _sharkProcessor.Object,
             _virtualHerbariumProcessor.Object,
             _artportalenProcessor.Object,
+            _dwcaObservationProcessor.Object,
+            _dataProviderManager.Object,
             _taxonProcessedRepository.Object,
             _instanceManager.Object,
             _copyFieldMappingsJob.Object,
@@ -96,357 +102,364 @@ namespace SOS.Process.UnitTests.Jobs
             _taxonProcessedRepository = new Mock<IProcessedTaxonRepository>();
             _areaHelper = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<ProcessJob>>();
+            _dwcaObservationProcessor = new Mock<IDwcaObservationProcessor>();
+            _dataProviderManager = new Mock<IDataProviderManager>();
         }
 
-        /// <summary>
-        /// Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
+        // todo - delete test?
+        // This test doesn't add any value to the unit test suite due to the following reasons:
+        // 1) The constructor is always invoked by dependency injection, which means that this test adds no protection against regressions (bugs).
+        // 2) This test tests the code implementation details and not the behavior of the system.
+        //
+        ///// <summary>
+        ///// Test constructor
+        ///// </summary>
+        //[Fact]
+        //public void ConstructorTest()
+        //{
+        //    TestObject.Should().NotBeNull();
 
-            Action create = () => new ProcessJob(
-                null,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
+        //    Action create = () => new ProcessJob(
+        //        null,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                null,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processInfoRepository");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        null,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processInfoRepository");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                null,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        null,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                null,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamPortalObservationProcessor");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        null,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("clamPortalObservationProcessor");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                null,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("kulObservationProcessor");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        null,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("kulObservationProcessor");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                null,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("mvmObservationProcessor");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        null,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("mvmObservationProcessor");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                null,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("norsObservationProcessor");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        null,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("norsObservationProcessor");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                null,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sersObservationProcessor");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        null,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sersObservationProcessor");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                null,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sharkObservationProcessor");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        null,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sharkObservationProcessor");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                null,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("virtualHerbariumObservationProcessor");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        null,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("virtualHerbariumObservationProcessor");
 
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                null,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenObservationProcessor");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        null,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenObservationProcessor");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                null,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedTaxonRepository");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        null,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedTaxonRepository");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                null,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("instanceManager");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        null,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("instanceManager");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                null,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("copyFieldMappingsJob");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        null,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("copyFieldMappingsJob");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                null,
-                _areaHelper.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processTaxaJob");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        null,
+        //        _areaHelper.Object,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processTaxaJob");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        null,
+        //        _loggerMock.Object);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
 
-            create = () => new ProcessJob(
-                _darwinCoreRepository.Object,
-                _processInfoRepository.Object,
-                _harvestInfoRepository.Object,
-                _clamPortalProcessor.Object,
-                _kulProcessor.Object,
-                _mvmProcessor.Object,
-                _norsProcessor.Object,
-                _sersProcessor.Object,
-                _sharkProcessor.Object,
-                _virtualHerbariumProcessor.Object,
-                _artportalenProcessor.Object,
-                _taxonProcessedRepository.Object,
-                _instanceManager.Object,
-                _copyFieldMappingsJob.Object,
-                _processTaxaJob.Object,
-                _areaHelper.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
+        //    create = () => new ProcessJob(
+        //        _darwinCoreRepository.Object,
+        //        _processInfoRepository.Object,
+        //        _harvestInfoRepository.Object,
+        //        _clamPortalProcessor.Object,
+        //        _kulProcessor.Object,
+        //        _mvmProcessor.Object,
+        //        _norsProcessor.Object,
+        //        _sersProcessor.Object,
+        //        _sharkProcessor.Object,
+        //        _virtualHerbariumProcessor.Object,
+        //        _artportalenProcessor.Object,
+        //        _taxonProcessedRepository.Object,
+        //        _instanceManager.Object,
+        //        _copyFieldMappingsJob.Object,
+        //        _processTaxaJob.Object,
+        //        _areaHelper.Object,
+        //        null);
+        //    create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
+        //}
 
         /// <summary>
         /// Make a successful test of processing
@@ -474,18 +487,18 @@ namespace SOS.Process.UnitTests.Jobs
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenVerbatimObservation)))
                 .ReturnsAsync(new HarvestInfo(nameof(ArtportalenVerbatimObservation), DataSet.ArtportalenObservations, DateTime.Now));
-            _artportalenProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(ObservationProvider.Artportalen, DateTime.Now, DateTime.Now, 1));
+            _artportalenProcessor.Setup(r => r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.Artportalen, DataSet.ArtportalenObservations, DateTime.Now, DateTime.Now, 1));
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ClamObservationVerbatim)))
                 .ReturnsAsync(new HarvestInfo(nameof(ClamObservationVerbatim), DataSet.ClamPortalObservations, DateTime.Now));
-            _clamPortalProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(ObservationProvider.ClamPortal, DateTime.Now, DateTime.Now, 1));
+            _clamPortalProcessor.Setup(r => r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.ClamGateway, DataSet.ClamPortalObservations, DateTime.Now, DateTime.Now, 1));
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(KulObservationVerbatim)))
                 .ReturnsAsync(new HarvestInfo(nameof(KulObservationVerbatim), DataSet.KULObservations, DateTime.Now));
-            _kulProcessor.Setup(r => r.ProcessAsync(It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(ObservationProvider.KUL, DateTime.Now, DateTime.Now, 1));
+            _kulProcessor.Setup(r => r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.KUL, DataSet.KULObservations, DateTime.Now, DateTime.Now, 1));
 
             _darwinCoreRepository.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()));
 
@@ -501,8 +514,15 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var sources = (byte) ObservationProvider.Artportalen + (byte)ObservationProvider.ClamPortal + (byte)ObservationProvider.KUL;
-            var result = await TestObject.RunAsync(sources, false, false, true, JobCancellationToken.Null);
+            var result = await TestObject.RunAsync(
+                new List<string>
+                {
+                    DataProviderIdentifiers.Artportalen, DataProviderIdentifiers.ClamGateway, DataProviderIdentifiers.KUL
+                }, 
+                false, 
+                false, 
+                true, 
+                JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -525,7 +545,7 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.RunAsync(It.IsAny<int>(), false, false, true, JobCancellationToken.Null);
+            var result = await TestObject.RunAsync(It.IsAny<List<string>>(), false, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -548,7 +568,7 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.RunAsync(It.IsAny<int>(), false, false, true, JobCancellationToken.Null);
+            var result = await TestObject.RunAsync(It.IsAny<List<string>>(), false, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
