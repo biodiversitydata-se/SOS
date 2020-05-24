@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
-using MongoDB.Driver.GeoJsonObjectModel;
+using MongoDB.Driver.GridFS;
+using Nest;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Database.Interfaces;
 
@@ -11,6 +12,9 @@ namespace SOS.Process.Repositories.Source
 {
     public class AreaVerbatimRepository : VerbatimBaseRepository<Area, int>, Interfaces.IAreaVerbatimRepository
     {
+        private readonly GridFSBucket _gridFSBucket;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -19,50 +23,19 @@ namespace SOS.Process.Repositories.Source
         public AreaVerbatimRepository(IVerbatimClient client,
             ILogger<AreaVerbatimRepository> logger) : base(client, logger)
         {
+            _jsonSerializerOptions = new JsonSerializerOptions();
+            _jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
 
+            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = nameof(Area) });
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Area>> GetAreasByCoordinatesAsync(double longitude, double latitude)
+        public async Task<IGeoShape> GetGeometryAsync(int areaId)
         {
-            try
-            {
-                var filter = Builders<Area>.Filter.GeoIntersects(a => a.Geometry,
-                    new GeoJsonPoint<GeoJson2DCoordinates>(
-                        new GeoJson2DCoordinates(longitude, latitude)
-                    )
-                );
+            var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync($"geometry-{ areaId }");
+            var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
-                var res = await MongoCollection
-                    .Find(filter)
-                    .Project(a => new Area(a.AreaType){ Id = a.Id, Name = a.Name }) // Project to skip geometry
-                    .ToListAsync();
-
-                return res;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-
-                return default;
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<List<AreaBase>> GetAllAreaBaseAsync()
-        {
-            var res = await MongoCollection
-                .Find(x => true)
-                .Project(m => new AreaBase(m.AreaType)
-                {
-                    FeatureId = m.FeatureId,
-                    Id = m.Id,
-                    Name = m.Name,
-                    ParentId = m.ParentId,
-                })
-                .ToListAsync();
-
-            return res;
+            return JsonSerializer.Deserialize<IGeoShape>(utfString, _jsonSerializerOptions);
         }
     }
 }

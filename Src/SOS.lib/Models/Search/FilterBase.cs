@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Nest;
 using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.Search
@@ -10,11 +11,7 @@ namespace SOS.Lib.Models.Search
     /// </summary>
     public class FilterBase
     {
-        /// <summary>
-        /// Counties to match. Queryable values are available in Field Mappings.
-        /// </summary>
         public IEnumerable<int> CountyIds { get; set; }
-
 
         public GeometryFilter GeometryFilter { get; set; }
 

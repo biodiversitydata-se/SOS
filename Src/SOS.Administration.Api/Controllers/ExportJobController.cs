@@ -45,7 +45,7 @@ namespace SOS.Administration.Api.Controllers
                     return BadRequest("You must provide a file name");
                 }
 
-                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndStoreJob>(job => job.RunAsync(filter, blobStorageContainer, fileName, JobCancellationToken.Null)));
+                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndStoreJob>(job => job.RunAsync(filter, blobStorageContainer, fileName, false, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
@@ -72,7 +72,7 @@ namespace SOS.Administration.Api.Controllers
                     return BadRequest("You must provide a file name");
                 }
 
-                RecurringJob.AddOrUpdate<IExportAndStoreJob>(nameof(IExportAndStoreJob), job => job.RunAsync(filter, blobStorageContainer, fileName, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IExportAndStoreJob>(nameof(IExportAndStoreJob), job => job.RunAsync(filter, blobStorageContainer, fileName, false, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult($"Export Darwin Core Job Scheduled.");
             }
             catch (Exception e)

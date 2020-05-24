@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
-using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
@@ -20,35 +16,38 @@ namespace SOS.Observations.Api.Managers
     /// <summary>
     /// Observation manager class
     /// </summary>
-    public class ObservationManager : Interfaces.IObservationManager
+    public class ObservationManager : IObservationManager
     {
+        private readonly IAreaRepository _areaRepository;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IFieldMappingManager _fieldMappingManager;
-        private readonly IAreaManager _areaManager;
         private readonly ITaxonManager _taxonManager;
         private readonly ILogger<ObservationManager> _logger;
         
         private const int BiotaTaxonId = 0;
 
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
+        /// <param name="areaRepository"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingManager"></param>
-        /// <param name="taxonManager"></param>
         /// <param name="areaManager"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         public ObservationManager(
+            IAreaRepository areaRepository,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingManager fieldMappingManager,
             IAreaManager areaManager,
             ITaxonManager taxonManager,
             ILogger<ObservationManager> logger)
         {
+            _areaRepository = areaRepository ?? throw new ArgumentNullException(nameof(areaRepository));
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
-            _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
+            
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -89,122 +88,65 @@ namespace SOS.Observations.Api.Managers
             // handle the area ids search
             if(preparedFilter.AreaIds != null && preparedFilter.AreaIds.Any())
             {
-                var area = await _areaManager.GetAreaInternalAsync(preparedFilter.AreaIds.First());
-                if (area != null)
+                foreach (var areaId in preparedFilter.AreaIds)
                 {
-                    //if we already have the info needed for the search we skip polygon searches
-                    if (area.AreaType == AreaType.County ||
-                        area.AreaType == AreaType.Municipality ||
-                        area.AreaType == AreaType.Province)
-                    {
-                        if (area.AreaType == AreaType.County)
-                        {
-                            if (preparedFilter.CountyIds == null)
-                            {
-                                preparedFilter.CountyIds = new List<int>();
-                            }
-                            var list = preparedFilter.CountyIds.ToList();
-                            list.Add(area.Id);
-                            preparedFilter.CountyIds = list;
-                        }
-                        else if (area.AreaType == AreaType.Municipality)
-                        {
-                            if (preparedFilter.MunicipalityIds == null)
-                            {
-                                preparedFilter.MunicipalityIds = new List<int>();
-                            }
-                            var list = preparedFilter.MunicipalityIds.ToList();
-                            list.Add(area.Id);
-                            preparedFilter.MunicipalityIds = list;
-                        }
-                        else if (area.AreaType == AreaType.Province)
-                        {
-                            if (preparedFilter.ProvinceIds == null)
-                            {
-                                preparedFilter.ProvinceIds = new List<int>();
-                            }
-                            var list = preparedFilter.ProvinceIds.ToList();
-                            list.Add(area.Id);
-                            preparedFilter.ProvinceIds = list;
-                        }
-                    }
-                    // we need to use the geometry filter
-                    else
-                    {
-                        var geomList = new List<Lib.Models.Shared.GeometryGeoJson>();
-                        if (preparedFilter.GeometryFilter == null) 
-                        {                            
-                            preparedFilter.GeometryFilter = new GeometryFilter();
-                            preparedFilter.GeometryFilter.MaxDistanceFromPoint = 0;
-                        }
+                    var area = await _areaRepository.GetAreaAsync(areaId);
 
-                        if (area.Geometry.Type == GeoJsonObjectType.MultiPolygon)
+                    if (area != null)
+                    {
+                        //if we already have the info needed for the search we skip polygon searches
+                        if (area.AreaType == AreaType.County ||
+                            area.AreaType == AreaType.Municipality ||
+                            area.AreaType == AreaType.Province)
                         {
-                            var geom = (GeoJsonMultiPolygon<GeoJson2DGeographicCoordinates>)area.Geometry;
-                            foreach (var polygon in geom.Coordinates.Polygons)
+                            if (area.AreaType == AreaType.County)
                             {
-                                CreatePolygon(geomList, polygon);                                
-                            }                          
-                        }                        
-                        else if (area.Geometry.Type == GeoJsonObjectType.Polygon)
-                        {
-                            var coordinates = ((GeoJsonPolygon<GeoJson2DGeographicCoordinates>)area.Geometry).Coordinates;
-                            CreatePolygon(geomList, coordinates);
+                                if (preparedFilter.CountyIds == null)
+                                {
+                                    preparedFilter.CountyIds = new List<int>();
+                                }
+                                var list = preparedFilter.CountyIds.ToList();
+                                list.Add(area.Id);
+                                preparedFilter.CountyIds = list;
+                            }
+                            else if (area.AreaType == AreaType.Municipality)
+                            {
+                                if (preparedFilter.MunicipalityIds == null)
+                                {
+                                    preparedFilter.MunicipalityIds = new List<int>();
+                                }
+                                var list = preparedFilter.MunicipalityIds.ToList();
+                                list.Add(area.Id);
+                                preparedFilter.MunicipalityIds = list;
+                            }
+                            else if (area.AreaType == AreaType.Province)
+                            {
+                                if (preparedFilter.ProvinceIds == null)
+                                {
+                                    preparedFilter.ProvinceIds = new List<int>();
+                                }
+                                var list = preparedFilter.ProvinceIds.ToList();
+                                list.Add(area.Id);
+                                preparedFilter.ProvinceIds = list;
+                            }
                         }
-                        //if we already have a geometry filter then we can just add the area polygons onto those
-                        if (preparedFilter.GeometryFilter.Geometries != null)
+                        else // we need to use the geometry filter
                         {
-                            var list = preparedFilter.GeometryFilter.Geometries.ToList();
-                            list.AddRange(geomList);
-                            preparedFilter.GeometryFilter.Geometries = list;
-                        }
-                        else 
-                        {                            
-                            preparedFilter.GeometryFilter.Geometries = geomList;
+                            var geometry = await _areaRepository.GetGeometryAsync(areaId);
+
+                            if (preparedFilter.GeometryFilter == null)
+                            {
+                                preparedFilter.GeometryFilter = new GeometryFilter();
+                                preparedFilter.GeometryFilter.MaxDistanceFromPoint = 0;
+                            }
+
+                            preparedFilter.GeometryFilter.Geometries.Add(geometry);
                         }
                     }
                 }
             }
 
             return preparedFilter;
-        }
-
-        private static void CreatePolygon(List<GeometryGeoJson> geomList, GeoJsonPolygonCoordinates<GeoJson2DGeographicCoordinates> coordinates)
-        {
-            //create the polygon
-            var inputGeom = new GeometryGeoJson();
-            inputGeom.Type = "polygon";
-            inputGeom.Coordinates = new System.Collections.ArrayList();
-            var str = "[";
-            foreach (var coord in coordinates.Exterior.Positions)
-            {
-                str += $"[{coord.Longitude.ToString(CultureInfo.InvariantCulture)}, {coord.Latitude.ToString(CultureInfo.InvariantCulture)}],";
-
-            }
-            str = str.Substring(0, str.Length - 1);
-            inputGeom.Coordinates.Add(JsonDocument.Parse(str + "]").RootElement);
-            geomList.Add(inputGeom);
-
-            //add the holes
-            if (coordinates.Holes != null && coordinates.Holes.Count > 0)
-            {
-                foreach (var hole in coordinates.Holes)
-                {
-                    var inputHoleGeom = new GeometryGeoJson();
-                    inputHoleGeom.Type = "holepolygon";
-                    inputHoleGeom.Coordinates = new System.Collections.ArrayList();
-                    str = "[";
-
-                    foreach (var coord in hole.Positions)
-                    {
-                        str += $"[{coord.Longitude.ToString(CultureInfo.InvariantCulture)}, {coord.Latitude.ToString(CultureInfo.InvariantCulture)}],";
-                    }
-                    str = str.Substring(0, str.Length - 1);
-                    inputHoleGeom.Coordinates.Add(JsonDocument.Parse(str + "]").RootElement);
-                    geomList.Add(inputHoleGeom);
-
-                }
-            }
         }
 
         private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)

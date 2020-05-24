@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
-using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Configuration.ObservationApi;
 using SOS.Observations.Api.IoC.Modules;
 
 namespace SOS.Observations.Api
@@ -16,8 +16,6 @@ namespace SOS.Observations.Api
     /// </summary>
     public class Program
     {
-        private static MongoDbConfiguration _mongoDbConfiguration;
-
         /// <summary>
         /// Main 
         /// </summary>
@@ -63,15 +61,6 @@ namespace SOS.Observations.Api
                     logging.ClearProviders();
                     logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
                 })
-                .UseServiceProviderFactory(hostContext =>
-                {
-                    _mongoDbConfiguration = hostContext.Configuration.GetSection("ProcessedDbConfiguration").Get<MongoDbConfiguration>();
-
-                    return new AutofacServiceProviderFactory(builder =>
-                        builder.RegisterModule(new SearchModule { MongoDbConfiguration = _mongoDbConfiguration })
-                    );
-                }
-                )
                 .UseNLog();
     }
 }

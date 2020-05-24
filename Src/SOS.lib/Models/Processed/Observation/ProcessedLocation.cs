@@ -1,5 +1,4 @@
 ﻿using Nest;
-using Newtonsoft.Json;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -292,6 +291,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// from the original to correct perceived errors or
         /// standardize the description.
         /// </summary>
+        [Keyword]
         public string Locality { get; set; }
 
         /// <summary>
@@ -506,5 +506,10 @@ namespace SOS.Lib.Models.Processed.Observation
         /// vocabulary such as the Getty Thesaurus of Geographic Names.
         /// </summary>
         public string WaterBody { get; set; }
+
+        /// <summary>
+        /// Internal field: The parent location id of the current location, this is used by Artportalen for bird locations that have one main location and several sublocation
+        /// </summary>
+        public int? ParentLocationId { get; set; }
     }
 }

@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using JsonDiffPatchDotNet;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
@@ -32,13 +30,13 @@ namespace SOS.Process.Helpers
         /// Get diff between generated, verbatim and processed areas.
         /// </summary>
         /// <returns></returns>
-        public async Task<byte[]> CreateDiffZipFile(AreaBase[] generatedAreas)
+        public async Task<byte[]> CreateDiffZipFile(Area[] generatedAreas)
         {
             // Get verbatim areas and set Geometry to null. It takes too long time and RAM to compare coordinates using JsonDiffPatch.
-            var verbatimAreas = (await _areaVerbatimRepository.GetAllAreaBaseAsync()).ToArray();
+            var verbatimAreas = (await _areaVerbatimRepository.GetAllAsync()).ToArray();
 
             // Get processed areas and set Geometry to null. It takes too long time and RAM to compare coordinates using JsonDiffPatch.
-            var processedAreas = (await _processedAreaRepository.GetAllAreaBaseAsync()).ToArray();
+            var processedAreas = (await _processedAreaRepository.GetAllAsync()).ToArray();
 
             var generatedAreasJtoken = JToken.FromObject(generatedAreas);
             var verbatimAreasJtoken = JToken.FromObject(verbatimAreas);

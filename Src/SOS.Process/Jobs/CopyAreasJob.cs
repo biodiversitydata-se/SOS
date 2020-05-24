@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Shared;
@@ -36,6 +38,14 @@ namespace SOS.Process.Jobs
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        private async Task<bool> CopyGeometryAsync(int id)
+        {
+            var geometry = await _areaVerbatimRepository.GetGeometryAsync(id);
+           
+            return await _processedAreaRepository.StoreGeometryAsync(id, geometry);
+        }
+        
+
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {
@@ -58,12 +68,26 @@ namespace SOS.Process.Jobs
 
             _logger.LogDebug("Start copy areas");
             var success = await _processedAreaRepository.AddManyAsync(areas);
-            //var success = await CopyAreas();
+           
             _logger.LogDebug("Finish copy areas");
 
-            _logger.LogDebug("Start indexing areas");
-            await _processedAreaRepository.CreateIndexAsync();
-            _logger.LogDebug("Finish indexing areas");
+            if (success)
+            {
+                _logger.LogDebug("Start deleting geometries");
+                await _processedAreaRepository.DropGeometriesAsync();
+                _logger.LogDebug("Finish deleting geometries");
+
+                _logger.LogDebug("Start copy geometries");
+                foreach (var area in areas)
+                {
+                    success = success && await CopyGeometryAsync(area.Id);
+                }
+                _logger.LogDebug("Finish copy geometries");
+
+                _logger.LogDebug("Start indexing areas");
+                await _processedAreaRepository.CreateIndexAsync();
+                _logger.LogDebug("Finish indexing areas");
+            }
 
             _logger.LogDebug("Start updating process info for areas");
             var harvestInfo = await GetHarvestInfoAsync(nameof(Area));

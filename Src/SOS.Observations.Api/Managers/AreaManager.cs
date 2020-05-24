@@ -1,18 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Models.Area;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using Newtonsoft.Json;
 using System.Text;
+using SOS.Lib.Extensions;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -54,15 +54,17 @@ namespace SOS.Observations.Api.Managers
                 return null;
             }
         }
+
         public async Task<byte[]> GetZipppedAreaAsync(int areaId)
         {
             try
             {
                 var area = await GetAreaInternalAsync(areaId);
+                var geometry = await _areaRepository.GetGeometryAsync(areaId);
                 var externalArea = new ExternalArea
                 {                    
                     AreaType = area.AreaType.ToString(),
-                    Geometry = area.Geometry.ToGeoJson(),
+                    Geometry = geometry.ToGeoJson(),
                     Id = area.Id,
                     Name = area.Name                    
                 };
@@ -75,12 +77,13 @@ namespace SOS.Observations.Api.Managers
                 return null;
             }
         }
+
         /// <inheritdoc />
-        public async Task<PagedResult<ExternalSimpleArea>> GetAreasAsync(AreaType areaType, string searchString, int skip, int take)
+        public async Task<PagedResult<ExternalSimpleArea>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip, int take)
         {
             try
             {
-                var result = await _areaRepository.GetAreasAsync(areaType, searchString, skip, take);
+                var result = await _areaRepository.GetAreasAsync(areaTypes, searchString, skip, take);
 
                 return new PagedResult<ExternalSimpleArea>
                 {

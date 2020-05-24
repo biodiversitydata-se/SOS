@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using FluentAssertions;
+using Nest;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using Xunit;
@@ -27,11 +28,12 @@ namespace SOS.Lib.UnitTests.Models.Search
                 {
                     MaxDistanceFromPoint = 50,
                     UsePointAccuracy = true,
-                    Geometries = new List<GeometryGeoJson>(){
-                        new GeometryGeoJson
+                    Geometries = new List<IGeoShape>{
+                        new PolygonGeoShape(new []{ new []
                         {
-                            Coordinates = new ArrayList(){ new[] { new double[] { 1, 2 }, new double[] { 3, 4 } } }
-                        }
+                            new GeoCoordinate(1,2),
+                            new GeoCoordinate(3,4) 
+                        } })
                     }
                 },
                 EndDate = currentDate
@@ -63,11 +65,12 @@ namespace SOS.Lib.UnitTests.Models.Search
                 {
                     MaxDistanceFromPoint = 50,
                     UsePointAccuracy = true,
-                    Geometries = new List<GeometryGeoJson>(){
-                        new GeometryGeoJson
+                    Geometries = new List<IGeoShape>{
+                        new PolygonGeoShape(new []{ new []
                         {
-                            Coordinates = new ArrayList(){ new[] { new double[] { 1, 2 }, new double[] { 3, 4 } } }
-                        }
+                            new GeoCoordinate(1,2),
+                            new GeoCoordinate(3,4)
+                        } })
                     }
                 },
                 EndDate = currentDate

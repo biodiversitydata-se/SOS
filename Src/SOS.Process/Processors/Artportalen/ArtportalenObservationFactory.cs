@@ -63,6 +63,7 @@ namespace SOS.Process.Processors.Artportalen
             var taxonId = verbatimObservation.TaxonId ?? -1;
 
             var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 && (verbatimObservation.Site?.YCoord ?? 0) > 0;
+            var point = (PointGeoShape) verbatimObservation.Site?.Point?.ToGeoShape();
 
             if (_taxa.TryGetValue(taxonId, out var taxon))
             {
@@ -121,8 +122,8 @@ namespace SOS.Process.Processors.Artportalen
                     CoordinateUncertaintyInMeters = verbatimObservation.Site?.Accuracy,
                     Country = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
                     CountryCode = CountryCode.Sweden,
-                    DecimalLatitude = verbatimObservation.Site?.Point?.Coordinates?.Latitude ?? 0,
-                    DecimalLongitude = verbatimObservation.Site?.Point?.Coordinates?.Longitude ?? 0,
+                    DecimalLatitude = point?.Coordinates?.Latitude ?? 0,
+                    DecimalLongitude = point?.Coordinates?.Longitude ?? 0,
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Locality = verbatimObservation.Site?.Name,
                     LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}",
@@ -130,12 +131,13 @@ namespace SOS.Process.Processors.Artportalen
                     MaximumElevationInMeters = verbatimObservation.MaxHeight,
                     MinimumDepthInMeters = verbatimObservation.MinDepth,
                     MinimumElevationInMeters = verbatimObservation.MinHeight,
-                    Point = (PointGeoShape)verbatimObservation.Site?.Point?.ToGeoShape(),
+                    Point = point,
                     PointLocation = verbatimObservation.Site?.Point?.ToGeoLocation(),
-                    PointWithBuffer = (PolygonGeoShape)verbatimObservation.Site?.PointWithBuffer?.ToGeoShape(),
+                    PointWithBuffer = (PolygonGeoShape)verbatimObservation.Site?.PointWithBuffer.ToGeoShape(),
                     VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord : 0,
                     VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0,
-                    VerbatimCoordinateSystem = "EPSG:3857"
+                    VerbatimCoordinateSystem = "EPSG:3857",
+                    ParentLocationId = verbatimObservation.Site?.ParentSiteId
                 },
                 Modified = endDate ?? verbatimObservation.ReportedDate,
                 Occurrence = new ProcessedOccurrence

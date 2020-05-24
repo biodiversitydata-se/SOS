@@ -307,6 +307,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// IdentificationQualifier term.
         /// Currently scientific name without author is provided.
         /// </summary>
+        [Keyword]
         public string ScientificName { get; set; }
 
         /// <summary>

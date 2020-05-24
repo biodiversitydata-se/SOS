@@ -21,11 +21,5 @@ namespace SOS.Import.Harvesters.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<Area>> GetAreasAsync();
-
-        /// <summary>
-        /// Get all areas, but skip getting geometry field.
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<AreaBase>> GetAreasBaseAsync();
     }
 }

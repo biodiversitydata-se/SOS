@@ -11,6 +11,7 @@ using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Jobs.Export;
 
 
@@ -47,6 +48,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<TaxonManager>().As<ITaxonManager>().InstancePerLifetimeScope();
 
             // Repositories mongo
+            builder.RegisterType<DOIRepository>().As<IDOIRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();

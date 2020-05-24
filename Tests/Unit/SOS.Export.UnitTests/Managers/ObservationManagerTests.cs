@@ -20,6 +20,7 @@ namespace SOS.Export.UnitTests.Managers
     /// </summary>
     public class ObservationManagerTests
     {
+        private readonly Mock<IDOIRepository> _doiRepository;
         private readonly Mock<IDwcArchiveFileWriter> _dwcArchiveFileWriterMock;
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
@@ -32,6 +33,7 @@ namespace SOS.Export.UnitTests.Managers
         /// Return object to be tested
         /// </summary>
         private ObservationManager TestObject => new ObservationManager(
+            _doiRepository.Object,
             _dwcArchiveFileWriterMock.Object,
             _processedObservationRepositoryMock.Object,
             _processInfoRepositoryMock.Object,
@@ -46,6 +48,7 @@ namespace SOS.Export.UnitTests.Managers
         /// </summary>
         public ObservationManagerTests()
         {
+            _doiRepository = new Mock<IDOIRepository>();
             _dwcArchiveFileWriterMock = new Mock<IDwcArchiveFileWriter>();
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
@@ -66,6 +69,19 @@ namespace SOS.Export.UnitTests.Managers
 
             Action create = () => new ObservationManager(
                 null,
+                _dwcArchiveFileWriterMock.Object,
+                _processedObservationRepositoryMock.Object,
+                _processInfoRepositoryMock.Object,
+                _fileServiceMock.Object,
+                _blobStorageServiceMock.Object,
+                _zendToServiceMock.Object,
+                new FileDestination { Path = "test" },
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("doiRepository");
+
+            create = () => new ObservationManager(
+                _doiRepository.Object,
+                null,
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
                 _fileServiceMock.Object,
@@ -75,7 +91,9 @@ namespace SOS.Export.UnitTests.Managers
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("dwcArchiveFileWriter");
 
+
             create = () => new ObservationManager(
+                _doiRepository.Object,
                 _dwcArchiveFileWriterMock.Object,
                 null,
                 _processInfoRepositoryMock.Object,
@@ -87,6 +105,7 @@ namespace SOS.Export.UnitTests.Managers
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
 
             create = () => new ObservationManager(
+                _doiRepository.Object,
                 _dwcArchiveFileWriterMock.Object,
                 _processedObservationRepositoryMock.Object,
                 null,
@@ -98,6 +117,7 @@ namespace SOS.Export.UnitTests.Managers
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processInfoRepository");
 
             create = () => new ObservationManager(
+                _doiRepository.Object,
                 _dwcArchiveFileWriterMock.Object,
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
@@ -109,6 +129,7 @@ namespace SOS.Export.UnitTests.Managers
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("fileService");
 
             create = () => new ObservationManager(
+                _doiRepository.Object,
                 _dwcArchiveFileWriterMock.Object,
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
@@ -121,6 +142,7 @@ namespace SOS.Export.UnitTests.Managers
 
 
             create = () => new ObservationManager(
+                _doiRepository.Object,
                 _dwcArchiveFileWriterMock.Object,
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
@@ -132,6 +154,7 @@ namespace SOS.Export.UnitTests.Managers
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("zendToService");
 
             create = () => new ObservationManager(
+                _doiRepository.Object,
                 _dwcArchiveFileWriterMock.Object,
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
@@ -143,6 +166,7 @@ namespace SOS.Export.UnitTests.Managers
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("fileDestination");
 
             create = () => new ObservationManager(
+                _doiRepository.Object,
                 _dwcArchiveFileWriterMock.Object,
                 _processedObservationRepositoryMock.Object,
                 _processInfoRepositoryMock.Object,
@@ -187,7 +211,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndStoreAsync(null,It.IsAny<string>(), It.IsAny<string>(), JobCancellationToken.Null);
+            var result = await TestObject.ExportAndStoreAsync(null,It.IsAny<string>(), It.IsAny<string>(), false, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -228,7 +252,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), JobCancellationToken.Null);
+            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), false, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -253,7 +277,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), JobCancellationToken.Null);
+            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), false, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

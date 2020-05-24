@@ -1,7 +1,7 @@
-﻿using MongoDB.Driver.GeoJsonObjectModel;
-using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen
 {
@@ -10,9 +10,20 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
     /// </summary>
     public class Site
     {
-        private GeoJsonPoint<GeoJson2DGeographicCoordinates> _point;
-        private GeoJsonGeometry<GeoJson2DGeographicCoordinates> _pointWithBuffer;
-        
+        private GeoJsonGeometry _point;
+        private GeoJsonGeometry _pointWithBuffer;
+
+        private void InitGeometries()
+        {
+            if (XCoord > 0 && YCoord > 0)
+            {
+                var webMercatorPoint = new Point(XCoord, YCoord);
+                var wgs84Point = (Point)webMercatorPoint.Transform(VerbatimCoordinateSystem, CoordinateSys.WGS84);
+                _point = wgs84Point?.ToGeoJson();
+                _pointWithBuffer = wgs84Point?.ToCircle(Accuracy)?.ToGeoJson();
+            }
+        }
+
         /// <summary>
         /// Accuracy in meters
         /// </summary>
@@ -29,6 +40,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public GeographicalArea CountryPart { get; set; }
 
         /// <summary>
+        /// Country Region
+        /// </summary>
+        public GeographicalArea CountryRegion { get; set; }
+        
+        /// <summary>
         /// Id of site
         /// </summary>
         public int Id { get; set; }
@@ -39,6 +55,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public GeographicalArea Municipality { get; set; }
 
         /// <summary>
+        /// Name of site
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// Parish
         /// </summary>
         public GeographicalArea Parish { get; set; }
@@ -46,7 +67,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         /// Point (WGS84)
         /// </summary>
-        public GeoJsonPoint<GeoJson2DGeographicCoordinates> Point
+        public GeoJsonGeometry Point
         {
             get
             {
@@ -63,7 +84,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         /// Point with accuracy buffer (WGS84)
         /// </summary>
-        public GeoJsonGeometry<GeoJson2DGeographicCoordinates> PointWithBuffer
+        public GeoJsonGeometry PointWithBuffer
         {
             get
             {
@@ -77,27 +98,22 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
             set => _pointWithBuffer = value;
         }
 
-        private void InitGeometries()
-        {
-            if (XCoord > 0 && YCoord > 0)
-            {
-                var webMercatorPoint = new Point(XCoord, YCoord);
-                var wgs84Point = (Point)webMercatorPoint.Transform(VerbatimCoordinateSystem, CoordinateSys.WGS84);
-                _point = (GeoJsonPoint<GeoJson2DGeographicCoordinates>)wgs84Point?.ToGeoJsonGeometry();
-                _pointWithBuffer = (GeoJsonPolygon<GeoJson2DGeographicCoordinates>) wgs84Point?.ToCircle(Accuracy)?.ToGeoJsonGeometry();
-            }
-        }
-        
+        /// <summary>
+        /// Protected Nature
+        /// </summary>
+        public GeographicalArea ProtectedNature { get; set; }
+
         /// <summary>
         /// Province
         /// </summary>
         public GeographicalArea Province { get; set; }
 
-        /// <summary>
-        /// Name of site
-        /// </summary>
-        public string Name { get; set; }
 
+        /// <summary>
+        ///  Special Protection Area, Natura 2000, Birds Directive
+        /// </summary>
+        public GeographicalArea SpecialProtectionArea { get; set; }
+        
         /// <summary>
         /// X coordinate of site
         /// </summary>
@@ -110,5 +126,14 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public int YCoord { get; set; }
 
         public CoordinateSys VerbatimCoordinateSystem { get; set; }
-    }
+
+        /// <summary>
+        /// Water Area
+        /// </summary>
+        public GeographicalArea WaterArea { get; set; }
+        /// <summary>
+        /// The parent site id
+        /// </summary>
+        public int? ParentSiteId { get; set; }
+}
 }

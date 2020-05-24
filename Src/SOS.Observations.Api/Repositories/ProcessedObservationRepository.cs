@@ -52,11 +52,10 @@ namespace SOS.Observations.Api.Repositories
             if (!string.IsNullOrEmpty(sortBy))
             {
                 sortDescriptor.Field(sortBy, sortOrder == SearchSortOrder.Desc ? SortOrder.Descending : SortOrder.Ascending);
-            }
-
+            }            
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(CollectionName.ToLower())
-                .Source(filter.OutputFields.ToProjection())
+                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
                 .From(skip)
                 .Size(take)
                 .Query(q => q
@@ -69,12 +68,33 @@ namespace SOS.Observations.Api.Repositories
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            var totalCount = searchResponse.HitsMetadata.Total.Value;
+
+            if(filter is SearchFilterInternal)
+            {
+                var internalFilter = filter as SearchFilterInternal;
+                if (internalFilter.IncludeRealCount)
+                {
+                    var countResponse = await _elasticClient.CountAsync<dynamic>(s => s
+                                                    .Index(CollectionName.ToLower())                                                    
+                                                    .Query(q => q
+                                                        .Bool(b => b
+                                                            .MustNot(excludeQuery)
+                                                            .Filter(query)
+                                                        )
+                                                    )                                                    
+                                                );
+                    if (!countResponse.IsValid) throw new InvalidOperationException(countResponse.DebugInformation);
+                    totalCount = countResponse.Count;
+                }
+            }
             return new PagedResult<dynamic>
             {
                 Records = searchResponse.Documents,
                 Skip = skip,
                 Take = take,
-                TotalCount = searchResponse.HitsMetadata.Total.Value
+                TotalCount = totalCount
             };
         }
         private static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateExcludeQuery(FilterBase filter)
@@ -93,7 +113,7 @@ namespace SOS.Observations.Api.Repositories
                                 queryContainers.Add(q => q
                                     .GeoShape(gd => gd
                                         .Field("location.pointWithBuffer")
-                                        .Shape(s => geom.ToGeoShape())
+                                        .Shape(s => geom)
                                         .Relation(GeoShapeRelation.Intersects)
                                     )
                                 );
@@ -103,7 +123,7 @@ namespace SOS.Observations.Api.Repositories
                                 queryContainers.Add(q => q
                                     .GeoShape(gd => gd
                                         .Field("location.point")
-                                        .Shape(s => geom.ToGeoShape())
+                                        .Shape(s => geom)
                                         .Relation(GeoShapeRelation.Within)
                                     )
                                 );
@@ -124,11 +144,14 @@ namespace SOS.Observations.Api.Repositories
                 if (internalFilter.ProjectId.HasValue)
                 {
                     queryInternal.Add(q => q
-                        .Match(t => t
-                            .Field(new Field("projects.id"))
-                            .Query(internalFilter.ProjectId.ToString())
+                        .Nested(n=>n
+                            .Path("projects")
+                            .Query(q=>q
+                                .Match(m=>m
+                                .Field(new Field("projects.id"))
+                                .Query(internalFilter.ProjectId.ToString())
                         )
-                    );
+                    )));
                 }
                 if (internalFilter.UserId.HasValue)
                 {
@@ -138,6 +161,16 @@ namespace SOS.Observations.Api.Repositories
                             .Terms(internalFilter.UserId)
                         )
                     );
+                }
+                if(internalFilter.BoundingBox != null)
+                {
+                    queryInternal.Add(q => q
+                            .GeoBoundingBox(g => g
+                            .Field(new Field("location.pointLocation"))
+                            .BoundingBox(internalFilter.BoundingBox[1],
+                                         internalFilter.BoundingBox[0],                                                                                 
+                                         internalFilter.BoundingBox[3],
+                                         internalFilter.BoundingBox[2])));
                 }
             }
             return queryInternal;

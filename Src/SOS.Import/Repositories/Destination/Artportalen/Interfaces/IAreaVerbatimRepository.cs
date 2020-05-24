@@ -1,7 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nest;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Repositories.Destination.Artportalen.Interfaces
 {
@@ -11,9 +12,16 @@ namespace SOS.Import.Repositories.Destination.Artportalen.Interfaces
     public interface IAreaVerbatimRepository : IVerbatimRepository<Area, int>
     {
         /// <summary>
-        /// Create search index
+        /// Delete all geometries stored in Gridfs
         /// </summary>
         /// <returns></returns>
-        Task CreateIndexAsync();
+        Task DropGeometriesAsync();
+
+        /// <summary>
+        /// Save geometries to Gridfs
+        /// </summary>
+        /// <param name="areaGeometries"></param>
+        /// <returns></returns>
+        Task<bool> StoreGeometriesAsync(IDictionary<int, IGeoShape> areaGeometries);
     }
 }

@@ -248,6 +248,7 @@ namespace SOS.Process.Repositories.Destination
             // Make sure invalid collection is empty 
             await _invalidObservationRepository.DeleteCollectionAsync();
             await _invalidObservationRepository.AddCollectionAsync();
+            await _invalidObservationRepository.CreateIndexAsync();
 
             return !response.Exists;
         }

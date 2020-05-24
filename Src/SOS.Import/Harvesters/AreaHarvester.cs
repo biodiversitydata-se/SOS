@@ -7,6 +7,7 @@ using SOS.Import.Extensions;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 
@@ -46,35 +47,44 @@ namespace SOS.Import.Harvesters
                 var start = DateTime.Now;
                 _logger.LogDebug("Start getting areas");
 
-                var areas = (await _areaRepository.GetAsync()).ToVerbatims();
+                var areas = await _areaRepository.GetAsync();
                 _logger.LogDebug("Finish getting areas");
 
-                _logger.LogDebug("Start preparing area collection");
                 // Make sure we have an empty collection
-                if (await _areaVerbatimRepository.DeleteCollectionAsync())
+                if ((areas?.Any() ?? false) && await _areaVerbatimRepository.DeleteCollectionAsync())
                 {
+                    _logger.LogDebug("Start preparing area collection");
+                    await _areaVerbatimRepository.DropGeometriesAsync();
+
                     if (await _areaVerbatimRepository.AddCollectionAsync())
                     {
                         _logger.LogDebug("Finish preparing area collection");
                         _logger.LogDebug("Start adding areas");
-                        if (await _areaVerbatimRepository.AddManyAsync(areas))
+                        if (await _areaVerbatimRepository.AddManyAsync(areas.ToVerbatims()))
                         {
                             _logger.LogDebug("Finish adding areas");
 
-                            _logger.LogDebug("Start creating area indexes");
-                            await _areaVerbatimRepository.CreateIndexAsync();
-                            _logger.LogDebug("Finish creating area indexes");
-                            _logger.LogDebug("Adding areas succeeded");
+                            _logger.LogDebug("Start casting geometries");
+                            var geometries = areas.ToDictionary(a => a.Id, a => a.Polygon.ToGeometry().ToGeoShape());
+                            _logger.LogDebug("Finsih casting geometries");
 
-                            // Update harvest info
-                            harvestInfo.End = DateTime.Now;
-                            harvestInfo.Status = RunStatus.Success;
-                            harvestInfo.Count = areas?.Count() ?? 0;
+                            _logger.LogDebug("Start storing geometries");
+                            if (await _areaVerbatimRepository.StoreGeometriesAsync(geometries))
+                            {
+                                _logger.LogDebug("Finish storing geometries");
+                                _logger.LogDebug("Adding areas succeeded");
 
-                            return harvestInfo;
+                                // Update harvest info
+                                harvestInfo.End = DateTime.Now;
+                                harvestInfo.Status = RunStatus.Success;
+                                harvestInfo.Count = areas?.Count() ?? 0;
+
+                                return harvestInfo;
+                            }
                         }
                     }
                 }
+                _logger.LogDebug("Failed harvest of areas");
                 harvestInfo.Status = RunStatus.Failed;
             }
             catch (Exception e)
@@ -90,13 +100,6 @@ namespace SOS.Import.Harvesters
         public async Task<IEnumerable<Area>> GetAreasAsync()
         {
             return (await _areaRepository.GetAsync()).ToVerbatims();
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<AreaBase>> GetAreasBaseAsync()
-        {
-            var areaEntities = await _areaRepository.GetAreasExceptGeometryFieldAsync();
-            return areaEntities.Select(ae => ae.ToAreaBaseVerbatim());
         }
     }
 }

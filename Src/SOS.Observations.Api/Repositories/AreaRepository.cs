@@ -1,12 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using MongoDB.Driver.GridFS;
+using Nest;
 using SOS.Lib.Enums;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Database.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Observations.Api.Repositories
 {
@@ -15,26 +22,33 @@ namespace SOS.Observations.Api.Repositories
     /// </summary>
     public class AreaRepository : ProcessBaseRepository<Area, int>, IAreaRepository
     {
+        private readonly GridFSBucket _gridFSBucket;
+        private readonly JsonSerializerOptions _jsonSerializerOptions;
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
         public AreaRepository(
-            IProcessClient client, 
+            IProcessClient client,
             ILogger<AreaRepository> logger) : base(client, false, logger)
         {
+            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = nameof(Area) });
+            _jsonSerializerOptions = new JsonSerializerOptions();
+            _jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<Area>> GetAreasAsync(AreaType areaType, string searchString, int skip, int take)
+        public async Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip, int take)
         {
             var filters = new List<FilterDefinition<Area>>();
 
-            filters.Add(Builders<Area>.Filter
-                .Eq(f => f
-                    .AreaType, areaType));
-
+            if (areaTypes?.Any() ?? false)
+            {
+                filters.Add(Builders<Area>.Filter.In(a => a.AreaType, areaTypes));
+            }
+            
             if (!string.IsNullOrEmpty(searchString))
             {
                 filters.Add(Builders<Area>.Filter
@@ -43,12 +57,12 @@ namespace SOS.Observations.Api.Repositories
                         .Contains(searchString.ToLower())));
             }
 
-            var filter = Builders<Area>.Filter.And(filters);
+            var filter = filters.Count == 0 ? Builders<Area>.Filter.Empty : Builders<Area>.Filter.And(filters);
 
             var total = await MongoCollection
                 .Find(filter)
                 .CountDocumentsAsync();
-            
+
             var result = await MongoCollection
                 .Find(filter)
                 .Skip(skip)
@@ -68,6 +82,15 @@ namespace SOS.Observations.Api.Repositories
         public async Task<Area> GetAreaAsync(int areaId)
         {
             return await GetAsync(areaId);
+        }
+
+        /// <inheritdoc />
+        public async Task<IGeoShape> GetGeometryAsync(int areaId)
+        {
+            var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync($"geometry-{ areaId }");
+            var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+
+            return JsonSerializer.Deserialize<IGeoShape>(utfString, _jsonSerializerOptions);
         }
     }
 }

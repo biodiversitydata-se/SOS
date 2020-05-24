@@ -61,21 +61,23 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                
                 if (!filter.IsFilterActive )
                 {
                     return BadRequest("You must provide a filter.");
                 }
-
-                if (skip < 0 || take <= 0 || take > MaxBatchSize)
+                //Remove the limitations if we use the internal functions
+                if (!(filter is SearchFilterInternal))
                 {
-                    return BadRequest($"You can't take more than { MaxBatchSize } at a time.");
+                    if (skip < 0 || take <= 0 || take > MaxBatchSize)
+                    {
+                        return BadRequest($"You can't take more than { MaxBatchSize } at a time.");
+                    }                                    
                 }
-
                 if (skip + take > ElasticSearchMaxRecords)
                 {
                     return BadRequest($"Skip + take ");
                 }
-
                 return new OkObjectResult(await _observationManager.GetChunkAsync(filter, skip, take, sortBy, sortOrder));
             }
             catch (Exception e)
