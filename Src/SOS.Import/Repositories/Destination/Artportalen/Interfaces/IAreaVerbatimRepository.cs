@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Nest;
+using NetTopologySuite.Geometries;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Models.Shared;
 
@@ -22,6 +22,6 @@ namespace SOS.Import.Repositories.Destination.Artportalen.Interfaces
         /// </summary>
         /// <param name="areaGeometries"></param>
         /// <returns></returns>
-        Task<bool> StoreGeometriesAsync(IDictionary<int, IGeoShape> areaGeometries);
+        Task<bool> StoreGeometriesAsync(IDictionary<int, Geometry> areaGeometries);
     }
 }

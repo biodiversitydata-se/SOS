@@ -342,21 +342,24 @@ namespace SOS.Lib.Extensions
             }
 
             var coordinates = new ArrayList();
-
+            var type = "";
             switch (geometry.Type?.ToLower())
             {
                 case "point":
                     var point = (PointGeoShape) geometry;
                     coordinates.Add(point.Coordinates.Longitude);
                     coordinates.Add(point.Coordinates.Latitude);
+                    type = "Point"; // Type in correct case
                     break;
                 case "polygon":
                     var polygon = (PolygonGeoShape)geometry;
                     coordinates.AddRange(polygon.Coordinates.Select(ls => ls.Select(pnt => new[] { pnt.Longitude, pnt.Latitude })).ToArray());
+                    type = "Polygon"; // Type in correct case
                     break;
                 case "multipolygon":
                     var multiPolygons = (MultiPolygonGeoShape)geometry;
                     coordinates.AddRange(multiPolygons.Coordinates.Select(p => p.Select(ls => ls.Select(pnt => new[] { pnt.Longitude, pnt.Latitude }))).ToArray());
+                    type = "MultiPolygon"; // Type in correct case
                     break;
                 default:
                     return null;
@@ -364,7 +367,7 @@ namespace SOS.Lib.Extensions
 
             return new GeoJsonGeometry
             {
-                Type = geometry.Type,
+                Type = type,
                 Coordinates = coordinates
             }; 
         }

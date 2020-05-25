@@ -36,6 +36,24 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <inheritdoc />
+        [HttpPost("Areas/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RunProcessAreasJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IProcessAreasJob>(job => job.RunAsync());
+                return new OkObjectResult("Started process areas job");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Starting process areas job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
         [HttpPost("Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -216,24 +234,6 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Starting copy field mapping job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpPost("CopyAreas/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunCopyAreasJob()
-        {
-            try
-            {
-                BackgroundJob.Enqueue<ICopyAreasJob>(job => job.RunAsync());
-                return new OkObjectResult("Started copy areas job");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Starting copy areas job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

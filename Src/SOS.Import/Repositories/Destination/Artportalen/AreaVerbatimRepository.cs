@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.GridFS;
-using Nest;
+using NetTopologySuite.Geometries;
 using SOS.Import.MongoDb.Interfaces;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
@@ -42,10 +42,10 @@ namespace SOS.Import.Repositories.Destination.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<bool> StoreGeometriesAsync(IDictionary<int, IGeoShape> areaGeometries)
+        public async Task<bool> StoreGeometriesAsync(IDictionary<int, Geometry> areaGeometries)
         {
             var serializeOptions = new JsonSerializerOptions();
-            serializeOptions.Converters.Add(new GeoShapeConverter());
+            serializeOptions.Converters.Add(new GeometryConverter());
 
             foreach (var geometry in areaGeometries)
             {

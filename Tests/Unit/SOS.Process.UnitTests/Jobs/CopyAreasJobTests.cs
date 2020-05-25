@@ -18,15 +18,15 @@ namespace SOS.Process.UnitTests.Jobs
     /// <summary>
     /// Tests for activate instance job
     /// </summary>
-    public class CopyAreasJobTests
+    public class ProcessAreasJobTests
     {
         private readonly Mock<IAreaVerbatimRepository> _areaVerbatimRepositoryMock;
         private readonly Mock<IProcessedAreaRepository> _processedAreaRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
-        private readonly Mock<ILogger<CopyAreasJob>> _loggerMock;
+        private readonly Mock<ILogger<ProcessAreasJob>> _loggerMock;
 
-        private CopyAreasJob TestObject => new CopyAreasJob(
+        private ProcessAreasJob TestObject => new ProcessAreasJob(
             _areaVerbatimRepositoryMock.Object,
             _processedAreaRepositoryMock.Object,
             _harvestInfoRepository.Object,
@@ -36,13 +36,13 @@ namespace SOS.Process.UnitTests.Jobs
         /// <summary>
         /// Constructor
         /// </summary>
-        public CopyAreasJobTests()
+        public ProcessAreasJobTests()
         {
             _areaVerbatimRepositoryMock = new Mock<IAreaVerbatimRepository>();
             _processedAreaRepositoryMock = new Mock<IProcessedAreaRepository>();
             _processInfoRepository = new Mock<IProcessInfoRepository>();
             _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
-            _loggerMock = new Mock<ILogger<CopyAreasJob>>();
+            _loggerMock = new Mock<ILogger<ProcessAreasJob>>();
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace SOS.Process.UnitTests.Jobs
         {
             TestObject.Should().NotBeNull();
 
-            Action create = () => new CopyAreasJob(
+            Action create = () => new ProcessAreasJob(
                 null,
                 _processedAreaRepositoryMock.Object,
                 _harvestInfoRepository.Object,
@@ -61,7 +61,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaVerbatimRepository");
 
-            create = () => new CopyAreasJob(
+            create = () => new ProcessAreasJob(
                 _areaVerbatimRepositoryMock.Object,
                 null,
                 _harvestInfoRepository.Object,
@@ -69,7 +69,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedAreaRepository");
 
-            create = () => new CopyAreasJob(
+            create = () => new ProcessAreasJob(
                 _areaVerbatimRepositoryMock.Object,
                 _processedAreaRepositoryMock.Object,
                 null,
@@ -77,7 +77,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
 
-            create = () => new CopyAreasJob(
+            create = () => new ProcessAreasJob(
                 _areaVerbatimRepositoryMock.Object,
                 _processedAreaRepositoryMock.Object,
                 _harvestInfoRepository.Object,
@@ -85,7 +85,7 @@ namespace SOS.Process.UnitTests.Jobs
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processInfoRepository");
 
-            create = () => new CopyAreasJob(
+            create = () => new ProcessAreasJob(
                 _areaVerbatimRepositoryMock.Object,
                 _processedAreaRepositoryMock.Object,
                 _harvestInfoRepository.Object,

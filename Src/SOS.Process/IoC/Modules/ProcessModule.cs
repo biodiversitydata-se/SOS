@@ -113,7 +113,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ProcessJob>().As<IProcessJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessTaxaJob>().As<IProcessTaxaJob>().InstancePerLifetimeScope();
             builder.RegisterType<CopyFieldMappingsJob>().As<ICopyFieldMappingsJob>().InstancePerLifetimeScope();
-            builder.RegisterType<CopyAreasJob>().As<ICopyAreasJob>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessAreasJob>().As<IProcessAreasJob>().InstancePerLifetimeScope();
         }
     }
 }
