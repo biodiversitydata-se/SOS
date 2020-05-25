@@ -13,65 +13,27 @@ using SOS.Lib.Jobs.Import;
 namespace SOS.Administration.Api.Controllers
 {
     /// <summary>
-    /// Import job controller
+    /// Harvest observations job controller
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class HarvestJobsController : ControllerBase, Interfaces.IHarvestJobController
+    public class HarvestObservationsJobController : ControllerBase, Interfaces.IHarvestObservationJobController
     {
         private readonly IDataProviderManager _dataProviderManager;
-        private readonly ILogger<HarvestJobsController> _logger;
+        private readonly ILogger<HarvestObservationsJobController> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
-        public HarvestJobsController(
+        public HarvestObservationsJobController(
             IDataProviderManager dataProviderManager,
-            ILogger<HarvestJobsController> logger)
+            ILogger<HarvestObservationsJobController> logger)
         {
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
-        #region Areas
-        /// <inheritdoc />
-        [HttpPost("Areas/Schedule/Daily")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailyGeoAreasHarvestJob([FromQuery]int hour, [FromQuery]int minute)
-        {
-            try
-            {
-                RecurringJob.AddOrUpdate<IGeoAreasHarvestJob>(nameof(IGeoAreasHarvestJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
-                return new OkObjectResult("Areas harvest job added");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Adding areas harvest job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpPost("Areas/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunGeoAreasHarvestJob()
-        {
-            try
-            {
-                BackgroundJob.Enqueue<IGeoAreasHarvestJob>(job => job.RunAsync());
-                return new OkObjectResult("Started areas harvest job");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Running areas harvest job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-        #endregion Geo
 
         #region Artportalen
         /// <inheritdoc />
@@ -164,14 +126,14 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                var dataProvider = await _dataProviderManager.GetDataProviderByIdAsync(model.DataProviderId);
+                var dataProvider = await _dataProviderManager.GetDataProviderByIdOrIdentifier(model.DataProviderIdOrIdentifier);
                 if (dataProvider == null)
                 {
-                    return new BadRequestObjectResult($"No data provider exist with Id={model.DataProviderId}");
+                    return new BadRequestObjectResult($"No data provider exist with Id={model.DataProviderIdOrIdentifier}");
                 }
-                if (dataProvider.DataType != DataSet.DwcA)
+                if (dataProvider.Type != DataSet.DwcA)
                 {
-                    return new BadRequestObjectResult($"The data provider \"{dataProvider.Name} [Id={dataProvider.Id}, Identfier={dataProvider.Identifier}]\" is not a DwC-A provider");
+                    return new BadRequestObjectResult($"The data provider \"{dataProvider}\" is not a DwC-A provider");
                 }
                 if (model.DwcaFile.Length == 0)
                 {
@@ -186,7 +148,7 @@ namespace SOS.Administration.Api.Controllers
 
                 // process uploaded file
                 BackgroundJob.Enqueue<IDwcArchiveHarvestJob>(job => job.RunAsync(dataProvider.Id, filePath, JobCancellationToken.Null));
-                return new OkObjectResult("Started DwC-A harvest job");
+                return new OkObjectResult($"Started DwC-A harvest job for data provider: {dataProvider}");
 
             }
             catch (Exception e)
@@ -197,26 +159,6 @@ namespace SOS.Administration.Api.Controllers
         }
 
         #endregion DwC-A
-
-        #region FieldMapping
-        /// <inheritdoc />
-        [HttpPost("FieldMapping/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunImportFieldMappingJob()
-        {
-            try
-            {
-                BackgroundJob.Enqueue<IFieldMappingImportJob>(job => job.RunAsync());
-                return new OkObjectResult("Started import field mapping job");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Running import field mapping job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-        #endregion FieldMapping
 
         #region KUL
         /// <inheritdoc />
@@ -407,44 +349,6 @@ namespace SOS.Administration.Api.Controllers
             }
         }
         #endregion SHARK
-
-        #region Taxon
-        /// <inheritdoc />
-        [HttpPost("Taxon/Schedule/Daily")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailyTaxonHarvestJob([FromQuery]int hour, [FromQuery]int minute)
-        {
-            try
-            {
-                RecurringJob.AddOrUpdate<ITaxonHarvestJob>(nameof(ITaxonHarvestJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
-                return new OkObjectResult("Taxon harvest job added");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Adding taxon harvest job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpPost("Taxon/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunTaxonHarvestJob()
-        {
-            try
-            {
-                BackgroundJob.Enqueue<ITaxonHarvestJob>(job => job.RunAsync());
-                return new OkObjectResult("Started taxon harvest job");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Running taxon harvest job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-        #endregion Taxon
 
         #region Virtual Herbarium
         /// <inheritdoc />

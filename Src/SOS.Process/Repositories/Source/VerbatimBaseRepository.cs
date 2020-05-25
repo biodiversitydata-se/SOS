@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Models.Interfaces;
 using SOS.Process.Database.Interfaces;
@@ -22,6 +23,8 @@ namespace SOS.Process.Repositories.Source
         /// Mongo db
         /// </summary>
         protected readonly IMongoDatabase Database;
+
+        protected readonly IVerbatimClient Client;
 
         /// <summary>
         /// Disposed
@@ -47,6 +50,7 @@ namespace SOS.Process.Repositories.Source
                 throw new ArgumentNullException(nameof(client));
             }
 
+            Client = client;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Database = client.GetDatabase();
@@ -60,6 +64,26 @@ namespace SOS.Process.Repositories.Source
         /// <returns></returns>
         protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(_collectionName);
 
+        /// <inheritdoc />
+        public async Task<bool> CheckIfCollectionExistsAsync()
+        {
+            return await CheckIfCollectionExistsAsync(_collectionName);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> CheckIfCollectionExistsAsync(string collectionName)
+        {
+            //filter by collection name
+            var exists = await (await Database
+                    .ListCollectionNamesAsync(new ListCollectionNamesOptions
+                    {
+                        Filter = new BsonDocument("name", _collectionName)
+                    }))
+                .AnyAsync();
+
+            return exists;
+        }
+
         protected IMongoCollection<TEntity> GetMongoCollection(string collectionName)
         {
             return Database.GetCollection<TEntity>(collectionName);
@@ -72,9 +96,9 @@ namespace SOS.Process.Repositories.Source
         }
 
         /// <inheritdoc />
-        public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync(IMongoCollection<TEntity> mongoCollection)
+        public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync(IMongoCollection<TEntity> mongoCollection, bool noCursorTimeout = false)
         {
-            return await mongoCollection.FindAsync(FilterDefinition<TEntity>.Empty);
+            return await mongoCollection.FindAsync(FilterDefinition<TEntity>.Empty, new FindOptions<TEntity, TEntity> { NoCursorTimeout = noCursorTimeout});
         }
 
         /// <inheritdoc />

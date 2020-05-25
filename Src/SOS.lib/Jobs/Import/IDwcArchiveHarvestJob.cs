@@ -3,7 +3,7 @@ using Hangfire;
 
 namespace SOS.Lib.Jobs.Import
 {
-    public interface IDwcArchiveHarvestJob
+    public interface IDwcArchiveHarvestJob : IHarvestJob
     {
         /// <summary>
         /// Run DwC-A harvest

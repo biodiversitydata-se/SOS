@@ -14,6 +14,7 @@ using SOS.Import.Harvesters.Observations;
 using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.DarwinCoreArchive;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Harvesters.Observations
@@ -29,11 +30,10 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-occurrence-lifewatch-psophus-stridulus.zip";
-            var datasetInfo = new DwcaDatasetInfo
+            var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
-                DataProviderId = 100,
-                DataProviderIdentifier = "TestPsophusStridulusCollection",
-                ArchiveFilename = System.IO.Path.GetFileName(archivePath)
+                Id = 100,
+                Identifier = "TestPsophusStridulusCollection"
             };
             var dwcObservationHarvester = CreateDwcObservationHarvester();
 
@@ -42,7 +42,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
                 archivePath,
-                datasetInfo,
+                dataProviderIdIdentifierTuple,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -58,11 +58,10 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-occurrence-emof-lifewatch.zip";
-            var datasetInfo = new DwcaDatasetInfo
+            var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
-                DataProviderId = 101,
-                DataProviderIdentifier = "TestLifeWatchSubsetCollection",
-                ArchiveFilename = System.IO.Path.GetFileName(archivePath)
+                Id = 101,
+                Identifier = "TestLifeWatchSubsetCollection"
             };
             var dwcObservationHarvester = CreateDwcObservationHarvester();
 
@@ -70,8 +69,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
-                archivePath, 
-                datasetInfo,
+                archivePath,
+                dataProviderIdIdentifierTuple,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -87,11 +86,10 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
-            var datasetInfo = new DwcaDatasetInfo
+            var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
-                DataProviderId = 102,
-                DataProviderIdentifier = "TestButterflyMonitoring",
-                ArchiveFilename = System.IO.Path.GetFileName(archivePath)
+                Id = 102,
+                Identifier = "TestButterflyMonitoring"
             };
             var dwcObservationHarvester = CreateDwcObservationHarvester();
 
@@ -103,7 +101,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             // https://www.gbif.org/data-quality-requirements-sampling-events
             var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
                 archivePath,
-                datasetInfo,
+                dataProviderIdIdentifierTuple,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -119,11 +117,10 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string archivePath = "./resources/dwca/SHARK_Zooplankton_NAT_DwC-A.zip";
-            var datasetInfo = new DwcaDatasetInfo
+            var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
-                DataProviderId = 103,
-                DataProviderIdentifier = "TestSHARK",
-                ArchiveFilename = System.IO.Path.GetFileName(archivePath)
+                Id = 103,
+                Identifier = "TestSHARK"
             };
             var dwcObservationHarvester = CreateDwcObservationHarvester();
 
@@ -132,7 +129,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
                 archivePath,
-                datasetInfo,
+                dataProviderIdIdentifierTuple,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------

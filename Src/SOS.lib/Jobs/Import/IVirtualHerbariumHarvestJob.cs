@@ -3,12 +3,8 @@ using Hangfire;
 
 namespace SOS.Lib.Jobs.Import
 {
-    public interface IVirtualHerbariumHarvestJob
+    public interface IVirtualHerbariumHarvestJob : IHarvestJob
     {
-        /// <summary>
-        /// Run Virtual Herbarium harvest.
-        /// </summary>
-        /// <returns></returns>
-        Task<bool> RunAsync(IJobCancellationToken cancellationToken);
+        
     }
 }

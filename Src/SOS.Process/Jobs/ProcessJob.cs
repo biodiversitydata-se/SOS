@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Processed;
@@ -14,15 +15,18 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Models.Verbatim.Mvm;
 using SOS.Lib.Models.Verbatim.Nors;
 using SOS.Lib.Models.Verbatim.Sers;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Verbatim.Shark;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Processors.ClamPortal.Interfaces;
+using SOS.Process.Processors.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
 using SOS.Process.Processors.Mvm.Interfaces;
 using SOS.Process.Processors.Nors.Interfaces;
@@ -40,20 +44,14 @@ namespace SOS.Process.Jobs
     public class ProcessJob : ProcessJobBase, IProcessJob
     {
         private readonly IProcessedObservationRepository _processedObservationRepository;
-        private readonly IArtportalenObservationProcessor _artportalenObservationProcessor;
-        private readonly IClamPortalObservationProcessor _clamPortalObservationProcessor;
-        private readonly IKulObservationProcessor _kulObservationProcessor;
-        private readonly IMvmObservationProcessor _mvmObservationProcessor;
-        private readonly INorsObservationProcessor _norsObservationProcessor;
-        private readonly ISersObservationProcessor _sersObservationProcessor;
-        private readonly ISharkObservationProcessor _sharkObservationProcessor;
-        private readonly IVirtualHerbariumObservationProcessor _virtualHerbariumObservationProcessor;
+        private readonly IDataProviderManager _dataProviderManager;
         private readonly IInstanceManager _instanceManager;
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly ICopyFieldMappingsJob _copyFieldMappingsJob;
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly IAreaHelper _areaHelper;
         private readonly ILogger<ProcessJob> _logger;
+        private readonly Dictionary<DataSet, IProcessor> _processorByType;
 
         /// <summary>
         /// Constructor
@@ -69,6 +67,8 @@ namespace SOS.Process.Jobs
         /// <param name="sharkObservationProcessor"></param>
         /// <param name="virtualHerbariumObservationProcessor"></param>
         /// <param name="artportalenObservationProcessor"></param>
+        /// <param name="dwcaObservationProcessor"></param>
+        /// <param name="dataProviderManager"></param>
         /// <param name="processedTaxonRepository"></param>
         /// <param name="instanceManager"></param>
         /// <param name="copyFieldMappingsJob"></param>
@@ -87,6 +87,8 @@ namespace SOS.Process.Jobs
             ISharkObservationProcessor sharkObservationProcessor,
             IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor,
             IArtportalenObservationProcessor artportalenObservationProcessor,
+            IDwcaObservationProcessor dwcaObservationProcessor,
+            IDataProviderManager dataProviderManager,
             IProcessedTaxonRepository processedTaxonRepository,
             IInstanceManager instanceManager,
             ICopyFieldMappingsJob copyFieldMappingsJob,
@@ -95,230 +97,255 @@ namespace SOS.Process.Jobs
             ILogger<ProcessJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
-            _clamPortalObservationProcessor = clamPortalObservationProcessor ?? throw new ArgumentNullException(nameof(clamPortalObservationProcessor));
-            _kulObservationProcessor = kulObservationProcessor ?? throw new ArgumentNullException(nameof(kulObservationProcessor));
-            _mvmObservationProcessor = mvmObservationProcessor ?? throw new ArgumentNullException(nameof(mvmObservationProcessor));
-            _norsObservationProcessor = norsObservationProcessor ?? throw new ArgumentNullException(nameof(norsObservationProcessor));
-            _sersObservationProcessor = sersObservationProcessor ?? throw new ArgumentNullException(nameof(sersObservationProcessor));
-            _sharkObservationProcessor = sharkObservationProcessor ?? throw new ArgumentNullException(nameof(sharkObservationProcessor));
-            _virtualHerbariumObservationProcessor = virtualHerbariumObservationProcessor ?? throw new ArgumentNullException(nameof(virtualHerbariumObservationProcessor)); 
-            _artportalenObservationProcessor = artportalenObservationProcessor ?? throw new ArgumentNullException(nameof(artportalenObservationProcessor));
+            _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
             _copyFieldMappingsJob = copyFieldMappingsJob ?? throw new ArgumentNullException(nameof(copyFieldMappingsJob));
             _processTaxaJob = processTaxaJob ?? throw new ArgumentNullException(nameof(processTaxaJob));
             _instanceManager = instanceManager ?? throw new ArgumentNullException(nameof(instanceManager));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            if (clamPortalObservationProcessor == null) throw new ArgumentNullException(nameof(clamPortalObservationProcessor));
+            if (kulObservationProcessor == null) throw new ArgumentNullException(nameof(kulObservationProcessor));
+            if (mvmObservationProcessor == null) throw new ArgumentNullException(nameof(mvmObservationProcessor));
+            if (norsObservationProcessor == null) throw new ArgumentNullException(nameof(norsObservationProcessor));
+            if (sersObservationProcessor == null) throw new ArgumentNullException(nameof(sersObservationProcessor));
+            if (sharkObservationProcessor == null) throw new ArgumentNullException(nameof(sharkObservationProcessor));
+            if (virtualHerbariumObservationProcessor == null) throw new ArgumentNullException(nameof(virtualHerbariumObservationProcessor));
+            if (dwcaObservationProcessor == null) throw new ArgumentNullException(nameof(dwcaObservationProcessor));
+            if (artportalenObservationProcessor == null) throw new ArgumentNullException(nameof(artportalenObservationProcessor));
+            if (sharkObservationProcessor == null) throw new ArgumentNullException(nameof(sharkObservationProcessor));
+            _processorByType = new Dictionary<DataSet, IProcessor>
+            {
+                {DataSet.ArtportalenObservations, artportalenObservationProcessor},
+                {DataSet.ClamPortalObservations, clamPortalObservationProcessor},
+                {DataSet.SersObservations, sersObservationProcessor},
+                {DataSet.NorsObservations, norsObservationProcessor},
+                {DataSet.KULObservations, kulObservationProcessor},
+                {DataSet.MvmObservations, mvmObservationProcessor},
+                {DataSet.SharkObservations, sharkObservationProcessor},
+                {DataSet.VirtualHerbariumObservations, virtualHerbariumObservationProcessor},
+                {DataSet.DwcA, dwcaObservationProcessor}
+            };
         }
 
-        /// <inheritdoc />
-        public async Task<bool> RunAsync(int sources, bool cleanStart, bool copyFromActiveOnFail, bool toggleInstanceOnSuccess, IJobCancellationToken cancellationToken)
+        private List<DataProvider> GetDataProvidersToProcess(List<string> dataProviderIdOrIdentifiers, List<DataProvider> allDataProviders)
+        {
+            return allDataProviders.Where(dataProvider =>
+                    dataProviderIdOrIdentifiers.Any(dataProvider.EqualsIdOrIdentifier))
+                .ToList();
+        }
+
+        public async Task<bool> RunAsync(
+            List<string> dataProviderIdOrIdentifiers, 
+            bool cleanStart, 
+            bool copyFromActiveOnFail,
+            bool toggleInstanceOnSuccess, 
+            IJobCancellationToken cancellationToken)
+        {
+            var allDataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
+            List<DataProvider> dataProvidersToProcess;
+            if (dataProviderIdOrIdentifiers != null && dataProviderIdOrIdentifiers.Count > 0)
+            {
+                dataProvidersToProcess = GetDataProvidersToProcess(dataProviderIdOrIdentifiers, allDataProviders);
+            }
+            else
+            {
+                dataProvidersToProcess = allDataProviders;
+            }
+
+            return await RunAsync(
+                dataProvidersToProcess,
+                cleanStart,
+                copyFromActiveOnFail,
+                toggleInstanceOnSuccess,
+                cancellationToken);
+        }
+
+        public async Task<bool> RunAsync(
+            bool cleanStart,
+            bool copyFromActiveOnFail,
+            bool toggleInstanceOnSuccess,
+            IJobCancellationToken cancellationToken)
+        {
+            List<DataProvider> dataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
+            List<DataProvider> dataProvidersToProcess = dataProviders.Where(dataProvider => dataProvider.IsActive).ToList();
+            return await RunAsync(
+                dataProvidersToProcess, 
+                cleanStart, 
+                copyFromActiveOnFail, 
+                toggleInstanceOnSuccess,
+                cancellationToken);
+        }
+
+        public async Task<bool> RunAsync(
+            List<DataProvider> dataProvidersToProcess, 
+            bool cleanStart, 
+            bool copyFromActiveOnFail, 
+            bool toggleInstanceOnSuccess, 
+            IJobCancellationToken cancellationToken)
         {
             try
             {
-                if (sources == 0)
+                //-----------------
+                // 1. Arrange
+                //-----------------
+                var processStart = DateTime.Now;
+
+                //-----------------
+                // 2. Validation
+                //-----------------
+                if (!dataProvidersToProcess.Any())
                 {
                     return false;
                 }
 
-                var start = DateTime.Now;
+                //----------------------------------------------------------------------
+                // 3. Copy field mappings and taxa from sos-verbatim to sos-processed
+                //----------------------------------------------------------------------
+                _logger.LogInformation("Start copying taxonomy and fieldmapping from verbatim to processed db");
                 var metadataTasks = new[]
                 {
                     _copyFieldMappingsJob.RunAsync(),
                     _processTaxaJob.RunAsync()
                 };
                 await Task.WhenAll(metadataTasks);
-
-                _logger.LogInformation("Start processing meta data");
                 if (!metadataTasks.All(t => t.Result))
                 {
-                    _logger.LogError("Failed to process meta data");
+                    _logger.LogError("Failed to copy taxonomy and fieldmapping from verbatim to processed db");
                     return false;
                 }
-                _logger.LogDebug("Finish processing meta data");
 
-                // Create task list
+                _logger.LogDebug("Finish copying taxonomy and fieldmapping from verbatim to processed db");
+
+
+                //--------------------------------------
+                // 4. Get taxonomy
+                //--------------------------------------
                 _logger.LogDebug("Start getting processed taxa");
-
-                // Get taxa
                 var taxa = await _processedTaxonRepository.GetAllAsync();
                 if (!taxa?.Any() ?? true)
                 {
                     _logger.LogDebug("Failed to get processed taxa");
                     return false;
                 }
-                _logger.LogDebug("Finish getting processed taxa");
 
                 var taxonById = taxa.ToDictionary(m => m.Id, m => m);
                 cancellationToken?.ThrowIfCancellationRequested();
-                _logger.LogDebug("Verify collection");
+                _logger.LogDebug("Finish getting processed taxa");
 
-                var newCollection = false;
-                // Make sure we have a collection
+                //------------------------------------------------------------------------
+                // 5. Ensure ElasticSearch (ES) index ProcessedObservation-{0/1} exists
+                //    Also empty the MongoDb collection InvalidObservation-{0/1}
+                //
+                // If cleanStart == true => Always clear the ES index.
+                // If cleanStart == false => Keep existing data. Just create ES index if it doesn't exist.
+                //------------------------------------------------------------------------
+                bool newCollection;
                 if (cleanStart)
                 {
-                    _logger.LogDebug("Start deleting current collection");
-                    await _processedObservationRepository.DeleteCollectionAsync();
-                    _logger.LogDebug("Finish deleting current collection");
-                    _logger.LogDebug("Start creating new collection");
-                    await _processedObservationRepository.AddCollectionAsync();
-                    _logger.LogDebug("Finish creating new collection");
-
+                    _logger.LogDebug($"Start clear ElasticSearch index: {_processedObservationRepository.IndexName}");
+                    await _processedObservationRepository.ClearCollectionAsync();
                     newCollection = true;
+                    _logger.LogDebug($"Finish clear ElasticSearch index: {_processedObservationRepository.IndexName}");
+
                 }
                 else
                 {
-                    _logger.LogDebug("Start verifying collection");
+                    _logger.LogDebug("Start ensure collection exists");
+                    // Create ES index ProcessedObservation-{0/1} if it doesn't exist. Empty MongoDB InvalidObservation-{0/1} collection.
                     newCollection = await _processedObservationRepository.VerifyCollectionAsync();
-                    _logger.LogDebug("Finish verifying collection");
+                    _logger.LogDebug("Finish ensure collection exists");
                 }
 
                 cancellationToken?.ThrowIfCancellationRequested();
 
-                var providersInfo = new Dictionary<ObservationProvider, ProviderInfo>();
-                var processTasks = new Dictionary<ObservationProvider, Task<ProcessingStatus>>();
+                //--------------------------------------
+                // 6. Get ProviderInfo
+                //--------------------------------------
+                var providerInfoByDataProvider = new Dictionary<DataProvider, ProviderInfo>();
                 var metaDataProviderInfo = await GetProviderInfoAsync(new Dictionary<string, DataSet>
                 {
                     {nameof(Area), DataSet.Areas},
                     {nameof(ProcessedTaxon), DataSet.Taxa}
                 });
 
-                // Add Artportalen import if first bit is set
-                if ((sources & (int)ObservationProvider.Artportalen) > 0)
+                //------------------------------------------------------------------------
+                // 7. Create observation processing tasks, and wait for them to complete
+                //------------------------------------------------------------------------
+                var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
+                foreach (var dataProvider in dataProvidersToProcess)
                 {
-                    processTasks.Add(ObservationProvider.Artportalen, _artportalenObservationProcessor.ProcessAsync(taxonById, cancellationToken));
+                    var processor = _processorByType[dataProvider.Type];
+                    processTaskByDataProvider.Add(dataProvider,
+                        processor.ProcessAsync(dataProvider, taxonById, cancellationToken));
 
                     // Get harvest info and create a provider info object that we can add processing info to later
-                    var harvestInfo = await GetHarvestInfoAsync(nameof(ArtportalenVerbatimObservation));
-                    var providerInfo = CreateProviderInfo(DataSet.ArtportalenObservations, harvestInfo, start);
-                    providerInfo.MetadataInfo =
-                        metaDataProviderInfo.Where(mdp => new[] { DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
-                    providersInfo.Add(ObservationProvider.Artportalen, providerInfo);
+                    string harvestInfoId = HarvestInfo.GetIdFromDataProvider(dataProvider);
+                    var harvestInfo2 = await GetHarvestInfoAsync(harvestInfoId);
+                    var harvestInfo = dataProvider.HarvestInfo; // todo - decide where we should store harvestInfo
+                    var providerInfo = CreateProviderInfo(dataProvider, harvestInfo, processStart);
+                    providerInfo.MetadataInfo = metaDataProviderInfo
+                        .Where(mdp => new[] {DataSet.Taxa}.Contains(mdp.DataProviderType)).ToArray();
+                    providerInfoByDataProvider.Add(dataProvider, providerInfo);
                 }
 
-                if ((sources & (int)ObservationProvider.ClamPortal) > 0)
+                ProcessingStatus[] processingResult = await Task.WhenAll(processTaskByDataProvider.Values);
+                var success = processTaskByDataProvider.Values.All(t => t.Result.Status == RunStatus.Success);
+
+                //----------------------------------------------
+                // 8. Update provider info 
+                //----------------------------------------------
+                foreach (var task in processTaskByDataProvider)
                 {
-                    processTasks.Add(ObservationProvider.ClamPortal, _clamPortalObservationProcessor.ProcessAsync(taxonById, cancellationToken));
-
-                    // Get harvest info and create a provider info object  that we can add processing info to later
-                    var harvestInfo = await GetHarvestInfoAsync(nameof(ClamObservationVerbatim));
-                    var providerInfo = CreateProviderInfo(DataSet.ClamPortalObservations, harvestInfo, start);
-                    providerInfo.MetadataInfo =
-                        metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
-                    providersInfo.Add(ObservationProvider.ClamPortal, providerInfo);
-                }
-
-                if ((sources & (int)ObservationProvider.KUL) > 0)
-                {
-                    processTasks.Add(ObservationProvider.KUL, _kulObservationProcessor.ProcessAsync(taxonById, cancellationToken));
-
-                    // Get harvest info and create a provider info object  that we can add processing info to later
-                    var harvestInfo = await GetHarvestInfoAsync(nameof(KulObservationVerbatim));
-                    var providerInfo = CreateProviderInfo(DataSet.KULObservations, harvestInfo, start);
-                    providerInfo.MetadataInfo =
-                        metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
-                    providersInfo.Add(ObservationProvider.KUL, providerInfo);
-                }
-
-                if ((sources & (int)ObservationProvider.MVM) > 0)
-                {
-                    processTasks.Add(ObservationProvider.MVM, _mvmObservationProcessor.ProcessAsync(taxonById, cancellationToken));
-
-                    // Get harvest info and create a provider info object  that we can add processing info to later
-                    var harvestInfo = await GetHarvestInfoAsync(nameof(MvmObservationVerbatim));
-                    var providerInfo = CreateProviderInfo(DataSet.MvmObservations, harvestInfo, start);
-                    providerInfo.MetadataInfo =
-                        metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
-                    providersInfo.Add(ObservationProvider.MVM, providerInfo);
-                }
-
-                if ((sources & (int)ObservationProvider.NORS) > 0)
-                {
-                    processTasks.Add(ObservationProvider.NORS, _norsObservationProcessor.ProcessAsync(taxonById, cancellationToken));
-
-                    // Get harvest info and create a provider info object  that we can add processing info to later
-                    var harvestInfo = await GetHarvestInfoAsync(nameof(NorsObservationVerbatim));
-                    var providerInfo = CreateProviderInfo(DataSet.NorsObservations, harvestInfo, start);
-                    providerInfo.MetadataInfo =
-                        metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
-                    providersInfo.Add(ObservationProvider.NORS, providerInfo);
-                }
-
-                if ((sources & (int)ObservationProvider.SERS) > 0)
-                {
-                    processTasks.Add(ObservationProvider.SERS, _sersObservationProcessor.ProcessAsync(taxonById, cancellationToken));
-
-                    // Get harvest info and create a provider info object  that we can add processing info to later
-                    var harvestInfo = await GetHarvestInfoAsync(nameof(SersObservationVerbatim));
-                    var providerInfo = CreateProviderInfo(DataSet.SersObservations, harvestInfo, start);
-                    providerInfo.MetadataInfo =
-                        metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
-                    providersInfo.Add(ObservationProvider.SERS, providerInfo);
-                }
-
-                if ((sources & (int)ObservationProvider.SHARK) > 0)
-                {
-                    processTasks.Add(ObservationProvider.SHARK, _sharkObservationProcessor.ProcessAsync(taxonById, cancellationToken));
-
-                    // Get harvest info and create a provider info object  that we can add processing info to later
-                    var harvestInfo = await GetHarvestInfoAsync(nameof(SharkObservationVerbatim));
-                    var providerInfo = CreateProviderInfo(DataSet.SharkObservations, harvestInfo, start);
-                    providerInfo.MetadataInfo =
-                        metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
-                    providersInfo.Add(ObservationProvider.SHARK, providerInfo);
-                }
-
-                if ((sources & (int)ObservationProvider.VirtualHerbarium) > 0)
-                {
-                    processTasks.Add(ObservationProvider.VirtualHerbarium, _virtualHerbariumObservationProcessor.ProcessAsync(taxonById, cancellationToken));
-
-                    // Get harvest info and create a provider info object  that we can add processing info to later
-                    var harvestInfo = await GetHarvestInfoAsync(nameof(VirtualHerbariumObservationVerbatim));
-                    var providerInfo = CreateProviderInfo(DataSet.VirtualHerbariumObservations, harvestInfo, start);
-                    providerInfo.MetadataInfo =
-                        metaDataProviderInfo.Where(mdp => new[] { DataSet.Areas, DataSet.Taxa }.Contains(mdp.Provider)).ToArray();
-                    providersInfo.Add(ObservationProvider.VirtualHerbarium, providerInfo);
-                }
-
-                // Run all tasks async
-                await Task.WhenAll(processTasks.Values);
-
-                var success = processTasks.Values.All(t => t.Result.Status == RunStatus.Success);
-
-                // Update provider info from process result
-                foreach (var task in processTasks)
-                {
-                    var vi = providersInfo[task.Key];
+                    var vi = providerInfoByDataProvider[task.Key];
                     vi.ProcessCount = task.Value.Result.Count;
                     vi.ProcessEnd = task.Value.Result.End;
                     vi.ProcessStart = task.Value.Result.Start;
                     vi.ProcessStatus = task.Value.Result.Status;
                 }
 
+                //-----------------------------------------
+                // 9. Save process info
+                //-----------------------------------------
                 _logger.LogDebug("Start updating process info for observations");
-
-                await SaveProcessInfo(_processedObservationRepository.InActiveCollectionName, start, providersInfo.Sum(pi => pi.Value.ProcessCount ?? 0),
-                    success ? RunStatus.Success : RunStatus.Failed, providersInfo.Values);
-                _logger.LogDebug("Finish updating process info for observations");
-
-                // If some task/s failed and it was not Artportalen, Try to copy provider data from active instance
-                if (!success
-                    && copyFromActiveOnFail
-                    && (
-                        !processTasks.ContainsKey(ObservationProvider.Artportalen) 
-                        || processTasks[ObservationProvider.Artportalen].Result.Status == RunStatus.Success)
-                    )
+                foreach (var dataProvider in dataProvidersToProcess)
                 {
-                    var copyTasks = processTasks
-                        .Where(t => t.Value.Result.Status == RunStatus.Failed)
-                        .Select(t => _instanceManager.CopyProviderDataAsync(t.Key)).ToArray();
-
-                    await Task.WhenAll(copyTasks);
-
-                    success = copyTasks.All(t => t.Result);
+                    await _dataProviderManager.UpdateProcessInfo(
+                        dataProvider.Id,
+                        _processedObservationRepository.InactiveCollectionName,
+                        providerInfoByDataProvider[dataProvider]);
                 }
 
-                // Create index if great success
+                await SaveProcessInfo(
+                    _processedObservationRepository.InactiveCollectionName,
+                    processStart,
+                    providerInfoByDataProvider.Sum(pi => pi.Value.ProcessCount ?? 0),
+                    success ? RunStatus.Success : RunStatus.Failed,
+                    providerInfoByDataProvider.Values);
+                _logger.LogDebug("Finish updating process info for observations");
+
+                //----------------------------------------------------------------------------
+                // 10. If a data provider failed to process and it was not Artportalen,
+                //     then try to copy that data from the active instance.
+                //----------------------------------------------------------------------------
+                bool artportalenSuccededOrDidntRun = !processTaskByDataProvider.Any(pair =>
+                    pair.Key.Type == DataSet.ArtportalenObservations && pair.Value.Result.Status == RunStatus.Failed);
+
+                if (!success && copyFromActiveOnFail && artportalenSuccededOrDidntRun)
+                {
+                    // todo - Fix problems with restoring observations. Check if ElasticSearch Scroll API is used.
+                    //var copyTasks = processTaskByDataProvider
+                    //    .Where(t => t.Value.Result.Status == RunStatus.Failed)
+                    //    .Select(t => _instanceManager.CopyProviderDataAsync(t.Key)).ToArray();
+
+                    //await Task.WhenAll(copyTasks);
+                    //success = copyTasks.All(t => t.Result);
+                }
+
+                //---------------------------------
+                // 11. Create ElasticSearch index
+                //---------------------------------
                 if (success)
                 {
                     if (newCollection)
@@ -331,22 +358,44 @@ namespace SOS.Process.Jobs
                     if (toggleInstanceOnSuccess)
                     {
                         _logger.LogDebug("Toggle instance");
-                        await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository.InActiveInstance);
+                        await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
+                            .InActiveInstance);
                     }
                 }
 
                 _logger.LogInformation($"Processing done: {success}");
 
+                //------------------------
+                // 12. Store area cache
+                //------------------------
                 _logger.LogDebug("Persist area cache");
                 _areaHelper.PersistCache();
 
-                // return result of all processing
+                //-------------------------------
+                // 13. Return processing result
+                //-------------------------------
                 return success ? true : throw new Exception("Process sightings job failed");
             }
             catch (JobAbortedException)
             {
                 _logger.LogInformation("Process job was cancelled.");
                 return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Process sightings job failed");
+                throw new Exception("Process sightings job failed");
+            }
+        }
+
+        private string GetHarvestInfoId(DataProvider dataProvider)
+        {
+            switch (dataProvider.Type)
+            {
+                case DataSet.DwcA:
+                    return $"{nameof(DwcObservationVerbatim)}-{dataProvider.Identifier}";
+                default:
+                    return dataProvider.Type.ToString();
             }
         }
     }

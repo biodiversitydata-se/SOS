@@ -12,19 +12,6 @@ namespace SOS.Lib.Models.Processed.Observation
     /// </summary>
     public class ProcessedObservation : IEntity<string>
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="provider"></param>
-        public ProcessedObservation(ObservationProvider provider)
-        {
-            Provider = provider;
-        }
-
-        public ProcessedObservation()
-        {
-        }
-
         #region Record level
         /// <summary>
         /// Information about who can access the resource or
@@ -177,10 +164,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public int ProtectionLevel { get; set; }
 
         /// <summary>
-        /// Internal use. Provider of the data
+        /// Data provider id.
         /// </summary>
-        [JsonIgnore]
-        public ObservationProvider Provider { get; set; }
+        public int DataProviderId { get; set; }
 
         /// <summary>
         /// A related resource that is referenced, cited,

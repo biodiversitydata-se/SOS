@@ -17,6 +17,8 @@ using SOS.Import.DarwinCore;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Import.Repositories.Destination.DarwinCoreArchive.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
@@ -59,28 +61,33 @@ namespace SOS.Import.Harvesters.Observations
         /// <returns></returns>
         public async Task<HarvestInfo> HarvestObservationsAsync(
             string archivePath,
-            DwcaDatasetInfo datasetInfo,
+            IIdIdentifierTuple idIdentifierTuple,
             IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(DwcObservationVerbatim), DataSet.DwcA, DateTime.Now);
+            string harvestInfoId = $"{nameof(DwcObservationVerbatim)}-{idIdentifierTuple.Identifier}";
+            var harvestInfo = new HarvestInfo(harvestInfoId, DataSet.DwcA, DateTime.Now);
+
             try
             {
                 ConventionRegistry.Register("IgnoreIfNull",
-                    new ConventionPack { new IgnoreIfNullConvention(true) },
+                    new ConventionPack {new IgnoreIfNullConvention(true)},
                     t => true);
 
                 _logger.LogDebug("Start storing DwC-A observations");
-                await _dwcArchiveVerbatimRepository.DeleteCollectionAsync(datasetInfo);
-                await _dwcArchiveVerbatimRepository.AddCollectionAsync(datasetInfo);
+                await _dwcArchiveVerbatimRepository.ClearTempHarvestCollection(idIdentifierTuple);
                 int observationCount = 0;
                 using var archiveReader = new ArchiveReader(archivePath);
-                var observationBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, datasetInfo, BatchSize);
+                var observationBatches =
+                    _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, idIdentifierTuple, BatchSize);
                 await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     observationCount += verbatimObservationsBatch.Count;
-                    await _dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch, datasetInfo);
+                    await _dwcArchiveVerbatimRepository.AddManyToTempHarvestAsync(verbatimObservationsBatch,
+                        idIdentifierTuple);
                 }
+
+                await _dwcArchiveVerbatimRepository.RenameTempHarvestCollection(idIdentifierTuple);
                 _logger.LogDebug("Finish storing DwC-A observations");
 
                 // Read and store events
@@ -104,22 +111,28 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogError(e, "Failed harvest of DwC Archive");
                 harvestInfo.Status = RunStatus.Failed;
             }
+            finally
+            {
+                await _dwcArchiveVerbatimRepository.DeleteTempHarvestCollectionIfExists(idIdentifierTuple);
+            }
+
             return harvestInfo;
         }
 
-        private async Task HarvestEventData(DwcaDatasetInfo datasetInfo, IJobCancellationToken cancellationToken,
-            ArchiveReader archiveReader)
+        private async Task HarvestEventData(IIdIdentifierTuple idIdentifierTuple,
+            ArchiveReader archiveReader,
+            IJobCancellationToken cancellationToken)
         {
             _logger.LogDebug("Start storing DwC-A events");
-            await _dwcArchiveEventRepository.DeleteCollectionAsync(datasetInfo);
-            await _dwcArchiveEventRepository.AddCollectionAsync(datasetInfo);
-            var eventBatches = _dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archiveReader, datasetInfo, BatchSize);
+            await _dwcArchiveEventRepository.ClearTempHarvestCollection(idIdentifierTuple);
+            var eventBatches = _dwcArchiveReader.ReadSamplingEventArchiveInBatchesAsDwcEventAsync(archiveReader, idIdentifierTuple, BatchSize);
             await foreach (List<DwcEvent> eventBatch in eventBatches)
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                await _dwcArchiveEventRepository.AddManyAsync(eventBatch, datasetInfo);
+                await _dwcArchiveEventRepository.AddManyToTempHarvestAsync(eventBatch, idIdentifierTuple);
             }
 
+            await _dwcArchiveEventRepository.RenameTempHarvestCollection(idIdentifierTuple);
             _logger.LogDebug("Finish storing DwC-A events");
         }
 
@@ -155,11 +168,10 @@ namespace SOS.Import.Harvesters.Observations
                 foreach (var filePath in filePaths)
                 {
                     latestFilePath = filePath;
-                    var datasetInfo = new DwcaDatasetInfo
+                    var datasetInfo = new IdIdentifierTuple
                     {
-                        ArchiveFilename = filePath,
-                        DataProviderIdentifier = Path.GetFileNameWithoutExtension(filePath),
-                        DataProviderId = -1 // Unknown
+                        Identifier = Path.GetFileNameWithoutExtension(filePath),
+                        Id = -1 // Unknown
                     };
 
                     using var archiveReader = new ArchiveReader(filePath);

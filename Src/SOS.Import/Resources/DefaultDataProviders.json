@@ -2,7 +2,8 @@
   {
     "Id": 1,
     "Identifier": "Artportalen",
-    "DataType": "ArtportalenObservations",
+    "Type": "ArtportalenObservations",
+    "IsActive": true,
     "Name": "Species Observation System (Artportalen)",
     "SwedishName": "Artportalen",
     "Organization": "SLU Swedish Species Information Centre (SLU Artdatabanken)",
@@ -12,12 +13,16 @@
     "Url": "https://www.artportalen.se/",
     "ContactPerson": "Stephen Coulson",
     "ContactEmail": "stephen.coulson@slu.se",
-    "DownloadUrl": null
+    "DownloadUrl": null,
+    "IncludeInScheduledHarvest": true,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 2,
     "Identifier": "ClamGateway",
-    "DataType": "ClamPortalObservations",
+    "Type": "ClamPortalObservations",
+    "IsActive": false,
     "Name": "Clam Gateway",
     "SwedishName": "Musselportalen",
     "Organization": "SLU Swedish Species Information Centre (SLU Artdatabanken)",
@@ -27,12 +32,16 @@
     "Url": "http://musselportalen.se/",
     "ContactPerson": "Eddie Von Wachenfeldt",
     "ContactEmail": "eddie.vonwachenfeldt@slu.se",
-    "DownloadUrl": null
+    "DownloadUrl": null,
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 3,
     "Identifier": "KUL",
-    "DataType": "KULObservations",
+    "Type": "KULObservations",
+    "IsActive": false,
     "Name": "The database for coastal fish (KUL)",
     "SwedishName": "Kustfiskdatabasen (KUL)",
     "Organization": "Department of Aquatic Resources, Institute of Coastal Research, SLU",
@@ -42,12 +51,16 @@
     "Url": "https://www.slu.se/kul/",
     "ContactPerson": "Peter Ljungberg",
     "ContactEmail": "peter.ljungberg@slu.se",
-    "DownloadUrl": null
+    "DownloadUrl": null,
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 4,
     "Identifier": "MVM",
-    "DataType": "MvmObservations",
+    "Type": "MvmObservations",
+    "IsActive": false,
     "Name": "MVM",
     "SwedishName": "MVM",
     "Organization": "Environmental data MVM, SLU",
@@ -57,12 +70,16 @@
     "Url": "http://miljodata.slu.se/mvm/",
     "ContactPerson": "Lars Sonesten",
     "ContactEmail": "Lars.Sonesten@slu.se",
-    "DownloadUrl": null
+    "DownloadUrl": null,
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 5,
     "Identifier": "NORS",
-    "DataType": "NorsObservations",
+    "Type": "NorsObservations",
+    "IsActive": false,
     "Name": "The National Register of Survey test-fishing (NORS)",
     "SwedishName": "Sjöprovfiskedatabasen NORS",
     "Organization": "Department of Aquatic Resources, SLU",
@@ -72,12 +89,16 @@
     "Url": "http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/national-register-of-survey-test-fishing-nors/",
     "ContactPerson": "Anders Kinnerbäck",
     "ContactEmail": "anders.kinnerback@slu.se",
-    "DownloadUrl": null
+    "DownloadUrl": null,
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 6,
     "Identifier": "SERS",
-    "DataType": "SersObservations",
+    "Type": "SersObservations",
+    "IsActive": false,
     "Name": "The Database for electrofishing in streams (SERS)",
     "SwedishName": "Elfiskeregistret SERS",
     "Organization": "Department of Aquatic Resources, SLU",
@@ -87,12 +108,16 @@
     "Url": "http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/database-for-testfishing-in-streams/",
     "ContactPerson": "Berit Sers",
     "ContactEmail": "berit.sers@slu.se",
-    "DownloadUrl": null
+    "DownloadUrl": null,
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 7,
     "Identifier": "VirtualHerbarium",
-    "DataType": "VirtualHerbariumObservations",
+    "Type": "VirtualHerbariumObservations",
+    "IsActive": false,
     "Name": "Swedish Virtual Herbarium",
     "SwedishName": "Virtuella Herbariet",
     "Organization": "Umeå University",
@@ -102,12 +127,16 @@
     "Url": "http://herbarium.emg.umu.se",
     "ContactPerson": "Nils Ericson",
     "ContactEmail": "mossnisse@hotmail.com",
-    "DownloadUrl": null
+    "DownloadUrl": null,
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 8,
     "Identifier": "SHARK",
-    "DataType": "SharkObservations",
+    "Type": "SharkObservations",
+    "IsActive": false,
     "Name": "Shark SMHI",
     "SwedishName": "Shark SMHI",
     "Organization": "SMHI",
@@ -117,12 +146,16 @@
     "Url": "http://sharkweb.smhi.se/",
     "ContactPerson": "Patrik Strömberg",
     "ContactEmail": "patrik.stromberg@smhi.se",
-    "DownloadUrl": null
+    "DownloadUrl": null,
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 9,
     "Identifier": "BirdRingingCentre",
-    "DataType": "DwcA",
+    "Type": "DwcA",
+    "IsActive": false,
     "Name": "Bird ringing centre in Sweden via GBIF",
     "SwedishName": "Ringmärkningscentralen via GBIF",
     "Organization": "Swedish Museum of Natural History",
@@ -132,12 +165,16 @@
     "Url": "http://www.nrm.se/forskningochsamlingar/miljoforskningochovervakning/ringmarkningscentralen.214.html",
     "ContactPerson": "-",
     "ContactEmail": "-",
-    "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds"
+    "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 10,
     "Identifier": "EntomologicalCollection",
-    "DataType": "DwcA",
+    "Type": "DwcA",
+    "IsActive": false,
     "Name": "Entomological Collections (NHRS) from GBIF",
     "SwedishName": "Entomologiska samlingarna (NHRS) via GBIF",
     "Organization": "Swedish Museum of Natural History",
@@ -147,12 +184,16 @@
     "Url": "http://www.gbif.org/dataset/9940af5a-3271-4e6a-ad71-ced986b9a9a5",
     "ContactPerson": "-",
     "ContactEmail": "-",
-    "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm"
+    "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 11,
     "Identifier": "MalaiseTrap",
-    "DataType": "DwcA",
+    "Type": "DwcA",
+    "IsActive": false,
     "Name": "Swedish Malaise Trap Project (SMTP) from GBIF",
     "SwedishName": "Svenska Malaisefälle projektet (SMTP) via GBIF",
     "Organization": "Foundation Station Linné",
@@ -162,12 +203,16 @@
     "Url": "http://www.gbif.org/dataset/38c1351d-9cfe-42c0-97da-02d2c8be141c",
     "ContactPerson": "",
     "ContactEmail": "",
-    "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=smtp-nrm"
+    "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=smtp-nrm",
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 12,
     "Identifier": "Porpoises",
-    "DataType": "DwcA",
+    "Type": "DwcA",
+    "IsActive": false,
     "Name": "Porpoises (NRM) via GBIF",
     "SwedishName": "Tumlare (NRM) via GBIF",
     "Organization": "Swedish Museum of Natural History",
@@ -177,12 +222,16 @@
     "Url": "http://www.gbif.org/dataset/6aa7c400-0c66-11dd-84d2-b8a03c50a862",
     "ContactPerson": "-",
     "ContactEmail": "-",
-    "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises"
+    "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 13,
     "Identifier": "ButterflyMonitoring",
-    "DataType": "DwcA",
+    "Type": "DwcA",
+    "IsActive": false,
     "Name": "Swedish Butterfly Monitoring Scheme (SeBMS)",
     "SwedishName": "Svensk Dagfjärilsövervakning",
     "Organization": "Lund University",
@@ -192,12 +241,16 @@
     "Url": "https://www.dagfjarilar.lu.se/",
     "ContactPerson": "-",
     "ContactEmail": "-",
-    "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=lu_sebms"
+    "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=lu_sebms",
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   },
   {
     "Id": 14,
     "Identifier": "SharkZooplankton",
-    "DataType": "DwcA",
+    "Type": "DwcA",
+    "IsActive": false,
     "Name": "SHARK - National zooplankton monitoring in Sweden since 1979",
     "SwedishName": null,
     "Organization": "Swedish Meterological and Hydrological Institute (SMHI)",
@@ -207,6 +260,9 @@
     "Url": "http://sharkdata.se/",
     "ContactPerson": "Lisa Sundqvist",
     "ContactEmail": "shark@smhi.se",
-    "DownloadUrl": ""
+    "DownloadUrl": "",
+    "IncludeInScheduledHarvest": false,
+    "DataQualityIsApproved": true,
+    "HarvestInfo": null
   }
 ]

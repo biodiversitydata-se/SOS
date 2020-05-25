@@ -12,7 +12,7 @@ using SOS.Observations.Api.Repositories.Interfaces;
 namespace SOS.Observations.Api.Managers
 {
     /// <summary>
-    /// Field mapping manager.
+    /// Data provider manager.
     /// </summary>
     public class DataProviderManager : IDataProviderManager
     {

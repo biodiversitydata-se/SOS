@@ -14,7 +14,7 @@ using SOS.Process.Helpers.Interfaces;
 namespace SOS.Administration.Api.Controllers
 {
     /// <summary>
-    /// Field mapping controller.
+    /// Diagnostics controller.
     /// </summary>
     [ApiController]
     [Route("[controller]")]
@@ -52,7 +52,7 @@ namespace SOS.Administration.Api.Controllers
         /// Get diff between generated, verbatim and processed field mappings.
         /// </summary>
         /// <returns></returns>
-        [HttpPost("FieldMappingDiffAsZipFile")]
+        [HttpGet("FieldMappingDiffAsZipFile")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetFieldMappingsDiffAsZipFile()
@@ -75,7 +75,7 @@ namespace SOS.Administration.Api.Controllers
         /// Get diff between generated, verbatim and processed areas.
         /// </summary>
         /// <returns></returns>
-        [HttpPost("AreaDiffAsZipFile")]
+        [HttpGet("AreaDiffAsZipFile")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetAreasDiffAsZipFile()

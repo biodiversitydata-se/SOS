@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SOS.Lib.Enums;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SOS.Administration.Api.Controllers.Interfaces
 {
@@ -11,9 +12,9 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <summary>
         /// Copy data from active to inactive instance
         /// </summary>
-        /// <param name="provider"></param>
+        /// <param name="dataProviderIdOrIdentifier"></param>
         /// <returns></returns>
-        IActionResult RunCopyProviderData(ObservationProvider provider);
+        Task<IActionResult> RunCopyDataProviderData(string dataProviderIdOrIdentifier);
 
         /// <summary>
         /// Activate instance

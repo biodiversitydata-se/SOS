@@ -57,7 +57,7 @@ namespace SOS.Lib.Models.Search
         /// <summary>
         /// Only get data from these providers
         /// </summary>
-        public IEnumerable<ObservationProvider> Providers { get; set; }
+        public IEnumerable<int> DataProviderIds { get; set; }
 
         /// <summary>
         /// Provinces to match. Queryable values are available in Field Mappings.

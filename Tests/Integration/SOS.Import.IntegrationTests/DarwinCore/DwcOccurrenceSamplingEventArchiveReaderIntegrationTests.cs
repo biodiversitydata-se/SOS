@@ -27,7 +27,7 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             // Act
             //-----------------------------------------------------------------------------------------------------------
             using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcArchiveReader.ReadArchiveAsync(archiveReader, datasetInfo: null);
+            var observations = await dwcArchiveReader.ReadArchiveAsync(archiveReader, null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -76,7 +76,7 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             // Act
             //-----------------------------------------------------------------------------------------------------------
             using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcArchiveReader.ReadArchiveAsync(archiveReader, datasetInfo: null);
+            var observations = await dwcArchiveReader.ReadArchiveAsync(archiveReader, null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using NetTopologySuite.Operation.Buffer;
 using SOS.Import.DarwinCore.Factories;
 using SOS.Import.Harvesters.Observations;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Import.DarwinCore
@@ -32,12 +33,12 @@ namespace SOS.Import.DarwinCore
         /// Reads a sampling event based DwC-A, and returns events in batches.
         /// </summary>
         /// <param name="archiveReader"></param>
-        /// <param name="datasetInfo"></param>
+        /// <param name="idIdentifierTuple"></param>
         /// <param name="batchSize"></param>
         /// <returns></returns>
         public async IAsyncEnumerable<List<DwcEvent>> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader,
-            DwcaDatasetInfo datasetInfo,
+            IIdIdentifierTuple idIdentifierTuple,
             int batchSize)
         {
             var occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Event);
@@ -46,7 +47,7 @@ namespace SOS.Import.DarwinCore
 
             await foreach (IRow row in occurrenceFileReader.GetDataRowsAsync())
             {
-                var eventRecord = DwcEventFactory.Create(row, datasetInfo, idIndex);
+                var eventRecord = DwcEventFactory.Create(row, idIdentifierTuple, idIndex);
                 eventRecords.Add(eventRecord);
 
                 if (eventRecords.Count % batchSize == 0)
@@ -65,16 +66,17 @@ namespace SOS.Import.DarwinCore
         /// Reads a sampling event based DwC-A.
         /// </summary>
         /// <param name="archiveReader"></param>
-        /// <param name="datasetInfo"></param>
+        /// <param name="idIdentifierTuple"></param>
         /// <returns></returns>
         public async Task<List<DwcEvent>> ReadArchiveAsync(
             ArchiveReader archiveReader,
-            DwcaDatasetInfo datasetInfo)
+            IIdIdentifierTuple idIdentifierTuple)
         {
             const int batchSize = 100000;
             var observationsBatches = ReadArchiveInBatchesAsync(
                 archiveReader,
-                datasetInfo, batchSize);
+                idIdentifierTuple, 
+                batchSize);
             List<DwcEvent> dwcEvents = new List<DwcEvent>();
             await foreach (List<DwcEvent> observationsBatch in observationsBatches)
             {

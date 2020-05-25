@@ -1,20 +1,21 @@
 ﻿using DwC_A;
 using DwC_A.Meta;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Import.DarwinCore.Factories
 {
     public static class DwcEventFactory
     {
-        public static DwcEvent Create(IRow row, DwcaDatasetInfo datasetInfo, int idIndex)
+        public static DwcEvent Create(IRow row, IIdIdentifierTuple idIdentifierTuple, int idIndex)
         {
             var dwcEvent = new DwcEvent();
-            if (datasetInfo != null)
+            if (idIdentifierTuple != null)
             {
-                dwcEvent.DataProviderId = datasetInfo.DataProviderId;
-                dwcEvent.DataProviderIdentifier = datasetInfo.DataProviderIdentifier;
-                dwcEvent.DwcArchiveFilename = datasetInfo.ArchiveFilename;
+                dwcEvent.DataProviderId = idIdentifierTuple.Id;
+                dwcEvent.DataProviderIdentifier = idIdentifierTuple.Identifier;
             }
+
             foreach (FieldType fieldType in row.FieldMetaData)
             {
                 var val = row[fieldType.Index];

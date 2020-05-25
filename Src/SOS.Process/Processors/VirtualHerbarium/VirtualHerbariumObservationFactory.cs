@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Nest;
 using NetTopologySuite.Geometries;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
@@ -61,10 +62,10 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 defects.Add("DateCollected", verbatim.DateCollected);
             }
 
-            var obs = new ProcessedObservation(ObservationProvider.VirtualHerbarium)
+            var obs = new ProcessedObservation
             {
                 BasisOfRecord = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ ObservationProvider.VirtualHerbarium.ToString() }",
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ DataProviderIdentifiers.VirtualHerbarium }",
                 DatasetName = "Virtual Herbarium",
                 Defects = defects.Count == 0 ? null : defects,
                 Event = new ProcessedEvent

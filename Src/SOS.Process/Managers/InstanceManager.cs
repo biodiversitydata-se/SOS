@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Managers
@@ -28,12 +30,12 @@ namespace SOS.Process.Managers
         }
 
         /// <inheritdoc />
-        public async Task<bool> CopyProviderDataAsync(ObservationProvider provider)
+        public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)
         {
             try
             {
                 Logger.LogDebug("Start deleting data from inactive instance");
-                if (!await ProcessRepository.DeleteProviderDataAsync(provider))
+                if (!await ProcessRepository.DeleteProviderDataAsync(dataProvider))
                 {
                     Logger.LogError("Failed to delete from inactive instance");
                     return false;
@@ -41,12 +43,12 @@ namespace SOS.Process.Managers
                 Logger.LogDebug("Finish deleting data from inactive instance");
 
                 Logger.LogDebug("Start copying data from active to inactive instance");
-                if (await ProcessRepository.CopyProviderDataAsync(provider))
+                if (await ProcessRepository.CopyProviderDataAsync(dataProvider))
                 {
                     Logger.LogDebug("Finish copying data from active to inactive instance");
 
                     Logger.LogDebug("Start copying metadata from active to inactive instance");
-                    var res =  await _processInfoRepository.CopyProviderDataAsync(provider);
+                    var res = await _processInfoRepository.CopyProviderDataAsync(dataProvider);
                     Logger.LogDebug("Finish copying metadata from active to inactive instance");
 
                     return res;
@@ -56,7 +58,7 @@ namespace SOS.Process.Managers
             }
             catch (Exception e)
             {
-                Logger.LogError(e,"Failed to copy from active to inactive instance");
+                Logger.LogError(e, "Failed to copy from active to inactive instance");
                 return false;
             }
         }

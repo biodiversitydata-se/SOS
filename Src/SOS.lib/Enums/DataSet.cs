@@ -1,5 +1,6 @@
 ﻿namespace SOS.Lib.Enums
 {
+    // todo - rename to DataProviderType?
     /// <summary>
     /// Id of data sets
     /// </summary>

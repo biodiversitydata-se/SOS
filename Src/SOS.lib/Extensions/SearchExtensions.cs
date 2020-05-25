@@ -109,12 +109,12 @@ namespace SOS.Lib.Extensions
                     .Term(m => m.Field("occurrence.isPositiveObservation").Value(filter.PositiveSightings.Value)));
             }
 
-            if (filter.Providers?.Any() ?? false)
+            if (filter.DataProviderIds?.Any() ?? false)
             {
                 queryContainers.Add(q => q
                     .Terms(t => t
-                        .Field("provider")
-                        .Terms(filter.Providers)
+                        .Field("dataProviderId")
+                        .Terms(filter.DataProviderIds)
                     )
                 );
             }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 
@@ -49,6 +51,7 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         /// <summary>
         /// Running status
         /// </summary>
+        [BsonRepresentation(BsonType.String)]
         public RunStatus Status { get; set; }
     }
 }

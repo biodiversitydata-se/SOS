@@ -9,7 +9,9 @@ using MongoDB.Driver;
 using Moq;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Kul;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Processors.Kul;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -116,7 +118,7 @@ namespace SOS.Process.UnitTests.Processors
 
             _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<ProcessedObservation>>()));
 
-            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<ObservationProvider>()))
+            _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
 
             _processedObservationRepositoryMock.Setup(r => r.AddManyAsync(It.IsAny<ICollection<ProcessedObservation>>()))
@@ -126,15 +128,16 @@ namespace SOS.Process.UnitTests.Processors
             {
                 { 0, new ProcessedTaxon { Id = 0, TaxonId = "taxon:0", ScientificName = "Biota" } }
             };
+            var dataProvider = CreateDataProvider();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(taxa, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, taxa, JobCancellationToken.Null);
+            
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
             result.Status.Should().Be(RunStatus.Success);
         }
 
@@ -148,16 +151,16 @@ namespace SOS.Process.UnitTests.Processors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-
+            var dataProvider = CreateDataProvider();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, null, JobCancellationToken.Null);
+            
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
             result.Status.Should().Be(RunStatus.Failed);
         }
 
@@ -171,17 +174,29 @@ namespace SOS.Process.UnitTests.Processors
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            var dataProvider = CreateDataProvider();
             _kulObservationVerbatimRepositoryMock.Setup(r => r.GetAllByCursorAsync())
                 .ThrowsAsync(new Exception("Failed"));
+            
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(null, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, null, JobCancellationToken.Null);
+            
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
             result.Status.Should().Be(RunStatus.Failed);
         }
+
+        private DataProvider CreateDataProvider()
+        {
+            return new DataProvider
+            {
+                Name = "KUL",
+                Type = DataSet.KULObservations
+            };
+        }
+
     }
 }

@@ -10,6 +10,8 @@ using MongoDB.Driver;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -25,7 +27,7 @@ namespace SOS.Process.Processors.Artportalen
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly SemaphoreSlim _semaphore;
         private readonly ProcessConfiguration _processConfiguration;
-        public override ObservationProvider DataProvider => ObservationProvider.Artportalen;
+        public override DataSet Type => DataSet.ArtportalenObservations;
 
         /// <summary>
         /// Constructor
@@ -59,23 +61,26 @@ namespace SOS.Process.Processors.Artportalen
         /// <summary>
         /// Process all observations
         /// </summary>
+        /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         protected override async Task<int> ProcessObservations(
+            DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
             if (_processConfiguration.ParallelProcessing)
             {
-                return await ProcessObservationsParallel(taxa, cancellationToken);
+                return await ProcessObservationsParallel(dataProvider, taxa, cancellationToken);
             }
             
             // Sequential processing is used for easier debugging.
-            return await ProcessObservationsSequential(taxa, cancellationToken);
+            return await ProcessObservationsSequential(dataProvider, taxa, cancellationToken);
         }
 
         private async Task<int> ProcessObservationsParallel(
+            DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
@@ -90,7 +95,7 @@ namespace SOS.Process.Processors.Artportalen
                 await _semaphore.WaitAsync();
 
                 var batchEndId = batchStartId + _processedFieldMappingRepository.BatchSize - 1;
-                processBatchTasks.Add(ProcessBatchAsync(batchStartId, batchEndId, observationFactory, cancellationToken));
+                processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, observationFactory, cancellationToken));
                 batchStartId = batchEndId + 1;
             }
             await Task.WhenAll(processBatchTasks);
@@ -101,12 +106,14 @@ namespace SOS.Process.Processors.Artportalen
         /// <summary>
         /// Process a batch of data
         /// </summary>
+        /// <param name="dataProvider"></param>
         /// <param name="startId"></param>
         /// <param name="endId"></param>
         /// <param name="observationFactory"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<int> ProcessBatchAsync(
+            DataProvider dataProvider,
             int startId,
             int endId,
             ArtportalenObservationFactory observationFactory,
@@ -124,7 +131,7 @@ namespace SOS.Process.Processors.Artportalen
                 Logger.LogDebug($"Finish processing Artportalen batch ({ startId }-{ endId })");
 
                 Logger.LogDebug($"Start storing Artportalen batch ({ startId }-{ endId })");
-                var successCount = await CommitBatchAsync(processedObservationsBatch.ToArray());
+                var successCount = await CommitBatchAsync(dataProvider, processedObservationsBatch.ToArray());
                 Logger.LogDebug($"Finish storing Artportalen batch ({ startId }-{ endId })");
                 
                 return successCount;
@@ -146,6 +153,7 @@ namespace SOS.Process.Processors.Artportalen
             return 0;
         }
         private async Task<int> ProcessObservationsSequential(
+            DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
@@ -161,7 +169,8 @@ namespace SOS.Process.Processors.Artportalen
                 if (IsBatchFilledToLimit(sightings.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    verbatimCount += await CommitBatchAsync(sightings);
+                    verbatimCount += await CommitBatchAsync(dataProvider, sightings);
+                    sightings.Clear();
                     Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
                 }
             });
@@ -170,7 +179,7 @@ namespace SOS.Process.Processors.Artportalen
             if (sightings.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                verbatimCount += await CommitBatchAsync(sightings);
+                verbatimCount += await CommitBatchAsync(dataProvider, sightings);
                 Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
             }
 

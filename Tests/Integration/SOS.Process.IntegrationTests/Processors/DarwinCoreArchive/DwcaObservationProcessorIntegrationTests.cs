@@ -12,11 +12,13 @@ using Moq;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
+using SOS.Process.Processors;
 using SOS.Process.Processors.DarwinCoreArchive;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -43,12 +45,18 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             var dwcaProcessor = CreateDwcaObservationProcessor(storeProcessedObservations: false);
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
+            var dataProvider = new DataProvider()
+            {
+                Id = 13,
+                Identifier = "ButterflyMonitoring",
+                Name = "Swedish Butterfly Monitoring Scheme (SeBMS)",
+                Type = DataSet.DwcA
+            };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var processingStatus = await dwcaProcessor.ProcessAsync(
-                taxonByTaxonId, JobCancellationToken.Null);
+            var processingStatus = await dwcaProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -101,7 +109,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
         private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock()
         {
             var mock = new Mock<IProcessedObservationRepository>();
-            mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<ObservationProvider>())).ReturnsAsync(true);
+            mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>())).ReturnsAsync(true);
             return mock;
         }
 

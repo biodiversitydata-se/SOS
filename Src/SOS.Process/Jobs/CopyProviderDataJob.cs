@@ -13,26 +13,36 @@ namespace SOS.Process.Jobs
     public class CopyProviderDataJob : ICopyProviderDataJob
     {
         private readonly IInstanceManager _instanceManager;
+        private readonly IDataProviderManager _dataProviderManager;
         private readonly ILogger<CopyProviderDataJob> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="instanceManager"></param>
+        /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
         public CopyProviderDataJob(
             IInstanceManager instanceManager,
+            IDataProviderManager dataProviderManager,
             ILogger<CopyProviderDataJob> logger)
         {
             _instanceManager = instanceManager ?? throw new ArgumentNullException(nameof(instanceManager));
+            _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(ObservationProvider provider)
+        public async Task<bool> RunAsync(int dataProviderId)
         {
+            var dataProvider = await _dataProviderManager.GetDataProviderByIdAsync(dataProviderId);
+            if (dataProvider == null)
+            {
+                throw new Exception($"Data provider with Id={dataProviderId} is not found");
+            }
+
             // Activate passed instance
-            var success =  await _instanceManager.CopyProviderDataAsync(provider);
+            var success = await _instanceManager.CopyProviderDataAsync(dataProvider);
             return success ? true : throw new Exception("Copy provider data job failed");
         }
     }

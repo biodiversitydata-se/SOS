@@ -80,7 +80,7 @@ namespace SOS.Process.Processors.Artportalen
                 verbatimObservation.EndDate.Value.ToLocalTime() + verbatimObservation.EndTime :
                 verbatimObservation.EndDate;
 
-            var obs = new ProcessedObservation(ObservationProvider.Artportalen)
+            var obs = new ProcessedObservation()
             {
                 AccessRights =
                 !verbatimObservation.ProtectedBySystem && verbatimObservation.HiddenByProvider.HasValue &&
@@ -94,7 +94,7 @@ namespace SOS.Process.Processors.Artportalen
                 ? "Artportalen"
                 : verbatimObservation.SpeciesCollection,
                 CollectionId = verbatimObservation.CollectionID,
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ObservationProvider.Artportalen.ToString()}",
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}",
                 DatasetName = "Artportalen",
                 Event = new ProcessedEvent
                 {

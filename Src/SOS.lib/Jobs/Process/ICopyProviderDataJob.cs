@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using SOS.Lib.Enums;
 
 namespace SOS.Lib.Jobs.Process
@@ -6,10 +7,10 @@ namespace SOS.Lib.Jobs.Process
     public interface ICopyProviderDataJob
     {
         /// <summary>
-        /// Copy data from active to inactive instance
+        /// Copy data from active to inactive instance.
         /// </summary>
-        /// <param name="provider"></param>
+        /// <param name="dataProviderId"></param>
         /// <returns></returns>
-        Task<bool> RunAsync(ObservationProvider provider);
+        Task<bool> RunAsync(int dataProviderId);
     }
 }

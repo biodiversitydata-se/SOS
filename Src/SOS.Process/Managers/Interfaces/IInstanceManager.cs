@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Process.Managers.Interfaces
 {
@@ -9,11 +12,11 @@ namespace SOS.Process.Managers.Interfaces
     public interface IInstanceManager
     {
         /// <summary>
-        /// Copy data from active to inactive instance
+        /// Copy data from active to inactive instance.
         /// </summary>
-        /// <param name="provider"></param>
+        /// <param name="dataProvider"></param>
         /// <returns></returns>
-        Task<bool> CopyProviderDataAsync(ObservationProvider provider);
+        Task<bool> CopyProviderDataAsync(DataProvider dataProvider);
 
         /// <summary>
         /// Activate passed instance

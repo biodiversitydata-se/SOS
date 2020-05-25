@@ -175,7 +175,6 @@ namespace SOS.Process.Repositories.Destination
             return res;
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -262,7 +261,7 @@ namespace SOS.Process.Repositories.Destination
 
         public string ActiveCollectionName =>  GetInstanceName(ActiveInstance);
 
-        public string InActiveCollectionName => GetInstanceName(InActiveInstance);
+        public string InactiveCollectionName => GetInstanceName(InActiveInstance);
 
         /// <inheritdoc />
         public async Task<bool> AddAsync(TEntity item)
