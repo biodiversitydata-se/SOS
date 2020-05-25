@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -6,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using Nest;
+using SOS.Lib.Enums;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Database.Interfaces;
@@ -84,6 +87,13 @@ namespace SOS.Process.Repositories.Destination
             {
                 return false;
             }
+        }
+
+        public async Task<List<Area>> GetAsync(AreaType[] areaTypes)
+        {
+            var filter = Builders<Area>.Filter.In(y => y.AreaType, areaTypes);
+            var res = await (await MongoCollection.FindAsync(filter)).ToListAsync();
+            return res;
         }
     }
 }

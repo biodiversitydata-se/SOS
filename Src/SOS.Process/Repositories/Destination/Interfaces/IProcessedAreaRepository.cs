@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Nest;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Process.Repositories.Destination.Interfaces
@@ -35,5 +38,7 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// <param name="geometry"></param>
         /// <returns></returns>
         Task<bool> StoreGeometryAsync(int id, IGeoShape geometry);
+
+        Task<List<Area>> GetAsync(AreaType[] areaTypes);
     }
 }
