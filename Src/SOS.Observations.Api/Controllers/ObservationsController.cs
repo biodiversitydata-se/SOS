@@ -93,9 +93,13 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> GetChunkInternalAsync([FromBody] SearchFilterInternal filter, [FromQuery]int skip = 0, [FromQuery]int take = 100)
+        public async Task<IActionResult> GetChunkInternalAsync([FromBody] SearchFilterInternal filter,
+            [FromQuery]int skip = 0,
+            [FromQuery]int take = 100,
+            [FromQuery]string sortBy = "",
+            [FromQuery]SearchSortOrder sortOrder = SearchSortOrder.Asc)
         {
-            return await GetChunkAsync(filter, skip, take);            
+            return await GetChunkAsync(filter, skip, take, sortBy, sortOrder);            
         }
 
         /// <inheritdoc />
