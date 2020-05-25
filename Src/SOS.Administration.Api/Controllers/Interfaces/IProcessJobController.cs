@@ -8,6 +8,12 @@ namespace SOS.Administration.Api.Controllers.Interfaces
     public interface IProcessJobController
     {
         /// <summary>
+        /// Run copy areas job.
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunProcessAreasJob();
+
+        /// <summary>
         /// Add daily process job
         /// </summary>
         /// <param name="sources"></param>
@@ -48,11 +54,5 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         IActionResult RunCopyFieldMappingJob();
-
-        /// <summary>
-        /// Run copy areas job.
-        /// </summary>
-        /// <returns></returns>
-        IActionResult RunCopyAreasJob();
     }
 }

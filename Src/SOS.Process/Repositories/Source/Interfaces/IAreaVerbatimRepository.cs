@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Nest;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Process.Repositories.Source.Interfaces
@@ -11,6 +11,6 @@ namespace SOS.Process.Repositories.Source.Interfaces
         /// </summary>
         /// <param name="areaId"></param>
         /// <returns></returns>
-        Task<IGeoShape> GetGeometryAsync(int areaId);
+        Task<Geometry> GetGeometryAsync(int areaId);
     }
 }

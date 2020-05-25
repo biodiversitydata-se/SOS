@@ -2,7 +2,7 @@
 
 namespace SOS.Lib.Jobs.Process
 {
-    public interface ICopyAreasJob
+    public interface IProcessAreasJob
     {
         /// <summary>
         /// Copy areas from verbatim db to process db.

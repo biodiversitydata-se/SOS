@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Nest;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -12,11 +11,11 @@ using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Jobs
 {
-    public class CopyAreasJob : ProcessJobBase, ICopyAreasJob
+    public class ProcessAreasJob : ProcessJobBase, IProcessAreasJob
     {
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
         private readonly IProcessedAreaRepository _processedAreaRepository;
-        private readonly ILogger<CopyAreasJob> _logger;
+        private readonly ILogger<ProcessAreasJob> _logger;
 
         /// <summary>
         /// Constructor
@@ -26,26 +25,26 @@ namespace SOS.Process.Jobs
         /// <param name="harvestInfoRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="logger"></param>
-        public CopyAreasJob(
+        public ProcessAreasJob(
             IAreaVerbatimRepository areaVerbatimRepository,
             IProcessedAreaRepository processedAreaRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IProcessInfoRepository processInfoRepository,
-            ILogger<CopyAreasJob> logger) : base(harvestInfoRepository, processInfoRepository)
+            ILogger<ProcessAreasJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
             _processedAreaRepository = processedAreaRepository ?? throw new ArgumentNullException(nameof(processedAreaRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private async Task<bool> CopyGeometryAsync(int id)
+        private async Task<bool> ProcessGeometryAsync(int id)
         {
-            var geometry = await _areaVerbatimRepository.GetGeometryAsync(id);
-           
-            return await _processedAreaRepository.StoreGeometryAsync(id, geometry);
+            var webMercatorGeometry = await _areaVerbatimRepository.GetGeometryAsync(id);
+            var wgs84Geometry = webMercatorGeometry.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+
+            return await _processedAreaRepository.StoreGeometryAsync(id, wgs84Geometry.ToGeoShape());
         }
         
-
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {
@@ -77,12 +76,12 @@ namespace SOS.Process.Jobs
                 await _processedAreaRepository.DropGeometriesAsync();
                 _logger.LogDebug("Finish deleting geometries");
 
-                _logger.LogDebug("Start copy geometries");
+                _logger.LogDebug("Start processing geometries");
                 foreach (var area in areas)
                 {
-                    success = success && await CopyGeometryAsync(area.Id);
+                    success = success && await ProcessGeometryAsync(area.Id);
                 }
-                _logger.LogDebug("Finish copy geometries");
+                _logger.LogDebug("Finish processing geometries");
 
                 _logger.LogDebug("Start indexing areas");
                 await _processedAreaRepository.CreateIndexAsync();
