@@ -175,8 +175,7 @@ namespace SOS.Lib.JsonConverters
             writer.WriteStartObject();
 
             var type = value.GeometryType;
-            writer.WriteString("type", type);
-            
+
             writer.WritePropertyName("coordinates");
             switch (type?.ToLower())
             {
@@ -188,7 +187,6 @@ namespace SOS.Lib.JsonConverters
                     var polygon = (Polygon)value;
 
                     WritePolygon(writer, polygon);
-
                     break;
                 case "multipolygon":
                     var muliPolygon = (MultiPolygon)value;
@@ -200,6 +198,8 @@ namespace SOS.Lib.JsonConverters
                     writer.WriteEndArray();
                     break;
             }
+
+            writer.WriteString("type", type);
 
             writer.WriteEndObject();
         }
