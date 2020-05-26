@@ -22,7 +22,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
     {
         private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataSet Type => DataSet.VirtualHerbariumObservations;
+        public override DataProviderType Type => DataProviderType.VirtualHerbariumObservations;
 
         /// <summary>
         /// Constructor

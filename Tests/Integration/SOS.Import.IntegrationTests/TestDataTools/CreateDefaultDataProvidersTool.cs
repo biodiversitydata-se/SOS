@@ -67,7 +67,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Stephen Coulson",
                     ContactEmail = "stephen.coulson@slu.se",
                     Url = "https://www.artportalen.se/",
-                    Type = DataSet.ArtportalenObservations,
+                    Type = DataProviderType.ArtportalenObservations,
                     IsActive = true,
                     IncludeInScheduledHarvest = true,
                     DataQualityIsApproved = true
@@ -84,7 +84,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Eddie Von Wachenfeldt",
                     ContactEmail = "eddie.vonwachenfeldt@slu.se",
                     Url = "http://musselportalen.se/",
-                    Type = DataSet.ClamPortalObservations,
+                    Type = DataProviderType.ClamPortalObservations,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true
@@ -101,7 +101,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Peter Ljungberg",
                     ContactEmail = "peter.ljungberg@slu.se",
                     Url = "https://www.slu.se/kul/",
-                    Type = DataSet.KULObservations,
+                    Type = DataProviderType.KULObservations,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true
@@ -118,7 +118,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Lars Sonesten",
                     ContactEmail = "Lars.Sonesten@slu.se",
                     Url = "http://miljodata.slu.se/mvm/",
-                    Type = DataSet.MvmObservations,
+                    Type = DataProviderType.MvmObservations,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true
@@ -135,7 +135,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Anders Kinnerbäck",
                     ContactEmail = "anders.kinnerback@slu.se",
                     Url = "http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/national-register-of-survey-test-fishing-nors/",
-                    Type = DataSet.NorsObservations,
+                    Type = DataProviderType.NorsObservations,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true
@@ -152,7 +152,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Berit Sers",
                     ContactEmail = "berit.sers@slu.se",
                     Url = "http://www.slu.se/en/faculties/nl/about-the-faculty/departments/department-of-aquatic-resources/databases/database-for-testfishing-in-streams/",
-                    Type = DataSet.SersObservations,
+                    Type = DataProviderType.SersObservations,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true
@@ -169,7 +169,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Nils Ericson",
                     ContactEmail = "mossnisse@hotmail.com",
                     Url = "http://herbarium.emg.umu.se",
-                    Type = DataSet.VirtualHerbariumObservations,
+                    Type = DataProviderType.VirtualHerbariumObservations,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true
@@ -186,7 +186,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactPerson = "Patrik Strömberg",
                     ContactEmail = "patrik.stromberg@smhi.se",
                     Url = "http://sharkweb.smhi.se/",
-                    Type = DataSet.SharkObservations,
+                    Type = DataProviderType.SharkObservations,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true
@@ -204,7 +204,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "-",
                     Url = "http://www.nrm.se/forskningochsamlingar/miljoforskningochovervakning/ringmarkningscentralen.214.html",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
-                    Type = DataSet.DwcA,
+                    Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true
@@ -222,7 +222,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "-",
                     Url = "http://www.gbif.org/dataset/9940af5a-3271-4e6a-ad71-ced986b9a9a5",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
-                    Type = DataSet.DwcA,
+                    Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true
@@ -240,7 +240,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "",
                     Url = "http://www.gbif.org/dataset/38c1351d-9cfe-42c0-97da-02d2c8be141c",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=smtp-nrm",
-                    Type = DataSet.DwcA,
+                    Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true
@@ -258,7 +258,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "-",
                     Url = "http://www.gbif.org/dataset/6aa7c400-0c66-11dd-84d2-b8a03c50a862",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
-                    Type = DataSet.DwcA,
+                    Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true
@@ -276,7 +276,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "-",
                     Url = "https://www.dagfjarilar.lu.se/",
                     DownloadUrl = "http://www.gbif.se/ipt/archive.do?r=lu_sebms",
-                    Type = DataSet.DwcA,
+                    Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true
@@ -293,7 +293,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     ContactEmail = "shark@smhi.se",
                     Url = "http://sharkdata.se/",
                     DownloadUrl = "",
-                    Type = DataSet.DwcA,
+                    Type = DataProviderType.DwcA,
                     IsActive = false,
                     IncludeInScheduledHarvest = false,
                     DataQualityIsApproved = true

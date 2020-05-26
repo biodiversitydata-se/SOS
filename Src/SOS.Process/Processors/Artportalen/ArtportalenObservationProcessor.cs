@@ -27,7 +27,7 @@ namespace SOS.Process.Processors.Artportalen
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly SemaphoreSlim _semaphore;
         private readonly ProcessConfiguration _processConfiguration;
-        public override DataSet Type => DataSet.ArtportalenObservations;
+        public override DataProviderType Type => DataProviderType.ArtportalenObservations;
 
         /// <summary>
         /// Constructor

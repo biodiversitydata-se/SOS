@@ -19,7 +19,7 @@ namespace SOS.Process.Processors
         protected readonly IProcessedObservationRepository ProcessRepository;
         protected readonly ILogger<TEntity> Logger;
         protected readonly IFieldMappingResolverHelper FieldMappingResolverHelper;
-        public abstract DataSet Type { get; }
+        public abstract DataProviderType Type { get; }
 
         protected ObservationProcessorBase(
             IProcessedObservationRepository processedObservationRepository,

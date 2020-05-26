@@ -131,7 +131,7 @@ namespace SOS.Administration.Api.Controllers
                 {
                     return new BadRequestObjectResult($"No data provider exist with Id={model.DataProviderIdOrIdentifier}");
                 }
-                if (dataProvider.Type != DataSet.DwcA)
+                if (dataProvider.Type != DataProviderType.DwcA)
                 {
                     return new BadRequestObjectResult($"The data provider \"{dataProvider}\" is not a DwC-A provider");
                 }

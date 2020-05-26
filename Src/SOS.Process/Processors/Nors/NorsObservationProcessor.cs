@@ -22,7 +22,7 @@ namespace SOS.Process.Processors.Nors
     {
         private readonly INorsObservationVerbatimRepository _norsObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataSet Type => DataSet.NorsObservations;
+        public override DataProviderType Type => DataProviderType.NorsObservations;
 
         /// <summary>
         /// Constructor

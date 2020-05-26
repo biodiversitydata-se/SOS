@@ -20,7 +20,7 @@ namespace SOS.Lib.Models.Shared
         public string Identifier { get; set; }
         [BsonRepresentation(BsonType.String)]
         [JsonConverter(typeof(StringEnumConverter))]
-        public DataSet Type { get; set; }
+        public DataProviderType Type { get; set; }
         public bool IsActive { get; set; }
         public string Name { get; set; }
         public string SwedishName { get; set; }

@@ -125,7 +125,7 @@ namespace SOS.Process.UnitTests.Processors
             var dataProvider = new DataProvider
             {
                 Name = "Artportalen",
-                Type = DataSet.ArtportalenObservations
+                Type = DataProviderType.ArtportalenObservations
             };
 
             var taxa = new Dictionary<int, ProcessedTaxon>
@@ -163,7 +163,7 @@ namespace SOS.Process.UnitTests.Processors
             var dataProvider = new DataProvider
             {
                 Name = "Artportalen",
-                Type = DataSet.ArtportalenObservations
+                Type = DataProviderType.ArtportalenObservations
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -190,7 +190,7 @@ namespace SOS.Process.UnitTests.Processors
             var dataProvider = new DataProvider
             {
                 Name = "Artportalen",
-                Type = DataSet.ArtportalenObservations
+                Type = DataProviderType.ArtportalenObservations
             };
 
             _artportalenVerbatimRepository.Setup(r => r.GetBatchAsync(0, 0))

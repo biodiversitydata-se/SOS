@@ -71,7 +71,7 @@ namespace SOS.Process.Jobs
 
             _logger.LogDebug("Start updating process info for taxa");
             var harvestInfo = await GetHarvestInfoAsync(nameof(DarwinCoreTaxon));
-            var providerInfo = CreateProviderInfo(DataSet.Taxa, harvestInfo, start, DateTime.Now,
+            var providerInfo = CreateProviderInfo(DataProviderType.Taxa, harvestInfo, start, DateTime.Now,
                 success ? RunStatus.Success : RunStatus.Failed, taxa.Count);
             await SaveProcessInfo(nameof(ProcessedTaxon), start, taxa.Count,
                 success ? RunStatus.Success : RunStatus.Failed, new[] { providerInfo });

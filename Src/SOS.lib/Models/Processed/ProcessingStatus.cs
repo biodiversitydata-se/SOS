@@ -11,7 +11,7 @@ namespace SOS.Lib.Models.Processed
         /// Constructor
         /// </summary>
         /// <param name="type"></param>
-        protected ProcessingStatus(DataSet type)
+        protected ProcessingStatus(DataProviderType type)
         {
             Type = type;
         }
@@ -21,7 +21,7 @@ namespace SOS.Lib.Models.Processed
         /// </summary>
         /// <param name="dataProviderIdentifier"></param>
         /// <param name="type"></param>
-        protected ProcessingStatus(string dataProviderIdentifier, DataSet type)
+        protected ProcessingStatus(string dataProviderIdentifier, DataProviderType type)
         {
             DataProviderIdentifier = dataProviderIdentifier;
             Type = type;
@@ -41,7 +41,7 @@ namespace SOS.Lib.Models.Processed
         /// Type
         /// </summary>
         [BsonRepresentation(BsonType.String)]
-        public DataSet Type { get; }
+        public DataProviderType Type { get; }
 
         /// <summary>
         /// Harvest end date and time
@@ -62,7 +62,7 @@ namespace SOS.Lib.Models.Processed
 
         public static ProcessingStatus Success(
             string dataProviderIdentifier,
-            DataSet type,
+            DataProviderType type,
             DateTime start,
             DateTime end,
             int count)
@@ -78,7 +78,7 @@ namespace SOS.Lib.Models.Processed
 
         public static ProcessingStatus Failed(
             string dataProviderIdentifier,
-            DataSet type,
+            DataProviderType type,
             DateTime start,
             DateTime end)
         {
@@ -92,7 +92,7 @@ namespace SOS.Lib.Models.Processed
 
         public static ProcessingStatus Cancelled(
             string dataProviderIdentifier,
-            DataSet type,
+            DataProviderType type,
             DateTime start,
             DateTime end)
         {

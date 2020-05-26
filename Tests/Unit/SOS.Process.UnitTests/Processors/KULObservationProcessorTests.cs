@@ -194,7 +194,7 @@ namespace SOS.Process.UnitTests.Processors
             return new DataProvider
             {
                 Name = "KUL",
-                Type = DataSet.KULObservations
+                Type = DataProviderType.KULObservations
             };
         }
 

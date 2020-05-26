@@ -54,7 +54,7 @@ namespace SOS.Process.Jobs
 
             _logger.LogDebug("Start updating process info for field mappings");
             var harvestInfo = await GetHarvestInfoAsync(nameof(FieldMapping));
-            var providerInfo = CreateProviderInfo(DataSet.FieldMappings, harvestInfo, start, DateTime.Now,
+            var providerInfo = CreateProviderInfo(DataProviderType.FieldMappings, harvestInfo, start, DateTime.Now,
                 success ? RunStatus.Success : RunStatus.Failed, fieldMappings.Count);
             await SaveProcessInfo(nameof(FieldMapping), start, fieldMappings.Count,
                 success ? RunStatus.Success : RunStatus.Failed, new[] { providerInfo });

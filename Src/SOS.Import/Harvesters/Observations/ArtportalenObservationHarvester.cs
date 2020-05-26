@@ -177,7 +177,7 @@ namespace SOS.Import.Harvesters.Observations
         /// <inheritdoc />
         public async Task<HarvestInfo> HarvestSightingsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(ArtportalenVerbatimObservation), DataSet.ArtportalenObservations, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(ArtportalenVerbatimObservation), DataProviderType.ArtportalenObservations, DateTime.Now);
 
             try
             {

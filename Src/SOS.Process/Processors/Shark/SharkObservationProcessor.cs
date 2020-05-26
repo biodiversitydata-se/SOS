@@ -22,7 +22,7 @@ namespace SOS.Process.Processors.Shark
     {
         private readonly ISharkObservationVerbatimRepository _sharkObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataSet Type => DataSet.SharkObservations;
+        public override DataProviderType Type => DataProviderType.SharkObservations;
 
         /// <summary>
         /// Constructor

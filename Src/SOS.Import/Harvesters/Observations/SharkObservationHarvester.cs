@@ -43,7 +43,7 @@ namespace SOS.Import.Harvesters.Observations
 
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken  cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(SharkObservationVerbatim), DataSet.SharkObservations, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(SharkObservationVerbatim), DataProviderType.SharkObservations, DateTime.Now);
             harvestInfo.Status = RunStatus.Failed;
 
             try

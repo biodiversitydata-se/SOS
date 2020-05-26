@@ -52,7 +52,7 @@ namespace SOS.Import.Harvesters.Observations
         
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken  cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(MvmObservationVerbatim), DataSet.MvmObservations, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(MvmObservationVerbatim), DataProviderType.MvmObservations, DateTime.Now);
 
             try
             {

@@ -182,7 +182,7 @@ namespace SOS.Process.UnitTests.Processors
             return new DataProvider
             {
                 Name = "Clam portal",
-                Type = DataSet.ClamPortalObservations
+                Type = DataProviderType.ClamPortalObservations
             };
         }
     }

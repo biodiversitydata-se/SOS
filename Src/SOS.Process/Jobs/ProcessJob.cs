@@ -51,7 +51,7 @@ namespace SOS.Process.Jobs
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly IAreaHelper _areaHelper;
         private readonly ILogger<ProcessJob> _logger;
-        private readonly Dictionary<DataSet, IProcessor> _processorByType;
+        private readonly Dictionary<DataProviderType, IProcessor> _processorByType;
 
         /// <summary>
         /// Constructor
@@ -115,17 +115,17 @@ namespace SOS.Process.Jobs
             if (dwcaObservationProcessor == null) throw new ArgumentNullException(nameof(dwcaObservationProcessor));
             if (artportalenObservationProcessor == null) throw new ArgumentNullException(nameof(artportalenObservationProcessor));
             if (sharkObservationProcessor == null) throw new ArgumentNullException(nameof(sharkObservationProcessor));
-            _processorByType = new Dictionary<DataSet, IProcessor>
+            _processorByType = new Dictionary<DataProviderType, IProcessor>
             {
-                {DataSet.ArtportalenObservations, artportalenObservationProcessor},
-                {DataSet.ClamPortalObservations, clamPortalObservationProcessor},
-                {DataSet.SersObservations, sersObservationProcessor},
-                {DataSet.NorsObservations, norsObservationProcessor},
-                {DataSet.KULObservations, kulObservationProcessor},
-                {DataSet.MvmObservations, mvmObservationProcessor},
-                {DataSet.SharkObservations, sharkObservationProcessor},
-                {DataSet.VirtualHerbariumObservations, virtualHerbariumObservationProcessor},
-                {DataSet.DwcA, dwcaObservationProcessor}
+                {DataProviderType.ArtportalenObservations, artportalenObservationProcessor},
+                {DataProviderType.ClamPortalObservations, clamPortalObservationProcessor},
+                {DataProviderType.SersObservations, sersObservationProcessor},
+                {DataProviderType.NorsObservations, norsObservationProcessor},
+                {DataProviderType.KULObservations, kulObservationProcessor},
+                {DataProviderType.MvmObservations, mvmObservationProcessor},
+                {DataProviderType.SharkObservations, sharkObservationProcessor},
+                {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationProcessor},
+                {DataProviderType.DwcA, dwcaObservationProcessor}
             };
         }
 
@@ -264,10 +264,10 @@ namespace SOS.Process.Jobs
                 // 6. Get ProviderInfo
                 //--------------------------------------
                 var providerInfoByDataProvider = new Dictionary<DataProvider, ProviderInfo>();
-                var metaDataProviderInfo = await GetProviderInfoAsync(new Dictionary<string, DataSet>
+                var metaDataProviderInfo = await GetProviderInfoAsync(new Dictionary<string, DataProviderType>
                 {
-                    {nameof(Area), DataSet.Areas},
-                    {nameof(ProcessedTaxon), DataSet.Taxa}
+                    {nameof(Area), DataProviderType.Areas},
+                    {nameof(ProcessedTaxon), DataProviderType.Taxa}
                 });
 
                 //------------------------------------------------------------------------
@@ -286,7 +286,7 @@ namespace SOS.Process.Jobs
                     var harvestInfo2 = dataProvider.HarvestInfo; // todo - decide where we should store harvestInfo
                     var providerInfo = CreateProviderInfo(dataProvider, harvestInfo, processStart);
                     providerInfo.MetadataInfo = metaDataProviderInfo
-                        .Where(mdp => new[] {DataSet.Taxa}.Contains(mdp.DataProviderType)).ToArray();
+                        .Where(mdp => new[] {DataProviderType.Taxa}.Contains(mdp.DataProviderType)).ToArray();
                     providerInfoByDataProvider.Add(dataProvider, providerInfo);
                 }
 
@@ -330,7 +330,7 @@ namespace SOS.Process.Jobs
                 //     then try to copy that data from the active instance.
                 //----------------------------------------------------------------------------
                 bool artportalenSuccededOrDidntRun = !processTaskByDataProvider.Any(pair =>
-                    pair.Key.Type == DataSet.ArtportalenObservations && pair.Value.Result.Status == RunStatus.Failed);
+                    pair.Key.Type == DataProviderType.ArtportalenObservations && pair.Value.Result.Status == RunStatus.Failed);
 
                 if (!success && copyFromActiveOnFail && artportalenSuccededOrDidntRun)
                 {
@@ -391,7 +391,7 @@ namespace SOS.Process.Jobs
         {
             switch (dataProvider.Type)
             {
-                case DataSet.DwcA:
+                case DataProviderType.DwcA:
                     return $"{nameof(DwcObservationVerbatim)}-{dataProvider.Identifier}";
                 default:
                     return dataProvider.Type.ToString();

@@ -22,7 +22,7 @@ namespace SOS.Process.Processors.ClamPortal
     {
         private readonly IClamObservationVerbatimRepository _clamObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataSet Type => DataSet.ClamPortalObservations;
+        public override DataProviderType Type => DataProviderType.ClamPortalObservations;
 
         /// <summary>
         /// Constructor

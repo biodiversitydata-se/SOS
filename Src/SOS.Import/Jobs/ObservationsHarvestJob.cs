@@ -25,7 +25,7 @@ namespace SOS.Import.Jobs
         private readonly IFieldMappingImportJob _fieldMappingImportJob;
         private readonly IDataProviderManager _dataProviderManager;
         private readonly ILogger<ObservationsHarvestJob> _logger;
-        private readonly Dictionary<DataSet, IHarvestJob> _harvestJobByType;
+        private readonly Dictionary<DataProviderType, IHarvestJob> _harvestJobByType;
 
         /// <summary>
         /// Constructor
@@ -71,17 +71,17 @@ namespace SOS.Import.Jobs
             if (sharkHarvestJob == null) throw new ArgumentNullException(nameof(sharkHarvestJob));
             if (virtualHerbariumHarvestJob == null) throw new ArgumentNullException(nameof(virtualHerbariumHarvestJob));
             if (dwcArchiveHarvestJob == null) throw new ArgumentNullException(nameof(dwcArchiveHarvestJob));
-            _harvestJobByType = new Dictionary<DataSet, IHarvestJob>
+            _harvestJobByType = new Dictionary<DataProviderType, IHarvestJob>
             {
-                {DataSet.ArtportalenObservations, artportalenHarvestJob},
-                {DataSet.ClamPortalObservations, clamPortalHarvestJob},
-                {DataSet.SersObservations, sersHarvestJob},
-                {DataSet.NorsObservations, norsHarvestJob},
-                {DataSet.KULObservations, kulHarvestJob},
-                {DataSet.MvmObservations, mvmHarvestJob},
-                {DataSet.SharkObservations, sharkHarvestJob},
-                {DataSet.VirtualHerbariumObservations, virtualHerbariumHarvestJob},
-                {DataSet.DwcA, dwcArchiveHarvestJob}
+                {DataProviderType.ArtportalenObservations, artportalenHarvestJob},
+                {DataProviderType.ClamPortalObservations, clamPortalHarvestJob},
+                {DataProviderType.SersObservations, sersHarvestJob},
+                {DataProviderType.NorsObservations, norsHarvestJob},
+                {DataProviderType.KULObservations, kulHarvestJob},
+                {DataProviderType.MvmObservations, mvmHarvestJob},
+                {DataProviderType.SharkObservations, sharkHarvestJob},
+                {DataProviderType.VirtualHerbariumObservations, virtualHerbariumHarvestJob},
+                {DataProviderType.DwcA, dwcArchiveHarvestJob}
             };
         }
 
@@ -154,9 +154,9 @@ namespace SOS.Import.Jobs
                 // 2. Harvest taxonomy & field mappings directly without enqueuing to Hangfire
                 //-----------------------------------------------------------------------------
                 _logger.LogInformation("Start resource harvest jobs (taxonomy & field mappings)");
-                var resourceHarvestTasks = new Dictionary<DataSet, Task<bool>>();
-                resourceHarvestTasks.Add(DataSet.Taxa, _taxonHarvestJob.RunAsync());
-                resourceHarvestTasks.Add(DataSet.FieldMappings, _fieldMappingImportJob.RunAsync());
+                var resourceHarvestTasks = new Dictionary<DataProviderType, Task<bool>>();
+                resourceHarvestTasks.Add(DataProviderType.Taxa, _taxonHarvestJob.RunAsync());
+                resourceHarvestTasks.Add(DataProviderType.FieldMappings, _fieldMappingImportJob.RunAsync());
                 await Task.WhenAll(resourceHarvestTasks.Values);
                 _logger.LogInformation("Finish resource harvest jobs (taxonomy & field mappings)");
 
@@ -179,8 +179,8 @@ namespace SOS.Import.Jobs
                 //---------------------------------------------------------------------------------------------------------
                 var artportalenHarvestTask = harvestTaskByDataProvider.Single(pair => pair.Key.Identifier == DataProviderIdentifiers.Artportalen).Value;
                 if (artportalenHarvestTask.Result &&
-                    resourceHarvestTasks[DataSet.Taxa].Result &&
-                    resourceHarvestTasks[DataSet.FieldMappings].Result)
+                    resourceHarvestTasks[DataProviderType.Taxa].Result &&
+                    resourceHarvestTasks[DataProviderType.FieldMappings].Result)
                 {
                     // Ensure that Artportalen always is included in processDataProviders
                     if (processDataProviders.All(dataProvider => dataProvider.Identifier != DataProviderIdentifiers.Artportalen))

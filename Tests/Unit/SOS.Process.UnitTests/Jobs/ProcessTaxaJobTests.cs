@@ -118,7 +118,7 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(true);
 
             _harvestInfoRepository.Setup(r => r.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HarvestInfo("ID", DataSet.Taxa, DateTime.Now){ Status = RunStatus.Success});
+                .ReturnsAsync(new HarvestInfo("ID", DataProviderType.Taxa, DateTime.Now){ Status = RunStatus.Success});
 
             _processInfoRepository.Setup(r => r.VerifyCollectionAsync());
 

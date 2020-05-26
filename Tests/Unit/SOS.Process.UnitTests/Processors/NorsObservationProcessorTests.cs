@@ -194,7 +194,7 @@ namespace SOS.Process.UnitTests.Processors
             return new DataProvider
             {
                 Name = "NORS",
-                Type = DataSet.NorsObservations
+                Type = DataProviderType.NorsObservations
             };
         }
     }

@@ -28,7 +28,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly IAreaHelper _areaHelper;
-        public override DataSet Type => DataSet.DwcA;
+        public override DataProviderType Type => DataProviderType.DwcA;
 
         /// <summary>
         /// Constructor

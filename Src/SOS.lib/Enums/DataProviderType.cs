@@ -1,10 +1,10 @@
 ﻿namespace SOS.Lib.Enums
 {
-    // todo - rename to DataProviderType?
+    // todo - extract Areas, FieldMappings and Taxa to a new enum ResourceDataType?
     /// <summary>
-    /// Id of data sets
+    /// Data provider types
     /// </summary>
-    public enum DataSet
+    public enum DataProviderType
     {
         Areas = 1,
         FieldMappings,

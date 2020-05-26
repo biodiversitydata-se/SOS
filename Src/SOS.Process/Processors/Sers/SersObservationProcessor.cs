@@ -22,7 +22,7 @@ namespace SOS.Process.Processors.Sers
     {
         private readonly ISersObservationVerbatimRepository _sersObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataSet Type => DataSet.SersObservations;
+        public override DataProviderType Type => DataProviderType.SersObservations;
 
         /// <summary>
         /// Constructor

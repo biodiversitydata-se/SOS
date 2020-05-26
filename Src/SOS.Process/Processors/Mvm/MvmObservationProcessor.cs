@@ -22,7 +22,7 @@ namespace SOS.Process.Processors.Mvm
     {
         private readonly IMvmObservationVerbatimRepository _mvmObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataSet Type => DataSet.MvmObservations;
+        public override DataProviderType Type => DataProviderType.MvmObservations;
 
         /// <summary>
         /// Constructor

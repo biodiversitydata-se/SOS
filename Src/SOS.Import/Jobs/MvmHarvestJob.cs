@@ -40,7 +40,7 @@ namespace SOS.Import.Jobs
         public async Task<bool> RunAsync(IJobCancellationToken  cancellationToken)
         {
             _logger.LogInformation("Start MVM Harvest Job");
-            var dataProvider = await _dataProviderManager.GetDataProviderByType(DataSet.MvmObservations);
+            var dataProvider = await _dataProviderManager.GetDataProviderByType(DataProviderType.MvmObservations);
             var harvestInfoResult = await _mvmObservationHarvester.HarvestObservationsAsync(cancellationToken);
             _logger.LogInformation($"End MVM Harvest Job. Status: {harvestInfoResult.Status}");
 
