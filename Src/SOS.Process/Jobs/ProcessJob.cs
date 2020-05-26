@@ -282,8 +282,8 @@ namespace SOS.Process.Jobs
 
                     // Get harvest info and create a provider info object that we can add processing info to later
                     string harvestInfoId = HarvestInfo.GetIdFromDataProvider(dataProvider);
-                    var harvestInfo2 = await GetHarvestInfoAsync(harvestInfoId);
-                    var harvestInfo = dataProvider.HarvestInfo; // todo - decide where we should store harvestInfo
+                    var harvestInfo = await GetHarvestInfoAsync(harvestInfoId);
+                    var harvestInfo2 = dataProvider.HarvestInfo; // todo - decide where we should store harvestInfo
                     var providerInfo = CreateProviderInfo(dataProvider, harvestInfo, processStart);
                     providerInfo.MetadataInfo = metaDataProviderInfo
                         .Where(mdp => new[] {DataSet.Taxa}.Contains(mdp.DataProviderType)).ToArray();

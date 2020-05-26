@@ -38,14 +38,19 @@ namespace SOS.Lib.Models.Shared
         public ProviderInfo ProcessInfoInstance0 { get; set; }
         public ProviderInfo ProcessInfoInstance1 { get; set; }
         [JsonIgnore]
+        [BsonIgnore]
         public int PublicObservations { get; set; }
         [JsonIgnore]
+        [BsonIgnore]
         public int ProtectedObservations { get; set; }
         [JsonIgnore]
+        [BsonIgnore]
         public DateTime? LatestHarvestDate { get; set; }
         [JsonIgnore]
+        [BsonIgnore]
         public ICollection<DateTime> HarvestHistory { get; set; } // todo - change data type?
         [JsonIgnore]
+        [BsonIgnore]
         public string HarvestSchedule { get; set; } // todo - change data type
 
         public bool EqualsIdOrIdentifier(string idOrIdentifier)
