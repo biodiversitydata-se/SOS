@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
@@ -53,7 +54,7 @@ namespace SOS.Process.Jobs
             _logger.LogDebug("Finish copy field mappings");
 
             _logger.LogDebug("Start updating process info for field mappings");
-            var harvestInfo = await GetHarvestInfoAsync(nameof(FieldMapping));
+            var harvestInfo = await GetHarvestInfoAsync(HarvestInfo.GetIdFromResourceProvider(DataProviderType.FieldMappings));
             var providerInfo = CreateProviderInfo(DataProviderType.FieldMappings, harvestInfo, start, DateTime.Now,
                 success ? RunStatus.Success : RunStatus.Failed, fieldMappings.Count);
             await SaveProcessInfo(nameof(FieldMapping), start, fieldMappings.Count,

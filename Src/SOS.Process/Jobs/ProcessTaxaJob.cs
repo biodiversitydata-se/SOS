@@ -10,6 +10,7 @@ using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
@@ -70,7 +71,7 @@ namespace SOS.Process.Jobs
             _logger.LogDebug("Finish saving processed taxa");
 
             _logger.LogDebug("Start updating process info for taxa");
-            var harvestInfo = await GetHarvestInfoAsync(nameof(DarwinCoreTaxon));
+            var harvestInfo = await GetHarvestInfoAsync(HarvestInfo.GetIdFromResourceProvider(DataProviderType.Taxa));
             var providerInfo = CreateProviderInfo(DataProviderType.Taxa, harvestInfo, start, DateTime.Now,
                 success ? RunStatus.Success : RunStatus.Failed, taxa.Count);
             await SaveProcessInfo(nameof(ProcessedTaxon), start, taxa.Count,

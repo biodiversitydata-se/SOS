@@ -61,10 +61,10 @@ namespace SOS.Import.Harvesters.Observations
         /// <returns></returns>
         public async Task<HarvestInfo> HarvestObservationsAsync(
             string archivePath,
-            IIdIdentifierTuple idIdentifierTuple,
+            DataProvider dataProvider,
             IJobCancellationToken cancellationToken)
         {
-            string harvestInfoId = $"{nameof(DwcObservationVerbatim)}-{idIdentifierTuple.Identifier}";
+            string harvestInfoId = HarvestInfo.GetIdFromDataProvider(dataProvider);
             var harvestInfo = new HarvestInfo(harvestInfoId, DataProviderType.DwcA, DateTime.Now);
 
             try
@@ -74,20 +74,19 @@ namespace SOS.Import.Harvesters.Observations
                     t => true);
 
                 _logger.LogDebug("Start storing DwC-A observations");
-                await _dwcArchiveVerbatimRepository.ClearTempHarvestCollection(idIdentifierTuple);
+                await _dwcArchiveVerbatimRepository.ClearTempHarvestCollection(dataProvider);
                 int observationCount = 0;
                 using var archiveReader = new ArchiveReader(archivePath);
                 var observationBatches =
-                    _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, idIdentifierTuple, BatchSize);
+                    _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, dataProvider, BatchSize);
                 await foreach (List<DwcObservationVerbatim> verbatimObservationsBatch in observationBatches)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     observationCount += verbatimObservationsBatch.Count;
-                    await _dwcArchiveVerbatimRepository.AddManyToTempHarvestAsync(verbatimObservationsBatch,
-                        idIdentifierTuple);
+                    await _dwcArchiveVerbatimRepository.AddManyToTempHarvestAsync(verbatimObservationsBatch, dataProvider);
                 }
 
-                await _dwcArchiveVerbatimRepository.RenameTempHarvestCollection(idIdentifierTuple);
+                await _dwcArchiveVerbatimRepository.RenameTempHarvestCollection(dataProvider);
                 _logger.LogDebug("Finish storing DwC-A observations");
 
                 // Read and store events
@@ -113,7 +112,7 @@ namespace SOS.Import.Harvesters.Observations
             }
             finally
             {
-                await _dwcArchiveVerbatimRepository.DeleteTempHarvestCollectionIfExists(idIdentifierTuple);
+                await _dwcArchiveVerbatimRepository.DeleteTempHarvestCollectionIfExists(dataProvider);
             }
 
             return harvestInfo;

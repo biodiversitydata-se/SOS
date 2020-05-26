@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Reflection;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -86,6 +88,22 @@ namespace SOS.Lib.Models.Verbatim.Shared
                     return nameof(VirtualHerbariumObservationVerbatim);
                 default:
                     return dataProvider.Type.ToString();
+            }
+        }
+
+        public static string GetIdFromResourceProvider(DataProviderType dataProviderType)
+        {
+            switch (dataProviderType)
+            {
+                case DataProviderType.Areas:
+                    return nameof(Area);
+                case DataProviderType.FieldMappings:
+                    return nameof(FieldMapping);
+                case DataProviderType.Taxa:
+                    return nameof(DarwinCoreTaxon);
+                default:
+                    throw new ArgumentException(
+                        $"{MethodBase.GetCurrentMethod()?.Name}() does not support the value {dataProviderType}", nameof(dataProviderType));
             }
         }
     }
