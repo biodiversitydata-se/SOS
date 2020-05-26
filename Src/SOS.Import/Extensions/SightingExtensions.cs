@@ -184,10 +184,13 @@ namespace SOS.Import.Extensions
             if (personSightings.TryGetValue(entity.Id, out PersonSighting personSighting))
             {
                 observation.VerifiedBy = personSighting.VerifiedBy;
+                observation.VerifiedByInternal = personSighting.VerifiedByInternal;
                 observation.Observers = personSighting.Observers;
+                observation.ObserversInternal = personSighting.ObserversInternal;
                 observation.ReportedBy = personSighting.ReportedBy;
                 observation.SpeciesCollection = personSighting.SpeciesCollection;
                 observation.ReportedByUserId = personSighting.ReportedByUserId;
+                observation.ReportedByUserAlias = personSighting.ReportedByUserAlias;
             }
 
             return observation;
@@ -393,7 +396,8 @@ namespace SOS.Import.Extensions
                 Id = entity.Id,
                 UserId = entity.UserId,
                 FirstName = entity.FirstName,
-                LastName = entity.LastName
+                LastName = entity.LastName,
+                Alias = entity.Alias
             };
         }
 

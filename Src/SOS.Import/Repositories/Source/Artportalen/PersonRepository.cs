@@ -25,7 +25,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                p.Id,
 	                u.Id as UserId,	                
 	                p.FirstName,
-	                p.LastName
+	                p.LastName,
+                    u.UserAlias AS Alias
                 FROM 
 	                [Person] p
                     INNER JOIN [User] u ON p.Id = u.PersonId";

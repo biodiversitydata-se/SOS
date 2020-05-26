@@ -110,6 +110,7 @@ namespace SOS.Process.Processors.Artportalen
                 Identification = new ProcessedIdentification
                 {
                     IdentifiedBy = verbatimObservation.VerifiedBy,
+                    IdentifiedByInternal = verbatimObservation.VerifiedByInternal,
                     Validated = new[] { 60, 61, 62, 63, 64, 65 }.Contains(verbatimObservation.ValidationStatus?.Id ?? 0),
                     UncertainDetermination = verbatimObservation.UnsureDetermination
                 },
@@ -158,6 +159,7 @@ namespace SOS.Process.Processors.Artportalen
                     OrganismQuantityInt = verbatimObservation.Quantity,
                     OrganismQuantity = verbatimObservation.Quantity.ToString(),
                     RecordedBy = verbatimObservation.Observers,
+                    RecordedByInternal = verbatimObservation.ObserversInternal,
                     RecordNumber = verbatimObservation.Label,
                     OccurrenceRemarks = verbatimObservation.Comment,
                     OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
@@ -170,6 +172,7 @@ namespace SOS.Process.Processors.Artportalen
                 ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem),
                 ReportedBy = verbatimObservation.ReportedBy,
                 ReportedByUserId = verbatimObservation.ReportedByUserId,
+                ReportedByUserAlias = verbatimObservation.ReportedByUserAlias,
                 ReportedDate = verbatimObservation.ReportedDate,
                 RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas",
                 Taxon = taxon,
