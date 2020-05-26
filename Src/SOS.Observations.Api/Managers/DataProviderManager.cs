@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -37,23 +38,32 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<DataProvider>> GetDataProvidersAsync()
+        public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive)
         {
+            List<DataProviderDto> dataProviderDtos = new List<DataProviderDto>();
             var processInfo = await _processInfoManager.GetProcessInfoAsync(true);
-            var allDataProviders = await _dataProviderRepository.GetAllAsync();
-            
+            List<DataProvider> allDataProviders = await _dataProviderRepository.GetAllAsync();
+            var selectedDataProviders = includeInactive ? allDataProviders : allDataProviders.Where(provider => provider.IsActive).ToList();
+
             // Add process data
-            foreach (var dataProvider in allDataProviders)
+            foreach (var dataProvider in selectedDataProviders)
             {
                 var providerInfo = processInfo?.ProvidersInfo?.FirstOrDefault(provider => provider.DataProviderId == dataProvider.Id);
                 if (providerInfo != null)
                 {
-                    dataProvider.LatestHarvestDate = providerInfo.HarvestEnd;
-                    dataProvider.PublicObservations = providerInfo.ProcessCount.GetValueOrDefault(0);
+                    dataProviderDtos.Add(DataProviderDto.Create(
+                        dataProvider,
+                        providerInfo.ProcessCount.GetValueOrDefault(0),
+                        0,
+                        providerInfo.HarvestEnd));
+                }
+                else
+                {
+                    dataProviderDtos.Add(DataProviderDto.Create(dataProvider));
                 }
             }
 
-            return allDataProviders;
+            return dataProviderDtos;
         }
     }
 }

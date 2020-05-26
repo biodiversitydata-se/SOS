@@ -11,48 +11,108 @@ using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Lib.Models.Shared
 {
+    /// <summary>
+    /// Data provider.
+    /// </summary>
     public class DataProvider : IEntity<int>, IIdIdentifierTuple
     {
-        public int Id { get; set; }
         /// <summary>
-        /// A unique identifer that is easier to read than just an Id number.
+        /// Id.
+        /// </summary>
+        public int Id { get; set; }
+        
+        /// <summary>
+        /// A unique identifer that is easier to understand than an Id number.
         /// </summary>
         public string Identifier { get; set; }
+        
+        /// <summary>
+        /// The harvest data format.
+        /// </summary>
         [BsonRepresentation(BsonType.String)]
         [JsonConverter(typeof(StringEnumConverter))]
         public DataProviderType Type { get; set; }
+        
+        /// <summary>
+        /// Decides whether the data provider should be included in processing of observations and available for the search API.
+        /// </summary>
         public bool IsActive { get; set; }
+        
+        /// <summary>
+        /// The name of the data provider (in english).
+        /// </summary>
         public string Name { get; set; }
+        
+        /// <summary>
+        /// The name of the data provider (in swedish).
+        /// </summary>
         public string SwedishName { get; set; }
+        
+        /// <summary>
+        /// The organization name (in english).
+        /// </summary>
         public string Organization { get; set; }
+        
+        /// <summary>
+        /// The organization name (in swedish).
+        /// </summary>
         public string SwedishOrganization { get; set; }
+        
+        /// <summary>
+        /// Description of the data provider (in english).
+        /// </summary>
         public string Description { get; set; }
-        public string SwedishDescription { get; set; }
-        public string Url { get; set; }
-        public string ContactPerson { get; set; }
-        public string ContactEmail { get; set; }
-        public string DownloadUrl { get; set; }
-        public bool IncludeInScheduledHarvest { get; set; }
-        public bool DataQualityIsApproved { get; set; }
-        public HarvestInfo HarvestInfo { get; set; }
-        public ProviderInfo ProcessInfoInstance0 { get; set; }
-        public ProviderInfo ProcessInfoInstance1 { get; set; }
-        [JsonIgnore]
-        [BsonIgnore]
-        public int PublicObservations { get; set; }
-        [JsonIgnore]
-        [BsonIgnore]
-        public int ProtectedObservations { get; set; }
-        [JsonIgnore]
-        [BsonIgnore]
-        public DateTime? LatestHarvestDate { get; set; }
-        [JsonIgnore]
-        [BsonIgnore]
-        public ICollection<DateTime> HarvestHistory { get; set; } // todo - change data type?
-        [JsonIgnore]
-        [BsonIgnore]
-        public string HarvestSchedule { get; set; } // todo - change data type
 
+        /// <summary>
+        /// Description of the data provider (in swedish).
+        /// </summary>
+        public string SwedishDescription { get; set; }
+        
+        /// <summary>
+        /// URL to the data provider source.
+        /// </summary>
+        public string Url { get; set; }
+        
+        /// <summary>
+        /// Contact person.
+        /// </summary>
+        public string ContactPerson { get; set; }
+        
+        /// <summary>
+        /// Contact person E-mail.
+        /// </summary>
+        public string ContactEmail { get; set; }
+        
+        /// <summary>
+        /// Download URL (for DwC-A files).
+        /// </summary>
+        public string DownloadUrl { get; set; }
+        
+        /// <summary>
+        /// Decides whether the data provider should be included in scheduled harvest.
+        /// </summary>
+        public bool IncludeInScheduledHarvest { get; set; }
+        
+        /// <summary>
+        /// Decides whether the data quality is approved.
+        /// </summary>
+        public bool DataQualityIsApproved { get; set; }
+        
+        /// <summary>
+        /// Latest harvest info. Currently used for testing purpose.
+        /// </summary>
+        public HarvestInfo HarvestInfo { get; set; } // todo - decide if we should remove this property and just keep harvesting info in HarvestInfo MongoDB collection.
+
+        /// <summary>
+        /// Process info for instance 0. Currently used for testing purpose.
+        /// </summary>
+        public ProviderInfo ProcessInfoInstance0 { get; set; } // todo - decide if we should remove this property and just keep processing info in ProcessInfo MongoDB collection.
+
+        /// <summary>
+        /// Process info for instance 1. Currently used for testing purpose.
+        /// </summary>
+        public ProviderInfo ProcessInfoInstance1 { get; set; } // todo - decide if we should remove this property and just keep processing info in ProcessInfo MongoDB collection.
+       
         public bool EqualsIdOrIdentifier(string idOrIdentifier)
         {
             if (int.TryParse(idOrIdentifier, out int id))
