@@ -226,9 +226,12 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public Metadata ValidationStatus { get; set; }
 
         public string VerifiedBy { get; set; }
+        public IEnumerable<UserInternal> VerifiedByInternal { get; set; }
         public string Observers { get; set; }
+        public IEnumerable<UserInternal> ObserversInternal { get; set; }
         public string ReportedBy { get; set; }
         public int ReportedByUserId { get; set; }
+        public string ReportedByUserAlias { get; set; }
         public string SpeciesCollection { get; set; }
     }
 }

@@ -26,6 +26,11 @@
         public string LastName { get; set; }
 
         /// <summary>
+        /// User alias
+        /// </summary>
+        public string Alias { get; set; }
+
+        /// <summary>
         /// The full name of the person.
         /// </summary>
         public string FullName => $"{FirstName} {LastName}";

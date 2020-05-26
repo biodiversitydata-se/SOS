@@ -225,6 +225,9 @@ namespace SOS.Lib.Extensions
             else {
                 projection.Excludes(e => e
                     .Field("defects")
+                    .Field("occurrence.recordedByInternal")
+                    .Field("reportedByUserAlias")
+                    .Field("identification.identifiedByInternal")                    
                     .Field("location.point")
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer")                    

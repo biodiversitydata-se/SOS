@@ -25,9 +25,14 @@
         /// </summary>
         public string LastName { get; set; }
 
+        /// <summary>
+        /// The users alias
+        /// </summary>
+        public string Alias { get; set; }
+
         public override string ToString()
         {
-            return $"{nameof(Id)}: {Id}, {nameof(UserId)}: {UserId}, {nameof(FirstName)}: {FirstName}, {nameof(LastName)}: {LastName}";
+            return $"{nameof(Id)}: {Id}, {nameof(UserId)}: {UserId}, {nameof(FirstName)}: {FirstName}, {nameof(LastName)}: {LastName}, {nameof(Alias)}: {Alias}";
         }
     }
 }
