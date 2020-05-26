@@ -334,13 +334,12 @@ namespace SOS.Process.Jobs
 
                 if (!success && copyFromActiveOnFail && artportalenSuccededOrDidntRun)
                 {
-                    // todo - Fix problems with restoring observations. Check if ElasticSearch Scroll API is used.
-                    //var copyTasks = processTaskByDataProvider
-                    //    .Where(t => t.Value.Result.Status == RunStatus.Failed)
-                    //    .Select(t => _instanceManager.CopyProviderDataAsync(t.Key)).ToArray();
+                    var copyTasks = processTaskByDataProvider
+                        .Where(t => t.Value.Result.Status == RunStatus.Failed)
+                        .Select(t => _instanceManager.CopyProviderDataAsync(t.Key)).ToArray();
 
-                    //await Task.WhenAll(copyTasks);
-                    //success = copyTasks.All(t => t.Result);
+                    await Task.WhenAll(copyTasks);
+                    success = copyTasks.All(t => t.Result);
                 }
 
                 //---------------------------------
