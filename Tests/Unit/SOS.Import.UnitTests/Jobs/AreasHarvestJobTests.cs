@@ -12,13 +12,13 @@ using Xunit;
 
 namespace SOS.Import.UnitTests.Managers
 {
-    public class GeoAreasHarvestJobTests
+    public class AreasHarvestJobTests
     {
         private readonly Mock<IAreaHarvester> _areaHarvesterMock;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
-        private readonly Mock<ILogger<GeoAreasHarvestJob>> _loggerMock;
+        private readonly Mock<ILogger<AreasHarvestJob>> _loggerMock;
 
-        private GeoAreasHarvestJob TestObject => new GeoAreasHarvestJob(
+        private AreasHarvestJob TestObject => new AreasHarvestJob(
             _areaHarvesterMock.Object,
             _harvestInfoRepositoryMock.Object,
             _loggerMock.Object);
@@ -26,11 +26,11 @@ namespace SOS.Import.UnitTests.Managers
         /// <summary>
         /// Constructor
         /// </summary>
-        public GeoAreasHarvestJobTests()
+        public AreasHarvestJobTests()
         {
             _areaHarvesterMock = new Mock<IAreaHarvester>();
             _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
-            _loggerMock = new Mock<ILogger<GeoAreasHarvestJob>>();
+            _loggerMock = new Mock<ILogger<AreasHarvestJob>>();
         }
 
         /// <summary>
@@ -41,19 +41,19 @@ namespace SOS.Import.UnitTests.Managers
         {
             TestObject.Should().NotBeNull();
 
-            Action create = () => new GeoAreasHarvestJob(
+            Action create = () => new AreasHarvestJob(
                null,
                 _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHarvester");
 
-            create = () => new GeoAreasHarvestJob(
+            create = () => new AreasHarvestJob(
                 _areaHarvesterMock.Object,
                null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
 
-            create = () => new GeoAreasHarvestJob(
+            create = () => new AreasHarvestJob(
                 _areaHarvesterMock.Object,
                 _harvestInfoRepositoryMock.Object,
                 null);

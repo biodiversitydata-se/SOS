@@ -36,11 +36,11 @@ namespace SOS.Administration.Api.Controllers
         [HttpPost("Areas/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailyGeoAreasHarvestJob([FromQuery]int hour, [FromQuery]int minute)
+        public IActionResult AddDailyAreasHarvestJob([FromQuery]int hour, [FromQuery]int minute)
         {
             try
             {
-                RecurringJob.AddOrUpdate<IGeoAreasHarvestJob>(nameof(IGeoAreasHarvestJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IAreasHarvestJob>(nameof(IAreasHarvestJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Areas harvest job added");
             }
             catch (Exception e)
@@ -54,11 +54,11 @@ namespace SOS.Administration.Api.Controllers
         [HttpPost("Areas/Run")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunGeoAreasHarvestJob()
+        public IActionResult RunAreasHarvestJob()
         {
             try
             {
-                BackgroundJob.Enqueue<IGeoAreasHarvestJob>(job => job.RunAsync());
+                BackgroundJob.Enqueue<IAreasHarvestJob>(job => job.RunAsync());
                 return new OkObjectResult("Started areas harvest job");
             }
             catch (Exception e)
