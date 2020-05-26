@@ -152,8 +152,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             obs.Taxon = CreateProcessedTaxon(verbatimObservation);
 
             // Temporarily remove
-            obs.IsInEconomicZoneOfSweden = true;
-            //_areaHelper.AddAreaDataToProcessedObservation(obs);
+            //obs.IsInEconomicZoneOfSweden = true;
+            _areaHelper.AddAreaDataToProcessedObservation(obs);
             return obs;
 
             // Code from ArtportalenObservationFactory
