@@ -44,11 +44,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<IProcessAreasJob>(job => job.RunAsync());
-                return new OkObjectResult("Started process areas job");
+                return new OkObjectResult("Process areas job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Starting process areas job failed");
+                _logger.LogError(e, "Enqueuing process areas job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -103,11 +103,11 @@ namespace SOS.Administration.Api.Controllers
                 }
 
                 BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(cleanStart, copyFromActiveOnFail, toggleInstanceOnSuccess, JobCancellationToken.Null));
-                return new OkObjectResult($"Started process job for the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, dataProvidersToProcess.Select(dataProvider => " -" + dataProvider))}");
+                return new OkObjectResult($"Process job was enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, dataProvidersToProcess.Select(dataProvider => " -" + dataProvider))}.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Starting process job failed");
+                _logger.LogError(e, "Enqueuing process job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -138,11 +138,11 @@ namespace SOS.Administration.Api.Controllers
                 }
 
                 BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(dataProviderIdOrIdentifiers, cleanStart, copyFromActiveOnFail, toggleInstanceOnSuccess, JobCancellationToken.Null));
-                return new OkObjectResult($"Started process job for the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, dataProvidersToProcess.Select(res => " - " + res.Value))}");
+                return new OkObjectResult($"Process job was enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, dataProvidersToProcess.Select(res => " - " + res.Value))}");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Starting process job failed");
+                _logger.LogError(e, "Enqueuing process job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -211,11 +211,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<IProcessTaxaJob>(job => job.RunAsync());
-                return new OkObjectResult("Started process job");
+                return new OkObjectResult("Process taxa job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Starting process job failed");
+                _logger.LogError(e, "Enqueuing process taxa job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -229,11 +229,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<ICopyFieldMappingsJob>(job => job.RunAsync());
-                return new OkObjectResult("Started copy field mapping job");
+                return new OkObjectResult("Copy field mapping job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Starting copy field mapping job failed");
+                _logger.LogError(e, "Enqueuing copy field mapping job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

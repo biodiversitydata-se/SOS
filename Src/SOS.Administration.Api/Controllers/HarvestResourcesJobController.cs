@@ -59,11 +59,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<IAreasHarvestJob>(job => job.RunAsync());
-                return new OkObjectResult("Started areas harvest job");
+                return new OkObjectResult("Areas harvest job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running areas harvest job failed");
+                _logger.LogError(e, "Enqueuing Areas harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -79,11 +79,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<IFieldMappingImportJob>(job => job.RunAsync());
-                return new OkObjectResult("Started import field mapping job");
+                return new OkObjectResult("Import field mapping job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running import field mapping job failed");
+                _logger.LogError(e, "Enqueuing import field mapping job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -117,11 +117,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<ITaxonHarvestJob>(job => job.RunAsync());
-                return new OkObjectResult("Started taxon harvest job");
+                return new OkObjectResult("Taxon harvest job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running taxon harvest job failed");
+                _logger.LogError(e, "Enqueuing Taxon harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
