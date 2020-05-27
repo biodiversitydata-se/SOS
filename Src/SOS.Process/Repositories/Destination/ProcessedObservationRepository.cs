@@ -4,13 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
-using Newtonsoft.Json;
-using SOS.Lib.Enums;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
@@ -23,28 +21,38 @@ namespace SOS.Process.Repositories.Destination
     {
         private readonly IInvalidObservationRepository _invalidObservationRepository;
         private readonly IElasticClient _elasticClient;
+        private readonly string _indexPrefix;
+        private readonly int _scrollBatchSize;
+
         private const string ScrollTimeOut = "45s";
-        private const int ScrollBatchSize = 50000;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
+        /// <param name="elasticClient"></param>
         /// <param name="invalidObservationRepository"></param>
+        /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
         /// <param name="elasticClient"></param>
         public ProcessedObservationRepository(
             IProcessClient client,
+            IElasticClient elasticClient,
             IInvalidObservationRepository invalidObservationRepository,
-            ILogger<ProcessedObservationRepository> logger,
-            IElasticClient elasticClient
+            ElasticSearchConfiguration elasticConfiguration,
+            ILogger<ProcessedObservationRepository> logger
         ) : base(client, true, logger)
         {
             _invalidObservationRepository = invalidObservationRepository ?? throw new ArgumentNullException(nameof(invalidObservationRepository));
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
+
+            _indexPrefix = elasticConfiguration.IndexPrefix;
+            _scrollBatchSize = client.BatchSize;
         }
 
-        public string IndexName => _collectionName.ToLower();
+        public string IndexName => string.IsNullOrEmpty(_indexPrefix) ?
+            $"{ _collectionName.ToLower() }" :
+            $"{ _indexPrefix.ToLower() }-{ _collectionName.ToLower() }";
 
         /// <summary>
         /// Validate Darwin core.
@@ -156,9 +164,6 @@ namespace SOS.Process.Repositories.Destination
             await _elasticClient.Indices.UpdateSettingsAsync(IndexName, p => p.IndexSettings(g => g.RefreshInterval(1)));
         }
 
-        private string ActiveInstanceIndexName => GetInstanceName(ActiveInstance).ToLower();
-        private string InactiveInstanceIndexName => GetInstanceName(InActiveInstance).ToLower();
-
         /// <inheritdoc />
         public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)
         {
@@ -183,10 +188,10 @@ namespace SOS.Process.Repositories.Destination
             {
                 searchResponse = await _elasticClient
                     .SearchAsync<ProcessedObservation>(s => s
-                        .Index(ActiveInstanceIndexName)
+                        .Index(IndexName)
                         .Query(query => query.Term(term => term.Field(obs => obs.DataProviderId).Value(dataProviderId)))
                         .Scroll(ScrollTimeOut)
-                        .Size(ScrollBatchSize)
+                        .Size(_scrollBatchSize)
                     );
             }
             else

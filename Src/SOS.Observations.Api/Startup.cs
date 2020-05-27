@@ -164,6 +164,7 @@ namespace SOS.Observations.Api
 
             // Add configuration
             services.AddSingleton(observationApiConfiguration.BlobStorageConfiguration);
+            services.AddSingleton(elasticConfiguration);
 
             // Add managers
             services.AddSingleton<IAreaManager, AreaManager>();

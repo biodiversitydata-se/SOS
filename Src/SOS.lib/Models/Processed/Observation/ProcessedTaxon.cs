@@ -420,5 +420,10 @@ namespace SOS.Lib.Models.Processed.Observation
         /// A common or vernacular name.
         /// </summary>
         public string VernacularName { get; set; }
+
+        /// <summary>
+        /// Systematic sort order
+        /// </summary>
+        public int SortOrder { get; set; }
     }
 }

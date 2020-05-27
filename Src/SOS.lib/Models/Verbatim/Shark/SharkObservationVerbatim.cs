@@ -11,64 +11,144 @@ namespace SOS.Lib.Models.Verbatim.Shark
     public class SharkObservationVerbatim : IEntity<ObjectId>
     {
         /// <summary>
-        /// Analytical laboratory code
+        /// Additional sampling
         /// </summary>
-        public string AnalyticalLaboratoryCode { get; set; }
+        public string AdditionalSampling { get; set; }
 
         /// <summary>
-        /// Class
+        /// Air temperature in celcius
         /// </summary>
-        public string Class { get; set; }
+        public string AirTemperatureDegc { get; set; }
 
         /// <summary>
-        /// Dataset name
+        /// Air pressure in Hpa
+        /// </summary>
+        public string AirPressureHpa { get; set; }
+
+        /// <summary>Ait temperature wet degrees
+        /// 
+        /// </summary>
+        public string AirTemperatureWetDegc { get; set; }
+
+        /// <summary>
+        /// Analysed by
+        /// </summary>
+        public string AnalysedBy { get; set; }
+
+        /// <summary>
+        /// Analysed volume in cm3
+        /// </summary>
+        public string AnalysedVolumeCm3 { get; set; }
+
+        /// <summary>
+        /// Analysis date
+        /// </summary>
+        public DateTime? AnalysisDate { get; set; }
+
+        /// <summary>
+        /// Analytical laboratory accreditated
+        /// </summary>
+        public string AnalyticalLaboratoryAccreditated { get; set; }
+
+        /// <summary>
+        /// Analytical laboratory name
+        /// </summary>
+        public string AnalyticalLaboratoryNameSv { get; set; }
+
+        /// <summary>
+        /// Analysis method code
+        /// </summary>
+        public string AnalysisMethodCode { get; set; }
+
+        /// <summary>
+        /// Analysis range
+        /// </summary>
+        public string AnalysisRange { get; set; }
+
+        /// <summary>
+        /// Calc by dc
+        /// </summary>
+        public string CalcByDc { get; set; }
+
+        /// <summary>
+        /// Check status
+        /// </summary>
+        public string CheckStatusSv { get; set; }
+
+        /// <summary>
+        /// Cloud observation code
+        /// </summary>
+        public string CloudObservationCode { get; set; }
+
+        /// <summary>
+        /// Coefficient
+        /// </summary>
+        public string Coefficient { get; set; }
+
+        /// <summary>
+        /// Counted portions
+        /// </summary>
+        public string CountedPortions { get; set; }
+
+        /// <summary>
+        /// Data checked by
+        /// </summary>
+        public string DataCheckedBySv { get; set; }
+
+        /// <summary>
+        /// Data holding centre
+        /// </summary>
+        public string DataHoldingCentre { get; set; }
+
+        /// <summary>
+        /// Name of data set
         /// </summary>
         public string DatasetName { get; set; }
 
         /// <summary>
-        /// Dataset file name
+        /// Name of data set file
         /// </summary>
         public string DatasetFileName { get; set; }
 
         /// <summary>
-        /// Data Type
+        /// Delivery data type
         /// </summary>
-        public string DataType { get; set; }
+        public string DeliveryDatatype { get; set; }
 
         /// <summary>
-        /// Day
+        /// Detection limit
         /// </summary>
-        public int Day { get; set; }
+        public string DetectionLimit { get; set; }
 
         /// <summary>
-        /// Latitude
+        /// Development stage code
         /// </summary>
-        public double DecimalLatitude { get; set; }
+        public string DevStageCode { get; set; }
 
         /// <summary>
-        /// Longitude
+        /// Id in dyntaxa
         /// </summary>
-        public double DecimalLongitude { get; set; }
+        public int? DyntaxaId { get; set; }
 
         /// <summary>
-        /// Dyntaxa taxon id
+        /// Estimated uncertainty
         /// </summary>
-        public int DyntaxaTaxonId { get; set; }
+        public string EstimationUncertainty { get; set; }
 
         /// <summary>
-        /// Date of event
+        /// Expedition id
         /// </summary>
-        public DateTime EventDate { get; set; }
+        public string ExpeditionId { get; set; }
 
         /// <summary>
-        /// Family
+        /// Factors Influencing Code
         /// </summary>
-        public string Family { get; set; }
+        public string FactorsInfluencingCode { get; set; }
 
         /// <summary>
-        /// Genus
+        /// Fauna flora found
         /// </summary>
-        public string Genus { get; set; }
+        public string FaunaFloraFound { get; set; }
 
         /// <summary>
         /// Unique id
@@ -77,59 +157,259 @@ namespace SOS.Lib.Models.Verbatim.Shark
         public ObjectId Id { get; set; }
 
         /// <summary>
-        /// Kingdom
+        /// Internet access
         /// </summary>
-        public string Kingdom { get; set; }
+        public string InternetAccess { get; set; }
 
         /// <summary>
-        /// Maximum depth in meters
+        /// Ice observation code
         /// </summary>
-        public double? MaximumDepthInMeters { get; set; }
+        public string IceObservationCode { get; set; }
 
         /// <summary>
-        /// Minimum depth in meters
+        /// Lower Mesh Size Um
         /// </summary>
-        public double? MinimumDepthInMeters { get; set; }
+        public string LowerMeshSizeUm { get; set; }
 
         /// <summary>
-        /// Month
+        /// Method calculation uncertainty
         /// </summary>
-        public int Month { get; set; }
+        public string MethodCalculationUncertainty { get; set; }
 
         /// <summary>
-        /// Occurrence id
+        /// Method documentation
         /// </summary>
-        public string OccurrenceId { get; set; }
+        public string MethodDocumentation { get; set; }
 
         /// <summary>
-        /// Order
+        /// Method reference code
         /// </summary>
-        public string Order { get; set; }
+        public string MethodReferenceCode { get; set; }
 
         /// <summary>
-        /// Owner institution code
+        /// Monitoring program code
         /// </summary>
-        public string OwnerInstitutionCode { get; set; }
+        public string MonitoringProgramCode { get; set; }
 
         /// <summary>
-        /// Phylum
+        /// Monitoring purpose code
         /// </summary>
-        public string Phylum { get; set; }
+        public string MonitoringPurposeCode { get; set; }
 
         /// <summary>
-        /// Reporting institution code
+        /// Monitoring station type code
         /// </summary>
-        public string ReportingInstitutionCode { get; set; }
+        public string MonitoringStationTypeCode { get; set; }
 
         /// <summary>
-        /// Recorded by
+        /// Number of portions
         /// </summary>
-        public string RecordedBy { get; set; }
+        public string NumberOfPortions { get; set; }
 
         /// <summary>
-        /// Sampler type
+        /// Parameter 
         /// </summary>
-        public string SamplerType { get; set; }
+        public string Parameter { get; set; }
+
+        /// <summary>
+        /// Platform code
+        /// </summary>
+        public string PlatformCode { get; set; }
+
+        /// <summary>
+        /// Position system code
+        /// </summary>
+        public string PositioningSystemCode { get; set; }
+
+        /// <summary>
+        /// Preservation method code
+        /// </summary>
+        public string PreservationMethodCode { get; set; }
+
+        /// <summary>
+        /// Reported parameter
+        /// </summary>
+        public string ReportedParameter { get; set; }
+
+        /// <summary>
+        /// Reported scientific name
+        /// </summary>
+        public string ReportedScientificName { get; set; }
+
+        /// <summary>
+        /// Reported station name
+        /// </summary>
+        public string ReportedStationName { get; set; }
+
+        /// <summary>
+        /// Reported unit
+        /// </summary>
+        public string ReportedUnit { get; set; }
+
+        /// <summary>
+        /// Reported value
+        /// </summary>
+        public string ReportedValue { get; set; }
+
+        /// <summary>
+        /// Reporting instance name
+        /// </summary>
+        public string ReportingInstituteNameSv { get; set; }
+
+        /// <summary>
+        /// Quality flag
+        /// </summary>
+        public string QualityFlag { get; set; }
+
+        /// <summary>
+        /// Quantification limit
+        /// </summary>
+        public string QuantificationLimit { get; set; }
+
+        /// <summary>
+        /// Comment about sample
+        /// </summary>
+        public string SampleComment { get; set; }
+
+        /// <summary>
+        /// Date of sample
+        /// </summary>
+        public DateTime? SampleDate { get; set; }
+
+        /// <summary>
+        /// Sample dept in m
+        /// </summary>
+        public string SampleDepthM { get; set; }
+
+        /// <summary>
+        /// Sampled volume in liters
+        /// </summary>
+        public string SampledVolumeL { get; set; }
+
+        /// <summary>
+        /// End date of sample
+        /// </summary>
+        public DateTime? SampleEndDate { get; set; }
+
+        /// <summary>
+        /// End time of sample
+        /// </summary>
+        public string SampleEndTime { get; set; }
+
+        /// <summary>
+        /// Id of sample
+        /// </summary>
+        public string SampleId { get; set; }
+
+        /// <summary>
+        /// Sample latitude dd
+        /// </summary>
+        public double? SampleLatitudeDd { get; set; }
+
+        /// <summary>
+        /// Sample latitude dm
+        /// </summary>
+        public string SampleLatitudeDm { get; set; }
+
+        /// <summary>
+        /// Sample longitude dd
+        /// </summary>
+        public double? SampleLongitudeDd { get; set; }
+
+        /// <summary>
+        /// Sample longitude Dm
+        /// </summary>
+        public string SampleLongitudeDm { get; set; }
+
+        /// <summary>
+        /// Sample max dept in m
+        /// </summary>
+        public string SampleMaxDepthM { get; set; }
+
+        /// <summary>
+        /// Sample min dept in m
+        /// </summary>
+        public string SampleMinDepthM { get; set; }
+
+        /// <summary>
+        /// Sample orderer name in swedish
+        /// </summary>
+        public string SampleOrdererNameSv { get; set; }
+
+        /// <summary>
+        /// Sample part id
+        /// </summary>
+        public string SamplePartId { get; set; }
+
+        /// <summary>
+        /// Sample part max
+        /// </summary>
+        public string SamplePartMaxCm { get; set; }
+
+        /// <summary>
+        /// Sample part min
+        /// </summary>
+        public string SamplePartMinCm { get; set; }
+
+        /// <summary>
+        /// Sample project name in swedish
+        /// </summary>
+        public string SampleProjectNameSv { get; set; }
+
+        /// <summary>
+        /// Sampler area
+        /// </summary>
+        public string SamplerAreaCm2 { get; set; }
+
+        /// <summary>
+        /// Sampler type code 
+        /// </summary>
+        public string SamplerTypeCode { get; set; }
+
+        /// <summary>
+        /// Sampler type code phyche
+        /// </summary>
+        public string SamplerTypeCodePhyche { get; set; }
+
+        /// <summary>
+        /// Sample series
+        /// </summary>
+        public string SampleSeries { get; set; }
+
+        /// <summary>
+        /// Time of sample
+        /// </summary>
+        public string SampleTime { get; set; }
+
+        /// <summary>
+        /// Sampling laboratory accreditated 
+        /// </summary>
+        public string SamplingLaboratoryAccreditated { get; set; }
+
+        /// <summary>
+        /// Sampling laboratory accreditated  phyche
+        /// </summary>
+        public string SamplingLaboratoryAccreditatedPhyche { get; set; }
+
+        /// <summary>
+        /// Sampling laboratory code phyche
+        /// </summary>
+        public string SamplingLaboratoryCodePhyche { get; set; }
+
+        /// <summary>
+        /// Sampling laboratory names in swedish
+        /// </summary>
+        public string SamplingLaboratoryNamesv { get; set; }
+
+        /// <summary>
+        /// Sampling method comment phyche
+        /// </summary>
+        public string SamplingMethodCommentPhyche { get; set; }
+
+        /// <summary>
+        /// Sampling method reference code phyche
+        /// </summary>
+        public string SamplingMethodReferenceCodePhyche { get; set; }
 
         /// <summary>
         /// Taxon scientific name
@@ -137,23 +417,128 @@ namespace SOS.Lib.Models.Verbatim.Shark
         public string ScientificName { get; set; }
 
         /// <summary>
-        /// Scientific name authorship
+        /// Secchi dept 
         /// </summary>
-        public string ScientificNameAuthorship { get; set; }
+        public string SecchiDepthM { get; set; }
 
         /// <summary>
-        /// Species
+        /// Secch dept quality flag
         /// </summary>
-        public string Species { get; set; }
+        public string SecchiDepthQualityFlag { get; set; }
 
         /// <summary>
-        /// Status
+        /// Sediment type
         /// </summary>
-        public string Status { get; set; }
+        public string SedimentType { get; set; }
 
         /// <summary>
-        /// Year
+        /// Shark sample id
         /// </summary>
-        public int Year { get; set; }
+        public string SharkSampleId { get; set; }
+
+        /// <summary>
+        /// Shark sample id
+        /// </summary>
+        public string Sharksampleidmd5 { get; set; }
+
+        /// <summary>
+        /// Shark sample id
+        /// </summary>
+        public string SpeciesFlagCode { get; set; }
+
+        /// <summary>
+        /// Station cluster
+        /// </summary>
+        public string StationCluster { get; set; }
+
+        /// <summary>
+        /// Station name
+        /// </summary>
+        public string StationName { get; set; }
+
+        /// <summary>
+        /// Station viss eu id
+        /// </summary>
+        public string StationVissEuId { get; set; }
+
+        /// <summary>
+        /// Taxonomist
+        /// </summary>
+        public string Taxonomist { get; set; }
+
+        /// <summary>
+        /// Unit of value
+        /// </summary>
+        public string Unit { get; set; }
+
+        /// <summary>
+        /// Upper Mesh Size Um
+        /// </summary>
+        public string UpperMeshSizeUm { get; set; }
+
+        /// <summary>
+        /// Value property
+        /// </summary>
+        public string Value { get; set; }
+
+        /// <summary>
+        /// Comment of variable
+        /// </summary>
+        public string VariableComment { get; set; }
+
+        /// <summary>
+        /// Comment of visit
+        /// </summary>
+        public string VisitComment { get; set; }
+
+        /// <summary>
+        /// Date of visit
+        /// </summary>
+        public DateTime? VisitDate { get; set; }
+
+        /// <summary>
+        /// Id of visit
+        /// </summary>
+        public string VisitId { get; set; }
+
+        /// <summary>
+        /// Visit year
+        /// </summary>
+        public string VisitYear { get; set; }
+
+        /// <summary>
+        /// Water dept in m
+        /// </summary>
+        public double? WaterDepthM { get; set; }
+
+        /// <summary>
+        /// Waterland station type code
+        /// </summary>
+        public string WaterlandStationTypeCode { get; set; }
+
+        /// <summary>
+        /// Wave observation code
+        /// </summary>
+        public string WaveObservationCode { get; set; }
+
+        /// <summary>
+        /// Wave height
+        /// </summary>
+        public string WaveHeightM { get; set; }
+
+        /// <summary>
+        /// Weather observation code
+        /// </summary>
+        public string WeatherObservationCode { get; set; }
+
+        /// <summary>
+        /// Wind direction code
+        /// </summary>
+        public string WindDirectionCode { get; set; }
+
+        /// <summary>
+        /// Wind speed in m/s   
+        /// </summary>
+        public string WindSpeedMs { get; set; }
     }
 }

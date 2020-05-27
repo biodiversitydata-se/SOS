@@ -8,6 +8,7 @@ using SOS.Export.Extensions;
 using SOS.Export.Managers;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Search;
 using Xunit;
 
@@ -68,6 +69,7 @@ namespace SOS.Export.IntegrationTests.Repositories
                 new ProcessedObservationRepository(
                     elasticClient,
                     exportClient,
+                    new ElasticSearchConfiguration(), 
                     new NullLogger<ProcessedObservationRepository>());
 
             return processedObservationRepository;

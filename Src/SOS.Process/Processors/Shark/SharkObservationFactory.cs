@@ -46,12 +46,12 @@ namespace SOS.Process.Processors.Shark
         public ProcessedObservation CreateProcessedObservation(SharkObservationVerbatim verbatim)
         {
             Point wgs84Point = null;
-            if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
+            if (verbatim.SampleLatitudeDd.HasValue && verbatim.SampleLongitudeDd.HasValue)
             {
-                wgs84Point = new Point(verbatim.DecimalLongitude, verbatim.DecimalLatitude) { SRID = (int)CoordinateSys.WGS84 };
+                wgs84Point = new Point(verbatim.SampleLongitudeDd.Value, verbatim.SampleLatitudeDd.Value) { SRID = (int)CoordinateSys.WGS84 };
             }
 
-            _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
+            _taxa.TryGetValue(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, out var taxon);
 
             var obs = new ProcessedObservation
             {
@@ -61,13 +61,13 @@ namespace SOS.Process.Processors.Shark
                 DatasetName = verbatim.DatasetName,
                 Event = new ProcessedEvent
                 {
-                    EndDate = verbatim.EventDate.ToUniversalTime(),
-                    StartDate = verbatim.EventDate.ToUniversalTime(),
-                    VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.EventDate)
+                    EndDate = verbatim.SampleDate.HasValue ? verbatim.SampleDate.Value.ToUniversalTime() : (DateTime?)null,
+                    StartDate = verbatim.SampleDate.HasValue ? verbatim.SampleDate.Value.ToUniversalTime() : (DateTime?)null,
+                    VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.SampleDate)
                 },
                 Identification = new ProcessedIdentification
                 {
-                    IdentifiedBy = verbatim.AnalyticalLaboratoryCode,
+                    IdentifiedBy = verbatim.AnalysedBy,
                     Validated = true,
                     UncertainDetermination = false
                 },
@@ -75,33 +75,32 @@ namespace SOS.Process.Processors.Shark
                 {
                     CoordinateUncertaintyInMeters = DefaultCoordinateUncertaintyInMeters,
                     CountryCode = CountryCode.Sweden,
-                    DecimalLatitude = verbatim.DecimalLatitude,
-                    DecimalLongitude = verbatim.DecimalLongitude,
+                    DecimalLatitude = verbatim.SampleLatitudeDd,
+                    DecimalLongitude = verbatim.SampleLongitudeDd,
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     Continent = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
                     Country = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
-                    MaximumDepthInMeters = verbatim.MaximumDepthInMeters,
-                    MinimumDepthInMeters = verbatim.MinimumDepthInMeters,
+                    MaximumDepthInMeters = verbatim.WaterDepthM,
+                    MinimumDepthInMeters = verbatim.WaterDepthM,
                     Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
                     PointLocation = wgs84Point?.ToGeoLocation(),
                     PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(ProcessConstants.DefaultAccuracyInMeters)?.ToGeoShape(),
-                    VerbatimLatitude = verbatim.DecimalLatitude,
-                    VerbatimLongitude = verbatim.DecimalLongitude
+                    VerbatimLatitude = verbatim.SampleLatitudeDd,
+                    VerbatimLongitude = verbatim.SampleLongitudeDd
                 },
                 Occurrence = new ProcessedOccurrence
                 {
-                    CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
-                    OccurrenceId = verbatim.OccurrenceId,
+                    OccurrenceId = verbatim.SharkSampleId,
                     IsNaturalOccurrence = true,
-                    IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
+                    IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),
                     IsNotRediscoveredObservation = false,
-                    IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
-                    RecordedBy = verbatim.RecordedBy,
-                    OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
+                    IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
+                    RecordedBy = verbatim.Taxonomist,
+                    OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId)
                 },
-                OwnerInstitutionCode = verbatim.OwnerInstitutionCode,
+                OwnerInstitutionCode = verbatim.ReportingInstituteNameSv,
                 ProtectionLevel = GetProtectionLevel(),
-                ReportedBy = verbatim.ReportingInstitutionCode,
+                ReportedBy = verbatim.ReportedStationName,
                 Taxon = taxon
             };
 
@@ -131,7 +130,7 @@ namespace SOS.Process.Processors.Shark
         /// <summary>
         /// Gets the occurrence status. Set to Present if DyntaxaTaxonId from provider is greater than 0 and Absent if DyntaxaTaxonId is 0
         /// </summary>
-        private ProcessedFieldMapValue GetOccurrenceStatusId(int dyntaxaTaxonId)
+        private ProcessedFieldMapValue GetOccurrenceStatusId(int? dyntaxaTaxonId)
         {
             if (dyntaxaTaxonId == 0)
             {
@@ -156,7 +155,7 @@ namespace SOS.Process.Processors.Shark
         /// <summary>
         /// Set to False if DyntaxaTaxonId from provider is greater than 0 and True if DyntaxaTaxonId is 0.
         /// </summary>
-        private bool GetIsNeverFoundObservation(int dyntaxaTaxonId)
+        private bool GetIsNeverFoundObservation(int? dyntaxaTaxonId)
         {
             return dyntaxaTaxonId == 0;
         }
@@ -164,7 +163,7 @@ namespace SOS.Process.Processors.Shark
         /// <summary>
         /// Set to True if DyntaxaTaxonId from provider is greater than 0 and False if DyntaxaTaxonId is 0.
         /// </summary>
-        private bool GetIsPositiveObservation(int dyntaxaTaxonId)
+        private bool GetIsPositiveObservation(int? dyntaxaTaxonId)
         {
             return dyntaxaTaxonId != 0;
         }

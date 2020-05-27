@@ -12,6 +12,7 @@ using SOS.Export.Repositories;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Configuration.Shared;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.Managers
@@ -62,6 +63,7 @@ namespace SOS.Export.IntegrationTests.Managers
                 new ProcessedObservationRepository(
                     elasticClient, 
                     exportClient,
+                    new ElasticSearchConfiguration(), 
                     new Mock<ILogger<ProcessedObservationRepository>>().Object),
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),

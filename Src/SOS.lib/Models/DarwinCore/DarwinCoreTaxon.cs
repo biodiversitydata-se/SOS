@@ -317,5 +317,10 @@ namespace SOS.Lib.Models.DarwinCore
         /// Vernacular names that is used in the vernacular name extension.
         /// </summary>
         public IEnumerable<DarwinCoreVernacularName> VernacularNames { get; set; }
+
+        /// <summary>
+        /// Systematic sort order
+        /// </summary>
+        public int SortOrder { get; set; }
     }
 }

@@ -16,6 +16,7 @@ using Nest;
 using Moq;
 using SOS.Import.DarwinCore;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -140,7 +141,8 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             IProcessedObservationRepository processedObservationRepository;
             if (storeProcessedObservations)
             {
-                processedObservationRepository = new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>(), elasticClient);
+                processedObservationRepository = new ProcessedObservationRepository(processClient, elasticClient, invalidObservationRepository, 
+                    new ElasticSearchConfiguration(),  new NullLogger<ProcessedObservationRepository>());
             }
             else
             {

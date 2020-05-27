@@ -64,6 +64,7 @@ namespace SOS.Lib.Extensions
                 TaxonomicStatus = sourceTaxon.TaxonomicStatus,
                 VernacularName = sourceTaxon.VernacularName,
                 VerbatimTaxonRank = sourceTaxon.VerbatimTaxonRank,
+                SortOrder = sourceTaxon.SortOrder
             };
         }
 
