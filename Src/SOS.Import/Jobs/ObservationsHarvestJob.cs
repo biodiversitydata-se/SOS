@@ -214,5 +214,60 @@ namespace SOS.Import.Jobs
                 throw new Exception("Failed to harvest data");
             }
         }
+
+
+        public async Task<bool> RunHarvestObservationsAsync(
+            List<string> harvestDataProviderIdOrIdentifiers,
+            IJobCancellationToken cancellationToken)
+        {
+            if (harvestDataProviderIdOrIdentifiers == null || harvestDataProviderIdOrIdentifiers.Count == 0)
+            {
+                _logger.LogInformation("Couldn't run ObservationHarvestJob because harvestDataProviderIdOrIdentifiers is not set");
+                return false;
+            }
+
+            var harvestDataProviders = await _dataProviderManager.GetDataProvidersByIdOrIdentifier(harvestDataProviderIdOrIdentifiers);
+            var harvestDataProvidersResult = Result.Combine(harvestDataProviders);
+            if (harvestDataProvidersResult.IsFailure)
+            {
+                _logger.LogInformation($"Couldn't run ObservationHarvestJob because of: {harvestDataProvidersResult.Error}");
+                return false;
+            }
+
+            return await RunHarvestObservationsAsync(
+                harvestDataProviders.Select(d => d.Value).ToList(),
+                cancellationToken);
+        }
+
+        private async Task<bool> RunHarvestObservationsAsync(
+            List<DataProvider> harvestDataProviders,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                _logger.LogInformation("Start harvest observations jobs");
+                var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<bool>>();
+                foreach (var dataProvider in harvestDataProviders)
+                {
+                    var harvestJob = _harvestJobByType[dataProvider.Type];
+                    harvestTaskByDataProvider.Add(dataProvider, harvestJob.RunAsync(cancellationToken));
+                    _logger.LogDebug($"Added {dataProvider.Name} harvest");
+                }
+                bool[] result = await Task.WhenAll(harvestTaskByDataProvider.Values);
+                _logger.LogInformation("Finish harvest observations jobs");
+
+                return result.All(res => res == true);
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Observation harvest job was cancelled.");
+                return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Observation harvest job was cancelled.");
+                throw new Exception("Failed to harvest data");
+            }
+        }
     }
 }

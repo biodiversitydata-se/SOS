@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -33,6 +36,84 @@ namespace SOS.Administration.Api.Controllers
         {
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> RunObservationsHarvestJob([FromQuery]List<string> dataProviderIdOrIdentifiers)
+        {
+            try
+            {
+                if (dataProviderIdOrIdentifiers == null || dataProviderIdOrIdentifiers.Count == 0)
+                {
+                    return new BadRequestObjectResult("dataProviderIdOrIdentifiers is not set");
+                }
+                
+                var parsedDataProvidersResult = await _dataProviderManager.GetDataProvidersByIdOrIdentifier(dataProviderIdOrIdentifiers);
+                var parsedDataProvidersCombinedResult = Result.Combine(parsedDataProvidersResult);
+                if (parsedDataProvidersCombinedResult.IsFailure)
+                {
+                    return new BadRequestObjectResult(parsedDataProvidersCombinedResult.Error);
+                }
+                if (parsedDataProvidersResult.Any(providerResult => providerResult.Value.Type == DataProviderType.DwcA))
+                {
+                    return new BadRequestObjectResult("A DwC-A data provider was included in the list. Currently DwC-A harvesting is only supported by providing a file using the Administration API.");
+                }
+
+                BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunHarvestObservationsAsync(
+                    parsedDataProvidersResult.Select(providerResult => providerResult.Value.Identifier).ToList(),
+                    JobCancellationToken.Null));
+
+                return new OkObjectResult($"Harvest observations job enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, parsedDataProvidersResult.Select(res => " - " + res.Value))}");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Enqueuing process job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
+        [HttpPost("Schedule/Daily")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> AddObservationsHarvestJob([FromQuery]List<string> dataProviderIdOrIdentifiers, [FromQuery]int hour, [FromQuery]int minute)
+        {
+            try
+            {
+                if (dataProviderIdOrIdentifiers == null || dataProviderIdOrIdentifiers.Count == 0)
+                {
+                    return new BadRequestObjectResult("dataProviderIdOrIdentifiers is not set");
+                }
+
+                var parsedDataProvidersResult = await _dataProviderManager.GetDataProvidersByIdOrIdentifier(dataProviderIdOrIdentifiers);
+                var parsedDataProvidersCombinedResult = Result.Combine(parsedDataProvidersResult);
+                if (parsedDataProvidersCombinedResult.IsFailure)
+                {
+                    return new BadRequestObjectResult(parsedDataProvidersCombinedResult.Error);
+                }
+                if (parsedDataProvidersResult.Any(providerResult => providerResult.Value.Type == DataProviderType.DwcA))
+                {
+                    return new BadRequestObjectResult("A DwC-A data provider was included in the list. Currently DwC-A harvesting is only supported by providing a file using the Administration API.");
+                }
+
+                RecurringJob.AddOrUpdate<IObservationsHarvestJob>(
+                    nameof(IObservationsHarvestJob), 
+                    job => job.RunHarvestObservationsAsync(
+                    parsedDataProvidersResult.Select(providerResult => providerResult.Value.Identifier).ToList(), JobCancellationToken.Null), 
+                    $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+
+                return new OkObjectResult($"Scheduled harvest observations job enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, parsedDataProvidersResult.Select(res => " - " + res.Value))}");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Enqueuing process job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
         }
 
         #region Artportalen
