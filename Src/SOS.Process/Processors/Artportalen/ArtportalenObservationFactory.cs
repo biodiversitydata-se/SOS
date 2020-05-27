@@ -126,7 +126,7 @@ namespace SOS.Process.Processors.Artportalen
                     DecimalLatitude = point?.Coordinates?.Latitude ?? 0,
                     DecimalLongitude = point?.Coordinates?.Longitude ?? 0,
                     GeodeticDatum = GeodeticDatum.Wgs84,
-                    Locality = verbatimObservation.Site?.Name,
+                    Locality = verbatimObservation.Site?.Name.Trim(),
                     LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}",
                     MaximumDepthInMeters = verbatimObservation.MaxDepth,
                     MaximumElevationInMeters = verbatimObservation.MaxHeight,
