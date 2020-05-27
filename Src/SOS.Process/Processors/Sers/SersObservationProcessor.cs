@@ -50,7 +50,7 @@ namespace SOS.Process.Processors.Sers
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
-            var observationFactory = new SersObservationFactory(taxa);
+            var observationFactory = new SersObservationFactory(dataProvider, taxa);
 
             using var cursor = await _sersObservationVerbatimRepository.GetAllByCursorAsync();
 

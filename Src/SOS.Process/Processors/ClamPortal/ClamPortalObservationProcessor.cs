@@ -50,7 +50,7 @@ namespace SOS.Process.Processors.ClamPortal
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
-            var observationFactory = new ClamPortalObservationFactory(taxa);
+            var observationFactory = new ClamPortalObservationFactory(dataProvider, taxa);
 
             using var cursor = await _clamObservationVerbatimRepository.GetAllByCursorAsync();
             // Process and commit in batches.

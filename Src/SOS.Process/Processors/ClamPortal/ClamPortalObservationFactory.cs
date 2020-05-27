@@ -10,6 +10,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 
 namespace SOS.Process.Processors.ClamPortal
@@ -18,9 +19,11 @@ namespace SOS.Process.Processors.ClamPortal
     {
         private const string ValidatedObservationStringValue = "Godkänd";
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
+        private readonly DataProvider _dataProvider;
 
-        public ClamPortalObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
+        public ClamPortalObservationFactory(DataProvider dataProvider, IDictionary<int, ProcessedTaxon> taxa)
         {
+            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
         }
 
@@ -51,6 +54,7 @@ namespace SOS.Process.Processors.ClamPortal
 
             return new ProcessedObservation()
             {
+                DataProviderId = _dataProvider.Id,
                 AccessRights = GetAccessRightsIdFromString(verbatimObservation.AccessRights),
                 BasisOfRecord = GetBasisOfRecordIdFromString(verbatimObservation.BasisOfRecord),
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.ClamGateway}",

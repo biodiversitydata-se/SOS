@@ -10,6 +10,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 
 namespace SOS.Process.Processors.VirtualHerbarium
@@ -17,10 +18,12 @@ namespace SOS.Process.Processors.VirtualHerbarium
     public class VirtualHerbariumObservationFactory
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
+        private readonly DataProvider _dataProvider;
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
 
-        public VirtualHerbariumObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
+        public VirtualHerbariumObservationFactory(DataProvider dataProvider, IDictionary<int, ProcessedTaxon> taxa)
         {
+            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
         }
 
@@ -64,6 +67,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
 
             var obs = new ProcessedObservation
             {
+                DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ DataProviderIdentifiers.VirtualHerbarium }",
                 DatasetName = "Virtual Herbarium",

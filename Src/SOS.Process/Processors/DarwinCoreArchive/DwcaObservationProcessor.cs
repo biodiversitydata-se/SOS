@@ -132,6 +132,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         {
             var verbatimCount = 0;
             var observationFactory = await DwcaObservationFactory.CreateAsync(
+                dataProvider, 
                 taxa, 
                 _processedFieldMappingRepository,
                 _areaHelper);

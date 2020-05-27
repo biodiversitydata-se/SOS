@@ -84,7 +84,7 @@ namespace SOS.Process.Processors.Artportalen
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = await ArtportalenObservationFactory.CreateAsync(taxa, _processedFieldMappingRepository);
+            var observationFactory = await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository);
             // Get min and max id from db
             (await _artportalenVerbatimRepository.GetIdSpanAsync())
                 .Deconstruct(out var batchStartId, out var maxId);
@@ -158,7 +158,7 @@ namespace SOS.Process.Processors.Artportalen
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
-            var observationFactory = await ArtportalenObservationFactory.CreateAsync(taxa, _processedFieldMappingRepository);
+            var observationFactory = await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository);
             ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
             using var cursor = await _artportalenVerbatimRepository.GetAllByCursorAsync();
 

@@ -12,6 +12,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Process.Repositories.Destination.Interfaces;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
@@ -21,13 +22,16 @@ namespace SOS.Process.Processors.Artportalen
 {
     public class ArtportalenObservationFactory
     {
+        private readonly DataProvider _dataProvider;
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
         private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
 
         public ArtportalenObservationFactory(
+            DataProvider dataProvider, 
             IDictionary<int, ProcessedTaxon> taxa,
             IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings)
         {
+            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             {
                 _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
                 _fieldMappings = fieldMappings ?? throw new ArgumentNullException(nameof(fieldMappings));
@@ -35,12 +39,13 @@ namespace SOS.Process.Processors.Artportalen
         }
 
         public static async Task<ArtportalenObservationFactory> CreateAsync(
+            DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
             IProcessedFieldMappingRepository processedFieldMappingRepository)
         {
             var allFieldMappings = await processedFieldMappingRepository.GetAllAsync();
             var fieldMappings = GetFieldMappingsDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
-            return new ArtportalenObservationFactory(taxa, fieldMappings);
+            return new ArtportalenObservationFactory(dataProvider, taxa, fieldMappings);
         }
 
         public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<ArtportalenVerbatimObservation> verbatimObservations)
@@ -82,6 +87,7 @@ namespace SOS.Process.Processors.Artportalen
 
             var obs = new ProcessedObservation()
             {
+                DataProviderId = _dataProvider.Id,
                 AccessRights =
                 !verbatimObservation.ProtectedBySystem && verbatimObservation.HiddenByProvider.HasValue &&
                 verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now

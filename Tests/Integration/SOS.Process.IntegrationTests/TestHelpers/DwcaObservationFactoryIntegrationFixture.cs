@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Processors.DarwinCoreArchive;
@@ -28,6 +29,7 @@ namespace SOS.Process.IntegrationTests.TestHelpers
 
         private async Task<DwcaObservationFactory> CreateDwcaObservationFactoryAsync()
         {
+            var dataProviderDummy = new DataProvider();
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
             var processConfiguration = GetProcessConfiguration();
             var processClient = new ProcessClient(
@@ -39,6 +41,7 @@ namespace SOS.Process.IntegrationTests.TestHelpers
                 new AreaHelper(new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()),
                     processedFieldMappingRepository);
             var dwcaObservationFactory = await DwcaObservationFactory.CreateAsync(
+                dataProviderDummy, 
                 taxonByTaxonId,
                 processedFieldMappingRepository,
                 areaHelper);

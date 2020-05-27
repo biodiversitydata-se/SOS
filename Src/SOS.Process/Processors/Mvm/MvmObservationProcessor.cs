@@ -50,7 +50,7 @@ namespace SOS.Process.Processors.Mvm
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
-            var observationFactory = new MvmObservationFactory(taxa);
+            var observationFactory = new MvmObservationFactory(dataProvider, taxa);
 
             using var cursor = await _mvmObservationVerbatimRepository.GetAllByCursorAsync();
 

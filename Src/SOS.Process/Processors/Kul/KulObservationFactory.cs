@@ -10,6 +10,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Kul;
 
 namespace SOS.Process.Processors.Kul
@@ -17,10 +18,12 @@ namespace SOS.Process.Processors.Kul
     public class KulObservationFactory
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
+        private readonly DataProvider _dataProvider;
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
 
-        public KulObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
+        public KulObservationFactory(DataProvider dataProvider, IDictionary<int, ProcessedTaxon> taxa)
         {
+            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
         }
 
@@ -51,6 +54,7 @@ namespace SOS.Process.Processors.Kul
 
             var obs = new ProcessedObservation
             {
+                DataProviderId = _dataProvider.Id,
                 BasisOfRecord = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.KUL}",
                 DatasetName = "KUL",

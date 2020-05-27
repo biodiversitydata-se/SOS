@@ -51,7 +51,7 @@ namespace SOS.Process.Processors.Shark
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
-            var observationFactory = new SharkObservationFactory(taxa);
+            var observationFactory = new SharkObservationFactory(dataProvider, taxa);
 
             using var cursor = await _sharkObservationVerbatimRepository.GetAllByCursorAsync();
 

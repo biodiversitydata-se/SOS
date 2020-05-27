@@ -50,7 +50,7 @@ namespace SOS.Process.Processors.Kul
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
-            var observationFactory = new KulObservationFactory(taxa);
+            var observationFactory = new KulObservationFactory(dataProvider, taxa);
 
             using var cursor = await _kulObservationVerbatimRepository.GetAllByCursorAsync();
 

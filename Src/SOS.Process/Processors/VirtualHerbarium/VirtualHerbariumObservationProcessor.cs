@@ -51,7 +51,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
-            var observationFactory = new VirtualHerbariumObservationFactory(taxa);
+            var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa);
 
             using var cursor = await _virtualHerbariumObservationVerbatimRepository.GetAllByCursorAsync();
 
