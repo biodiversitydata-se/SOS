@@ -14,5 +14,11 @@ namespace SOS.Import.Services.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<DarwinCoreTaxon>> GetTaxaAsync();
+        /// <summary>
+        /// Gets the sort orders from the service
+        /// </summary>
+        /// <param name="taxonIds"></param>
+        /// <returns></returns>
+        Task<Dictionary<int, int>> GetSortOrdersByTaxonId(IEnumerable<int> taxonIds);
     }
 }
