@@ -48,7 +48,7 @@ namespace SOS.Import.Services
                     return null;
                 }
 
-                using var streamReader = new StreamReader(fileStream, Encoding.UTF8);
+                using var streamReader = new StreamReader(fileStream, Encoding.UTF7);
                 var json = await streamReader.ReadToEndAsync();
                 fileStream.Close();
 

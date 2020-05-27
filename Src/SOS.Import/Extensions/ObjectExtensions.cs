@@ -26,10 +26,14 @@ namespace SOS.Import.Extensions
 
             var propertyType = property.PropertyType;
             var underlyingType = Nullable.GetUnderlyingType(propertyType);
+            var targetPropertyType = underlyingType ?? propertyType;
 
-            property.SetValue(target,
-                Convert.ChangeType(value, underlyingType ?? propertyType,
-                    CultureInfo.InvariantCulture));
+            if (targetPropertyType.IsInstanceOfType(value))
+            {
+                property.SetValue(target,
+                    Convert.ChangeType(value, targetPropertyType,
+                        CultureInfo.InvariantCulture));
+            }
         }
     }
 }

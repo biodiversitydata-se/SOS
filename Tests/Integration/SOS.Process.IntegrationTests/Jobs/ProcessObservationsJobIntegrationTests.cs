@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Nest;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Process.Database;
@@ -111,7 +112,8 @@ namespace SOS.Process.IntegrationTests.Jobs
             IProcessedObservationRepository processedObservationRepository;
             if (storeProcessed)
             {
-                processedObservationRepository = new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>(), elasticClient);
+                processedObservationRepository = new ProcessedObservationRepository(processClient, elasticClient, invalidObservationRepository, 
+                    new ElasticSearchConfiguration(),  new NullLogger<ProcessedObservationRepository>());
             }
             else
             {
@@ -171,7 +173,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
             var instanceManager = new InstanceManager(
-                new ProcessedObservationRepository(processClient, invalidObservationRepository, new NullLogger<ProcessedObservationRepository>(), elasticClient),
+                new ProcessedObservationRepository(processClient, elasticClient, invalidObservationRepository, 
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>()),
                 processInfoRepository,
                 new NullLogger<InstanceManager>());
 

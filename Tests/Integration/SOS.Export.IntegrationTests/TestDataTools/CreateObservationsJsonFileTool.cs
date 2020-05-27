@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using SOS.Export.Managers;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Search;
 using SOS.TestHelpers.JsonConverters;
 using Xunit;
@@ -36,6 +37,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             var processedObservationRepository = new ProcessedObservationRepository(
                 elasticClient,
                 exportClient,
+                new ElasticSearchConfiguration(), 
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

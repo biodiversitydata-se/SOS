@@ -25,6 +25,12 @@ namespace SOS.Import.Extensions
                 propertyMapping.Add(header[i].Replace("_", "").ToLower(), i);
             }
 
+            // If file don't contains taxon id there's no reason to go on 
+            if (!propertyMapping.ContainsKey("dyntaxaid"))
+            {
+                return null;
+            }
+
             return fileData.Rows.Select(r => r.ToArray().ToVerbatim(propertyMapping));
         }
 

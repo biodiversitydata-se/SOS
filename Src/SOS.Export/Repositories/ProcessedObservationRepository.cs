@@ -6,6 +6,7 @@ using Nest;
 using Newtonsoft.Json;
 using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -19,21 +20,27 @@ namespace SOS.Export.Repositories
     {
         private readonly IElasticClient _elasticClient;
         private readonly int _batchSize;
+        private readonly string _indexName;
         private const string ScrollTimeOut = "45s";
 
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
         /// <param name="elasticClient"></param>
         /// <param name="exportClient"></param>
+        /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IElasticClient elasticClient,
             IExportClient exportClient,
+            ElasticSearchConfiguration elasticConfiguration,
             ILogger<ProcessedObservationRepository> logger) : base(exportClient, true, logger)
         {
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
-            _batchSize = exportClient.BatchSize;
+            _batchSize = elasticConfiguration.BatchSize;
+            _indexName = string.IsNullOrEmpty(elasticConfiguration.IndexPrefix) ?
+                $"{ CollectionName.ToLower() }" :
+                $"{ elasticConfiguration.IndexPrefix.ToLower() }-{ CollectionName.ToLower() }";
         }
 
         public async Task<ScrollResult<ProcessedProject>> ScrollProjectParametersAsync(
@@ -44,7 +51,7 @@ namespace SOS.Export.Repositories
             if (string.IsNullOrEmpty(scrollId))
             {
                 searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
-                    .Index(CollectionName.ToLower())
+                    .Index(_indexName)
                     .Source(s => s
                         .Includes(i => i
                             .Field("projects")))
@@ -91,7 +98,7 @@ namespace SOS.Export.Repositories
 
                 searchResponse = await _elasticClient
                     .SearchAsync<dynamic>(s => s
-                        .Index(CollectionName.ToLower())
+                        .Index(_indexName)
                         .Source(p => projection)
                        /* .Query(q => q
                             .Bool(b => b

@@ -4,11 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
-using SOS.Lib.Enums;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
@@ -21,25 +20,33 @@ namespace SOS.Process.Repositories.Destination
     {
         private readonly IInvalidObservationRepository _invalidObservationRepository;
         private readonly IElasticClient _elasticClient;
+        private readonly string _indexPrefix;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="client"></param>
+        /// <param name="elasticClient"></param>
         /// <param name="invalidObservationRepository"></param>
+        /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IProcessClient client,
+            IElasticClient elasticClient,
             IInvalidObservationRepository invalidObservationRepository,
-            ILogger<ProcessedObservationRepository> logger,
-            IElasticClient elasticClient
+            ElasticSearchConfiguration elasticConfiguration,
+            ILogger<ProcessedObservationRepository> logger
         ) : base(client, true, logger)
         {
             _invalidObservationRepository = invalidObservationRepository ?? throw new ArgumentNullException(nameof(invalidObservationRepository));
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
+
+            _indexPrefix = elasticConfiguration.IndexPrefix;
         }
 
-        public string IndexName => _collectionName.ToLower();
+        public string IndexName => string.IsNullOrEmpty(_indexPrefix) ?
+            $"{ _collectionName.ToLower() }" :
+            $"{ _indexPrefix.ToLower() }-{ _collectionName.ToLower() }";
 
         /// <summary>
         /// Validate Darwin core.

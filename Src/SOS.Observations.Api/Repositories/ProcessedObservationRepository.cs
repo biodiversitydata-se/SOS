@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -19,20 +20,26 @@ namespace SOS.Observations.Api.Repositories
     public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, string>, IProcessedObservationRepository
     {
         private readonly IElasticClient _elasticClient;
-
+        private readonly string _indexName;
 
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
         /// <param name="elasticClient"></param>
         /// <param name="client"></param>
+        /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IElasticClient elasticClient,
             IProcessClient client,
+            ElasticSearchConfiguration elasticConfiguration,
             ILogger<ProcessedObservationRepository> logger) : base(client, true, logger)
         {
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
+
+            _indexName = string.IsNullOrEmpty(elasticConfiguration.IndexPrefix) ?
+                $"{ CollectionName.ToLower() }" :
+                $"{ elasticConfiguration.IndexPrefix.ToLower() }-{ CollectionName.ToLower() }";
         }
 
         /// <inheritdoc />
@@ -54,7 +61,7 @@ namespace SOS.Observations.Api.Repositories
                 sortDescriptor.Field(sortBy, sortOrder == SearchSortOrder.Desc ? SortOrder.Descending : SortOrder.Ascending);
             }            
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
-                .Index(CollectionName.ToLower())
+                .Index(_indexName)
                 .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
                 .From(skip)
                 .Size(take)
@@ -77,7 +84,7 @@ namespace SOS.Observations.Api.Repositories
                 if (internalFilter.IncludeRealCount)
                 {
                     var countResponse = await _elasticClient.CountAsync<dynamic>(s => s
-                                                    .Index(CollectionName.ToLower())                                                    
+                                                    .Index(_indexName)                                                    
                                                     .Query(q => q
                                                         .Bool(b => b
                                                             .MustNot(excludeQuery)
