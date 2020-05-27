@@ -22,6 +22,9 @@ namespace SOS.Process.Repositories.Destination
         private readonly IInvalidObservationRepository _invalidObservationRepository;
         private readonly IElasticClient _elasticClient;
         private readonly string _indexPrefix;
+        private readonly int _scrollBatchSize;
+
+        private const string ScrollTimeOut = "45s";
 
         /// <summary>
         /// Constructor
@@ -44,6 +47,7 @@ namespace SOS.Process.Repositories.Destination
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
 
             _indexPrefix = elasticConfiguration.IndexPrefix;
+            _scrollBatchSize = client.BatchSize;
         }
 
         public string IndexName => string.IsNullOrEmpty(_indexPrefix) ?
@@ -160,9 +164,6 @@ namespace SOS.Process.Repositories.Destination
             await _elasticClient.Indices.UpdateSettingsAsync(IndexName, p => p.IndexSettings(g => g.RefreshInterval(1)));
         }
 
-        private string ActiveInstanceIndexName => GetInstanceName(ActiveInstance).ToLower();
-        private string InactiveInstanceIndexName => GetInstanceName(InActiveInstance).ToLower();
-
         /// <inheritdoc />
         public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)
         {
@@ -187,10 +188,10 @@ namespace SOS.Process.Repositories.Destination
             {
                 searchResponse = await _elasticClient
                     .SearchAsync<ProcessedObservation>(s => s
-                        .Index(ActiveInstanceIndexName)
+                        .Index(IndexName)
                         .Query(query => query.Term(term => term.Field(obs => obs.DataProviderId).Value(dataProviderId)))
                         .Scroll(ScrollTimeOut)
-                        .Size(ScrollBatchSize)
+                        .Size(_scrollBatchSize)
                     );
             }
             else
