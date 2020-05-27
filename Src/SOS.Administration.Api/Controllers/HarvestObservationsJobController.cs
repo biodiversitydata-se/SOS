@@ -63,11 +63,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<IArtportalenHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Started Artportalen harvest job");
+                return new OkObjectResult("Artportalen harvest job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running Artportalen harvest job failed");
+                _logger.LogError(e, "Enqueueing Artportalen harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -101,11 +101,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<IClamPortalHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Started clam Portal harvest job");
+                return new OkObjectResult("Clam Portal harvest job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running clam Portal harvest job failed");
+                _logger.LogError(e, "Enqueuing Clam Portal harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -131,7 +131,7 @@ namespace SOS.Administration.Api.Controllers
                 {
                     return new BadRequestObjectResult($"No data provider exist with Id={model.DataProviderIdOrIdentifier}");
                 }
-                if (dataProvider.Type != DataSet.DwcA)
+                if (dataProvider.Type != DataProviderType.DwcA)
                 {
                     return new BadRequestObjectResult($"The data provider \"{dataProvider}\" is not a DwC-A provider");
                 }
@@ -148,12 +148,12 @@ namespace SOS.Administration.Api.Controllers
 
                 // process uploaded file
                 BackgroundJob.Enqueue<IDwcArchiveHarvestJob>(job => job.RunAsync(dataProvider.Id, filePath, JobCancellationToken.Null));
-                return new OkObjectResult($"Started DwC-A harvest job for data provider: {dataProvider}");
+                return new OkObjectResult($"DwC-A harvest job for data provider: {dataProvider} was enqueued to Hangfire.");
 
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running DwC-A harvest job failed");
+                _logger.LogError(e, "Enqueuing DwC-A harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -188,11 +188,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<IKulHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Started KUL harvest job");
+                return new OkObjectResult("KUL harvest job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running KUL harvest job failed");
+                _logger.LogError(e, "Enqueuing KUL harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -226,11 +226,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<IMvmHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Started MVM harvest job");
+                return new OkObjectResult("MVM harvest job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running MVM harvest job failed");
+                _logger.LogError(e, "Enqueuing MVM harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -264,11 +264,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<INorsHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Started NORS harvest job");
+                return new OkObjectResult("NORS harvest job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running NORS harvest job failed");
+                _logger.LogError(e, "Enqueuing NORS harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -302,11 +302,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<ISersHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Started SERS harvest job");
+                return new OkObjectResult("SERS harvest job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running SERS harvest job failed");
+                _logger.LogError(e, "Enqueuing SERS harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -340,11 +340,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<ISharkHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Started SHARK harvest job");
+                return new OkObjectResult("SHARK harvest job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running SHARK harvest job failed");
+                _logger.LogError(e, "Enqueuing SHARK harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -378,11 +378,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<IVirtualHerbariumHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Started Virtual Herbarium harvest job");
+                return new OkObjectResult("Virtual Herbarium harvest job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running Virtual Herbarium harvest job failed");
+                _logger.LogError(e, "Enqueuing Virtual Herbarium harvest job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

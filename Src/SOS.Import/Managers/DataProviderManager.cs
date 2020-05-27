@@ -97,9 +97,9 @@ namespace SOS.Import.Managers
             return allDataProviders.FirstOrDefault(provider => provider.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase));
         }
 
-        public async Task<DataProvider> GetDataProviderByType(DataSet type)
+        public async Task<DataProvider> GetDataProviderByType(DataProviderType type)
         {
-            if (type == DataSet.DwcA) throw new ArgumentException("Can't decide which data provider to return because there exists multiple data providers of DwC-A type.");
+            if (type == DataProviderType.DwcA) throw new ArgumentException("Can't decide which data provider to return because there exists multiple data providers of DwC-A type.");
             var allDataProviders = await _dataProviderRepository.GetAllAsync();
             var dataProvider = allDataProviders.Single(provider => provider.Type == type);
             return dataProvider;

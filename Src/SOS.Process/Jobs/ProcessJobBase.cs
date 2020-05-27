@@ -41,7 +41,7 @@ namespace SOS.Process.Jobs
         /// <param name="processCount"></param>
         /// <returns></returns>
         protected ProviderInfo CreateProviderInfo(
-            DataSet type, 
+            DataProviderType type, 
             HarvestInfo harvestInfo, 
             DateTime processStart, 
             DateTime? processEnd = null, 
@@ -100,7 +100,7 @@ namespace SOS.Process.Jobs
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProviderInfo>> GetProviderInfoAsync(IDictionary<string, DataSet> ids)
+        public async Task<IEnumerable<ProviderInfo>> GetProviderInfoAsync(IDictionary<string, DataProviderType> ids)
         {
             var providerInfo = new List<ProviderInfo>();
             foreach (var id in ids)

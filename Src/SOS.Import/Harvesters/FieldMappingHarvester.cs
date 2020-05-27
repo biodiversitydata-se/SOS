@@ -107,7 +107,7 @@ namespace SOS.Import.Harvesters
         /// <returns></returns>
         public async Task<HarvestInfo> HarvestAsync()
         {
-            var harvestInfo = new HarvestInfo(nameof(FieldMapping), DataSet.FieldMappings, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(FieldMapping), DataProviderType.FieldMappings, DateTime.Now);
             var fieldMappings = new List<FieldMapping>();
             try
             {

@@ -91,8 +91,8 @@ namespace SOS.Import.UnitTests.Managers
             _dataProviderManagerMock.Setup(ts => ts.GetDataProviderByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync(new DataProvider());
 
-            _dwcObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<IIdIdentifierTuple>(), JobCancellationToken.Null))
-                .ReturnsAsync(new HarvestInfo("id", DataSet.Taxa, DateTime.Now){ Status = RunStatus.Success});
+            _dwcObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<DataProvider>(), JobCancellationToken.Null))
+                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now){ Status = RunStatus.Success});
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             //-----------------------------------------------------------------------------------------------------------
@@ -119,8 +119,8 @@ namespace SOS.Import.UnitTests.Managers
             _dataProviderManagerMock.Setup(ts => ts.GetDataProviderByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync(new DataProvider());
 
-            _dwcObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<IIdIdentifierTuple>(), JobCancellationToken.Null))
-                .ReturnsAsync(new HarvestInfo("id", DataSet.Taxa, DateTime.Now) { Status = RunStatus.Failed });
+            _dwcObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<DataProvider>(), JobCancellationToken.Null))
+                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) { Status = RunStatus.Failed });
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             //-----------------------------------------------------------------------------------------------------------

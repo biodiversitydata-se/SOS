@@ -51,7 +51,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 Id = 13,
                 Identifier = "ButterflyMonitoring",
                 Name = "Swedish Butterfly Monitoring Scheme (SeBMS)",
-                Type = DataSet.DwcA
+                Type = DataProviderType.DwcA
             };
 
             //-----------------------------------------------------------------------------------------------------------

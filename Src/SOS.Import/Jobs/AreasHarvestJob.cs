@@ -9,13 +9,13 @@ using SOS.Lib.Jobs.Import;
 namespace SOS.Import.Jobs
 {
     /// <summary>
-    /// Artportalen harvest
+    /// Areas harvest.
     /// </summary>
-    public class GeoAreasHarvestJob : IGeoAreasHarvestJob
+    public class AreasHarvestJob : IAreasHarvestJob
     {
         private readonly IAreaHarvester _areaHarvester;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
-        private readonly ILogger<GeoAreasHarvestJob> _logger;
+        private readonly ILogger<AreasHarvestJob> _logger;
 
         /// <summary>
         /// Constructor
@@ -23,9 +23,9 @@ namespace SOS.Import.Jobs
         /// <param name="areaHarvester"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="logger"></param>
-        public GeoAreasHarvestJob(IAreaHarvester areaHarvester,
+        public AreasHarvestJob(IAreaHarvester areaHarvester,
             IHarvestInfoRepository harvestInfoRepository,
-            ILogger<GeoAreasHarvestJob> logger)
+            ILogger<AreasHarvestJob> logger)
         {
             _areaHarvester = areaHarvester ?? throw new ArgumentNullException(nameof(areaHarvester));
             _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));

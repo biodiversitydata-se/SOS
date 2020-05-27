@@ -50,7 +50,7 @@ namespace SOS.Import.Jobs
             {
                 throw new Exception($"Data provider with Id={dataProviderId} is not found");
             }
-            if (dataProvider.Type != DataSet.DwcA)
+            if (dataProvider.Type != DataProviderType.DwcA)
             {
                 throw new Exception($"The data provider \"{dataProvider}\" is not a DwC-A provider");
             }

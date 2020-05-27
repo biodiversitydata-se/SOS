@@ -22,7 +22,7 @@ namespace SOS.Process.Processors.Shark
     {
         private readonly ISharkObservationVerbatimRepository _sharkObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataSet Type => DataSet.SharkObservations;
+        public override DataProviderType Type => DataProviderType.SharkObservations;
 
         /// <summary>
         /// Constructor
@@ -51,7 +51,7 @@ namespace SOS.Process.Processors.Shark
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
-            var observationFactory = new SharkObservationFactory(taxa);
+            var observationFactory = new SharkObservationFactory(dataProvider, taxa);
 
             using var cursor = await _sharkObservationVerbatimRepository.GetAllByCursorAsync();
 

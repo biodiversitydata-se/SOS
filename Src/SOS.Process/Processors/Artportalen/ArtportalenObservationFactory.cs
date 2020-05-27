@@ -12,6 +12,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Process.Repositories.Destination.Interfaces;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
@@ -21,13 +22,16 @@ namespace SOS.Process.Processors.Artportalen
 {
     public class ArtportalenObservationFactory
     {
+        private readonly DataProvider _dataProvider;
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
         private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
 
         public ArtportalenObservationFactory(
+            DataProvider dataProvider, 
             IDictionary<int, ProcessedTaxon> taxa,
             IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings)
         {
+            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             {
                 _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
                 _fieldMappings = fieldMappings ?? throw new ArgumentNullException(nameof(fieldMappings));
@@ -35,12 +39,13 @@ namespace SOS.Process.Processors.Artportalen
         }
 
         public static async Task<ArtportalenObservationFactory> CreateAsync(
+            DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
             IProcessedFieldMappingRepository processedFieldMappingRepository)
         {
             var allFieldMappings = await processedFieldMappingRepository.GetAllAsync();
             var fieldMappings = GetFieldMappingsDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
-            return new ArtportalenObservationFactory(taxa, fieldMappings);
+            return new ArtportalenObservationFactory(dataProvider, taxa, fieldMappings);
         }
 
         public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<ArtportalenVerbatimObservation> verbatimObservations)
@@ -82,6 +87,7 @@ namespace SOS.Process.Processors.Artportalen
 
             var obs = new ProcessedObservation()
             {
+                DataProviderId = _dataProvider.Id,
                 AccessRights =
                 !verbatimObservation.ProtectedBySystem && verbatimObservation.HiddenByProvider.HasValue &&
                 verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now
@@ -110,6 +116,7 @@ namespace SOS.Process.Processors.Artportalen
                 Identification = new ProcessedIdentification
                 {
                     IdentifiedBy = verbatimObservation.VerifiedBy,
+                    IdentifiedByInternal = verbatimObservation.VerifiedByInternal,
                     Validated = new[] { 60, 61, 62, 63, 64, 65 }.Contains(verbatimObservation.ValidationStatus?.Id ?? 0),
                     UncertainDetermination = verbatimObservation.UnsureDetermination
                 },
@@ -125,7 +132,7 @@ namespace SOS.Process.Processors.Artportalen
                     DecimalLatitude = point?.Coordinates?.Latitude ?? 0,
                     DecimalLongitude = point?.Coordinates?.Longitude ?? 0,
                     GeodeticDatum = GeodeticDatum.Wgs84,
-                    Locality = verbatimObservation.Site?.Name,
+                    Locality = verbatimObservation.Site?.Name.Trim(),
                     LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}",
                     MaximumDepthInMeters = verbatimObservation.MaxDepth,
                     MaximumElevationInMeters = verbatimObservation.MaxHeight,
@@ -158,6 +165,7 @@ namespace SOS.Process.Processors.Artportalen
                     OrganismQuantityInt = verbatimObservation.Quantity,
                     OrganismQuantity = verbatimObservation.Quantity.ToString(),
                     RecordedBy = verbatimObservation.Observers,
+                    RecordedByInternal = verbatimObservation.ObserversInternal,
                     RecordNumber = verbatimObservation.Label,
                     OccurrenceRemarks = verbatimObservation.Comment,
                     OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
@@ -170,6 +178,7 @@ namespace SOS.Process.Processors.Artportalen
                 ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem),
                 ReportedBy = verbatimObservation.ReportedBy,
                 ReportedByUserId = verbatimObservation.ReportedByUserId,
+                ReportedByUserAlias = verbatimObservation.ReportedByUserAlias,
                 ReportedDate = verbatimObservation.ReportedDate,
                 RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas",
                 Taxon = taxon,

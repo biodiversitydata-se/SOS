@@ -22,7 +22,7 @@ namespace SOS.Process.Processors.Sers
     {
         private readonly ISersObservationVerbatimRepository _sersObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataSet Type => DataSet.SersObservations;
+        public override DataProviderType Type => DataProviderType.SersObservations;
 
         /// <summary>
         /// Constructor
@@ -50,7 +50,7 @@ namespace SOS.Process.Processors.Sers
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
-            var observationFactory = new SersObservationFactory(taxa);
+            var observationFactory = new SersObservationFactory(dataProvider, taxa);
 
             using var cursor = await _sersObservationVerbatimRepository.GetAllByCursorAsync();
 

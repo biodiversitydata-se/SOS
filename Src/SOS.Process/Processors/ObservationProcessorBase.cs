@@ -19,7 +19,7 @@ namespace SOS.Process.Processors
         protected readonly IProcessedObservationRepository ProcessRepository;
         protected readonly ILogger<TEntity> Logger;
         protected readonly IFieldMappingResolverHelper FieldMappingResolverHelper;
-        public abstract DataSet Type { get; }
+        public abstract DataProviderType Type { get; }
 
         protected ObservationProcessorBase(
             IProcessedObservationRepository processedObservationRepository,
@@ -76,12 +76,7 @@ namespace SOS.Process.Processors
             DataProvider dataProvider,
             ICollection<ProcessedObservation> processedObservations)
         {
-            FieldMappingResolverHelper.ResolveFieldMappedValues(processedObservations);
-            foreach (var observation in processedObservations)
-            {
-                observation.DataProviderId = dataProvider.Id;
-            }
-
+            FieldMappingResolverHelper.ResolveFieldMappedValues(processedObservations); // used for testing purpose. A setting decides whether values should be resolved for easier debugging of field mapped data.
             var successCount = await ProcessRepository.AddManyAsync(processedObservations);
 
             return successCount;

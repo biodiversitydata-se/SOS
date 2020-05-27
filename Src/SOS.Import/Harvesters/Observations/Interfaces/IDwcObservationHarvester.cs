@@ -2,6 +2,7 @@
 using Hangfire;
 using SOS.Import.DarwinCore;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Harvesters.Observations.Interfaces
@@ -14,7 +15,7 @@ namespace SOS.Import.Harvesters.Observations.Interfaces
         /// <returns></returns>
         Task<HarvestInfo> HarvestObservationsAsync(
             string archivePath,
-            IIdIdentifierTuple idIdentifierTuple,
+            DataProvider dataProvider,
             IJobCancellationToken cancellationToken);
 
         /// <summary>

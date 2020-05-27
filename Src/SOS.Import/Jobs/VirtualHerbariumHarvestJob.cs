@@ -40,7 +40,7 @@ namespace SOS.Import.Jobs
         public async Task<bool> RunAsync(IJobCancellationToken  cancellationToken)
         {
             _logger.LogInformation("Start Virtual Herbarium Harvest Job");
-            var dataProvider = await _dataProviderManager.GetDataProviderByType(DataSet.VirtualHerbariumObservations);
+            var dataProvider = await _dataProviderManager.GetDataProviderByType(DataProviderType.VirtualHerbariumObservations);
             var harvestInfoResult = await _virtualHerbariumObservationHarvester.HarvestObservationsAsync(cancellationToken);
             _logger.LogInformation($"End Virtual Herbarium Harvest Job. Status: {harvestInfoResult.Status}");
 

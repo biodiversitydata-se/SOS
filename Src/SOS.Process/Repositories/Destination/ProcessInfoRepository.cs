@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
@@ -29,25 +30,28 @@ namespace SOS.Process.Repositories.Destination
 
         }
 
+
         /// <inheritdoc />
         public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)
         {
+            string activeProcessedInfoId = $"{nameof(ProcessedObservation)}-{ActiveInstance}";
+            string inactiveProcessedInfoId = $"{nameof(ProcessedObservation)}-{InActiveInstance}";
             // Get data from active instance
-            var source = await GetAsync(ActiveCollectionName);
-            var sourceProvider = source?.ProvidersInfo?.FirstOrDefault(pi => pi.DataProviderType.Equals(dataProvider.Type));
+            var source = await GetAsync(activeProcessedInfoId);
+            var sourceProvider = source?.ProvidersInfo?.FirstOrDefault(pi => pi.DataProviderIdentifier.Equals(dataProvider.Identifier));
 
             if (sourceProvider == null)
             {
                 return false;
             }
 
-            var target = await GetAsync(InactiveCollectionName) ?? new ProcessInfo(InactiveCollectionName, DateTime.Now);
+            var target = await GetAsync(inactiveProcessedInfoId) ?? new ProcessInfo(InactiveCollectionName, DateTime.Now);
 
             // make a list of providers
             var targetProviders = target.ProvidersInfo.ToList();
 
             // Remove provider data
-            targetProviders.RemoveAll(p => p.DataProviderType.Equals(dataProvider.Type));
+            targetProviders.RemoveAll(p => p.DataProviderIdentifier.Equals(dataProvider.Identifier));
 
             // Add provider data from active instance and update db document
             targetProviders.Add(sourceProvider);

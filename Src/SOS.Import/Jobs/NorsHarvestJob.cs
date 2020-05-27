@@ -40,7 +40,7 @@ namespace SOS.Import.Jobs
         public async Task<bool> RunAsync(IJobCancellationToken  cancellationToken)
         {
             _logger.LogInformation("Start NORS Harvest Job");
-            var dataProvider = await _dataProviderManager.GetDataProviderByType(DataSet.NorsObservations);
+            var dataProvider = await _dataProviderManager.GetDataProviderByType(DataProviderType.NorsObservations);
             var harvestInfoResult = await _norsObservationHarvester.HarvestObservationsAsync(cancellationToken);
             _logger.LogInformation($"End NORS Harvest Job. Status: {harvestInfoResult.Status}");
 

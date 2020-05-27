@@ -7,6 +7,7 @@ using Nest;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -30,6 +31,7 @@ namespace SOS.Process.Repositories.Destination
         /// <param name="invalidObservationRepository"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
+        /// <param name="elasticClient"></param>
         public ProcessedObservationRepository(
             IProcessClient client,
             IElasticClient elasticClient,
@@ -158,27 +160,51 @@ namespace SOS.Process.Repositories.Destination
             await _elasticClient.Indices.UpdateSettingsAsync(IndexName, p => p.IndexSettings(g => g.RefreshInterval(1)));
         }
 
+        private string ActiveInstanceIndexName => GetInstanceName(ActiveInstance).ToLower();
+        private string InactiveInstanceIndexName => GetInstanceName(InActiveInstance).ToLower();
+
         /// <inheritdoc />
         public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)
         {
-            // Get data from active instance
-            SetCollectionName(ActiveInstance);
+            var scrollResult = await ScrollObservationsAsync(dataProvider.Id, null);
+            bool success = true;
 
-            var source = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
-                .Index(IndexName)
-                .Query(q => q
-                    .Term(t => t
-                        .Field(f => f.DataProviderId)
-                        .Value(dataProvider.Id))));
+            while (scrollResult?.Records?.Any() ?? false)
+            {
+                var processedObservations = scrollResult.Records;
+                var indexResult = WriteToElastic(processedObservations);
+                if (indexResult.TotalNumberOfFailedBuffers != 0) success = false;
+                scrollResult = await ScrollObservationsAsync(dataProvider.Id, scrollResult.ScrollId);
+            }
+            
+            return success;
+        }
 
-            // switch to inactive instance and add data 
-            SetCollectionName(InActiveInstance);
+        private async Task<ScrollResult<ProcessedObservation>> ScrollObservationsAsync(int dataProviderId, string scrollId)
+        {
+            ISearchResponse<ProcessedObservation> searchResponse;
+            if (string.IsNullOrEmpty(scrollId))
+            {
+                searchResponse = await _elasticClient
+                    .SearchAsync<ProcessedObservation>(s => s
+                        .Index(ActiveInstanceIndexName)
+                        .Query(query => query.Term(term => term.Field(obs => obs.DataProviderId).Value(dataProviderId)))
+                        .Scroll(ScrollTimeOut)
+                        .Size(ScrollBatchSize)
+                    );
+            }
+            else
+            {
+                searchResponse = await _elasticClient
+                    .ScrollAsync<ProcessedObservation>(ScrollTimeOut, scrollId);
+            }
 
-            Logger.LogDebug($"Start copying provider data to search");
-            var indexResult = WriteToElastic(source.Documents.ToList());
-            Logger.LogDebug($"Finished copying provider data to search");
-
-            return (indexResult.TotalNumberOfFailedBuffers == 0);
+            return new ScrollResult<ProcessedObservation>
+            {
+                Records = searchResponse.Documents,
+                ScrollId = searchResponse.ScrollId,
+                TotalCount = searchResponse.HitsMetadata.Total.Value
+            };
         }
 
         /// <inheritdoc />

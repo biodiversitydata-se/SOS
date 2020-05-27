@@ -43,7 +43,7 @@ namespace SOS.Import.Harvesters.Observations
         /// <inheritdoc />
         public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken  cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(VirtualHerbariumObservationVerbatim), DataSet.VirtualHerbariumObservations, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(VirtualHerbariumObservationVerbatim), DataProviderType.VirtualHerbariumObservations, DateTime.Now);
             harvestInfo.Status = RunStatus.Failed;
 
             try

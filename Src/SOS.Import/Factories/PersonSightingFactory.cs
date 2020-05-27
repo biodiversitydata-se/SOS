@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using SOS.Import.Extensions;
 using SOS.Import.Repositories.Source.Artportalen.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Factories
@@ -43,11 +44,12 @@ namespace SOS.Import.Factories
             {
                 if (personSightingBySightingId.TryGetValue(pair.Key, out PersonSighting personSighting))
                 {
-                    personSighting.Observers = pair.Value;
+                    personSighting.Observers = pair.Value.names;
+                    personSighting.ObserversInternal = pair.Value.users;
                 }
                 else
                 {
-                    personSightingBySightingId.Add(pair.Key, new PersonSighting { Observers = pair.Value });
+                    personSightingBySightingId.Add(pair.Key, new PersonSighting { Observers = pair.Value.names, ObserversInternal = pair.Value.users });
                 }
             }
 
@@ -60,13 +62,23 @@ namespace SOS.Import.Factories
 
             foreach (var pair in verifiedByStringBySightingId)
             {
+                var users = new List<UserInternal>();
+                if (pair.Value.determiner != null)
+                {
+                    users.Add(pair.Value.determiner);
+                }
+                if (pair.Value.confirmator != null)
+                {
+                    users.Add(pair.Value.confirmator);
+                }
                 if (personSightingBySightingId.TryGetValue(pair.Key, out PersonSighting personSighting))
                 {
-                    personSighting.VerifiedBy = pair.Value;
+                    personSighting.VerifiedBy = pair.Value.names;
+                    personSighting.VerifiedByInternal = users;    
                 }
                 else
                 {
-                    personSightingBySightingId.Add(pair.Key, new PersonSighting { VerifiedBy = pair.Value });
+                    personSightingBySightingId.Add(pair.Key, new PersonSighting { VerifiedBy = pair.Value.names, VerifiedByInternal = users });
                 }
             }
 
@@ -83,10 +95,11 @@ namespace SOS.Import.Factories
                 {
                     personSighting.ReportedBy = pair.Value.FullName;
                     personSighting.ReportedByUserId = pair.Value.UserId;
+                    personSighting.ReportedByUserAlias = pair.Value.Alias;
                 }
                 else
                 {
-                    personSightingBySightingId.Add(pair.Key, new PersonSighting { ReportedBy = pair.Value.FullName, ReportedByUserId = pair.Value.UserId });
+                    personSightingBySightingId.Add(pair.Key, new PersonSighting { ReportedBy = pair.Value.FullName, ReportedByUserId = pair.Value.UserId, ReportedByUserAlias = pair.Value.Alias });
                 }
             }
 
@@ -98,6 +111,7 @@ namespace SOS.Import.Factories
                 if (string.IsNullOrEmpty(pair.Value.Observers) && !string.IsNullOrEmpty(pair.Value.ReportedBy))
                 {
                     pair.Value.Observers = "Via " + pair.Value.ReportedBy;
+                    pair.Value.ObserversInternal = new List<UserInternal> { new UserInternal() { Id = pair.Value.ReportedByUserId, UserAlias = pair.Value.ReportedByUserAlias } };
                 }
             }
 
@@ -143,11 +157,11 @@ namespace SOS.Import.Factories
             return speciesCollectionBySightingId;
         }
 
-        private static IDictionary<int, string> CreateObserversDictionary(
+        private static IDictionary<int, (string names, IEnumerable<UserInternal> users)> CreateObserversDictionary(
             IEnumerable<SightingRelation> sightingRelations,
             IDictionary<int, Person> personsByUserId)
         {
-            Dictionary<int, string> observersBySightingId = new Dictionary<int, string>();
+            Dictionary<int, (string name, IEnumerable<UserInternal> alias)> observersBySightingId = new Dictionary<int, (string name, IEnumerable<UserInternal> alias)>();
             var query = sightingRelations
                 .Where(y => y.SightingRelationTypeId == (int)SightingRelationTypeId.Observer && y.IsPublic)
                 .GroupBy(y => y.SightingId);
@@ -155,7 +169,7 @@ namespace SOS.Import.Factories
             {
                 IEnumerable<Person> persons = grouping.Where(p => personsByUserId.ContainsKey(p.UserId)).Select(v => personsByUserId[v.UserId]);
                 string observers = string.Join(", ", persons.Select(n => n.FullName)).WithMaxLength(256);
-                observersBySightingId.Add(grouping.Key, observers);
+                observersBySightingId.Add(grouping.Key, (observers, persons.Select(g => new UserInternal() { Id = g.Id, UserAlias = g.Alias })));
             }
 
             return observersBySightingId;
@@ -183,7 +197,7 @@ namespace SOS.Import.Factories
         }
 
 
-        private static Dictionary<int, string> CreateVerifiedByStringDictionary(
+        private static Dictionary<int, (string names, UserInternal determiner, UserInternal confirmator)> CreateVerifiedByStringDictionary(
             IDictionary<int, Person> personById,
             IList<SpeciesCollectionItem> speciesCollectionItems,
             IList<SightingRelation> sightingRelations
@@ -194,7 +208,7 @@ namespace SOS.Import.Factories
                 speciesCollectionItems,
                 sightingRelations);
 
-            return verifiedByDataSightingId.ToDictionary(x => x.Key, x => ConcatenateVerifiedByString(x.Value));
+            return verifiedByDataSightingId.ToDictionary(x => x.Key, x => (ConcatenateVerifiedByString(x.Value), x.Value.DeterminerInternal, x.Value.ConfirmatorInternal));
         }
 
         private static Dictionary<int, VerifiedByData> CreateVerifiedByDataDictionary(
@@ -220,6 +234,7 @@ namespace SOS.Import.Factories
                 if (personById.TryGetValue(determinerRelation.UserId, out Person person))
                 {
                     vbd.DeterminerName = person.FullName;
+                    vbd.DeterminerInternal = new UserInternal() { Id = person.Id, UserAlias = person.Alias };
                 }
 
                 vbd.SightingRelationDeterminationYear = determinerRelation.DeterminationYear;
@@ -241,6 +256,7 @@ namespace SOS.Import.Factories
                 if (personById.TryGetValue(confirmatorRelation.UserId, out Person person))
                 {
                     vbd.ConfirmatorName = person.FullName;
+                    vbd.ConfirmatorInternal = new UserInternal() { Id = person.Id, UserAlias = person.Alias };
                 }
 
                 vbd.SightingRelationConfirmationYear = confirmatorRelation.DeterminationYear;

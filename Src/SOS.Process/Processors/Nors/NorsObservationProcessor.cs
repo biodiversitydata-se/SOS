@@ -22,7 +22,7 @@ namespace SOS.Process.Processors.Nors
     {
         private readonly INorsObservationVerbatimRepository _norsObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataSet Type => DataSet.NorsObservations;
+        public override DataProviderType Type => DataProviderType.NorsObservations;
 
         /// <summary>
         /// Constructor
@@ -51,7 +51,7 @@ namespace SOS.Process.Processors.Nors
         {
             var verbatimCount = 0;
             ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
-            var observationFactory = new NorsObservationFactory(taxa);
+            var observationFactory = new NorsObservationFactory(dataProvider, taxa);
 
             using var cursor = await _norsObservationVerbatimRepository.GetAllByCursorAsync();
 

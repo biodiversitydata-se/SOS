@@ -28,6 +28,7 @@ namespace SOS.Process.Helpers
         private readonly IDictionary<string, PositionLocation> _featureCache;
         private IDictionary<FieldMappingFieldId, Dictionary<int, FieldMappingValue>> _fieldMappingValueById;
         private const string CacheFileName = "positionAreas.json";
+        private readonly AreaType[] _areaTypes = {AreaType.County, AreaType.Province, AreaType.Municipality, AreaType.Parish, AreaType.EconomicZoneOfSweden};
 
         /// <summary>
         /// Constructor
@@ -74,7 +75,7 @@ namespace SOS.Process.Helpers
                 return;
             }
 
-            var areas = await _processedAreaRepository.GetAllAsync();
+            var areas = await _processedAreaRepository.GetAsync(_areaTypes);
             foreach (var area in areas)
             {
                 var geometry = await _processedAreaRepository.GetGeometryAsync(area.Id);

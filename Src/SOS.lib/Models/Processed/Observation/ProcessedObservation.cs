@@ -186,6 +186,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? ReportedByUserId { get; set; }
 
         /// <summary>
+        /// Alias for the reporter, internal use only
+        /// </summary>
+        public string ReportedByUserAlias { get; set; }
+
+        /// <summary>
         /// Date and time when the species observation was reported.
         /// </summary>
         [Date]
@@ -287,7 +292,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// taxon name usages, or taxon concepts.
         /// </summary>
         [Object]
-        public ProcessedTaxon Taxon { get; set; }
+        public ProcessedTaxon Taxon { get; set; }        
 
         //public string VerbatimObservation { get; set; } // todo - this could be used to store the orginal verbatim observation.
     }

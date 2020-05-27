@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Nest;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -69,6 +71,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// subject.
         /// </summary>
         public string IdentifiedBy { get; set; }
+
+        /// <summary>
+        /// List of userids and aliases matching the IdentifiedBy string, internal use only
+        /// </summary>
+        public IEnumerable<UserInternal> IdentifiedByInternal { get; set; }
 
         /// <summary>
         /// A list (concatenated and separated) of nomenclatural

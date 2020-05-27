@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Reflection;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -24,7 +26,7 @@ namespace SOS.Lib.Models.Verbatim.Shared
         /// <param name="id"></param>
         /// <param name="provider"></param>
         /// <param name="start"></param>
-        public HarvestInfo(string id, DataSet provider, DateTime start)
+        public HarvestInfo(string id, DataProviderType provider, DateTime start)
         {
             DataProvider = provider;
             Id = id;
@@ -39,7 +41,7 @@ namespace SOS.Lib.Models.Verbatim.Shared
         /// <summary>
         /// Id of data provider
         /// </summary>
-        public DataSet DataProvider { get; }
+        public DataProviderType DataProvider { get; }
 
         /// <summary>
         /// Harvest end date and time
@@ -66,26 +68,42 @@ namespace SOS.Lib.Models.Verbatim.Shared
         {
             switch (dataProvider.Type)
             {
-                case DataSet.DwcA:
+                case DataProviderType.DwcA:
                     return $"{nameof(DwcObservationVerbatim)}-{dataProvider.Identifier}";
-                case DataSet.ArtportalenObservations:
+                case DataProviderType.ArtportalenObservations:
                     return nameof(ArtportalenVerbatimObservation);
-                case DataSet.ClamPortalObservations:
+                case DataProviderType.ClamPortalObservations:
                     return nameof(ClamObservationVerbatim);
-                case DataSet.SharkObservations:
+                case DataProviderType.SharkObservations:
                     return nameof(SharkObservationVerbatim);
-                case DataSet.KULObservations:
+                case DataProviderType.KULObservations:
                     return nameof(KulObservationVerbatim);
-                case DataSet.NorsObservations:
+                case DataProviderType.NorsObservations:
                     return nameof(NorsObservationVerbatim);
-                case DataSet.SersObservations:
+                case DataProviderType.SersObservations:
                     return nameof(SersObservationVerbatim);
-                case DataSet.MvmObservations:
+                case DataProviderType.MvmObservations:
                     return nameof(MvmObservationVerbatim);
-                case DataSet.VirtualHerbariumObservations:
+                case DataProviderType.VirtualHerbariumObservations:
                     return nameof(VirtualHerbariumObservationVerbatim);
                 default:
                     return dataProvider.Type.ToString();
+            }
+        }
+
+        public static string GetIdFromResourceProvider(DataProviderType dataProviderType)
+        {
+            switch (dataProviderType)
+            {
+                case DataProviderType.Areas:
+                    return nameof(Area);
+                case DataProviderType.FieldMappings:
+                    return nameof(FieldMapping);
+                case DataProviderType.Taxa:
+                    return nameof(DarwinCoreTaxon);
+                default:
+                    throw new ArgumentException(
+                        $"{MethodBase.GetCurrentMethod()?.Name}() does not support the value {dataProviderType}", nameof(dataProviderType));
             }
         }
     }

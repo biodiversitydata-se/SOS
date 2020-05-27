@@ -16,6 +16,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Process.Helpers.Interfaces;
@@ -30,33 +31,34 @@ namespace SOS.Process.Processors.DarwinCoreArchive
     /// </summary>
     public class DwcaObservationFactory
     {
+        private readonly DataProvider _dataProvider;
         private readonly IDictionary<int, ProcessedTaxon> _taxonByTaxonId;
-        HashMapDictionary<string, ProcessedTaxon> _taxonByScientificName;
-
+        private readonly HashMapDictionary<string, ProcessedTaxon> _taxonByScientificName;
         private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
         private readonly IAreaHelper _areaHelper;
 
         public DwcaObservationFactory(
+            DataProvider dataProvider, 
             IDictionary<int, ProcessedTaxon> taxa,
             IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings,
             IAreaHelper areaHelper)
         {
-            {
-                _taxonByTaxonId = taxa ?? throw new ArgumentNullException(nameof(taxa));
-                _fieldMappings = fieldMappings ?? throw new ArgumentNullException(nameof(fieldMappings));
-                _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
+            _taxonByTaxonId = taxa ?? throw new ArgumentNullException(nameof(taxa));
+            _fieldMappings = fieldMappings ?? throw new ArgumentNullException(nameof(fieldMappings));
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
 
-                _taxonByScientificName = new HashMapDictionary<string, ProcessedTaxon>();
-                foreach (var processedTaxon in _taxonByTaxonId.Values)
-                {
-                    _taxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
-                }
+            _taxonByScientificName = new HashMapDictionary<string, ProcessedTaxon>();
+            foreach (var processedTaxon in _taxonByTaxonId.Values)
+            {
+                _taxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
             }
         }
 
         public static async Task<DwcaObservationFactory> CreateAsync(
+            DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
-            IProcessedFieldMappingRepository processedFieldMappingRepository, 
+            IProcessedFieldMappingRepository processedFieldMappingRepository,
             IAreaHelper areaHelper)
         {
             var allFieldMappings = await processedFieldMappingRepository.GetAllAsync();
@@ -64,7 +66,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 ExternalSystemId.DarwinCore, 
                 allFieldMappings.ToArray(),
                 convertValuesToLowercase: true);
-            return new DwcaObservationFactory(taxa, fieldMappings, areaHelper);
+            return new DwcaObservationFactory(dataProvider, taxa, fieldMappings, areaHelper);
         }
 
         public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<DwcObservationVerbatim> verbatimObservations)
@@ -85,6 +87,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             }
 
             var obs = new ProcessedObservation();
+            obs.DataProviderId = _dataProvider.Id;
             //StoreVerbatimObservation(obs, verbatimObservation); // todo - this could be used to store the original verbatim observation
 
             // Other
@@ -152,8 +155,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             obs.Taxon = CreateProcessedTaxon(verbatimObservation);
 
             // Temporarily remove
-            obs.IsInEconomicZoneOfSweden = true;
-            //_areaHelper.AddAreaDataToProcessedObservation(obs);
+            //obs.IsInEconomicZoneOfSweden = true;
+            _areaHelper.AddAreaDataToProcessedObservation(obs);
             return obs;
 
             // Code from ArtportalenObservationFactory

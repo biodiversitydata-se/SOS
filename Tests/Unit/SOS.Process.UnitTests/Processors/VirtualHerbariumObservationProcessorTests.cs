@@ -194,7 +194,7 @@ namespace SOS.Process.UnitTests.Processors
             return new DataProvider
             {
                 Name = "Virtual Herbarium",
-                Type = DataSet.VirtualHerbariumObservations
+                Type = DataProviderType.VirtualHerbariumObservations
             };
         }
     }

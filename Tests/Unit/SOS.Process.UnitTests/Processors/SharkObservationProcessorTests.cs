@@ -195,7 +195,7 @@ namespace SOS.Process.UnitTests.Processors
             return new DataProvider
             {
                 Name = "SHARK",
-                Type = DataSet.SharkObservations
+                Type = DataProviderType.SharkObservations
             };
         }
     }

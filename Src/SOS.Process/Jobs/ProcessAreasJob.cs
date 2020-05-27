@@ -6,6 +6,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
@@ -89,8 +90,8 @@ namespace SOS.Process.Jobs
             }
 
             _logger.LogDebug("Start updating process info for areas");
-            var harvestInfo = await GetHarvestInfoAsync(nameof(Area));
-            var providerInfo = CreateProviderInfo(DataSet.Areas, harvestInfo,  start, DateTime.Now, success ? RunStatus.Success : RunStatus.Failed, areas.Count);
+            var harvestInfo = await GetHarvestInfoAsync(HarvestInfo.GetIdFromResourceProvider(DataProviderType.Areas));
+            var providerInfo = CreateProviderInfo(DataProviderType.Areas, harvestInfo,  start, DateTime.Now, success ? RunStatus.Success : RunStatus.Failed, areas.Count);
             await SaveProcessInfo(nameof(Area), start, areas.Count,
                 success ? RunStatus.Success : RunStatus.Failed, new [] { providerInfo } );
             _logger.LogDebug("Finish updating process info for areas");

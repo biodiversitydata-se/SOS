@@ -49,11 +49,11 @@ namespace SOS.Administration.Api.Controllers
                 }
 
                 BackgroundJob.Enqueue<ICopyProviderDataJob>(job => job.RunAsync(dataProvider.Id));
-                return new OkObjectResult($"Started copy provider data job for {dataProvider}");
+                return new OkObjectResult($"Copy provider data job for {dataProvider} was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Starting copy provider data failed");
+                _logger.LogError(e, "Enqueuing copy provider data failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -74,11 +74,11 @@ namespace SOS.Administration.Api.Controllers
                 }
 
                 BackgroundJob.Enqueue<IActivateInstanceJob>(job => job.RunAsync(instance));
-                return new OkObjectResult("Started activate instance job");
+                return new OkObjectResult("Activate instance job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Starting activate instance failed");
+                _logger.LogError(e, "Enqueuing Activate instance failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers;
 using SOS.Process.Processors.DarwinCoreArchive;
 using SOS.Process.UnitTests.TestHelpers.Factories;
@@ -35,12 +36,14 @@ namespace SOS.Process.UnitTests.TestHelpers
 
         private DwcaObservationFactory CreateDwcaObservationFactory()
         {
+            var dataProviderDummy = new DataProvider();
             var mammaliaTaxa = MessagePackHelper.CreateListFromMessagePackFile<ProcessedTaxon>(@"Resources\MammaliaProcessedTaxa.msgpck");
             var mammaliaTaxonByTaxonId = mammaliaTaxa.ToDictionary(t => t.Id, t => t);
             var processedAreaRepositoryStub = ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);
             var processedFieldMappingRepository = ProcessedFieldMappingRepositoryStubFactory.Create();
             var areaHelper = new AreaHelper(processedAreaRepositoryStub.Object, processedFieldMappingRepository.Object);
             var factory = DwcaObservationFactory.CreateAsync(
+                dataProviderDummy, 
                 mammaliaTaxonByTaxonId, 
                 processedFieldMappingRepository.Object,
                 areaHelper).Result;

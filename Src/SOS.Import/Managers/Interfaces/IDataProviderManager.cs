@@ -44,7 +44,7 @@ namespace SOS.Import.Managers.Interfaces
         /// <param name="identifier"></param>
         /// <returns></returns>
         Task<DataProvider> GetDataProviderByIdentifier(string identifier);
-        Task<DataProvider> GetDataProviderByType(DataSet type);
+        Task<DataProvider> GetDataProviderByType(DataProviderType type);
         Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(List<string> dataProviderIdOrIdentifiers);
         Task<bool> UpdateHarvestInfo(int dataProviderId, HarvestInfo harvestInfo);
     }

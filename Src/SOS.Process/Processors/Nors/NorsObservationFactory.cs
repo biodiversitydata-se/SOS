@@ -10,6 +10,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Nors;
 
 namespace SOS.Process.Processors.Nors
@@ -17,10 +18,12 @@ namespace SOS.Process.Processors.Nors
     public class NorsObservationFactory
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
+        private readonly DataProvider _dataProvider;
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
 
-        public NorsObservationFactory(IDictionary<int, ProcessedTaxon> taxa)
+        public NorsObservationFactory(DataProvider dataProvider, IDictionary<int, ProcessedTaxon> taxa)
         {
+            _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
         }
 

@@ -1,4 +1,7 @@
-﻿namespace SOS.Lib.Models.Verbatim.Artportalen
+﻿using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
+
+namespace SOS.Lib.Models.Verbatim.Artportalen
 {
     /// <summary>
     /// Contains properties used to create a verified by string.
@@ -17,5 +20,7 @@
         public int? SightingRelationConfirmationYear { get; set; } // SightingRelationTypeId.Confirmator = 5
         public int? SpeciesCollectionItemConfirmatorYear { get; set; }
         public int? ConfirmatorYear => SightingRelationConfirmationYear ?? SpeciesCollectionItemConfirmatorYear;
+        public UserInternal DeterminerInternal { get; set; }
+        public UserInternal ConfirmatorInternal { get; set; }
     }
 }

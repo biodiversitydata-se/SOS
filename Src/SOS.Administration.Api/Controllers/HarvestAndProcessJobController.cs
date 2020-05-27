@@ -62,11 +62,11 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
-                return new OkObjectResult("Started observations harvest and process job");
+                return new OkObjectResult("Observations harvest and process job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Running observations harvest and process job failed");
+                _logger.LogError(e, "Enqueuing observations harvest and process job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -109,11 +109,12 @@ namespace SOS.Administration.Api.Controllers
                     harvestDataProviderIdOrIdentifiers,
                     processDataProviderIdOrIdentifiers,
                     JobCancellationToken.Null));
-                return new OkObjectResult("Started process job");
+
+                return new OkObjectResult("Process job was enqueued to Hangfire.");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Starting process job failed");
+                _logger.LogError(e, "Enqueuing process job failed");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

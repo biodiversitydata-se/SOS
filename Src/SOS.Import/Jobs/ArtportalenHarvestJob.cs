@@ -44,7 +44,7 @@ namespace SOS.Import.Jobs
         public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
             _logger.LogInformation("Start Artportalen Harvest Job");
-            var dataProvider = await _dataProviderManager.GetDataProviderByType(DataSet.ArtportalenObservations);
+            var dataProvider = await _dataProviderManager.GetDataProviderByType(DataProviderType.ArtportalenObservations);
             var harvestInfoResult = await _artportalenObservationHarvester.HarvestSightingsAsync(cancellationToken);
             _logger.LogInformation($"End Artportalen Harvest Job. Status: {harvestInfoResult.Status}");
 

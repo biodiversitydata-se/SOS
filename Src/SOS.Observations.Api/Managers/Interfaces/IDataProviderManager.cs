@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Observations.Api.Dtos;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {
@@ -14,7 +15,8 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <summary>
         /// Get data providers
         /// </summary>
+        /// <param name="includeInactive">If true also inactive data providers will be included.</param>
         /// <returns></returns>
-        Task<IEnumerable<DataProvider>> GetDataProvidersAsync();
+        Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive);
     }
 }

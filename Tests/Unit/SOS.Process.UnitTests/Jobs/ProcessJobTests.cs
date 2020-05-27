@@ -486,19 +486,19 @@ namespace SOS.Process.UnitTests.Jobs
 
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenVerbatimObservation)))
-                .ReturnsAsync(new HarvestInfo(nameof(ArtportalenVerbatimObservation), DataSet.ArtportalenObservations, DateTime.Now));
+                .ReturnsAsync(new HarvestInfo(nameof(ArtportalenVerbatimObservation), DataProviderType.ArtportalenObservations, DateTime.Now));
             _artportalenProcessor.Setup(r => r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.Artportalen, DataSet.ArtportalenObservations, DateTime.Now, DateTime.Now, 1));
+                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.Artportalen, DataProviderType.ArtportalenObservations, DateTime.Now, DateTime.Now, 1));
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ClamObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(nameof(ClamObservationVerbatim), DataSet.ClamPortalObservations, DateTime.Now));
+                .ReturnsAsync(new HarvestInfo(nameof(ClamObservationVerbatim), DataProviderType.ClamPortalObservations, DateTime.Now));
             _clamPortalProcessor.Setup(r => r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.ClamGateway, DataSet.ClamPortalObservations, DateTime.Now, DateTime.Now, 1));
+                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.ClamGateway, DataProviderType.ClamPortalObservations, DateTime.Now, DateTime.Now, 1));
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(KulObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(nameof(KulObservationVerbatim), DataSet.KULObservations, DateTime.Now));
+                .ReturnsAsync(new HarvestInfo(nameof(KulObservationVerbatim), DataProviderType.KULObservations, DateTime.Now));
             _kulProcessor.Setup(r => r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.KUL, DataSet.KULObservations, DateTime.Now, DateTime.Now, 1));
+                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.KUL, DataProviderType.KULObservations, DateTime.Now, DateTime.Now, 1));
 
             _darwinCoreRepository.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()));
 

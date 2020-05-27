@@ -13,13 +13,13 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult AddDailyGeoAreasHarvestJob(int hour, int minute);
+        IActionResult AddDailyAreasHarvestJob(int hour, int minute);
 
         /// <summary>
         /// Run geo data harvest
         /// </summary>
         /// <returns></returns>
-        IActionResult RunGeoAreasHarvestJob();
+        IActionResult RunAreasHarvestJob();
 
         /// <summary>
         /// Schedule daily taxon harvest job
