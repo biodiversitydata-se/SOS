@@ -39,6 +39,11 @@ namespace SOS.Lib.Models.Verbatim.Shared
         public int Count { get; set; }
 
         /// <summary>
+        /// Last time data was modified
+        /// </summary>
+        public DateTime? DataLastModified { get; set; }
+
+        /// <summary>
         /// Id of data provider
         /// </summary>
         public DataProviderType DataProvider { get; }

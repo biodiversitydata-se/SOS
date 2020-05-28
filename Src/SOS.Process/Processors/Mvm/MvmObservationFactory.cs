@@ -85,7 +85,7 @@ namespace SOS.Process.Processors.Mvm
                     VerbatimLatitude = verbatim.DecimalLatitude,
                     VerbatimLongitude = verbatim.DecimalLongitude
                 },
-                Modified = DateTime.Parse(verbatim.Modified).ToUniversalTime(),
+                Modified = verbatim.Modified.HasValue ? verbatim.Modified.Value.ToUniversalTime() : (DateTime?)null,
                 Occurrence = new ProcessedOccurrence
                 {
                     CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),

@@ -58,6 +58,7 @@ namespace SOS.Import.Harvesters.Observations
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 // Update harvest info
+                harvestInfo.DataLastModified = items?.Select(o => o.Modified).Max();
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = items?.Count() ?? 0;

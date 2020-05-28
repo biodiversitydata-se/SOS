@@ -28,7 +28,7 @@ namespace SOS.Lib.Models.Verbatim.Sers
 
         public string LocationId { get; set; }
 
-        public string Modified { get; set; }
+        public DateTime? Modified { get; set; }
 
         public string Municipality { get; set; }
 

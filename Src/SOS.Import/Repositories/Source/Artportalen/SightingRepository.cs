@@ -223,7 +223,28 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<(int SightingId, int ProjectId)>> GetProjectIdsAsync()
+		public async Task<DateTime?> GetLastModifiedDateAsyc()
+        {
+            try
+            {
+                const string query = @"
+                SELECT 
+	                MAX(EditDate)
+                FROM 
+	                Sighting";
+
+                return (await QueryAsync<DateTime?>(query)).FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting last modified date");
+
+                return null;
+            }
+		}
+
+		/// <inheritdoc />
+		public async Task<IEnumerable<(int SightingId, int ProjectId)>> GetProjectIdsAsync()
         {
             try
             {

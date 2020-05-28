@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SOS.Lib.Models.Verbatim.Sers;
 
@@ -25,7 +26,10 @@ namespace SOS.Import.Extensions
         {
             var observation = new SersObservationVerbatim();
             observation.ReportedBy = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.ReportedBy)?.Value;
-            observation.Modified = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.Modified)?.Value;
+            DateTime.TryParse(
+                entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.Modified)
+                    ?.Value, out var modified);
+            observation.Modified = modified;
             observation.Owner = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.Owner)?.Value;
             observation.IndividualId = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.IndividualID)?.Value;
             observation.RecordedBy = entity.Fields.FirstOrDefault(p => p.Property.Id == SersService.SpeciesObservationPropertyId.RecordedBy)?.Value;

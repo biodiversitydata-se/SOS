@@ -26,7 +26,10 @@ namespace SOS.Import.Extensions
         {
             var observation = new MvmObservationVerbatim();
             observation.ReportedBy = entity.Fields.FirstOrDefault(p => p.Property.Id == MvmService.SpeciesObservationPropertyId.ReportedBy)?.Value;
-            observation.Modified = entity.Fields.FirstOrDefault(p => p.Property.Id == MvmService.SpeciesObservationPropertyId.Modified)?.Value;
+            DateTime.TryParse(
+                entity.Fields.FirstOrDefault(p => p.Property.Id == MvmService.SpeciesObservationPropertyId.Modified)
+                    ?.Value, out var modified);
+            observation.Modified = modified;
             observation.Owner = entity.Fields.FirstOrDefault(p => p.Property.Id == MvmService.SpeciesObservationPropertyId.Owner)?.Value;
             observation.IndividualId = entity.Fields.FirstOrDefault(p => p.Property.Id == MvmService.SpeciesObservationPropertyId.IndividualID)?.Value;
             observation.RecordedBy = entity.Fields.FirstOrDefault(p => p.Property.Id == MvmService.SpeciesObservationPropertyId.RecordedBy)?.Value;
