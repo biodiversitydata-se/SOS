@@ -40,26 +40,17 @@ namespace SOS.Observations.Api.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
-        public async Task<Area> GetAreaInternalAsync(int areaId)
-        {
-            try
-            {
-                var area = await _areaRepository.GetAreaAsync(areaId);
-                return area;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get area");
-                return null;
-            }
-        }
-
         public async Task<byte[]> GetZipppedAreaAsync(int areaId)
         {
             try
             {
-                var area = await GetAreaInternalAsync(areaId);
+                var area = await _areaRepository.GetAreaAsync(areaId);
+
+                if (area?.AreaType == AreaType.EconomicZoneOfSweden)
+                {
+                    return null;
+                }
+
                 var geometry = await _areaRepository.GetGeometryAsync(areaId);
                 var externalArea = new ExternalArea
                 {                    

@@ -13,12 +13,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
     public interface IAreaManager
     {
         /// <summary>
-        /// Get information about a single area, used for internal calls
-        /// </summary>
-        /// <returns></returns>
-        Task<Area> GetAreaInternalAsync(int areaId);
-
-        /// <summary>
         /// Get zipped json bytes with an area json file
         /// </summary>
         /// <returns></returns>

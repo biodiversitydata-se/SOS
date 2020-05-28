@@ -55,11 +55,18 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("{areaId}/export")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public async Task<IActionResult> ExportArea(int areaId)
         {
             try
             {
                 var zipBytes = await _areaManager.GetZipppedAreaAsync(areaId);
+
+                if (zipBytes == null)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
                 return File(zipBytes, "application/zip", $"Area{areaId}.zip");                
             }
             catch (Exception e)
