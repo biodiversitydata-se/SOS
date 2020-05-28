@@ -94,15 +94,15 @@ namespace SOS.Administration.Api
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Hangfire
-            var mongoConfiguration = Configuration.GetSection("ApplicationSettings").GetSection("HangfireDbConfiguration").Get<MongoDbConfiguration>();
+            var hangfireDbConfiguration = Configuration.GetSection("ApplicationSettings").GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
 
             services.AddHangfire(configuration =>
                 configuration
                     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                     .UseSimpleAssemblyNameTypeSerializer()
                     .UseRecommendedSerializerSettings()
-                    .UseMongoStorage(mongoConfiguration.GetMongoDbSettings(),
-                        mongoConfiguration.DatabaseName,
+                    .UseMongoStorage(hangfireDbConfiguration.GetMongoDbSettings(),
+                        hangfireDbConfiguration.DatabaseName,
                         new MongoStorageOptions
                         {
                             MigrationOptions = new MongoMigrationOptions

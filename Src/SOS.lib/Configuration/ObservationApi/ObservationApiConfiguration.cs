@@ -9,7 +9,7 @@ namespace SOS.Lib.Configuration.ObservationApi
 
         public MongoDbConfiguration ProcessedDbConfiguration { get; set; }
 
-        public MongoDbConfiguration HangfireDbConfiguration { get; set; }
+        public HangfireDbConfiguration HangfireDbConfiguration { get; set; }
 
         public ElasticSearchConfiguration SearchDbConfiguration { get; set; }
     }
