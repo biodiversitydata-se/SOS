@@ -69,6 +69,7 @@ namespace SOS.Import.Harvesters.Observations
                 var nrSightingsHarvested = 0;
                 var result = await _sersObservationService.GetAsync(0);
                 var maxId = result?.Item1 ?? 0;
+                var dataLastModified = DateTime.MinValue;
 
                 // Loop until all sightings are fetched.
                 while (maxId != 0)
@@ -83,6 +84,13 @@ namespace SOS.Import.Harvesters.Observations
                     // Add sightings to MongoDb
                     await _sersObservationVerbatimRepository.AddManyAsync(aggregates);
 
+                    var batchDataLastModified = aggregates.Select(a => a.Modified).Max();
+
+                    if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
+                    {
+                        dataLastModified = batchDataLastModified.Value;
+                    }
+
                     if (_sersServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         nrSightingsHarvested >= _sersServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
@@ -96,6 +104,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogInformation("Finished harvesting sightings for SERS data provider");
 
                 // Update harvest info
+                harvestInfo.DataLastModified = dataLastModified == DateTime.MinValue ? (DateTime?)null : dataLastModified;
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;

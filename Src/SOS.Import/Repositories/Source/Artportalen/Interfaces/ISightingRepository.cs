@@ -31,6 +31,12 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         Task<Tuple<int, int>> GetIdSpanAsync();
 
         /// <summary>
+        /// Get last modified date for sightings
+        /// </summary>
+        /// <returns></returns>
+        Task<DateTime?> GetLastModifiedDateAsyc();
+
+        /// <summary>
         /// Get all connections between project and sighting
         /// </summary>
         /// <returns></returns>

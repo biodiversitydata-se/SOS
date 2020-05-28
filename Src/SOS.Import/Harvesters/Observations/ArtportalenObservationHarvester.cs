@@ -274,6 +274,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogDebug("Finish getting Artportalen sightings");
 
                 // Update harvest info
+                harvestInfo.DataLastModified = await _sightingRepository.GetLastModifiedDateAsyc();
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
