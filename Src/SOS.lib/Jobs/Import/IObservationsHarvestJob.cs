@@ -24,5 +24,15 @@ namespace SOS.Lib.Jobs.Import
             List<string> harvestDataProviderIdOrIdentifiers, 
             List<string> processDataProviderIdOrIdentifiers, 
             IJobCancellationToken cancellationToken);
+
+        /// <summary>
+        /// Harvest multiple sources without starting processing.
+        /// </summary>
+        /// <param name="harvestDataProviderIdOrIdentifiers"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<bool> RunHarvestObservationsAsync(
+            List<string> harvestDataProviderIdOrIdentifiers,
+            IJobCancellationToken cancellationToken);
     }
 }

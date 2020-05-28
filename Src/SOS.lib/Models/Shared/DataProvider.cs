@@ -125,7 +125,7 @@ namespace SOS.Lib.Models.Shared
 
         public override string ToString()
         {
-            return $"{Name} [Id={Id}, Identfier={Identifier}]";
+            return $"[Id={Id}, Identfier={Identifier}] - {Name}";
         }
 
         protected bool Equals(DataProvider other)

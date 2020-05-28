@@ -22,6 +22,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
 using TaxonDynamicProperties = SOS.Lib.Models.DarwinCore.TaxonDynamicProperties;
+using Newtonsoft.Json;
 
 namespace SOS.Import.Services
 {
@@ -68,7 +69,29 @@ namespace SOS.Import.Services
 
             return null;
         }
+        class TaxonInfo
+        {
+            public int SortOrder { get; set; }
+            public int Id { get; set; }
+        }
+        public async Task<Dictionary<int, int>> GetSortOrdersByTaxonId(IEnumerable<int> taxonIds)
+        {
+            try
+            {
+                var uri = new Uri(_taxonDwcUrl);
+                var host = uri.Scheme + Uri.SchemeDelimiter + uri.Host;
+                string resultsString = await _taxonServiceProxy.GetTaxonAsync(host + "/api/Taxon/byIds", taxonIds);
+                if (resultsString == null) return null;
+                var info = JsonConvert.DeserializeObject<IEnumerable<TaxonInfo>>(resultsString);
+                return info.ToDictionary(x => x.Id, x => x.SortOrder);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+            }
 
+            return null;
+        }
         private string GetCsvFieldDelimiterFromMetaFile(ZipArchive zipArchive)
         {
             var csvFieldDelimiter = "\t";
