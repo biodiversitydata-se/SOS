@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Nest;
 using NLog.Web;
 using SOS.Export.IoC.Modules;
+using SOS.Hangfire.JobServer.Configuration;
 using SOS.Import.IoC.Modules;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Import;
@@ -79,15 +80,15 @@ namespace SOS.Hangfire.JobServer
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var mongoConfiguration = hostContext.Configuration.GetSection("ApplicationSettings").GetSection("HangfireDbConfiguration").Get<MongoDbConfiguration>();
+                    var hangfireDbConfiguration = hostContext.Configuration.GetSection("ApplicationSettings").GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
                     
                     services.AddHangfire(configuration =>
                             configuration
-                            .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                             .UseSimpleAssemblyNameTypeSerializer()
-                            .UseRecommendedSerializerSettings()
-                            .UseMongoStorage(mongoConfiguration.GetMongoDbSettings(),
-                                mongoConfiguration.DatabaseName,
+                            .UseRecommendedSerializerSettings()                                
+                            .UseMongoStorage(hangfireDbConfiguration.GetMongoDbSettings(),
+                                hangfireDbConfiguration.DatabaseName,
                                 new MongoStorageOptions
                                 {
                                     MigrationOptions = new MongoMigrationOptions
@@ -97,6 +98,7 @@ namespace SOS.Hangfire.JobServer
                                     }
                                 })
                     );
+                    GlobalJobFilters.Filters.Add(new HangfireJobExpirationTimeAttribute(hangfireDbConfiguration.JobExpirationDays));
 
                     // Add the processing server as IHostedService
                     services.AddHangfireServer();
