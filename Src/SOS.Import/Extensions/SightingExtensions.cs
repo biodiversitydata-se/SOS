@@ -117,10 +117,10 @@ namespace SOS.Import.Extensions
                 Activity = entity.ActivityId.HasValue && activities.ContainsKey(entity.ActivityId.Value)
                     ? activities[entity.ActivityId.Value]
                     : null,
-                Bioptope = entity.BiptopeId.HasValue && biotopes.ContainsKey(entity.BiptopeId.Value)
-                    ? biotopes[entity.BiptopeId.Value]
+                Biotope = entity.BiotopeId.HasValue && biotopes.ContainsKey(entity.BiotopeId.Value)
+                    ? biotopes[entity.BiotopeId.Value]
                     : null,
-                BiotopeDescription = entity.BiptopeDescription,
+                BiotopeDescription = entity.BiotopeDescription,
                 CollectionID = entity.CollectionID,
                 Comment = entity.Comment,
                 EndDate = entity.EndDate,

@@ -15,12 +15,12 @@ namespace SOS.Import.Entities.Artportalen
         /// <summary>
         ///     Id of biotope
         /// </summary>
-        public int? BiptopeId { get; set; }
+        public int? BiotopeId { get; set; }
 
         /// <summary>
         ///     Description of biotope
         /// </summary>
-        public string BiptopeDescription { get; set; }
+        public string BiotopeDescription { get; set; }
 
         /// <summary>
         ///     Id of collection

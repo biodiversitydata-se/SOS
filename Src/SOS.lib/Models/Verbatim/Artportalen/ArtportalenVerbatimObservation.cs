@@ -18,7 +18,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Biotope
         /// </summary>
-        public Metadata Bioptope { get; set; }
+        public Metadata Biotope { get; set; }
 
         /// <summary>
         ///     Description of bioptpe

@@ -212,8 +212,8 @@ namespace SOS.Process.Processors.Artportalen
             obs.Location.Parish = GetSosId(verbatimObservation.Site?.Parish?.Id,
                 _fieldMappings[FieldMappingFieldId.Parish]);
             obs.Event.Biotope =
-                GetSosId(verbatimObservation?.Bioptope?.Id, _fieldMappings[FieldMappingFieldId.Biotope]);
-            obs.Event.Substrate = GetSosId(verbatimObservation?.Bioptope?.Id,
+                GetSosId(verbatimObservation?.Biotope?.Id, _fieldMappings[FieldMappingFieldId.Biotope]);
+            obs.Event.Substrate = GetSosId(verbatimObservation?.Biotope?.Id,
                 _fieldMappings[FieldMappingFieldId.Substrate]);
             obs.Identification.ValidationStatus = GetSosId(verbatimObservation?.ValidationStatus?.Id,
                 _fieldMappings[FieldMappingFieldId.ValidationStatus]);
