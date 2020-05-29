@@ -72,7 +72,7 @@ namespace SOS.Lib.Extensions
                 queryContainers.Add(q => q
                     .DateRange(r => r
                         .Field("event.endDate")
-                        .LessThanOrEquals(filter.EndDate.Value.ToUniversalTime())
+                        .LessThanOrEquals(DateMath.Anchored(filter.EndDate.Value.ToUniversalTime()))//.RoundTo(DateMathTimeUnit.Day))
                     )
                 );
             }
@@ -144,7 +144,7 @@ namespace SOS.Lib.Extensions
                 queryContainers.Add(q => q
                     .DateRange(r => r
                         .Field("event.startDate")
-                        .GreaterThanOrEquals(filter.StartDate.Value.ToUniversalTime())
+                        .GreaterThanOrEquals(DateMath.Anchored(filter.StartDate.Value.ToUniversalTime()))//.RoundTo(DateMathTimeUnit.Day))
                     )
                 );
             }
