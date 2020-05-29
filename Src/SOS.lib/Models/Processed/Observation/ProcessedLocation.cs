@@ -309,6 +309,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// May be a global unique identifier or an identifier
         /// specific to the data set.
         /// </summary>
+        [Keyword]
         public string LocationId { get; set; }
 
         /// <summary>
