@@ -1,12 +1,11 @@
-﻿using System.Text.RegularExpressions;
-using CsvHelper;
+﻿using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 
 namespace SOS.Export.IO.Csv.Converters
 {
     /// <summary>
-    /// Replaces newline and tabs with space.
+    ///     Replaces newline and tabs with space.
     /// </summary>
     public class CoordinateUncertaintyConverter<T> : DefaultTypeConverter
     {
@@ -17,18 +16,16 @@ namespace SOS.Export.IO.Csv.Converters
                 return null;
             }
 
-            if (int.TryParse(text, out int result))
+            if (int.TryParse(text, out var result))
             {
                 return result;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         /// <summary>
-        /// Replaces newline and tabs with space.
+        ///     Replaces newline and tabs with space.
         /// </summary>
         public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
         {
@@ -37,15 +34,13 @@ namespace SOS.Export.IO.Csv.Converters
                 return "";
             }
 
-            int val = (int) value;
+            var val = (int) value;
             if (val == 0)
             {
                 return 1.ToString();
             }
-            else
-            {
-                return val.ToString();
-            }
+
+            return val.ToString();
         }
     }
 }

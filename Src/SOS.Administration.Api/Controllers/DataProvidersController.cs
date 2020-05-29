@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Models;
@@ -14,17 +13,17 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Administration.Api.Controllers
 {
     /// <summary>
-    /// Data providers controller.
+    ///     Data providers controller.
     /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class DataProvidersController : ControllerBase
     {
-        private readonly ILogger<DataProvidersController> _logger;
         private readonly IDataProviderManager _dataProviderManager;
+        private readonly ILogger<DataProvidersController> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
@@ -37,15 +36,19 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <summary>
-        /// Initialize the MongoDB DataProvider collection with default data providers.
+        ///     Initialize the MongoDB DataProvider collection with default data providers.
         /// </summary>
-        /// <param name="forceOverwriteIfCollectionExist">If the DataProvider collection already exists, set forceOverwriteIfCollectionExist to true if you want to overwrite this collection with default data.</param>
+        /// <param name="forceOverwriteIfCollectionExist">
+        ///     If the DataProvider collection already exists, set
+        ///     forceOverwriteIfCollectionExist to true if you want to overwrite this collection with default data.
+        /// </param>
         /// <returns></returns>
         [HttpPost("ImportDefaultDataProviders")]
         [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> ImportDefaultDataprovidersAsync([FromQuery]bool forceOverwriteIfCollectionExist = false)
+        public async Task<IActionResult> ImportDefaultDataprovidersAsync(
+            [FromQuery] bool forceOverwriteIfCollectionExist = false)
         {
             try
             {
@@ -56,17 +59,17 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <summary>
-        /// Get all data providers.
+        ///     Get all data providers.
         /// </summary>
         /// <returns></returns>
         [HttpGet("")]
-        [ProducesResponseType(typeof(List<DataProvider>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(List<DataProvider>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetDataProvidersAsync()
         {
             try
@@ -78,22 +81,22 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting data providers");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <summary>
-        /// Get information about which data sources are included in scheduled harvest and processing.
+        ///     Get information about which data sources are included in scheduled harvest and processing.
         /// </summary>
         /// <returns></returns>
         [HttpGet("HarvestAndProcessSettings")]
-        [ProducesResponseType(typeof(DataProviderHarvestAndProcessSettingsDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(DataProviderHarvestAndProcessSettingsDto), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> DataProviderHarvestSettings()
         {
             try
             {
-                List<DataProvider> allDataProviders = await _dataProviderManager.GetAllDataProviders();
+                var allDataProviders = await _dataProviderManager.GetAllDataProviders();
                 var harvestProcessSettings = new DataProviderHarvestAndProcessSettingsDto
                 {
                     IncludedInScheduledHarvest = allDataProviders
@@ -115,7 +118,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
     }

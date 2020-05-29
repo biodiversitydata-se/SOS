@@ -5,11 +5,6 @@ namespace SOS.Lib.Models.Verbatim.Sers
 {
     public class SersObservationVerbatim : IEntity<string>
     {
-        public string Id
-        {
-            get => OccurrenceId;
-            set => OccurrenceId = value;
-        }
         public int? CoordinateUncertaintyInMeters { get; set; }
 
         public string County { get; set; }
@@ -42,5 +37,11 @@ namespace SOS.Lib.Models.Verbatim.Sers
         public string ScientificName { get; set; }
 
         public DateTime Start { get; set; }
+
+        public string Id
+        {
+            get => OccurrenceId;
+            set => OccurrenceId = value;
+        }
     }
 }

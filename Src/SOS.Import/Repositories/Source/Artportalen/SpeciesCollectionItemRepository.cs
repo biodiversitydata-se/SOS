@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
+using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
-    public class SpeciesCollectionItemRepository : BaseRepository<SpeciesCollectionItemRepository>, Interfaces.ISpeciesCollectionItemRepository
+    public class SpeciesCollectionItemRepository : BaseRepository<SpeciesCollectionItemRepository>,
+        ISpeciesCollectionItemRepository
     {
         public SpeciesCollectionItemRepository(
-            IArtportalenDataService artportalenDataService, 
+            IArtportalenDataService artportalenDataService,
             ILogger<SpeciesCollectionItemRepository> logger) : base(artportalenDataService, logger)
         {
         }

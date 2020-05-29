@@ -1,20 +1,18 @@
 ﻿using MongoDB.Driver;
+using SOS.Process.Database.Interfaces;
 
 namespace SOS.Process.Database
 {
-    public class VerbatimClient : MongoClient, Interfaces.IVerbatimClient
+    public class VerbatimClient : MongoClient, IVerbatimClient
     {
         /// <summary>
-        /// Name of database
+        ///     Name of database
         /// </summary>
         private readonly string _dataBaseName;
 
-        /// <inheritdoc />
-        public int BatchSize { get; }
-
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="settings"></param>
         /// <param name="dataBaseName"></param>
@@ -24,6 +22,9 @@ namespace SOS.Process.Database
             _dataBaseName = dataBaseName;
             BatchSize = batchSize;
         }
+
+        /// <inheritdoc />
+        public int BatchSize { get; }
 
         public IMongoDatabase GetDatabase()
         {

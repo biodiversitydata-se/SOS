@@ -6,14 +6,14 @@ namespace SOS.Import.Services.Interfaces
     public interface ISharkObservationService
     {
         /// <summary>
-        ///  Get data set from Shark
+        ///     Get data set from Shark
         /// </summary>
         /// <param name="dataSetName"></param>
         /// <returns></returns>
         Task<SharkJsonFile> GetAsync(string dataSetName);
 
         /// <summary>
-        /// Get data sets available
+        ///     Get data sets available
         /// </summary>
         /// <returns></returns>
         Task<SharkJsonFile> GetDataSetsAsync();

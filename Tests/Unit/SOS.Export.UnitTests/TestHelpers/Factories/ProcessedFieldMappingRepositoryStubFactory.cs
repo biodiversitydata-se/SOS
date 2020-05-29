@@ -10,7 +10,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
         public static Mock<IProcessedFieldMappingRepository> Create(string filename = @"Resources\FieldMappings.msgpck")
         {
             var fieldMappings = MessagePackHelper.CreateListFromMessagePackFile<FieldMapping>(filename);
-            Mock<IProcessedFieldMappingRepository> processedFieldMappingRepositoryStub = new Mock<IProcessedFieldMappingRepository>();
+            var processedFieldMappingRepositoryStub = new Mock<IProcessedFieldMappingRepository>();
             processedFieldMappingRepositoryStub
                 .Setup(pfmr => pfmr.GetFieldMappingsAsync())
                 .ReturnsAsync(fieldMappings);

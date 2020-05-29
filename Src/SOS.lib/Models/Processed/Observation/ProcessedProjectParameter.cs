@@ -1,8 +1,7 @@
-﻿
-namespace SOS.Lib.Models.Processed.Observation
+﻿namespace SOS.Lib.Models.Processed.Observation
 {
     /// <summary>
-    /// Darwin Core Project Parameter.
+    ///     Darwin Core Project Parameter.
     /// </summary>
     public class ProcessedProjectParameter
     {

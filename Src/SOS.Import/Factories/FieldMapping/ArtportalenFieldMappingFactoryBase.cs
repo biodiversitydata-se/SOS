@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Factories.FieldMapping.Interfaces;
 using SOS.Lib.Constants;
@@ -14,12 +13,12 @@ namespace SOS.Import.Factories.FieldMapping
     {
         protected abstract FieldMappingFieldId FieldId { get; }
         protected abstract bool Localized { get; }
-        protected abstract Task<ICollection<FieldMappingValue>> GetFieldMappingValues();
+
         public virtual async Task<Lib.Models.Shared.FieldMapping> CreateFieldMappingAsync()
         {
             var fieldMappingValues = await GetFieldMappingValues();
 
-            Lib.Models.Shared.FieldMapping fieldMapping = new Lib.Models.Shared.FieldMapping
+            var fieldMapping = new Lib.Models.Shared.FieldMapping
             {
                 Id = FieldId,
                 Name = FieldId.ToString(),
@@ -31,9 +30,12 @@ namespace SOS.Import.Factories.FieldMapping
             return fieldMapping;
         }
 
-        protected virtual ICollection<FieldMappingValue> ConvertToLocalizedFieldMappingValues(ICollection<MetadataEntity> metadataEntities)
+        protected abstract Task<ICollection<FieldMappingValue>> GetFieldMappingValues();
+
+        protected virtual ICollection<FieldMappingValue> ConvertToLocalizedFieldMappingValues(
+            ICollection<MetadataEntity> metadataEntities)
         {
-            List<FieldMappingValue> fieldMappingValues = new List<FieldMappingValue>(metadataEntities.Count());
+            var fieldMappingValues = new List<FieldMappingValue>(metadataEntities.Count());
             foreach (var group in metadataEntities.GroupBy(m => m.Id))
             {
                 var swedishRecord = group.Single(m => m.CultureCode == Cultures.sv_SE);
@@ -62,9 +64,10 @@ namespace SOS.Import.Factories.FieldMapping
             return fieldMappingValues;
         }
 
-        protected virtual ICollection<FieldMappingValue> ConvertToNonLocalizedFieldMappingValues(ICollection<MetadataEntity> metadataEntities)
+        protected virtual ICollection<FieldMappingValue> ConvertToNonLocalizedFieldMappingValues(
+            ICollection<MetadataEntity> metadataEntities)
         {
-            List<FieldMappingValue> fieldMappingValues = new List<FieldMappingValue>(metadataEntities.Count());
+            var fieldMappingValues = new List<FieldMappingValue>(metadataEntities.Count());
             foreach (var metadataEntity in metadataEntities)
             {
                 fieldMappingValues.Add(new FieldMappingValue
@@ -79,9 +82,10 @@ namespace SOS.Import.Factories.FieldMapping
         }
 
 
-        protected virtual ICollection<FieldMappingValue> ConvertToFieldMappingValuesWithCategory(ICollection<MetadataWithCategoryEntity> metadataWithCategoryEntities)
+        protected virtual ICollection<FieldMappingValue> ConvertToFieldMappingValuesWithCategory(
+            ICollection<MetadataWithCategoryEntity> metadataWithCategoryEntities)
         {
-            List<FieldMappingValue> fieldMappingValues = new List<FieldMappingValue>(metadataWithCategoryEntities.Count());
+            var fieldMappingValues = new List<FieldMappingValue>(metadataWithCategoryEntities.Count());
             foreach (var group in metadataWithCategoryEntities.GroupBy(m => m.Id))
             {
                 var swedishRecord = group.Single(m => m.CultureCode == Cultures.sv_SE);
@@ -94,11 +98,11 @@ namespace SOS.Import.Factories.FieldMapping
                     Translations =
                         new List<FieldMappingTranslation>
                         {
-                            new FieldMappingTranslation()
+                            new FieldMappingTranslation
                             {
                                 CultureCode = swedishRecord.CultureCode, Value = swedishRecord.Translation
                             },
-                            new FieldMappingTranslation()
+                            new FieldMappingTranslation
                             {
                                 CultureCode = englishRecord.CultureCode, Value = englishRecord.Translation
                             }
@@ -110,12 +114,12 @@ namespace SOS.Import.Factories.FieldMapping
                         Localized = true,
                         Translations = new List<FieldMappingTranslation>
                         {
-                            new FieldMappingTranslation()
+                            new FieldMappingTranslation
                             {
                                 CultureCode = swedishRecord.CultureCode,
                                 Value = swedishRecord.CategoryName
                             },
-                            new FieldMappingTranslation()
+                            new FieldMappingTranslation
                             {
                                 CultureCode = englishRecord.CultureCode,
                                 Value = englishRecord.CategoryName
@@ -131,25 +135,27 @@ namespace SOS.Import.Factories.FieldMapping
         }
 
 
-        protected virtual List<ExternalSystemMapping> GetExternalSystemMappings(ICollection<FieldMappingValue> fieldMappingValues)
+        protected virtual List<ExternalSystemMapping> GetExternalSystemMappings(
+            ICollection<FieldMappingValue> fieldMappingValues)
         {
-            return new List<ExternalSystemMapping>()
+            return new List<ExternalSystemMapping>
             {
                 GetArtportalenExternalSystemMapping(fieldMappingValues)
             };
         }
 
 
-        protected virtual ExternalSystemMapping GetArtportalenExternalSystemMapping(ICollection<FieldMappingValue> fieldMappingValues)
+        protected virtual ExternalSystemMapping GetArtportalenExternalSystemMapping(
+            ICollection<FieldMappingValue> fieldMappingValues)
         {
-            ExternalSystemMapping artportalenMapping = new ExternalSystemMapping
+            var artportalenMapping = new ExternalSystemMapping
             {
                 Id = ExternalSystemId.Artportalen,
                 Name = ExternalSystemId.Artportalen.ToString(),
                 Mappings = new List<ExternalSystemMappingField>()
             };
 
-            ExternalSystemMappingField mappingField = new ExternalSystemMappingField
+            var mappingField = new ExternalSystemMappingField
             {
                 Key = FieldMappingKeyFields.Id,
                 Description = "Id field mapping",

@@ -1,5 +1,5 @@
-﻿using SOS.Lib.Models.Shared;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen
 {
@@ -16,7 +16,8 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
 
         public override string ToString()
         {
-            return $"{nameof(Observers)}: \"{Observers}\", {nameof(VerifiedBy)}: \"{VerifiedBy}\", {nameof(ReportedBy)}: \"{ReportedBy}\", {nameof(SpeciesCollection)}: \"{SpeciesCollection}\"";
+            return
+                $"{nameof(Observers)}: \"{Observers}\", {nameof(VerifiedBy)}: \"{VerifiedBy}\", {nameof(ReportedBy)}: \"{ReportedBy}\", {nameof(SpeciesCollection)}: \"{SpeciesCollection}\"";
         }
     }
 }

@@ -17,10 +17,22 @@ using Xunit;
 namespace SOS.Process.UnitTests.Jobs
 {
     /// <summary>
-    /// Tests for activate instance job
+    ///     Tests for activate instance job
     /// </summary>
     public class ProcessTaxaJobTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public ProcessTaxaJobTests()
+        {
+            _taxonVerbatimRepositoryMock = new Mock<ITaxonVerbatimRepository>();
+            _processedTaxonRepositoryMock = new Mock<IProcessedTaxonRepository>();
+            _processInfoRepository = new Mock<IProcessInfoRepository>();
+            _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
+            _loggerMock = new Mock<ILogger<ProcessTaxaJob>>();
+        }
+
         private readonly Mock<ITaxonVerbatimRepository> _taxonVerbatimRepositoryMock;
         private readonly Mock<IProcessedTaxonRepository> _processedTaxonRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
@@ -35,19 +47,7 @@ namespace SOS.Process.UnitTests.Jobs
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public ProcessTaxaJobTests()
-        {
-            _taxonVerbatimRepositoryMock = new Mock<ITaxonVerbatimRepository>();
-            _processedTaxonRepositoryMock = new Mock<IProcessedTaxonRepository>();
-            _processInfoRepository = new Mock<IProcessInfoRepository>();
-            _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
-            _loggerMock = new Mock<ILogger<ProcessTaxaJob>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -96,82 +96,7 @@ namespace SOS.Process.UnitTests.Jobs
         }
 
         /// <summary>
-        /// Make a successful test of processing
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task RunAsyncSuccess()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _taxonVerbatimRepositoryMock.Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new List<DarwinCoreTaxon>
-                {
-                    new DarwinCoreTaxon { Id = 100024, ScientificName = "Canus Lupus" },
-                });
-
-            _processedTaxonRepositoryMock.Setup(r => r.DeleteCollectionAsync())
-                .ReturnsAsync(true);
-
-            _processedTaxonRepositoryMock.Setup(r => r.AddManyAsync(It.IsAny<IEnumerable<ProcessedTaxon>>()))
-                .ReturnsAsync(true);
-
-            _harvestInfoRepository.Setup(r => r.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HarvestInfo("ID", DataProviderType.Taxa, DateTime.Now){ Status = RunStatus.Success});
-
-            _processInfoRepository.Setup(r => r.VerifyCollectionAsync());
-
-            _processInfoRepository.Setup(r => r.AddOrUpdateAsync(It.IsAny<ProcessInfo>()));
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.RunAsync();
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeTrue();
-        }
-
-        /// <summary>
-        /// Test processing fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task RunAsyncFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            _taxonVerbatimRepositoryMock.Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new List<DarwinCoreTaxon>
-                {
-                    new DarwinCoreTaxon { Id = 100024, ScientificName = "Canus Lupus" },
-                });
-
-            _processedTaxonRepositoryMock.Setup(r => r.DeleteCollectionAsync())
-                .ReturnsAsync(false);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.RunAsync();
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeFalse();
-        }
-
-        /// <summary>
-        /// Test processing exception
+        ///     Test processing exception
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -191,6 +116,81 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
 
             await act.Should().ThrowAsync<Exception>();
+        }
+
+        /// <summary>
+        ///     Test processing fail
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task RunAsyncFail()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            _taxonVerbatimRepositoryMock.Setup(r => r.GetAllAsync())
+                .ReturnsAsync(new List<DarwinCoreTaxon>
+                {
+                    new DarwinCoreTaxon {Id = 100024, ScientificName = "Canus Lupus"}
+                });
+
+            _processedTaxonRepositoryMock.Setup(r => r.DeleteCollectionAsync())
+                .ReturnsAsync(false);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.RunAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeFalse();
+        }
+
+        /// <summary>
+        ///     Make a successful test of processing
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task RunAsyncSuccess()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _taxonVerbatimRepositoryMock.Setup(r => r.GetAllAsync())
+                .ReturnsAsync(new List<DarwinCoreTaxon>
+                {
+                    new DarwinCoreTaxon {Id = 100024, ScientificName = "Canus Lupus"}
+                });
+
+            _processedTaxonRepositoryMock.Setup(r => r.DeleteCollectionAsync())
+                .ReturnsAsync(true);
+
+            _processedTaxonRepositoryMock.Setup(r => r.AddManyAsync(It.IsAny<IEnumerable<ProcessedTaxon>>()))
+                .ReturnsAsync(true);
+
+            _harvestInfoRepository.Setup(r => r.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HarvestInfo("ID", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success});
+
+            _processInfoRepository.Setup(r => r.VerifyCollectionAsync());
+
+            _processInfoRepository.Setup(r => r.AddOrUpdateAsync(It.IsAny<ProcessInfo>()));
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.RunAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeTrue();
         }
     }
 }

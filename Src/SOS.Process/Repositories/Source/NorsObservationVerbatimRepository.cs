@@ -1,13 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Verbatim.Nors;
 using SOS.Process.Database.Interfaces;
+using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source
 {
-    public class NorsObservationVerbatimRepository : VerbatimBaseRepository<NorsObservationVerbatim, string>, Interfaces.INorsObservationVerbatimRepository
+    public class NorsObservationVerbatimRepository : VerbatimBaseRepository<NorsObservationVerbatim, string>,
+        INorsObservationVerbatimRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
@@ -15,7 +17,6 @@ namespace SOS.Process.Repositories.Source
             IVerbatimClient client,
             ILogger<NorsObservationVerbatimRepository> logger) : base(client, logger)
         {
-
         }
     }
 }

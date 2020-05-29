@@ -1,14 +1,14 @@
-﻿using  SOS.Lib.Models.DarwinCore;
+﻿using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Export.Models.DarwinCore
 {
     /// <summary>
-    /// Darwin core Geological Context used for csv
+    ///     Darwin core Geological Context used for csv
     /// </summary>
     public class DwCGeologicalContext : DarwinCoreGeologicalContext
     {
         /// <summary>
-        /// Pointer to core object
+        ///     Pointer to core object
         /// </summary>
         public string CoreID { get; set; }
     }

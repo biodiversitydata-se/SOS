@@ -8,24 +8,23 @@ using MongoDB.Driver;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Processors.Kul.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Processors.Kul
 {
     /// <summary>
-    /// Process factory class
+    ///     Process factory class
     /// </summary>
-    public class KulObservationProcessor : ObservationProcessorBase<KulObservationProcessor>, Interfaces.IKulObservationProcessor
+    public class KulObservationProcessor : ObservationProcessorBase<KulObservationProcessor>, IKulObservationProcessor
     {
-        private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataProviderType Type => DataProviderType.KULObservations;
+        private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="kulObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
@@ -37,12 +36,17 @@ namespace SOS.Process.Processors.Kul
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<KulObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,logger)
+            ILogger<KulObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,
+            logger)
         {
-            _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository));
+            _kulObservationVerbatimRepository = kulObservationVerbatimRepository ??
+                                                throw new ArgumentNullException(
+                                                    nameof(kulObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
-       
+
+        public override DataProviderType Type => DataProviderType.KULObservations;
+
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
@@ -57,7 +61,7 @@ namespace SOS.Process.Processors.Kul
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
-                ProcessedObservation processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
                 observations.Add(processedObservation);
                 if (IsBatchFilledToLimit(observations.Count))

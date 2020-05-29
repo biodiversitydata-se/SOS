@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using DwC_A;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Verbatim.DarwinCore;

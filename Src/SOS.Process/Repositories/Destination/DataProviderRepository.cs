@@ -4,18 +4,18 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database.Interfaces;
+using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Repositories.Destination
 {
     /// <summary>
-    /// Repository for data providers.
+    ///     Repository for data providers.
     /// </summary>
-    public class DataProviderRepository : ProcessBaseRepository<DataProvider, int>, Interfaces.IDataProviderRepository
+    public class DataProviderRepository : ProcessBaseRepository<DataProvider, int>, IDataProviderRepository
     {
         /// <summary>
-        /// Constructor.
+        ///     Constructor.
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
@@ -24,7 +24,6 @@ namespace SOS.Process.Repositories.Destination
             ILogger<DataProviderRepository> logger)
             : base(client, false, logger)
         {
-
         }
 
         public async Task<bool> UpdateProcessInfo(int dataProviderId, string collectionName, ProviderInfo providerInfo)
@@ -34,14 +33,17 @@ namespace SOS.Process.Repositories.Destination
                 if (collectionName == "ProcessedObservation-0")
                 {
                     var filter = Builders<DataProvider>.Filter.Eq(dataProvider => dataProvider.Id, dataProviderId);
-                    var update = Builders<DataProvider>.Update.Set(dataProvider => dataProvider.ProcessInfoInstance0, providerInfo);
+                    var update = Builders<DataProvider>.Update.Set(dataProvider => dataProvider.ProcessInfoInstance0,
+                        providerInfo);
                     var updateResult = await MongoCollection.UpdateOneAsync(filter, update);
                     return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
                 }
-                else if (collectionName == "ProcessedObservation-1")
+
+                if (collectionName == "ProcessedObservation-1")
                 {
                     var filter = Builders<DataProvider>.Filter.Eq(dataProvider => dataProvider.Id, dataProviderId);
-                    var update = Builders<DataProvider>.Update.Set(dataProvider => dataProvider.ProcessInfoInstance1, providerInfo);
+                    var update = Builders<DataProvider>.Update.Set(dataProvider => dataProvider.ProcessInfoInstance1,
+                        providerInfo);
                     var updateResult = await MongoCollection.UpdateOneAsync(filter, update);
                     return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
                 }

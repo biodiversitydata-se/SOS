@@ -12,9 +12,9 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 namespace SOS.Import.DarwinCore
 {
     /// <summary>
-    /// DwC-A reader.
+    ///     DwC-A reader.
     /// </summary>
-    public class DwcArchiveReader : Interfaces.IDwcArchiveReader
+    public class DwcArchiveReader : IDwcArchiveReader
     {
         private readonly ILogger<DwcArchiveReader> _logger;
 
@@ -30,7 +30,8 @@ namespace SOS.Import.DarwinCore
             int batchSize)
         {
             var occurrenceReader = CreateOccurrenceReader(archiveReader.CoreFile.FileMetaData.RowType);
-            await foreach (var batch in occurrenceReader.ReadArchiveInBatchesAsync(archiveReader, idIdentifierTuple, batchSize))
+            await foreach (var batch in occurrenceReader.ReadArchiveInBatchesAsync(archiveReader, idIdentifierTuple,
+                batchSize))
             {
                 yield return batch;
             }
@@ -44,10 +45,10 @@ namespace SOS.Import.DarwinCore
             const int batchSize = 100000;
             var observationsBatches = ReadArchiveInBatchesAsync(
                 archiveReader,
-                idIdentifierTuple, 
+                idIdentifierTuple,
                 batchSize);
-            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
-            await foreach (List<DwcObservationVerbatim> observationsBatch in observationsBatches)
+            var observations = new List<DwcObservationVerbatim>();
+            await foreach (var observationsBatch in observationsBatches)
             {
                 observations.AddRange(observationsBatch);
             }
@@ -62,7 +63,8 @@ namespace SOS.Import.DarwinCore
             int batchSize)
         {
             var dwcSamplingEventArchiveReader = new DwcSamplingEventArchiveReader(_logger);
-            await foreach (var batch in dwcSamplingEventArchiveReader.ReadArchiveInBatchesAsync(archiveReader, idIdentifierTuple, batchSize))
+            await foreach (var batch in dwcSamplingEventArchiveReader.ReadArchiveInBatchesAsync(archiveReader,
+                idIdentifierTuple, batchSize))
             {
                 yield return batch;
             }
@@ -78,8 +80,8 @@ namespace SOS.Import.DarwinCore
                 archiveReader,
                 idIdentifierTuple,
                 batchSize);
-            List<DwcEvent> events = new List<DwcEvent>();
-            await foreach (List<DwcEvent> observationsBatch in observationsBatches)
+            var events = new List<DwcEvent>();
+            await foreach (var observationsBatch in observationsBatches)
             {
                 events.AddRange(observationsBatch);
             }
@@ -93,14 +95,12 @@ namespace SOS.Import.DarwinCore
             {
                 return new DwcOccurrenceArchiveReader(_logger);
             }
-            else // Event
-            {
-                return new DwcOccurrenceSamplingEventArchiveReader(_logger);
-            }
+
+            return new DwcOccurrenceSamplingEventArchiveReader(_logger);
         }
 
         /// <summary>
-        /// Validate a DwC-A file.
+        ///     Validate a DwC-A file.
         /// </summary>
         /// <param name="archivePath"></param>
         /// <param name="nrRows"></param>

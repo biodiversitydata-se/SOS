@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using DwC_A.Terms;
+﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -21,19 +14,37 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
 {
     public class DwcObservationHarvesterIntegrationTests : TestBase
     {
-        private const string SamplingEventDwcArchiveWithMofExtension = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
+        private const string SamplingEventDwcArchiveWithMofExtension =
+            "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
+
+
+        private DwcObservationHarvester CreateDwcObservationHarvester()
+        {
+            var importConfiguration = GetImportConfiguration();
+            var importClient = new ImportClient(
+                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                importConfiguration.VerbatimDbConfiguration.DatabaseName,
+                importConfiguration.VerbatimDbConfiguration.BatchSize);
+            var dwcObservationHarvester = new DwcObservationHarvester(
+                new DarwinCoreArchiveVerbatimRepository(importClient,
+                    new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
+                new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
+                new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
+                new NullLogger<DwcObservationHarvester>());
+            return dwcObservationHarvester;
+        }
 
         [Fact]
-        public async Task Harvest_psophus_stridulus_occurrence_dwc_archive_observations()
+        public async Task Harvest_occurrence_dwc_archive_with_emof_extension()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            const string archivePath = "./resources/dwca/dwca-occurrence-lifewatch-psophus-stridulus.zip";
+            const string archivePath = "./resources/dwca/dwca-occurrence-emof-lifewatch.zip";
             var dataProvider = new DataProvider
             {
-                Id = 100,
-                Identifier = "TestPsophusStridulusCollection",
+                Id = 101,
+                Identifier = "TestLifeWatchSubsetCollection",
                 Type = DataProviderType.DwcA
             };
             var dwcObservationHarvester = CreateDwcObservationHarvester();
@@ -53,16 +64,16 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
         }
 
         [Fact]
-        public async Task Harvest_occurrence_dwc_archive_with_emof_extension()
+        public async Task Harvest_psophus_stridulus_occurrence_dwc_archive_observations()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            const string archivePath = "./resources/dwca/dwca-occurrence-emof-lifewatch.zip";
+            const string archivePath = "./resources/dwca/dwca-occurrence-lifewatch-psophus-stridulus.zip";
             var dataProvider = new DataProvider
             {
-                Id = 101,
-                Identifier = "TestLifeWatchSubsetCollection",
+                Id = 100,
+                Identifier = "TestPsophusStridulusCollection",
                 Type = DataProviderType.DwcA
             };
             var dwcObservationHarvester = CreateDwcObservationHarvester();
@@ -141,22 +152,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             harvestInfo.Status.Should().Be(RunStatus.Success);
-        }
-
-
-        private DwcObservationHarvester CreateDwcObservationHarvester()
-        {
-            var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                importConfiguration.VerbatimDbConfiguration.BatchSize);
-            var dwcObservationHarvester = new DwcObservationHarvester(
-                new DarwinCoreArchiveVerbatimRepository(importClient, new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
-                new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()), 
-                new DwcArchiveReader(new NullLogger<DwcArchiveReader>()), 
-                new NullLogger<DwcObservationHarvester>());
-            return dwcObservationHarvester;
         }
     }
 }

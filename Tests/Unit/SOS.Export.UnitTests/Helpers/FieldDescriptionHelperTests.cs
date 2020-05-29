@@ -9,22 +9,6 @@ namespace SOS.Export.UnitTests.Helpers
     public class FieldDescriptionHelperTests
     {
         [Fact]
-        [Trait("Category","Unit")]
-        public void TestGetAllDefaultDwcFieldDescriptions()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var fields = FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            fields.Count().Should().BeGreaterThan(100);
-        }
-
-
-        [Fact]
         [Trait("Category", "Unit")]
         public void AddMandatoryFieldDescriptionIds_When_NotAllMandatoryFieldsIsProvided()
         {
@@ -64,7 +48,8 @@ namespace SOS.Export.UnitTests.Helpers
                 FieldDescriptionId.AccessRights
             };
 
-            fields.Should().ContainInOrder(expectedResult, "because the mandatory DwC fields are added first in the list");
+            fields.Should().ContainInOrder(expectedResult,
+                "because the mandatory DwC fields are added first in the list");
         }
 
         [Fact]
@@ -91,6 +76,21 @@ namespace SOS.Export.UnitTests.Helpers
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             fieldDescriptions.Should().Contain(x => x.Id == (int) FieldDescriptionId.CatalogNumber);
+        }
+
+        [Fact]
+        [Trait("Category", "Unit")]
+        public void TestGetAllDefaultDwcFieldDescriptions()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var fields = FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            fields.Count().Should().BeGreaterThan(100);
         }
     }
 }

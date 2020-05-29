@@ -4,20 +4,17 @@ using SOS.Observations.Api.Database.Interfaces;
 namespace SOS.Observations.Api.Database
 {
     /// <summary>
-    /// Process client.
+    ///     Process client.
     /// </summary>
     public class ProcessClient : MongoClient, IProcessClient
     {
-        /// <inheritdoc />
-        public int BatchSize { get; }
-
         /// <summary>
-        /// Name of database
+        ///     Name of database
         /// </summary>
         private readonly string _databaseName;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="settings"></param>
         /// <param name="databaseName"></param>
@@ -27,6 +24,9 @@ namespace SOS.Observations.Api.Database
             _databaseName = databaseName;
             BatchSize = batchSize;
         }
+
+        /// <inheritdoc />
+        public int BatchSize { get; }
 
         /// <inheritdoc />
         public IMongoDatabase GetDatabase()

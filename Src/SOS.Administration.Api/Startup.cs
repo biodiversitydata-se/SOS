@@ -20,22 +20,12 @@ using SOS.Lib.Configuration.Shared;
 namespace SOS.Administration.Api
 {
     /// <summary>
-    /// Start up class
+    ///     Start up class
     /// </summary>
     public class Startup
     {
         /// <summary>
-        /// Configuration
-        /// </summary>
-        public IConfiguration Configuration { get; }
-
-        /// <summary>
-        /// Auto fac
-        /// </summary>
-        public ILifetimeScope AutofacContainer { get; private set; }
-
-        /// <summary>
-        /// Start up
+        ///     Start up
         /// </summary>
         /// <param name="env"></param>
         public Startup(IWebHostEnvironment env)
@@ -44,10 +34,10 @@ namespace SOS.Administration.Api
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environment}.json", optional: true)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{environment}.json", true)
                 .AddEnvironmentVariables();
-            
+
             //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
             if (env.IsDevelopment() ||
                 environment == "dev" ||
@@ -59,18 +49,40 @@ namespace SOS.Administration.Api
             Configuration = builder.Build();
         }
 
+        /// <summary>
+        ///     Configuration
+        /// </summary>
+        public IConfiguration Configuration { get; }
 
         /// <summary>
-        /// This method gets called by the runtime. Use this method to add services to the container.
+        ///     Auto fac
+        /// </summary>
+        public ILifetimeScope AutofacContainer { get; private set; }
+
+        private static MongoStorageOptions MongoStorageOptions
+        {
+            get
+            {
+                var migrationOptions = new MongoMigrationOptions
+                {
+                    Strategy = MongoMigrationStrategy.Migrate,
+                    BackupStrategy = MongoBackupStrategy.Collections
+                };
+
+                var storageOptions = new MongoStorageOptions {MigrationOptions = migrationOptions};
+                return storageOptions;
+            }
+        }
+
+
+        /// <summary>
+        ///     This method gets called by the runtime. Use this method to add services to the container.
         /// </summary>
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
-                .AddJsonOptions(x =>
-                {
-                    x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                });
+                .AddJsonOptions(x => { x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
 
             // Swagger
             services.AddSwaggerGen(
@@ -94,7 +106,8 @@ namespace SOS.Administration.Api
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Hangfire
-            var hangfireDbConfiguration = Configuration.GetSection("ApplicationSettings").GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+            var hangfireDbConfiguration = Configuration.GetSection("ApplicationSettings")
+                .GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
 
             services.AddHangfire(configuration =>
                 configuration
@@ -112,43 +125,41 @@ namespace SOS.Administration.Api
                             }
                         })
             );
-
         }
 
         /// <summary>
-        /// Register Autofac services. This runs after ConfigureServices so the things
-        /// here will override registrations made in ConfigureServices.
+        ///     Register Autofac services. This runs after ConfigureServices so the things
+        ///     here will override registrations made in ConfigureServices.
         /// </summary>
         /// <param name="builder"></param>
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            
         }
 
         /// <summary>
-        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline. 
+        ///     This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            this.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
+            AutofacContainer = app.ApplicationServices.GetAutofacRoot();
 
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions()
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
-                Authorization = new[] { new AllowAllConnectionsFilter() },
+                Authorization = new[] {new AllowAllConnectionsFilter()},
                 IgnoreAntiforgeryToken = true
             });
 
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
-            
+
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
@@ -162,36 +173,15 @@ namespace SOS.Administration.Api
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
-
-        private static MongoStorageOptions MongoStorageOptions
-        {
-            get
-            {
-                var migrationOptions = new MongoMigrationOptions
-                {
-                    Strategy = MongoMigrationStrategy.Migrate,
-                    BackupStrategy = MongoBackupStrategy.Collections
-                };
-
-                var storageOptions = new MongoStorageOptions { MigrationOptions = migrationOptions };
-                return storageOptions;
-            }
-        }
-
     }
 
     /// <summary>
-    /// 
     /// </summary>
     public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
     {
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -202,5 +192,4 @@ namespace SOS.Administration.Api
             return true;
         }
     }
-
 }

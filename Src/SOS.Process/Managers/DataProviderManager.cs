@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
@@ -24,7 +23,8 @@ namespace SOS.Process.Managers
             IDataProviderRepository dataProviderRepository,
             ILogger<DataProviderManager> logger)
         {
-            _dataProviderRepository = dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
+            _dataProviderRepository =
+                dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -45,9 +45,10 @@ namespace SOS.Process.Managers
 
         public async Task<bool> InitDefaultDataProviders()
         {
-            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, @"Resources\DefaultDataProviders.json");
-            var dataProviders = JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
+            var dataProviders =
+                JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
             await _dataProviderRepository.DeleteCollectionAsync();
             await _dataProviderRepository.AddCollectionAsync();
             return await _dataProviderRepository.AddManyAsync(dataProviders);
@@ -71,23 +72,15 @@ namespace SOS.Process.Managers
             return GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier, allDataProviders);
         }
 
-        private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier, List<DataProvider> allDataProviders)
-        {
-            if (int.TryParse(dataProviderIdOrIdentifier, out int id))
-            {
-                return allDataProviders.FirstOrDefault(provider => provider.Id == id);
-            }
-
-            return allDataProviders.FirstOrDefault(provider => provider.Identifier.Equals(dataProviderIdOrIdentifier, StringComparison.OrdinalIgnoreCase));
-        }
-
         public async Task<DataProvider> GetDataProviderByIdentifier(string identifier)
         {
             var dataProviders = await _dataProviderRepository.GetAllAsync();
-            return dataProviders.FirstOrDefault(provider => provider.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase));
+            return dataProviders.FirstOrDefault(provider =>
+                provider.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase));
         }
 
-        public async Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(List<string> dataProviderIdOrIdentifiers)
+        public async Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(
+            List<string> dataProviderIdOrIdentifiers)
         {
             var parsedDataProviders = new List<Result<DataProvider>>();
             var allDataProviders = await _dataProviderRepository.GetAllAsync();
@@ -100,7 +93,8 @@ namespace SOS.Process.Managers
                 }
                 else
                 {
-                    parsedDataProviders.Add(Result.Failure<DataProvider>($"There is no data provider that has Id or Identifier = \"{dataProviderIdOrIdentifier}\""));
+                    parsedDataProviders.Add(Result.Failure<DataProvider>(
+                        $"There is no data provider that has Id or Identifier = \"{dataProviderIdOrIdentifier}\""));
                 }
             }
 
@@ -110,6 +104,18 @@ namespace SOS.Process.Managers
         public async Task<bool> UpdateProcessInfo(int dataProviderId, string collectionName, ProviderInfo providerInfo)
         {
             return await _dataProviderRepository.UpdateProcessInfo(dataProviderId, collectionName, providerInfo);
+        }
+
+        private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier,
+            List<DataProvider> allDataProviders)
+        {
+            if (int.TryParse(dataProviderIdOrIdentifier, out var id))
+            {
+                return allDataProviders.FirstOrDefault(provider => provider.Id == id);
+            }
+
+            return allDataProviders.FirstOrDefault(provider =>
+                provider.Identifier.Equals(dataProviderIdOrIdentifier, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

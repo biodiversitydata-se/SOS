@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 namespace SOS.Import.Services.Interfaces
 {
     /// <summary>
-    /// Artportalen data service interface
+    ///     Artportalen data service interface
     /// </summary>
     public interface IArtportalenDataService
     {
         /// <summary>
-        /// Query data base
+        ///     Query data base
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="query"></param>

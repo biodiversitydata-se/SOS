@@ -2,13 +2,15 @@
 using MongoDB.Bson;
 using SOS.Lib.Models.Verbatim.Shark;
 using SOS.Process.Database.Interfaces;
+using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source
 {
-    public class SharkObservationVerbatimRepository : VerbatimBaseRepository<SharkObservationVerbatim, ObjectId>, Interfaces.ISharkObservationVerbatimRepository
+    public class SharkObservationVerbatimRepository : VerbatimBaseRepository<SharkObservationVerbatim, ObjectId>,
+        ISharkObservationVerbatimRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
@@ -16,7 +18,6 @@ namespace SOS.Process.Repositories.Source
             IVerbatimClient client,
             ILogger<SharkObservationVerbatimRepository> logger) : base(client, logger)
         {
-
         }
     }
 }

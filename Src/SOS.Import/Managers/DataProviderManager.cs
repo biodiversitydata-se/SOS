@@ -6,18 +6,16 @@ using System.Reflection;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
-using Nest;
 using Newtonsoft.Json;
-using SOS.Import.Repositories.Destination.Interfaces;
+using SOS.Import.Managers.Interfaces;
 using SOS.Import.Repositories.Resource.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
-using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Import.Managers
 {
-    public class DataProviderManager : Interfaces.IDataProviderManager
+    public class DataProviderManager : IDataProviderManager
     {
         private readonly IDataProviderRepository _dataProviderRepository;
         private readonly ILogger<DataProviderManager> _logger;
@@ -26,7 +24,8 @@ namespace SOS.Import.Managers
             IDataProviderRepository dataProviderRepository,
             ILogger<DataProviderManager> logger)
         {
-            _dataProviderRepository = dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
+            _dataProviderRepository =
+                dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -47,19 +46,23 @@ namespace SOS.Import.Managers
 
         public async Task<Result<string>> InitDefaultDataProviders(bool forceOverwriteIfCollectionExist)
         {
-            bool collectionExists = await _dataProviderRepository.CheckIfCollectionExistsAsync();
+            var collectionExists = await _dataProviderRepository.CheckIfCollectionExistsAsync();
             if (collectionExists && !forceOverwriteIfCollectionExist)
             {
-                return Result.Failure<string>("The DataProvider collection already exists. Set forceOverwriteIfCollectionExist to true if you want to overwrite this collection with default data.");
+                return Result.Failure<string>(
+                    "The DataProvider collection already exists. Set forceOverwriteIfCollectionExist to true if you want to overwrite this collection with default data.");
             }
 
-            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, @"Resources\DefaultDataProviders.json");
-            var dataProviders = JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
+            var dataProviders =
+                JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
             await _dataProviderRepository.DeleteCollectionAsync();
             await _dataProviderRepository.AddCollectionAsync();
             await _dataProviderRepository.AddManyAsync(dataProviders);
-            var returnDescription = collectionExists ? "DataProvider collection was created and initialized with default data providers. Existing data were overwritten." : "DataProvider collection was created and initialized with default data providers.";
+            var returnDescription = collectionExists
+                ? "DataProvider collection was created and initialized with default data providers. Existing data were overwritten."
+                : "DataProvider collection was created and initialized with default data providers.";
             return Result.Success(returnDescription);
         }
 
@@ -81,31 +84,25 @@ namespace SOS.Import.Managers
             return GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier, allDataProviders);
         }
 
-        private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier, List<DataProvider> allDataProviders)
-        {
-            if (int.TryParse(dataProviderIdOrIdentifier, out int id))
-            {
-                return allDataProviders.FirstOrDefault(provider => provider.Id == id);
-            }
-
-            return allDataProviders.FirstOrDefault(provider => provider.Identifier.Equals(dataProviderIdOrIdentifier, StringComparison.OrdinalIgnoreCase));
-        }
-
         public async Task<DataProvider> GetDataProviderByIdentifier(string identifier)
         {
             var allDataProviders = await _dataProviderRepository.GetAllAsync();
-            return allDataProviders.FirstOrDefault(provider => provider.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase));
+            return allDataProviders.FirstOrDefault(provider =>
+                provider.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase));
         }
 
         public async Task<DataProvider> GetDataProviderByType(DataProviderType type)
         {
-            if (type == DataProviderType.DwcA) throw new ArgumentException("Can't decide which data provider to return because there exists multiple data providers of DwC-A type.");
+            if (type == DataProviderType.DwcA)
+                throw new ArgumentException(
+                    "Can't decide which data provider to return because there exists multiple data providers of DwC-A type.");
             var allDataProviders = await _dataProviderRepository.GetAllAsync();
             var dataProvider = allDataProviders.Single(provider => provider.Type == type);
             return dataProvider;
         }
 
-        public async Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(List<string> dataProviderIdOrIdentifiers)
+        public async Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(
+            List<string> dataProviderIdOrIdentifiers)
         {
             var parsedDataProviders = new List<Result<DataProvider>>();
             var allDataProviders = await _dataProviderRepository.GetAllAsync();
@@ -118,7 +115,8 @@ namespace SOS.Import.Managers
                 }
                 else
                 {
-                    parsedDataProviders.Add(Result.Failure<DataProvider>($"There is no data provider that has Id or Identifier = \"{dataProviderIdOrIdentifier}\""));
+                    parsedDataProviders.Add(Result.Failure<DataProvider>(
+                        $"There is no data provider that has Id or Identifier = \"{dataProviderIdOrIdentifier}\""));
                 }
             }
 
@@ -128,6 +126,18 @@ namespace SOS.Import.Managers
         public async Task<bool> UpdateHarvestInfo(int dataProviderId, HarvestInfo harvestInfo)
         {
             return await _dataProviderRepository.UpdateHarvestInfo(dataProviderId, harvestInfo);
+        }
+
+        private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier,
+            List<DataProvider> allDataProviders)
+        {
+            if (int.TryParse(dataProviderIdOrIdentifier, out var id))
+            {
+                return allDataProviders.FirstOrDefault(provider => provider.Id == id);
+            }
+
+            return allDataProviders.FirstOrDefault(provider =>
+                provider.Identifier.Equals(dataProviderIdOrIdentifier, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

@@ -14,7 +14,32 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
     public class DwcArchiveMetaFileWriterTests
     {
         [Fact]
-        [Trait("Category","Unit")]
+        [Trait("Category", "Unit")]
+        [Trait("Category", "DwcArchiveUnit")]
+        public void Create_meta_xml_file_fails_when_occurrenceId_field_description_is_not_first()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var memoryStream = new MemoryStream();
+            var fieldDescriptions = FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions().ToList();
+            fieldDescriptions.RemoveAt(0);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            Action act = () => DwcArchiveMetaFileWriter.CreateMetaXmlFile(memoryStream, fieldDescriptions);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            act.Should()
+                .Throw<ArgumentException>()
+                .WithMessage("OccurrenceID must be first in fieldDescriptions list.");
+        }
+
+        [Fact]
+        [Trait("Category", "Unit")]
         [Trait("Category", "DwcArchiveUnit")]
         public void OccurrenceId_field_description_must_be_first_when_creating_meta_xml_file()
         {
@@ -46,31 +71,6 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             coreNode.Attribute("rowType")?.Value.Should().Be("http://rs.tdwg.org/dwc/terms/Occurrence");
             locationNode.Value.Should().Be("occurrence.csv");
             firstFieldNode.Attribute("term")?.Value.Should().Be("http://rs.tdwg.org/dwc/terms/occurrenceID");
-        }
-
-        [Fact]
-        [Trait("Category", "Unit")]
-        [Trait("Category", "DwcArchiveUnit")]
-        public void Create_meta_xml_file_fails_when_occurrenceId_field_description_is_not_first()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var memoryStream = new MemoryStream();
-            var fieldDescriptions = FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions().ToList();
-            fieldDescriptions.RemoveAt(0);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            Action act = () => DwcArchiveMetaFileWriter.CreateMetaXmlFile(memoryStream, fieldDescriptions);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            act.Should()
-                .Throw<ArgumentException>()
-                .WithMessage("OccurrenceID must be first in fieldDescriptions list.");
         }
     }
 }

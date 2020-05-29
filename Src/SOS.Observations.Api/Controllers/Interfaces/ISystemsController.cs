@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace SOS.Observations.Api.Controllers.Interfaces
 {
     /// <summary>
-    /// System controller interface
+    ///     System controller interface
     /// </summary>
     public interface ISystemsController
     {
         /// <summary>
-        /// Get information about observation processing
+        ///     Get information about observation processing
         /// </summary>
         /// <param name="active">True: get information about last processing, false get information about previous processing</param>
         /// <returns>Meta data about processing. E.g, Start time, end time, number of observations processed...</returns>

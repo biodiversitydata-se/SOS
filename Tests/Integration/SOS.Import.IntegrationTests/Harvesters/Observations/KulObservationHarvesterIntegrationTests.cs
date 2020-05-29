@@ -10,7 +10,6 @@ using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Kul;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Services;
-using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using Xunit;
 
@@ -25,7 +24,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            ImportConfiguration importConfiguration = GetImportConfiguration();
+            var importConfiguration = GetImportConfiguration();
             importConfiguration.KulServiceConfiguration.StartHarvestYear = 2015;
             importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
 
@@ -33,19 +32,19 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new SpeciesObservationChangeServiceClient(),
                 importConfiguration.KulServiceConfiguration,
                 new NullLogger<KulObservationService>());
-            
+
             var kulObservationVerbatimRepository = new KulObservationVerbatimRepository(
                 new ImportClient(
                     importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
                     importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                    importConfiguration.VerbatimDbConfiguration.BatchSize), 
+                    importConfiguration.VerbatimDbConfiguration.BatchSize),
                 new Mock<ILogger<KulObservationVerbatimRepository>>().Object);
 
             var kulObservationHarvester = new KulObservationHarvester(
-                    kulObservationService,
-                    kulObservationVerbatimRepository, 
-                    importConfiguration.KulServiceConfiguration,
-                    new Mock<ILogger<KulObservationHarvester>>().Object);
+                kulObservationService,
+                kulObservationVerbatimRepository,
+                importConfiguration.KulServiceConfiguration,
+                new Mock<ILogger<KulObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -65,16 +64,16 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            ImportConfiguration importConfiguration = GetImportConfiguration();
+            var importConfiguration = GetImportConfiguration();
             importConfiguration.KulServiceConfiguration.StartHarvestYear = 2015;
             importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
-           
+
             var kulObservationHarvester = new KulObservationHarvester(
                 new KulObservationService(
-                new SpeciesObservationChangeServiceClient(),
-                importConfiguration.KulServiceConfiguration,
-                new NullLogger<KulObservationService>()),
-            new Mock<IKulObservationVerbatimRepository>().Object,
+                    new SpeciesObservationChangeServiceClient(),
+                    importConfiguration.KulServiceConfiguration,
+                    new NullLogger<KulObservationService>()),
+                new Mock<IKulObservationVerbatimRepository>().Object,
                 importConfiguration.KulServiceConfiguration,
                 new Mock<ILogger<KulObservationHarvester>>().Object);
 

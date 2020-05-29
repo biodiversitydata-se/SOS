@@ -3,37 +3,37 @@
     public class ZendToConfiguration
     {
         /// <summary>
-        /// Email subject
+        ///     Email subject
         /// </summary>
         public string EmailSubject { get; set; }
 
         /// <summary>
-        /// Email message
+        ///     Email message
         /// </summary>
         public string Message { get; set; }
 
         /// <summary>
-        /// Account password
+        ///     Account password
         /// </summary>
         public string Password { get; set; }
 
         /// <summary>
-        /// "SenderName" "SenderEmail" has dropped off a file for you
+        ///     "SenderName" "SenderEmail" has dropped off a file for you
         /// </summary>
         public string SenderEmail { get; set; }
 
         /// <summary>
-        /// "SenderName" "SenderEmail" has dropped off a file for you
+        ///     "SenderName" "SenderEmail" has dropped off a file for you
         /// </summary>
         public string SenderName { get; set; }
 
         /// <summary>
-        /// Sender organization 
+        ///     Sender organization
         /// </summary>
         public string SenderOrganization { get; set; }
 
         /// <summary>
-        /// Account user name
+        ///     Account user name
         /// </summary>
         public string UserName { get; set; }
     }

@@ -4,13 +4,14 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Database.Interfaces;
+using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source
 {
-    public class HarvestInfoRepository : VerbatimBaseRepository<HarvestInfo, string>, Interfaces.IHarvestInfoRepository
+    public class HarvestInfoRepository : VerbatimBaseRepository<HarvestInfo, string>, IHarvestInfoRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
@@ -18,7 +19,6 @@ namespace SOS.Process.Repositories.Source
             IVerbatimClient client,
             ILogger<HarvestInfoRepository> logger) : base(client, logger)
         {
-            
         }
 
         public async Task<HarvestInfo> GetAsync(string id)

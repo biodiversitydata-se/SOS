@@ -10,6 +10,15 @@ namespace SOS.Export.UnitTests.Repositories
 {
     public class ProcessedFieldMappingRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public ProcessedFieldMappingRepositoryTests()
+        {
+            _exportClient = new Mock<IExportClient>();
+            _loggerMock = new Mock<ILogger<ProcessedFieldMappingRepository>>();
+        }
+
         private readonly Mock<IExportClient> _exportClient;
         private readonly Mock<ILogger<ProcessedFieldMappingRepository>> _loggerMock;
 
@@ -18,19 +27,10 @@ namespace SOS.Export.UnitTests.Repositories
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public ProcessedFieldMappingRepositoryTests()
-        {
-            _exportClient = new Mock<IExportClient>();
-            _loggerMock = new Mock<ILogger<ProcessedFieldMappingRepository>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
-        [Trait("Category","Unit")]
+        [Trait("Category", "Unit")]
         public void ConstructorTest()
         {
             TestObject.Should().NotBeNull();

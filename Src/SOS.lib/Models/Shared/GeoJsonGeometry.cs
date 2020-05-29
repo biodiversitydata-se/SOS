@@ -1,20 +1,22 @@
 ﻿using System.Collections;
+using Newtonsoft.Json;
 
 namespace SOS.Lib.Models.Shared
 {
     public class GeoJsonGeometry
     {
         /// <summary>
-        /// Geometry coordinates
+        ///     Geometry coordinates
         /// </summary>
         public ArrayList Coordinates { get; set; }
 
         /// <summary>
-        /// Simple check to check if geometry looks ok
+        ///     Simple check to check if geometry looks ok
         /// </summary>
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         [System.Text.Json.Serialization.JsonIgnore]
-        public bool IsValid  {
+        public bool IsValid
+        {
             get
             {
                 switch (Type?.ToLower())
@@ -31,11 +33,10 @@ namespace SOS.Lib.Models.Shared
                         return false;
                 }
             }
-            
         }
 
         /// <summary>
-        /// Type of geometry (point or polygon)
+        ///     Type of geometry (point or polygon)
         /// </summary>
         public string Type { get; set; }
     }

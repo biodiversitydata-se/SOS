@@ -1,13 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Import.MongoDb.Interfaces;
+using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Repositories.Destination
 {
-    public class HarvestInfoRepository : VerbatimRepository<HarvestInfo, string>, Interfaces.IHarvestInfoRepository
+    public class HarvestInfoRepository : VerbatimRepository<HarvestInfo, string>, IHarvestInfoRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
@@ -15,7 +16,6 @@ namespace SOS.Import.Repositories.Destination
             IImportClient importClient,
             ILogger<HarvestInfoRepository> logger) : base(importClient, logger)
         {
-            
         }
     }
 }

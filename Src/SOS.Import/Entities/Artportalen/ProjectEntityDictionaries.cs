@@ -3,7 +3,7 @@
 namespace SOS.Import.Entities.Artportalen
 {
     /// <summary>
-    /// Project & project parameter dictionaries.
+    ///     Project & project parameter dictionaries.
     /// </summary>
     public class ProjectEntityDictionaries
     {

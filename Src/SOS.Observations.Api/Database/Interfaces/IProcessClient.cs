@@ -3,17 +3,17 @@
 namespace SOS.Observations.Api.Database.Interfaces
 {
     /// <summary>
-    /// Process client.
+    ///     Process client.
     /// </summary>
     public interface IProcessClient : IMongoClient
     {
         /// <summary>
-        /// Batch size.
+        ///     Batch size.
         /// </summary>
         int BatchSize { get; }
 
         /// <summary>
-        /// Get database
+        ///     Get database
         /// </summary>
         /// <returns></returns>
         IMongoDatabase GetDatabase();

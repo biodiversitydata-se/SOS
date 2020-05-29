@@ -2,21 +2,21 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Managers
 {
     /// <summary>
-    /// Process info manager
+    ///     Process info manager
     /// </summary>
-    public class ProcessInfoManager : Interfaces.IProcessInfoManager
+    public class ProcessInfoManager : IProcessInfoManager
     {
+        private readonly ILogger<ProcessInfoManager> _logger;
         private readonly IProcessInfoRepository _processInfoRepository;
 
-        private readonly ILogger<ProcessInfoManager> _logger;
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="processInfoRepository"></param>
         /// <param name="logger"></param>
@@ -25,7 +25,7 @@ namespace SOS.Observations.Api.Managers
             ILogger<ProcessInfoManager> logger)
         {
             _processInfoRepository = processInfoRepository ??
-                                           throw new ArgumentNullException(nameof(processInfoRepository));
+                                     throw new ArgumentNullException(nameof(processInfoRepository));
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }

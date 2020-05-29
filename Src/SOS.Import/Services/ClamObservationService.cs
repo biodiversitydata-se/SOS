@@ -9,27 +9,28 @@ using SOS.Lib.Models.Verbatim.ClamPortal;
 namespace SOS.Import.Services
 {
     /// <summary>
-    /// Species data service
+    ///     Species data service
     /// </summary>
     public class ClamObservationService : IClamObservationService
     {
-        private readonly IHttpClientService _httpClientService;
         private readonly ClamServiceConfiguration _clamServiceConfiguration;
+        private readonly IHttpClientService _httpClientService;
         private readonly ILogger<ClamObservationService> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="httpClientService"></param>
         /// <param name="clamServiceConfiguration"></param>
         /// <param name="logger"></param>
         public ClamObservationService(
             IHttpClientService httpClientService,
-            ClamServiceConfiguration clamServiceConfiguration, 
+            ClamServiceConfiguration clamServiceConfiguration,
             ILogger<ClamObservationService> logger)
         {
             _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
-            _clamServiceConfiguration = clamServiceConfiguration ?? throw new ArgumentNullException(nameof(clamServiceConfiguration));
+            _clamServiceConfiguration = clamServiceConfiguration ??
+                                        throw new ArgumentNullException(nameof(clamServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

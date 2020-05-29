@@ -1,21 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using FluentAssertions;
-using Moq;
-using SOS.Lib.Constants;
-using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
-using SOS.Lib.Extensions;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Shared;
-using SOS.Process.Helpers.Interfaces;
-using SOS.Process.Processors.DarwinCoreArchive;
 using SOS.Process.UnitTests.TestHelpers;
-using SOS.Process.UnitTests.TestHelpers.Factories;
-using SOS.TestHelpers.Gis;
 using SOS.TestHelpers.Helpers.Builders;
-using SOS.TestHelpers.Taxonomy;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFactory
@@ -23,12 +10,12 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
     [CollectionDefinition("DwcaObservationFactory collection")]
     public class IdentificationTests : IClassFixture<DwcaObservationFactoryFixture>
     {
-        private readonly DwcaObservationFactoryFixture _fixture;
-
         public IdentificationTests(DwcaObservationFactoryFixture fixture)
         {
             _fixture = fixture;
         }
+
+        private readonly DwcaObservationFactoryFixture _fixture;
 
         [Fact]
         public void DateIdentified_is_parsed_to_DateTime_type()
@@ -41,7 +28,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
                 .WithDefaultValues()
                 .WithDateIdentified("2019-05-29")
                 .Build();
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -50,7 +37,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Identification.DateIdentified.Should().Be(new DateTime(2019,5,29));
+            result.Identification.DateIdentified.Should().Be(new DateTime(2019, 5, 29));
         }
 
         [Fact]
@@ -60,7 +47,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var builder = new DwcObservationVerbatimBuilder();
-            var date = new DateTime(2019,5,29);
+            var date = new DateTime(2019, 5, 29);
             var dwcaObservation = builder
                 .WithDefaultValues()
                 .WithDateIdentified(date)
@@ -88,12 +75,12 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
                 .WithDefaultValues()
                 .WithIdentificationVerificationStatus("unverified")
                 .Build();
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

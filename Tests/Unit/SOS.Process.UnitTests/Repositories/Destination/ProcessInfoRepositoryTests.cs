@@ -10,11 +10,8 @@ namespace SOS.Process.UnitTests.Repositories.Destination
 {
     public class ProcessInfoRepositoryTests
     {
-        private readonly Mock<IProcessClient> _processClient;
-        private readonly Mock<ILogger<ProcessInfoRepository>> _loggerMock;
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public ProcessInfoRepositoryTests()
         {
@@ -22,8 +19,11 @@ namespace SOS.Process.UnitTests.Repositories.Destination
             _loggerMock = new Mock<ILogger<ProcessInfoRepository>>();
         }
 
+        private readonly Mock<IProcessClient> _processClient;
+        private readonly Mock<ILogger<ProcessInfoRepository>> _loggerMock;
+
         /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()

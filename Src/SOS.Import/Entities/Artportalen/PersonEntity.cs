@@ -1,38 +1,39 @@
 ﻿namespace SOS.Import.Entities.Artportalen
 {
     /// <summary>
-    /// Represents a person
+    ///     Represents a person
     /// </summary>
     public class PersonEntity
     {
         /// <summary>
-        /// Id of person
+        ///     Id of person
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// The user id.
+        ///     The user id.
         /// </summary>
         public int UserId { get; set; }
 
         /// <summary>
-        /// First name of person
+        ///     First name of person
         /// </summary>
         public string FirstName { get; set; }
 
         /// <summary>
-        /// Last name of person
+        ///     Last name of person
         /// </summary>
         public string LastName { get; set; }
 
         /// <summary>
-        /// The users alias
+        ///     The users alias
         /// </summary>
         public string Alias { get; set; }
 
         public override string ToString()
         {
-            return $"{nameof(Id)}: {Id}, {nameof(UserId)}: {UserId}, {nameof(FirstName)}: {FirstName}, {nameof(LastName)}: {LastName}, {nameof(Alias)}: {Alias}";
+            return
+                $"{nameof(Id)}: {Id}, {nameof(UserId)}: {UserId}, {nameof(FirstName)}: {FirstName}, {nameof(LastName)}: {LastName}, {nameof(Alias)}: {Alias}";
         }
     }
 }

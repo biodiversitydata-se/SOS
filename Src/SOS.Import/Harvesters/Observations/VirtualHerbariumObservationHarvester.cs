@@ -5,24 +5,25 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
+using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.VirtualHerbarium.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 
 namespace SOS.Import.Harvesters.Observations
 {
-    public class VirtualHerbariumObservationHarvester : Interfaces.IVirtualHerbariumObservationHarvester
+    public class VirtualHerbariumObservationHarvester : IVirtualHerbariumObservationHarvester
     {
+        private readonly ILogger<VirtualHerbariumObservationHarvester> _logger;
         private readonly IVirtualHerbariumObservationService _virtualHerbariumObservationService;
         private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
-        private readonly ILogger<VirtualHerbariumObservationHarvester> _logger;
         private readonly VirtualHerbariumServiceConfiguration _virtualHerbariumServiceConfiguration;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="virtualHerbariumObservationService"></param>
         /// <param name="virtualHerbariumObservationVerbatimRepository"></param>
@@ -34,16 +35,23 @@ namespace SOS.Import.Harvesters.Observations
             VirtualHerbariumServiceConfiguration virtualHerbariumServiceConfiguration,
             ILogger<VirtualHerbariumObservationHarvester> logger)
         {
-            _virtualHerbariumObservationService = virtualHerbariumObservationService ?? throw new ArgumentNullException(nameof(virtualHerbariumObservationService));
-            _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(virtualHerbariumObservationVerbatimRepository));
-            _virtualHerbariumServiceConfiguration = virtualHerbariumServiceConfiguration ?? throw new ArgumentNullException(nameof(virtualHerbariumServiceConfiguration));
+            _virtualHerbariumObservationService = virtualHerbariumObservationService ??
+                                                  throw new ArgumentNullException(
+                                                      nameof(virtualHerbariumObservationService));
+            _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ??
+                                                             throw new ArgumentNullException(
+                                                                 nameof(virtualHerbariumObservationVerbatimRepository));
+            _virtualHerbariumServiceConfiguration = virtualHerbariumServiceConfiguration ??
+                                                    throw new ArgumentNullException(
+                                                        nameof(virtualHerbariumServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken  cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(VirtualHerbariumObservationVerbatim), DataProviderType.VirtualHerbariumObservations, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(VirtualHerbariumObservationVerbatim),
+                DataProviderType.VirtualHerbariumObservations, DateTime.Now);
             harvestInfo.Status = RunStatus.Failed;
 
             try
@@ -62,16 +70,16 @@ namespace SOS.Import.Harvesters.Observations
                 var pageIndex = 1;
                 var nrSightingsHarvested = 0;
                 var fromDate = new DateTime(1628, 1, 1);
-                _logger.LogInformation($"Start getting observations page: { pageIndex }");
+                _logger.LogInformation($"Start getting observations page: {pageIndex}");
                 var observations = await _virtualHerbariumObservationService.GetAsync(fromDate, pageIndex, 10000);
-                _logger.LogInformation($"Finish getting observations page: { pageIndex }");
+                _logger.LogInformation($"Finish getting observations page: {pageIndex}");
 
                 while (true)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     var verbatims = observations.ToVerbatims(localities)?.ToArray();
-                    
+
                     if ((verbatims?.Length ?? 0) == 0)
                     {
                         break;
@@ -89,9 +97,10 @@ namespace SOS.Import.Harvesters.Observations
                     }
 
                     pageIndex++;
-                    _logger.LogInformation($"Start getting observations page: { pageIndex }");
-                    observations = await _virtualHerbariumObservationService.GetAsync(new DateTime(1900, 1, 1), pageIndex, 10000);
-                    _logger.LogInformation($"Finish getting observations page: { pageIndex }");
+                    _logger.LogInformation($"Start getting observations page: {pageIndex}");
+                    observations =
+                        await _virtualHerbariumObservationService.GetAsync(new DateTime(1900, 1, 1), pageIndex, 10000);
+                    _logger.LogInformation($"Finish getting observations page: {pageIndex}");
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for Virtual Herbarium data provider");

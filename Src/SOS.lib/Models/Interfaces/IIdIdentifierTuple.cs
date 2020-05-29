@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SOS.Lib.Models.Interfaces
+﻿namespace SOS.Lib.Models.Interfaces
 {
     /// <summary>
-    /// Data provider id and identifier.
+    ///     Data provider id and identifier.
     /// </summary>
     public interface IIdIdentifierTuple
     {

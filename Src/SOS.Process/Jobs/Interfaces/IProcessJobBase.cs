@@ -10,21 +10,21 @@ namespace SOS.Process.Jobs.Interfaces
     public interface IProcessJobBase
     {
         /// <summary>
-        /// Get a harvest info item
+        ///     Get a harvest info item
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<HarvestInfo> GetHarvestInfoAsync(string id);
 
         /// <summary>
-        /// Get a process info item
+        ///     Get a process info item
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ProcessInfo> GetProcessInfoAsync(string id);
 
         /// <summary>
-        /// Save process info
+        ///     Save process info
         /// </summary>
         /// <param name="processInfoId"></param>
         /// <param name="start"></param>

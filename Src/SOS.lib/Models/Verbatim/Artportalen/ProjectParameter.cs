@@ -1,8 +1,7 @@
-﻿
-namespace SOS.Lib.Models.Verbatim.Artportalen
+﻿namespace SOS.Lib.Models.Verbatim.Artportalen
 {
     /// <summary>
-    /// Project parameter.
+    ///     Project parameter.
     /// </summary>
     public class ProjectParameter
     {

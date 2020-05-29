@@ -1,30 +1,29 @@
-﻿
-namespace SOS.Import.Models.TaxonAttributeService
+﻿namespace SOS.Import.Models.TaxonAttributeService
 {
     public class AttributeValueModel
     {
         /// <summary>
-        /// Attribute id
+        ///     Attribute id
         /// </summary>
         public int AttributeId { get; set; }
 
         /// <summary>
-        /// Attribute name
+        ///     Attribute name
         /// </summary>
         public string Attribute { get; set; }
 
         /// <summary>
-        /// Compfield index
+        ///     Compfield index
         /// </summary>
         public int CompFieldIdx { get; set; }
 
         /// <summary>
-        /// Is mainfield
+        ///     Is mainfield
         /// </summary>
         public bool IsMainField { get; set; }
 
         /// <summary>
-        /// Current value
+        ///     Current value
         /// </summary>
         public string Value { get; set; }
     }

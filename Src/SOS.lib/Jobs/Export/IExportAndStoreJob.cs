@@ -5,12 +5,12 @@ using SOS.Lib.Models.Search;
 namespace SOS.Lib.Jobs.Export
 {
     /// <summary>
-    /// Interface for DOI export job
+    ///     Interface for DOI export job
     /// </summary>
     public interface IExportAndStoreJob
     {
         /// <summary>
-        /// Export a file and store it in blob storage
+        ///     Export a file and store it in blob storage
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="blobStorageContainer"></param>
@@ -18,6 +18,7 @@ namespace SOS.Lib.Jobs.Export
         /// <param name="isDOI"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> RunAsync(ExportFilter filter, string blobStorageContainer, string fileName, bool isDOI, IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(ExportFilter filter, string blobStorageContainer, string fileName, bool isDOI,
+            IJobCancellationToken cancellationToken);
     }
 }

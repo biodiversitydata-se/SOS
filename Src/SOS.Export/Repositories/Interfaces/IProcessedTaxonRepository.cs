@@ -5,12 +5,11 @@ using SOS.Lib.Models.Processed.Observation;
 namespace SOS.Export.Repositories.Interfaces
 {
     /// <summary>
-    /// 
     /// </summary>
     public interface IProcessedTaxonRepository : IBaseRepository<ProcessedTaxon, int>
     {
         /// <summary>
-        /// Get chunk of ProcessedBasicTaxon objects from repository.
+        ///     Get chunk of ProcessedBasicTaxon objects from repository.
         /// </summary>
         /// <param name="skip"></param>
         /// <param name="take"></param>

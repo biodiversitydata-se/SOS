@@ -5,47 +5,47 @@ using MongoDB.Driver;
 namespace SOS.Lib.Configuration.Shared
 {
     /// <summary>
-    /// Cosmos configuration properties
+    ///     Cosmos configuration properties
     /// </summary>
     public class MongoDbConfiguration
     {
         /// <summary>
-        /// Host
+        ///     Host
         /// </summary>
         public MongoDbServer[] Hosts { get; set; }
 
         /// <summary>
-        /// Name of replica set
+        ///     Name of replica set
         /// </summary>
         public string ReplicaSetName { get; set; }
 
         /// <summary>
-        /// User name
+        ///     User name
         /// </summary>
         public string UserName { get; set; }
 
         /// <summary>
-        /// Password
+        ///     Password
         /// </summary>
         public string Password { get; set; }
 
         /// <summary>
-        /// Name of data base
+        ///     Name of data base
         /// </summary>
         public string DatabaseName { get; set; }
 
         /// <summary>
-        /// True if ssl is used
+        ///     True if ssl is used
         /// </summary>
         public bool UseTls { get; set; }
 
         /// <summary>
-        /// How many items to add in a time
+        ///     How many items to add in a time
         /// </summary>
         public int BatchSize { get; set; }
 
         /// <summary>
-        /// Get mongo db settings object.
+        ///     Get mongo db settings object.
         /// </summary>
         /// <returns></returns>
         public MongoClientSettings GetMongoDbSettings()
@@ -63,11 +63,15 @@ namespace SOS.Lib.Configuration.Shared
             var mongoSettings = new MongoClientSettings
             {
                 UseTls = UseTls,
-                SslSettings = UseTls ? new SslSettings
-                {
-                    EnabledSslProtocols = SslProtocols.Tls12
-                } : null,
-                Credential = identity != null && evidence != null ? new MongoCredential("SCRAM-SHA-1", identity, evidence) : null
+                SslSettings = UseTls
+                    ? new SslSettings
+                    {
+                        EnabledSslProtocols = SslProtocols.Tls12
+                    }
+                    : null,
+                Credential = identity != null && evidence != null
+                    ? new MongoCredential("SCRAM-SHA-1", identity, evidence)
+                    : null
             };
 
             if (Hosts.Length == 1)

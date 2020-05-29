@@ -1,27 +1,27 @@
 ﻿namespace SOS.Import.Entities.Artportalen
 {
     /// <summary>
-    /// Taxon object
+    ///     Taxon object
     /// </summary>
     public class TaxonEntity
     {
         /// <summary>
-        /// Taxon category
+        ///     Taxon category
         /// </summary>
         public string Category { get; set; }
 
         /// <summary>
-        /// Id of taxon
+        ///     Id of taxon
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Taxon swedish name
+        ///     Taxon swedish name
         /// </summary>
         public string ScientificName { get; set; }
 
         /// <summary>
-        /// Taxon scientific name
+        ///     Taxon scientific name
         /// </summary>
         public string SwedishName { get; set; }
     }

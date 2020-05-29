@@ -8,24 +8,24 @@ using MongoDB.Driver;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Processors.VirtualHerbarium.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Processors.VirtualHerbarium
 {
     /// <summary>
-    /// Process factory class
+    ///     Process factory class
     /// </summary>
-    public class VirtualHerbariumObservationProcessor : ObservationProcessorBase<VirtualHerbariumObservationProcessor>, Interfaces.IVirtualHerbariumObservationProcessor
+    public class VirtualHerbariumObservationProcessor : ObservationProcessorBase<VirtualHerbariumObservationProcessor>,
+        IVirtualHerbariumObservationProcessor
     {
-        private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataProviderType Type => DataProviderType.VirtualHerbariumObservations;
+        private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="virtualHerbariumObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
@@ -37,12 +37,17 @@ namespace SOS.Process.Processors.VirtualHerbarium
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<VirtualHerbariumObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,logger)
+            ILogger<VirtualHerbariumObservationProcessor> logger) : base(processedObservationRepository,
+            fieldMappingResolverHelper, logger)
         {
-            _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(virtualHerbariumObservationVerbatimRepository));
+            _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ??
+                                                             throw new ArgumentNullException(
+                                                                 nameof(virtualHerbariumObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
-       
+
+        public override DataProviderType Type => DataProviderType.VirtualHerbariumObservations;
+
         /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
@@ -58,7 +63,6 @@ namespace SOS.Process.Processors.VirtualHerbarium
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
-                
                 var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
 

@@ -5,16 +5,18 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Models.Processed.Validation;
 using SOS.Process.Database.Interfaces;
+using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Repositories.Destination
 {
     /// <summary>
-    /// Invalid observation repository
+    ///     Invalid observation repository
     /// </summary>
-    public class InvalidObservationRepository : ProcessBaseRepository<InvalidObservation, ObjectId>, Interfaces.IInvalidObservationRepository
+    public class InvalidObservationRepository : ProcessBaseRepository<InvalidObservation, ObjectId>,
+        IInvalidObservationRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
@@ -23,13 +25,12 @@ namespace SOS.Process.Repositories.Destination
             ILogger<InvalidObservationRepository> logger
         ) : base(client, true, logger)
         {
-            
         }
 
         /// <inheritdoc />
         public async Task CreateIndexAsync()
         {
-            var indexModels = new List<CreateIndexModel<InvalidObservation>>()
+            var indexModels = new List<CreateIndexModel<InvalidObservation>>
             {
                 new CreateIndexModel<InvalidObservation>(
                     Builders<InvalidObservation>.IndexKeys.Ascending(io => io.DatasetName)),

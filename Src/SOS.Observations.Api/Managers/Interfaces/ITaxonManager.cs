@@ -4,12 +4,12 @@ using SOS.Lib.Models.TaxonTree;
 namespace SOS.Observations.Api.Managers.Interfaces
 {
     /// <summary>
-    /// Taxon manager
+    ///     Taxon manager
     /// </summary>
     public interface ITaxonManager
     {
         /// <summary>
-        /// Taxon Tree
+        ///     Taxon Tree
         /// </summary>
         TaxonTree<IBasicTaxon> TaxonTree { get; }
     }

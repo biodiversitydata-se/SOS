@@ -5,23 +5,14 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Models.Verbatim.ClamPortal;
-using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Lib.Models.Verbatim.Mvm;
-using SOS.Lib.Models.Verbatim.Nors;
-using SOS.Lib.Models.Verbatim.Sers;
 using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Lib.Models.Verbatim.Shark;
-using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
@@ -39,22 +30,22 @@ using SOS.Process.Repositories.Source.Interfaces;
 namespace SOS.Process.Jobs
 {
     /// <summary>
-    /// Artportalen harvest
+    ///     Artportalen harvest
     /// </summary>
     public class ProcessJob : ProcessJobBase, IProcessJob
     {
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IAreaHelper _areaHelper;
+        private readonly ICopyFieldMappingsJob _copyFieldMappingsJob;
         private readonly IDataProviderManager _dataProviderManager;
         private readonly IInstanceManager _instanceManager;
-        private readonly IProcessedTaxonRepository _processedTaxonRepository;
-        private readonly ICopyFieldMappingsJob _copyFieldMappingsJob;
-        private readonly IProcessTaxaJob _processTaxaJob;
-        private readonly IAreaHelper _areaHelper;
         private readonly ILogger<ProcessJob> _logger;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly Dictionary<DataProviderType, IProcessor> _processorByType;
+        private readonly IProcessTaxaJob _processTaxaJob;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
@@ -96,24 +87,30 @@ namespace SOS.Process.Jobs
             IAreaHelper areaHelper,
             ILogger<ProcessJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
-            _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
+            _processedObservationRepository = processedObservationRepository ??
+                                              throw new ArgumentNullException(nameof(processedObservationRepository));
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
-            _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
-            _copyFieldMappingsJob = copyFieldMappingsJob ?? throw new ArgumentNullException(nameof(copyFieldMappingsJob));
+            _processedTaxonRepository = processedTaxonRepository ??
+                                        throw new ArgumentNullException(nameof(processedTaxonRepository));
+            _copyFieldMappingsJob =
+                copyFieldMappingsJob ?? throw new ArgumentNullException(nameof(copyFieldMappingsJob));
             _processTaxaJob = processTaxaJob ?? throw new ArgumentNullException(nameof(processTaxaJob));
             _instanceManager = instanceManager ?? throw new ArgumentNullException(nameof(instanceManager));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            if (clamPortalObservationProcessor == null) throw new ArgumentNullException(nameof(clamPortalObservationProcessor));
+            if (clamPortalObservationProcessor == null)
+                throw new ArgumentNullException(nameof(clamPortalObservationProcessor));
             if (kulObservationProcessor == null) throw new ArgumentNullException(nameof(kulObservationProcessor));
             if (mvmObservationProcessor == null) throw new ArgumentNullException(nameof(mvmObservationProcessor));
             if (norsObservationProcessor == null) throw new ArgumentNullException(nameof(norsObservationProcessor));
             if (sersObservationProcessor == null) throw new ArgumentNullException(nameof(sersObservationProcessor));
             if (sharkObservationProcessor == null) throw new ArgumentNullException(nameof(sharkObservationProcessor));
-            if (virtualHerbariumObservationProcessor == null) throw new ArgumentNullException(nameof(virtualHerbariumObservationProcessor));
+            if (virtualHerbariumObservationProcessor == null)
+                throw new ArgumentNullException(nameof(virtualHerbariumObservationProcessor));
             if (dwcaObservationProcessor == null) throw new ArgumentNullException(nameof(dwcaObservationProcessor));
-            if (artportalenObservationProcessor == null) throw new ArgumentNullException(nameof(artportalenObservationProcessor));
+            if (artportalenObservationProcessor == null)
+                throw new ArgumentNullException(nameof(artportalenObservationProcessor));
             if (sharkObservationProcessor == null) throw new ArgumentNullException(nameof(sharkObservationProcessor));
             _processorByType = new Dictionary<DataProviderType, IProcessor>
             {
@@ -129,18 +126,11 @@ namespace SOS.Process.Jobs
             };
         }
 
-        private List<DataProvider> GetDataProvidersToProcess(List<string> dataProviderIdOrIdentifiers, List<DataProvider> allDataProviders)
-        {
-            return allDataProviders.Where(dataProvider =>
-                    dataProviderIdOrIdentifiers.Any(dataProvider.EqualsIdOrIdentifier))
-                .ToList();
-        }
-
         public async Task<bool> RunAsync(
-            List<string> dataProviderIdOrIdentifiers, 
-            bool cleanStart, 
+            List<string> dataProviderIdOrIdentifiers,
+            bool cleanStart,
             bool copyFromActiveOnFail,
-            bool toggleInstanceOnSuccess, 
+            bool toggleInstanceOnSuccess,
             IJobCancellationToken cancellationToken)
         {
             var allDataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
@@ -168,21 +158,29 @@ namespace SOS.Process.Jobs
             bool toggleInstanceOnSuccess,
             IJobCancellationToken cancellationToken)
         {
-            List<DataProvider> dataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
-            List<DataProvider> dataProvidersToProcess = dataProviders.Where(dataProvider => dataProvider.IsActive).ToList();
+            var dataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
+            var dataProvidersToProcess = dataProviders.Where(dataProvider => dataProvider.IsActive).ToList();
             return await RunAsync(
-                dataProvidersToProcess, 
-                cleanStart, 
-                copyFromActiveOnFail, 
+                dataProvidersToProcess,
+                cleanStart,
+                copyFromActiveOnFail,
                 toggleInstanceOnSuccess,
                 cancellationToken);
         }
 
+        private List<DataProvider> GetDataProvidersToProcess(List<string> dataProviderIdOrIdentifiers,
+            List<DataProvider> allDataProviders)
+        {
+            return allDataProviders.Where(dataProvider =>
+                    dataProviderIdOrIdentifiers.Any(dataProvider.EqualsIdOrIdentifier))
+                .ToList();
+        }
+
         public async Task<bool> RunAsync(
-            List<DataProvider> dataProvidersToProcess, 
-            bool cleanStart, 
-            bool copyFromActiveOnFail, 
-            bool toggleInstanceOnSuccess, 
+            List<DataProvider> dataProvidersToProcess,
+            bool cleanStart,
+            bool copyFromActiveOnFail,
+            bool toggleInstanceOnSuccess,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -248,7 +246,6 @@ namespace SOS.Process.Jobs
                     await _processedObservationRepository.ClearCollectionAsync();
                     newCollection = true;
                     _logger.LogDebug($"Finish clear ElasticSearch index: {_processedObservationRepository.IndexName}");
-
                 }
                 else
                 {
@@ -281,7 +278,7 @@ namespace SOS.Process.Jobs
                         processor.ProcessAsync(dataProvider, taxonById, cancellationToken));
 
                     // Get harvest info and create a provider info object that we can add processing info to later
-                    string harvestInfoId = HarvestInfo.GetIdFromDataProvider(dataProvider);
+                    var harvestInfoId = HarvestInfo.GetIdFromDataProvider(dataProvider);
                     var harvestInfo = await GetHarvestInfoAsync(harvestInfoId);
                     var harvestInfo2 = dataProvider.HarvestInfo; // todo - decide where we should store harvestInfo
                     var providerInfo = CreateProviderInfo(dataProvider, harvestInfo, processStart);
@@ -290,7 +287,7 @@ namespace SOS.Process.Jobs
                     providerInfoByDataProvider.Add(dataProvider, providerInfo);
                 }
 
-                ProcessingStatus[] processingResult = await Task.WhenAll(processTaskByDataProvider.Values);
+                var processingResult = await Task.WhenAll(processTaskByDataProvider.Values);
                 var success = processTaskByDataProvider.Values.All(t => t.Result.Status == RunStatus.Success);
 
                 //----------------------------------------------
@@ -329,8 +326,9 @@ namespace SOS.Process.Jobs
                 // 10. If a data provider failed to process and it was not Artportalen,
                 //     then try to copy that data from the active instance.
                 //----------------------------------------------------------------------------
-                bool artportalenSuccededOrDidntRun = !processTaskByDataProvider.Any(pair =>
-                    pair.Key.Type == DataProviderType.ArtportalenObservations && pair.Value.Result.Status == RunStatus.Failed);
+                var artportalenSuccededOrDidntRun = !processTaskByDataProvider.Any(pair =>
+                    pair.Key.Type == DataProviderType.ArtportalenObservations &&
+                    pair.Value.Result.Status == RunStatus.Failed);
 
                 if (!success && copyFromActiveOnFail && artportalenSuccededOrDidntRun)
                 {

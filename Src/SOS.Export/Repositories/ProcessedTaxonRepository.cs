@@ -9,12 +9,11 @@ using SOS.Lib.Models.Processed.Observation;
 namespace SOS.Export.Repositories
 {
     /// <summary>
-    /// 
     /// </summary>
     public class ProcessedTaxonRepository : BaseRepository<ProcessedTaxon, int>, IProcessedTaxonRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="mongoClient"></param>
         /// <param name="mongoDbConfiguration"></param>
@@ -26,7 +25,7 @@ namespace SOS.Export.Repositories
         }
 
         /// <summary>
-        /// Get chunk of taxa
+        ///     Get chunk of taxa
         /// </summary>
         /// <param name="skip"></param>
         /// <param name="take"></param>
@@ -37,10 +36,10 @@ namespace SOS.Export.Repositories
                 .Find(x => true)
                 .Project(m => new ProcessedBasicTaxon
                 {
-                    DyntaxaTaxonId = m.DyntaxaTaxonId, 
-                    Id = m.Id, 
-                    ParentDyntaxaTaxonId = m.ParentDyntaxaTaxonId, 
-                    SecondaryParentDyntaxaTaxonIds = m.SecondaryParentDyntaxaTaxonIds, 
+                    DyntaxaTaxonId = m.DyntaxaTaxonId,
+                    Id = m.Id,
+                    ParentDyntaxaTaxonId = m.ParentDyntaxaTaxonId,
+                    SecondaryParentDyntaxaTaxonIds = m.SecondaryParentDyntaxaTaxonIds,
                     ScientificName = m.ScientificName
                 })
                 .Skip(skip)

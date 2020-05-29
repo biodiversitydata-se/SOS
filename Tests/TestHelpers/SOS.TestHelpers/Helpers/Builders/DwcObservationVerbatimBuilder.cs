@@ -90,7 +90,8 @@ namespace SOS.TestHelpers.Helpers.Builders
             return With(entity => entity.DateIdentified = DwcFormatter.CreateDateString(dateIdentified));
         }
 
-        public DwcObservationVerbatimBuilder WithIdentificationVerificationStatus(string identificationVerificationStatus)
+        public DwcObservationVerbatimBuilder WithIdentificationVerificationStatus(
+            string identificationVerificationStatus)
         {
             return With(entity => entity.IdentificationVerificationStatus = identificationVerificationStatus);
         }
@@ -100,7 +101,7 @@ namespace SOS.TestHelpers.Helpers.Builders
             WithGeodeticDatum(CoordinateSys.WGS84.EpsgCode());
             WithDecimalLatitude(Coordinates.TranasMunicipality.Latitude);
             WithDecimalLongitude(Coordinates.TranasMunicipality.Longitude);
-            
+
             return this;
         }
 

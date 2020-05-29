@@ -5,10 +5,8 @@ using SOS.Lib.Models.Verbatim.ClamPortal;
 namespace SOS.Import.Repositories.Destination.ClamPortal.Interfaces
 {
     /// <summary>
-    /// 
     /// </summary>
     public interface IClamObservationVerbatimRepository : IVerbatimRepository<ClamObservationVerbatim, ObjectId>
     {
-
     }
 }

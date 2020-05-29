@@ -11,12 +11,13 @@ namespace SOS.TestHelpers.JsonConverters
             return objectType == typeof(ObjectId);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
             if (reader.TokenType != JsonToken.String)
                 throw new Exception($"Unexpected token parsing ObjectId. Expected String, got {reader.TokenType}.");
 
-            var value = (string)reader.Value;
+            var value = (string) reader.Value;
             return string.IsNullOrEmpty(value) ? ObjectId.Empty : new ObjectId(value);
         }
 
@@ -24,7 +25,7 @@ namespace SOS.TestHelpers.JsonConverters
         {
             if (value is ObjectId)
             {
-                var objectId = (ObjectId)value;
+                var objectId = (ObjectId) value;
                 writer.WriteValue(objectId != ObjectId.Empty ? objectId.ToString() : string.Empty);
             }
             else

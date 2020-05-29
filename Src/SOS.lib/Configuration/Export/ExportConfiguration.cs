@@ -3,27 +3,27 @@
 namespace SOS.Lib.Configuration.Export
 {
     /// <summary>
-    /// Root config
+    ///     Root config
     /// </summary>
     public class ExportConfiguration
     {
         /// <summary>
-        /// Blob storage configuration
+        ///     Blob storage configuration
         /// </summary>
         public BlobStorageConfiguration BlobStorageConfiguration { get; set; }
 
         /// <summary>
-        /// Destination file settings
+        ///     Destination file settings
         /// </summary>
         public FileDestination FileDestination { get; set; }
 
         /// <summary>
-        /// Host
+        ///     Host
         /// </summary>
         public MongoDbConfiguration ProcessedDbConfiguration { get; set; }
 
         /// <summary>
-        /// Zend to config
+        ///     Zend to config
         /// </summary>
         public ZendToConfiguration ZendToConfiguration { get; set; }
     }

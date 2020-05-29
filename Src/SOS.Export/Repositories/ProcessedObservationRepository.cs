@@ -14,17 +14,18 @@ using SOS.Lib.Models.Search;
 namespace SOS.Export.Repositories
 {
     /// <summary>
-    /// Species data service
+    ///     Species data service
     /// </summary>
-    public class ProcessedObservationRepository : BaseRepository<ProcessedObservation, string>, IProcessedObservationRepository
+    public class ProcessedObservationRepository : BaseRepository<ProcessedObservation, string>,
+        IProcessedObservationRepository
     {
-        private readonly IElasticClient _elasticClient;
-        private readonly int _batchSize;
-        private readonly string _indexName;
         private const string ScrollTimeOut = "45s";
+        private readonly int _batchSize;
+        private readonly IElasticClient _elasticClient;
+        private readonly string _indexName;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="elasticClient"></param>
         /// <param name="exportClient"></param>
@@ -38,9 +39,9 @@ namespace SOS.Export.Repositories
         {
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
             _batchSize = elasticConfiguration.BatchSize;
-            _indexName = string.IsNullOrEmpty(elasticConfiguration.IndexPrefix) ?
-                $"{ CollectionName.ToLower() }" :
-                $"{ elasticConfiguration.IndexPrefix.ToLower() }-{ CollectionName.ToLower() }";
+            _indexName = string.IsNullOrEmpty(elasticConfiguration.IndexPrefix)
+                ? $"{CollectionName.ToLower()}"
+                : $"{elasticConfiguration.IndexPrefix.ToLower()}-{CollectionName.ToLower()}";
         }
 
         public async Task<ScrollResult<ProcessedProject>> ScrollProjectParametersAsync(
@@ -63,7 +64,6 @@ namespace SOS.Export.Repositories
                     .Scroll(ScrollTimeOut)
                     .Size(_batchSize)
                 );
-
             }
             else
             {
@@ -76,7 +76,9 @@ namespace SOS.Export.Repositories
             return new ScrollResult<ProcessedProject>
             {
                 Records = searchResponse.Documents
-                    .Select(po => (ProcessedObservation)JsonConvert.DeserializeObject<ProcessedObservation>(JsonConvert.SerializeObject(po)))
+                    .Select(po =>
+                        (ProcessedObservation) JsonConvert.DeserializeObject<ProcessedObservation>(
+                            JsonConvert.SerializeObject(po)))
                     .SelectMany(p => p.Projects),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
@@ -84,7 +86,8 @@ namespace SOS.Export.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<ScrollResult<ProcessedObservation>> ScrollObservationsAsync(FilterBase filter, string scrollId)
+        public async Task<ScrollResult<ProcessedObservation>> ScrollObservationsAsync(FilterBase filter,
+            string scrollId)
         {
             ISearchResponse<dynamic> searchResponse;
             if (string.IsNullOrEmpty(scrollId))
@@ -100,11 +103,11 @@ namespace SOS.Export.Repositories
                     .SearchAsync<dynamic>(s => s
                         .Index(_indexName)
                         .Source(p => projection)
-                       /* .Query(q => q
-                            .Bool(b => b
-                                .Filter(filter.ToQuery())
-                            )
-                        )*/
+                        /* .Query(q => q
+                             .Bool(b => b
+                                 .Filter(filter.ToQuery())
+                             )
+                         )*/
                         .Scroll(ScrollTimeOut)
                         .Size(_batchSize)
                     );
@@ -119,7 +122,7 @@ namespace SOS.Export.Repositories
             {
                 Records = searchResponse.Documents
                     .Select(po =>
-                        (ProcessedObservation)JsonConvert.DeserializeObject<ProcessedObservation>(
+                        (ProcessedObservation) JsonConvert.DeserializeObject<ProcessedObservation>(
                             JsonConvert.SerializeObject(po))),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value

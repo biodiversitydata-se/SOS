@@ -12,29 +12,29 @@ using SOS.Lib.Models.DarwinCore;
 namespace SOS.Export.Mappings
 {
     /// <summary>
-    /// Mapping of Darwin Core to csv
+    ///     Mapping of Darwin Core to csv
     /// </summary>
     public sealed class DarwinCoreDynamicMap : ClassMap<DarwinCore>
     {
         /// <summary>
-        /// Constructor.
+        ///     Constructor.
         /// </summary>
-        public DarwinCoreDynamicMap(IEnumerable<FieldDescription> fieldDescriptions) 
-            : this(fieldDescriptions.Select(m => (FieldDescriptionId)m.Id))
+        public DarwinCoreDynamicMap(IEnumerable<FieldDescription> fieldDescriptions)
+            : this(fieldDescriptions.Select(m => (FieldDescriptionId) m.Id))
         {
         }
 
         /// <summary>
-        /// Constructor.
+        ///     Constructor.
         /// </summary>
         public DarwinCoreDynamicMap(IEnumerable<FieldDescriptionId> fieldDescriptionIds)
         {
             var mappingbyId = CreateMappingDictionary(fieldDescriptionIds);
 
             Map(m => m.Occurrence.OccurrenceID)
-               .Name(mappingbyId[FieldDescriptionId.OccurrenceID].Name)
-               .Index(mappingbyId[FieldDescriptionId.OccurrenceID].Index)
-               .Ignore(mappingbyId[FieldDescriptionId.OccurrenceID].Ignore);
+                .Name(mappingbyId[FieldDescriptionId.OccurrenceID].Name)
+                .Index(mappingbyId[FieldDescriptionId.OccurrenceID].Index)
+                .Ignore(mappingbyId[FieldDescriptionId.OccurrenceID].Ignore);
 
             Map(m => m.Occurrence.CatalogNumber)
                 .Name(mappingbyId[FieldDescriptionId.CatalogNumber].Name)
@@ -973,13 +973,14 @@ namespace SOS.Export.Mappings
         }
 
 
-        private Dictionary<FieldDescriptionId, MappingItem> CreateMappingDictionary(IEnumerable<FieldDescriptionId> fieldDescriptionIds)
+        private Dictionary<FieldDescriptionId, MappingItem> CreateMappingDictionary(
+            IEnumerable<FieldDescriptionId> fieldDescriptionIds)
         {
             var dic = new Dictionary<FieldDescriptionId, MappingItem>();
-            int index = 1;
+            var index = 1;
             foreach (var fieldDescriptionId in fieldDescriptionIds)
             {
-                MappingItem mappingItem = new MappingItem()
+                var mappingItem = new MappingItem
                 {
                     FieldDescriptionId = fieldDescriptionId,
                     Ignore = false,
@@ -991,10 +992,10 @@ namespace SOS.Export.Mappings
                 index++;
             }
 
-            IEnumerable<FieldDescriptionId> missingFieldDescriptionIds = FieldDescriptionHelper.GetMissingFieldDescriptionIds(fieldDescriptionIds);
+            var missingFieldDescriptionIds = FieldDescriptionHelper.GetMissingFieldDescriptionIds(fieldDescriptionIds);
             foreach (var fieldDescriptionId in missingFieldDescriptionIds)
             {
-                MappingItem mappingItem = new MappingItem()
+                var mappingItem = new MappingItem
                 {
                     FieldDescriptionId = fieldDescriptionId,
                     Ignore = true,
@@ -1008,18 +1009,11 @@ namespace SOS.Export.Mappings
             return dic;
         }
 
-        private class MappingItem
-        {
-            public FieldDescriptionId FieldDescriptionId { get; set; }
-            public bool Ignore { get; set; }
-            public string Name { get; set; }
-            public int Index { get; set; }
-        }
-
-        public static Dictionary<FieldDescriptionId, Expression<Func<DarwinCore, object>>> CreateFieldMappingDictionary()
+        public static Dictionary<FieldDescriptionId, Expression<Func<DarwinCore, object>>>
+            CreateFieldMappingDictionary()
         {
             var dic = new Dictionary<FieldDescriptionId, Expression<Func<DarwinCore, object>>>();
-            
+
             // Occurrence
             dic.Add(FieldDescriptionId.OccurrenceID, m => m.Occurrence.OccurrenceID);
             dic.Add(FieldDescriptionId.CatalogNumber, m => m.Occurrence.CatalogNumber);
@@ -1105,8 +1099,10 @@ namespace SOS.Export.Mappings
             dic.Add(FieldDescriptionId.MinimumDepthInMeters, m => m.Location.MinimumDepthInMeters);
             dic.Add(FieldDescriptionId.MaximumDepthInMeters, m => m.Location.MaximumDepthInMeters);
             dic.Add(FieldDescriptionId.VerbatimDepth, m => m.Location.VerbatimDepth);
-            dic.Add(FieldDescriptionId.MinimumDistanceAboveSurfaceInMeters, m => m.Location.MinimumDistanceAboveSurfaceInMeters);
-            dic.Add(FieldDescriptionId.MaximumDistanceAboveSurfaceInMeters, m => m.Location.MaximumDistanceAboveSurfaceInMeters);
+            dic.Add(FieldDescriptionId.MinimumDistanceAboveSurfaceInMeters,
+                m => m.Location.MinimumDistanceAboveSurfaceInMeters);
+            dic.Add(FieldDescriptionId.MaximumDistanceAboveSurfaceInMeters,
+                m => m.Location.MaximumDistanceAboveSurfaceInMeters);
             dic.Add(FieldDescriptionId.LocationAccordingTo, m => m.Location.LocationAccordingTo);
             dic.Add(FieldDescriptionId.LocationRemarks, m => m.Location.LocationRemarks);
             dic.Add(FieldDescriptionId.DecimalLatitude, m => m.Location.DecimalLatitude);
@@ -1172,7 +1168,8 @@ namespace SOS.Export.Mappings
             dic.Add(FieldDescriptionId.IdentifiedBy, m => m.Identification.IdentifiedBy);
             dic.Add(FieldDescriptionId.DateIdentified, m => m.Identification.DateIdentified);
             dic.Add(FieldDescriptionId.IdentificationReferences, m => m.Identification.IdentificationReferences);
-            dic.Add(FieldDescriptionId.IdentificationVerificationStatus, m => m.Identification.IdentificationVerificationStatus);
+            dic.Add(FieldDescriptionId.IdentificationVerificationStatus,
+                m => m.Identification.IdentificationVerificationStatus);
             dic.Add(FieldDescriptionId.IdentificationRemarks, m => m.Identification.IdentificationRemarks);
 
             // Material sample
@@ -1195,24 +1192,30 @@ namespace SOS.Export.Mappings
             dic.Add(FieldDescriptionId.RelatedResourceID, m => m.ResourceRelationship.RelatedResourceID);
             dic.Add(FieldDescriptionId.RelationshipOfResource, m => m.ResourceRelationship.RelationshipOfResource);
             dic.Add(FieldDescriptionId.RelationshipAccordingTo, m => m.ResourceRelationship.RelationshipAccordingTo);
-            dic.Add(FieldDescriptionId.RelationshipEstablishedDate, m => m.ResourceRelationship.RelationshipEstablishedDate);
+            dic.Add(FieldDescriptionId.RelationshipEstablishedDate,
+                m => m.ResourceRelationship.RelationshipEstablishedDate);
             dic.Add(FieldDescriptionId.RelationshipRemarks, m => m.ResourceRelationship.RelationshipRemarks);
 
 
             // GeologicalContext
             dic.Add(FieldDescriptionId.GeologicalContextID, m => m.GeologicalContext.GeologicalContextID);
-            dic.Add(FieldDescriptionId.EarliestEonOrLowestEonothem, m => m.GeologicalContext.EarliestEonOrLowestEonothem);
+            dic.Add(FieldDescriptionId.EarliestEonOrLowestEonothem,
+                m => m.GeologicalContext.EarliestEonOrLowestEonothem);
             dic.Add(FieldDescriptionId.LatestEonOrHighestEonothem, m => m.GeologicalContext.LatestEonOrHighestEonothem);
             dic.Add(FieldDescriptionId.EarliestEraOrLowestErathem, m => m.GeologicalContext.EarliestEraOrLowestErathem);
             dic.Add(FieldDescriptionId.LatestEraOrHighestErathem, m => m.GeologicalContext.LatestEraOrHighestErathem);
-            dic.Add(FieldDescriptionId.EarliestPeriodOrLowestSystem, m => m.GeologicalContext.EarliestPeriodOrLowestSystem);
-            dic.Add(FieldDescriptionId.LatestPeriodOrHighestSystem, m => m.GeologicalContext.LatestPeriodOrHighestSystem);
-            dic.Add(FieldDescriptionId.EarliestEpochOrLowestSeries, m => m.GeologicalContext.EarliestEpochOrLowestSeries);
+            dic.Add(FieldDescriptionId.EarliestPeriodOrLowestSystem,
+                m => m.GeologicalContext.EarliestPeriodOrLowestSystem);
+            dic.Add(FieldDescriptionId.LatestPeriodOrHighestSystem,
+                m => m.GeologicalContext.LatestPeriodOrHighestSystem);
+            dic.Add(FieldDescriptionId.EarliestEpochOrLowestSeries,
+                m => m.GeologicalContext.EarliestEpochOrLowestSeries);
             dic.Add(FieldDescriptionId.LatestEpochOrHighestSeries, m => m.GeologicalContext.LatestEpochOrHighestSeries);
             dic.Add(FieldDescriptionId.EarliestAgeOrLowestStage, m => m.GeologicalContext.EarliestAgeOrLowestStage);
             dic.Add(FieldDescriptionId.LatestAgeOrHighestStage, m => m.GeologicalContext.LatestAgeOrHighestStage);
             dic.Add(FieldDescriptionId.LowestBiostratigraphicZone, m => m.GeologicalContext.LowestBiostratigraphicZone);
-            dic.Add(FieldDescriptionId.HighestBiostratigraphicZone, m => m.GeologicalContext.HighestBiostratigraphicZone);
+            dic.Add(FieldDescriptionId.HighestBiostratigraphicZone,
+                m => m.GeologicalContext.HighestBiostratigraphicZone);
             dic.Add(FieldDescriptionId.LithostratigraphicTerms, m => m.GeologicalContext.LithostratigraphicTerms);
             dic.Add(FieldDescriptionId.Group, m => m.GeologicalContext.Group);
             dic.Add(FieldDescriptionId.Formation, m => m.GeologicalContext.Formation);
@@ -1227,8 +1230,16 @@ namespace SOS.Export.Mappings
             dic.Add(FieldDescriptionId.OrganismRemarks, m => m.Organism.OrganismRemarks);
             dic.Add(FieldDescriptionId.OrganismScope, m => m.Organism.OrganismScope);
             dic.Add(FieldDescriptionId.PreviousIdentifications, m => m.Organism.PreviousIdentifications);
-            
+
             return dic;
+        }
+
+        private class MappingItem
+        {
+            public FieldDescriptionId FieldDescriptionId { get; set; }
+            public bool Ignore { get; set; }
+            public string Name { get; set; }
+            public int Index { get; set; }
         }
     }
 }

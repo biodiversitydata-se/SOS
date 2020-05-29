@@ -13,49 +13,51 @@ using SOS.Observations.Api.Models.Area;
 namespace SOS.Observations.Api.Controllers
 {
     /// <summary>
-    /// Area controller
+    ///     Area controller
     /// </summary>
     [Route("[controller]")]
     [ApiController]
     public class AreasController : ControllerBase, IAreasController
-    {                
+    {
         private readonly IAreaManager _areaManager;
-        private readonly ILogger<AreasController> _logger;        
+        private readonly ILogger<AreasController> _logger;
 
         /// <summary>
-        /// Constructor
-        /// </summary>                
+        ///     Constructor
+        /// </summary>
         /// <param name="areaManager"></param>
         /// <param name="logger"></param>
-        public AreasController(                 
+        public AreasController(
             IAreaManager areaManager,
             ILogger<AreasController> logger)
-        {                        
+        {
             _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
         [HttpGet("")]
-        [ProducesResponseType(typeof(PagedResult<ExternalSimpleArea>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAreasAsync([FromQuery] IEnumerable<AreaType> areaTypes = null, [FromQuery]string searchString = null, [FromQuery]int skip = 0, [FromQuery]int take = 100)
+        [ProducesResponseType(typeof(PagedResult<ExternalSimpleArea>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetAreasAsync([FromQuery] IEnumerable<AreaType> areaTypes = null,
+            [FromQuery] string searchString = null, [FromQuery] int skip = 0, [FromQuery] int take = 100)
         {
-            try 
+            try
             {
                 return new OkObjectResult(await _areaManager.GetAreasAsync(areaTypes, searchString, skip, take));
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting areas");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
+
         /// <inheritdoc />
         [HttpGet("{areaId}/export")]
-        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int) HttpStatusCode.NoContent)]
         public async Task<IActionResult> ExportArea(int areaId)
         {
             try
@@ -64,15 +66,15 @@ namespace SOS.Observations.Api.Controllers
 
                 if (zipBytes == null)
                 {
-                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                    return new StatusCodeResult((int) HttpStatusCode.NoContent);
                 }
 
-                return File(zipBytes, "application/zip", $"Area{areaId}.zip");                
+                return File(zipBytes, "application/zip", $"Area{areaId}.zip");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting areas");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
     }

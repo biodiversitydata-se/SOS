@@ -4,12 +4,11 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 namespace SOS.Observations.Api.Repositories.Interfaces
 {
     /// <summary>
-    /// 
     /// </summary>
     public interface IProcessInfoRepository : IBaseRepository<ProcessInfo, string>
     {
         /// <summary>
-        /// Get process information
+        ///     Get process information
         /// </summary>
         /// <param name="current"></param>
         /// <returns></returns>

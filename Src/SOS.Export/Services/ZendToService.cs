@@ -14,9 +14,10 @@ namespace SOS.Export.Services
 {
     public class ZendToService : IZendToService
     {
-        private ZendToConfiguration _configuration;
+        private readonly ZendToConfiguration _configuration;
+
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public ZendToService(ZendToConfiguration configuration)
         {

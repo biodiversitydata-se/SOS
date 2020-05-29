@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -13,12 +11,11 @@ using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Process.Repositories.Destination
 {
     /// <summary>
-    /// Repository for retrieving processed areas.
+    ///     Repository for retrieving processed areas.
     /// </summary>
     public class ProcessedAreaRepository : ProcessBaseRepository<Area, int>, IProcessedAreaRepository
     {
@@ -26,16 +23,16 @@ namespace SOS.Process.Repositories.Destination
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         /// <summary>
-        /// Constructor.
+        ///     Constructor.
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
         public ProcessedAreaRepository(
-            IProcessClient client, 
-            ILogger<ProcessedAreaRepository> logger) 
+            IProcessClient client,
+            ILogger<ProcessedAreaRepository> logger)
             : base(client, false, logger)
         {
-            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = nameof(Area) });
+            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions {BucketName = nameof(Area)});
             _jsonSerializerOptions = new JsonSerializerOptions();
             _jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
         }
@@ -43,7 +40,7 @@ namespace SOS.Process.Repositories.Destination
         /// <inheritdoc />
         public async Task CreateIndexAsync()
         {
-            var indexModels = new List<CreateIndexModel<Area>>()
+            var indexModels = new List<CreateIndexModel<Area>>
             {
                 new CreateIndexModel<Area>(
                     Builders<Area>.IndexKeys.Ascending(a => a.Name)),
@@ -64,7 +61,7 @@ namespace SOS.Process.Repositories.Destination
         /// <inheritdoc />
         public async Task<IGeoShape> GetGeometryAsync(int areaId)
         {
-            var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync($"geometry-{ areaId }");
+            var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync($"geometry-{areaId}");
             var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
             return JsonSerializer.Deserialize<IGeoShape>(utfString, _jsonSerializerOptions);

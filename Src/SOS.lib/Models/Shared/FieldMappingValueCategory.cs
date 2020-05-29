@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
-using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Shared
 {
@@ -12,10 +11,10 @@ namespace SOS.Lib.Models.Shared
         public bool Localized { get; set; }
 
         /// <summary>
-        /// Translations.
+        ///     Translations.
         /// </summary>
         /// <remarks>
-        /// Translations exists if the <see cref="Localized"/> property is set to true.
+        ///     Translations exists if the <see cref="Localized" /> property is set to true.
         /// </remarks>
         [BsonIgnoreIfNull]
         public ICollection<FieldMappingTranslation> Translations { get; set; }

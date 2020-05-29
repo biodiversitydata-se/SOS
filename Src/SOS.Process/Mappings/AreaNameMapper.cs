@@ -10,17 +10,23 @@ using SOS.Process.Mappings.Interfaces;
 namespace SOS.Process.Mappings
 {
     /// <summary>
-    /// Loads dictionaries that can be used to merge different spelling varations
-    /// of Counties and Provinces into the intended County/Province.
+    ///     Loads dictionaries that can be used to merge different spelling varations
+    ///     of Counties and Provinces into the intended County/Province.
     /// </summary>
     public class AreaNameMapper : IAreaNameMapper
     {
+        public AreaNameMapper()
+        {
+            CountyNameByCountyNameSpelling = LoadCountyNameMapping();
+            ProvinceNameByProvinceNameSpelling = LoadProvinceNameMapping();
+        }
+
         public Dictionary<string, string> CountyNameByCountyNameSpelling { get; }
         public Dictionary<string, string> ProvinceNameByProvinceNameSpelling { get; }
 
         public Dictionary<string, string> BuildCountyFeatureIdByNameMapper(IEnumerable<Area> countyAreas)
         {
-            Dictionary<string, string> countyIdByNames = new Dictionary<string, string>();
+            var countyIdByNames = new Dictionary<string, string>();
             var countyAreaByName = countyAreas.ToDictionary(x => x.Name, x => x);
             foreach (var pair in CountyNameByCountyNameSpelling)
             {
@@ -33,7 +39,7 @@ namespace SOS.Process.Mappings
 
         public Dictionary<string, string> BuildProvinceFeatureIdByNameMapper(IEnumerable<Area> provinceAreas)
         {
-            Dictionary<string, string> provinceIdByNames = new Dictionary<string, string>();
+            var provinceIdByNames = new Dictionary<string, string>();
             var countyAreaByName = provinceAreas.ToDictionary(x => x.Name, x => x);
             foreach (var pair in ProvinceNameByProvinceNameSpelling)
             {
@@ -44,18 +50,11 @@ namespace SOS.Process.Mappings
             return provinceIdByNames;
         }
 
-
-        public AreaNameMapper()
-        {
-            CountyNameByCountyNameSpelling = LoadCountyNameMapping();
-            ProvinceNameByProvinceNameSpelling = LoadProvinceNameMapping();
-        }
-
         private Dictionary<string, string> LoadCountyNameMapping()
         {
-            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, @"Resources\CountyNameMapper.json");
-            using (FileStream fs = FileSystemHelper.WaitForFile(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var fs = FileSystemHelper.WaitForFile(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 var countyNameMappings = JsonSerializer.DeserializeAsync<List<CountyNameMapperItem>>(fs).Result;
                 return countyNameMappings.ToDictionary(x => x.DcoCountyName, x => x.CountyName);
@@ -64,9 +63,9 @@ namespace SOS.Process.Mappings
 
         private Dictionary<string, string> LoadProvinceNameMapping()
         {
-            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, @"Resources\ProvinceNameMapper.json");
-            using (FileStream fs = FileSystemHelper.WaitForFile(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var fs = FileSystemHelper.WaitForFile(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 var countyNameMappings = JsonSerializer.DeserializeAsync<List<ProvinceNameMapperItem>>(fs).Result;
                 return countyNameMappings.ToDictionary(x => x.DcoStateProvinceName, x => x.ProvinceName);

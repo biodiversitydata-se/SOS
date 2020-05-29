@@ -10,15 +10,12 @@ using Xunit;
 namespace SOS.Process.UnitTests.Jobs
 {
     /// <summary>
-    /// Tests for activate instance job
+    ///     Tests for activate instance job
     /// </summary>
     public class ActivateInstanceJobTests
     {
-        private readonly Mock<IInstanceManager> _instanceManagerMock;
-        private readonly Mock<ILogger<ActivateInstanceJob>> _loggerMock;
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public ActivateInstanceJobTests()
         {
@@ -26,8 +23,11 @@ namespace SOS.Process.UnitTests.Jobs
             _loggerMock = new Mock<ILogger<ActivateInstanceJob>>();
         }
 
+        private readonly Mock<IInstanceManager> _instanceManagerMock;
+        private readonly Mock<ILogger<ActivateInstanceJob>> _loggerMock;
+
         /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -41,26 +41,25 @@ namespace SOS.Process.UnitTests.Jobs
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("instanceManager");
 
-            
+
             create = () => new ActivateInstanceJob(
                 _instanceManagerMock.Object,
-               null);
+                null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
         /// <summary>
-        /// Make a successful test of processing
+        ///     Test processing exception
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task RunAsyncSuccess()
+        public async Task RunAsyncException()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _instanceManagerMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
-                .ReturnsAsync(true);
-
+                .ThrowsAsync(new Exception("Failed"));
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -73,11 +72,11 @@ namespace SOS.Process.UnitTests.Jobs
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeTrue();
+            result.Should().BeFalse();
         }
 
         /// <summary>
-        /// Test processing fail
+        ///     Test processing fail
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -104,17 +103,18 @@ namespace SOS.Process.UnitTests.Jobs
         }
 
         /// <summary>
-        /// Test processing exception
+        ///     Make a successful test of processing
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task RunAsyncException()
+        public async Task RunAsyncSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _instanceManagerMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
-                .ThrowsAsync(new Exception("Failed"));
+                .ReturnsAsync(true);
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
@@ -127,7 +127,7 @@ namespace SOS.Process.UnitTests.Jobs
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeFalse();
+            result.Should().BeTrue();
         }
     }
 }

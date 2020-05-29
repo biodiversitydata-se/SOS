@@ -7,12 +7,12 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Repositories.Destination.FieldMappings
 {
     /// <summary>
-    /// Field mapping repository.
+    ///     Field mapping repository.
     /// </summary>
     public class FieldMappingRepository : VerbatimRepository<FieldMapping, FieldMappingFieldId>, IFieldMappingRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="importClient"></param>
         /// <param name="logger"></param>

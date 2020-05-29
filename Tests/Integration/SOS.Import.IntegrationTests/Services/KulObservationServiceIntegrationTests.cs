@@ -3,9 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using KulService;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using SOS.Import.Services;
 using Xunit;
 
@@ -14,7 +12,7 @@ namespace SOS.Import.IntegrationTests.Services
     public class KulObservationServiceIntegrationTests : TestBase
     {
         [Fact]
-        [Trait("Category","Integration")]
+        [Trait("Category", "Integration")]
         public async Task TestGetObservationsUsingRepository()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -25,7 +23,7 @@ namespace SOS.Import.IntegrationTests.Services
                 new SpeciesObservationChangeServiceClient(),
                 importConfiguration.KulServiceConfiguration,
                 new NullLogger<KulObservationService>());
-            var changedFrom = new DateTime(2015,1,1);
+            var changedFrom = new DateTime(2015, 1, 1);
             var changedTo = changedFrom.AddYears(1);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -37,7 +35,8 @@ namespace SOS.Import.IntegrationTests.Services
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             result.Should().NotBeNull();
-            result.Count().Should().BeGreaterThan(10000, "because 2019-11-04 there were 12200 sightings from 2015-01-01 to 2016-01-01");
+            result.Count().Should().BeGreaterThan(10000,
+                "because 2019-11-04 there were 12200 sightings from 2015-01-01 to 2016-01-01");
         }
     }
 }

@@ -11,10 +11,19 @@ using Xunit;
 namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 {
     /// <summary>
-    /// Meta data repository tests
+    ///     Meta data repository tests
     /// </summary>
     public class AreaRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public AreaRepositoryTests()
+        {
+            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
+            _loggerMock = new Mock<ILogger<AreaRepository>>();
+        }
+
         private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
         private readonly Mock<ILogger<AreaRepository>> _loggerMock;
 
@@ -23,16 +32,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public AreaRepositoryTests()
-        {
-            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
-            _loggerMock = new Mock<ILogger<AreaRepository>>();
-        }
-
-        /// <summary>
-        /// Test the constructor
+        ///     Test the constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -51,55 +51,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get areas success
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetAsyncSuccess()
-        {
-            var areas = new[]
-            {
-               new AreaEntity{ Id = 1},
-               new AreaEntity{ Id = 2}
-            };
-
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null))
-                .ReturnsAsync(areas);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetAsync();
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().HaveCount(2);
-        }
-
-        /// <summary>
-        /// Test get areas fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetAsyncException()
-        {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null))
-               .Throws<Exception>();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetAsync();
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeNull();
-        }
-
-        /// <summary>
-        /// Test get areas success
+        ///     Test get areas success
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -107,8 +59,8 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         {
             var areas = new[]
             {
-               new AreaEntity{ Id = 1},
-               new AreaEntity{ Id = 2}
+                new AreaEntity {Id = 1},
+                new AreaEntity {Id = 2}
             };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null))
@@ -126,14 +78,14 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get areas fail
+        ///     Test get areas fail
         /// </summary>
         /// <returns></returns>
         [Fact]
         public async Task GetAreasExceptGeometryFieldAsyncxception()
         {
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null))
-               .Throws<Exception>();
+                .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -144,6 +96,54 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
 
             result.Should().BeNull();
+        }
+
+        /// <summary>
+        ///     Test get areas fail
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetAsyncException()
+        {
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null))
+                .Throws<Exception>();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.GetAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeNull();
+        }
+
+        /// <summary>
+        ///     Test get areas success
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetAsyncSuccess()
+        {
+            var areas = new[]
+            {
+                new AreaEntity {Id = 1},
+                new AreaEntity {Id = 2}
+            };
+
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null))
+                .ReturnsAsync(areas);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.GetAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().HaveCount(2);
         }
     }
 }

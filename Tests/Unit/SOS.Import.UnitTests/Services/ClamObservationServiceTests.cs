@@ -15,6 +15,16 @@ namespace SOS.Import.UnitTests.Services
 {
     public class ClamObservationServiceTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public ClamObservationServiceTests()
+        {
+            _httpClientService = new Mock<IHttpClientService>();
+            _clamServiceConfiguration = new ClamServiceConfiguration {BaseAddress = "https://www.test.se"};
+            _loggerMock = new Mock<ILogger<ClamObservationService>>();
+        }
+
         private readonly Mock<IHttpClientService> _httpClientService;
         private readonly ClamServiceConfiguration _clamServiceConfiguration;
         private readonly Mock<ILogger<ClamObservationService>> _loggerMock;
@@ -25,17 +35,7 @@ namespace SOS.Import.UnitTests.Services
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public ClamObservationServiceTests()
-        {
-            _httpClientService = new Mock<IHttpClientService>();
-            _clamServiceConfiguration = new ClamServiceConfiguration{BaseAddress = "https://www.test.se"};
-            _loggerMock = new Mock<ILogger<ClamObservationService>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -62,35 +62,7 @@ namespace SOS.Import.UnitTests.Services
         }
 
         /// <summary>
-        /// Get clams observations success
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetClamObservationsAsyncSuccess()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _httpClientService.Setup(hc => hc.GetDataAsync<IEnumerable<ClamObservationVerbatim>>(It.IsAny<Uri>()))
-                .ReturnsAsync(new[] { new ClamObservationVerbatim
-                {
-                    DyntaxaTaxonId = 100024
-                }  });
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetClamObservationsAsync();
-          
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Count().Should().Be(1);
-        }
-
-        /// <summary>
-        /// Get clams observations fail
+        ///     Get clams observations fail
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -110,6 +82,37 @@ namespace SOS.Import.UnitTests.Services
             //-----------------------------------------------------------------------------------------------------------
 
             result.Count().Should().Be(0);
+        }
+
+        /// <summary>
+        ///     Get clams observations success
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetClamObservationsAsyncSuccess()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _httpClientService.Setup(hc => hc.GetDataAsync<IEnumerable<ClamObservationVerbatim>>(It.IsAny<Uri>()))
+                .ReturnsAsync(new[]
+                {
+                    new ClamObservationVerbatim
+                    {
+                        DyntaxaTaxonId = 100024
+                    }
+                });
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.GetClamObservationsAsync();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Count().Should().Be(1);
         }
     }
 }

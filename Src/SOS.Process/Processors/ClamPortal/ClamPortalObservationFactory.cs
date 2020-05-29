@@ -18,8 +18,8 @@ namespace SOS.Process.Processors.ClamPortal
     public class ClamPortalObservationFactory
     {
         private const string ValidatedObservationStringValue = "Godkänd";
-        private readonly IDictionary<int, ProcessedTaxon> _taxa;
         private readonly DataProvider _dataProvider;
+        private readonly IDictionary<int, ProcessedTaxon> _taxa;
 
         public ClamPortalObservationFactory(DataProvider dataProvider, IDictionary<int, ProcessedTaxon> taxa)
         {
@@ -28,17 +28,18 @@ namespace SOS.Process.Processors.ClamPortal
         }
 
         /// <summary>
-        /// Cast multiple clam observations to processed observations
+        ///     Cast multiple clam observations to processed observations
         /// </summary>
         /// <param name="verbatimObservations"></param>
         /// <returns></returns>
-        public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<ClamObservationVerbatim> verbatimObservations)
+        public IEnumerable<ProcessedObservation> CreateProcessedObservations(
+            IEnumerable<ClamObservationVerbatim> verbatimObservations)
         {
             return verbatimObservations.Select(CreateProcessedObservation);
         }
 
         /// <summary>
-        /// Cast clam observation verbatim to processed observation
+        ///     Cast clam observation verbatim to processed observation
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
@@ -47,12 +48,13 @@ namespace SOS.Process.Processors.ClamPortal
             Point wgs84Point = null;
             if (verbatimObservation.DecimalLongitude > 0 && verbatimObservation.DecimalLatitude > 0)
             {
-                wgs84Point = new Point(verbatimObservation.DecimalLongitude, verbatimObservation.DecimalLatitude) { SRID = (int)CoordinateSys.WGS84 };
+                wgs84Point = new Point(verbatimObservation.DecimalLongitude, verbatimObservation.DecimalLatitude)
+                    {SRID = (int) CoordinateSys.WGS84};
             }
 
             _taxa.TryGetValue(verbatimObservation.DyntaxaTaxonId ?? -1, out var taxon);
 
-            return new ProcessedObservation()
+            return new ProcessedObservation
             {
                 DataProviderId = _dataProvider.Id,
                 AccessRights = GetAccessRightsIdFromString(verbatimObservation.AccessRights),
@@ -68,15 +70,17 @@ namespace SOS.Process.Processors.ClamPortal
                 },
                 Identification = new ProcessedIdentification
                 {
-                    Validated = verbatimObservation.IdentificationVerificationStatus.Equals(ValidatedObservationStringValue, StringComparison.CurrentCultureIgnoreCase),
-                    ValidationStatus = GetValidationStatusIdFromString(verbatimObservation.IdentificationVerificationStatus),
+                    Validated = verbatimObservation.IdentificationVerificationStatus.Equals(
+                        ValidatedObservationStringValue, StringComparison.CurrentCultureIgnoreCase),
+                    ValidationStatus =
+                        GetValidationStatusIdFromString(verbatimObservation.IdentificationVerificationStatus),
                     UncertainDetermination = verbatimObservation.UncertainDetermination != 0
                 },
                 InstitutionId = GetOrganizationIdFromString(verbatimObservation.InstitutionCode),
                 Language = verbatimObservation.Language,
                 Location = new ProcessedLocation
                 {
-                    Continent = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
+                    Continent = new ProcessedFieldMapValue {Id = (int) ContinentId.Europe},
                     CoordinatePrecision = verbatimObservation.CoordinateUncertaintyInMeters,
                     CountryCode = verbatimObservation.CountryCode,
                     DecimalLatitude = verbatimObservation.DecimalLatitude,
@@ -84,9 +88,10 @@ namespace SOS.Process.Processors.ClamPortal
                     GeodeticDatum = GeodeticDatum.Wgs84,
                     LocationId = verbatimObservation.LocationId,
                     Locality = verbatimObservation.Locality,
-                    Point = (PointGeoShape)wgs84Point?.ToGeoShape(),
+                    Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
                     PointLocation = wgs84Point?.ToGeoLocation(),
-                    PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatimObservation.CoordinateUncertaintyInMeters)?.ToGeoShape(),
+                    PointWithBuffer = (PolygonGeoShape) wgs84Point
+                        ?.ToCircle(verbatimObservation.CoordinateUncertaintyInMeters)?.ToGeoShape(),
                     LocationRemarks = verbatimObservation.LocationRemarks,
                     MaximumDepthInMeters = verbatimObservation.MaximumDepthInMeters,
                     VerbatimLatitude = verbatimObservation.DecimalLatitude,
@@ -112,13 +117,15 @@ namespace SOS.Process.Processors.ClamPortal
                     OccurrenceRemarks = verbatimObservation.OccurrenceRemarks,
                     OccurrenceStatus = GetOccurrenceStatusIdFromString(verbatimObservation.OccurrenceStatus)
                 },
-                Projects = string.IsNullOrEmpty(verbatimObservation.ProjectName) ? null : new[]
-                {
-                    new ProcessedProject
+                Projects = string.IsNullOrEmpty(verbatimObservation.ProjectName)
+                    ? null
+                    : new[]
                     {
-                        Name = verbatimObservation.ProjectName
-                    }
-                },
+                        new ProcessedProject
+                        {
+                            Name = verbatimObservation.ProjectName
+                        }
+                    },
                 ReportedBy = verbatimObservation.ReportedBy,
                 ReportedDate = verbatimObservation.ReportedDate,
                 RightsHolder = verbatimObservation.RightsHolder,
@@ -135,7 +142,7 @@ namespace SOS.Process.Processors.ClamPortal
                 case "Human observation":
                     return new ProcessedFieldMapValue
                     {
-                        Id = (int)BasisOfRecordId.HumanObservation
+                        Id = (int) BasisOfRecordId.HumanObservation
                     };
 
                 default:
@@ -156,7 +163,7 @@ namespace SOS.Process.Processors.ClamPortal
                 case "FreeUsage":
                     return new ProcessedFieldMapValue
                     {
-                        Id = (int)AccessRightsId.FreeUsage
+                        Id = (int) AccessRightsId.FreeUsage
                     };
 
                 default:
@@ -177,13 +184,13 @@ namespace SOS.Process.Processors.ClamPortal
                 case "Present":
                     return new ProcessedFieldMapValue
                     {
-                        Id = (int)OccurrenceStatusId.Present
+                        Id = (int) OccurrenceStatusId.Present
                     };
 
                 case "Not rediscovered":
                     return new ProcessedFieldMapValue
                     {
-                        Id = (int)OccurrenceStatusId.Absent
+                        Id = (int) OccurrenceStatusId.Absent
                     };
 
                 default:
@@ -204,7 +211,7 @@ namespace SOS.Process.Processors.ClamPortal
                 case "Antal individer":
                     return new ProcessedFieldMapValue
                     {
-                        Id = (int)UnitId.Individuals
+                        Id = (int) UnitId.Individuals
                     };
 
                 default:
@@ -225,7 +232,7 @@ namespace SOS.Process.Processors.ClamPortal
                 case "ArtDatabanken":
                     return new ProcessedFieldMapValue
                     {
-                        Id = (int)OrganizationId.ArtDatabanken
+                        Id = (int) OrganizationId.ArtDatabanken
                     };
 
                 default:
@@ -260,7 +267,7 @@ namespace SOS.Process.Processors.ClamPortal
             {
                 return new ProcessedFieldMapValue
                 {
-                    Id = (int)ValidationStatusId.ApprovedBasedOnReportersDocumentation
+                    Id = (int) ValidationStatusId.ApprovedBasedOnReportersDocumentation
                 };
             }
 

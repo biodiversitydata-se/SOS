@@ -10,17 +10,15 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.FieldMapping
 {
     /// <summary>
-    /// Class for creating life stage field mapping.
+    ///     Class for creating life stage field mapping.
     /// </summary>
     public class LifeStageFieldMappingFactory : ArtportalenFieldMappingFactoryBase
     {
-        private readonly IMetadataRepository _metadataRepository;
         private readonly ILogger<LifeStageFieldMappingFactory> _logger;
-        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.LifeStage;
-        protected override bool Localized => true;
+        private readonly IMetadataRepository _metadataRepository;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="metadataRepository"></param>
         /// <param name="logger"></param>
@@ -31,6 +29,9 @@ namespace SOS.Import.Factories.FieldMapping
             _metadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
+        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.LifeStage;
+        protected override bool Localized => true;
 
         protected override async Task<ICollection<FieldMappingValue>> GetFieldMappingValues()
         {

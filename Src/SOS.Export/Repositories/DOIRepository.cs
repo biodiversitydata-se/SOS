@@ -10,25 +10,25 @@ using SOS.Lib.Models.DOI;
 namespace SOS.Export.Repositories
 {
     /// <summary>
-    /// Process information repository
+    ///     Process information repository
     /// </summary>
     public class DOIRepository : BaseRepository<DOI, Guid>, IDOIRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="exportClient"></param>
         /// <param name="logger"></param>
         public DOIRepository(
-            IExportClient exportClient, 
+            IExportClient exportClient,
             ILogger<DOIRepository> logger) : base(exportClient, false, logger)
         {
             //filter by collection name
-            var exists = (Database
-                    .ListCollectionNames(new ListCollectionNamesOptions
-                    {
-                        Filter = new BsonDocument("name", CollectionName)
-                    }))
+            var exists = Database
+                .ListCollectionNames(new ListCollectionNamesOptions
+                {
+                    Filter = new BsonDocument("name", CollectionName)
+                })
                 .Any();
 
             //check for existence

@@ -7,14 +7,14 @@ namespace SOS.Lib.Extensions
     public static class MetadataExtensions
     {
         /// <summary>
-        /// Try to get translation
+        ///     Try to get translation
         /// </summary>
         /// <param name="metadata"></param>
         /// <param name="cultures">In preferred order. Return value on first match</param>
         /// <returns></returns>
         public static string Translate(this Metadata metadata, params string[] cultures)
         {
-            if (!(metadata?.Translations?.Any() ?? false)  || !(cultures?.Any() ?? false))
+            if (!(metadata?.Translations?.Any() ?? false) || !(cultures?.Any() ?? false))
             {
                 return null;
             }

@@ -12,13 +12,13 @@ namespace SOS.Import.Jobs
 {
     public class KulHarvestJob : IKulHarvestJob
     {
-        private readonly IKulObservationHarvester _kulObservationHarvester;
-        private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly IDataProviderManager _dataProviderManager;
+        private readonly IHarvestInfoRepository _harvestInfoRepository;
+        private readonly IKulObservationHarvester _kulObservationHarvester;
         private readonly ILogger<KulHarvestJob> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="kulObservationHarvester"></param>
         /// <param name="harvestInfoRepository"></param>
@@ -30,14 +30,16 @@ namespace SOS.Import.Jobs
             IDataProviderManager dataProviderManager,
             ILogger<KulHarvestJob> logger)
         {
-            _kulObservationHarvester = kulObservationHarvester ?? throw new ArgumentNullException(nameof(kulObservationHarvester));
-            _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
+            _kulObservationHarvester = kulObservationHarvester ??
+                                       throw new ArgumentNullException(nameof(kulObservationHarvester));
+            _harvestInfoRepository =
+                harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(IJobCancellationToken  cancellationToken)
+        public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
             _logger.LogInformation("Start KUL Harvest Job");
             var dataProvider = await _dataProviderManager.GetDataProviderByType(DataProviderType.KULObservations);
@@ -48,7 +50,9 @@ namespace SOS.Import.Jobs
             await _harvestInfoRepository.AddOrUpdateAsync(harvestInfoResult);
             await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult);
 
-            return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0 ? true : throw new Exception("KUL Harvest Job failed");
+            return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0
+                ? true
+                : throw new Exception("KUL Harvest Job failed");
         }
     }
 }

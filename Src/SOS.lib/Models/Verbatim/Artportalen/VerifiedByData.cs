@@ -1,10 +1,9 @@
 ﻿using SOS.Lib.Models.Shared;
-using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen
 {
     /// <summary>
-    /// Contains properties used to create a verified by string.
+    ///     Contains properties used to create a verified by string.
     /// </summary>
     public class VerifiedByData
     {

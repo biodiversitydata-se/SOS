@@ -1,79 +1,75 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Observations.Api.Dtos
 {
     /// <summary>
-    /// Data provider DTO.
+    ///     Data provider DTO.
     /// </summary>
     public class DataProviderDto
     {
         /// <summary>
-        /// Id.
+        ///     Id.
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// A unique identifer that is easier to understand than an Id number.
+        ///     A unique identifer that is easier to understand than an Id number.
         /// </summary>
         public string Identifier { get; set; }
 
         /// <summary>
-        /// The name of the data provider (in english).
+        ///     The name of the data provider (in english).
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// The name of the data provider (in swedish).
+        ///     The name of the data provider (in swedish).
         /// </summary>
         public string SwedishName { get; set; }
 
         /// <summary>
-        /// The organization name (in english).
+        ///     The organization name (in english).
         /// </summary>
         public string Organization { get; set; }
 
         /// <summary>
-        /// The organization name (in swedish).
+        ///     The organization name (in swedish).
         /// </summary>
         public string SwedishOrganization { get; set; }
 
         /// <summary>
-        /// Description of the data provider (in english).
+        ///     Description of the data provider (in english).
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// Description of the data provider (in swedish).
+        ///     Description of the data provider (in swedish).
         /// </summary>
         public string SwedishDescription { get; set; }
 
         /// <summary>
-        /// URL to the data provider source.
+        ///     URL to the data provider source.
         /// </summary>
         public string Url { get; set; }
-        
+
         /// <summary>
-        /// Number of public observations.
+        ///     Number of public observations.
         /// </summary>
         public int PublicObservations { get; set; }
-        
+
         /// <summary>
-        /// Number of protected observations.
+        ///     Number of protected observations.
         /// </summary>
         public int ProtectedObservations { get; set; }
-        
+
         /// <summary>
-        /// Latest harvest date.
+        ///     Latest harvest date.
         /// </summary>
         public DateTime? LatestHarvestDate { get; set; }
 
         /// <summary>
-        /// Creates a new DataProviderDto object.
+        ///     Creates a new DataProviderDto object.
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <returns></returns>
@@ -94,7 +90,7 @@ namespace SOS.Observations.Api.Dtos
         }
 
         /// <summary>
-        /// Creates a new DataProviderDto object.
+        ///     Creates a new DataProviderDto object.
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="publicObservations"></param>
@@ -123,6 +119,5 @@ namespace SOS.Observations.Api.Dtos
                 LatestHarvestDate = latestHarvestDate
             };
         }
-
     }
 }

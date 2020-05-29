@@ -7,7 +7,7 @@ namespace SOS.Process.Repositories.Source.Interfaces
     public interface IAreaVerbatimRepository : IVerbatimBaseRepository<Area, int>
     {
         /// <summary>
-        /// Get the geometry for a area
+        ///     Get the geometry for a area
         /// </summary>
         /// <param name="areaId"></param>
         /// <returns></returns>

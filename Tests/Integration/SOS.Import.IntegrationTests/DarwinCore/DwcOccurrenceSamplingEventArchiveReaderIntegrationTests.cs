@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using DwC_A;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Import.DarwinCore;
-using SOS.Lib.Models.Verbatim.DarwinCore;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.DarwinCore
@@ -35,7 +31,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             observations.Count.Should().Be(37201);
             var obs = observations.Single(o => o.OccurrenceID == "e3cc741e-23e6-11e8-a64f-4f26032957e3");
             obs.EventExtendedMeasurementOrFacts
-                .Count().Should().Be(6, "because there are 6 different event measurements for the 'Station:NM20130901150' event");
+                .Count().Should().Be(6,
+                    "because there are 6 different event measurements for the 'Station:NM20130901150' event");
             obs.EventExtendedMeasurementOrFacts
                 .Single(m => m.MeasurementType == "air temperature")
                 .MeasurementValue.Should().Be("20");
@@ -44,7 +41,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
                 .MeasurementValue.Should().Be("9");
 
             obs.ObservationExtendedMeasurementOrFacts
-                .Count().Should().Be(3, "because there are 3 different occurrence measurements for the 'e3cc741e-23e6-11e8-a64f-4f26032957e3' occurrence.");
+                .Count().Should().Be(3,
+                    "because there are 3 different occurrence measurements for the 'e3cc741e-23e6-11e8-a64f-4f26032957e3' occurrence.");
             obs.ObservationExtendedMeasurementOrFacts
                 .Single(o => o.MeasurementType == "catch per unit effort count")
                 .MeasurementValue.Should().Be("1.304408918");
@@ -54,13 +52,12 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             obs.ObservationExtendedMeasurementOrFacts
                 .Single(o => o.MeasurementType == "total number of individuals caught")
                 .MeasurementValue.Should().Be("1");
-
         }
 
         /// <summary>
-        /// Some links to Sampling Event Data Dwc-A:
-        /// - https://github.com/gbif/ipt/wiki/BestPracticesSamplingEventData
-        /// - https://www.gbif.org/data-quality-requirements-sampling-events
+        ///     Some links to Sampling Event Data Dwc-A:
+        ///     - https://github.com/gbif/ipt/wiki/BestPracticesSamplingEventData
+        ///     - https://www.gbif.org/data-quality-requirements-sampling-events
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -83,7 +80,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             observations.Count.Should().Be(105872);
             var obs = observations.Single(observation => observation.OccurrenceID == "SEBMS:10015:201062");
-            obs.EventMeasurementOrFacts.Count.Should().Be(6, "because there are 6 different event measurements for the 'SEBMS:10015:201062' event");
+            obs.EventMeasurementOrFacts.Count.Should().Be(6,
+                "because there are 6 different event measurements for the 'SEBMS:10015:201062' event");
             obs.EventMeasurementOrFacts
                 .Single(measurement => measurement.MeasurementType == "Temperature")
                 .MeasurementValue.Should().Be("19");

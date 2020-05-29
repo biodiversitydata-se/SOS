@@ -5,7 +5,7 @@ namespace SOS.Lib.Jobs.Import
     public interface IAreasHarvestJob
     {
         /// <summary>
-        /// Run geo harvest
+        ///     Run geo harvest
         /// </summary>
         /// <returns></returns>
         Task<bool> RunAsync();

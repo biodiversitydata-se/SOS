@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using MessagePack;
@@ -15,7 +16,7 @@ namespace SOS.Process.IntegrationTests.TestDataTools
     public class CreateFieldMappingsFileTool : TestBase
     {
         /// <summary>
-        /// Reads field mappings from MongoDb and saves them as a JSON file.
+        ///     Reads field mappings from MongoDb and saves them as a JSON file.
         /// </summary>
         [Fact]
         [Trait("Category", "Tool")]
@@ -25,7 +26,7 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\FieldMappings.json";
-            const int batchSize = 50000; 
+            const int batchSize = 50000;
             var processConfiguration = GetProcessConfiguration();
             var importClient = new ImportClient(
                 processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
@@ -39,12 +40,12 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var fieldMappings = await fieldMappingRepository.GetAllAsync();
-            var serializerSettings = new JsonSerializerSettings()
+            var serializerSettings = new JsonSerializerSettings
             {
-                Converters = new List<JsonConverter> { new ObjectIdConverter() }
+                Converters = new List<JsonConverter> {new ObjectIdConverter()}
             };
             var strJson = JsonConvert.SerializeObject(fieldMappings, serializerSettings);
-            System.IO.File.WriteAllText(filePath, strJson, Encoding.UTF8);
+            File.WriteAllText(filePath, strJson, Encoding.UTF8);
         }
 
         [Fact]
@@ -70,8 +71,8 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             var fieldMappings = await fieldMappingRepository.GetAllAsync();
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
-            byte[] bin = MessagePackSerializer.Serialize(fieldMappings, options);
-            System.IO.File.WriteAllBytes(filePath, bin);
+            var bin = MessagePackSerializer.Serialize(fieldMappings, options);
+            File.WriteAllBytes(filePath, bin);
         }
     }
 }

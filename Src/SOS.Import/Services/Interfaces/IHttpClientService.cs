@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 namespace SOS.Import.Services.Interfaces
 {
     /// <summary>
-    /// Class for sending http requests
+    ///     Class for sending http requests
     /// </summary>
     public interface IHttpClientService : IDisposable
     {
         /// <summary>
-        /// Get requests
+        ///     Get requests
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="requestUri"></param>
@@ -19,7 +19,7 @@ namespace SOS.Import.Services.Interfaces
         Task<T> GetDataAsync<T>(Uri requestUri);
 
         /// <summary>
-        /// Get request with header data
+        ///     Get request with header data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="requestUri"></param>
@@ -28,7 +28,7 @@ namespace SOS.Import.Services.Interfaces
         Task<T> GetDataAsync<T>(Uri requestUri, Dictionary<string, string> headerData);
 
         /// <summary>
-        /// Get file data stream
+        ///     Get file data stream
         /// </summary>
         /// <param name="requestUri"></param>
         /// <param name="headerData"></param>
@@ -36,7 +36,7 @@ namespace SOS.Import.Services.Interfaces
         Task<Stream> GetFileStreamAsync(Uri requestUri, Dictionary<string, string> headerData = null);
 
         /// <summary>
-        /// Post request
+        ///     Post request
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="requestUri"></param>
@@ -45,7 +45,7 @@ namespace SOS.Import.Services.Interfaces
         Task<T> PostDataAsync<T>(Uri requestUri, object model);
 
         /// <summary>
-        /// Post request with header data
+        ///     Post request with header data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="requestUri"></param>
@@ -55,7 +55,7 @@ namespace SOS.Import.Services.Interfaces
         Task<T> PostDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData);
 
         /// <summary>
-        /// Put requests
+        ///     Put requests
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="requestUri"></param>
@@ -64,12 +64,11 @@ namespace SOS.Import.Services.Interfaces
         Task<T> PutDataAsync<T>(Uri requestUri, object model);
 
         /// <summary>
-        /// Delete requests
+        ///     Delete requests
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="requestUri"></param>
         /// <returns></returns>
         Task<T> DeleteDataAsync<T>(Uri requestUri);
-
     }
 }

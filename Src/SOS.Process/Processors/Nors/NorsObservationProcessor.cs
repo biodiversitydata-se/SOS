@@ -8,24 +8,24 @@ using MongoDB.Driver;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Processors.Nors
 {
     /// <summary>
-    /// Process factory class
+    ///     Process factory class
     /// </summary>
-    public class NorsObservationProcessor : ObservationProcessorBase<NorsObservationProcessor>, Interfaces.INorsObservationProcessor
+    public class NorsObservationProcessor : ObservationProcessorBase<NorsObservationProcessor>,
+        INorsObservationProcessor
     {
-        private readonly INorsObservationVerbatimRepository _norsObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataProviderType Type => DataProviderType.NorsObservations;
+        private readonly INorsObservationVerbatimRepository _norsObservationVerbatimRepository;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="norsObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
@@ -37,12 +37,17 @@ namespace SOS.Process.Processors.Nors
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<NorsObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,logger)
+            ILogger<NorsObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,
+            logger)
         {
-            _norsObservationVerbatimRepository = norsObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(norsObservationVerbatimRepository));
+            _norsObservationVerbatimRepository = norsObservationVerbatimRepository ??
+                                                 throw new ArgumentNullException(
+                                                     nameof(norsObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
-       
+
+        public override DataProviderType Type => DataProviderType.NorsObservations;
+
         /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
@@ -58,7 +63,7 @@ namespace SOS.Process.Processors.Nors
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
-                ProcessedObservation processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
                 observations.Add(processedObservation);
                 if (IsBatchFilledToLimit(observations.Count))

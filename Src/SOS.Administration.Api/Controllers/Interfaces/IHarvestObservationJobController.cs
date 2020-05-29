@@ -5,28 +5,29 @@ using Microsoft.AspNetCore.Mvc;
 namespace SOS.Administration.Api.Controllers.Interfaces
 {
     /// <summary>
-    /// Harvest observations job controller
+    ///     Harvest observations job controller
     /// </summary>
     public interface IHarvestObservationJobController
     {
         /// <summary>
-        /// Run observations harvest for the specified data providers.
+        ///     Run observations harvest for the specified data providers.
         /// </summary>
         /// <param name="dataProviderIdOrIdentifiers"></param>
         /// <returns></returns>
         Task<IActionResult> RunObservationsHarvestJob([FromQuery] List<string> dataProviderIdOrIdentifiers);
 
         /// <summary>
-        /// Add daily harvest for the specified data providers.
+        ///     Add daily harvest for the specified data providers.
         /// </summary>
         /// <param name="dataProviderIdOrIdentifiers"></param>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        Task<IActionResult> AddObservationsHarvestJob([FromQuery] List<string> dataProviderIdOrIdentifiers, [FromQuery] int hour, [FromQuery] int minute);
+        Task<IActionResult> AddObservationsHarvestJob([FromQuery] List<string> dataProviderIdOrIdentifiers,
+            [FromQuery] int hour, [FromQuery] int minute);
 
         /// <summary>
-        /// Add daily harvest of sightings from clam/tree portal
+        ///     Add daily harvest of sightings from clam/tree portal
         /// </summary>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
@@ -34,13 +35,13 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult AddDailyClamPortalHarvestJob(int hour, int minute);
 
         /// <summary>
-        /// Run clam/tree portal sightings harvest
+        ///     Run clam/tree portal sightings harvest
         /// </summary>
         /// <returns></returns>
         IActionResult RunClamPortalHarvestJob();
 
         /// <summary>
-        /// Add daily harvest of sightings from KUL
+        ///     Add daily harvest of sightings from KUL
         /// </summary>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
@@ -48,13 +49,13 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult AddDailyKulHarvestJob(int hour, int minute);
 
         /// <summary>
-        /// Run KUL sightings harvest
+        ///     Run KUL sightings harvest
         /// </summary>
         /// <returns></returns>
         IActionResult RunKulHarvestJob();
 
         /// <summary>
-        /// Add daily harvest of sightings from MVM
+        ///     Add daily harvest of sightings from MVM
         /// </summary>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
@@ -62,13 +63,13 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult AddDailyMvmHarvestJob(int hour, int minute);
 
         /// <summary>
-        /// Run MVM sightings harvest
+        ///     Run MVM sightings harvest
         /// </summary>
         /// <returns></returns>
         IActionResult RunMvmHarvestJob();
 
         /// <summary>
-        /// Add daily harvest of sightings from NORS
+        ///     Add daily harvest of sightings from NORS
         /// </summary>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
@@ -76,13 +77,13 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult AddDailyNorsHarvestJob(int hour, int minute);
 
         /// <summary>
-        /// Run NORS sightings harvest
+        ///     Run NORS sightings harvest
         /// </summary>
         /// <returns></returns>
         IActionResult RunNorsHarvestJob();
 
         /// <summary>
-        /// Add daily harvest of sightings from SERS
+        ///     Add daily harvest of sightings from SERS
         /// </summary>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
@@ -90,13 +91,13 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult AddDailySersHarvestJob(int hour, int minute);
 
         /// <summary>
-        /// Run SERS sightings harvest
+        ///     Run SERS sightings harvest
         /// </summary>
         /// <returns></returns>
         IActionResult RunSersHarvestJob();
 
         /// <summary>
-        /// Add daily harvest of sightings from SHARK
+        ///     Add daily harvest of sightings from SHARK
         /// </summary>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
@@ -104,13 +105,13 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult AddDailySharkHarvestJob(int hour, int minute);
 
         /// <summary>
-        /// Run SHARK sightings harvest
+        ///     Run SHARK sightings harvest
         /// </summary>
         /// <returns></returns>
         IActionResult RunSharkHarvestJob();
 
         /// <summary>
-        /// Add daily harvest of sightings from species data portal
+        ///     Add daily harvest of sightings from species data portal
         /// </summary>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
@@ -118,13 +119,13 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult AddDailyArtportalenHarvestJob(int hour, int minute);
 
         /// <summary>
-        /// Run Artportalen sightings harvest
+        ///     Run Artportalen sightings harvest
         /// </summary>
         /// <returns></returns>
         IActionResult RunArtportalenHarvestJob();
 
         /// <summary>
-        /// Add daily harvest of sightings from Virtual Herbarium
+        ///     Add daily harvest of sightings from Virtual Herbarium
         /// </summary>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
@@ -132,7 +133,7 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult AddDailyVirtualHerbariumHarvestJob(int hour, int minute);
 
         /// <summary>
-        /// Run Virtual Herbarium sightings harvest
+        ///     Run Virtual Herbarium sightings harvest
         /// </summary>
         /// <returns></returns>
         IActionResult RunVirtualHerbariumHarvestJob();

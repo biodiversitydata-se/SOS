@@ -5,33 +5,37 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SOS.Lib.Enums;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
 using Newtonsoft.Json;
 using SOS.Lib.Constants;
+using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Models.Cache;
 using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Helpers
 {
-    public class AreaHelper : Interfaces.IAreaHelper
+    public class AreaHelper : IAreaHelper
     {
+        private const string CacheFileName = "positionAreas.json";
+
+        private readonly AreaType[] _areaTypes =
+            {AreaType.County, AreaType.Province, AreaType.Municipality, AreaType.Parish, AreaType.EconomicZoneOfSweden};
+
+        private readonly IDictionary<string, PositionLocation> _featureCache;
         private readonly IProcessedAreaRepository _processedAreaRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly STRtree<IFeature> _strTree;
-        private readonly IDictionary<string, PositionLocation> _featureCache;
         private IDictionary<FieldMappingFieldId, Dictionary<int, FieldMappingValue>> _fieldMappingValueById;
-        private const string CacheFileName = "positionAreas.json";
-        private readonly AreaType[] _areaTypes = {AreaType.County, AreaType.Province, AreaType.Municipality, AreaType.Parish, AreaType.EconomicZoneOfSweden};
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="processedAreaRepository"></param>
         /// <param name="processedFieldMappingRepository"></param>
@@ -39,8 +43,10 @@ namespace SOS.Process.Helpers
             IProcessedAreaRepository processedAreaRepository,
             IProcessedFieldMappingRepository processedFieldMappingRepository)
         {
-            _processedAreaRepository = processedAreaRepository ?? throw new ArgumentNullException(nameof(processedAreaRepository));
-            _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _processedAreaRepository = processedAreaRepository ??
+                                       throw new ArgumentNullException(nameof(processedAreaRepository));
+            _processedFieldMappingRepository = processedFieldMappingRepository ??
+                                               throw new ArgumentNullException(nameof(processedFieldMappingRepository));
             _strTree = new STRtree<IFeature>();
 
             // Try to get saved cache
@@ -49,23 +55,63 @@ namespace SOS.Process.Helpers
             Task.Run(InitializeAsync).Wait();
         }
 
+
+        /// <inheritdoc />
+        public void AddAreaDataToProcessedObservations(IEnumerable<ProcessedObservation> processedObservations)
+        {
+            foreach (var processedObservation in processedObservations)
+            {
+                AddAreaDataToProcessedObservation(processedObservation);
+            }
+        }
+
+        /// <inheritdoc />
+        public void AddAreaDataToProcessedObservation(ProcessedObservation processedObservation)
+        {
+            if (processedObservation.Location == null || !processedObservation.Location.DecimalLatitude.HasValue ||
+                !processedObservation.Location.DecimalLongitude.HasValue)
+            {
+                return;
+            }
+
+            var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude.Value,
+                processedObservation.Location.DecimalLatitude.Value);
+            processedObservation.Location.County = ProcessedFieldMapValue.Create(positionLocation.County?.Id);
+            processedObservation.Location.Municipality =
+                ProcessedFieldMapValue.Create(positionLocation.Municipality?.Id);
+            processedObservation.Location.Parish = ProcessedFieldMapValue.Create(positionLocation.Parish?.Id);
+            processedObservation.Location.Province = ProcessedFieldMapValue.Create(positionLocation.Province?.Id);
+            processedObservation.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
+            SetCountyPartIdByCoordinate(processedObservation);
+            SetProvincePartIdByCoordinate(processedObservation);
+        }
+
+        /// <inheritdoc />
+        public void PersistCache()
+        {
+            // Update saved cache
+            using var file = new StreamWriter(File.Create(CacheFileName), Encoding.UTF8);
+            file.Write(JsonConvert.SerializeObject(_featureCache));
+        }
+
         /// <summary>
-        /// Get save cache if it exists
+        ///     Get save cache if it exists
         /// </summary>
         /// <returns></returns>
         private static IDictionary<string, PositionLocation> InitializeCache()
         {
             // Try to get saved cache
-           return File.Exists(CacheFileName) ?
-                JsonConvert.DeserializeObject<IDictionary<string, PositionLocation>>(
-                    File.ReadAllText(CacheFileName, Encoding.UTF8)) : new ConcurrentDictionary<string, PositionLocation>();
+            return File.Exists(CacheFileName)
+                ? JsonConvert.DeserializeObject<IDictionary<string, PositionLocation>>(
+                    File.ReadAllText(CacheFileName, Encoding.UTF8))
+                : new ConcurrentDictionary<string, PositionLocation>();
         }
 
         private async Task InitializeAsync()
         {
             // Get field mappings
             var fieldMappings = (await _processedFieldMappingRepository.GetAllAsync()).ToArray();
-    
+
             _fieldMappingValueById = fieldMappings.ToDictionary(m => m.Id,
                 m => m.Values.ToDictionary(v => v.Id, v => v));
 
@@ -93,7 +139,7 @@ namespace SOS.Process.Helpers
         }
 
         /// <summary>
-        /// Get all features where position is inside area
+        ///     Get all features where position is inside area
         /// </summary>
         /// <param name="longitude"></param>
         /// <param name="latitude"></param>
@@ -116,34 +162,6 @@ namespace SOS.Process.Helpers
             return featuresContainingPoint;
         }
 
-
-        /// <inheritdoc />
-        public void AddAreaDataToProcessedObservations(IEnumerable<ProcessedObservation> processedObservations)
-        {
-            foreach (var processedObservation in processedObservations)
-            {
-                AddAreaDataToProcessedObservation(processedObservation);
-            }
-        }
-
-        /// <inheritdoc />
-        public void AddAreaDataToProcessedObservation(ProcessedObservation processedObservation)
-        {
-            if (processedObservation.Location == null || !processedObservation.Location.DecimalLatitude.HasValue || !processedObservation.Location.DecimalLongitude.HasValue)
-            {
-                return;
-            }
-
-            var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude.Value, processedObservation.Location.DecimalLatitude.Value);
-            processedObservation.Location.County = ProcessedFieldMapValue.Create(positionLocation.County?.Id);
-            processedObservation.Location.Municipality = ProcessedFieldMapValue.Create(positionLocation.Municipality?.Id);
-            processedObservation.Location.Parish = ProcessedFieldMapValue.Create(positionLocation.Parish?.Id);
-            processedObservation.Location.Province = ProcessedFieldMapValue.Create(positionLocation.Province?.Id);
-            processedObservation.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
-            SetCountyPartIdByCoordinate(processedObservation);
-            SetProvincePartIdByCoordinate(processedObservation);
-        }
-
         private PositionLocation GetPositionLocation(double decimalLongitude, double decimalLatitude)
         {
             // Round coordinates to 5 decimals (roughly 1m)
@@ -160,15 +178,16 @@ namespace SOS.Process.Helpers
                     foreach (var feature in features)
                     {
                         int.TryParse(feature.Attributes.GetOptionalValue("id").ToString(), out var id);
-                        Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(), out var areaType);
-                        
+                        Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
+                            out var areaType);
+
                         var area = new ProcessedArea
                         {
                             Id = id,
                             FeatureId = feature.Attributes.GetOptionalValue("featureId")?.ToString(),
                             Name = feature.Attributes.GetOptionalValue("name")?.ToString()
                         };
-                        switch ((AreaType)areaType)
+                        switch ((AreaType) areaType)
                         {
                             case AreaType.County:
                                 positionLocation.County = area;
@@ -232,24 +251,17 @@ namespace SOS.Process.Helpers
             }
         }
 
-        /// <inheritdoc />
-        public void PersistCache()
-        {
-            // Update saved cache
-            using var file = new StreamWriter(File.Create(CacheFileName), Encoding.UTF8);
-            file.Write(JsonConvert.SerializeObject(_featureCache));
-        }
-
         private IDictionary<FieldMappingFieldId, IDictionary<object, int>> GetGeoRegionFieldMappingDictionaries(
             ICollection<FieldMapping> verbatimFieldMappings)
         {
             var dic = new Dictionary<FieldMappingFieldId, IDictionary<object, int>>();
             foreach (var fieldMapping in verbatimFieldMappings.Where(m => m.Id.IsGeographicRegionField()))
             {
-                var fieldMappings = fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == ExternalSystemId.Artportalen);
+                var fieldMappings =
+                    fieldMapping.ExternalSystemsMapping.FirstOrDefault(m => m.Id == ExternalSystemId.Artportalen);
                 if (fieldMappings != null)
                 {
-                    ExternalSystemMappingField mapping = fieldMappings.Mappings.Single(m => m.Key == FieldMappingKeyFields.FeatureId);
+                    var mapping = fieldMappings.Mappings.Single(m => m.Key == FieldMappingKeyFields.FeatureId);
                     var sosIdByValue = mapping.GetIdByValueDictionary();
                     dic.Add(fieldMapping.Id, sosIdByValue);
                 }
@@ -269,7 +281,7 @@ namespace SOS.Process.Helpers
         private void SetValue(ProcessedFieldMapValue val, IDictionary<int, FieldMappingValue> fieldMappingValueById)
         {
             if (val == null) return;
-            if (fieldMappingValueById.TryGetValue(val.Id, out FieldMappingValue fieldMappingValue))
+            if (fieldMappingValueById.TryGetValue(val.Id, out var fieldMappingValue))
             {
                 val.Value = fieldMappingValue.Value;
             }

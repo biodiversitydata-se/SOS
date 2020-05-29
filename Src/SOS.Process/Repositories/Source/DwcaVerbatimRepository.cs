@@ -3,16 +3,17 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Process.Database.Interfaces;
+using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source
 {
-    public class DwcaVerbatimRepository : VerbatimBaseRepository<DwcObservationVerbatim, ObjectId>, Interfaces.IDwcaVerbatimRepository
+    public class DwcaVerbatimRepository : VerbatimBaseRepository<DwcObservationVerbatim, ObjectId>,
+        IDwcaVerbatimRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
@@ -20,27 +21,14 @@ namespace SOS.Process.Repositories.Source
             IVerbatimClient client,
             ILogger<DwcaVerbatimRepository> logger) : base(client, logger)
         {
-
-        }
-
-        /// <summary>
-        /// Checks if the collection exists.
-        /// </summary>
-        /// <returns></returns>
-        public async Task<bool> CheckIfCollectionExistsAsync(
-            int dataProviderId,
-            string dataProviderIdentifier)
-        {
-            string collectionName = GetCollectionName(dataProviderId, dataProviderIdentifier);
-            return await CheckIfCollectionExistsAsync(collectionName);
         }
 
         public async Task<IAsyncCursor<DwcObservationVerbatim>> GetAllByCursorAsync(
             int dataProviderId,
             string dataProviderIdentifier)
         {
-            string collectionName = GetCollectionName(dataProviderId, dataProviderIdentifier);
-            var mongoCollection = base.GetMongoCollection(collectionName);
+            var collectionName = GetCollectionName(dataProviderId, dataProviderIdentifier);
+            var mongoCollection = GetMongoCollection(collectionName);
             return await GetAllByCursorAsync(mongoCollection);
         }
 
@@ -48,13 +36,25 @@ namespace SOS.Process.Repositories.Source
             int dataProviderId,
             string dataProviderIdentifier)
         {
-            string collectionName = GetCollectionName(dataProviderId, dataProviderIdentifier);
-            var mongoCollection = base.GetMongoCollection(collectionName);
+            var collectionName = GetCollectionName(dataProviderId, dataProviderIdentifier);
+            var mongoCollection = GetMongoCollection(collectionName);
             return await GetAllAsync(mongoCollection);
         }
 
         /// <summary>
-        /// Gets collection name. Example: "DwcaOccurrence_007_ButterflyMonitoring".
+        ///     Checks if the collection exists.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> CheckIfCollectionExistsAsync(
+            int dataProviderId,
+            string dataProviderIdentifier)
+        {
+            var collectionName = GetCollectionName(dataProviderId, dataProviderIdentifier);
+            return await CheckIfCollectionExistsAsync(collectionName);
+        }
+
+        /// <summary>
+        ///     Gets collection name. Example: "DwcaOccurrence_007_ButterflyMonitoring".
         /// </summary>
         /// <returns></returns>
         private string GetCollectionName(int dataProviderId, string dataProviderIdentifier)
@@ -63,7 +63,7 @@ namespace SOS.Process.Repositories.Source
         }
 
         /// <summary>
-        /// Gets temp collection name. Example: "DwcaOccurrence_007_ButterflyMonitoring_temp".
+        ///     Gets temp collection name. Example: "DwcaOccurrence_007_ButterflyMonitoring_temp".
         /// </summary>
         /// <returns></returns>
         private string GetTempHarvestCollectionName(int dataProviderId, string dataProviderIdentifier)
@@ -81,16 +81,16 @@ namespace SOS.Process.Repositories.Source
             var collectionExists = await CollectionExistsAsync(collectionName);
             if (collectionExists)
             {
-                await base.Database.DropCollectionAsync(collectionName);
+                await Database.DropCollectionAsync(collectionName);
             }
 
-            await base.Database.RenameCollectionAsync(tempHarvestCollectionName, collectionName);
+            await Database.RenameCollectionAsync(tempHarvestCollectionName, collectionName);
             return true;
         }
 
         private async Task<bool> RenameCollectionUsingTransaction(int dataProviderId, string dataProviderIdentifier)
         {
-            using var session = await base.Client.StartSessionAsync();
+            using var session = await Client.StartSessionAsync();
             var tempHarvestCollectionName = GetTempHarvestCollectionName(dataProviderId, dataProviderIdentifier);
             var collectionName = GetTempHarvestCollectionName(dataProviderId, dataProviderIdentifier);
             var tempHarvestCollectionExists = await CollectionExistsAsync(session, tempHarvestCollectionName);
@@ -99,26 +99,26 @@ namespace SOS.Process.Repositories.Source
             var collectionExists = await CollectionExistsAsync(session, collectionName);
             if (collectionExists)
             {
-                await base.Database.DropCollectionAsync(session, collectionName);
+                await Database.DropCollectionAsync(session, collectionName);
             }
 
-            await base.Database.RenameCollectionAsync(session, tempHarvestCollectionName, collectionName);
+            await Database.RenameCollectionAsync(session, tempHarvestCollectionName, collectionName);
             return true;
         }
 
         private async Task<bool> CollectionExistsAsync(string collectionName)
         {
             var filter = new BsonDocument("name", collectionName);
-            var collections = await base.Database.ListCollectionsAsync(new ListCollectionsOptions { Filter = filter });
+            var collections = await Database.ListCollectionsAsync(new ListCollectionsOptions {Filter = filter});
             return await collections.AnyAsync();
         }
 
         private async Task<bool> CollectionExistsAsync(IClientSessionHandle session, string collectionName)
         {
             var filter = new BsonDocument("name", collectionName);
-            var collections = await base.Database.ListCollectionsAsync(session, new ListCollectionsOptions { Filter = filter });
+            var collections =
+                await Database.ListCollectionsAsync(session, new ListCollectionsOptions {Filter = filter});
             return await collections.AnyAsync();
         }
-
     }
 }

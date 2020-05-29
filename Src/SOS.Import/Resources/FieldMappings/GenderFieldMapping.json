@@ -1,183 +1,183 @@
 {
-  "Id": 0,
-  "Name": "Gender",
-  "Localized": true,
-  "Values": [
-    {
-      "Id": 0,
-      "Value": "empty",
-      "Localized": true,
-      "Translations": [
+    "Id": 0,
+    "Name": "Gender",
+    "Localized": true,
+    "Values": [
         {
-          "CultureCode": "sv-SE",
-          "Value": " "
+            "Id": 0,
+            "Value": "empty",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": " "
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": " "
+                }
+            ]
         },
         {
-          "CultureCode": "en-GB",
-          "Value": " "
-        }
-      ]
-    },
-    {
-      "Id": 1,
-      "Value": "male",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "hane"
+            "Id": 1,
+            "Value": "male",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "hane"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "male"
+                }
+            ]
         },
         {
-          "CultureCode": "en-GB",
-          "Value": "male"
-        }
-      ]
-    },
-    {
-      "Id": 2,
-      "Value": "female",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "hona"
+            "Id": 2,
+            "Value": "female",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "hona"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "female"
+                }
+            ]
         },
         {
-          "CultureCode": "en-GB",
-          "Value": "female"
-        }
-      ]
-    },
-    {
-      "Id": 3,
-      "Value": "female coloured",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "honfärgad"
+            "Id": 3,
+            "Value": "female coloured",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "honfärgad"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "female coloured"
+                }
+            ]
         },
         {
-          "CultureCode": "en-GB",
-          "Value": "female coloured"
-        }
-      ]
-    },
-    {
-      "Id": 4,
-      "Value": "in pair",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "i par"
+            "Id": 4,
+            "Value": "in pair",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "i par"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "in pair"
+                }
+            ]
         },
         {
-          "CultureCode": "en-GB",
-          "Value": "in pair"
-        }
-      ]
-    },
-    {
-      "Id": 5,
-      "Value": "worker",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "arbetare"
+            "Id": 5,
+            "Value": "worker",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "arbetare"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "worker"
+                }
+            ]
         },
         {
-          "CultureCode": "en-GB",
-          "Value": "worker"
+            "Id": 6,
+            "Value": "hermaphroditic",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "hermafrodit"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "hermaphroditic"
+                }
+            ]
         }
-      ]
-    },
-    {
-      "Id": 6,
-      "Value": "hermaphroditic",
-      "Localized": true,
-      "Translations": [
+    ],
+    "ExternalSystemsMapping": [
         {
-          "CultureCode": "sv-SE",
-          "Value": "hermafrodit"
+            "Id": 0,
+            "Name": "Artportalen",
+            "Mappings": [
+                {
+                    "Key": "Id",
+                    "Description": "Id field mapping",
+                    "Values": [
+                        {
+                            "Value": 0,
+                            "SosId": 0
+                        },
+                        {
+                            "Value": 1,
+                            "SosId": 1
+                        },
+                        {
+                            "Value": 2,
+                            "SosId": 2
+                        },
+                        {
+                            "Value": 3,
+                            "SosId": 3
+                        },
+                        {
+                            "Value": 4,
+                            "SosId": 4
+                        },
+                        {
+                            "Value": 5,
+                            "SosId": 5
+                        },
+                        {
+                            "Value": 6,
+                            "SosId": 6
+                        }
+                    ]
+                }
+            ]
         },
         {
-          "CultureCode": "en-GB",
-          "Value": "hermaphroditic"
+            "Id": 1,
+            "Name": "DarwinCore",
+            "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
+            "Mappings": [
+                {
+                    "Key": "sex",
+                    "Description": "The sex term (http://rs.tdwg.org/dwc/terms/sex)",
+                    "Values": [
+                        {
+                            "Value": "male",
+                            "SosId": 1
+                        },
+                        {
+                            "Value": "female",
+                            "SosId": 2
+                        },
+                        {
+                            "Value": "hermaphrodite",
+                            "SosId": 6
+                        },
+                        {
+                            "Value": "undetermined",
+                            "SosId": 0
+                        }
+                    ]
+                }
+            ]
         }
-      ]
-    }
-  ],
-  "ExternalSystemsMapping": [
-    {
-      "Id": 0,
-      "Name": "Artportalen",
-      "Mappings": [
-        {
-          "Key": "Id",
-          "Description": "Id field mapping",
-          "Values": [
-            {
-              "Value": 0,
-              "SosId": 0
-            },
-            {
-              "Value": 1,
-              "SosId": 1
-            },
-            {
-              "Value": 2,
-              "SosId": 2
-            },
-            {
-              "Value": 3,
-              "SosId": 3
-            },
-            {
-              "Value": 4,
-              "SosId": 4
-            },
-            {
-              "Value": 5,
-              "SosId": 5
-            },
-            {
-              "Value": 6,
-              "SosId": 6
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "Id": 1,
-      "Name": "DarwinCore",
-      "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
-      "Mappings": [
-        {
-          "Key": "sex",
-          "Description": "The sex term (http://rs.tdwg.org/dwc/terms/sex)",
-          "Values": [
-            {
-              "Value": "male",
-              "SosId": 1
-            },
-            {
-              "Value": "female",
-              "SosId": 2
-            },
-            {
-              "Value": "hermaphrodite",
-              "SosId": 6
-            },
-            {
-              "Value": "undetermined",
-              "SosId": 0
-            }
-          ]
-        }
-      ]
-    }
-  ]
+    ]
 }

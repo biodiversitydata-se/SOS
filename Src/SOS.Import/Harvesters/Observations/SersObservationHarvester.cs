@@ -6,6 +6,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
+using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.Sers.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
@@ -15,15 +16,15 @@ using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Harvesters.Observations
 {
-    public class SersObservationHarvester : Interfaces.ISersObservationHarvester
+    public class SersObservationHarvester : ISersObservationHarvester
     {
+        private readonly ILogger<SersObservationHarvester> _logger;
         private readonly ISersObservationService _sersObservationService;
         private readonly ISersObservationVerbatimRepository _sersObservationVerbatimRepository;
-        private readonly ILogger<SersObservationHarvester> _logger;
         private readonly SersServiceConfiguration _sersServiceConfiguration;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="sersObservationService"></param>
         /// <param name="sersObservationVerbatimRepository"></param>
@@ -35,24 +36,20 @@ namespace SOS.Import.Harvesters.Observations
             SersServiceConfiguration sersServiceConfiguration,
             ILogger<SersObservationHarvester> logger)
         {
-            _sersObservationService = sersObservationService ?? throw new ArgumentNullException(nameof(sersObservationService));
-            _sersObservationVerbatimRepository = sersObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(sersObservationVerbatimRepository));
-            _sersServiceConfiguration = sersServiceConfiguration ?? throw new ArgumentNullException(nameof(sersServiceConfiguration));
+            _sersObservationService =
+                sersObservationService ?? throw new ArgumentNullException(nameof(sersObservationService));
+            _sersObservationVerbatimRepository = sersObservationVerbatimRepository ??
+                                                 throw new ArgumentNullException(
+                                                     nameof(sersObservationVerbatimRepository));
+            _sersServiceConfiguration = sersServiceConfiguration ??
+                                        throw new ArgumentNullException(nameof(sersServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private string GetSersHarvestSettingsInfoString()
+        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-           var sb = new StringBuilder();
-            sb.AppendLine("SERS Harvest settings:");
-            sb.AppendLine($"  Page size: {_sersServiceConfiguration.MaxReturnedChangesInOnePage}");
-            sb.AppendLine($"  Max Number Of Sightings Harvested: {_sersServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            return sb.ToString();
-        }
-        
-        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken  cancellationToken)
-        {
-            var harvestInfo = new HarvestInfo(nameof(SersObservationVerbatim), DataProviderType.SersObservations, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(SersObservationVerbatim), DataProviderType.SersObservations,
+                DateTime.Now);
 
             try
             {
@@ -77,7 +74,7 @@ namespace SOS.Import.Harvesters.Observations
                     var sightings = result?.Item2;
 
                     cancellationToken?.ThrowIfCancellationRequested();
-                    
+
                     var aggregates = sightings.ToVerbatims().ToArray();
                     nrSightingsHarvested += aggregates.Length;
 
@@ -104,7 +101,8 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogInformation("Finished harvesting sightings for SERS data provider");
 
                 // Update harvest info
-                harvestInfo.DataLastModified = dataLastModified == DateTime.MinValue ? (DateTime?)null : dataLastModified;
+                harvestInfo.DataLastModified =
+                    dataLastModified == DateTime.MinValue ? (DateTime?) null : dataLastModified;
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
@@ -121,6 +119,16 @@ namespace SOS.Import.Harvesters.Observations
             }
 
             return harvestInfo;
+        }
+
+        private string GetSersHarvestSettingsInfoString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("SERS Harvest settings:");
+            sb.AppendLine($"  Page size: {_sersServiceConfiguration.MaxReturnedChangesInOnePage}");
+            sb.AppendLine(
+                $"  Max Number Of Sightings Harvested: {_sersServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            return sb.ToString();
         }
     }
 }

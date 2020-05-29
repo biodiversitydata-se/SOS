@@ -8,7 +8,6 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
@@ -16,20 +15,23 @@ namespace SOS.Process.Processors
 {
     public abstract class ObservationProcessorBase<TEntity>
     {
-        protected readonly IProcessedObservationRepository ProcessRepository;
-        protected readonly ILogger<TEntity> Logger;
         protected readonly IFieldMappingResolverHelper FieldMappingResolverHelper;
-        public abstract DataProviderType Type { get; }
+        protected readonly ILogger<TEntity> Logger;
+        protected readonly IProcessedObservationRepository ProcessRepository;
 
         protected ObservationProcessorBase(
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             ILogger<TEntity> logger)
         {
-            ProcessRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
+            ProcessRepository = processedObservationRepository ??
+                                throw new ArgumentNullException(nameof(processedObservationRepository));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            FieldMappingResolverHelper = fieldMappingResolverHelper ?? throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
+            FieldMappingResolverHelper = fieldMappingResolverHelper ??
+                                         throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
         }
+
+        public abstract DataProviderType Type { get; }
 
         public virtual async Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
@@ -46,6 +48,7 @@ namespace SOS.Process.Processors
                     Logger.LogError($"Failed to delete {dataProvider} data");
                     return ProcessingStatus.Failed(dataProvider.Identifier, Type, startTime, DateTime.Now);
                 }
+
                 Logger.LogDebug($"Finish deleting {dataProvider} data");
 
                 Logger.LogDebug($"Start processing {dataProvider} data");
@@ -70,13 +73,15 @@ namespace SOS.Process.Processors
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken);
-        
+
 
         protected async Task<int> CommitBatchAsync(
             DataProvider dataProvider,
             ICollection<ProcessedObservation> processedObservations)
         {
-            FieldMappingResolverHelper.ResolveFieldMappedValues(processedObservations); // used for testing purpose. A setting decides whether values should be resolved for easier debugging of field mapped data.
+            FieldMappingResolverHelper
+                .ResolveFieldMappedValues(
+                    processedObservations); // used for testing purpose. A setting decides whether values should be resolved for easier debugging of field mapped data.
             var successCount = await ProcessRepository.AddManyAsync(processedObservations);
 
             return successCount;

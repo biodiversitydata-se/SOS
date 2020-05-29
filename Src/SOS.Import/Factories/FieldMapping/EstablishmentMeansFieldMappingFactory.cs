@@ -5,12 +5,13 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.FieldMapping
 {
     /// <summary>
-    /// Class for creating EstablishmentMeans field mapping.
+    ///     Class for creating EstablishmentMeans field mapping.
     /// </summary>
     public class EstablishmentMeansFieldMappingFactory : DwcFieldMappingFactoryBase
     {
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.EstablishmentMeans;
         protected override bool Localized => false;
+
         protected override ICollection<FieldMappingValue> GetFieldMappingValues()
         {
             // Vocabulary from http://rs.gbif.org/vocabulary/gbif/establishment_means.xml.

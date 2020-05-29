@@ -5,27 +5,27 @@ namespace SOS.Process.Models.Cache
     public class PositionLocation
     {
         /// <summary>
-        /// County property
+        ///     County property
         /// </summary>
         public ProcessedArea County { get; set; }
 
         /// <summary>
-        /// Municipality property
+        ///     Municipality property
         /// </summary>
         public ProcessedArea Municipality { get; set; }
 
         /// <summary>
-        /// Parish property
+        ///     Parish property
         /// </summary>
         public ProcessedArea Parish { get; set; }
 
         /// <summary>
-        /// Province property
+        ///     Province property
         /// </summary>
         public ProcessedArea Province { get; set; }
 
         /// <summary>
-        /// County property
+        ///     County property
         /// </summary>
         public bool EconomicZoneOfSweden { get; set; }
     }

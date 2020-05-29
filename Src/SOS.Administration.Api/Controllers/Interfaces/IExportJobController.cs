@@ -4,21 +4,22 @@ using SOS.Lib.Models.Search;
 namespace SOS.Administration.Api.Controllers.Interfaces
 {
     /// <summary>
-    /// Export job controller
+    ///     Export job controller
     /// </summary>
     public interface IExportJobController
     {
         /// <summary>
-        ///  Run export job
+        ///     Run export job
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="blobStorageContainer"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        IActionResult RunExportAndStoreJob([FromBody]ExportFilter filter, [FromQuery]string blobStorageContainer, [FromQuery]string fileName);
+        IActionResult RunExportAndStoreJob([FromBody] ExportFilter filter, [FromQuery] string blobStorageContainer,
+            [FromQuery] string fileName);
 
         /// <summary>
-        /// Schedule daily export job
+        ///     Schedule daily export job
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="blobStorageContainer"></param>

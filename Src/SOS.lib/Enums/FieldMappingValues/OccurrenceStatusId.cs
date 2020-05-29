@@ -1,17 +1,17 @@
 ﻿namespace SOS.Lib.Enums.FieldMappingValues
 {
     /// <summary>
-    /// Enumeration of OccurrenceStatus.
+    ///     Enumeration of OccurrenceStatus.
     /// </summary>
     public enum OccurrenceStatusId
     {
         /// <summary>
-        /// Present.
+        ///     Present.
         /// </summary>
         Present = 0,
 
         /// <summary>
-        /// Absent.
+        ///     Absent.
         /// </summary>
         Absent = 1
     }

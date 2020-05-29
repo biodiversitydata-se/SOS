@@ -1,20 +1,20 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
+using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Export.Services
 {
-    public class BlobStorageService : Interfaces.IBlobStorageService
+    public class BlobStorageService : IBlobStorageService
     {
-        private readonly ILogger<BlobStorageService> _logger;
         private readonly CloudBlobClient _cloudBlobClient;
+        private readonly ILogger<BlobStorageService> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="blobStorageConfiguration"></param>
         /// <param name="logger"></param>
@@ -69,7 +69,8 @@ namespace SOS.Export.Services
             try
             {
                 var cloudBlobContainer = _cloudBlobClient.GetContainerReference(container);
-                var blobName = sourcePath.Substring(sourcePath.LastIndexOf(@"\", StringComparison.CurrentCultureIgnoreCase) + 1); 
+                var blobName =
+                    sourcePath.Substring(sourcePath.LastIndexOf(@"\", StringComparison.CurrentCultureIgnoreCase) + 1);
                 var cloudBlockBlob = cloudBlobContainer.GetBlockBlobReference(blobName);
                 await cloudBlockBlob.UploadFromFileAsync(sourcePath);
 

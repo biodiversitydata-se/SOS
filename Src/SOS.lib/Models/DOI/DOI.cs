@@ -5,32 +5,32 @@ using SOS.Lib.Models.Search;
 namespace SOS.Lib.Models.DOI
 {
     /// <summary>
-    /// DOI related data
+    ///     DOI related data
     /// </summary>
     public class DOI : IEntity<Guid>
     {
         /// <summary>
-        /// Container
+        ///     Container
         /// </summary>
         public string Container { get; set; }
 
         /// <summary>
-        /// Creation Date
+        ///     Creation Date
         /// </summary>
         public DateTime Created { get; set; }
 
         /// <summary>
-        /// Created by
+        ///     Created by
         /// </summary>
         public string CreatedBy { get; set; }
 
         /// <summary>
-        /// Filter used to create DOI
+        ///     Filter used to create DOI
         /// </summary>
         public ExportFilter Filter { get; set; }
 
         /// <summary>
-        /// DOI id
+        ///     DOI id
         /// </summary>
         public Guid Id { get; set; }
     }

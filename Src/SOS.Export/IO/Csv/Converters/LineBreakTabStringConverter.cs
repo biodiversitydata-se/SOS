@@ -6,7 +6,7 @@ using CsvHelper.TypeConversion;
 namespace SOS.Export.IO.Csv.Converters
 {
     /// <summary>
-    /// Replaces newline and tabs with space.
+    ///     Replaces newline and tabs with space.
     /// </summary>
     public class LineBreakTabStringConverter<T> : DefaultTypeConverter
     {
@@ -18,7 +18,7 @@ namespace SOS.Export.IO.Csv.Converters
         }
 
         /// <summary>
-        /// Replaces newline and tabs with space.
+        ///     Replaces newline and tabs with space.
         /// </summary>
         public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
         {

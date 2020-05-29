@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using MessagePack;
 using MessagePack.Resolvers;
@@ -10,7 +9,6 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Process.Database;
-using SOS.Process.Jobs;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Source;
 using Xunit;
@@ -19,53 +17,32 @@ namespace SOS.Process.IntegrationTests.TestDataTools
 {
     public class CreateTaxaFilesTool : TestBase
     {
-        [Fact]
-        [Trait("Category", "Tool")]
-        public async Task CreateListOfDarwinCoreTaxonAsMessagePackFile()
+        private ProcessedTaxonRepository CreateTaxonProcessedRepository()
         {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            const int batchSize = 200000;
-            const string filePath = @"c:\temp\AllDarwinCoreTaxa.msgpck";
-            var taxonVerbatimRepository = CreateTaxonVerbatimRepository(batchSize);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var taxa = await taxonVerbatimRepository.GetBatchAsync(0, 0);
-            var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
-            byte[] bin = MessagePackSerializer.Serialize(taxa, options);
-            System.IO.File.WriteAllBytes(filePath, bin);
+            var processConfiguration = GetProcessConfiguration();
+            var processClient = new ProcessClient(
+                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
+                processConfiguration.ProcessedDbConfiguration.DatabaseName,
+                processConfiguration.ProcessedDbConfiguration.BatchSize);
+            var processedTaxonRepository =
+                new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
+            return processedTaxonRepository;
         }
 
-
-        /// <summary>
-        /// Creates a Message pack file with a list of ProcessedBasicTaxon.
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        [Trait("Category", "Tool")]
-        public async Task CreateListOfProcessedBasicTaxonAsMessagePackFile()
+        private TaxonVerbatimRepository CreateTaxonVerbatimRepository(int batchSize)
         {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            const string filePath = @"c:\temp\AllProcessedBasicTaxa.msgpck";
-            var taxonProcessedRepository = CreateTaxonProcessedRepository();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            IEnumerable<ProcessedTaxon> taxa = await taxonProcessedRepository.GetAllAsync();
-            var basicTaxa = taxa.ToProcessedBasicTaxa();
-            var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
-            byte[] bin = MessagePackSerializer.Serialize(basicTaxa, options);
-            System.IO.File.WriteAllBytes(filePath, bin);
+            var processConfiguration = GetProcessConfiguration();
+            var verbatimClient = new VerbatimClient(
+                processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                processConfiguration.VerbatimDbConfiguration.DatabaseName,
+                batchSize);
+            var taxonVerbatimRepository =
+                new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
+            return taxonVerbatimRepository;
         }
 
         /// <summary>
-        /// Creates a Message pack file with a list of ProcessedBasicTaxon.
+        ///     Creates a Message pack file with a list of ProcessedBasicTaxon.
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -85,34 +62,56 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             IEnumerable<ProcessedTaxon> taxa = await taxonProcessedRepository.GetAllAsync();
             var basicTaxa = taxa.ToProcessedBasicTaxa();
             var tree = TaxonTreeFactory.CreateTaxonTree(basicTaxa);
-            IEnumerable<int> mammaliaTaxonIds = tree.GetUnderlyingTaxonIds(MammaliaTaxonId, true);
+            var mammaliaTaxonIds = tree.GetUnderlyingTaxonIds(MammaliaTaxonId, true);
             var mammaliaProcessedTaxa = taxa.Where(m => mammaliaTaxonIds.Contains(m.DyntaxaTaxonId));
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
-            byte[] bin = MessagePackSerializer.Serialize(mammaliaProcessedTaxa, options);
-            System.IO.File.WriteAllBytes(filePath, bin);
+            var bin = MessagePackSerializer.Serialize(mammaliaProcessedTaxa, options);
+            File.WriteAllBytes(filePath, bin);
         }
 
-        private ProcessedTaxonRepository CreateTaxonProcessedRepository()
+        [Fact]
+        [Trait("Category", "Tool")]
+        public async Task CreateListOfDarwinCoreTaxonAsMessagePackFile()
         {
-            var processConfiguration = GetProcessConfiguration();
-            var processClient = new ProcessClient(
-                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                processConfiguration.ProcessedDbConfiguration.BatchSize);
-            ProcessedTaxonRepository processedTaxonRepository = new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
-            return processedTaxonRepository;
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const int batchSize = 200000;
+            const string filePath = @"c:\temp\AllDarwinCoreTaxa.msgpck";
+            var taxonVerbatimRepository = CreateTaxonVerbatimRepository(batchSize);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var taxa = await taxonVerbatimRepository.GetBatchAsync(0, 0);
+            var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
+            var bin = MessagePackSerializer.Serialize(taxa, options);
+            File.WriteAllBytes(filePath, bin);
         }
 
-        private TaxonVerbatimRepository CreateTaxonVerbatimRepository(int batchSize)
+
+        /// <summary>
+        ///     Creates a Message pack file with a list of ProcessedBasicTaxon.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Tool")]
+        public async Task CreateListOfProcessedBasicTaxonAsMessagePackFile()
         {
-            var processConfiguration = GetProcessConfiguration();
-            var verbatimClient = new VerbatimClient(
-                processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.VerbatimDbConfiguration.DatabaseName,
-                batchSize);
-            var taxonVerbatimRepository = new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
-            return taxonVerbatimRepository;
-        }
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string filePath = @"c:\temp\AllProcessedBasicTaxa.msgpck";
+            var taxonProcessedRepository = CreateTaxonProcessedRepository();
 
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            IEnumerable<ProcessedTaxon> taxa = await taxonProcessedRepository.GetAllAsync();
+            var basicTaxa = taxa.ToProcessedBasicTaxa();
+            var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
+            var bin = MessagePackSerializer.Serialize(basicTaxa, options);
+            File.WriteAllBytes(filePath, bin);
+        }
     }
 }

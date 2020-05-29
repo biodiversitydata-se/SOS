@@ -10,28 +10,6 @@ namespace SOS.Import.IntegrationTests.TestDataTools
 {
     public class CreateDwcTermMappingTool
     {
-        [Fact]
-        public void CreateDwcMapperMapValueByTermSwitchStatements()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var fieldValues = GetFieldValues(typeof(Terms));
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("switch (term)");
-            sb.AppendLine("{");
-            foreach (var pair in fieldValues)
-            {
-                sb.AppendLine($"   case \"{pair.Value}\":");
-                sb.AppendLine($"        observation.{CapitalizeFirstChar(pair.Key)} = val;");
-                sb.AppendLine("        break;");
-            }
-
-            sb.AppendLine("}");
-
-            var result = sb.ToString();
-        }
-
         private string CapitalizeFirstChar(string input)
         {
             try
@@ -51,7 +29,29 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 .GetFields(BindingFlags.Public | BindingFlags.Static)
                 .Where(f => f.FieldType == typeof(string))
                 .ToDictionary(f => f.Name,
-                    f => (string)f.GetValue(null));
+                    f => (string) f.GetValue(null));
+        }
+
+        [Fact]
+        public void CreateDwcMapperMapValueByTermSwitchStatements()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var fieldValues = GetFieldValues(typeof(Terms));
+            var sb = new StringBuilder();
+            sb.AppendLine("switch (term)");
+            sb.AppendLine("{");
+            foreach (var pair in fieldValues)
+            {
+                sb.AppendLine($"   case \"{pair.Value}\":");
+                sb.AppendLine($"        observation.{CapitalizeFirstChar(pair.Key)} = val;");
+                sb.AppendLine("        break;");
+            }
+
+            sb.AppendLine("}");
+
+            var result = sb.ToString();
         }
     }
 }

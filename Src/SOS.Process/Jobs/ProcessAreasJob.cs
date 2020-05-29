@@ -15,11 +15,11 @@ namespace SOS.Process.Jobs
     public class ProcessAreasJob : ProcessJobBase, IProcessAreasJob
     {
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
-        private readonly IProcessedAreaRepository _processedAreaRepository;
         private readonly ILogger<ProcessAreasJob> _logger;
+        private readonly IProcessedAreaRepository _processedAreaRepository;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="areaVerbatimRepository"></param>
         /// <param name="processedAreaRepository"></param>
@@ -33,19 +33,13 @@ namespace SOS.Process.Jobs
             IProcessInfoRepository processInfoRepository,
             ILogger<ProcessAreasJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
-            _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
-            _processedAreaRepository = processedAreaRepository ?? throw new ArgumentNullException(nameof(processedAreaRepository));
+            _areaVerbatimRepository =
+                areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
+            _processedAreaRepository = processedAreaRepository ??
+                                       throw new ArgumentNullException(nameof(processedAreaRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private async Task<bool> ProcessGeometryAsync(int id)
-        {
-            var webMercatorGeometry = await _areaVerbatimRepository.GetGeometryAsync(id);
-            var wgs84Geometry = webMercatorGeometry.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
-
-            return await _processedAreaRepository.StoreGeometryAsync(id, wgs84Geometry.ToGeoShape());
-        }
-        
         /// <inheritdoc />
         public async Task<bool> RunAsync()
         {
@@ -64,11 +58,12 @@ namespace SOS.Process.Jobs
                 _logger.LogError("Failed to delete areas");
                 return false;
             }
+
             _logger.LogDebug("Finish deleting areas");
 
             _logger.LogDebug("Start copy areas");
             var success = await _processedAreaRepository.AddManyAsync(areas);
-           
+
             _logger.LogDebug("Finish copy areas");
 
             if (success)
@@ -82,6 +77,7 @@ namespace SOS.Process.Jobs
                 {
                     success = success && await ProcessGeometryAsync(area.Id);
                 }
+
                 _logger.LogDebug("Finish processing geometries");
 
                 _logger.LogDebug("Start indexing areas");
@@ -91,12 +87,21 @@ namespace SOS.Process.Jobs
 
             _logger.LogDebug("Start updating process info for areas");
             var harvestInfo = await GetHarvestInfoAsync(HarvestInfo.GetIdFromResourceProvider(DataProviderType.Areas));
-            var providerInfo = CreateProviderInfo(DataProviderType.Areas, harvestInfo,  start, DateTime.Now, success ? RunStatus.Success : RunStatus.Failed, areas.Count);
+            var providerInfo = CreateProviderInfo(DataProviderType.Areas, harvestInfo, start, DateTime.Now,
+                success ? RunStatus.Success : RunStatus.Failed, areas.Count);
             await SaveProcessInfo(nameof(Area), start, areas.Count,
-                success ? RunStatus.Success : RunStatus.Failed, new [] { providerInfo } );
+                success ? RunStatus.Success : RunStatus.Failed, new[] {providerInfo});
             _logger.LogDebug("Finish updating process info for areas");
 
             return success ? true : throw new Exception("Copy field areas job failed");
+        }
+
+        private async Task<bool> ProcessGeometryAsync(int id)
+        {
+            var webMercatorGeometry = await _areaVerbatimRepository.GetGeometryAsync(id);
+            var wgs84Geometry = webMercatorGeometry.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+
+            return await _processedAreaRepository.StoreGeometryAsync(id, wgs84Geometry.ToGeoShape());
         }
     }
 }

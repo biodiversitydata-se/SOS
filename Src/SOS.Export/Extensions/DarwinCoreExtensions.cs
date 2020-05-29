@@ -3,18 +3,18 @@ using System.Linq;
 using Newtonsoft.Json;
 using SOS.Export.Models.DarwinCore;
 using SOS.Lib.Helpers;
-using  SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Export.Extensions
 {
     /// <summary>
-    /// Extensions for Darwin Core
+    ///     Extensions for Darwin Core
     /// </summary>
     public static class DarwinCoreExtensions
     {
         /// <summary>
-        /// Cast processed Darwin Core object to Darwin Core Archive
+        ///     Cast processed Darwin Core object to Darwin Core Archive
         /// </summary>
         /// <param name="processedDarwinCore"></param>
         /// <returns></returns>
@@ -49,7 +49,7 @@ namespace SOS.Export.Extensions
         }
 
         /// <summary>
-        ///  Cast processed Darwin Core objects to Darwin Core 
+        ///     Cast processed Darwin Core objects to Darwin Core
         /// </summary>
         /// <param name="processedDarwinCore"></param>
         /// <returns></returns>
@@ -60,7 +60,7 @@ namespace SOS.Export.Extensions
         }
 
         /// <summary>
-        /// Cast processed Darwin Core event object to Darwin Core Archive
+        ///     Cast processed Darwin Core event object to Darwin Core Archive
         /// </summary>
         /// <param name="source"></param>
         /// <param name="coreId"></param>
@@ -97,7 +97,7 @@ namespace SOS.Export.Extensions
         }
 
         /// <summary>
-        /// Cast processed Darwin Core geological context object to Darwin Core Archive
+        ///     Cast processed Darwin Core geological context object to Darwin Core Archive
         /// </summary>
         /// <param name="source"></param>
         /// <param name="coreId"></param>
@@ -134,7 +134,7 @@ namespace SOS.Export.Extensions
         }
 
         /// <summary>
-        /// Cast processed Darwin Core Identification object to Darwin Core Archive
+        ///     Cast processed Darwin Core Identification object to Darwin Core Archive
         /// </summary>
         /// <param name="source"></param>
         /// <param name="coreId"></param>
@@ -161,7 +161,7 @@ namespace SOS.Export.Extensions
         }
 
         /// <summary>
-        /// Cast processed Darwin Core Location object to Darwin Core Archive
+        ///     Cast processed Darwin Core Location object to Darwin Core Archive
         /// </summary>
         /// <param name="source"></param>
         /// <param name="coreId"></param>
@@ -224,7 +224,7 @@ namespace SOS.Export.Extensions
         }
 
         /// <summary>
-        /// Cast processed Darwin Core Material Sample object to Darwin Core Archive
+        ///     Cast processed Darwin Core Material Sample object to Darwin Core Archive
         /// </summary>
         /// <param name="source"></param>
         /// <param name="coreId"></param>
@@ -244,7 +244,7 @@ namespace SOS.Export.Extensions
         }
 
         /// <summary>
-        /// Cast processed Darwin Core Measurement Or Fact object to Darwin Core Archive
+        ///     Cast processed Darwin Core Measurement Or Fact object to Darwin Core Archive
         /// </summary>
         /// <param name="source"></param>
         /// <param name="coreId"></param>
@@ -272,7 +272,7 @@ namespace SOS.Export.Extensions
         }
 
         /// <summary>
-        /// Cast processed Darwin Core Occurrence object to Darwin Core Archive
+        ///     Cast processed Darwin Core Occurrence object to Darwin Core Archive
         /// </summary>
         /// <param name="source"></param>
         /// <param name="coreId"></param>
@@ -315,7 +315,7 @@ namespace SOS.Export.Extensions
         }
 
         /// <summary>
-        /// Cast processed Darwin Core Resource Relationship. object to Darwin Core Archive
+        ///     Cast processed Darwin Core Resource Relationship. object to Darwin Core Archive
         /// </summary>
         /// <param name="source"></param>
         /// <param name="coreId"></param>
@@ -337,12 +337,12 @@ namespace SOS.Export.Extensions
                 RelationshipOfResource = source.RelationshipOfResource,
                 RelationshipRemarks = source.RelationshipRemarks,
                 ResourceID = source.ResourceID,
-                ResourceRelationshipID = source.ResourceRelationshipID,
+                ResourceRelationshipID = source.ResourceRelationshipID
             };
         }
 
         /// <summary>
-        /// Cast processed Darwin Core taxon object to Darwin Core Archive
+        ///     Cast processed Darwin Core taxon object to Darwin Core Archive
         /// </summary>
         /// <param name="source"></param>
         /// <param name="coreId"></param>
@@ -407,7 +407,8 @@ namespace SOS.Export.Extensions
                 return null;
             }
 
-            var rows = project.ProjectParameters.Select(projectParameter => ToExtendedMeasurementOrFactRow(project, projectParameter));
+            var rows = project.ProjectParameters.Select(projectParameter =>
+                ToExtendedMeasurementOrFactRow(project, projectParameter));
             return rows;
         }
 
@@ -415,7 +416,7 @@ namespace SOS.Export.Extensions
             ProcessedProject project,
             ProcessedProjectParameter projectParameter)
         {
-            ExtendedMeasurementOrFactRow row = new ExtendedMeasurementOrFactRow();
+            var row = new ExtendedMeasurementOrFactRow();
             row.MeasurementID = project.Id; // Should this be ProjectId or ProjectParameterId?
             //row.MeasurementID = projectParameter.ProjectParameterId.ToString(); // Should this be ProjectId or ProjectParameterId?
             row.MeasurementType = projectParameter.Name;

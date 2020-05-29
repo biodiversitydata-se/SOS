@@ -9,10 +9,19 @@ using Xunit;
 namespace SOS.Import.UnitTests.Repositories.Destination.FieldMappings
 {
     /// <summary>
-    /// Meta data repository tests
+    ///     Meta data repository tests
     /// </summary>
     public class FieldMappingRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public FieldMappingRepositoryTests()
+        {
+            _importClient = new Mock<IImportClient>();
+            _loggerMock = new Mock<ILogger<FieldMappingRepository>>();
+        }
+
         private readonly Mock<IImportClient> _importClient;
         private readonly Mock<ILogger<FieldMappingRepository>> _loggerMock;
 
@@ -21,16 +30,7 @@ namespace SOS.Import.UnitTests.Repositories.Destination.FieldMappings
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public FieldMappingRepositoryTests()
-        {
-            _importClient = new Mock<IImportClient>();
-            _loggerMock = new Mock<ILogger<FieldMappingRepository>>();
-        }
-
-        /// <summary>
-        /// Test the constructor
+        ///     Test the constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -47,6 +47,5 @@ namespace SOS.Import.UnitTests.Repositories.Destination.FieldMappings
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
-
     }
 }

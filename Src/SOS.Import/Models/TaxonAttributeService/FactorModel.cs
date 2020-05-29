@@ -1,33 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace SOS.Import.Models.TaxonAttributeService
 {
     public class FactorModel
     {
         /// <summary>
-        /// Attributes property
+        ///     Attributes property
         /// </summary>
         public IEnumerable<AttributeValueModel> Attributes { get; set; }
 
         /// <summary>
-        /// Current quality
+        ///     Current quality
         /// </summary>
         public string Quality { get; set; }
 
         /// <summary>
-        /// Current Reference ids
+        ///     Current Reference ids
         /// </summary>
         public IEnumerable<int> ReferenceIds { get; set; }
 
         /// <summary>
-        /// Factor id
+        ///     Factor id
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Factor name
+        ///     Factor name
         /// </summary>
         public string Name { get; set; }
     }

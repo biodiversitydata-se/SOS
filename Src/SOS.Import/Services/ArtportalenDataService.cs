@@ -11,22 +11,23 @@ using SOS.Lib.Configuration.Import;
 namespace SOS.Import.Services
 {
     /// <summary>
-    /// Artportalen data service
+    ///     Artportalen data service
     /// </summary>
     public class ArtportalenDataService : IArtportalenDataService
     {
         private readonly string _connectionString;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public ArtportalenDataService(ArtportalenConfiguration artportalenConfiguration)
         {
-            _connectionString = artportalenConfiguration?.ConnectionString ?? throw new ArgumentNullException(nameof(artportalenConfiguration));
+            _connectionString = artportalenConfiguration?.ConnectionString ??
+                                throw new ArgumentNullException(nameof(artportalenConfiguration));
         }
 
         /// <summary>
-        /// Create new db connection
+        ///     Create new db connection
         /// </summary>
         private IDbConnection Connection => new SqlConnection(_connectionString);
 
@@ -41,7 +42,7 @@ namespace SOS.Import.Services
                     query,
                     parameters,
                     null,
-                    5*60, // 5 minutes
+                    5 * 60, // 5 minutes
                     CommandType.Text,
                     CommandFlags.NoCache
                 )

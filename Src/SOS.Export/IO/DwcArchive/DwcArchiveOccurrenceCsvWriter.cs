@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Managers.Interfaces;
 using SOS.Export.Mappings;
 using SOS.Export.Models;
@@ -21,7 +23,7 @@ using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive
 {
-    public class DwcArchiveOccurrenceCsvWriter : Interfaces.IDwcArchiveOccurrenceCsvWriter
+    public class DwcArchiveOccurrenceCsvWriter : IDwcArchiveOccurrenceCsvWriter
     {
         private readonly ILogger<DwcArchiveOccurrenceCsvWriter> _logger;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
@@ -32,7 +34,8 @@ namespace SOS.Export.IO.DwcArchive
             ITaxonManager taxonManager,
             ILogger<DwcArchiveOccurrenceCsvWriter> logger)
         {
-            _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _processedFieldMappingRepository = processedFieldMappingRepository ??
+                                               throw new ArgumentNullException(nameof(processedFieldMappingRepository));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -61,7 +64,8 @@ namespace SOS.Export.IO.DwcArchive
                     ResolveFieldMappedValues(processedObservations, valueMappingDictionaries);
                     await WriteOccurrenceCsvAsync(stream, processedObservations.ToDarwinCore(), darwinCoreMap);
 
-                    scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
+                    scrollResult =
+                        await processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
 
                 return true;
@@ -96,30 +100,48 @@ namespace SOS.Export.IO.DwcArchive
         }
 
         private void ResolveFieldMappedValues(
-            IEnumerable<ProcessedObservation>  processedObservations, 
+            IEnumerable<ProcessedObservation> processedObservations,
             Dictionary<FieldMappingFieldId, Dictionary<int, string>> valueMappingDictionaries)
         {
             foreach (var observation in processedObservations)
             {
-                ResolveFieldMappedValue(observation.BasisOfRecord, valueMappingDictionaries[FieldMappingFieldId.BasisOfRecord]);
+                ResolveFieldMappedValue(observation.BasisOfRecord,
+                    valueMappingDictionaries[FieldMappingFieldId.BasisOfRecord]);
                 ResolveFieldMappedValue(observation.Type, valueMappingDictionaries[FieldMappingFieldId.Type]);
-                ResolveFieldMappedValue(observation.AccessRights, valueMappingDictionaries[FieldMappingFieldId.AccessRights]);
-                ResolveFieldMappedValue(observation.InstitutionId, valueMappingDictionaries[FieldMappingFieldId.Institution]);
-                ResolveFieldMappedValue(observation.Location?.County, valueMappingDictionaries[FieldMappingFieldId.County]);
-                ResolveFieldMappedValue(observation.Location?.Municipality, valueMappingDictionaries[FieldMappingFieldId.Municipality]);
-                ResolveFieldMappedValue(observation.Location?.Parish, valueMappingDictionaries[FieldMappingFieldId.Parish]);
-                ResolveFieldMappedValue(observation.Location?.Province, valueMappingDictionaries[FieldMappingFieldId.Province]);
-                ResolveFieldMappedValue(observation.Location?.Country, valueMappingDictionaries[FieldMappingFieldId.Country]);
-                ResolveFieldMappedValue(observation.Location?.Continent, valueMappingDictionaries[FieldMappingFieldId.Continent]);
-                ResolveFieldMappedValue(observation.Event?.Biotope, valueMappingDictionaries[FieldMappingFieldId.Biotope]);
-                ResolveFieldMappedValue(observation.Event?.Substrate, valueMappingDictionaries[FieldMappingFieldId.Substrate]);
-                ResolveFieldMappedValue(observation.Identification?.ValidationStatus, valueMappingDictionaries[FieldMappingFieldId.ValidationStatus]);
-                ResolveFieldMappedValue(observation.Occurrence?.LifeStage, valueMappingDictionaries[FieldMappingFieldId.LifeStage]);
-                ResolveFieldMappedValue(observation.Occurrence?.Activity, valueMappingDictionaries[FieldMappingFieldId.Activity]);
-                ResolveFieldMappedValue(observation.Occurrence?.Gender, valueMappingDictionaries[FieldMappingFieldId.Gender]);
-                ResolveFieldMappedValue(observation.Occurrence?.OrganismQuantityUnit, valueMappingDictionaries[FieldMappingFieldId.Unit]);
-                ResolveFieldMappedValue(observation.Occurrence?.EstablishmentMeans, valueMappingDictionaries[FieldMappingFieldId.EstablishmentMeans]);
-                ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatus, valueMappingDictionaries[FieldMappingFieldId.OccurrenceStatus]);
+                ResolveFieldMappedValue(observation.AccessRights,
+                    valueMappingDictionaries[FieldMappingFieldId.AccessRights]);
+                ResolveFieldMappedValue(observation.InstitutionId,
+                    valueMappingDictionaries[FieldMappingFieldId.Institution]);
+                ResolveFieldMappedValue(observation.Location?.County,
+                    valueMappingDictionaries[FieldMappingFieldId.County]);
+                ResolveFieldMappedValue(observation.Location?.Municipality,
+                    valueMappingDictionaries[FieldMappingFieldId.Municipality]);
+                ResolveFieldMappedValue(observation.Location?.Parish,
+                    valueMappingDictionaries[FieldMappingFieldId.Parish]);
+                ResolveFieldMappedValue(observation.Location?.Province,
+                    valueMappingDictionaries[FieldMappingFieldId.Province]);
+                ResolveFieldMappedValue(observation.Location?.Country,
+                    valueMappingDictionaries[FieldMappingFieldId.Country]);
+                ResolveFieldMappedValue(observation.Location?.Continent,
+                    valueMappingDictionaries[FieldMappingFieldId.Continent]);
+                ResolveFieldMappedValue(observation.Event?.Biotope,
+                    valueMappingDictionaries[FieldMappingFieldId.Biotope]);
+                ResolveFieldMappedValue(observation.Event?.Substrate,
+                    valueMappingDictionaries[FieldMappingFieldId.Substrate]);
+                ResolveFieldMappedValue(observation.Identification?.ValidationStatus,
+                    valueMappingDictionaries[FieldMappingFieldId.ValidationStatus]);
+                ResolveFieldMappedValue(observation.Occurrence?.LifeStage,
+                    valueMappingDictionaries[FieldMappingFieldId.LifeStage]);
+                ResolveFieldMappedValue(observation.Occurrence?.Activity,
+                    valueMappingDictionaries[FieldMappingFieldId.Activity]);
+                ResolveFieldMappedValue(observation.Occurrence?.Gender,
+                    valueMappingDictionaries[FieldMappingFieldId.Gender]);
+                ResolveFieldMappedValue(observation.Occurrence?.OrganismQuantityUnit,
+                    valueMappingDictionaries[FieldMappingFieldId.Unit]);
+                ResolveFieldMappedValue(observation.Occurrence?.EstablishmentMeans,
+                    valueMappingDictionaries[FieldMappingFieldId.EstablishmentMeans]);
+                ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatus,
+                    valueMappingDictionaries[FieldMappingFieldId.OccurrenceStatus]);
             }
         }
 
@@ -147,7 +169,7 @@ namespace SOS.Export.IO.DwcArchive
             {
                 HasHeaderRecord = true,
                 Delimiter = "\t", // tab
-                Encoding = System.Text.Encoding.UTF8
+                Encoding = Encoding.UTF8
             };
             await using var csv = new CsvWriter(streamWriter, csvConfig);
 

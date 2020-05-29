@@ -1,26 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DwC_A;
-using DwC_A.Meta;
 using DwC_A.Terms;
 using Microsoft.Extensions.Logging;
-using NetTopologySuite.Operation.Buffer;
 using SOS.Import.DarwinCore.Factories;
-using SOS.Import.Harvesters.Observations;
+using SOS.Import.DarwinCore.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Import.DarwinCore
 {
     /// <summary>
-    /// DwC-A reader for sampling event based DwC-A as DwcObservationVerbatim collection.
+    ///     DwC-A reader for sampling event based DwC-A as DwcObservationVerbatim collection.
     /// </summary>
-    public class DwcOccurrenceSamplingEventArchiveReader : Interfaces.IDwcArchiveReaderAsDwcObservation
+    public class DwcOccurrenceSamplingEventArchiveReader : IDwcArchiveReaderAsDwcObservation
     {
         private readonly ILogger<DwcArchiveReader> _logger;
 
@@ -30,7 +25,7 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <summary>
-        /// Reads a sampling event based DwC-A, and returns observations in batches.
+        ///     Reads a sampling event based DwC-A, and returns observations in batches.
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <param name="idIdentifierTuple"></param>
@@ -41,12 +36,12 @@ namespace SOS.Import.DarwinCore
             IIdIdentifierTuple idIdentifierTuple,
             int batchSize)
         {
-            IAsyncFileReader occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Occurrence);
+            var occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Occurrence);
             if (occurrenceFileReader == null) yield break;
-            List<DwcObservationVerbatim> occurrenceRecords = new List<DwcObservationVerbatim>();
-            int idIndex = occurrenceFileReader.GetIdIndex();
+            var occurrenceRecords = new List<DwcObservationVerbatim>();
+            var idIndex = occurrenceFileReader.GetIdIndex();
 
-            await foreach (IRow row in occurrenceFileReader.GetDataRowsAsync())
+            await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
             {
                 var occurrenceRecord = DwcObservationVerbatimFactory.Create(row, idIdentifierTuple, idIndex);
                 occurrenceRecords.Add(occurrenceRecord);
@@ -70,10 +65,10 @@ namespace SOS.Import.DarwinCore
             const int batchSize = 100000;
             var observationsBatches = ReadArchiveInBatchesAsync(
                 archiveReader,
-                idIdentifierTuple, 
+                idIdentifierTuple,
                 batchSize);
-            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
-            await foreach (List<DwcObservationVerbatim> observationsBatch in observationsBatches)
+            var observations = new List<DwcObservationVerbatim>();
+            await foreach (var observationsBatch in observationsBatches)
             {
                 observations.AddRange(observationsBatch);
             }
@@ -83,12 +78,13 @@ namespace SOS.Import.DarwinCore
 
 
         /// <summary>
-        /// Add data from DwC-A extensions
+        ///     Add data from DwC-A extensions
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <param name="occurrenceRecords"></param>
         /// <returns></returns>
-        private async Task AddDataFromExtensionsAsync(ArchiveReader archiveReader, List<DwcObservationVerbatim> occurrenceRecords)
+        private async Task AddDataFromExtensionsAsync(ArchiveReader archiveReader,
+            List<DwcObservationVerbatim> occurrenceRecords)
         {
             await AddEventDataAsync(occurrenceRecords, archiveReader);
             await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
@@ -98,27 +94,28 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <summary>
-        /// Add Measurement Or Fact extension data
+        ///     Add Measurement Or Fact extension data
         /// </summary>
         /// <param name="occurrenceRecords"></param>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        private async Task AddMofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
+        private async Task AddMofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
+            ArchiveReader archiveReader)
         {
             try
             {
-                IAsyncFileReader mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
+                var mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
                 if (mofFileReader == null) return;
-                int idIndex = mofFileReader.GetIdIndex();
+                var idIndex = mofFileReader.GetIdIndex();
 
-                Dictionary<string, IEnumerable<DwcObservationVerbatim>> observationsByRecordId =
+                var observationsByRecordId =
                     occurrenceRecords
                         .GroupBy(observation => observation.RecordId)
                         .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
 
-                await foreach (IRow row in mofFileReader.GetDataRowsAsync())
+                await foreach (var row in mofFileReader.GetDataRowsAsync())
                 {
-                    string id = row[idIndex];
+                    var id = row[idIndex];
                     AddEventMof(row, id, observationsByRecordId);
                 }
             }
@@ -130,26 +127,27 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <summary>
-        /// Add Simple Multimedia extension data
+        ///     Add Simple Multimedia extension data
         /// </summary>
         /// <param name="occurrenceRecords"></param>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        private async Task AddMultimediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
+        private async Task AddMultimediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
+            ArchiveReader archiveReader)
         {
             try
             {
-                IAsyncFileReader multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
+                var multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
                 if (multimediaFileReader == null) return;
-                int idIndex = multimediaFileReader.GetIdIndex();
-                Dictionary<string, IEnumerable<DwcObservationVerbatim>> observationsByRecordId =
+                var idIndex = multimediaFileReader.GetIdIndex();
+                var observationsByRecordId =
                     occurrenceRecords
                         .GroupBy(observation => observation.RecordId)
                         .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
 
-                await foreach (IRow row in multimediaFileReader.GetDataRowsAsync())
+                await foreach (var row in multimediaFileReader.GetDataRowsAsync())
                 {
-                    string id = row[idIndex];
+                    var id = row[idIndex];
                     if (!observationsByRecordId.TryGetValue(id, out var observations)) continue;
                     foreach (var observation in observations)
                     {
@@ -170,21 +168,22 @@ namespace SOS.Import.DarwinCore
             }
         }
 
-        private async Task AddAudubonMediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
+        private async Task AddAudubonMediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
+            ArchiveReader archiveReader)
         {
             try
             {
-                IAsyncFileReader audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
+                var audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
                 if (audubonFileReader == null) return;
-                int idIndex = audubonFileReader.GetIdIndex();
-                Dictionary<string, IEnumerable<DwcObservationVerbatim>> observationsByRecordId =
+                var idIndex = audubonFileReader.GetIdIndex();
+                var observationsByRecordId =
                     occurrenceRecords
                         .GroupBy(observation => observation.RecordId)
                         .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
 
-                await foreach (IRow row in audubonFileReader.GetDataRowsAsync())
+                await foreach (var row in audubonFileReader.GetDataRowsAsync())
                 {
-                    string id = row[idIndex];
+                    var id = row[idIndex];
                     if (!observationsByRecordId.TryGetValue(id, out var observations)) continue;
                     foreach (var observation in observations)
                     {
@@ -206,14 +205,14 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <summary>
-        /// Add MeasureMentOrFact data
+        ///     Add MeasureMentOrFact data
         /// </summary>
         /// <param name="row"></param>
         /// <param name="id"></param>
         /// <param name="observationsByRecordId"></param>
         private void AddEventMof(
-            IRow row, 
-            string id, 
+            IRow row,
+            string id,
             Dictionary<string, IEnumerable<DwcObservationVerbatim>> observationsByRecordId)
         {
             if (!observationsByRecordId.TryGetValue(id, out var observations)) return;
@@ -230,27 +229,28 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <summary>
-        /// Add event data to observations by reading the core file.
+        ///     Add event data to observations by reading the core file.
         /// </summary>
         /// <param name="occurrenceRecords"></param>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        private async Task AddEventDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
+        private async Task AddEventDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
+            ArchiveReader archiveReader)
         {
-            IAsyncFileReader eventFileReader = archiveReader.GetAsyncCoreFile();
-            int idIndex = eventFileReader.GetIdIndex();
-            Dictionary<string, IEnumerable<DwcObservationVerbatim>> observationsByRecordId = 
+            var eventFileReader = archiveReader.GetAsyncCoreFile();
+            var idIndex = eventFileReader.GetIdIndex();
+            var observationsByRecordId =
                 occurrenceRecords
                     .GroupBy(observation => observation.RecordId)
                     .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
 
-            await foreach (IRow row in eventFileReader.GetDataRowsAsync())
+            await foreach (var row in eventFileReader.GetDataRowsAsync())
             {
                 var id = row[idIndex];
                 if (!observationsByRecordId.TryGetValue(id, out var observations)) continue;
                 foreach (var observation in observations)
                 {
-                    foreach (FieldType fieldType in row.FieldMetaData)
+                    foreach (var fieldType in row.FieldMetaData)
                     {
                         var val = row[fieldType.Index];
                         DwcTermValueMapper.MapValueByTerm(observation, fieldType.Term, val);
@@ -260,29 +260,31 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <summary>
-        /// Add Extended Measurement Or Fact data
+        ///     Add Extended Measurement Or Fact data
         /// </summary>
         /// <param name="occurrenceRecords"></param>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
-        private async Task AddEmofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords, ArchiveReader archiveReader)
+        private async Task AddEmofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
+            ArchiveReader archiveReader)
         {
             try
             {
-                IAsyncFileReader emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
+                var emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
                 if (emofFileReader == null) return;
-                int idIndex = emofFileReader.GetIdIndex();
-                FieldType occurrenceIdFieldMetaData = emofFileReader.TryGetFieldMetaData(Terms.occurrenceID);
-                Dictionary<string, IEnumerable<DwcObservationVerbatim>> observationsByRecordId =
+                var idIndex = emofFileReader.GetIdIndex();
+                var occurrenceIdFieldMetaData = emofFileReader.TryGetFieldMetaData(Terms.occurrenceID);
+                var observationsByRecordId =
                     occurrenceRecords
                         .GroupBy(observation => observation.RecordId)
                         .ToDictionary(grouping => grouping.Key, grouping => grouping.AsEnumerable());
 
-                if (occurrenceIdFieldMetaData == null) // If there is no occurrenceID field, then add only event measurements
+                if (occurrenceIdFieldMetaData == null
+                ) // If there is no occurrenceID field, then add only event measurements
                 {
-                    await foreach (IRow row in emofFileReader.GetDataRowsAsync())
+                    await foreach (var row in emofFileReader.GetDataRowsAsync())
                     {
-                        string id = row[idIndex];
+                        var id = row[idIndex];
                         AddEventEmof(row, id, observationsByRecordId);
                     }
                 }
@@ -290,13 +292,13 @@ namespace SOS.Import.DarwinCore
                 {
                     var observationByOccurrenceId =
                         occurrenceRecords.ToDictionary(v => v.OccurrenceID, v => v);
-                    await foreach (IRow row in emofFileReader.GetDataRowsAsync())
+                    await foreach (var row in emofFileReader.GetDataRowsAsync())
                     {
-                        string occurrenceId = row[occurrenceIdFieldMetaData.Index];
+                        var occurrenceId = row[occurrenceIdFieldMetaData.Index];
                         AddOccurrenceEmof(row, occurrenceId, observationByOccurrenceId);
                         if (string.IsNullOrEmpty(occurrenceId)) // Measurement for event
                         {
-                            string id = row[idIndex];
+                            var id = row[idIndex];
                             AddEventEmof(row, id, observationsByRecordId);
                         }
                     }
@@ -310,14 +312,14 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <summary>
-        /// Add event measurement
+        ///     Add event measurement
         /// </summary>
         /// <param name="row"></param>
         /// <param name="id"></param>
         /// <param name="observationsByRecordId"></param>
         private void AddEventEmof(
-            IRow row, 
-            string id, 
+            IRow row,
+            string id,
             Dictionary<string, IEnumerable<DwcObservationVerbatim>> observationsByRecordId)
         {
             if (!observationsByRecordId.TryGetValue(id, out var observations)) return;
@@ -334,19 +336,19 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <summary>
-        /// Add occurrence measurement.
+        ///     Add occurrence measurement.
         /// </summary>
         /// <param name="row"></param>
         /// <param name="occurrenceId"></param>
         /// <param name="observationByOccurrenceId"></param>
         private void AddOccurrenceEmof(
-            IRow row, 
-            string occurrenceId, 
+            IRow row,
+            string occurrenceId,
             Dictionary<string, DwcObservationVerbatim> observationByOccurrenceId)
         {
             if (string.IsNullOrEmpty(occurrenceId)) return;
-            
-            if (observationByOccurrenceId.TryGetValue(occurrenceId, out DwcObservationVerbatim obs))
+
+            if (observationByOccurrenceId.TryGetValue(occurrenceId, out var obs))
             {
                 if (obs.ObservationExtendedMeasurementOrFacts == null)
                 {

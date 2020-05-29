@@ -10,17 +10,15 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.FieldMapping
 {
     /// <summary>
-    /// Class for creating biotope field mapping.
+    ///     Class for creating biotope field mapping.
     /// </summary>
     public class BiotopeFieldMappingFactory : ArtportalenFieldMappingFactoryBase
     {
         private readonly IMetadataRepository _artportalenMetadataRepository;
         private readonly ILogger<BiotopeFieldMappingFactory> _logger;
-        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Biotope;
-        protected override bool Localized => true;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="artportalenMetadataRepository"></param>
         /// <param name="logger"></param>
@@ -28,9 +26,13 @@ namespace SOS.Import.Factories.FieldMapping
             IMetadataRepository artportalenMetadataRepository,
             ILogger<BiotopeFieldMappingFactory> logger)
         {
-            _artportalenMetadataRepository = artportalenMetadataRepository ?? throw new ArgumentNullException(nameof(artportalenMetadataRepository));
+            _artportalenMetadataRepository = artportalenMetadataRepository ??
+                                             throw new ArgumentNullException(nameof(artportalenMetadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
+        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Biotope;
+        protected override bool Localized => true;
 
         protected override async Task<ICollection<FieldMappingValue>> GetFieldMappingValues()
         {

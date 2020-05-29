@@ -28,7 +28,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
 
             return stub;
         }
-        
+
         public static Mock<IProcessedObservationRepository> Create(ProcessedObservation observation)
         {
             var stub = new Mock<IProcessedObservationRepository>();
@@ -36,7 +36,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
                 .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
                 .ReturnsAsync(new ScrollResult<ProcessedObservation>
                 {
-                    Records = new[] { observation }
+                    Records = new[] {observation}
                 });
 
             return stub;
@@ -44,12 +44,12 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
 
         private static IEnumerable<ProcessedObservation> LoadObservations(string fileName)
         {
-            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
-            string str = File.ReadAllText(filePath, Encoding.UTF8);
-            var serializerSettings = new JsonSerializerSettings()
+            var str = File.ReadAllText(filePath, Encoding.UTF8);
+            var serializerSettings = new JsonSerializerSettings
             {
-                Converters = new List<JsonConverter> { new ObjectIdConverter() }
+                Converters = new List<JsonConverter> {new ObjectIdConverter()}
             };
 
             var observations = JsonConvert.DeserializeObject<List<ProcessedObservation>>(str, serializerSettings);

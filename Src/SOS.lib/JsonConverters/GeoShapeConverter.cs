@@ -10,7 +10,7 @@ using Nest;
 namespace SOS.Lib.JsonConverters
 {
     /// <summary>
-    /// Json converter for IGeoShape
+    ///     Json converter for IGeoShape
     /// </summary>
     public class GeoShapeConverter : JsonConverter<IGeoShape>
     {
@@ -43,7 +43,7 @@ namespace SOS.Lib.JsonConverters
                     ? reader.ValueSequence.ToArray()
                     : reader.ValueSpan.ToArray();
                 result.Append(Encoding.Default.GetString(seq));
-                
+
                 addComma = reader.TokenType == JsonTokenType.Number && !addComma;
 
                 if (reader.TokenType == JsonTokenType.EndArray)
@@ -71,7 +71,7 @@ namespace SOS.Lib.JsonConverters
             writer.WriteEndArray();
         }
 
-        private void WritePolygon(Utf8JsonWriter writer, IEnumerable<IEnumerable<GeoCoordinate>>  coordinates)
+        private void WritePolygon(Utf8JsonWriter writer, IEnumerable<IEnumerable<GeoCoordinate>> coordinates)
         {
             writer.WriteStartArray();
 
@@ -82,6 +82,7 @@ namespace SOS.Lib.JsonConverters
                 {
                     WritePoint(writer, point);
                 }
+
                 writer.WriteEndArray();
             }
 
@@ -92,6 +93,7 @@ namespace SOS.Lib.JsonConverters
         {
             return typeof(IGeoShape).IsAssignableFrom(type);
         }
+
         public override IGeoShape Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.StartObject)
@@ -103,7 +105,7 @@ namespace SOS.Lib.JsonConverters
             var type = string.Empty;
 
             reader.Read();
-            
+
             while (reader.TokenType != JsonTokenType.EndObject)
             {
                 var property = reader.GetString();
@@ -128,16 +130,18 @@ namespace SOS.Lib.JsonConverters
                     var pointCoordinates = JsonSerializer.Deserialize<double[]>(coordinateString);
                     return new PointGeoShape(new GeoCoordinate(pointCoordinates[1], pointCoordinates[0]));
                 case "polygon":
-                    var polygonCoordinates = JsonSerializer.Deserialize<IEnumerable<IEnumerable<double[]>>>(coordinateString);
+                    var polygonCoordinates =
+                        JsonSerializer.Deserialize<IEnumerable<IEnumerable<double[]>>>(coordinateString);
                     return new PolygonGeoShape(polygonCoordinates
                         .Select(ls => ls
                             .Select(pnt => new GeoCoordinate(pnt[1], pnt[0]))));
                 case "multipolygon":
-                    var muliPolygonCoordinates = JsonSerializer.Deserialize<IEnumerable<IEnumerable<IEnumerable<double[]>>>>(coordinateString);
+                    var muliPolygonCoordinates =
+                        JsonSerializer.Deserialize<IEnumerable<IEnumerable<IEnumerable<double[]>>>>(coordinateString);
                     return new MultiPolygonGeoShape(muliPolygonCoordinates
                         .Select(poly => poly
-                        .Select(ls => ls
-                            .Select(pnt => new GeoCoordinate(pnt[1], pnt[0])))));
+                            .Select(ls => ls
+                                .Select(pnt => new GeoCoordinate(pnt[1], pnt[0])))));
             }
 
             return null;
@@ -148,29 +152,32 @@ namespace SOS.Lib.JsonConverters
             if (value == null)
             {
                 return;
-            };
+            }
+
+            ;
             writer.WriteStartObject();
 
             var type = value.Type;
-            
+
             writer.WritePropertyName("coordinates");
             switch (type?.ToLower())
             {
                 case "point":
-                    var point = (PointGeoShape)value;
+                    var point = (PointGeoShape) value;
                     WritePoint(writer, point.Coordinates);
                     break;
                 case "polygon":
-                    var polygon = (PolygonGeoShape)value;
+                    var polygon = (PolygonGeoShape) value;
                     WritePolygon(writer, polygon.Coordinates);
                     break;
                 case "multipolygon":
-                    var muliPolygon = (MultiPolygonGeoShape)value;
+                    var muliPolygon = (MultiPolygonGeoShape) value;
                     writer.WriteStartArray();
                     foreach (var poly in muliPolygon.Coordinates)
                     {
                         WritePolygon(writer, poly);
                     }
+
                     writer.WriteEndArray();
                     break;
             }

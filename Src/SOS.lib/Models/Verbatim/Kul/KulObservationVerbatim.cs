@@ -5,11 +5,6 @@ namespace SOS.Lib.Models.Verbatim.Kul
 {
     public class KulObservationVerbatim : IEntity<string>
     {
-        public string Id
-        {
-            get => OccurrenceId;
-            set => OccurrenceId = value;
-        }
         public string OccurrenceId { get; set; }
         public int DyntaxaTaxonId { get; set; }
         public double DecimalLongitude { get; set; }
@@ -26,5 +21,11 @@ namespace SOS.Lib.Models.Verbatim.Kul
         public int? IndividualCount { get; set; }
         public string CountryCode { get; set; }
         public string AssociatedOccurrences { get; set; }
+
+        public string Id
+        {
+            get => OccurrenceId;
+            set => OccurrenceId = value;
+        }
     }
 }

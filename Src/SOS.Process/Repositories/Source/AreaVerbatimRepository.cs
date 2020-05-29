@@ -7,16 +7,17 @@ using NetTopologySuite.Geometries;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Database.Interfaces;
+using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source
 {
-    public class AreaVerbatimRepository : VerbatimBaseRepository<Area, int>, Interfaces.IAreaVerbatimRepository
+    public class AreaVerbatimRepository : VerbatimBaseRepository<Area, int>, IAreaVerbatimRepository
     {
         private readonly GridFSBucket _gridFSBucket;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
@@ -26,13 +27,13 @@ namespace SOS.Process.Repositories.Source
             _jsonSerializerOptions = new JsonSerializerOptions();
             _jsonSerializerOptions.Converters.Add(new GeometryConverter());
 
-            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = nameof(Area) });
+            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions {BucketName = nameof(Area)});
         }
 
         /// <inheritdoc />
         public async Task<Geometry> GetGeometryAsync(int areaId)
         {
-            var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync($"geometry-{ areaId }");
+            var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync($"geometry-{areaId}");
             var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
             return JsonSerializer.Deserialize<Geometry>(utfString, _jsonSerializerOptions);

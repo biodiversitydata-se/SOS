@@ -4,12 +4,12 @@ using SOS.Export.Models.DarwinCore;
 namespace SOS.Export.Mappings
 {
     /// <summary>
-    /// Mapping of Darwin Core to csv
+    ///     Mapping of Darwin Core to csv
     /// </summary>
     public class DwCLocationMap : ClassMap<DwCLocation>
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public DwCLocationMap()
         {
@@ -58,7 +58,6 @@ namespace SOS.Export.Mappings
             Map(m => m.GeoreferenceSources).Index(42).Name("georeferenceSources");
             Map(m => m.GeoreferenceVerificationStatus).Index(43).Name("georeferenceVerificationStatus");
             Map(m => m.GeoreferenceRemarks).Index(44).Name("georeferenceRemarks");
-
         }
     }
 }

@@ -9,10 +9,19 @@ using Xunit;
 namespace SOS.Import.UnitTests.Repositories.Destination.ClamPortal
 {
     /// <summary>
-    /// Meta data repository tests
+    ///     Meta data repository tests
     /// </summary>
     public class ClamObservationVerbatimRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public ClamObservationVerbatimRepositoryTests()
+        {
+            _importClient = new Mock<IImportClient>();
+            _loggerMock = new Mock<ILogger<ClamObservationVerbatimRepository>>();
+        }
+
         private readonly Mock<IImportClient> _importClient;
         private readonly Mock<ILogger<ClamObservationVerbatimRepository>> _loggerMock;
 
@@ -21,16 +30,7 @@ namespace SOS.Import.UnitTests.Repositories.Destination.ClamPortal
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public ClamObservationVerbatimRepositoryTests()
-        {
-            _importClient = new Mock<IImportClient>();
-            _loggerMock = new Mock<ILogger<ClamObservationVerbatimRepository>>();
-        }
-
-        /// <summary>
-        /// Test the constructor
+        ///     Test the constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -47,6 +47,5 @@ namespace SOS.Import.UnitTests.Repositories.Destination.ClamPortal
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
-
     }
 }

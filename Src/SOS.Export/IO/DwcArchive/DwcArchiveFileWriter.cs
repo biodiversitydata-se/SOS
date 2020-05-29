@@ -24,7 +24,7 @@ namespace SOS.Export.IO.DwcArchive
         private readonly ILogger<DwcArchiveFileWriter> _logger;
 
         /// <summary>
-        /// Constructor.
+        ///     Constructor.
         /// </summary>
         /// <param name="dwcArchiveOccurrenceCsvWriter"></param>
         /// <param name="extendedMeasurementOrFactCsvWriter"></param>
@@ -36,8 +36,11 @@ namespace SOS.Export.IO.DwcArchive
             IFileService fileService,
             ILogger<DwcArchiveFileWriter> logger)
         {
-            _dwcArchiveOccurrenceCsvWriter = dwcArchiveOccurrenceCsvWriter ?? throw new ArgumentNullException(nameof(dwcArchiveOccurrenceCsvWriter));
-            _extendedMeasurementOrFactCsvWriter = extendedMeasurementOrFactCsvWriter ?? throw new ArgumentNullException(nameof(extendedMeasurementOrFactCsvWriter));
+            _dwcArchiveOccurrenceCsvWriter = dwcArchiveOccurrenceCsvWriter ??
+                                             throw new ArgumentNullException(nameof(dwcArchiveOccurrenceCsvWriter));
+            _extendedMeasurementOrFactCsvWriter = extendedMeasurementOrFactCsvWriter ??
+                                                  throw new ArgumentNullException(
+                                                      nameof(extendedMeasurementOrFactCsvWriter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -72,20 +75,19 @@ namespace SOS.Export.IO.DwcArchive
             IJobCancellationToken cancellationToken)
         {
             string temporaryZipExportFolderPath = null;
-            
+
             try
             {
-                
                 temporaryZipExportFolderPath = Path.Combine(exportFolderPath, fileName);
                 _fileService.CreateFolder(temporaryZipExportFolderPath);
-                string occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.csv");
-                string emofCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "extendedMeasurementOrFact.csv");
-                string metaXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "meta.xml");
-                string emlXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "eml.xml");
-                string processInfoXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "processinfo.xml");
+                var occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.csv");
+                var emofCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "extendedMeasurementOrFact.csv");
+                var metaXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "meta.xml");
+                var emlXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "eml.xml");
+                var processInfoXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "processinfo.xml");
 
                 // Create Occurrence.csv
-                using (FileStream fileStream = File.Create(occurrenceCsvFilePath))
+                using (var fileStream = File.Create(occurrenceCsvFilePath))
                 {
                     await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                         filter,
@@ -96,7 +98,7 @@ namespace SOS.Export.IO.DwcArchive
                 }
 
                 // Create ExtendedMeasurementOrFact.csv
-                using (FileStream fileStream = File.Create(emofCsvFilePath))
+                using (var fileStream = File.Create(emofCsvFilePath))
                 {
                     await _extendedMeasurementOrFactCsvWriter.CreateCsvFileAsync(
                         filter,
@@ -107,19 +109,19 @@ namespace SOS.Export.IO.DwcArchive
                 }
 
                 // Create meta.xml
-                using (FileStream fileStream = File.Create(metaXmlFilePath))
+                using (var fileStream = File.Create(metaXmlFilePath))
                 {
                     DwcArchiveMetaFileWriter.CreateMetaXmlFile(fileStream, fieldDescriptions.ToList());
                 }
 
                 // Create eml.xml
-                using (FileStream fileStream = File.Create(emlXmlFilePath))
+                using (var fileStream = File.Create(emlXmlFilePath))
                 {
                     await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(fileStream);
                 }
 
                 // Create processinfo.xml
-                
+
                 await using var processInfoFileStream = File.Create(processInfoXmlFilePath);
                 DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileStream, processInfo);
                 processInfoFileStream.Close();

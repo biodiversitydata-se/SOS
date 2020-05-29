@@ -8,24 +8,26 @@ namespace SOS.Process.IntegrationTests
     {
         protected ProcessConfiguration GetProcessConfiguration()
         {
-            IConfigurationRoot config = new ConfigurationBuilder()
+            var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            ProcessConfiguration processConfiguration = config.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
+            var processConfiguration = config.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
             return processConfiguration;
         }
+
         protected ElasticSearchConfiguration GetElasticConfiguration()
         {
-            IConfigurationRoot config = new ConfigurationBuilder()
+            var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var elasticConfiguration = config.GetSection("ProcessConfiguration").GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();            
+            var elasticConfiguration = config.GetSection("ProcessConfiguration").GetSection("SearchDbConfiguration")
+                .Get<ElasticSearchConfiguration>();
             return elasticConfiguration;
         }
     }

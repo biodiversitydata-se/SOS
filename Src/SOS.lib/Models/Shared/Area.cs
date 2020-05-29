@@ -6,7 +6,7 @@ namespace SOS.Lib.Models.Shared
     public class Area : IEntity<int>
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="areaType"></param>
         public Area(AreaType areaType)
@@ -15,23 +15,23 @@ namespace SOS.Lib.Models.Shared
         }
 
         /// <summary>
-        /// Area Id
-        /// </summary>
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Name of area
+        ///     Name of area
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Type of area
+        ///     Type of area
         /// </summary>
-        public AreaType AreaType { get; private set; }
-        
+        public AreaType AreaType { get; }
+
         /// <summary>
-        /// Feature Id.
+        ///     Feature Id.
         /// </summary>
         public string FeatureId { get; set; }
+
+        /// <summary>
+        ///     Area Id
+        /// </summary>
+        public int Id { get; set; }
     }
 }

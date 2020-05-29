@@ -10,18 +10,18 @@ using Xunit;
 namespace SOS.Import.IntegrationTests.Repositories
 {
     /// <summary>
-    /// Test sighting repository
+    ///     Test sighting repository
     /// </summary>
     public class SightingRepositoryIntegrationTests : TestBase
     {
         /// <summary>
-        /// Test get chunk of specific sighting ids.
+        ///     Test get chunk of specific sighting ids.
         /// </summary>
         /// <returns></returns>
         [Fact]
         public async Task GetChunkAsync_ForSpecificSightingIds_Success()
         {
-            IEnumerable<int> sightingIds = new []
+            IEnumerable<int> sightingIds = new[]
             {
                 72109918,
                 53584868,
@@ -39,7 +39,7 @@ namespace SOS.Import.IntegrationTests.Repositories
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result = await sightingRepository.GetChunkAsync(sightingIds);
-            
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

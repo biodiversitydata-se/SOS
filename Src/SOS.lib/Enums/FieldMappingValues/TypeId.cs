@@ -1,67 +1,67 @@
 ﻿namespace SOS.Lib.Enums.FieldMappingValues
 {
     /// <summary>
-    /// Enumeration of Type.
+    ///     Enumeration of Type.
     /// </summary>
     public enum TypeId
     {
         /// <summary>
-        /// Collection.
+        ///     Collection.
         /// </summary>
         Collection = 0,
 
         /// <summary>
-        /// Dataset.
+        ///     Dataset.
         /// </summary>
         Dataset = 1,
 
         /// <summary>
-        /// Event.
+        ///     Event.
         /// </summary>
         Event = 2,
 
         /// <summary>
-        /// Image.
+        ///     Image.
         /// </summary>
         Image = 3,
 
         /// <summary>
-        /// InteractiveResource.
+        ///     InteractiveResource.
         /// </summary>
         InteractiveResource = 4,
 
         /// <summary>
-        /// MovingImage.
+        ///     MovingImage.
         /// </summary>
         MovingImage = 5,
 
         /// <summary>
-        /// PhysicalObject.
+        ///     PhysicalObject.
         /// </summary>
         PhysicalObject = 6,
 
         /// <summary>
-        /// Service.
+        ///     Service.
         /// </summary>
         Service = 7,
 
         /// <summary>
-        /// Software.
+        ///     Software.
         /// </summary>
         Software = 8,
 
         /// <summary>
-        /// Sound.
+        ///     Sound.
         /// </summary>
         Sound = 9,
 
         /// <summary>
-        /// StillImage.
+        ///     StillImage.
         /// </summary>
         StillImage = 10,
 
         /// <summary>
-        /// Text.
+        ///     Text.
         /// </summary>
         Text = 11
     }

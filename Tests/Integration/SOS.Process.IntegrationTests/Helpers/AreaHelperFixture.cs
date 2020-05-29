@@ -5,18 +5,17 @@ using Moq;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Repositories.Destination;
-using SOS.Process.Repositories.Source;
 
 namespace SOS.Process.IntegrationTests.Helpers
 {
     public class AreaHelperFixture : TestBase, IDisposable
     {
-        public AreaHelper AreaHelper { get; private set; }
-
         public AreaHelperFixture()
         {
             AreaHelper = CreateAreaHelper();
         }
+
+        public AreaHelper AreaHelper { get; private set; }
 
         public void Dispose()
         {

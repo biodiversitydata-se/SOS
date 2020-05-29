@@ -1,14 +1,14 @@
-﻿using DwC_A.Factories;
-using DwC_A.Meta;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DwC_A.Factories;
+using DwC_A.Meta;
 
 namespace DwC_A
 {
     internal class FileReader : IFileReaderAggregate
     {
-        const int BufferSize = 65536;   //TODO: Make this configurable to allow tuning
+        private const int BufferSize = 65536; //TODO: Make this configurable to allow tuning
         private readonly StreamReader streamReader;
 
         public FileReader(string fileName,
@@ -16,8 +16,8 @@ namespace DwC_A
             ITokenizer tokenizer,
             IFileMetaData fileMetaData)
         {
-            this.FileName = fileName;
-            this.FileMetaData = fileMetaData;
+            FileName = fileName;
+            FileMetaData = fileMetaData;
             FileReaderUtils.ValidateLineEnds(fileMetaData.LinesTerminatedBy);
             streamReader = new StreamReader(rowFactory, tokenizer, fileMetaData);
         }
@@ -26,10 +26,10 @@ namespace DwC_A
         {
             get
             {
-                using (var stream = new FileStream(FileName, 
+                using (var stream = new FileStream(FileName,
                     FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, false))
                 {
-                    foreach(var row in streamReader.ReadRows(stream))
+                    foreach (var row in streamReader.ReadRows(stream))
                     {
                         yield return row;
                     }
@@ -37,25 +37,13 @@ namespace DwC_A
             }
         }
 
-        public IEnumerable<IRow> HeaderRows
-        {
-            get
-            {
-                return Rows.Take(FileMetaData.HeaderRowCount);
-            }
-        }
+        public IEnumerable<IRow> HeaderRows => Rows.Take(FileMetaData.HeaderRowCount);
 
-        public IEnumerable<IRow> DataRows
-        {
-            get
-            {
-                return Rows.Skip(FileMetaData.HeaderRowCount);
-            }
-        }
+        public IEnumerable<IRow> DataRows => Rows.Skip(FileMetaData.HeaderRowCount);
 
         public async IAsyncEnumerable<IRow> GetRowsAsync()
         {
-            using (var stream = new FileStream(FileName, 
+            using (var stream = new FileStream(FileName,
                 FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, true))
             {
                 await foreach (var row in streamReader.ReadRowsAsync(stream))
@@ -77,7 +65,7 @@ namespace DwC_A
 
         public async IAsyncEnumerable<IRow> GetHeaderRowsAsync()
         {
-            int count = 0;
+            var count = 0;
             await foreach (var row in GetRowsAsync())
             {
                 if (count < FileMetaData.HeaderRowCount)
@@ -88,13 +76,14 @@ namespace DwC_A
                 {
                     break;
                 }
+
                 count++;
             }
         }
 
         public async IAsyncEnumerable<IRow> GetDataRowsAsync()
         {
-            int count = 0;
+            var count = 0;
             await foreach (var row in GetRowsAsync())
             {
                 if (count >= FileMetaData.HeaderRowCount)

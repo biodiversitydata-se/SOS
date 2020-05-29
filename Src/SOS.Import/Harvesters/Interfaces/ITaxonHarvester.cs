@@ -4,12 +4,12 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters.Interfaces
 {
     /// <summary>
-    /// Taxon harvester
+    ///     Taxon harvester
     /// </summary>
     public interface ITaxonHarvester
     {
         /// <summary>
-        /// Harvest taxa.
+        ///     Harvest taxa.
         /// </summary>
         /// <returns></returns>
         Task<HarvestInfo> HarvestAsync();

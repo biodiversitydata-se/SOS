@@ -1,146 +1,146 @@
 {
-  "Id": 18,
-  "Name": "Type",
-  "Localized": false,
-  "Values": [
-    {
-      "Id": 0,
-      "Value": "Collection",
-      "Localized": false
-    },
-    {
-      "Id": 1,
-      "Value": "Dataset",
-      "Localized": false
-    },
-    {
-      "Id": 2,
-      "Value": "Event",
-      "Localized": false
-    },
-    {
-      "Id": 3,
-      "Value": "Image",
-      "Localized": false
-    },
-    {
-      "Id": 4,
-      "Value": "InteractiveResource",
-      "Localized": false
-    },
-    {
-      "Id": 5,
-      "Value": "MovingImage",
-      "Localized": false
-    },
-    {
-      "Id": 6,
-      "Value": "PhysicalObject",
-      "Localized": false
-    },
-    {
-      "Id": 7,
-      "Value": "Service",
-      "Localized": false
-    },
-    {
-      "Id": 8,
-      "Value": "Software",
-      "Localized": false
-    },
-    {
-      "Id": 9,
-      "Value": "Sound",
-      "Localized": false
-    },
-    {
-      "Id": 10,
-      "Value": "StillImage",
-      "Localized": false
-    },
-    {
-      "Id": 11,
-      "Value": "Text",
-      "Localized": false
-    }
-  ],
-  "ExternalSystemsMapping": [
-    {
-      "Id": 1,
-      "Name": "DarwinCore",
-      "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
-      "Mappings": [
+    "Id": 18,
+    "Name": "Type",
+    "Localized": false,
+    "Values": [
         {
-          "Key": "type",
-          "Description": "The type term (http://rs.tdwg.org/dwc/terms/type)",
-          "Values": [
-            {
-              "Value": "Collection",
-              "SosId": 0
-            },
-            {
-              "Value": "Dataset",
-              "SosId": 1
-            },
-            {
-              "Value": "Event",
-              "SosId": 2
-            },
-            {
-              "Value": "Image",
-              "SosId": 3
-            },
-            {
-              "Value": "InteractiveResource",
-              "SosId": 4
-            },
-            {
-              "Value": "Interactive Resource",
-              "SosId": 4
-            },
-            {
-              "Value": "MovingImage",
-              "SosId": 5
-            },
-            {
-              "Value": "Moving Image",
-              "SosId": 5
-            },
-            {
-              "Value": "PhysicalObject",
-              "SosId": 6
-            },
-            {
-              "Value": "Physical Object",
-              "SosId": 6
-            },
-            {
-              "Value": "Service",
-              "SosId": 7
-            },
-            {
-              "Value": "Software",
-              "SosId": 8
-            },
-            {
-              "Value": "Sound",
-              "SosId": 9
-            },
-            {
-              "Value": "StillImage",
-              "SosId": 10
-            },
-            {
-              "Value": "Still Image",
-              "SosId": 10
-            },
-            {
-              "Value": "Text",
-              "SosId": 11
-            }
-          ]
+            "Id": 0,
+            "Value": "Collection",
+            "Localized": false
+        },
+        {
+            "Id": 1,
+            "Value": "Dataset",
+            "Localized": false
+        },
+        {
+            "Id": 2,
+            "Value": "Event",
+            "Localized": false
+        },
+        {
+            "Id": 3,
+            "Value": "Image",
+            "Localized": false
+        },
+        {
+            "Id": 4,
+            "Value": "InteractiveResource",
+            "Localized": false
+        },
+        {
+            "Id": 5,
+            "Value": "MovingImage",
+            "Localized": false
+        },
+        {
+            "Id": 6,
+            "Value": "PhysicalObject",
+            "Localized": false
+        },
+        {
+            "Id": 7,
+            "Value": "Service",
+            "Localized": false
+        },
+        {
+            "Id": 8,
+            "Value": "Software",
+            "Localized": false
+        },
+        {
+            "Id": 9,
+            "Value": "Sound",
+            "Localized": false
+        },
+        {
+            "Id": 10,
+            "Value": "StillImage",
+            "Localized": false
+        },
+        {
+            "Id": 11,
+            "Value": "Text",
+            "Localized": false
         }
-      ]
-    }
-  ]
+    ],
+    "ExternalSystemsMapping": [
+        {
+            "Id": 1,
+            "Name": "DarwinCore",
+            "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
+            "Mappings": [
+                {
+                    "Key": "type",
+                    "Description": "The type term (http://rs.tdwg.org/dwc/terms/type)",
+                    "Values": [
+                        {
+                            "Value": "Collection",
+                            "SosId": 0
+                        },
+                        {
+                            "Value": "Dataset",
+                            "SosId": 1
+                        },
+                        {
+                            "Value": "Event",
+                            "SosId": 2
+                        },
+                        {
+                            "Value": "Image",
+                            "SosId": 3
+                        },
+                        {
+                            "Value": "InteractiveResource",
+                            "SosId": 4
+                        },
+                        {
+                            "Value": "Interactive Resource",
+                            "SosId": 4
+                        },
+                        {
+                            "Value": "MovingImage",
+                            "SosId": 5
+                        },
+                        {
+                            "Value": "Moving Image",
+                            "SosId": 5
+                        },
+                        {
+                            "Value": "PhysicalObject",
+                            "SosId": 6
+                        },
+                        {
+                            "Value": "Physical Object",
+                            "SosId": 6
+                        },
+                        {
+                            "Value": "Service",
+                            "SosId": 7
+                        },
+                        {
+                            "Value": "Software",
+                            "SosId": 8
+                        },
+                        {
+                            "Value": "Sound",
+                            "SosId": 9
+                        },
+                        {
+                            "Value": "StillImage",
+                            "SosId": 10
+                        },
+                        {
+                            "Value": "Still Image",
+                            "SosId": 10
+                        },
+                        {
+                            "Value": "Text",
+                            "SosId": 11
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 }

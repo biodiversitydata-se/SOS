@@ -4,16 +4,23 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Managers;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Import.Repositories.Resource.Interfaces;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Managers
 {
     public class DataProviderManagerTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public DataProviderManagerTests()
+        {
+            _dataProviderRepositoryMock = new Mock<IDataProviderRepository>();
+            _loggerMock = new Mock<ILogger<DataProviderManager>>();
+        }
+
         private readonly Mock<IDataProviderRepository> _dataProviderRepositoryMock;
         private readonly Mock<ILogger<DataProviderManager>> _loggerMock;
 
@@ -22,81 +29,7 @@ namespace SOS.Import.UnitTests.Managers
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public DataProviderManagerTests()
-        {
-            _dataProviderRepositoryMock = new Mock<IDataProviderRepository>();
-            _loggerMock = new Mock<ILogger<DataProviderManager>>();
-        }
-
-        /// <summary>
-        /// Test constructor
-        /// </summary>
-        [Fact]
-        public void ConstructorTest()
-        {
-            TestObject.Should().NotBeNull();
-
-            Action create = () => new DataProviderManager(
-                null,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("dataProviderRepository");
-
-            create = () => new DataProviderManager(
-                _dataProviderRepositoryMock.Object,
-                null);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
-        }
-
-        /// <summary>
-        /// Add a provider successfully
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task AddDataProviderSuccess()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _dataProviderRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<DataProvider>()))
-                .ReturnsAsync(true);
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.AddDataProvider(It.IsAny<DataProvider>());
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeTrue();
-        }
-
-        /// <summary>
-        /// Fail to a add provider
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task AddDataProviderFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _dataProviderRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<DataProvider>()))
-                .ReturnsAsync(false);
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.AddDataProvider(It.IsAny<DataProvider>());
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeFalse();
-        }
-
-        /// <summary>
-        /// Exception occur when a provider is added
+        ///     Exception occur when a provider is added
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -119,44 +52,21 @@ namespace SOS.Import.UnitTests.Managers
         }
 
         /// <summary>
-        /// Delete a provider successfully
+        ///     Fail to a add provider
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task DeleteDataProviderSuccess()
+        public async Task AddDataProviderFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _dataProviderRepositoryMock.Setup(ts => ts.DeleteAsync(It.IsAny<int>()))
-                .ReturnsAsync(true);
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.DeleteDataProvider(It.IsAny<int>());
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeTrue();
-        }
-
-        /// <summary>
-        /// Fail to a delete provider
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task DeleteDataProviderFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _dataProviderRepositoryMock.Setup(ts => ts.DeleteAsync(It.IsAny<int>()))
+            _dataProviderRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(false);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.DeleteDataProvider(It.IsAny<int>());
+            var result = await TestObject.AddDataProvider(It.IsAny<DataProvider>());
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -165,7 +75,49 @@ namespace SOS.Import.UnitTests.Managers
         }
 
         /// <summary>
-        /// Exception occur when a provider is deleted
+        ///     Add a provider successfully
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task AddDataProviderSuccess()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _dataProviderRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<DataProvider>()))
+                .ReturnsAsync(true);
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.AddDataProvider(It.IsAny<DataProvider>());
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeTrue();
+        }
+
+        /// <summary>
+        ///     Test constructor
+        /// </summary>
+        [Fact]
+        public void ConstructorTest()
+        {
+            TestObject.Should().NotBeNull();
+
+            Action create = () => new DataProviderManager(
+                null,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("dataProviderRepository");
+
+            create = () => new DataProviderManager(
+                _dataProviderRepositoryMock.Object,
+                null);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
+        }
+
+        /// <summary>
+        ///     Exception occur when a provider is deleted
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -188,21 +140,44 @@ namespace SOS.Import.UnitTests.Managers
         }
 
         /// <summary>
-        /// Update a provider successfully
+        ///     Fail to a delete provider
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task UpdateDataProviderSuccess()
+        public async Task DeleteDataProviderFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _dataProviderRepositoryMock.Setup(ts => ts.UpdateAsync(It.IsAny<int>(), It.IsAny<DataProvider>()))
+            _dataProviderRepositoryMock.Setup(ts => ts.DeleteAsync(It.IsAny<int>()))
+                .ReturnsAsync(false);
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.DeleteDataProvider(It.IsAny<int>());
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeFalse();
+        }
+
+        /// <summary>
+        ///     Delete a provider successfully
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task DeleteDataProviderSuccess()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _dataProviderRepositoryMock.Setup(ts => ts.DeleteAsync(It.IsAny<int>()))
                 .ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.UpdateDataProvider(It.IsAny<int>(), It.IsAny<DataProvider>());
+            var result = await TestObject.DeleteDataProvider(It.IsAny<int>());
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -211,7 +186,33 @@ namespace SOS.Import.UnitTests.Managers
         }
 
         /// <summary>
-        /// Fail to a update provider
+        ///     Exception occur when a provider is updated
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task UpdateDataProviderException()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _dataProviderRepositoryMock.Setup(ts => ts.UpdateAsync(It.IsAny<int>(), It.IsAny<DataProvider>()))
+                .Throws<Exception>();
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            Func<Task> act = async () =>
+            {
+                await TestObject.UpdateDataProvider(It.IsAny<int>(), It.IsAny<DataProvider>());
+            };
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            await act.Should().ThrowAsync<Exception>();
+        }
+
+        /// <summary>
+        ///     Fail to a update provider
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -234,26 +235,26 @@ namespace SOS.Import.UnitTests.Managers
         }
 
         /// <summary>
-        /// Exception occur when a provider is updated
+        ///     Update a provider successfully
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task UpdateDataProviderException()
+        public async Task UpdateDataProviderSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _dataProviderRepositoryMock.Setup(ts => ts.UpdateAsync(It.IsAny<int>(), It.IsAny<DataProvider>()))
-                .Throws<Exception>();
+                .ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.UpdateDataProvider(It.IsAny<int>(), It.IsAny<DataProvider>()); };
+            var result = await TestObject.UpdateDataProvider(It.IsAny<int>(), It.IsAny<DataProvider>());
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            await act.Should().ThrowAsync<Exception>();
+            result.Should().BeTrue();
         }
     }
 }

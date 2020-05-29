@@ -7,23 +7,24 @@ using CSharpFunctionalExtensions;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Import.Managers.Interfaces;
 using SOS.Lib.Jobs.Process;
 
 namespace SOS.Administration.Api.Controllers
 {
     /// <summary>
-    /// Process job controller
+    ///     Process job controller
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class ProcessJobController : ControllerBase, Interfaces.IProcessJobController
+    public class ProcessJobController : ControllerBase, IProcessJobController
     {
         private readonly IDataProviderManager _dataProviderManager;
         private readonly ILogger<ProcessJobController> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
@@ -37,8 +38,8 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost("Areas/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public IActionResult RunProcessAreasJob()
         {
             try
@@ -49,49 +50,49 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing process areas job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("Daily")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public IActionResult ScheduleDailyProcessJob(
-            [FromQuery]bool cleanStart = true, 
-            [FromQuery]bool copyFromActiveOnFail = false, 
-            [FromQuery]bool toggleInstanceOnSuccess = true, 
-            [FromQuery]int hour = 0, 
-            [FromQuery]int minute = 0)
+            [FromQuery] bool cleanStart = true,
+            [FromQuery] bool copyFromActiveOnFail = false,
+            [FromQuery] bool toggleInstanceOnSuccess = true,
+            [FromQuery] int hour = 0,
+            [FromQuery] int minute = 0)
         {
             try
             {
                 RecurringJob.AddOrUpdate<IProcessJob>(
                     nameof(IProcessJob), job => job.RunAsync(
-                        cleanStart, 
-                        copyFromActiveOnFail, 
-                        toggleInstanceOnSuccess, 
-                        JobCancellationToken.Null), 
-            $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                        cleanStart,
+                        copyFromActiveOnFail,
+                        toggleInstanceOnSuccess,
+                        JobCancellationToken.Null),
+                    $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
 
                 return new OkObjectResult("Process job added");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Adding Process job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> RunProcessJob(
-            [FromQuery]bool cleanStart = true,
-            [FromQuery]bool copyFromActiveOnFail = false, 
-            [FromQuery]bool toggleInstanceOnSuccess = true)
+            [FromQuery] bool cleanStart = true,
+            [FromQuery] bool copyFromActiveOnFail = false,
+            [FromQuery] bool toggleInstanceOnSuccess = true)
         {
             try
             {
@@ -102,26 +103,28 @@ namespace SOS.Administration.Api.Controllers
                     return new BadRequestObjectResult("No data providers is active.");
                 }
 
-                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(cleanStart, copyFromActiveOnFail, toggleInstanceOnSuccess, JobCancellationToken.Null));
-                return new OkObjectResult($"Process job was enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, dataProvidersToProcess.Select(dataProvider => " -" + dataProvider))}.");
+                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(cleanStart, copyFromActiveOnFail,
+                    toggleInstanceOnSuccess, JobCancellationToken.Null));
+                return new OkObjectResult(
+                    $"Process job was enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, dataProvidersToProcess.Select(dataProvider => " -" + dataProvider))}.");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing process job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("SelectedDataProviders/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> RunProcessJob(
-            [FromQuery]List<string> dataProviderIdOrIdentifiers,
-            [FromQuery]bool cleanStart = false, 
-            [FromQuery]bool copyFromActiveOnFail = false,
-            [FromQuery]bool toggleInstanceOnSuccess = false)
+            [FromQuery] List<string> dataProviderIdOrIdentifiers,
+            [FromQuery] bool cleanStart = false,
+            [FromQuery] bool copyFromActiveOnFail = false,
+            [FromQuery] bool toggleInstanceOnSuccess = false)
         {
             try
             {
@@ -130,20 +133,23 @@ namespace SOS.Administration.Api.Controllers
                     return new BadRequestObjectResult("dataProviderIdOrIdentifiers is not set");
                 }
 
-                var dataProvidersToProcess = await _dataProviderManager.GetDataProvidersByIdOrIdentifier(dataProviderIdOrIdentifiers);
+                var dataProvidersToProcess =
+                    await _dataProviderManager.GetDataProvidersByIdOrIdentifier(dataProviderIdOrIdentifiers);
                 var result = Result.Combine(dataProvidersToProcess);
                 if (result.IsFailure)
                 {
                     return new BadRequestObjectResult(result.Error);
                 }
 
-                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(dataProviderIdOrIdentifiers, cleanStart, copyFromActiveOnFail, toggleInstanceOnSuccess, JobCancellationToken.Null));
-                return new OkObjectResult($"Process job was enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, dataProvidersToProcess.Select(res => " - " + res.Value))}");
+                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(dataProviderIdOrIdentifiers, cleanStart,
+                    copyFromActiveOnFail, toggleInstanceOnSuccess, JobCancellationToken.Null));
+                return new OkObjectResult(
+                    $"Process job was enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, dataProvidersToProcess.Select(res => " - " + res.Value))}");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing process job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
@@ -186,26 +192,27 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost("Taxa/Daily")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult ScheduleDailyProcessTaxaJob([FromQuery]int hour, [FromQuery]int minute)
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public IActionResult ScheduleDailyProcessTaxaJob([FromQuery] int hour, [FromQuery] int minute)
         {
             try
             {
-                RecurringJob.AddOrUpdate<IProcessTaxaJob>(nameof(IProcessTaxaJob), job => job.RunAsync(), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IProcessTaxaJob>(nameof(IProcessTaxaJob), job => job.RunAsync(),
+                    $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Process job added");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Adding Process job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("Taxa/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public IActionResult RunProcessTaxaJob()
         {
             try
@@ -216,14 +223,14 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing process taxa job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("CopyFieldMapping/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public IActionResult RunCopyFieldMappingJob()
         {
             try
@@ -234,7 +241,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing copy field mapping job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
     }

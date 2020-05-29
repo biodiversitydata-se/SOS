@@ -3,7 +3,7 @@
     public enum SpecialProvincePartId
     {
         /// <summary>
-        /// Special province Lappland that have province parts.
+        ///     Special province Lappland that have province parts.
         /// </summary>
         Lappland = -100
     }

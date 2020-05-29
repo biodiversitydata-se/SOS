@@ -1,5 +1,4 @@
-﻿using System.Dynamic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace SOS.Lib.Models.Shared
@@ -7,13 +6,13 @@ namespace SOS.Lib.Models.Shared
     public class ExternalSystemMappingValue
     {
         /// <summary>
-        /// Value in data provider.
+        ///     Value in data provider.
         /// </summary>
         [JsonConverter(typeof(ExpandoObjectConverter))]
         public object Value { get; set; }
 
         /// <summary>
-        /// Id in SOS (Species Observation System).
+        ///     Id in SOS (Species Observation System).
         /// </summary>
         public int SosId { get; set; }
 

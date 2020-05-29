@@ -12,13 +12,13 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
     {
         public static ProcessedObservation CreateDefaultObservation()
         {
-            string fileName = @"Resources\DefaultTestObservation.json";
-            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var fileName = @"Resources\DefaultTestObservation.json";
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
-            string str = File.ReadAllText(filePath, Encoding.UTF8);
-            var serializerSettings = new JsonSerializerSettings()
+            var str = File.ReadAllText(filePath, Encoding.UTF8);
+            var serializerSettings = new JsonSerializerSettings
             {
-                Converters = new List<JsonConverter> { new ObjectIdConverter() }
+                Converters = new List<JsonConverter> {new ObjectIdConverter()}
             };
 
             var observation = JsonConvert.DeserializeObject<ProcessedObservation>(str, serializerSettings);

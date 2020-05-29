@@ -1,22 +1,22 @@
 ﻿namespace SOS.Lib.Configuration.Shared
 {
     /// <summary>
-    /// ElasticSearch configuration properties
+    ///     ElasticSearch configuration properties
     /// </summary>
     public class ElasticSearchConfiguration
     {
         /// <summary>
-        /// Batch size when scrolling
+        ///     Batch size when scrolling
         /// </summary>
         public int BatchSize { get; set; }
 
         /// <summary>
-        /// Host
+        ///     Host
         /// </summary>
         public string[] Hosts { get; set; }
 
         /// <summary>
-        /// dev, st or at. prod is empty
+        ///     dev, st or at. prod is empty
         /// </summary>
         public string IndexPrefix { get; set; }
     }

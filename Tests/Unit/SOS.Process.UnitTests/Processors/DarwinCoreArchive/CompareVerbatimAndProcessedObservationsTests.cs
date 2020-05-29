@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using FluentAssertions;
 using Newtonsoft.Json;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Process.Helpers;
 using SOS.Process.UnitTests.TestHelpers;
@@ -17,11 +14,17 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
     [CollectionDefinition("DwcaObservationFactory collection")]
     public class CompareVerbatimAndProcessedObservationsTests : IClassFixture<DwcaObservationFactoryFixture>
     {
-        private readonly DwcaObservationFactoryFixture _fixture;
-
         public CompareVerbatimAndProcessedObservationsTests(DwcaObservationFactoryFixture fixture)
         {
             _fixture = fixture;
+        }
+
+        private readonly DwcaObservationFactoryFixture _fixture;
+
+        public class CompareObservation
+        {
+            public object VerbatimObservation { get; set; }
+            public object ProcessedObservation { get; set; }
         }
 
         [Fact]
@@ -31,7 +34,8 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var processedFieldMappingRepositoryStub = ProcessedFieldMappingRepositoryStubFactory.Create();
-            var fieldMappingResolverHelper = new FieldMappingResolverHelper(processedFieldMappingRepositoryStub.Object, new FieldMappingConfiguration() { LocalizationCultureCode = "sv-SE", ResolveValues = true });
+            var fieldMappingResolverHelper = new FieldMappingResolverHelper(processedFieldMappingRepositoryStub.Object,
+                new FieldMappingConfiguration {LocalizationCultureCode = "sv-SE", ResolveValues = true});
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder
                 .WithDefaultValues()
@@ -42,16 +46,16 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var processedObservation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
-            fieldMappingResolverHelper.ResolveFieldMappedValues(new List<ProcessedObservation> { processedObservation });
+            fieldMappingResolverHelper.ResolveFieldMappedValues(new List<ProcessedObservation> {processedObservation});
             var compareResult = new CompareObservation
             {
-                VerbatimObservation = dwcaObservation, 
+                VerbatimObservation = dwcaObservation,
                 ProcessedObservation = processedObservation
             };
             var strJsonObservationCompare = JsonConvert.SerializeObject(
                 compareResult,
                 Formatting.Indented,
-                new JsonSerializerSettings()
+                new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Ignore
                 });
@@ -60,12 +64,6 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             strJsonObservationCompare.Should().NotBeEmpty();
-        }
-
-        public class CompareObservation
-        {
-            public object VerbatimObservation { get; set; }
-            public object ProcessedObservation { get; set; }
         }
     }
 }

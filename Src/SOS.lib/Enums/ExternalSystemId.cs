@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SOS.Lib.Enums
+﻿namespace SOS.Lib.Enums
 {
     public enum ExternalSystemId
     {

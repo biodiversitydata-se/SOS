@@ -1,23 +1,21 @@
-﻿
-namespace SOS.Lib.Models.Interfaces
+﻿namespace SOS.Lib.Models.Interfaces
 {
     /// <summary>
-    /// IEntity interface
+    ///     IEntity interface
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface IEntity<TKey>
     {
         /// <summary>
-        /// Id
+        ///     Id
         /// </summary>
         TKey Id { get; set; }
     }
 
     /// <summary>
-    /// IEntity interface
+    ///     IEntity interface
     /// </summary>
     public interface IEntity : IEntity<string>
     {
-
     }
 }

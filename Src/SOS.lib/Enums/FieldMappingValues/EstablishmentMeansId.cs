@@ -1,37 +1,37 @@
 ﻿namespace SOS.Lib.Enums.FieldMappingValues
 {
     /// <summary>
-    /// Enumeration of EstablishmentMeans.
+    ///     Enumeration of EstablishmentMeans.
     /// </summary>
     public enum EstablishmentMeansId
     {
         /// <summary>
-        /// Native.
+        ///     Native.
         /// </summary>
         Native = 0,
 
         /// <summary>
-        /// Introduced.
+        ///     Introduced.
         /// </summary>
         Introduced = 1,
 
         /// <summary>
-        /// Naturalised.
+        ///     Naturalised.
         /// </summary>
         Naturalised = 2,
 
         /// <summary>
-        /// Invasive.
+        ///     Invasive.
         /// </summary>
         Invasive = 3,
 
         /// <summary>
-        /// Managed.
+        ///     Managed.
         /// </summary>
         Managed = 4,
 
         /// <summary>
-        /// Uncertain.
+        ///     Uncertain.
         /// </summary>
         Uncertain = 5
     }

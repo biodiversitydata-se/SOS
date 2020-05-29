@@ -4,17 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 using Nest;
 using NetTopologySuite.Geometries;
-using Newtonsoft.Json;
 using SOS.Lib.Constants;
 using SOS.Lib.DataStructures;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -22,23 +19,24 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
-using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
 
 namespace SOS.Process.Processors.DarwinCoreArchive
 {
     /// <summary>
-    /// DwC-A observation factory.
+    ///     DwC-A observation factory.
     /// </summary>
     public class DwcaObservationFactory
     {
-        private readonly DataProvider _dataProvider;
-        private readonly IDictionary<int, ProcessedTaxon> _taxonByTaxonId;
-        private readonly HashMapDictionary<string, ProcessedTaxon> _taxonByScientificName;
-        private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
         private readonly IAreaHelper _areaHelper;
+        private readonly DataProvider _dataProvider;
+        private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
+        private readonly HashMapDictionary<string, ProcessedTaxon> _taxonByScientificName;
+        private readonly IDictionary<int, ProcessedTaxon> _taxonByTaxonId;
+
+        private readonly List<string> errors = new List<string>();
 
         public DwcaObservationFactory(
-            DataProvider dataProvider, 
+            DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
             IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings,
             IAreaHelper areaHelper)
@@ -63,19 +61,20 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         {
             var allFieldMappings = await processedFieldMappingRepository.GetAllAsync();
             var fieldMappings = GetFieldMappingsDictionary(
-                ExternalSystemId.DarwinCore, 
+                ExternalSystemId.DarwinCore,
                 allFieldMappings.ToArray(),
-                convertValuesToLowercase: true);
+                true);
             return new DwcaObservationFactory(dataProvider, taxa, fieldMappings, areaHelper);
         }
 
-        public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<DwcObservationVerbatim> verbatimObservations)
+        public IEnumerable<ProcessedObservation> CreateProcessedObservations(
+            IEnumerable<DwcObservationVerbatim> verbatimObservations)
         {
             return verbatimObservations.Select(CreateProcessedObservation);
         }
 
         /// <summary>
-        /// Cast verbatim observations to processed data model
+        ///     Cast verbatim observations to processed data model
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
@@ -105,8 +104,10 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             //obs.EventExtendedMeasurementOrFacts = verbatimObservation.EventExtendedMeasurementOrFacts;
 
             // Record level
-            obs.AccessRights = GetSosId(verbatimObservation.AccessRights, _fieldMappings[FieldMappingFieldId.AccessRights]);
-            obs.BasisOfRecord = GetSosId(verbatimObservation.BasisOfRecord, _fieldMappings[FieldMappingFieldId.BasisOfRecord]);
+            obs.AccessRights = GetSosId(verbatimObservation.AccessRights,
+                _fieldMappings[FieldMappingFieldId.AccessRights]);
+            obs.BasisOfRecord = GetSosId(verbatimObservation.BasisOfRecord,
+                _fieldMappings[FieldMappingFieldId.BasisOfRecord]);
             obs.BibliographicCitation = verbatimObservation.BibliographicCitation;
             obs.CollectionCode = verbatimObservation.CollectionCode;
             obs.CollectionId = verbatimObservation.CollectionID;
@@ -116,14 +117,17 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             obs.DynamicProperties = verbatimObservation.DynamicProperties;
             obs.InformationWithheld = verbatimObservation.InformationWithheld;
             obs.InstitutionCode = verbatimObservation.InstitutionCode;
-            obs.InstitutionId = ProcessedFieldMapValue.Create(verbatimObservation.InstitutionID); // todo - Create DarwinCore field mapping.
+            obs.InstitutionId =
+                ProcessedFieldMapValue.Create(verbatimObservation
+                    .InstitutionID); // todo - Create DarwinCore field mapping.
             obs.Language = verbatimObservation.Language;
             obs.License = verbatimObservation.License;
             obs.Modified = DwcParser.ParseDate(verbatimObservation.Modified);
             obs.OwnerInstitutionCode = verbatimObservation.OwnerInstitutionCode;
             obs.References = verbatimObservation.References;
             obs.RightsHolder = verbatimObservation.RightsHolder;
-            obs.Type = ProcessedFieldMapValue.Create(verbatimObservation.Type); // todo - Create DarwinCore field mapping.
+            obs.Type = ProcessedFieldMapValue.Create(verbatimObservation
+                .Type); // todo - Create DarwinCore field mapping.
             // todo - handle the following fields?
             // obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
             // obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
@@ -143,7 +147,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             obs.Location = CreateProcessedLocation(verbatimObservation);
 
             // MaterialSample
-            obs.MaterialSample = CreateProcessedMaterialSample(verbatimObservation); 
+            obs.MaterialSample = CreateProcessedMaterialSample(verbatimObservation);
 
             // Occurrence
             obs.Occurrence = CreateProcessedOccurrence(verbatimObservation);
@@ -200,7 +204,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             //return obs;
         }
 
-        private static void StoreVerbatimObservation(ProcessedObservation obs, DwcObservationVerbatim verbatimObservation)
+        private static void StoreVerbatimObservation(ProcessedObservation obs,
+            DwcObservationVerbatim verbatimObservation)
         {
             //obs.VerbatimObservation = JsonConvert.SerializeObject(
             //    verbatimObservation,
@@ -248,7 +253,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedGeologicalContext.LithostratigraphicTerms = verbatimObservation.LithostratigraphicTerms;
             processedGeologicalContext.LowestBiostratigraphicZone = verbatimObservation.LowestBiostratigraphicZone;
             processedGeologicalContext.Member = verbatimObservation.Member;
-            
+
             return processedGeologicalContext;
         }
 
@@ -279,8 +284,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 verbatimObservation.Year,
                 verbatimObservation.Month,
                 verbatimObservation.Day,
-                out DateTime? startDate,
-                out DateTime? endDate);
+                out var startDate,
+                out var endDate);
 
             processedEvent.StartDate = startDate;
             processedEvent.EndDate = endDate;
@@ -312,17 +317,18 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         {
             var processedLocation = new ProcessedLocation();
             processedLocation.Continent = GetSosId(
-                verbatimObservation.Continent, 
+                verbatimObservation.Continent,
                 _fieldMappings[FieldMappingFieldId.Continent],
-                defaultValue: (int)ContinentId.Europe, 
-                mappingNotFoundLogic: MappingNotFoundLogic.UseDefaultValue);
+                (int) ContinentId.Europe,
+                MappingNotFoundLogic.UseDefaultValue);
             processedLocation.CoordinatePrecision = verbatimObservation.CoordinatePrecision.ParseDouble();
-            processedLocation.CoordinateUncertaintyInMeters = verbatimObservation.CoordinateUncertaintyInMeters?.ParseInt();
+            processedLocation.CoordinateUncertaintyInMeters =
+                verbatimObservation.CoordinateUncertaintyInMeters?.ParseInt();
             processedLocation.Country = GetSosId(
-                verbatimObservation.Country, 
-                _fieldMappings[FieldMappingFieldId.Country], 
-                defaultValue: (int)CountryId.Sweden,
-                mappingNotFoundLogic: MappingNotFoundLogic.UseDefaultValue);
+                verbatimObservation.Country,
+                _fieldMappings[FieldMappingFieldId.Country],
+                (int) CountryId.Sweden,
+                MappingNotFoundLogic.UseDefaultValue);
             processedLocation.CountryCode = verbatimObservation.CountryCode;
             //processedLocation.County = GetSosId(verbatimObservation.County, _fieldMappings[FieldMappingFieldId.County]); // Mapped by AreaHelper
             processedLocation.DecimalLatitude = verbatimObservation.DecimalLatitude.ParseDouble();
@@ -346,10 +352,12 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedLocation.LocationId = verbatimObservation.LocationID;
             processedLocation.LocationRemarks = verbatimObservation.LocationRemarks;
             processedLocation.MaximumDepthInMeters = verbatimObservation.MaximumDepthInMeters.ParseDouble();
-            processedLocation.MaximumDistanceAboveSurfaceInMeters = verbatimObservation.MaximumDistanceAboveSurfaceInMeters.ParseDouble();
+            processedLocation.MaximumDistanceAboveSurfaceInMeters =
+                verbatimObservation.MaximumDistanceAboveSurfaceInMeters.ParseDouble();
             processedLocation.MaximumElevationInMeters = verbatimObservation.MaximumElevationInMeters.ParseDouble();
             processedLocation.MinimumDepthInMeters = verbatimObservation.MinimumDepthInMeters.ParseDouble();
-            processedLocation.MinimumDistanceAboveSurfaceInMeters = verbatimObservation.MinimumDistanceAboveSurfaceInMeters.ParseDouble();
+            processedLocation.MinimumDistanceAboveSurfaceInMeters =
+                verbatimObservation.MinimumDistanceAboveSurfaceInMeters.ParseDouble();
             processedLocation.MinimumElevationInMeters = verbatimObservation.MinimumElevationInMeters.ParseDouble();
             //processedLocation.Municipality = GetSosId(verbatimObservation.Municipality, _fieldMappings[FieldMappingFieldId.Municipality]); // Mapped by AreaHelper
             processedLocation.VerbatimMunicipality = verbatimObservation.Municipality;
@@ -377,14 +385,16 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             Point wgs84Point = null;
             if (string.IsNullOrWhiteSpace(processedLocation.GeodeticDatum)) // Assume WGS84 if GeodeticDatum is empty.
             {
-                wgs84Point = new Point(processedLocation.DecimalLongitude.Value, processedLocation.DecimalLatitude.Value);
+                wgs84Point = new Point(processedLocation.DecimalLongitude.Value,
+                    processedLocation.DecimalLatitude.Value);
             }
             else
             {
-                var originalPoint = new Point(processedLocation.DecimalLongitude.Value, processedLocation.DecimalLatitude.Value);
-                if (GISExtensions.TryParseCoordinateSystem(processedLocation.GeodeticDatum, out CoordinateSys coordinateSystem))
+                var originalPoint = new Point(processedLocation.DecimalLongitude.Value,
+                    processedLocation.DecimalLatitude.Value);
+                if (GISExtensions.TryParseCoordinateSystem(processedLocation.GeodeticDatum, out var coordinateSystem))
                 {
-                    wgs84Point = (Point)originalPoint.Transform(coordinateSystem, CoordinateSys.WGS84);
+                    wgs84Point = (Point) originalPoint.Transform(coordinateSystem, CoordinateSys.WGS84);
                     processedLocation.DecimalLongitude = wgs84Point.X;
                     processedLocation.DecimalLatitude = wgs84Point.Y;
                 }
@@ -393,15 +403,15 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedLocation.GeodeticDatum = CoordinateSys.WGS84.EpsgCode();
             processedLocation.Point = (PointGeoShape) wgs84Point?.ToGeoShape();
             processedLocation.PointLocation = wgs84Point?.ToGeoLocation();
-            processedLocation.PointWithBuffer = (PolygonGeoShape) wgs84Point?.ToCircle(processedLocation.CoordinateUncertaintyInMeters)?.ToGeoShape();
+            processedLocation.PointWithBuffer =
+                (PolygonGeoShape) wgs84Point?.ToCircle(processedLocation.CoordinateUncertaintyInMeters)?.ToGeoShape();
             return processedLocation;
         }
 
-        
 
         private double? ParseDouble(string strValue, string fieldName)
         {
-            double? result = strValue.ParseDouble();
+            var result = strValue.ParseDouble();
             if (!result.HasValue && strValue.HasValue())
             {
                 var errorText = $"The field {fieldName} with a value of [{strValue}] is not a valid {typeof(double)}";
@@ -411,7 +421,6 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return result;
         }
 
-        private List<string> errors = new List<string>();
         private ProcessedOccurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatimObservation)
         {
             var processedOccurrence = new ProcessedOccurrence();
@@ -422,25 +431,35 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedOccurrence.Behavior = verbatimObservation.Behavior;
             processedOccurrence.CatalogNumber = verbatimObservation.CatalogNumber ?? verbatimObservation.OccurrenceID;
             processedOccurrence.Disposition = verbatimObservation.Disposition;
-            processedOccurrence.EstablishmentMeans = GetSosId(verbatimObservation.EstablishmentMeans, _fieldMappings[FieldMappingFieldId.EstablishmentMeans]);
-            processedOccurrence.IndividualCount = verbatimObservation.IndividualCount; 
-            processedOccurrence.LifeStage = ProcessedFieldMapValue.Create(verbatimObservation.LifeStage); // todo - create DarwinCore field mapping for FieldMappingFieldId.LifeStage.
+            processedOccurrence.EstablishmentMeans = GetSosId(verbatimObservation.EstablishmentMeans,
+                _fieldMappings[FieldMappingFieldId.EstablishmentMeans]);
+            processedOccurrence.IndividualCount = verbatimObservation.IndividualCount;
+            processedOccurrence.LifeStage =
+                ProcessedFieldMapValue.Create(verbatimObservation
+                    .LifeStage); // todo - create DarwinCore field mapping for FieldMappingFieldId.LifeStage.
             processedOccurrence.OccurrenceId = verbatimObservation.OccurrenceID;
             processedOccurrence.OccurrenceRemarks = verbatimObservation.OccurrenceRemarks;
-            processedOccurrence.OccurrenceStatus = GetSosId(verbatimObservation.OccurrenceStatus, _fieldMappings[FieldMappingFieldId.OccurrenceStatus]);
+            processedOccurrence.OccurrenceStatus = GetSosId(verbatimObservation.OccurrenceStatus,
+                _fieldMappings[FieldMappingFieldId.OccurrenceStatus]);
             processedOccurrence.OrganismQuantity = verbatimObservation.OrganismQuantity;
-            processedOccurrence.OrganismQuantityUnit = ProcessedFieldMapValue.Create(verbatimObservation.OrganismQuantityType); // todo - create DarwinCore field mapping for FieldMappingFieldId.OrganismQuantityUnit.
+            processedOccurrence.OrganismQuantityUnit =
+                ProcessedFieldMapValue.Create(verbatimObservation
+                    .OrganismQuantityType); // todo - create DarwinCore field mapping for FieldMappingFieldId.OrganismQuantityUnit.
             processedOccurrence.OtherCatalogNumbers = verbatimObservation.OtherCatalogNumbers;
             processedOccurrence.Preparations = verbatimObservation.Preparations;
             processedOccurrence.RecordedBy = verbatimObservation.RecordedBy;
             processedOccurrence.RecordNumber = verbatimObservation.RecordNumber;
-            processedOccurrence.Activity = ProcessedFieldMapValue.Create(verbatimObservation.ReproductiveCondition); // todo - create DarwinCore field mapping for FieldMappingFieldId.Activity.
+            processedOccurrence.Activity =
+                ProcessedFieldMapValue.Create(verbatimObservation
+                    .ReproductiveCondition); // todo - create DarwinCore field mapping for FieldMappingFieldId.Activity.
             processedOccurrence.Gender = GetSosId(verbatimObservation.Sex, _fieldMappings[FieldMappingFieldId.Gender]);
             processedOccurrence.IsNaturalOccurrence = true;
-            processedOccurrence.IsNeverFoundObservation = false; // todo - Add the following logic? dyntaxaTaxonId == 0; // Set to False if DyntaxaTaxonId from provider is greater than 0 and True if DyntaxaTaxonId is 0.
+            processedOccurrence.IsNeverFoundObservation =
+                false; // todo - Add the following logic? dyntaxaTaxonId == 0; // Set to False if DyntaxaTaxonId from provider is greater than 0 and True if DyntaxaTaxonId is 0.
             processedOccurrence.IsNotRediscoveredObservation = false;
-            processedOccurrence.IsPositiveObservation = true; // todo - Add the following logic? dyntaxaTaxonId != 0; // Set to True if DyntaxaTaxonId from provider is greater than 0 and False if DyntaxaTaxonId is 0.
-            if (processedOccurrence.OccurrenceStatus?.Id == (int)OccurrenceStatusId.Absent)
+            processedOccurrence.IsPositiveObservation =
+                true; // todo - Add the following logic? dyntaxaTaxonId != 0; // Set to True if DyntaxaTaxonId from provider is greater than 0 and False if DyntaxaTaxonId is 0.
+            if (processedOccurrence.OccurrenceStatus?.Id == (int) OccurrenceStatusId.Absent)
             {
                 processedOccurrence.IsPositiveObservation = false;
                 processedOccurrence.IsNeverFoundObservation = true;
@@ -455,7 +474,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
         private ProcessedTaxon CreateProcessedTaxon(DwcObservationVerbatim verbatimObservation)
         {
-            ProcessedTaxon processedTaxon = new ProcessedTaxon();
+            var processedTaxon = new ProcessedTaxon();
             // Get all taxon values from Dyntaxa instead of the provided DarwinCore data.
             TryGetTaxonInformation(
                 processedTaxon,
@@ -504,24 +523,20 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
         private void TryGetTaxonInformation(
-            ProcessedTaxon processedTaxon, 
-            string taxonId, 
-            string scientificName, 
-            string scientificNameAuthorship, 
-            string vernacularName, 
-            string kingdom, 
+            ProcessedTaxon processedTaxon,
+            string taxonId,
+            string scientificName,
+            string scientificNameAuthorship,
+            string vernacularName,
+            string kingdom,
             string taxonRank)
         {
             ProcessedTaxon taxon = null;
-            if (_taxonByScientificName.TryGetValues(scientificName?.ToLower(), out List<ProcessedTaxon> result))
+            if (_taxonByScientificName.TryGetValues(scientificName?.ToLower(), out var result))
             {
                 if (result.Count == 1)
                 {
                     taxon = result.First();
-                }
-                else
-                {
-                    // todo - find out the correct taxon.
                 }
             }
 
@@ -595,27 +610,27 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         {
             if (string.IsNullOrWhiteSpace(val) || sosIdByValue == null)
             {
-                return defaultValue.HasValue ? new ProcessedFieldMapValue { Id = defaultValue.Value } : null;
+                return defaultValue.HasValue ? new ProcessedFieldMapValue {Id = defaultValue.Value} : null;
             }
 
-            string lookupVal = val.ToLower();
+            var lookupVal = val.ToLower();
             if (sosIdByValue.TryGetValue(lookupVal, out var sosId))
             {
-                return new ProcessedFieldMapValue { Id = sosId };
+                return new ProcessedFieldMapValue {Id = sosId};
             }
 
             if (mappingNotFoundLogic == MappingNotFoundLogic.UseDefaultValue && defaultValue.HasValue)
             {
-                return new ProcessedFieldMapValue { Id = defaultValue.Value };
+                return new ProcessedFieldMapValue {Id = defaultValue.Value};
             }
 
-            return new ProcessedFieldMapValue { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val };
+            return new ProcessedFieldMapValue
+                {Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
         }
 
-        
 
         /// <summary>
-        /// Get SOS internal Id for the id specific for the data provider.
+        ///     Get SOS internal Id for the id specific for the data provider.
         /// </summary>
         /// <param name="val"></param>
         /// <param name="sosIdByValue"></param>
@@ -626,11 +641,11 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
             if (sosIdByValue.TryGetValue(val.Value, out var sosId))
             {
-                return new ProcessedFieldMapValue { Id = sosId };
+                return new ProcessedFieldMapValue {Id = sosId};
             }
 
-            return new ProcessedFieldMapValue { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
-
+            return new ProcessedFieldMapValue
+                {Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString()};
         }
 
         private ProcessedProject CreateProcessedProject(Project project)
@@ -698,7 +713,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
         /// <summary>
-        /// Calculate protection level
+        ///     Calculate protection level
         /// </summary>
         /// <param name="taxon"></param>
         /// <param name="hiddenByProvider"></param>
@@ -719,7 +734,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 {
                     return 3;
                 }
-                if ((protectionLevel > 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now) || protectedBySystem)
+
+                if (protectionLevel > 3 && hiddenByProvider.HasValue && hiddenByProvider.Value >= DateTime.Now ||
+                    protectedBySystem)
                 {
                     return protectionLevel;
                 }
@@ -729,12 +746,13 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
         /// <summary>
-        /// Build the substrate description string
+        ///     Build the substrate description string
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        private string GetSubstrateDescription(ArtportalenVerbatimObservation verbatimObservation, IDictionary<int, ProcessedTaxon> taxa)
+        private string GetSubstrateDescription(ArtportalenVerbatimObservation verbatimObservation,
+            IDictionary<int, ProcessedTaxon> taxa)
         {
             if (verbatimObservation == null)
             {
@@ -750,12 +768,14 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
             if (verbatimObservation.Substrate != null)
             {
-                substrateDescription.Append($"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatimObservation.Substrate.Translate(Cultures.en_GB)}");
+                substrateDescription.Append(
+                    $"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatimObservation.Substrate.Translate(Cultures.en_GB)}");
             }
 
             if (!string.IsNullOrEmpty(verbatimObservation.SubstrateDescription))
             {
-                substrateDescription.Append($"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatimObservation.SubstrateDescription}");
+                substrateDescription.Append(
+                    $"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatimObservation.SubstrateDescription}");
             }
 
             if (verbatimObservation.SubstrateSpeciesId.HasValue &&
@@ -767,7 +787,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
             if (!string.IsNullOrEmpty(verbatimObservation.SubstrateSpeciesDescription))
             {
-                substrateDescription.Append($"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatimObservation.SubstrateSpeciesDescription}");
+                substrateDescription.Append(
+                    $"{(substrateDescription.Length == 0 ? "" : " # ")}{verbatimObservation.SubstrateSpeciesDescription}");
             }
 
             var res = substrateDescription.Length > 0 ? substrateDescription.ToString().WithMaxLength(255) : null;
@@ -775,7 +796,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
         /// <summary>
-        /// Get bird nest activity id
+        ///     Get bird nest activity id
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <param name="taxon"></param>
@@ -796,7 +817,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
         /// <summary>
-        /// Get associated references
+        ///     Get associated references
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
@@ -811,22 +832,28 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             switch (verbatimObservation.MigrateSightingPortalId ?? 0)
             {
                 case 1:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bird.{verbatimObservation.MigrateSightingObsId.Value}";
+                    associatedReferences =
+                        $"urn:lsid:artportalen.se:Sighting:Bird.{verbatimObservation.MigrateSightingObsId.Value}";
                     break;
                 case 2:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:PlantAndMushroom.{verbatimObservation.MigrateSightingObsId.Value}";
+                    associatedReferences =
+                        $"urn:lsid:artportalen.se:Sighting:PlantAndMushroom.{verbatimObservation.MigrateSightingObsId.Value}";
                     break;
                 case 6:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Vertebrate.{verbatimObservation.MigrateSightingObsId.Value}";
+                    associatedReferences =
+                        $"urn:lsid:artportalen.se:Sighting:Vertebrate.{verbatimObservation.MigrateSightingObsId.Value}";
                     break;
                 case 7:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Bugs.{verbatimObservation.MigrateSightingObsId.Value}";
+                    associatedReferences =
+                        $"urn:lsid:artportalen.se:Sighting:Bugs.{verbatimObservation.MigrateSightingObsId.Value}";
                     break;
                 case 8:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:Fish.{verbatimObservation.MigrateSightingObsId.Value}";
+                    associatedReferences =
+                        $"urn:lsid:artportalen.se:Sighting:Fish.{verbatimObservation.MigrateSightingObsId.Value}";
                     break;
                 case 9:
-                    associatedReferences = $"urn:lsid:artportalen.se:Sighting:MarineInvertebrates.{verbatimObservation.MigrateSightingObsId.Value}";
+                    associatedReferences =
+                        $"urn:lsid:artportalen.se:Sighting:MarineInvertebrates.{verbatimObservation.MigrateSightingObsId.Value}";
                     break;
             }
 
@@ -834,7 +861,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
         /// <summary>
-        /// Get field mappings for Artportalen.
+        ///     Get field mappings for Artportalen.
         /// </summary>
         /// <param name="externalSystemId"></param>
         /// <param name="allFieldMappings"></param>

@@ -2,7 +2,7 @@
 {
     // todo - extract Areas, FieldMappings and Taxa to a new enum ResourceDataType?
     /// <summary>
-    /// Data provider types
+    ///     Data provider types
     /// </summary>
     public enum DataProviderType
     {

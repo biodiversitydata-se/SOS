@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Export.MongoDb.Interfaces;
+using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
@@ -11,31 +12,31 @@ using SOS.Lib.Models.Processed.Configuration;
 namespace SOS.Export.Repositories
 {
     /// <summary>
-    /// Base class for cosmos db repositories
+    ///     Base class for cosmos db repositories
     /// </summary>
-    public class BaseRepository<TEntity, TKey> : Interfaces.IBaseRepository<TEntity, TKey> where TEntity : IEntity<TKey>
+    public class BaseRepository<TEntity, TKey> : IBaseRepository<TEntity, TKey> where TEntity : IEntity<TKey>
     {
-        /// <summary>
-        /// Logger 
-        /// </summary>
-        protected readonly ILogger<BaseRepository<TEntity, TKey>> Logger;
+        private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
+
+        private readonly bool _toggleable;
 
         /// <summary>
-        /// Mongo db
+        ///     Mongo db
         /// </summary>
         protected readonly IMongoDatabase Database;
 
         /// <summary>
-        /// Disposed
+        ///     Logger
+        /// </summary>
+        protected readonly ILogger<BaseRepository<TEntity, TKey>> Logger;
+
+        /// <summary>
+        ///     Disposed
         /// </summary>
         private bool _disposed;
 
-        private readonly bool _toggleable;
-
-        private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="exportClient"></param>
         /// <param name="toggleable"></param>
@@ -59,43 +60,26 @@ namespace SOS.Export.Repositories
         }
 
         /// <summary>
-        /// Get configuration object
-        /// </summary>
-        /// <returns></returns>
-        private ProcessedConfiguration GetConfiguration()
-        {
-            try
-            {
-                return MongoCollectionConfiguration
-                    .Find(Builders<ProcessedConfiguration>.Filter.Empty)
-                    .FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-
-                return default;
-            }
-        }
-
-        /// <summary>
-        /// Get active instance
-        /// </summary>
-        /// <returns></returns>
-        public byte ActiveInstance => GetConfiguration().ActiveInstance;
-
-        public string CollectionName => _toggleable ? $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ ActiveInstance }" : $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }";
-
-        /// <summary>
-        /// Get client
+        ///     Get client
         /// </summary>
         /// <returns></returns>
         protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(CollectionName);
 
         /// <summary>
-        /// Configuration collection
+        ///     Configuration collection
         /// </summary>
-        protected IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration => Database.GetCollection<ProcessedConfiguration>(_collectionNameConfiguration);
+        protected IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration =>
+            Database.GetCollection<ProcessedConfiguration>(_collectionNameConfiguration);
+
+        /// <summary>
+        ///     Get active instance
+        /// </summary>
+        /// <returns></returns>
+        public byte ActiveInstance => GetConfiguration().ActiveInstance;
+
+        public string CollectionName => _toggleable
+            ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{ActiveInstance}"
+            : $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
 
         /// <inheritdoc />
         public async Task<TEntity> GetAsync(TKey id)
@@ -121,7 +105,36 @@ namespace SOS.Export.Repositories
         }
 
         /// <summary>
-        /// Dispose
+        ///     Dispose
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        ///     Get configuration object
+        /// </summary>
+        /// <returns></returns>
+        private ProcessedConfiguration GetConfiguration()
+        {
+            try
+            {
+                return MongoCollectionConfiguration
+                    .Find(Builders<ProcessedConfiguration>.Filter.Empty)
+                    .FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+
+                return default;
+            }
+        }
+
+        /// <summary>
+        ///     Dispose
         /// </summary>
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
@@ -133,19 +146,9 @@ namespace SOS.Export.Repositories
 
             if (disposing)
             {
-               
             }
 
             _disposed = true;
-        }
-
-        /// <summary>
-        /// Dispose
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

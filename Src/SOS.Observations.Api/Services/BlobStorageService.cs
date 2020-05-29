@@ -3,17 +3,18 @@ using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Shared;
+using SOS.Observations.Services.Interfaces;
 
 namespace SOS.Observations.Services
 {
-    public class BlobStorageService : Interfaces.IBlobStorageService
+    public class BlobStorageService : IBlobStorageService
     {
-        private readonly ILogger<BlobStorageService> _logger;
         private readonly CloudBlobClient _cloudBlobClient;
         private readonly string _doiContainer;
+        private readonly ILogger<BlobStorageService> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="blobStorageConfiguration"></param>
         /// <param name="logger"></param>
@@ -45,18 +46,18 @@ namespace SOS.Observations.Services
             var blockBlobReference = cloudBlobContainer.GetBlockBlobReference(fileName);
 
             //Create an ad-hoc Shared Access Policy with read permissions which will expire in 12 hours
-            var policy = new SharedAccessBlobPolicy()
+            var policy = new SharedAccessBlobPolicy
             {
                 Permissions = SharedAccessBlobPermissions.Read,
                 SharedAccessExpiryTime = DateTime.UtcNow.AddHours(12)
             };
             //Set content-disposition header for force download
-            var headers = new SharedAccessBlobHeaders()
+            var headers = new SharedAccessBlobHeaders
             {
-                ContentDisposition = $"attachment;filename=\"{ fileName }\""
+                ContentDisposition = $"attachment;filename=\"{fileName}\""
             };
             var sasToken = blockBlobReference.GetSharedAccessSignature(policy, headers);
-            
+
             return blockBlobReference.Uri.AbsoluteUri + sasToken;
         }
     }

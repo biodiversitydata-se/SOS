@@ -4,12 +4,12 @@ using SOS.Export.Models.DarwinCore;
 namespace SOS.Export.Mappings
 {
     /// <summary>
-    /// Mapping of Darwin Core to csv
+    ///     Mapping of Darwin Core to csv
     /// </summary>
     public class DwCMap : ClassMap<DwC>
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public DwCMap()
         {

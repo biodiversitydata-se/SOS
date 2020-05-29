@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -14,50 +12,49 @@ using System.Xml.Linq;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.Import;
-using  SOS.Lib.Models.DarwinCore;
+using Newtonsoft.Json;
 using SOS.Import.Mappings;
 using SOS.Import.Services.Interfaces;
-using SOS.Lib.Extensions;
+using SOS.Lib.Configuration.Import;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.TaxonTree;
-using TaxonDynamicProperties = SOS.Lib.Models.DarwinCore.TaxonDynamicProperties;
-using Newtonsoft.Json;
 
 namespace SOS.Import.Services
 {
-    public class TaxonService : Interfaces.ITaxonService
+    public class TaxonService : ITaxonService
     {
         private const string DyntaxaTaxonIdPrefix = "urn:lsid:dyntaxa.se:Taxon:";
-        private readonly string _taxonDwcUrl;
         private readonly ILogger<TaxonService> _logger;
+        private readonly string _taxonDwcUrl;
         private readonly ITaxonServiceProxy _taxonServiceProxy;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="taxonServiceProxy"></param>
         /// <param name="taxonServiceConfiguration"></param>
         /// <param name="logger"></param>
         public TaxonService(
-            ITaxonServiceProxy taxonServiceProxy, 
+            ITaxonServiceProxy taxonServiceProxy,
             TaxonServiceConfiguration taxonServiceConfiguration,
             ILogger<TaxonService> logger)
         {
-            _taxonDwcUrl = taxonServiceConfiguration?.BaseAddress ?? throw new ArgumentNullException(nameof(taxonServiceConfiguration));
+            _taxonDwcUrl = taxonServiceConfiguration?.BaseAddress ??
+                           throw new ArgumentNullException(nameof(taxonServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _taxonServiceProxy = taxonServiceProxy ?? throw new ArgumentNullException(nameof(taxonServiceProxy));
         }
+
         /// <inheritdoc />
         public async Task<IEnumerable<DarwinCoreTaxon>> GetTaxaAsync()
         {
             try
             {
-                await using Stream zipFileContentStream = await _taxonServiceProxy.GetDwcaFileAsync(_taxonDwcUrl);
+                await using var zipFileContentStream = await _taxonServiceProxy.GetDwcaFileAsync(_taxonDwcUrl);
                 if (zipFileContentStream == null) return null;
-                using ZipArchive zipArchive = new ZipArchive(zipFileContentStream, ZipArchiveMode.Read, false);
+                using var zipArchive = new ZipArchive(zipFileContentStream, ZipArchiveMode.Read, false);
                 var csvFieldDelimiter = GetCsvFieldDelimiterFromMetaFile(zipArchive);
-                Dictionary<string, DarwinCoreTaxon> taxa = GetTaxonCoreData(zipArchive, csvFieldDelimiter);
+                var taxa = GetTaxonCoreData(zipArchive, csvFieldDelimiter);
                 AddVernacularNames(taxa, zipArchive, csvFieldDelimiter);
                 AddTaxonRelations(taxa, zipArchive, csvFieldDelimiter);
                 return taxa.Values;
@@ -69,18 +66,14 @@ namespace SOS.Import.Services
 
             return null;
         }
-        class TaxonInfo
-        {
-            public int SortOrder { get; set; }
-            public int Id { get; set; }
-        }
+
         public async Task<Dictionary<int, int>> GetSortOrdersByTaxonId(IEnumerable<int> taxonIds)
         {
             try
             {
                 var uri = new Uri(_taxonDwcUrl);
                 var host = uri.Scheme + Uri.SchemeDelimiter + uri.Host;
-                string resultsString = await _taxonServiceProxy.GetTaxonAsync(host + "/api/Taxon/byIds", taxonIds);
+                var resultsString = await _taxonServiceProxy.GetTaxonAsync(host + "/api/Taxon/byIds", taxonIds);
                 if (resultsString == null) return null;
                 var info = JsonConvert.DeserializeObject<IEnumerable<TaxonInfo>>(resultsString);
                 return info.ToDictionary(x => x.Id, x => x.SortOrder);
@@ -92,6 +85,7 @@ namespace SOS.Import.Services
 
             return null;
         }
+
         private string GetCsvFieldDelimiterFromMetaFile(ZipArchive zipArchive)
         {
             var csvFieldDelimiter = "\t";
@@ -105,14 +99,16 @@ namespace SOS.Import.Services
             {
                 using var reader = XmlReader.Create(metaFile.Open());
                 var xmlDoc = XDocument.Load(reader);
-                csvFieldDelimiter = xmlDoc.Root?.Element("archive")?.Element("core")?.Attribute("fieldsTerminatedBy")?.Value ??
-                            csvFieldDelimiter;
+                csvFieldDelimiter = xmlDoc.Root?.Element("archive")?.Element("core")?.Attribute("fieldsTerminatedBy")
+                                        ?.Value ??
+                                    csvFieldDelimiter;
             }
 
             return csvFieldDelimiter;
         }
 
-        private static Dictionary<string, DarwinCoreTaxon> GetTaxonCoreData(ZipArchive zipArchive, string csvFieldDelimiter)
+        private static Dictionary<string, DarwinCoreTaxon> GetTaxonCoreData(ZipArchive zipArchive,
+            string csvFieldDelimiter)
         {
             // Try to get the taxon data file
             var taxonFile = zipArchive.Entries.FirstOrDefault(f =>
@@ -136,7 +132,7 @@ namespace SOS.Import.Services
                 .GetRecords<DarwinCoreTaxon>()
                 .Where(t => matchRegex.IsMatch(t.TaxonID))
                 .ToDictionary(t => t.TaxonID, t => t);
-            
+
             // Create initial Dynamic properties
             foreach (var taxon in taxa.Values)
             {
@@ -155,14 +151,14 @@ namespace SOS.Import.Services
         }
 
         /// <summary>
-        /// Reads taxon relations from zip file and add parent relations to taxa.
+        ///     Reads taxon relations from zip file and add parent relations to taxa.
         /// </summary>
         /// <param name="taxa"></param>
         /// <param name="zipArchive"></param>
         /// <param name="csvFieldDelimiter"></param>
         private void AddTaxonRelations(
-            Dictionary<string, DarwinCoreTaxon> taxa, 
-            ZipArchive zipArchive, 
+            Dictionary<string, DarwinCoreTaxon> taxa,
+            ZipArchive zipArchive,
             string csvFieldDelimiter)
         {
             // Try to get TaxonRealtions.csv
@@ -172,12 +168,13 @@ namespace SOS.Import.Services
 
             // Read taxon relations data
             using var taxonRelationsReader = new StreamReader(taxonRelationsFile.Open(), Encoding.UTF8);
-            using var taxonRelationsCsv = new CsvReader(taxonRelationsReader, new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                Delimiter = csvFieldDelimiter,
-                Encoding = Encoding.UTF8,
-                HasHeaderRecord = true
-            });
+            using var taxonRelationsCsv = new CsvReader(taxonRelationsReader,
+                new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    Delimiter = csvFieldDelimiter,
+                    Encoding = Encoding.UTF8,
+                    HasHeaderRecord = true
+                });
 
             taxonRelationsCsv.Configuration.RegisterClassMap<TaxonRelationMapper>();
 
@@ -199,7 +196,8 @@ namespace SOS.Import.Services
             {
                 if (taxonRelationsByChildId.TryGetValue(taxon.DynamicProperties.DyntaxaTaxonId, out var taxonRelations))
                 {
-                    taxon.DynamicProperties.ParentDyntaxaTaxonId = taxonRelations.FirstOrDefault(m => m.IsMainRelation)?.ParentTaxonId;
+                    taxon.DynamicProperties.ParentDyntaxaTaxonId =
+                        taxonRelations.FirstOrDefault(m => m.IsMainRelation)?.ParentTaxonId;
                     var secondaryParentDyntaxaTaxonIds = taxonRelations
                         .Where(m => m.IsMainRelation == false)
                         .Select(m => m.ParentTaxonId);
@@ -213,7 +211,7 @@ namespace SOS.Import.Services
         }
 
         /// <summary>
-        /// Reads vernacular names from zip file and adds them to taxa.
+        ///     Reads vernacular names from zip file and adds them to taxa.
         /// </summary>
         /// <param name="taxa"></param>
         /// <param name="zipArchive"></param>
@@ -230,12 +228,13 @@ namespace SOS.Import.Services
 
             // Read vernacular name data
             using var vernacularNameReader = new StreamReader(vernacularNameFile.Open(), Encoding.UTF8);
-            using var vernacularNameCsv = new CsvReader(vernacularNameReader, new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                Delimiter = csvFieldDelimiter,
-                Encoding = Encoding.UTF8,
-                HasHeaderRecord = true
-            });
+            using var vernacularNameCsv = new CsvReader(vernacularNameReader,
+                new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    Delimiter = csvFieldDelimiter,
+                    Encoding = Encoding.UTF8,
+                    HasHeaderRecord = true
+                });
 
             // Get all vernacular names from file
             vernacularNameCsv.Configuration.RegisterClassMap<VernacularNameMapper>();
@@ -253,6 +252,12 @@ namespace SOS.Import.Services
                         .FirstOrDefault(m => m.Language == "sv" && m.IsPreferredName)?.VernacularName;
                 }
             }
+        }
+
+        private class TaxonInfo
+        {
+            public int SortOrder { get; set; }
+            public int Id { get; set; }
         }
     }
 }

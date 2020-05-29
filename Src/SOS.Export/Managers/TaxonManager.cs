@@ -13,17 +13,17 @@ using SOS.Lib.Models.TaxonTree;
 namespace SOS.Export.Managers
 {
     /// <summary>
-    /// Taxon manager
+    ///     Taxon manager
     /// </summary>
     public class TaxonManager : ITaxonManager
     {
-        private readonly IProcessedTaxonRepository _processedTaxonRepository;
+        private static readonly object InitLock = new object();
         private readonly ILogger<TaxonManager> _logger;
+        private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private TaxonTree<IBasicTaxon> _taxonTree;
-        static readonly object InitLock = new object();
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="processedTaxonRepository"></param>
         /// <param name="logger"></param>
@@ -32,8 +32,28 @@ namespace SOS.Export.Managers
             ILogger<TaxonManager> logger)
         {
             _processedTaxonRepository = processedTaxonRepository ??
-                                             throw new ArgumentNullException(nameof(processedTaxonRepository));
+                                        throw new ArgumentNullException(nameof(processedTaxonRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <inheritdoc />
+        public TaxonTree<IBasicTaxon> TaxonTree
+        {
+            get
+            {
+                if (_taxonTree == null)
+                {
+                    lock (InitLock)
+                    {
+                        if (_taxonTree == null)
+                        {
+                            _taxonTree = GetTaxonTreeAsync().Result;
+                        }
+                    }
+                }
+
+                return _taxonTree;
+            }
         }
 
         private async Task<IEnumerable<ProcessedBasicTaxon>> GetBasicTaxaAsync()
@@ -66,26 +86,6 @@ namespace SOS.Export.Managers
             var taxa = await GetBasicTaxaAsync();
             var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
             return taxonTree;
-        }
-
-        /// <inheritdoc />
-        public TaxonTree<IBasicTaxon> TaxonTree
-        {
-            get
-            {
-                if (_taxonTree == null)
-                {
-                    lock (InitLock)
-                    {
-                        if (_taxonTree == null)
-                        {
-                            _taxonTree = GetTaxonTreeAsync().Result;
-                        }
-                    }
-                }
-
-                return _taxonTree;
-            }
         }
     }
 }

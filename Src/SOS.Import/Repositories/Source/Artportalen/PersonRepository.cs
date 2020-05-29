@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
+using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
-    public class PersonRepository : BaseRepository<PersonRepository>, Interfaces.IPersonRepository
+    public class PersonRepository : BaseRepository<PersonRepository>, IPersonRepository
     {
         public PersonRepository(
-            IArtportalenDataService artportalenDataService, 
+            IArtportalenDataService artportalenDataService,
             ILogger<PersonRepository> logger) : base(artportalenDataService, logger)
         {
         }

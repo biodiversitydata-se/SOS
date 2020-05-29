@@ -3,31 +3,28 @@
 namespace SOS.Observations.Api.Models.Area
 {
     /// <summary>
-    /// Area used external
+    ///     Area used external
     /// </summary>
     public class ExternalArea
     {
         /// <summary>
-        /// Type of area
+        ///     Type of area
         /// </summary>
         public string AreaType { get; set; }
 
         /// <summary>
-        /// Area geometry
+        ///     Area geometry
         /// </summary>
         public GeoJsonGeometry Geometry { get; set; }
 
         /// <summary>
-        /// Area Id
+        ///     Area Id
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Name of area
+        ///     Name of area
         /// </summary>
         public string Name { get; set; }
-
-        
-
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Process.IntegrationTests.TestHelpers;
 using SOS.TestHelpers.Helpers.Builders;
 using Xunit;
@@ -8,12 +7,12 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 {
     public class DwcaObservationFactoryIntegrationTests : IClassFixture<DwcaObservationFactoryIntegrationFixture>
     {
-        private readonly DwcaObservationFactoryIntegrationFixture _fixture;
-
         public DwcaObservationFactoryIntegrationTests(DwcaObservationFactoryIntegrationFixture fixture)
         {
             _fixture = fixture;
         }
+
+        private readonly DwcaObservationFactoryIntegrationFixture _fixture;
 
         [Fact]
         public void Wgs84_coordinates_is_parsed_to_double_data_type()

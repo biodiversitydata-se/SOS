@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DwC_A;
 using FluentAssertions;
@@ -44,35 +41,46 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             observations.First().DataProviderIdentifier.Should().Be(dataProviderIdIdentifierTuple.Identifier);
         }
 
+        /// <summary>
+        ///     This test uses the following DwC-A: http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds&v=19.3
+        ///     containing 6,706,047 records.
+        ///     Reading all observations and storing them in RAM will use more than 10GB, so reading in batches is necessary.
+        /// </summary>
+        /// <returns></returns>
         [Fact]
-        public async Task Read_occurrence_dwca_with_multimedia_extension()
+        public async Task Read_local_large_occurrence_dwca_in_batches()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            const string archivePath = "./resources/dwca/dwca-occurrence-multimedia-verbatimoccurrence.zip";
             var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
+            const string archivePath = @"C:\DwC-A\SOS dev\dwca-nrm-ringedbirds-v19.3.zip";
+            const int batchSize = 50000;
+            const int totalNrObservationsToRead = 150000;
             var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
-                Id = 101,
-                Identifier = "TestMultimedia"
+                Id = 105,
+                Identifier = "TestRingedBirds"
             };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
+            var observationsBatches =
+                dwcOccurrenceArchiveReader.ReadArchiveInBatchesAsync(archiveReader, dataProviderIdIdentifierTuple,
+                    batchSize);
+            var observations = new List<DwcObservationVerbatim>();
+            await foreach (var observationsBatch in observationsBatches)
+            {
+                observations.AddRange(observationsBatch);
+                if (observations.Count >= totalNrObservationsToRead) break;
+            }
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observations.Count.Should().Be(2582);
-            var obs = observations.Single(o => o.OccurrenceID == "0C94D544-8B14-4DA8-A3AE-70AA4FC803AF");
-            obs.ObservationMultimedia.Count.Should().Be(3);
-            obs.ObservationMultimedia.Single(m =>
-                    m.Identifier == "http://ww2.bgbm.org/specimentool/plants/dicots/Teucrium_chamaedrys_Duerbye_1.jpg")
-                .Format.Should().Be("image/scan");
+            observations.Count.Should().Be(totalNrObservationsToRead);
         }
 
         [Fact]
@@ -93,7 +101,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             // Act
             //-----------------------------------------------------------------------------------------------------------
             using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
+            var observations =
+                await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -130,7 +139,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             // Act
             //-----------------------------------------------------------------------------------------------------------
             using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
+            var observations =
+                await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -159,7 +169,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             // Act
             //-----------------------------------------------------------------------------------------------------------
             using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
+            var observations =
+                await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -168,44 +179,36 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             observations[0].ObservationMeasurementOrFacts.Should().NotBeNull();
         }
 
-        /// <summary>
-        /// This test uses the following DwC-A: http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds&v=19.3
-        /// containing 6,706,047 records.
-        /// Reading all observations and storing them in RAM will use more than 10GB, so reading in batches is necessary.
-        /// </summary>
-        /// <returns></returns>
         [Fact]
-        public async Task Read_local_large_occurrence_dwca_in_batches()
+        public async Task Read_occurrence_dwca_with_multimedia_extension()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/dwca-occurrence-multimedia-verbatimoccurrence.zip";
             var dwcOccurrenceArchiveReader = new DwcOccurrenceArchiveReader(new NullLogger<DwcArchiveReader>());
-            const string archivePath = @"C:\DwC-A\SOS dev\dwca-nrm-ringedbirds-v19.3.zip";
-            const int batchSize = 50000;
-            const int totalNrObservationsToRead = 150000;
             var dataProviderIdIdentifierTuple = new IdIdentifierTuple
             {
-                Id = 105,
-                Identifier = "TestRingedBirds"
+                Id = 101,
+                Identifier = "TestMultimedia"
             };
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             using var archiveReader = new ArchiveReader(archivePath);
-            var observationsBatches = dwcOccurrenceArchiveReader.ReadArchiveInBatchesAsync(archiveReader, dataProviderIdIdentifierTuple, batchSize);
-            List<DwcObservationVerbatim> observations = new List<DwcObservationVerbatim>();
-            await foreach (List<DwcObservationVerbatim> observationsBatch in observationsBatches)
-            {
-                observations.AddRange(observationsBatch);
-                if (observations.Count >= totalNrObservationsToRead) break;
-            }
+            var observations =
+                await dwcOccurrenceArchiveReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            observations.Count.Should().Be(totalNrObservationsToRead);
+            observations.Count.Should().Be(2582);
+            var obs = observations.Single(o => o.OccurrenceID == "0C94D544-8B14-4DA8-A3AE-70AA4FC803AF");
+            obs.ObservationMultimedia.Count.Should().Be(3);
+            obs.ObservationMultimedia.Single(m =>
+                    m.Identifier == "http://ww2.bgbm.org/specimentool/plants/dicots/Teucrium_chamaedrys_Duerbye_1.jpg")
+                .Format.Should().Be("image/scan");
         }
     }
 }

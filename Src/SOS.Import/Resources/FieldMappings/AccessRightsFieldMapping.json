@@ -1,40 +1,40 @@
 {
-  "Id": 16,
-  "Name": "AccessRights",
-  "Localized": false,
-  "Values": [
-    {
-      "Id": 0,
-      "Value": "Free usage",
-      "Localized": false
-    },
-    {
-      "Id": 1,
-      "Value": "Not for public usage",
-      "Localized": false
-    }
-  ],
-  "ExternalSystemsMapping": [
-    {
-      "Id": 1,
-      "Name": "DarwinCore",
-      "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
-      "Mappings": [
+    "Id": 16,
+    "Name": "AccessRights",
+    "Localized": false,
+    "Values": [
         {
-          "Key": "accessRights",
-          "Description": "The accessRights term (http://rs.tdwg.org/dwc/terms/accessRights)",
-          "Values": [
-            {
-              "Value": "Free usage",
-              "SosId": 0
-            },
-            {
-              "Value": "Not for public usage",
-              "SosId": 1
-            }
-          ]
+            "Id": 0,
+            "Value": "Free usage",
+            "Localized": false
+        },
+        {
+            "Id": 1,
+            "Value": "Not for public usage",
+            "Localized": false
         }
-      ]
-    }
-  ]
+    ],
+    "ExternalSystemsMapping": [
+        {
+            "Id": 1,
+            "Name": "DarwinCore",
+            "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
+            "Mappings": [
+                {
+                    "Key": "accessRights",
+                    "Description": "The accessRights term (http://rs.tdwg.org/dwc/terms/accessRights)",
+                    "Values": [
+                        {
+                            "Value": "Free usage",
+                            "SosId": 0
+                        },
+                        {
+                            "Value": "Not for public usage",
+                            "SosId": 1
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 }

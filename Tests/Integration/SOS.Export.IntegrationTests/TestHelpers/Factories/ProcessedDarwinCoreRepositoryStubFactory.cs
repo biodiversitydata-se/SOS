@@ -25,29 +25,29 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
 
             return stub;
         }
-        
+
         public static Mock<IProcessedObservationRepository> Create(ProcessedObservation observation)
         {
             var stub = new Mock<IProcessedObservationRepository>();
             stub
                 .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
-                .ReturnsAsync(new ScrollResult<ProcessedObservation> { Records = new[] { observation }});
+                .ReturnsAsync(new ScrollResult<ProcessedObservation> {Records = new[] {observation}});
 
             return stub;
         }
 
         private static ScrollResult<ProcessedObservation> LoadObservations(string fileName)
         {
-            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
-            string str = File.ReadAllText(filePath, Encoding.UTF8);
-            var serializerSettings = new JsonSerializerSettings()
+            var str = File.ReadAllText(filePath, Encoding.UTF8);
+            var serializerSettings = new JsonSerializerSettings
             {
-                Converters = new List<JsonConverter> { new ObjectIdConverter() }
+                Converters = new List<JsonConverter> {new ObjectIdConverter()}
             };
 
             var observations = JsonConvert.DeserializeObject<List<ProcessedObservation>>(str, serializerSettings);
-            return new ScrollResult<ProcessedObservation> { Records = observations };
+            return new ScrollResult<ProcessedObservation> {Records = observations};
         }
     }
 }

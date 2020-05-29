@@ -5,14 +5,8 @@ namespace SOS.Lib.Models.Verbatim.Nors
 {
     public class NorsObservationVerbatim : IEntity<string>
     {
-        public string Id
-        {
-            get => OccurrenceId;
-            set => OccurrenceId = value;
-        }
-
         public int? CoordinateUncertaintyInMeters { get; set; }
-        
+
         public string County { get; set; }
 
         public double DecimalLatitude { get; set; }
@@ -43,5 +37,11 @@ namespace SOS.Lib.Models.Verbatim.Nors
         public string ScientificName { get; set; }
 
         public DateTime Start { get; set; }
+
+        public string Id
+        {
+            get => OccurrenceId;
+            set => OccurrenceId = value;
+        }
     }
 }

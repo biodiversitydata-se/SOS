@@ -6,12 +6,11 @@ using SOS.Observations.Api.Enum;
 namespace SOS.Observations.Api.Repositories.Interfaces
 {
     /// <summary>
-    /// 
     /// </summary>
     public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, string>
     {
         /// <summary>
-        /// Get chunk of objects from repository
+        ///     Get chunk of objects from repository
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="skip"></param>
@@ -19,6 +18,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="sortBy"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy, SearchSortOrder sortOrder);
+        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
+            SearchSortOrder sortOrder);
     }
 }

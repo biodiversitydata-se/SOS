@@ -7,7 +7,7 @@ namespace SOS.Import.Harvesters.Observations.Interfaces
     public interface IKulObservationHarvester
     {
         /// <summary>
-        /// Aggregate sightings.
+        ///     Aggregate sightings.
         /// </summary>
         /// <returns></returns>
         Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken);

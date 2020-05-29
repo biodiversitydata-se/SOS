@@ -8,11 +8,9 @@ namespace DwC_A
     {
         private readonly string fileName;
         private readonly string folderPath;
-        
-        public bool ShouldCleanup { get; private set; }
 
         /// <summary>
-        /// Extracts archive to a folder
+        ///     Extracts archive to a folder
         /// </summary>
         /// <param name="fileName">Zip archive file name</param>
         /// <param name="folderPath">Path to extract to.  Leave null for a temp folder</param>
@@ -21,6 +19,8 @@ namespace DwC_A
             this.fileName = fileName;
             this.folderPath = string.IsNullOrEmpty(folderPath) ? GetTempPath() : folderPath;
         }
+
+        public bool ShouldCleanup { get; private set; }
 
         public string Extract()
         {
@@ -39,6 +39,5 @@ namespace DwC_A
             var newPath = Path.Combine(Path.GetTempPath(), "dwca", Guid.NewGuid().ToString());
             return newPath;
         }
-
     }
 }

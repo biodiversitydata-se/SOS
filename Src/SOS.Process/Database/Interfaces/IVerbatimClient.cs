@@ -3,17 +3,17 @@
 namespace SOS.Process.Database.Interfaces
 {
     /// <summary>
-    /// Verbatim client
+    ///     Verbatim client
     /// </summary>
     public interface IVerbatimClient : IMongoClient
     {
         /// <summary>
-        /// Size of batch
+        ///     Size of batch
         /// </summary>
         int BatchSize { get; }
 
         /// <summary>
-        /// Get database
+        ///     Get database
         /// </summary>
         /// <returns></returns>
         IMongoDatabase GetDatabase();

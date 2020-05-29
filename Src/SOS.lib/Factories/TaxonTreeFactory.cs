@@ -6,7 +6,7 @@ using SOS.Lib.Models.TaxonTree;
 namespace SOS.Lib.Factories
 {
     /// <summary>
-    /// Taxon Tree Factory
+    ///     Taxon Tree Factory
     /// </summary>
     public static class TaxonTreeFactory
     {
@@ -26,7 +26,8 @@ namespace SOS.Lib.Factories
             return tree;
         }
 
-        public static Dictionary<int, TaxonTreeNode<IBasicTaxon>> CreateTaxonTreeNodeDictionary(Dictionary<int, IBasicTaxon> taxonById)
+        public static Dictionary<int, TaxonTreeNode<IBasicTaxon>> CreateTaxonTreeNodeDictionary(
+            Dictionary<int, IBasicTaxon> taxonById)
         {
             var treeNodeById = new Dictionary<int, TaxonTreeNode<IBasicTaxon>>();
 

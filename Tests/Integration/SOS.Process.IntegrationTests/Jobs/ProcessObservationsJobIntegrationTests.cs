@@ -10,7 +10,6 @@ using Nest;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Constants;
-using SOS.Lib.Enums;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Jobs;
@@ -33,61 +32,12 @@ namespace SOS.Process.IntegrationTests.Jobs
 {
     public class ProcessObservationsJobIntegrationTests : TestBase
     {
-        [Fact]
-        public async Task Run_the_process_Artportalen_job()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var processJob = CreateProcessJob(storeProcessed: false);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await processJob.RunAsync(
-                new List<string> {DataProviderIdentifiers.Artportalen}, 
-                false,
-                false, 
-                false,
-                JobCancellationToken.Null);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
-        }
-
-
-        [Fact]
-        public async Task Run_process_job_for_butterflymonitoring_dwca()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var processJob = CreateProcessJob(storeProcessed: false);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await processJob.RunAsync(
-                new List<string> { DataProviderIdentifiers.ButterflyMonitoring },
-                false,
-                false,
-                false,
-                JobCancellationToken.Null);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
-        }
-
         private ProcessJob CreateProcessJob(bool storeProcessed)
         {
             var processConfiguration = GetProcessConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
             var uris = new Uri[elasticConfiguration.Hosts.Length];
-            for (int i = 0; i < uris.Length; i++)
+            for (var i = 0; i < uris.Length; i++)
             {
                 uris[i] = new Uri(elasticConfiguration.Hosts[i]);
             }
@@ -103,64 +53,79 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processConfiguration.ProcessedDbConfiguration.DatabaseName,
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
             var areaHelper = new AreaHelper(
-                new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()), 
+                new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()),
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>()));
-            var taxonVerbatimRepository = new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
-            var fieldMappingVerbatimRepository = new FieldMappingVerbatimRepository(verbatimClient, new NullLogger<FieldMappingVerbatimRepository>());
-            var taxonProcessedRepository = new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
-            var invalidObservationRepository = new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
+            var taxonVerbatimRepository =
+                new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
+            var fieldMappingVerbatimRepository =
+                new FieldMappingVerbatimRepository(verbatimClient, new NullLogger<FieldMappingVerbatimRepository>());
+            var taxonProcessedRepository =
+                new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
+            var invalidObservationRepository =
+                new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             IProcessedObservationRepository processedObservationRepository;
             if (storeProcessed)
             {
-                processedObservationRepository = new ProcessedObservationRepository(processClient, elasticClient, invalidObservationRepository, 
-                    new ElasticSearchConfiguration(),  new NullLogger<ProcessedObservationRepository>());
+                processedObservationRepository = new ProcessedObservationRepository(processClient, elasticClient,
+                    invalidObservationRepository,
+                    new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>());
             }
             else
             {
                 processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
             }
 
-            var processInfoRepository = new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
-            var harvestInfoRepository = new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
-            var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
+            var processInfoRepository =
+                new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
+            var harvestInfoRepository =
+                new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
+            var processedFieldMappingRepository =
+                new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
             var clamPortalProcessor = new ClamPortalObservationProcessor(
-                new ClamObservationVerbatimRepository(verbatimClient, new NullLogger<ClamObservationVerbatimRepository>()), 
-                areaHelper, 
+                new ClamObservationVerbatimRepository(verbatimClient,
+                    new NullLogger<ClamObservationVerbatimRepository>()),
+                areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<ClamPortalObservationProcessor>());
             var kulProcessor = new KulObservationProcessor(
-                new KulObservationVerbatimRepository(verbatimClient, new NullLogger<KulObservationVerbatimRepository>()), 
+                new KulObservationVerbatimRepository(verbatimClient,
+                    new NullLogger<KulObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<KulObservationProcessor>());
             var mvmProcessor = new MvmObservationProcessor(
-                new MvmObservationVerbatimRepository(verbatimClient, new NullLogger<MvmObservationVerbatimRepository>()),
+                new MvmObservationVerbatimRepository(verbatimClient,
+                    new NullLogger<MvmObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<MvmObservationProcessor>());
             var norsProcessor = new NorsObservationProcessor(
-                new NorsObservationVerbatimRepository(verbatimClient, new NullLogger<NorsObservationVerbatimRepository>()),
+                new NorsObservationVerbatimRepository(verbatimClient,
+                    new NullLogger<NorsObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<NorsObservationProcessor>());
             var sersProcessor = new SersObservationProcessor(
-                new SersObservationVerbatimRepository(verbatimClient, new NullLogger<SersObservationVerbatimRepository>()),
+                new SersObservationVerbatimRepository(verbatimClient,
+                    new NullLogger<SersObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<SersObservationProcessor>());
             var sharkProcessor = new SharkObservationProcessor(
-                new SharkObservationVerbatimRepository(verbatimClient, new NullLogger<SharkObservationVerbatimRepository>()),
+                new SharkObservationVerbatimRepository(verbatimClient,
+                    new NullLogger<SharkObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new NullLogger<SharkObservationProcessor>());
             var virtualHrbariumProcessor = new VirtualHerbariumObservationProcessor(
-                new VirtualHerbariumObservationVerbatimRepository(verbatimClient, new NullLogger<VirtualHerbariumObservationVerbatimRepository>()),
+                new VirtualHerbariumObservationVerbatimRepository(verbatimClient,
+                    new NullLogger<VirtualHerbariumObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
@@ -168,18 +133,21 @@ namespace SOS.Process.IntegrationTests.Jobs
             var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
                 processedObservationRepository,
-                processedFieldMappingRepository, 
+                processedFieldMappingRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 processConfiguration,
                 new NullLogger<ArtportalenObservationProcessor>());
             var instanceManager = new InstanceManager(
-                new ProcessedObservationRepository(processClient, elasticClient, invalidObservationRepository, 
+                new ProcessedObservationRepository(processClient, elasticClient, invalidObservationRepository,
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>()),
                 processInfoRepository,
                 new NullLogger<InstanceManager>());
 
-            var copyFieldMappingsJob = new CopyFieldMappingsJob(fieldMappingVerbatimRepository, processedFieldMappingRepository, harvestInfoRepository, processInfoRepository, new NullLogger<CopyFieldMappingsJob>());
-            var processTaxaJob = new ProcessTaxaJob(taxonVerbatimRepository, taxonProcessedRepository, harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());
+            var copyFieldMappingsJob = new CopyFieldMappingsJob(fieldMappingVerbatimRepository,
+                processedFieldMappingRepository, harvestInfoRepository, processInfoRepository,
+                new NullLogger<CopyFieldMappingsJob>());
+            var processTaxaJob = new ProcessTaxaJob(taxonVerbatimRepository, taxonProcessedRepository,
+                harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());
             var dwcaProcessor = new DwcaObservationProcessor(
                 new DwcaVerbatimRepository(verbatimClient, new NullLogger<DwcaVerbatimRepository>()),
                 processedObservationRepository,
@@ -190,7 +158,8 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new NullLogger<DwcaObservationProcessor>());
 
             var dataProviderManager = new DataProviderManager(
-                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()), new NullLogger<DataProviderManager>());
+                new DataProviderRepository(processClient, new NullLogger<DataProviderRepository>()),
+                new NullLogger<DataProviderManager>());
 
             var processJob = new ProcessJob(
                 processedObservationRepository,
@@ -214,6 +183,55 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new NullLogger<ProcessJob>());
 
             return processJob;
+        }
+
+
+        [Fact]
+        public async Task Run_process_job_for_butterflymonitoring_dwca()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var processJob = CreateProcessJob(false);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await processJob.RunAsync(
+                new List<string> {DataProviderIdentifiers.ButterflyMonitoring},
+                false,
+                false,
+                false,
+                JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task Run_the_process_Artportalen_job()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var processJob = CreateProcessJob(false);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await processJob.RunAsync(
+                new List<string> {DataProviderIdentifiers.Artportalen},
+                false,
+                false,
+                false,
+                JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Should().BeTrue();
         }
     }
 }

@@ -14,33 +14,34 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Jobs.Export;
 
-
 namespace SOS.Export.IoC.Modules
 {
     /// <summary>
-    /// Export module
+    ///     Export module
     /// </summary>
     public class ExportModule : Module
     {
         /// <summary>
-        /// Module configuration
+        ///     Module configuration
         /// </summary>
         public ExportConfiguration Configuration { get; set; }
 
         /// <summary>
-        /// Load event
+        ///     Load event
         /// </summary>
         /// <param name="builder"></param>
         protected override void Load(ContainerBuilder builder)
         {
             // Add configuration
-            builder.RegisterInstance(Configuration.BlobStorageConfiguration).As<BlobStorageConfiguration>().SingleInstance();
+            builder.RegisterInstance(Configuration.BlobStorageConfiguration).As<BlobStorageConfiguration>()
+                .SingleInstance();
             builder.RegisterInstance(Configuration.FileDestination).As<FileDestination>().SingleInstance();
             builder.RegisterInstance(Configuration.ZendToConfiguration).As<ZendToConfiguration>().SingleInstance();
 
             // Init mongodb
             var exportSettings = Configuration.ProcessedDbConfiguration.GetMongoDbSettings();
-            var exportClient = new ExportClient(exportSettings, Configuration.ProcessedDbConfiguration.DatabaseName, Configuration.ProcessedDbConfiguration.BatchSize);
+            var exportClient = new ExportClient(exportSettings, Configuration.ProcessedDbConfiguration.DatabaseName,
+                Configuration.ProcessedDbConfiguration.BatchSize);
             builder.RegisterInstance(exportClient).As<IExportClient>().SingleInstance();
 
             // Add factories
@@ -49,10 +50,12 @@ namespace SOS.Export.IoC.Modules
 
             // Repositories mongo
             builder.RegisterType<DOIRepository>().As<IDOIRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>()
+                .InstancePerLifetimeScope();
 
             // Services
             builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().InstancePerLifetimeScope();
@@ -66,7 +69,8 @@ namespace SOS.Export.IoC.Modules
             // DwC Archive
             builder.RegisterType<DwcArchiveFileWriter>().As<IDwcArchiveFileWriter>().SingleInstance();
             builder.RegisterType<DwcArchiveOccurrenceCsvWriter>().As<IDwcArchiveOccurrenceCsvWriter>().SingleInstance();
-            builder.RegisterType<ExtendedMeasurementOrFactCsvWriter>().As<IExtendedMeasurementOrFactCsvWriter>().SingleInstance();
+            builder.RegisterType<ExtendedMeasurementOrFactCsvWriter>().As<IExtendedMeasurementOrFactCsvWriter>()
+                .SingleInstance();
         }
     }
 }

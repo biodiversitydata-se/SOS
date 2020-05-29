@@ -14,11 +14,11 @@ namespace SOS.Import.Services
     public class VirtualHerbariumObservationService : IVirtualHerbariumObservationService
     {
         private readonly IHttpClientService _httpClientService;
-        private readonly VirtualHerbariumServiceConfiguration _virtualHerbariumServiceConfiguration;
         private readonly ILogger<VirtualHerbariumObservationService> _logger;
+        private readonly VirtualHerbariumServiceConfiguration _virtualHerbariumServiceConfiguration;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="virtualHerbariumServiceConfiguration"></param>
@@ -28,64 +28,10 @@ namespace SOS.Import.Services
             ILogger<VirtualHerbariumObservationService> logger)
         {
             _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
-            _virtualHerbariumServiceConfiguration = virtualHerbariumServiceConfiguration ?? throw new ArgumentNullException(nameof(virtualHerbariumServiceConfiguration));
+            _virtualHerbariumServiceConfiguration = virtualHerbariumServiceConfiguration ??
+                                                    throw new ArgumentNullException(
+                                                        nameof(virtualHerbariumServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        /// <summary>
-        /// Get XDocument from stream
-        /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        private async Task<XDocument> GetXDocuemnt(string path)
-        {
-            await using var fileStream = await _httpClientService.GetFileStreamAsync(new Uri(
-                    $"{_virtualHerbariumServiceConfiguration.BaseAddress}/{path}"),
-                new Dictionary<string, string> { { "Accept", "application/xml" } });
-
-            if (!fileStream?.CanRead ?? true)
-            {
-                return null;
-            }
-
-            var encoding = new UTF8Encoding(true, true);
-            using var streamReader = new StreamReader(fileStream, encoding, true);
-
-            var xmlString = await streamReader.ReadToEndAsync();
-            fileStream.Close();
-
-            var xDocument = XDocument.Parse(CleanXml(xmlString, encoding));
-
-            return xDocument;
-        }
-
-        /// <summary>
-        /// Remove undesirable content from XML string
-        /// </summary>
-        /// <param name="xmlString">XML string.</param>
-        /// <param name="encoding">string encoding</param>
-        /// <returns>Same XML string with undesirable content removed.</returns>
-        private string CleanXml(string xmlString, Encoding encoding)
-        {
-            // Dropping the BOM
-            var _byteOrderMarkUtf8 = encoding.GetString(encoding.GetPreamble());
-            if (xmlString.StartsWith(_byteOrderMarkUtf8))
-            {
-                xmlString = xmlString.Remove(0, _byteOrderMarkUtf8.Length).Replace("&gt50", "").Replace("&", "");
-            }
-
-            // Replace bad data
-          //  xmlString = xmlString.Replace("1920-0&-21", "1920-06-21");
-          //  xmlString = xmlString.Replace("den 21/&amp;", "den 21/6");
-
-            // Change wrong Excel XML encoding.
-            //xmlString = xmlString.Replace("&", "&amp;");
-            var regularExpression = @"&(?!amp;)";
-
-            xmlString = Regex.Replace(xmlString, regularExpression, "&amp;");
-
-            regularExpression = @"[\x00-\x1F]";
-            return Regex.Replace(xmlString, regularExpression, string.Empty);
         }
 
         /// <inheritdoc />
@@ -115,6 +61,61 @@ namespace SOS.Import.Services
                 return null;
             }
         }
+
+        /// <summary>
+        ///     Get XDocument from stream
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private async Task<XDocument> GetXDocuemnt(string path)
+        {
+            await using var fileStream = await _httpClientService.GetFileStreamAsync(new Uri(
+                    $"{_virtualHerbariumServiceConfiguration.BaseAddress}/{path}"),
+                new Dictionary<string, string> {{"Accept", "application/xml"}});
+
+            if (!fileStream?.CanRead ?? true)
+            {
+                return null;
+            }
+
+            var encoding = new UTF8Encoding(true, true);
+            using var streamReader = new StreamReader(fileStream, encoding, true);
+
+            var xmlString = await streamReader.ReadToEndAsync();
+            fileStream.Close();
+
+            var xDocument = XDocument.Parse(CleanXml(xmlString, encoding));
+
+            return xDocument;
+        }
+
+        /// <summary>
+        ///     Remove undesirable content from XML string
+        /// </summary>
+        /// <param name="xmlString">XML string.</param>
+        /// <param name="encoding">string encoding</param>
+        /// <returns>Same XML string with undesirable content removed.</returns>
+        private string CleanXml(string xmlString, Encoding encoding)
+        {
+            // Dropping the BOM
+            var _byteOrderMarkUtf8 = encoding.GetString(encoding.GetPreamble());
+            if (xmlString.StartsWith(_byteOrderMarkUtf8))
+            {
+                xmlString = xmlString.Remove(0, _byteOrderMarkUtf8.Length).Replace("&gt50", "").Replace("&", "");
+            }
+
+            // Replace bad data
+            //  xmlString = xmlString.Replace("1920-0&-21", "1920-06-21");
+            //  xmlString = xmlString.Replace("den 21/&amp;", "den 21/6");
+
+            // Change wrong Excel XML encoding.
+            //xmlString = xmlString.Replace("&", "&amp;");
+            var regularExpression = @"&(?!amp;)";
+
+            xmlString = Regex.Replace(xmlString, regularExpression, "&amp;");
+
+            regularExpression = @"[\x00-\x1F]";
+            return Regex.Replace(xmlString, regularExpression, string.Empty);
+        }
     }
 }
-

@@ -11,12 +11,12 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 namespace SOS.Import.Extensions
 {
     /// <summary>
-    /// Entity extensions
+    ///     Entity extensions
     /// </summary>
     public static class SightingExtensions
     {
         /// <summary>
-        /// Cast multiple area entities to models 
+        ///     Cast multiple area entities to models
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
@@ -26,13 +26,13 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast area entity to model 
+        ///     Cast area entity to model
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         public static Area ToVerbatim(this AreaEntity entity)
         {
-            return new Area((AreaType)entity.AreaDatasetId)
+            return new Area((AreaType) entity.AreaDatasetId)
             {
                 Id = entity.Id,
                 FeatureId = entity.FeatureId,
@@ -41,7 +41,7 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast multiple sightings entities to models 
+        ///     Cast multiple sightings entities to models
         /// </summary>
         /// <param name="entities"></param>
         /// <param name="activities"></param>
@@ -84,7 +84,7 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast sighting itemEntity to model 
+        ///     Cast sighting itemEntity to model
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="activities"></param>
@@ -109,7 +109,7 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> stages,
             IDictionary<int, Metadata> substrates,
             IDictionary<int, Metadata> validationStatus,
-            IDictionary<int, Metadata> units, 
+            IDictionary<int, Metadata> units,
             ProjectEntityDictionaries projectEntityDictionaries)
         {
             var observation = new ArtportalenVerbatimObservation
@@ -181,7 +181,7 @@ namespace SOS.Import.Extensions
                     projectEntityDictionaries)
             };
 
-            if (personSightings.TryGetValue(entity.Id, out PersonSighting personSighting))
+            if (personSightings.TryGetValue(entity.Id, out var personSighting))
             {
                 observation.VerifiedBy = personSighting.VerifiedBy;
                 observation.VerifiedByInternal = personSighting.VerifiedByInternal;
@@ -197,7 +197,7 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Get project and project parameters for the specified sightingId.
+        ///     Get project and project parameters for the specified sightingId.
         /// </summary>
         private static List<Project> GetProjects(int sightingId, ProjectEntityDictionaries projectEntityDictionaries)
         {
@@ -207,7 +207,8 @@ namespace SOS.Import.Extensions
                 projectById = projectEntities.ToVerbatims().ToDictionary(p => p.Id, p => p);
             }
 
-            if (projectEntityDictionaries.ProjectParameterEntitiesBySightingId.TryGetValue(sightingId, out var projectParameterEntities))
+            if (projectEntityDictionaries.ProjectParameterEntitiesBySightingId.TryGetValue(sightingId,
+                out var projectParameterEntities))
             {
                 if (projectById == null)
                 {
@@ -227,7 +228,8 @@ namespace SOS.Import.Extensions
                     }
                     else
                     {
-                        if (projectEntityDictionaries.ProjectEntityById.TryGetValue(projectParameterEntity.ProjectId, out var projectEntity))
+                        if (projectEntityDictionaries.ProjectEntityById.TryGetValue(projectParameterEntity.ProjectId,
+                            out var projectEntity))
                         {
                             var newProject = projectEntity.ToVerbatim();
                             newProject.ProjectParameters = new List<ProjectParameter>();
@@ -247,7 +249,7 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast multiple sightings entities to models 
+        ///     Cast multiple sightings entities to models
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
@@ -266,20 +268,21 @@ namespace SOS.Import.Extensions
                     metadataItems.Add(entity.Id, new Metadata(entity.Id));
                 }
 
-                metadataItems[entity.Id].Translations.Add(new MetadataTranslation{ Culture = entity.CultureCode, Value = entity.Translation});
+                metadataItems[entity.Id].Translations.Add(new MetadataTranslation
+                    {Culture = entity.CultureCode, Value = entity.Translation});
             }
 
             return metadataItems.Values;
         }
 
-        
 
         /// <summary>
-        /// Cast multiple sightings entities to models 
+        ///     Cast multiple sightings entities to models
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
-        public static IEnumerable<MetadataWithCategory> ToVerbatims(this IEnumerable<MetadataWithCategoryEntity> entities)
+        public static IEnumerable<MetadataWithCategory> ToVerbatims(
+            this IEnumerable<MetadataWithCategoryEntity> entities)
         {
             if (!entities?.Any() ?? true)
             {
@@ -297,7 +300,7 @@ namespace SOS.Import.Extensions
                 var metadata = metadataItems[entity.Id];
                 metadata.Translations.Add(new MetadataTranslation
                 {
-                    Culture = entity.CultureCode, 
+                    Culture = entity.CultureCode,
                     Value = entity.Translation
                 });
 
@@ -312,13 +315,13 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast project entity to aggregate
+        ///     Cast project entity to aggregate
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         public static Project ToVerbatim(this ProjectEntity entity)
         {
-            return new Project()
+            return new Project
             {
                 Category = entity.Category,
                 Description = entity.Description,
@@ -334,7 +337,7 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast multiple projects entities to models 
+        ///     Cast multiple projects entities to models
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
@@ -344,7 +347,7 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast multiple projects to aggregates
+        ///     Cast multiple projects to aggregates
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
@@ -391,7 +394,7 @@ namespace SOS.Import.Extensions
 
         public static Person ToVerbatim(this PersonEntity entity)
         {
-            return new Person()
+            return new Person
             {
                 Id = entity.Id,
                 UserId = entity.UserId,
@@ -401,14 +404,15 @@ namespace SOS.Import.Extensions
             };
         }
 
-        public static IEnumerable<SpeciesCollectionItem> ToVerbatims(this IEnumerable<SpeciesCollectionItemEntity> entities)
+        public static IEnumerable<SpeciesCollectionItem> ToVerbatims(
+            this IEnumerable<SpeciesCollectionItemEntity> entities)
         {
             return entities.Select(e => e.ToVerbatim());
         }
 
         public static SpeciesCollectionItem ToVerbatim(this SpeciesCollectionItemEntity itemEntity)
         {
-            return new SpeciesCollectionItem()
+            return new SpeciesCollectionItem
             {
                 SightingId = itemEntity.SightingId,
                 CollectorId = itemEntity.CollectorId,
@@ -422,8 +426,8 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
-        /// This saves about 500MB RAM when casting Artportalen sites (3 millions).
+        ///     Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
+        ///     This saves about 500MB RAM when casting Artportalen sites (3 millions).
         /// </summary>
         /// <param name="siteEntities"></param>
         /// <returns></returns>
@@ -442,7 +446,7 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast multiple sites entities to models 
+        ///     Cast multiple sites entities to models
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
@@ -452,7 +456,7 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast site itemEntity to aggregate
+        ///     Cast site itemEntity to aggregate
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
@@ -465,19 +469,29 @@ namespace SOS.Import.Extensions
                 // We process point here since site is added to observation verbatim. One site can have multiple observations and by 
                 // doing it here we only have to convert the point once
                 var webMercatorPoint = new Point(entity.XCoord, entity.YCoord);
-                wgs84Point = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+                wgs84Point = (Point) webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
             }
 
             return new Site
             {
                 Accuracy = entity.Accuracy,
-                County = entity.CountyId.HasValue ? new GeographicalArea { Id = entity.CountyId.Value, Name = entity.CountyName } : null,
-                CountryPart = entity.CountryPartId.HasValue ? new GeographicalArea { Id = entity.CountryPartId.Value, Name = entity.CountryPartName } : null,
+                County = entity.CountyId.HasValue
+                    ? new GeographicalArea {Id = entity.CountyId.Value, Name = entity.CountyName}
+                    : null,
+                CountryPart = entity.CountryPartId.HasValue
+                    ? new GeographicalArea {Id = entity.CountryPartId.Value, Name = entity.CountryPartName}
+                    : null,
                 Id = entity.Id,
-                Municipality = entity.MunicipalityId.HasValue ? new GeographicalArea { Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName } : null,
-                Province = entity.ProvinceId.HasValue ? new GeographicalArea { Id = entity.ProvinceId.Value, Name = entity.ProvinceName } : null,
-                Parish = entity.ParishId.HasValue ? new GeographicalArea { Id = entity.ParishId.Value, Name = entity.ParishName } : null,
-                Point = wgs84Point?.ToGeoJson(), 
+                Municipality = entity.MunicipalityId.HasValue
+                    ? new GeographicalArea {Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName}
+                    : null,
+                Province = entity.ProvinceId.HasValue
+                    ? new GeographicalArea {Id = entity.ProvinceId.Value, Name = entity.ProvinceName}
+                    : null,
+                Parish = entity.ParishId.HasValue
+                    ? new GeographicalArea {Id = entity.ParishId.Value, Name = entity.ParishName}
+                    : null,
+                Point = wgs84Point?.ToGeoJson(),
                 PointWithBuffer = wgs84Point?.ToCircle(entity.Accuracy)?.ToGeoJson(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
@@ -488,7 +502,7 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast multiple project parameter entities to models 
+        ///     Cast multiple project parameter entities to models
         /// </summary>
         /// <param name="entities"></param>
         /// <returns></returns>
@@ -498,7 +512,7 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Cast project parameter itemEntity to aggregate
+        ///     Cast project parameter itemEntity to aggregate
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
@@ -509,8 +523,8 @@ namespace SOS.Import.Extensions
                 Id = entity.ProjectParameterId,
                 DataType = entity.DataType,
                 Description = entity.Description,
-                Name = entity.Name, 
-                Unit = entity.Unit, 
+                Name = entity.Name,
+                Unit = entity.Unit,
                 Value = entity.Value
             };
         }

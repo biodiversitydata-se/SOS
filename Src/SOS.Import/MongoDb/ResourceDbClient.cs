@@ -1,20 +1,18 @@
 ﻿using MongoDB.Driver;
+using SOS.Import.MongoDb.Interfaces;
 
 namespace SOS.Import.MongoDb
 {
-    public class ResourceDbClient : MongoClient, Interfaces.IResourceDbClient
+    public class ResourceDbClient : MongoClient, IResourceDbClient
     {
         /// <summary>
-        /// Name of database
+        ///     Name of database
         /// </summary>
         private readonly string _dataBaseName;
 
-        /// <inheritdoc />
-        public int BatchSize { get; }
-
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="settings"></param>
         /// <param name="dataBaseName"></param>
@@ -24,6 +22,9 @@ namespace SOS.Import.MongoDb
             _dataBaseName = dataBaseName;
             BatchSize = batchSize;
         }
+
+        /// <inheritdoc />
+        public int BatchSize { get; }
 
         public IMongoDatabase GetDatabase()
         {

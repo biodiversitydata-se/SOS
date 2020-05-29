@@ -3,37 +3,37 @@
 namespace SOS.Lib.Models.Verbatim.Shark
 {
     /// <summary>
-    /// Verbatim from Shark
+    ///     Verbatim from Shark
     /// </summary>
-    public class SharkObservationResponse 
+    public class SharkObservationResponse
     {
         /// <summary>
-        /// Array of properties in the rows
+        ///     Array of properties in the rows
         /// </summary>
         public IEnumerable<string> Header { get; set; }
 
         /// <summary>
-        /// Current page
+        ///     Current page
         /// </summary>
         public int Page { get; set; }
 
         /// <summary>
-        /// Total number of pages
+        ///     Total number of pages
         /// </summary>
         public int Pages { get; set; }
 
         /// <summary>
-        /// Observations per page
+        ///     Observations per page
         /// </summary>
         public int Per_page { get; set; }
 
         /// <summary>
-        /// Data rows
+        ///     Data rows
         /// </summary>
         public IEnumerable<IEnumerable<string>> Rows { get; set; }
 
         /// <summary>
-        /// Total number of observations
+        ///     Total number of observations
         /// </summary>
         public int Total { get; set; }
     }

@@ -3,12 +3,12 @@
     public class FieldMappingTranslation
     {
         /// <summary>
-        /// Culture code. I.e. en-GB, sv-SE
+        ///     Culture code. I.e. en-GB, sv-SE
         /// </summary>
         public string CultureCode { get; set; }
 
         /// <summary>
-        /// Translation
+        ///     Translation
         /// </summary>
         public string Value { get; set; }
 

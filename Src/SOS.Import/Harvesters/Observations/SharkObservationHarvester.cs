@@ -1,29 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
+using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.Shark.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Verbatim.Shark;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Models.Verbatim.Shark;
 
 namespace SOS.Import.Harvesters.Observations
 {
-    public class SharkObservationHarvester : Interfaces.ISharkObservationHarvester
+    public class SharkObservationHarvester : ISharkObservationHarvester
     {
+        private readonly ILogger<SharkObservationHarvester> _logger;
         private readonly ISharkObservationService _sharkObservationService;
         private readonly ISharkObservationVerbatimRepository _sharkObservationVerbatimRepository;
-        private readonly ILogger<SharkObservationHarvester> _logger;
         private readonly SharkServiceConfiguration _sharkServiceConfiguration;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="sharkObservationService"></param>
         /// <param name="sharkObservationVerbatimRepository"></param>
@@ -35,15 +35,20 @@ namespace SOS.Import.Harvesters.Observations
             SharkServiceConfiguration sharkServiceConfiguration,
             ILogger<SharkObservationHarvester> logger)
         {
-            _sharkObservationService = sharkObservationService ?? throw new ArgumentNullException(nameof(sharkObservationService));
-            _sharkObservationVerbatimRepository = sharkObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(sharkObservationVerbatimRepository));
-            _sharkServiceConfiguration = sharkServiceConfiguration ?? throw new ArgumentNullException(nameof(sharkServiceConfiguration));
+            _sharkObservationService = sharkObservationService ??
+                                       throw new ArgumentNullException(nameof(sharkObservationService));
+            _sharkObservationVerbatimRepository = sharkObservationVerbatimRepository ??
+                                                  throw new ArgumentNullException(
+                                                      nameof(sharkObservationVerbatimRepository));
+            _sharkServiceConfiguration = sharkServiceConfiguration ??
+                                         throw new ArgumentNullException(nameof(sharkServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken  cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(SharkObservationVerbatim), DataProviderType.SharkObservations, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(SharkObservationVerbatim), DataProviderType.SharkObservations,
+                DateTime.Now);
             harvestInfo.Status = RunStatus.Failed;
 
             try
@@ -91,13 +96,14 @@ namespace SOS.Import.Harvesters.Observations
                     {
                         break;
                     }
+
                     var dataSetName = row[datasetNameIndex];
 
-                    _logger.LogInformation($"Start getting file: { dataSetName }");
+                    _logger.LogInformation($"Start getting file: {dataSetName}");
 
                     var data = await _sharkObservationService.GetAsync(dataSetName);
 
-                    _logger.LogInformation($"Finish getting file: { dataSetName }");
+                    _logger.LogInformation($"Finish getting file: {dataSetName}");
 
                     if (data == null)
                     {
@@ -110,7 +116,7 @@ namespace SOS.Import.Harvesters.Observations
                     // Add sightings to MongoDb
                     await _sharkObservationVerbatimRepository.AddManyAsync(verbatims);
                 }
-                
+
                 _logger.LogInformation("Finished harvesting sightings for SHARK data provider");
 
                 // Update harvest info

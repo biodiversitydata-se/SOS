@@ -6,12 +6,11 @@ using SOS.Lib.Models.Search;
 namespace SOS.Observations.Api.Repositories.Interfaces
 {
     /// <summary>
-    /// 
     /// </summary>
     public interface IDOIRepository : IBaseRepository<DOI, Guid>
     {
         /// <summary>
-        /// Get DOIs 
+        ///     Get DOIs
         /// </summary>
         /// <param name="skip"></param>
         /// <param name="take"></param>

@@ -10,7 +10,7 @@ using NetTopologySuite.Geometries;
 namespace SOS.Lib.JsonConverters
 {
     /// <summary>
-    /// Json converter for Geometry
+    ///     Json converter for Geometry
     /// </summary>
     public class GeometryConverter : JsonConverter<Geometry>
     {
@@ -43,7 +43,7 @@ namespace SOS.Lib.JsonConverters
                     ? reader.ValueSequence.ToArray()
                     : reader.ValueSpan.ToArray();
                 result.Append(Encoding.Default.GetString(seq));
-                
+
                 addComma = reader.TokenType == JsonTokenType.Number && !addComma;
 
                 if (reader.TokenType == JsonTokenType.EndArray)
@@ -80,6 +80,7 @@ namespace SOS.Lib.JsonConverters
             {
                 WritePoint(writer, point);
             }
+
             writer.WriteEndArray();
 
             foreach (var lineRing in polygon.Holes)
@@ -89,6 +90,7 @@ namespace SOS.Lib.JsonConverters
                 {
                     WritePoint(writer, point);
                 }
+
                 writer.WriteEndArray();
             }
 
@@ -115,6 +117,7 @@ namespace SOS.Lib.JsonConverters
         {
             return typeof(Geometry).IsAssignableFrom(type);
         }
+
         public override Geometry Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType != JsonTokenType.StartObject)
@@ -126,7 +129,7 @@ namespace SOS.Lib.JsonConverters
             var type = string.Empty;
 
             reader.Read();
-            
+
             while (reader.TokenType != JsonTokenType.EndObject)
             {
                 var property = reader.GetString();
@@ -153,11 +156,13 @@ namespace SOS.Lib.JsonConverters
                     var point = geomFactory.CreatePoint(new Coordinate(pointCoordinates[0], pointCoordinates[1]));
                     return point;
                 case "polygon":
-                    var polygonCoordinates = JsonSerializer.Deserialize<IEnumerable<IEnumerable<double[]>>>(coordinateString);
-                    
+                    var polygonCoordinates =
+                        JsonSerializer.Deserialize<IEnumerable<IEnumerable<double[]>>>(coordinateString);
+
                     return CreatePolygon(geomFactory, polygonCoordinates);
                 case "multipolygon":
-                    var muliPolygonCoordinates = JsonSerializer.Deserialize<IEnumerable<IEnumerable<IEnumerable<double[]>>>>(coordinateString);
+                    var muliPolygonCoordinates =
+                        JsonSerializer.Deserialize<IEnumerable<IEnumerable<IEnumerable<double[]>>>>(coordinateString);
 
                     return geomFactory.CreateMultiPolygon(muliPolygonCoordinates
                         .Select(p => CreatePolygon(geomFactory, p)).ToArray());
@@ -171,7 +176,9 @@ namespace SOS.Lib.JsonConverters
             if (value == null)
             {
                 return;
-            };
+            }
+
+            ;
             writer.WriteStartObject();
 
             var type = value.GeometryType;
@@ -180,21 +187,22 @@ namespace SOS.Lib.JsonConverters
             switch (type?.ToLower())
             {
                 case "point":
-                    var point = (Point)value;
+                    var point = (Point) value;
                     WritePoint(writer, point.Coordinate);
                     break;
                 case "polygon":
-                    var polygon = (Polygon)value;
+                    var polygon = (Polygon) value;
 
                     WritePolygon(writer, polygon);
                     break;
                 case "multipolygon":
-                    var muliPolygon = (MultiPolygon)value;
+                    var muliPolygon = (MultiPolygon) value;
                     writer.WriteStartArray();
                     foreach (var poly in muliPolygon.Geometries)
                     {
-                        WritePolygon(writer, (Polygon)poly);
+                        WritePolygon(writer, (Polygon) poly);
                     }
+
                     writer.WriteEndArray();
                     break;
             }

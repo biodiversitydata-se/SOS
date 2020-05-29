@@ -3,17 +3,17 @@
 namespace SOS.Lib.Models.Processed.Configuration
 {
     /// <summary>
-    /// Process configuration
+    ///     Process configuration
     /// </summary>
     public class ProcessedConfiguration : IEntity<byte>
     {
         /// <summary>
-        /// Active instance 0 or 1
+        ///     Active instance 0 or 1
         /// </summary>
         public byte ActiveInstance { get; set; }
 
         /// <summary>
-        /// Id of configuration (always 0)
+        ///     Id of configuration (always 0)
         /// </summary>
         public byte Id { get; set; }
     }

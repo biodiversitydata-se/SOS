@@ -33,24 +33,14 @@ using SOS.Observations.Services.Interfaces;
 namespace SOS.Observations.Api
 {
     /// <summary>
-    /// Program class
+    ///     Program class
     /// </summary>
     public class Startup
     {
-        /// <summary>
-        /// Configuration
-        /// </summary>
-        public IConfiguration Configuration { get; }
-
-        /// <summary>
-        /// Auto fac
-        /// </summary>
-        public ILifetimeScope AutofacContainer { get; private set; }
-
         private readonly string _environment;
 
         /// <summary>
-        /// Start up
+        ///     Start up
         /// </summary>
         /// <param name="env"></param>
         public Startup(IWebHostEnvironment env)
@@ -59,8 +49,8 @@ namespace SOS.Observations.Api
 
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{_environment}.json", optional: true)
+                .AddJsonFile("appsettings.json", true, true)
+                .AddJsonFile($"appsettings.{_environment}.json", true)
                 .AddEnvironmentVariables();
 
             //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
@@ -68,36 +58,44 @@ namespace SOS.Observations.Api
 
             Configuration = builder.Build();
         }
+
+        /// <summary>
+        ///     Configuration
+        /// </summary>
+        public IConfiguration Configuration { get; }
+
+        /// <summary>
+        ///     Auto fac
+        /// </summary>
+        public ILifetimeScope AutofacContainer { get; private set; }
+
         public void ConfigureLogging(ContainerBuilder builder, ILoggingBuilder logging)
         {
             logging.ClearProviders();
             logging.AddConfiguration(Configuration.GetSection("Logging"))
-                .AddNLog(configFileName: $"nlog.{_environment}.config");
+                .AddNLog($"nlog.{_environment}.config");
         }
 
         /// <summary>
-        /// Register Autofac services. This runs after ConfigureServices so the things
-        /// here will override registrations made in ConfigureServices.
+        ///     Register Autofac services. This runs after ConfigureServices so the things
+        ///     here will override registrations made in ConfigureServices.
         /// </summary>
         /// <param name="builder"></param>
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            
         }
 
         /// <summary>
-        /// This method gets called by the runtime. Use this method to add services to the container.
+        ///     This method gets called by the runtime. Use this method to add services to the container.
         /// </summary>
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            var observationApiConfiguration = Configuration.GetSection("ObservationApiConfiguration").Get<ObservationApiConfiguration>();
+            var observationApiConfiguration = Configuration.GetSection("ObservationApiConfiguration")
+                .Get<ObservationApiConfiguration>();
 
             services.AddControllers()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
-                });
+                .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter()); });
 
             // Add Mvc Core services
             services.AddMvcCore(option => { option.EnableEndpointRouting = false; })
@@ -109,7 +107,7 @@ namespace SOS.Observations.Api
 
             // Configure swagger
             services.AddSwaggerGen(
-                options => 
+                options =>
                 {
                     options.SwaggerDoc("v1",
                         new OpenApiInfo
@@ -117,10 +115,9 @@ namespace SOS.Observations.Api
                             Title = "SOS.Observations.Api",
                             Version = "v1",
                             Description = "Search sightings"
-
                         });
-                            // Set the comments path for the Swagger JSON and UI.
-                            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    // Set the comments path for the Swagger JSON and UI.
+                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
                     options.IncludeXmlComments(xmlPath);
@@ -154,12 +151,14 @@ namespace SOS.Observations.Api
             //setup the elastic search configuration
             var elasticConfiguration = observationApiConfiguration.SearchDbConfiguration;
             var uris = elasticConfiguration.Hosts.Select(u => new Uri(u));
-            services.AddSingleton<IElasticClient>(new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))));
+            services.AddSingleton<IElasticClient>(
+                new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))));
 
             // Processed Mongo Db
             var processedDbConfiguration = observationApiConfiguration.ProcessedDbConfiguration;
             var processedSettings = processedDbConfiguration.GetMongoDbSettings();
-            var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName, processedDbConfiguration.BatchSize);
+            var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
+                processedDbConfiguration.BatchSize);
             services.AddSingleton<IProcessClient>(processClient);
 
             // Add configuration
@@ -174,7 +173,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IObservationManager, ObservationManager>();
             services.AddSingleton<IProcessInfoManager, ProcessInfoManager>();
             services.AddSingleton<ITaxonManager, TaxonManager>();
-           
+
             // Add repositories
             services.AddSingleton<IAreaRepository, AreaRepository>();
             services.AddSingleton<IDataProviderRepository, DataProviderRepository>();
@@ -189,15 +188,15 @@ namespace SOS.Observations.Api
         }
 
         /// <summary>
-        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline. 
+        ///     This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            this.AutofacContainer = app.ApplicationServices.GetAutofacRoot();
+            AutofacContainer = app.ApplicationServices.GetAutofacRoot();
 
-            if (new[] { "dev", "local" }.Contains(env.EnvironmentName.ToLower()))
+            if (new[] {"dev", "local"}.Contains(env.EnvironmentName.ToLower()))
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -211,14 +210,11 @@ namespace SOS.Observations.Api
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "SOS Search service");
-            });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "SOS Search service"); });
 
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions()
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
-                Authorization = new[] { new AllowAllConnectionsFilter() },
+                Authorization = new[] {new AllowAllConnectionsFilter()},
                 IgnoreAntiforgeryToken = true
             });
             app.UseHttpsRedirection();
@@ -227,20 +223,15 @@ namespace SOS.Observations.Api
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 
     /// <summary>
-    /// 
     /// </summary>
     public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
     {
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -251,5 +242,4 @@ namespace SOS.Observations.Api
             return true;
         }
     }
-
 }

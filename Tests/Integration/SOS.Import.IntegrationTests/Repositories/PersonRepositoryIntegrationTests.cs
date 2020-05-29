@@ -20,8 +20,8 @@ namespace SOS.Import.IntegrationTests.Repositories
             var importConfiguration = GetImportConfiguration();
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
 
-            PersonRepository personRepository = new PersonRepository(
-                artportalenDataService, 
+            var personRepository = new PersonRepository(
+                artportalenDataService,
                 new Mock<ILogger<PersonRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -34,6 +34,5 @@ namespace SOS.Import.IntegrationTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             personEntities.Should().NotBeEmpty();
         }
-
     }
 }

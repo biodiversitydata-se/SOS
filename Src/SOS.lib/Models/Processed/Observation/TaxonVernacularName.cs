@@ -9,14 +9,15 @@
 
         protected bool Equals(TaxonVernacularName other)
         {
-            return Name == other.Name && Language == other.Language && CountryCode == other.CountryCode && IsPreferredName == other.IsPreferredName;
+            return Name == other.Name && Language == other.Language && CountryCode == other.CountryCode &&
+                   IsPreferredName == other.IsPreferredName;
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((TaxonVernacularName) obj);
         }
 
@@ -24,7 +25,7 @@
         {
             unchecked
             {
-                var hashCode = (Name != null ? Name.GetHashCode() : 0);
+                var hashCode = Name != null ? Name.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ (Language != null ? Language.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (CountryCode != null ? CountryCode.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ IsPreferredName.GetHashCode();

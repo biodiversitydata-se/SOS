@@ -12,22 +12,12 @@ using Xunit;
 namespace SOS.Export.UnitTests.Jobs
 {
     /// <summary>
-    /// Tests for observation manager
+    ///     Tests for observation manager
     /// </summary>
     public class ExportAndSendJobTests
     {
-        private readonly Mock<IObservationManager> _observationManager;
-        private readonly Mock<ILogger<ExportAndSendJob>> _loggerMock;
-
         /// <summary>
-        /// Return object to be tested
-        /// </summary>
-        private ExportAndSendJob TestObject => new ExportAndSendJob(
-            _observationManager.Object,
-            _loggerMock.Object);
-
-        /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public ExportAndSendJobTests()
         {
@@ -35,8 +25,18 @@ namespace SOS.Export.UnitTests.Jobs
             _loggerMock = new Mock<ILogger<ExportAndSendJob>>();
         }
 
+        private readonly Mock<IObservationManager> _observationManager;
+        private readonly Mock<ILogger<ExportAndSendJob>> _loggerMock;
+
         /// <summary>
-        /// Test constructor
+        ///     Return object to be tested
+        /// </summary>
+        private ExportAndSendJob TestObject => new ExportAndSendJob(
+            _observationManager.Object,
+            _loggerMock.Object);
+
+        /// <summary>
+        ///     Test constructor
         /// </summary>
         [Fact]
         [Trait("Category", "Unit")]
@@ -55,39 +55,9 @@ namespace SOS.Export.UnitTests.Jobs
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
-        /// <summary>
-        /// Make a successful test of export
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        [Trait("Category", "Unit")]
-        public async Task RunAsyncSucess()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _observationManager
-                .Setup(blss => blss
-                    .ExportAndSendAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null)
-                )
-                .ReturnsAsync(true);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var observationManager = TestObject;
-
-           var result = await observationManager.RunAsync(new ExportFilter(), null, JobCancellationToken.Null);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Should().BeTrue();
-        }
-
 
         /// <summary>
-        /// Test run fail
+        ///     Test run fail
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -108,12 +78,45 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             var observationManager = TestObject;
 
-            Func<Task> act = async () => { await observationManager.RunAsync(new ExportFilter(), null, JobCancellationToken.Null); };
+            Func<Task> act = async () =>
+            {
+                await observationManager.RunAsync(new ExportFilter(), null, JobCancellationToken.Null);
+            };
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             await act.Should().ThrowAsync<Exception>();
+        }
+
+        /// <summary>
+        ///     Make a successful test of export
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task RunAsyncSucess()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _observationManager
+                .Setup(blss => blss
+                    .ExportAndSendAsync(It.IsAny<ExportFilter>(), It.IsAny<string>(), JobCancellationToken.Null)
+                )
+                .ReturnsAsync(true);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var observationManager = TestObject;
+
+            var result = await observationManager.RunAsync(new ExportFilter(), null, JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Should().BeTrue();
         }
 
         [Fact]
@@ -134,7 +137,10 @@ namespace SOS.Export.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             var observationManager = TestObject;
 
-            Func<Task> act = async () => { await observationManager.RunAsync(new ExportFilter(), null, JobCancellationToken.Null); };
+            Func<Task> act = async () =>
+            {
+                await observationManager.RunAsync(new ExportFilter(), null, JobCancellationToken.Null);
+            };
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

@@ -9,10 +9,19 @@ using Xunit;
 namespace SOS.Import.UnitTests.Repositories.Destination.Taxon
 {
     /// <summary>
-    /// Meta data repository tests
+    ///     Meta data repository tests
     /// </summary>
     public class TaxonVerbatimRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public TaxonVerbatimRepositoryTests()
+        {
+            _importClient = new Mock<IImportClient>();
+            _loggerMock = new Mock<ILogger<TaxonVerbatimRepository>>();
+        }
+
         private readonly Mock<IImportClient> _importClient;
         private readonly Mock<ILogger<TaxonVerbatimRepository>> _loggerMock;
 
@@ -21,16 +30,7 @@ namespace SOS.Import.UnitTests.Repositories.Destination.Taxon
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public TaxonVerbatimRepositoryTests()
-        {
-            _importClient = new Mock<IImportClient>();
-            _loggerMock = new Mock<ILogger<TaxonVerbatimRepository>>();
-        }
-
-        /// <summary>
-        /// Test the constructor
+        ///     Test the constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -47,6 +47,5 @@ namespace SOS.Import.UnitTests.Repositories.Destination.Taxon
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
-
     }
 }

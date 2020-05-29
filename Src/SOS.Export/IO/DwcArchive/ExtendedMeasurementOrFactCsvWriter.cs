@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -10,16 +11,16 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Extensions;
+using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Mappings;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
-using  SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive
 {
-    public class ExtendedMeasurementOrFactCsvWriter : Interfaces.IExtendedMeasurementOrFactCsvWriter
+    public class ExtendedMeasurementOrFactCsvWriter : IExtendedMeasurementOrFactCsvWriter
     {
         private readonly ILogger<ExtendedMeasurementOrFactCsvWriter> _logger;
 
@@ -30,7 +31,7 @@ namespace SOS.Export.IO.DwcArchive
 
         /// <inheritdoc />
         public async Task<bool> CreateCsvFileAsync(
-            FilterBase filter, 
+            FilterBase filter,
             Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationRepository processedObservationRepository,
@@ -41,15 +42,16 @@ namespace SOS.Export.IO.DwcArchive
                 var skip = 0;
                 const int take = 10000;
                 var map = new ExtendedMeasurementOrFactRowMap();
-                var results = await processedObservationRepository.ScrollProjectParametersAsync(filter,null);
-               
+                var results = await processedObservationRepository.ScrollProjectParametersAsync(filter, null);
+
                 while (results?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    IEnumerable<ExtendedMeasurementOrFactRow> records = results?.Records.ToExtendedMeasurementOrFactRows();
+                    var records = results?.Records.ToExtendedMeasurementOrFactRows();
                     await WriteEmofCsvAsync(stream, records, map);
                     skip += take;
-                    results = await processedObservationRepository.ScrollProjectParametersAsync(filter, results.ScrollId);
+                    results = await processedObservationRepository.ScrollProjectParametersAsync(filter,
+                        results.ScrollId);
                 }
 
                 return true;
@@ -66,7 +68,8 @@ namespace SOS.Export.IO.DwcArchive
             }
         }
 
-        private async Task WriteEmofCsvAsync<T>(Stream stream, IEnumerable<ExtendedMeasurementOrFactRow> records, ClassMap<T> map)
+        private async Task WriteEmofCsvAsync<T>(Stream stream, IEnumerable<ExtendedMeasurementOrFactRow> records,
+            ClassMap<T> map)
         {
             if (!records?.Any() ?? true)
             {
@@ -78,7 +81,7 @@ namespace SOS.Export.IO.DwcArchive
             {
                 HasHeaderRecord = true,
                 Delimiter = "\t", // tab
-                Encoding = System.Text.Encoding.UTF8
+                Encoding = Encoding.UTF8
             };
             using var csv = new CsvWriter(streamWriter, csvConfig);
 

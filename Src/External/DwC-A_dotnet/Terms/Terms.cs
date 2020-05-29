@@ -23,7 +23,10 @@ namespace DwC_A.Terms
         public static string collectionID = "http://rs.tdwg.org/dwc/terms/collectionID";
         public static string continent = "http://rs.tdwg.org/dwc/terms/continent";
         public static string coordinatePrecision = "http://rs.tdwg.org/dwc/terms/coordinatePrecision";
-        public static string coordinateUncertaintyInMeters = "http://rs.tdwg.org/dwc/terms/coordinateUncertaintyInMeters";
+
+        public static string coordinateUncertaintyInMeters =
+            "http://rs.tdwg.org/dwc/terms/coordinateUncertaintyInMeters";
+
         public static string country = "http://rs.tdwg.org/dwc/terms/country";
         public static string countryCode = "http://rs.tdwg.org/dwc/terms/countryCode";
         public static string county = "http://rs.tdwg.org/dwc/terms/county";
@@ -67,7 +70,10 @@ namespace DwC_A.Terms
         public static string georeferenceProtocol = "http://rs.tdwg.org/dwc/terms/georeferenceProtocol";
         public static string georeferenceRemarks = "http://rs.tdwg.org/dwc/terms/georeferenceRemarks";
         public static string georeferenceSources = "http://rs.tdwg.org/dwc/terms/georeferenceSources";
-        public static string georeferenceVerificationStatus = "http://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus";
+
+        public static string georeferenceVerificationStatus =
+            "http://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus";
+
         public static string group = "http://rs.tdwg.org/dwc/terms/group";
         public static string habitat = "http://rs.tdwg.org/dwc/terms/habitat";
         public static string higherClassification = "http://rs.tdwg.org/dwc/terms/higherClassification";
@@ -80,7 +86,10 @@ namespace DwC_A.Terms
         public static string identificationQualifier = "http://rs.tdwg.org/dwc/terms/identificationQualifier";
         public static string identificationReferences = "http://rs.tdwg.org/dwc/terms/identificationReferences";
         public static string identificationRemarks = "http://rs.tdwg.org/dwc/terms/identificationRemarks";
-        public static string identificationVerificationStatus = "http://rs.tdwg.org/dwc/terms/identificationVerificationStatus";
+
+        public static string identificationVerificationStatus =
+            "http://rs.tdwg.org/dwc/terms/identificationVerificationStatus";
+
         public static string identifiedBy = "http://rs.tdwg.org/dwc/terms/identifiedBy";
         public static string inCollection = "http://rs.tdwg.org/dwc/iri/inCollection";
         public static string inDataset = "http://rs.tdwg.org/dwc/iri/inDataset";
@@ -114,7 +123,10 @@ namespace DwC_A.Terms
         public static string MaterialSample = "http://rs.tdwg.org/dwc/terms/MaterialSample";
         public static string materialSampleID = "http://rs.tdwg.org/dwc/terms/materialSampleID";
         public static string maximumDepthInMeters = "http://rs.tdwg.org/dwc/terms/maximumDepthInMeters";
-        public static string maximumDistanceAboveSurfaceInMeters = "http://rs.tdwg.org/dwc/terms/maximumDistanceAboveSurfaceInMeters";
+
+        public static string maximumDistanceAboveSurfaceInMeters =
+            "http://rs.tdwg.org/dwc/terms/maximumDistanceAboveSurfaceInMeters";
+
         public static string maximumElevationInMeters = "http://rs.tdwg.org/dwc/terms/maximumElevationInMeters";
         public static string measurementAccuracy = "http://rs.tdwg.org/dwc/terms/measurementAccuracy";
         public static string measurementDeterminedBy = "http://rs.tdwg.org/dwc/terms/measurementDeterminedBy";
@@ -128,7 +140,10 @@ namespace DwC_A.Terms
         public static string measurementValue = "http://rs.tdwg.org/dwc/terms/measurementValue";
         public static string member = "http://rs.tdwg.org/dwc/terms/member";
         public static string minimumDepthInMeters = "http://rs.tdwg.org/dwc/terms/minimumDepthInMeters";
-        public static string minimumDistanceAboveSurfaceInMeters = "http://rs.tdwg.org/dwc/terms/minimumDistanceAboveSurfaceInMeters";
+
+        public static string minimumDistanceAboveSurfaceInMeters =
+            "http://rs.tdwg.org/dwc/terms/minimumDistanceAboveSurfaceInMeters";
+
         public static string minimumElevationInMeters = "http://rs.tdwg.org/dwc/terms/minimumElevationInMeters";
         public static string modified = "http://purl.org/dc/terms/modified";
         public static string month = "http://rs.tdwg.org/dwc/terms/month";
@@ -231,14 +246,14 @@ namespace DwC_A.Terms
         public static string source = "	http://purl.org/dc/terms/source";
 
 
-
         public static string ShortName(string term)
         {
-            if(term == null)
+            if (term == null)
             {
                 return null;
             }
-            Regex regex = new Regex("[^/]+$");
+
+            var regex = new Regex("[^/]+$");
             var match = regex.Match(term);
             return string.IsNullOrEmpty(match.Value) ? term : match.Value;
         }

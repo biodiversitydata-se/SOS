@@ -10,6 +10,15 @@ namespace SOS.Process.UnitTests.Repositories.Source
 {
     public class HarvestInfoRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public HarvestInfoRepositoryTests()
+        {
+            _processClient = new Mock<IVerbatimClient>();
+            _loggerMock = new Mock<ILogger<HarvestInfoRepository>>();
+        }
+
         private readonly Mock<IVerbatimClient> _processClient;
         private readonly Mock<ILogger<HarvestInfoRepository>> _loggerMock;
 
@@ -18,16 +27,7 @@ namespace SOS.Process.UnitTests.Repositories.Source
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public HarvestInfoRepositoryTests()
-        {
-            _processClient = new Mock<IVerbatimClient>();
-            _loggerMock = new Mock<ILogger<HarvestInfoRepository>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()

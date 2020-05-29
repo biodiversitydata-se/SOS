@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -12,26 +11,26 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Processors.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Processors.DarwinCoreArchive
 {
     /// <summary>
-    /// DwC-A observation processor.
+    ///     DwC-A observation processor.
     /// </summary>
-    public class DwcaObservationProcessor : ObservationProcessorBase<DwcaObservationProcessor>, Interfaces.IDwcaObservationProcessor
+    public class DwcaObservationProcessor : ObservationProcessorBase<DwcaObservationProcessor>,
+        IDwcaObservationProcessor
     {
-        private readonly IDwcaVerbatimRepository _dwcaVerbatimRepository;
-        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
-        private readonly ProcessConfiguration _processConfiguration;
         private readonly IAreaHelper _areaHelper;
-        public override DataProviderType Type => DataProviderType.DwcA;
+        private readonly IDwcaVerbatimRepository _dwcaVerbatimRepository;
+        private readonly ProcessConfiguration _processConfiguration;
+        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="dwcaVerbatimRepository"></param>
         /// <param name="processedObservationRepository"></param>
@@ -47,18 +46,24 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
-            ILogger<DwcaObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, logger)
+            ILogger<DwcaObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,
+            logger)
         {
-            _dwcaVerbatimRepository = dwcaVerbatimRepository ?? throw new ArgumentNullException(nameof(dwcaVerbatimRepository));
-            _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _dwcaVerbatimRepository =
+                dwcaVerbatimRepository ?? throw new ArgumentNullException(nameof(dwcaVerbatimRepository));
+            _processedFieldMappingRepository = processedFieldMappingRepository ??
+                                               throw new ArgumentNullException(nameof(processedFieldMappingRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-            _processConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
+            _processConfiguration =
+                processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
 
             if (processConfiguration == null)
             {
                 throw new ArgumentNullException(nameof(processConfiguration));
             }
         }
+
+        public override DataProviderType Type => DataProviderType.DwcA;
 
         public async Task<bool> DoesVerbatimDataExist()
         {
@@ -75,7 +80,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             var startTime = DateTime.Now;
             try
             {
-                bool dataExists = await DoesVerbatimDataExist();
+                var dataExists = await DoesVerbatimDataExist();
                 if (!dataExists)
                 {
                     return ProcessingStatus.Failed(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now);
@@ -87,16 +92,18 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                     Logger.LogError($"Failed to delete {dataProvider} data");
                     return ProcessingStatus.Failed(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now);
                 }
+
                 Logger.LogDebug($"Finish deleting {dataProvider} data");
 
                 Logger.LogDebug($"Start processing {dataProvider} data");
                 var verbatimCount = await ProcessObservationsSequential(
                     dataProvider,
-                    taxa, 
+                    taxa,
                     cancellationToken);
                 Logger.LogDebug($"Finish processing {dataProvider} data.");
 
-                return ProcessingStatus.Success(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now, verbatimCount);
+                return ProcessingStatus.Success(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now,
+                    verbatimCount);
             }
             catch (JobAbortedException)
             {
@@ -111,7 +118,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         }
 
         /// <summary>
-        /// Process all observations
+        ///     Process all observations
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
@@ -132,12 +139,13 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         {
             var verbatimCount = 0;
             var observationFactory = await DwcaObservationFactory.CreateAsync(
-                dataProvider, 
-                taxa, 
+                dataProvider,
+                taxa,
                 _processedFieldMappingRepository,
                 _areaHelper);
             ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
-            using var cursor = await _dwcaVerbatimRepository.GetAllByCursorAsync(dataProvider.Id, dataProvider.Identifier);
+            using var cursor =
+                await _dwcaVerbatimRepository.GetAllByCursorAsync(dataProvider.Id, dataProvider.Identifier);
 
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>

@@ -1,8 +1,8 @@
 {
-  "profiles": {
-    "SOS.Hangfire.JobServer": {
-      "commandName": "Project",
-      "commandLineArgs": "local"
+    "profiles": {
+        "SOS.Hangfire.JobServer": {
+            "commandName": "Project",
+            "commandLineArgs": "local"
+        }
     }
-  }
 }

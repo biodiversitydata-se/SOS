@@ -10,15 +10,15 @@ using SOS.Lib.Models.Search;
 namespace SOS.Export.Jobs
 {
     /// <summary>
-    /// Artportalen harvest
+    ///     Artportalen harvest
     /// </summary>
     public class ExportAndSendJob : IExportAndSendJob
     {
-        private readonly IObservationManager _observationManager;
         private readonly ILogger<ExportAndSendJob> _logger;
+        private readonly IObservationManager _observationManager;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="logger"></param>
@@ -37,7 +37,7 @@ namespace SOS.Export.Jobs
                 var success = await _observationManager.ExportAndSendAsync(filter, email, cancellationToken);
 
                 _logger.LogInformation($"End export and send job. Success: {success}");
-                
+
                 return success ? true : throw new Exception("Export and send job failed");
             }
             catch (JobAbortedException)

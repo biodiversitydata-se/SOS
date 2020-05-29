@@ -7,7 +7,7 @@ using SOS.Process.Managers.Interfaces;
 namespace SOS.Process.Jobs
 {
     /// <summary>
-    /// Artportalen harvest
+    ///     Artportalen harvest
     /// </summary>
     public class ActivateInstanceJob : IActivateInstanceJob
     {
@@ -15,7 +15,7 @@ namespace SOS.Process.Jobs
         private readonly ILogger<ActivateInstanceJob> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="instanceManager"></param>
         /// <param name="logger"></param>

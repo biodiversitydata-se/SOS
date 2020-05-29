@@ -1,16 +1,17 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Import.MongoDb.Interfaces;
-using  SOS.Lib.Models.DarwinCore;
+using SOS.Import.Repositories.Destination.Taxon.Interfaces;
+using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Import.Repositories.Destination.Taxon
 {
     /// <summary>
-    /// Clam verbatim repository
+    ///     Clam verbatim repository
     /// </summary>
-    public class TaxonVerbatimRepository : VerbatimRepository<DarwinCoreTaxon, int>, Interfaces.ITaxonVerbatimRepository
+    public class TaxonVerbatimRepository : VerbatimRepository<DarwinCoreTaxon, int>, ITaxonVerbatimRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="importClient"></param>
         /// <param name="logger"></param>

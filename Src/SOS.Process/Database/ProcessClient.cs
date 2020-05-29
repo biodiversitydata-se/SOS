@@ -1,19 +1,17 @@
 ﻿using MongoDB.Driver;
+using SOS.Process.Database.Interfaces;
 
 namespace SOS.Process.Database
 {
-    public class ProcessClient : MongoClient, Interfaces.IProcessClient
+    public class ProcessClient : MongoClient, IProcessClient
     {
-        /// <inheritdoc />
-        public int BatchSize { get; }
-
         /// <summary>
-        /// Name of database
+        ///     Name of database
         /// </summary>
         private readonly string _databaseName;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="settings"></param>
         /// <param name="databaseName"></param>
@@ -23,6 +21,9 @@ namespace SOS.Process.Database
             _databaseName = databaseName;
             BatchSize = batchSize;
         }
+
+        /// <inheritdoc />
+        public int BatchSize { get; }
 
         public IMongoDatabase GetDatabase()
         {

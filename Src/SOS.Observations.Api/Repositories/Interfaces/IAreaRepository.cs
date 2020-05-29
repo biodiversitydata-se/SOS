@@ -8,29 +8,30 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Observations.Api.Repositories.Interfaces
 {
     /// <summary>
-    /// Area repository
+    ///     Area repository
     /// </summary>
     public interface IAreaRepository : IBaseRepository<Area, int>
     {
         /// <summary>
-        /// Get info on a single area
+        ///     Get info on a single area
         /// </summary>
         /// <param name="areaId">Id of area</param>
         /// <returns></returns>
         public Task<Area> GetAreaAsync(int areaId);
 
         /// <summary>
-        /// Get all the areas, paged
+        ///     Get all the areas, paged
         /// </summary>
         /// <param name="areaTypes">Skip this many</param>
         /// <param name="searchString">Skip this many</param>
         /// <param name="skip">Skip this many</param>
         /// <param name="take">Take this many areas</param>
         /// <returns></returns>
-        public Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip, int take);
+        public Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip,
+            int take);
 
         /// <summary>
-        /// Get the geometry for a area
+        ///     Get the geometry for a area
         /// </summary>
         /// <param name="areaId"></param>
         /// <returns></returns>

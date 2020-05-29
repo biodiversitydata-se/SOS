@@ -1,12 +1,12 @@
 ﻿namespace SOS.Lib.Enums.FieldMappingValues
 {
     /// <summary>
-    /// Enumeration of Organization.
+    ///     Enumeration of Organization.
     /// </summary>
     public enum OrganizationId
     {
         /// <summary>
-        /// ArtDatabanken.
+        ///     ArtDatabanken.
         /// </summary>
         ArtDatabanken = 165
     }

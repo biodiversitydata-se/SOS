@@ -2,25 +2,25 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
+using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
     /// <summary>
-    /// Project repository
+    ///     Project repository
     /// </summary>
-    public class ProjectRepository : BaseRepository<ProjectRepository>, Interfaces.IProjectRepository
+    public class ProjectRepository : BaseRepository<ProjectRepository>, IProjectRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="artportalenDataService"></param>
         /// <param name="logger"></param>
-        public ProjectRepository(IArtportalenDataService artportalenDataService, ILogger<ProjectRepository> logger) : base(artportalenDataService, logger)
+        public ProjectRepository(IArtportalenDataService artportalenDataService, ILogger<ProjectRepository> logger) :
+            base(artportalenDataService, logger)
         {
-           
         }
 
         /// <inheritdoc />
@@ -62,11 +62,11 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-		public async Task<IEnumerable<ProjectParameterEntity>> GetProjectParametersAsync()
-		{
-			try
-			{
-				const string query = @"
+        public async Task<IEnumerable<ProjectParameterEntity>> GetProjectParametersAsync()
+        {
+            try
+            {
+                const string query = @"
                 SELECT
                     SearchableSightings.SightingId							AS SightingId,
 	                Project.Id												AS ProjectId,	                	                
@@ -102,14 +102,13 @@ namespace SOS.Import.Repositories.Source.Artportalen
 		                AND
 		                Project.IsHideAll = 0";
 
-				return await QueryAsync<ProjectParameterEntity>(query);
-			}
-			catch (Exception e)
-			{
-				Logger.LogError(e, "Error getting project parameters");
-				return null;
-			}
-		}
-
-	}
+                return await QueryAsync<ProjectParameterEntity>(query);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting project parameters");
+                return null;
+            }
+        }
+    }
 }

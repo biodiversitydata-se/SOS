@@ -5,12 +5,13 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.FieldMapping
 {
     /// <summary>
-    /// Class for creating Country field mapping.
+    ///     Class for creating Country field mapping.
     /// </summary>
     public class CountryFieldMappingFactory : DwcFieldMappingFactoryBase
     {
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Country;
         protected override bool Localized => false;
+
         protected override ICollection<FieldMappingValue> GetFieldMappingValues()
         {
             var fieldMappingValues = new List<FieldMappingValue>

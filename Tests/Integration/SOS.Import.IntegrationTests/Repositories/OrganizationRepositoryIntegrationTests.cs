@@ -20,7 +20,7 @@ namespace SOS.Import.IntegrationTests.Repositories
             var importConfiguration = GetImportConfiguration();
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
             var organizationRepository = new OrganizationRepository(
-                artportalenDataService, 
+                artportalenDataService,
                 new Mock<ILogger<OrganizationRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

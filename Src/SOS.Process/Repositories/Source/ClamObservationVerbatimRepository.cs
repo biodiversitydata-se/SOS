@@ -2,20 +2,21 @@
 using MongoDB.Bson;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Process.Database.Interfaces;
+using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source
 {
-    public class ClamObservationVerbatimRepository : VerbatimBaseRepository<ClamObservationVerbatim, ObjectId>, Interfaces.IClamObservationVerbatimRepository
+    public class ClamObservationVerbatimRepository : VerbatimBaseRepository<ClamObservationVerbatim, ObjectId>,
+        IClamObservationVerbatimRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
         public ClamObservationVerbatimRepository(IVerbatimClient client,
             ILogger<ClamObservationVerbatimRepository> logger) : base(client, logger)
         {
-
         }
     }
 }

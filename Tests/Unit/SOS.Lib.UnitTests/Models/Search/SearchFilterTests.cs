@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using FluentAssertions;
 using Nest;
 using SOS.Lib.Models.Search;
-using SOS.Lib.Models.Shared;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Models.Search
@@ -28,12 +24,16 @@ namespace SOS.Lib.UnitTests.Models.Search
                 {
                     MaxDistanceFromPoint = 50,
                     UsePointAccuracy = true,
-                    Geometries = new List<IGeoShape>{
-                        new PolygonGeoShape(new []{ new []
+                    Geometries = new List<IGeoShape>
+                    {
+                        new PolygonGeoShape(new[]
                         {
-                            new GeoCoordinate(1,2),
-                            new GeoCoordinate(3,4) 
-                        } })
+                            new[]
+                            {
+                                new GeoCoordinate(1, 2),
+                                new GeoCoordinate(3, 4)
+                            }
+                        })
                     }
                 },
                 EndDate = currentDate
@@ -60,17 +60,21 @@ namespace SOS.Lib.UnitTests.Models.Search
             var currentDate = DateTime.Now;
             var filter = new SearchFilter
             {
-                CountyIds = new[] { 1, 2, 3 },
+                CountyIds = new[] {1, 2, 3},
                 GeometryFilter = new GeometryFilter
                 {
                     MaxDistanceFromPoint = 50,
                     UsePointAccuracy = true,
-                    Geometries = new List<IGeoShape>{
-                        new PolygonGeoShape(new []{ new []
+                    Geometries = new List<IGeoShape>
+                    {
+                        new PolygonGeoShape(new[]
                         {
-                            new GeoCoordinate(1,2),
-                            new GeoCoordinate(3,4)
-                        } })
+                            new[]
+                            {
+                                new GeoCoordinate(1, 2),
+                                new GeoCoordinate(3, 4)
+                            }
+                        })
                     }
                 },
                 EndDate = currentDate

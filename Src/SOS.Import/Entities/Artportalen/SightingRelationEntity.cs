@@ -16,7 +16,8 @@ namespace SOS.Import.Entities.Artportalen
 
         public override string ToString()
         {
-            return $"{nameof(SightingId)}: {SightingId}, {nameof(UserId)}: {UserId}, {nameof(SightingRelationTypeId)}: {SightingRelationTypeId}, {nameof(Sort)}: {Sort}, {nameof(IsPublic)}: {IsPublic}, {nameof(DeterminationYear)}: {DeterminationYear}";
+            return
+                $"{nameof(SightingId)}: {SightingId}, {nameof(UserId)}: {UserId}, {nameof(SightingRelationTypeId)}: {SightingRelationTypeId}, {nameof(Sort)}: {Sort}, {nameof(IsPublic)}: {IsPublic}, {nameof(DeterminationYear)}: {DeterminationYear}";
         }
     }
 }

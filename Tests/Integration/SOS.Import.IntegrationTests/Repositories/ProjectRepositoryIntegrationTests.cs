@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Entities;
-using SOS.Import.Entities.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services;
 using Xunit;
@@ -23,14 +20,14 @@ namespace SOS.Import.IntegrationTests.Repositories
             var importConfiguration = GetImportConfiguration();
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
 
-            ProjectRepository projectRepository = new ProjectRepository(
+            var projectRepository = new ProjectRepository(
                 artportalenDataService,
                 new Mock<ILogger<ProjectRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            IEnumerable<ProjectEntity> projectEntities = await projectRepository.GetProjectsAsync();
+            var projectEntities = await projectRepository.GetProjectsAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

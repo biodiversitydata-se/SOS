@@ -11,7 +11,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
     public interface IDwcArchiveOccurrenceCsvWriter
     {
         /// <summary>
-        /// Creates a DwC occurrence CSV file.
+        ///     Creates a DwC occurrence CSV file.
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="stream"></param>

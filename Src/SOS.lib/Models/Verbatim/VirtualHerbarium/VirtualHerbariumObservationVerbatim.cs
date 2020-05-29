@@ -5,104 +5,104 @@ using SOS.Lib.Models.Interfaces;
 namespace SOS.Lib.Models.Verbatim.VirtualHerbarium
 {
     /// <summary>
-    /// Verbatim from Virtual Herbarium
+    ///     Verbatim from Virtual Herbarium
     /// </summary>
     public class VirtualHerbariumObservationVerbatim : IEntity<ObjectId>
     {
         /// <summary>
-        /// Accession No
+        ///     Accession No
         /// </summary>
         public string AccessionNo { get; set; }
 
         /// <summary>
-        /// Collector
+        ///     Collector
         /// </summary>
         public string Collector { get; set; }
 
         /// <summary>
-        /// Coordinate Precision
+        ///     Coordinate Precision
         /// </summary>
         public int? CoordinatePrecision { get; set; }
 
         /// <summary>
-        /// Coordinate Source
+        ///     Coordinate Source
         /// </summary>
         public string CoordinateSource { get; set; }
 
         /// <summary>
-        /// Collector number
+        ///     Collector number
         /// </summary>
         public string Collectornumber { get; set; }
 
         /// <summary>
-        /// Date Collected
+        ///     Date Collected
         /// </summary>
         public string DateCollected { get; set; }
 
         /// <summary>
-        /// Decimal Latitude
+        ///     Decimal Latitude
         /// </summary>
         public double DecimalLatitude { get; set; }
 
         /// <summary>
-        /// Decimal Longitude
+        ///     Decimal Longitude
         /// </summary>
         public double DecimalLongitude { get; set; }
 
         /// <summary>
-        /// District
+        ///     District
         /// </summary>
         public string District { get; set; }
 
         /// <summary>
-        /// Dyntaxa taxon id
+        ///     Dyntaxa taxon id
         /// </summary>
         public int DyntaxaId { get; set; }
 
         /// <summary>
-        /// File id
+        ///     File id
         /// </summary>
         public string FileId { get; set; }
 
         /// <summary>
-        /// Unique id
-        /// </summary>
-        [BsonId]
-        public ObjectId Id { get; set; }
-
-        /// <summary>
-        /// Institution Code
+        ///     Institution Code
         /// </summary>
         public string InstitutionCode { get; set; }
 
         /// <summary>
-        /// Locality
+        ///     Locality
         /// </summary>
         public string Locality { get; set; }
 
         /// <summary>
-        /// Notes
+        ///     Notes
         /// </summary>
         public string Notes { get; set; }
 
         /// <summary>
-        /// Original name
+        ///     Original name
         /// </summary>
         public string OriginalName { get; set; }
 
         /// <summary>
-        /// Original text
+        ///     Original text
         /// </summary>
         public string OriginalText { get; set; }
 
         /// <summary>
-        /// Province
+        ///     Province
         /// </summary>
         public string Province { get; set; }
 
         /// <summary>
-        /// Taxon scientific name
+        ///     Taxon scientific name
         /// </summary>
         public string ScientificName { get; set; }
+
+        /// <summary>
+        ///     Unique id
+        /// </summary>
+        [BsonId]
+        public ObjectId Id { get; set; }
     }
 }

@@ -8,39 +8,41 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.DOI;
 using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
 {
     /// <summary>
-    /// Import job controller
+    ///     Import job controller
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class DOIsController : ControllerBase, Interfaces.IDOIsController
+    public class DOIsController : ControllerBase, IDOIsController
     {
-        private readonly IDOIManager _doiManager;
         private readonly string _doiContainer;
+        private readonly IDOIManager _doiManager;
         private readonly ILogger<ExportsController> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
-        public DOIsController(IDOIManager doiManager, BlobStorageConfiguration configuration, ILogger<ExportsController> logger)
+        public DOIsController(IDOIManager doiManager, BlobStorageConfiguration configuration,
+            ILogger<ExportsController> logger)
         {
             _doiManager = doiManager ?? throw new ArgumentNullException(nameof(doiManager));
             _doiContainer = configuration?.DOI_Container ?? throw new ArgumentNullException(nameof(configuration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         [HttpPost]
-        [ProducesResponseType(typeof(object), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RunCreateDOIJobAsync([FromBody]ExportFilter filter)
+        [ProducesResponseType(typeof(object), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> RunCreateDOIJobAsync([FromBody] ExportFilter filter)
         {
             try
             {
@@ -48,20 +50,20 @@ namespace SOS.Observations.Api.Controllers
                 var jobId = BackgroundJob.Enqueue<IExportAndStoreJob>(job =>
                     job.RunAsync(filter, _doiContainer, fileName, true, JobCancellationToken.Null));
 
-                return new OkObjectResult(new { fileName, jobId });
+                return new OkObjectResult(new {fileName, jobId});
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Running DOI failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         [HttpGet]
-        [ProducesResponseType(typeof(PagedResult<DOI>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDOIsAsync([FromQuery]int skip = 0, [FromQuery]int take = 100)
+        [ProducesResponseType(typeof(PagedResult<DOI>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetDOIsAsync([FromQuery] int skip = 0, [FromQuery] int take = 100)
         {
             try
             {
@@ -72,15 +74,15 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Getting export job status failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpGet("{id}/URL")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult GetDOIFileUrl([FromRoute]Guid id)
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public IActionResult GetDOIFileUrl([FromRoute] Guid id)
         {
             try
             {
@@ -91,7 +93,7 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting DOI file");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
     }

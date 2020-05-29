@@ -29,17 +29,18 @@ namespace SOS.Process.Processors.Shark
         }
 
         /// <summary>
-        /// Cast multiple clam observations to ProcessedObservation
+        ///     Cast multiple clam observations to ProcessedObservation
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<SharkObservationVerbatim> verbatims)
+        public IEnumerable<ProcessedObservation> CreateProcessedObservations(
+            IEnumerable<SharkObservationVerbatim> verbatims)
         {
             return verbatims.Select(CreateProcessedObservation);
         }
 
         /// <summary>
-        /// Cast Shark observation verbatim to ProcessedObservation
+        ///     Cast Shark observation verbatim to ProcessedObservation
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
@@ -48,7 +49,8 @@ namespace SOS.Process.Processors.Shark
             Point wgs84Point = null;
             if (verbatim.SampleLatitudeDd.HasValue && verbatim.SampleLongitudeDd.HasValue)
             {
-                wgs84Point = new Point(verbatim.SampleLongitudeDd.Value, verbatim.SampleLatitudeDd.Value) { SRID = (int)CoordinateSys.WGS84 };
+                wgs84Point = new Point(verbatim.SampleLongitudeDd.Value, verbatim.SampleLatitudeDd.Value)
+                    {SRID = (int) CoordinateSys.WGS84};
             }
 
             _taxa.TryGetValue(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, out var taxon);
@@ -56,13 +58,17 @@ namespace SOS.Process.Processors.Shark
             var obs = new ProcessedObservation
             {
                 DataProviderId = _dataProvider.Id,
-                BasisOfRecord = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ DataProviderIdentifiers.SHARK }",
+                BasisOfRecord = new ProcessedFieldMapValue {Id = (int) BasisOfRecordId.HumanObservation},
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.SHARK}",
                 DatasetName = verbatim.DatasetName,
                 Event = new ProcessedEvent
                 {
-                    EndDate = verbatim.SampleDate.HasValue ? verbatim.SampleDate.Value.ToUniversalTime() : (DateTime?)null,
-                    StartDate = verbatim.SampleDate.HasValue ? verbatim.SampleDate.Value.ToUniversalTime() : (DateTime?)null,
+                    EndDate = verbatim.SampleDate.HasValue
+                        ? verbatim.SampleDate.Value.ToUniversalTime()
+                        : (DateTime?) null,
+                    StartDate = verbatim.SampleDate.HasValue
+                        ? verbatim.SampleDate.Value.ToUniversalTime()
+                        : (DateTime?) null,
                     VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.SampleDate)
                 },
                 Identification = new ProcessedIdentification
@@ -78,13 +84,14 @@ namespace SOS.Process.Processors.Shark
                     DecimalLatitude = verbatim.SampleLatitudeDd,
                     DecimalLongitude = verbatim.SampleLongitudeDd,
                     GeodeticDatum = GeodeticDatum.Wgs84,
-                    Continent = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
-                    Country = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
+                    Continent = new ProcessedFieldMapValue {Id = (int) ContinentId.Europe},
+                    Country = new ProcessedFieldMapValue {Id = (int) CountryId.Sweden},
                     MaximumDepthInMeters = verbatim.WaterDepthM,
                     MinimumDepthInMeters = verbatim.WaterDepthM,
                     Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
                     PointLocation = wgs84Point?.ToGeoLocation(),
-                    PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(ProcessConstants.DefaultAccuracyInMeters)?.ToGeoShape(),
+                    PointWithBuffer = (PolygonGeoShape) wgs84Point?.ToCircle(ProcessConstants.DefaultAccuracyInMeters)
+                        ?.ToGeoShape(),
                     VerbatimLatitude = verbatim.SampleLatitudeDd,
                     VerbatimLongitude = verbatim.SampleLongitudeDd
                 },
@@ -118,7 +125,7 @@ namespace SOS.Process.Processors.Shark
         }
 
         /// <summary>
-        /// Creates occurrence id.
+        ///     Creates occurrence id.
         /// </summary>
         /// <returns>The Catalog Number.</returns>
         private string GetCatalogNumber(string occurrenceId)
@@ -128,23 +135,24 @@ namespace SOS.Process.Processors.Shark
         }
 
         /// <summary>
-        /// Gets the occurrence status. Set to Present if DyntaxaTaxonId from provider is greater than 0 and Absent if DyntaxaTaxonId is 0
+        ///     Gets the occurrence status. Set to Present if DyntaxaTaxonId from provider is greater than 0 and Absent if
+        ///     DyntaxaTaxonId is 0
         /// </summary>
         private ProcessedFieldMapValue GetOccurrenceStatusId(int? dyntaxaTaxonId)
         {
             if (dyntaxaTaxonId == 0)
             {
-                return new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Absent };
+                return new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Absent};
             }
 
-            return new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Present };
+            return new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Present};
         }
 
         /// <summary>
-        /// An integer value corresponding to the Enum of the Main field of the SpeciesFact FactorId 761.
-        /// By default the value is 1. If the taxon is subordinate to the taxon category Species it is nessecary
-        /// to check the Species Fact values of parent taxa.
-        /// If the value is greater than 1 for any parent then the value should equal to the max value among parents.
+        ///     An integer value corresponding to the Enum of the Main field of the SpeciesFact FactorId 761.
+        ///     By default the value is 1. If the taxon is subordinate to the taxon category Species it is nessecary
+        ///     to check the Species Fact values of parent taxa.
+        ///     If the value is greater than 1 for any parent then the value should equal to the max value among parents.
         /// </summary>
         /// <returns></returns>
         private int GetProtectionLevel()
@@ -153,7 +161,7 @@ namespace SOS.Process.Processors.Shark
         }
 
         /// <summary>
-        /// Set to False if DyntaxaTaxonId from provider is greater than 0 and True if DyntaxaTaxonId is 0.
+        ///     Set to False if DyntaxaTaxonId from provider is greater than 0 and True if DyntaxaTaxonId is 0.
         /// </summary>
         private bool GetIsNeverFoundObservation(int? dyntaxaTaxonId)
         {
@@ -161,7 +169,7 @@ namespace SOS.Process.Processors.Shark
         }
 
         /// <summary>
-        /// Set to True if DyntaxaTaxonId from provider is greater than 0 and False if DyntaxaTaxonId is 0.
+        ///     Set to True if DyntaxaTaxonId from provider is greater than 0 and False if DyntaxaTaxonId is 0.
         /// </summary>
         private bool GetIsPositiveObservation(int? dyntaxaTaxonId)
         {

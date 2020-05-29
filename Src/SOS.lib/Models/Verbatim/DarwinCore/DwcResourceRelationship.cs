@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SOS.Lib.Models.Verbatim.DarwinCore
+﻿namespace SOS.Lib.Models.Verbatim.DarwinCore
 {
     /// <summary>
-    /// Darwin Core Resource Relationship exension
+    ///     Darwin Core Resource Relationship exension
     /// </summary>
     public class DwcResourceRelationship
     {

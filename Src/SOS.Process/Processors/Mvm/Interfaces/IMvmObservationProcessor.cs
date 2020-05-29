@@ -3,10 +3,9 @@
 namespace SOS.Process.Processors.Mvm.Interfaces
 {
     /// <summary>
-    /// SERS observation processor
+    ///     SERS observation processor
     /// </summary>
     public interface IMvmObservationProcessor : IProcessor
     {
-        
     }
 }

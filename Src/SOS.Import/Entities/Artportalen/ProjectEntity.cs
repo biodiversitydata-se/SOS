@@ -3,57 +3,57 @@
 namespace SOS.Import.Entities.Artportalen
 {
     /// <summary>
-    /// Project class
+    ///     Project class
     /// </summary>
     public class ProjectEntity
     {
         /// <summary>
-        /// Project category
+        ///     Project category
         /// </summary>
         public string Category { get; set; }
 
         /// <summary>
-        /// Project description
+        ///     Project description
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// Project end date
+        ///     Project end date
         /// </summary>
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        /// Id of project
+        ///     Id of project
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// True if project is public
+        ///     True if project is public
         /// </summary>
         public bool IsPublic { get; set; }
 
         /// <summary>
-        /// Name of project
+        ///     Name of project
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Project owner
+        ///     Project owner
         /// </summary>
         public string Owner { get; set; }
 
         /// <summary>
-        /// Project start date
+        ///     Project start date
         /// </summary>
         public DateTime? StartDate { get; set; }
 
         /// <summary>
-        /// Survey method used
+        ///     Survey method used
         /// </summary>
         public string SurveyMethod { get; set; }
 
         /// <summary>
-        /// Survey method url 
+        ///     Survey method url
         /// </summary>
         public string SurveyMethodUrl { get; set; }
     }

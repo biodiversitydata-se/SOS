@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using SOS.Lib.Models.Verbatim.DarwinCore;
+﻿using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Import.DarwinCore
 {
@@ -7,7 +6,7 @@ namespace SOS.Import.DarwinCore
     {
         public static void MapValueByTerm(
             DwcObservationVerbatim observation,
-            string term, 
+            string term,
             string val)
         {
             switch (term)
@@ -603,8 +602,8 @@ namespace SOS.Import.DarwinCore
         }
 
         public static void MapValueByTerm(
-            DwcExtendedMeasurementOrFact emofItem, 
-            string term, 
+            DwcExtendedMeasurementOrFact emofItem,
+            string term,
             string val)
         {
             switch (term)

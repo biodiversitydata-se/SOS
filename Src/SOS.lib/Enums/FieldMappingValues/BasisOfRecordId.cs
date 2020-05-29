@@ -1,62 +1,62 @@
 ﻿namespace SOS.Lib.Enums.FieldMappingValues
 {
     /// <summary>
-    /// Enumeration of BasisOfRecord.
+    ///     Enumeration of BasisOfRecord.
     /// </summary>
     public enum BasisOfRecordId
     {
         /// <summary>
-        /// HumanObservation.
+        ///     HumanObservation.
         /// </summary>
         HumanObservation = 0,
 
         /// <summary>
-        /// PreservedSpecimen.
+        ///     PreservedSpecimen.
         /// </summary>
         PreservedSpecimen = 1,
 
         /// <summary>
-        /// FossilSpecimen.
+        ///     FossilSpecimen.
         /// </summary>
         FossilSpecimen = 2,
 
         /// <summary>
-        /// LivingSpecimen.
+        ///     LivingSpecimen.
         /// </summary>
         LivingSpecimen = 3,
 
         /// <summary>
-        /// MaterialSample.
+        ///     MaterialSample.
         /// </summary>
         MaterialSample = 4,
 
         /// <summary>
-        /// Event.
+        ///     Event.
         /// </summary>
         Event = 5,
 
         /// <summary>
-        /// MachineObservation.
+        ///     MachineObservation.
         /// </summary>
         MachineObservation = 6,
 
         /// <summary>
-        /// Taxon.
+        ///     Taxon.
         /// </summary>
         Taxon = 7,
 
         /// <summary>
-        /// Occurrence.
+        ///     Occurrence.
         /// </summary>
         Occurrence = 8,
 
         /// <summary>
-        /// Literature.
+        ///     Literature.
         /// </summary>
         Literature = 9,
 
         /// <summary>
-        /// Unknown.
+        ///     Unknown.
         /// </summary>
         Unknown = 10
     }

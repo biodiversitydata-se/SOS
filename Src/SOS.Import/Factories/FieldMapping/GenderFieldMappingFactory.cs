@@ -10,19 +10,16 @@ using SOS.Lib.Models.Shared;
 
 namespace SOS.Import.Factories.FieldMapping
 {
-
     /// <summary>
-    /// Class for creating Gender field mapping.
+    ///     Class for creating Gender field mapping.
     /// </summary>
     public class GenderFieldMappingFactory : ArtportalenFieldMappingFactoryBase
     {
         private readonly IMetadataRepository _artportalenMetadataRepository;
         private readonly ILogger<GenderFieldMappingFactory> _logger;
-        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Gender;
-        protected override bool Localized => true;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="metadataRepository"></param>
         /// <param name="logger"></param>
@@ -30,9 +27,13 @@ namespace SOS.Import.Factories.FieldMapping
             IMetadataRepository metadataRepository,
             ILogger<GenderFieldMappingFactory> logger)
         {
-            _artportalenMetadataRepository = metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
+            _artportalenMetadataRepository =
+                metadataRepository ?? throw new ArgumentNullException(nameof(metadataRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+
+        protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Gender;
+        protected override bool Localized => true;
 
         protected override async Task<ICollection<FieldMappingValue>> GetFieldMappingValues()
         {
@@ -41,7 +42,8 @@ namespace SOS.Import.Factories.FieldMapping
             return fieldMappingValues;
         }
 
-        protected override List<ExternalSystemMapping> GetExternalSystemMappings(ICollection<FieldMappingValue> fieldMappingValues)
+        protected override List<ExternalSystemMapping> GetExternalSystemMappings(
+            ICollection<FieldMappingValue> fieldMappingValues)
         {
             return new List<ExternalSystemMapping>
             {
@@ -50,9 +52,10 @@ namespace SOS.Import.Factories.FieldMapping
             };
         }
 
-        private ExternalSystemMapping GetDarwinCoreExternalSystemMapping(ICollection<FieldMappingValue> fieldMappingValues)
+        private ExternalSystemMapping GetDarwinCoreExternalSystemMapping(
+            ICollection<FieldMappingValue> fieldMappingValues)
         {
-            ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping
+            var externalSystemMapping = new ExternalSystemMapping
             {
                 Id = ExternalSystemId.DarwinCore,
                 Name = ExternalSystemId.DarwinCore.ToString(),
@@ -60,7 +63,7 @@ namespace SOS.Import.Factories.FieldMapping
                 Mappings = new List<ExternalSystemMappingField>()
             };
 
-            ExternalSystemMappingField mappingField = new ExternalSystemMappingField
+            var mappingField = new ExternalSystemMappingField
             {
                 Key = FieldMappingKeyFields.DwcSex,
                 Description = "The sex term (http://rs.tdwg.org/dwc/terms/sex)",

@@ -9,10 +9,19 @@ using Xunit;
 namespace SOS.Import.UnitTests.Repositories.Destination.Nors
 {
     /// <summary>
-    /// Meta data repository tests
+    ///     Meta data repository tests
     /// </summary>
     public class NorsObservationVerbatimRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public NorsObservationVerbatimRepositoryTests()
+        {
+            _importClient = new Mock<IImportClient>();
+            _loggerMock = new Mock<ILogger<NorsObservationVerbatimRepository>>();
+        }
+
         private readonly Mock<IImportClient> _importClient;
         private readonly Mock<ILogger<NorsObservationVerbatimRepository>> _loggerMock;
 
@@ -21,16 +30,7 @@ namespace SOS.Import.UnitTests.Repositories.Destination.Nors
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public NorsObservationVerbatimRepositoryTests()
-        {
-            _importClient = new Mock<IImportClient>();
-            _loggerMock = new Mock<ILogger<NorsObservationVerbatimRepository>>();
-        }
-
-        /// <summary>
-        /// Test the constructor
+        ///     Test the constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -47,6 +47,5 @@ namespace SOS.Import.UnitTests.Repositories.Destination.Nors
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
-
     }
 }

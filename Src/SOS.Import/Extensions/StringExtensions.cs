@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using SOS.Lib.Constants;
 
 namespace SOS.Import.Extensions
@@ -11,7 +9,7 @@ namespace SOS.Import.Extensions
         private static readonly CultureInfo GbCultureInfo = CultureInfo.CreateSpecificCulture(Cultures.en_GB);
 
         /// <summary>
-        /// Truncates a string to a specific length.
+        ///     Truncates a string to a specific length.
         /// </summary>
         /// <param name="value">The string.</param>
         /// <param name="maxLength">The max length.</param>
@@ -22,6 +20,7 @@ namespace SOS.Import.Extensions
             {
                 return null;
             }
+
             if (maxLength < 0)
             {
                 return "";
@@ -31,44 +30,44 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Converts first char to lower case.
+        ///     Converts first char to lower case.
         /// </summary>
         /// <param name="input"></param>
         /// <returns></returns>
         public static string ToLowerFirstChar(this string input)
         {
-            string newString = input;
-            if (!String.IsNullOrEmpty(newString) && Char.IsUpper(newString[0]))
-                newString = Char.ToLower(newString[0]) + newString.Substring(1);
+            var newString = input;
+            if (!string.IsNullOrEmpty(newString) && char.IsUpper(newString[0]))
+                newString = char.ToLower(newString[0]) + newString.Substring(1);
             return newString;
         }
 
         /// <summary>
-        /// Validates a Boolean value that has been
-        /// received over the internet.
+        ///     Validates a Boolean value that has been
+        ///     received over the internet.
         /// </summary>
         /// <param name='value'>Boolean string value to validate</param>
         /// <returns>True if the value is a Boolean</returns>
         public static bool WebIsBoolean(this string value)
         {
-            Boolean dummyVal;
-            return Boolean.TryParse(value, out dummyVal);
+            bool dummyVal;
+            return bool.TryParse(value, out dummyVal);
         }
 
         /// <summary>
-        /// Parse a Boolean value that has been
-        /// received over the internet.
+        ///     Parse a Boolean value that has been
+        ///     received over the internet.
         /// </summary>
         /// <param name='value'>Boolean value to convert to a string.</param>
         /// <returns>The Boolean value as a string.</returns>
-        public static Boolean WebParseBoolean(this String value)
+        public static bool WebParseBoolean(this string value)
         {
-            return Boolean.Parse(value);
+            return bool.Parse(value);
         }
 
         /// <summary>
-        /// Validates a DateTime value that has been
-        /// received over the internet.
+        ///     Validates a DateTime value that has been
+        ///     received over the internet.
         /// </summary>
         /// <param name='value'>DateTime string value to validate</param>
         /// <returns>True if the value is a DateTime</returns>
@@ -79,87 +78,88 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// Parse a DateTime value that has been
-        /// received over the internet.
+        ///     Parse a DateTime value that has been
+        ///     received over the internet.
         /// </summary>
         /// <param name='value'>DateTime value to convert to a string.</param>
         /// <returns>The DateTime value as a string.</returns>
-        public static DateTime WebParseDateTime(this String value)
+        public static DateTime WebParseDateTime(this string value)
         {
             return DateTime.Parse(value);
         }
 
         /// <summary>
-        /// Validates a Double value that has been
-        /// received over the internet.
+        ///     Validates a Double value that has been
+        ///     received over the internet.
         /// </summary>
         /// <param name='value'>Double string value to validate</param>
         /// <returns>True if the value is a Double</returns>
         public static bool WebIsDouble(this string value)
         {
-            const NumberStyles styles = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign;
-            Double dummyVal;
-            return Double.TryParse(value.Replace(",", "."), styles, GbCultureInfo, out dummyVal);
+            const NumberStyles styles = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent |
+                                        NumberStyles.AllowLeadingSign;
+            double dummyVal;
+            return double.TryParse(value.Replace(",", "."), styles, GbCultureInfo, out dummyVal);
         }
 
         /// <summary>
-        /// Parse a Double value that has been
-        /// received over the internet.
+        ///     Parse a Double value that has been
+        ///     received over the internet.
         /// </summary>
         /// <param name='value'>Double value to convert to a string.</param>
         /// <returns>The Double value as a string.</returns>
-        public static Double WebParseDouble(this String value)
+        public static double WebParseDouble(this string value)
         {
             NumberStyles styles;
 
             styles = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign;
-            return Double.Parse(value.Replace(",", "."), styles, GbCultureInfo);
+            return double.Parse(value.Replace(",", "."), styles, GbCultureInfo);
         }
 
         /// <summary>
-        /// Validate a Int32 value that has been
-        /// received over the internet.
+        ///     Validate a Int32 value that has been
+        ///     received over the internet.
         /// </summary>
         /// <param name='value'>Int32 string value to validate</param>
         /// <returns>True if the value is an Int32</returns>
-        public static bool WebIsInt32(this String value)
+        public static bool WebIsInt32(this string value)
         {
-            Int32 dummyVal;
-            return Int32.TryParse(value, out dummyVal);
+            int dummyVal;
+            return int.TryParse(value, out dummyVal);
         }
 
         /// <summary>
-        /// Parse a Int32 value that has been
-        /// received over the internet.
+        ///     Parse a Int32 value that has been
+        ///     received over the internet.
         /// </summary>
         /// <param name='value'>Int32 value to convert to a string.</param>
         /// <returns>The Int32 value as a string.</returns>
-        public static Int32 WebParseInt32(this String value)
+        public static int WebParseInt32(this string value)
         {
-            return Int32.Parse(value);
+            return int.Parse(value);
         }
 
         /// <summary>
-        /// Validate a Int64 value that has been
-        /// received over the internet.
+        ///     Validate a Int64 value that has been
+        ///     received over the internet.
         /// </summary>
         /// <param name='value'>Int64 string value to validate</param>
         /// <returns>True if the values is an Int64</returns>
-        public static bool WebIsInt64(this String value)
+        public static bool WebIsInt64(this string value)
         {
-            Int64 dummyVal;
-            return Int64.TryParse(value, out dummyVal);
+            long dummyVal;
+            return long.TryParse(value, out dummyVal);
         }
 
         /// <summary>
-        /// Parse a Int64 value that has been
-        /// received over the internet.
+        ///     Parse a Int64 value that has been
+        ///     received over the internet.
         /// </summary>
         /// <param name='value'>Int64 value to convert to a string.</param>
         /// <returns>The Int64 value as a string.</returns>
-        public static Int64 WebParseInt64(this String value)
+        public static long WebParseInt64(this string value)
         {
-            return Int64.Parse(value);
+            return long.Parse(value);
         }
     }
 }

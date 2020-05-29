@@ -9,16 +9,16 @@ using SOS.Lib.Jobs.Import;
 namespace SOS.Import.Jobs
 {
     /// <summary>
-    /// Taxon harvest
+    ///     Taxon harvest
     /// </summary>
     public class TaxonHarvestJob : ITaxonHarvestJob
     {
-        private readonly ITaxonHarvester _taxonHarvester;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<TaxonHarvestJob> _logger;
+        private readonly ITaxonHarvester _taxonHarvester;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="taxonHarvester"></param>
         /// <param name="harvestInfoRepository"></param>
@@ -28,7 +28,8 @@ namespace SOS.Import.Jobs
             ILogger<TaxonHarvestJob> logger)
         {
             _taxonHarvester = taxonHarvester ?? throw new ArgumentNullException(nameof(taxonHarvester));
-            _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
+            _harvestInfoRepository =
+                harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -45,7 +46,9 @@ namespace SOS.Import.Jobs
             await _harvestInfoRepository.AddOrUpdateAsync(result);
 
             // return result of all harvests
-            return result.Status.Equals(RunStatus.Success) && result.Count > 0 ? true : throw new Exception("Taxon Harvest Job failed");
+            return result.Status.Equals(RunStatus.Success) && result.Count > 0
+                ? true
+                : throw new Exception("Taxon Harvest Job failed");
         }
     }
 }

@@ -9,19 +9,12 @@ using Xunit;
 namespace SOS.Import.UnitTests.Repositories.Destination.VirtualHerbarium
 {
     /// <summary>
-    /// Meta data repository tests
+    ///     Meta data repository tests
     /// </summary>
     public class VirtualHerbariumObservationVerbatimRepositoryTests
     {
-        private readonly Mock<IImportClient> _importClient;
-        private readonly Mock<ILogger<VirtualHerbariumObservationVerbatimRepository>> _loggerMock;
-
-        private VirtualHerbariumObservationVerbatimRepository TestObject => new VirtualHerbariumObservationVerbatimRepository(
-            _importClient.Object,
-            _loggerMock.Object);
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public VirtualHerbariumObservationVerbatimRepositoryTests()
         {
@@ -29,8 +22,16 @@ namespace SOS.Import.UnitTests.Repositories.Destination.VirtualHerbarium
             _loggerMock = new Mock<ILogger<VirtualHerbariumObservationVerbatimRepository>>();
         }
 
+        private readonly Mock<IImportClient> _importClient;
+        private readonly Mock<ILogger<VirtualHerbariumObservationVerbatimRepository>> _loggerMock;
+
+        private VirtualHerbariumObservationVerbatimRepository TestObject =>
+            new VirtualHerbariumObservationVerbatimRepository(
+                _importClient.Object,
+                _loggerMock.Object);
+
         /// <summary>
-        /// Test the constructor
+        ///     Test the constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -47,6 +48,5 @@ namespace SOS.Import.UnitTests.Repositories.Destination.VirtualHerbarium
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
-
     }
 }

@@ -12,20 +12,8 @@ namespace SOS.Export.UnitTests.Repositories
 {
     public class ProcessedObservationRepositoryTests
     {
-        
-        private readonly Mock<IElasticClient> _elasticClient;
-        private readonly Mock<IExportClient> _exportClient;
-        private readonly ElasticSearchConfiguration _elasticSearchConfiguration;
-        private readonly Mock<ILogger<ProcessedObservationRepository>> _loggerMock;
-
-        private ProcessedObservationRepository TestObject => new ProcessedObservationRepository(
-            _elasticClient.Object,
-            _exportClient.Object,
-            _elasticSearchConfiguration, 
-            _loggerMock.Object);
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public ProcessedObservationRepositoryTests()
         {
@@ -35,11 +23,22 @@ namespace SOS.Export.UnitTests.Repositories
             _loggerMock = new Mock<ILogger<ProcessedObservationRepository>>();
         }
 
+        private readonly Mock<IElasticClient> _elasticClient;
+        private readonly Mock<IExportClient> _exportClient;
+        private readonly ElasticSearchConfiguration _elasticSearchConfiguration;
+        private readonly Mock<ILogger<ProcessedObservationRepository>> _loggerMock;
+
+        private ProcessedObservationRepository TestObject => new ProcessedObservationRepository(
+            _elasticClient.Object,
+            _exportClient.Object,
+            _elasticSearchConfiguration,
+            _loggerMock.Object);
+
         /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
-        [Trait("Category","Unit")]
+        [Trait("Category", "Unit")]
         public void ConstructorTest()
         {
             TestObject.Should().NotBeNull();

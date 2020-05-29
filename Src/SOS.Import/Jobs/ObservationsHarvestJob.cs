@@ -12,23 +12,22 @@ using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Jobs
 {
     /// <summary>
-    /// Observation harvest job.
+    ///     Observation harvest job.
     /// </summary>
     public class ObservationsHarvestJob : IObservationsHarvestJob
     {
-        private readonly ITaxonHarvestJob _taxonHarvestJob;
-        private readonly IFieldMappingImportJob _fieldMappingImportJob;
         private readonly IDataProviderManager _dataProviderManager;
-        private readonly ILogger<ObservationsHarvestJob> _logger;
+        private readonly IFieldMappingImportJob _fieldMappingImportJob;
         private readonly Dictionary<DataProviderType, IHarvestJob> _harvestJobByType;
+        private readonly ILogger<ObservationsHarvestJob> _logger;
+        private readonly ITaxonHarvestJob _taxonHarvestJob;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="taxonHarvestJob"></param>
         /// <param name="fieldMappingImportJob"></param>
@@ -59,7 +58,8 @@ namespace SOS.Import.Jobs
             ILogger<ObservationsHarvestJob> logger)
         {
             _taxonHarvestJob = taxonHarvestJob ?? throw new ArgumentNullException(nameof(taxonHarvestJob));
-            _fieldMappingImportJob = fieldMappingImportJob ?? throw new ArgumentNullException(nameof(fieldMappingImportJob));
+            _fieldMappingImportJob =
+                fieldMappingImportJob ?? throw new ArgumentNullException(nameof(fieldMappingImportJob));
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             if (artportalenHarvestJob == null) throw new ArgumentNullException(nameof(artportalenHarvestJob));
@@ -101,28 +101,35 @@ namespace SOS.Import.Jobs
         {
             if (harvestDataProviderIdOrIdentifiers == null || harvestDataProviderIdOrIdentifiers.Count == 0)
             {
-                _logger.LogInformation("Couldn't run ObservationHarvestJob because harvestDataProviderIdOrIdentifiers is not set");
-                return false;
-            }
-            if (processDataProviderIdOrIdentifiers == null || processDataProviderIdOrIdentifiers.Count == 0)
-            {
-                _logger.LogInformation("Couldn't run ObservationHarvestJob because processDataProviderIdOrIdentifiers is not set");
+                _logger.LogInformation(
+                    "Couldn't run ObservationHarvestJob because harvestDataProviderIdOrIdentifiers is not set");
                 return false;
             }
 
-            var harvestDataProviders = await _dataProviderManager.GetDataProvidersByIdOrIdentifier(harvestDataProviderIdOrIdentifiers);
+            if (processDataProviderIdOrIdentifiers == null || processDataProviderIdOrIdentifiers.Count == 0)
+            {
+                _logger.LogInformation(
+                    "Couldn't run ObservationHarvestJob because processDataProviderIdOrIdentifiers is not set");
+                return false;
+            }
+
+            var harvestDataProviders =
+                await _dataProviderManager.GetDataProvidersByIdOrIdentifier(harvestDataProviderIdOrIdentifiers);
             var harvestDataProvidersResult = Result.Combine(harvestDataProviders);
             if (harvestDataProvidersResult.IsFailure)
             {
-                _logger.LogInformation($"Couldn't run ObservationHarvestJob because of: {harvestDataProvidersResult.Error}");
+                _logger.LogInformation(
+                    $"Couldn't run ObservationHarvestJob because of: {harvestDataProvidersResult.Error}");
                 return false;
             }
 
-            var processDataProviders = await _dataProviderManager.GetDataProvidersByIdOrIdentifier(processDataProviderIdOrIdentifiers);
+            var processDataProviders =
+                await _dataProviderManager.GetDataProvidersByIdOrIdentifier(processDataProviderIdOrIdentifiers);
             var processDataProvidersResult = Result.Combine(processDataProviders);
             if (processDataProvidersResult.IsFailure)
             {
-                _logger.LogInformation($"Couldn't run ObservationHarvestJob because of: {processDataProvidersResult.Error}");
+                _logger.LogInformation(
+                    $"Couldn't run ObservationHarvestJob because of: {processDataProvidersResult.Error}");
                 return false;
             }
 
@@ -132,9 +139,36 @@ namespace SOS.Import.Jobs
                 cancellationToken);
         }
 
+
+        public async Task<bool> RunHarvestObservationsAsync(
+            List<string> harvestDataProviderIdOrIdentifiers,
+            IJobCancellationToken cancellationToken)
+        {
+            if (harvestDataProviderIdOrIdentifiers == null || harvestDataProviderIdOrIdentifiers.Count == 0)
+            {
+                _logger.LogInformation(
+                    "Couldn't run ObservationHarvestJob because harvestDataProviderIdOrIdentifiers is not set");
+                return false;
+            }
+
+            var harvestDataProviders =
+                await _dataProviderManager.GetDataProvidersByIdOrIdentifier(harvestDataProviderIdOrIdentifiers);
+            var harvestDataProvidersResult = Result.Combine(harvestDataProviders);
+            if (harvestDataProvidersResult.IsFailure)
+            {
+                _logger.LogInformation(
+                    $"Couldn't run ObservationHarvestJob because of: {harvestDataProvidersResult.Error}");
+                return false;
+            }
+
+            return await RunHarvestObservationsAsync(
+                harvestDataProviders.Select(d => d.Value).ToList(),
+                cancellationToken);
+        }
+
         private async Task<bool> RunAsync(
-            List<DataProvider> harvestDataProviders, 
-            List<DataProvider> processDataProviders, 
+            List<DataProvider> harvestDataProviders,
+            List<DataProvider> processDataProviders,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -144,10 +178,13 @@ namespace SOS.Import.Jobs
                 //------------------------------------------------------------------------
                 // 1. Ensure that Artportalen always is included in harvestDataProviders
                 //------------------------------------------------------------------------
-                if (harvestDataProviders.All(dataProvider => dataProvider.Identifier != DataProviderIdentifiers.Artportalen))
+                if (harvestDataProviders.All(dataProvider =>
+                    dataProvider.Identifier != DataProviderIdentifiers.Artportalen))
                 {
-                    harvestDataProviders.Add(await _dataProviderManager.GetDataProviderByIdentifier(DataProviderIdentifiers.Artportalen));
-                    _logger.LogInformation("Artportalen harvest was added to harvestDataProviders because it's mandatory.");
+                    harvestDataProviders.Add(
+                        await _dataProviderManager.GetDataProviderByIdentifier(DataProviderIdentifiers.Artportalen));
+                    _logger.LogInformation(
+                        "Artportalen harvest was added to harvestDataProviders because it's mandatory.");
                 }
 
                 //-----------------------------------------------------------------------------
@@ -171,30 +208,36 @@ namespace SOS.Import.Jobs
                     harvestTaskByDataProvider.Add(dataProvider, harvestJob.RunAsync(cancellationToken));
                     _logger.LogDebug($"Added {dataProvider.Name} harvest");
                 }
+
                 await Task.WhenAll(harvestTaskByDataProvider.Values);
                 _logger.LogInformation("Finish observasions harvest jobs");
 
                 //---------------------------------------------------------------------------------------------------------
                 // 4. If Artportalen and resource harvest was successful, go on with enqueuing processing job to Hangfire
                 //---------------------------------------------------------------------------------------------------------
-                var artportalenHarvestTask = harvestTaskByDataProvider.Single(pair => pair.Key.Identifier == DataProviderIdentifiers.Artportalen).Value;
+                var artportalenHarvestTask = harvestTaskByDataProvider
+                    .Single(pair => pair.Key.Identifier == DataProviderIdentifiers.Artportalen).Value;
                 if (artportalenHarvestTask.Result &&
                     resourceHarvestTasks[DataProviderType.Taxa].Result &&
                     resourceHarvestTasks[DataProviderType.FieldMappings].Result)
                 {
                     // Ensure that Artportalen always is included in processDataProviders
-                    if (processDataProviders.All(dataProvider => dataProvider.Identifier != DataProviderIdentifiers.Artportalen))
+                    if (processDataProviders.All(dataProvider =>
+                        dataProvider.Identifier != DataProviderIdentifiers.Artportalen))
                     {
-                        processDataProviders.Add(await _dataProviderManager.GetDataProviderByIdentifier(DataProviderIdentifiers.Artportalen));
-                        _logger.LogInformation("Artportalen process was added to processDataProviders because it's mandatory.");
+                        processDataProviders.Add(
+                            await _dataProviderManager.GetDataProviderByIdentifier(DataProviderIdentifiers
+                                .Artportalen));
+                        _logger.LogInformation(
+                            "Artportalen process was added to processDataProviders because it's mandatory.");
                     }
 
                     // Enqueue process job to Hangfire
                     var jobId = BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(
-                        processDataProviders.Select(dataProvider => dataProvider.Identifier).ToList(), 
-                        true, 
-                        true, 
-                        true, 
+                        processDataProviders.Select(dataProvider => dataProvider.Identifier).ToList(),
+                        true,
+                        true,
+                        true,
                         cancellationToken));
 
                     _logger.LogInformation($"Process Job with Id={jobId} was enqueued");
@@ -215,30 +258,6 @@ namespace SOS.Import.Jobs
             }
         }
 
-
-        public async Task<bool> RunHarvestObservationsAsync(
-            List<string> harvestDataProviderIdOrIdentifiers,
-            IJobCancellationToken cancellationToken)
-        {
-            if (harvestDataProviderIdOrIdentifiers == null || harvestDataProviderIdOrIdentifiers.Count == 0)
-            {
-                _logger.LogInformation("Couldn't run ObservationHarvestJob because harvestDataProviderIdOrIdentifiers is not set");
-                return false;
-            }
-
-            var harvestDataProviders = await _dataProviderManager.GetDataProvidersByIdOrIdentifier(harvestDataProviderIdOrIdentifiers);
-            var harvestDataProvidersResult = Result.Combine(harvestDataProviders);
-            if (harvestDataProvidersResult.IsFailure)
-            {
-                _logger.LogInformation($"Couldn't run ObservationHarvestJob because of: {harvestDataProvidersResult.Error}");
-                return false;
-            }
-
-            return await RunHarvestObservationsAsync(
-                harvestDataProviders.Select(d => d.Value).ToList(),
-                cancellationToken);
-        }
-
         private async Task<bool> RunHarvestObservationsAsync(
             List<DataProvider> harvestDataProviders,
             IJobCancellationToken cancellationToken)
@@ -253,10 +272,11 @@ namespace SOS.Import.Jobs
                     harvestTaskByDataProvider.Add(dataProvider, harvestJob.RunAsync(cancellationToken));
                     _logger.LogDebug($"Added {dataProvider.Name} harvest");
                 }
-                bool[] result = await Task.WhenAll(harvestTaskByDataProvider.Values);
+
+                var result = await Task.WhenAll(harvestTaskByDataProvider.Values);
                 _logger.LogInformation("Finish harvest observations jobs");
 
-                return result.All(res => res == true);
+                return result.All(res => res);
             }
             catch (JobAbortedException)
             {

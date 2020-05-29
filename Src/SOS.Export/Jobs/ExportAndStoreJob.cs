@@ -10,15 +10,15 @@ using SOS.Lib.Models.Search;
 namespace SOS.Export.Jobs
 {
     /// <summary>
-    /// Artportalen harvest
+    ///     Artportalen harvest
     /// </summary>
     public class ExportAndStoreJob : IExportAndStoreJob
     {
-        private readonly IObservationManager _observationManager;
         private readonly ILogger<ExportAndStoreJob> _logger;
+        private readonly IObservationManager _observationManager;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="logger"></param>
@@ -29,15 +29,17 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(ExportFilter filter, string blobStorageContainer, string fileName, bool isDOI, IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(ExportFilter filter, string blobStorageContainer, string fileName, bool isDOI,
+            IJobCancellationToken cancellationToken)
         {
             try
             {
                 _logger.LogInformation("Start export and store job");
-                var success = await _observationManager.ExportAndStoreAsync(filter, blobStorageContainer, fileName, isDOI, cancellationToken);
+                var success = await _observationManager.ExportAndStoreAsync(filter, blobStorageContainer, fileName,
+                    isDOI, cancellationToken);
 
                 _logger.LogInformation($"End export and store job. Success: {success}");
-                
+
                 return success ? true : throw new Exception("Export and store job failed");
             }
             catch (JobAbortedException)

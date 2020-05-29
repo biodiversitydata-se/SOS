@@ -12,10 +12,19 @@ using Xunit;
 namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 {
     /// <summary>
-    /// Test sighting repository
+    ///     Test sighting repository
     /// </summary>
     public class SightingRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public SightingRepositoryTests()
+        {
+            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
+            _loggerMock = new Mock<ILogger<SightingRepository>>();
+        }
+
         private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
         private readonly Mock<ILogger<SightingRepository>> _loggerMock;
 
@@ -24,16 +33,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public SightingRepositoryTests()
-        {
-            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
-            _loggerMock = new Mock<ILogger<SightingRepository>>();
-        }
-
-        /// <summary>
-        /// Test the constructor
+        ///     Test the constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -52,40 +52,14 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get chunk of sightings success
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetChunkAsyncSuccess()
-        {
-            IEnumerable<SightingEntity> projects = new []
-            {
-                    new SightingEntity { Id = 1 },
-                    new SightingEntity { Id = 2 }
-            };
-
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>()))
-                .ReturnsAsync(projects);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetChunkAsync(0, 10);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().HaveCount(2);
-        }
-
-        /// <summary>
-        /// Test get chunk of sightings exception
+        ///     Test get chunk of sightings exception
         /// </summary>
         /// <returns></returns>
         [Fact]
         public async Task GetChunkAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>()))
+            _artportalenDataServiceMock
+                .Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>()))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -100,25 +74,26 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get sighting project id's success
+        ///     Test get chunk of sightings success
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetProjectIdsAsyncSuccess()
+        public async Task GetChunkAsyncSuccess()
         {
-            var projectIds = new List<(int SightingId, int ProjectId)>()
+            IEnumerable<SightingEntity> projects = new[]
             {
-                (1,1),
-                (1,2)
+                new SightingEntity {Id = 1},
+                new SightingEntity {Id = 2}
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<(int SightingId, int ProjectId)>(It.IsAny<string>(), null))
-                .ReturnsAsync(projectIds);
+            _artportalenDataServiceMock
+                .Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>()))
+                .ReturnsAsync(projects);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetProjectIdsAsync();
+            var result = await TestObject.GetChunkAsync(0, 10);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -127,19 +102,19 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get sightings project id's fail
+        ///     Test get id span fail
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetProjectIdsAsyncException()
+        public async Task GetIdSpanAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<(int SightingId, int ProjectId)>(It.IsAny<string>(), null))
-               .Throws<Exception>();
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
+                .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetProjectIdsAsync();
+            var result = await TestObject.GetIdSpanAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -148,7 +123,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get id span success
+        ///     Test get id span success
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -174,24 +149,53 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get id span fail
+        ///     Test get sightings project id's fail
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetIdSpanAsyncException()
+        public async Task GetProjectIdsAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds =>
+                    spds.QueryAsync<(int SightingId, int ProjectId)>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetIdSpanAsync();
+            var result = await TestObject.GetProjectIdsAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
             result.Should().BeNull();
+        }
+
+        /// <summary>
+        ///     Test get sighting project id's success
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetProjectIdsAsyncSuccess()
+        {
+            var projectIds = new List<(int SightingId, int ProjectId)>
+            {
+                (1, 1),
+                (1, 2)
+            };
+
+            _artportalenDataServiceMock.Setup(spds =>
+                    spds.QueryAsync<(int SightingId, int ProjectId)>(It.IsAny<string>(), null))
+                .ReturnsAsync(projectIds);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.GetProjectIdsAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().HaveCount(2);
         }
     }
 }

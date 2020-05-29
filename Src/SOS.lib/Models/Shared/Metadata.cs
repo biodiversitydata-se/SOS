@@ -3,12 +3,12 @@
 namespace SOS.Lib.Models.Shared
 {
     /// <summary>
-    /// Represents different metadata items
+    ///     Represents different metadata items
     /// </summary>
     public class Metadata
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="id"></param>
         public Metadata(int id)
@@ -18,12 +18,12 @@ namespace SOS.Lib.Models.Shared
         }
 
         /// <summary>
-        /// Id of item
+        ///     Id of item
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Name of item
+        ///     Name of item
         /// </summary>
         public ICollection<MetadataTranslation> Translations { get; set; }
     }

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.Json;
 using SOS.Export.Enums;
 using SOS.Export.Models;
@@ -11,7 +9,7 @@ using SOS.Export.Models;
 namespace SOS.Export.Helpers
 {
     /// <summary>
-    /// Field descriptions.
+    ///     Field descriptions.
     /// </summary>
     public static class FieldDescriptionHelper
     {
@@ -46,9 +44,9 @@ namespace SOS.Export.Helpers
 
         private static List<FieldDescription> LoadFieldDescriptions()
         {
-            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, @"Resources\FieldDescriptions.json");
-            using FileStream fs = FileSystemHelper.WaitForFileAndThenOpenIt(filePath);
+            using var fs = FileSystemHelper.WaitForFileAndThenOpenIt(filePath);
             var fields = JsonSerializer.DeserializeAsync<List<FieldDescription>>(fs).Result;
             return fields;
         }
@@ -63,7 +61,7 @@ namespace SOS.Export.Helpers
         {
             return AllFields
                 .Where(x => x.IncludedByDefaultInDwcExport)
-                .Select(x => (FieldDescriptionId)x.Id)
+                .Select(x => (FieldDescriptionId) x.Id)
                 .AddMandatoryFieldDescriptionIdsFirst();
         }
 
@@ -83,7 +81,7 @@ namespace SOS.Export.Helpers
             return AllFieldsByFieldDescriptionId
                 .Where(x => list.Contains(x.Key))
                 .Select(x => x.Value)
-                .OrderBy(x => list.IndexOf((FieldDescriptionId)x.Id));
+                .OrderBy(x => list.IndexOf((FieldDescriptionId) x.Id));
         }
 
         public static IEnumerable<FieldDescriptionId> AddMandatoryFieldDescriptionIds(
@@ -103,7 +101,8 @@ namespace SOS.Export.Helpers
             return AllFieldsByFieldDescriptionId[fieldDescriptionId];
         }
 
-        public static IEnumerable<FieldDescriptionId> GetMissingFieldDescriptionIds(IEnumerable<FieldDescriptionId> fieldDescriptionIds)
+        public static IEnumerable<FieldDescriptionId> GetMissingFieldDescriptionIds(
+            IEnumerable<FieldDescriptionId> fieldDescriptionIds)
         {
             return AllFields.Select(x => (FieldDescriptionId) x.Id).Except(fieldDescriptionIds);
         }

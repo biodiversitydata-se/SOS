@@ -4,17 +4,16 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Lib.Models.Processed.ProcessInfo
 {
     /// <summary>
-    /// Information about verbatim
+    ///     Information about verbatim
     /// </summary>
-    public class ProviderInfo 
+    public class ProviderInfo
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="dataProviderType"></param>
         public ProviderInfo(DataProviderType dataProviderType)
@@ -33,55 +32,55 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         public string DataProviderIdentifier { get; set; }
 
         /// <summary>
-        /// Number of items harvested
+        ///     Number of items harvested
         /// </summary>
         public int? HarvestCount { get; set; }
 
         /// <summary>
-        /// Harvest end date and time
+        ///     Harvest end date and time
         /// </summary>
         public DateTime? HarvestEnd { get; set; }
 
         /// <summary>
-        /// Harvest start date and time
+        ///     Harvest start date and time
         /// </summary>
         public DateTime? HarvestStart { get; set; }
 
         /// <summary>
-        /// Status of harvest
+        ///     Status of harvest
         /// </summary>
         [BsonRepresentation(BsonType.String)]
         public RunStatus? HarvestStatus { get; set; }
 
         /// <summary>
-        /// Number of items processed
+        ///     Number of items processed
         /// </summary>
         public int? ProcessCount { get; set; }
 
         /// <summary>
-        /// Process end date and time
+        ///     Process end date and time
         /// </summary>
         public DateTime? ProcessEnd { get; set; }
 
         /// <summary>
-        /// Process start date and time
+        ///     Process start date and time
         /// </summary>
         public DateTime ProcessStart { get; set; }
 
         /// <summary>
-        /// Status of processing
+        ///     Status of processing
         /// </summary>
         [BsonRepresentation(BsonType.String)]
         public RunStatus? ProcessStatus { get; set; }
 
         /// <summary>
-        /// Id of data provider
+        ///     Id of data provider
         /// </summary>
         [BsonRepresentation(BsonType.String)]
-        public DataProviderType DataProviderType { get; private set; }
+        public DataProviderType DataProviderType { get; }
 
         /// <summary>
-        /// Provider information about meta data
+        ///     Provider information about meta data
         /// </summary>
         public IEnumerable<ProviderInfo> MetadataInfo { get; set; }
     }

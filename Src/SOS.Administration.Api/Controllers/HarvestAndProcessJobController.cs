@@ -6,24 +6,24 @@ using CSharpFunctionalExtensions;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Import.Managers.Interfaces;
 using SOS.Lib.Jobs.Import;
-using SOS.Lib.Jobs.Process;
 
 namespace SOS.Administration.Api.Controllers
 {
     /// <summary>
-    /// Import job controller
+    ///     Import job controller
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class HarvestAndProcessJobController : ControllerBase, Interfaces.IHarvestAndProcessJobController
+    public class HarvestAndProcessJobController : ControllerBase, IHarvestAndProcessJobController
     {
         private readonly IDataProviderManager _dataProviderManager;
         private readonly ILogger<HarvestAndProcessJobController> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
@@ -37,26 +37,27 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost("Observations/Schedule/Daily")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailyObservationHarvestAndProcessJob([FromQuery]int hour, [FromQuery]int minute)
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public IActionResult AddDailyObservationHarvestAndProcessJob([FromQuery] int hour, [FromQuery] int minute)
         {
             try
             {
-                RecurringJob.AddOrUpdate<IObservationsHarvestJob>(nameof(IObservationsHarvestJob), job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                RecurringJob.AddOrUpdate<IObservationsHarvestJob>(nameof(IObservationsHarvestJob),
+                    job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Observations harvest and process job added");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Adding observations harvest and process job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("Observations/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public IActionResult RunObservationHarvestAndProcessJob()
         {
             try
@@ -67,18 +68,18 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing observations harvest and process job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("Observations/SelectedDataProviders/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> RunObservationHarvestAndProcessJob(
-            [FromQuery]List<string> harvestDataProviderIdOrIdentifiers,
-            [FromQuery]List<string> processDataProviderIdOrIdentifiers)
+            [FromQuery] List<string> harvestDataProviderIdOrIdentifiers,
+            [FromQuery] List<string> processDataProviderIdOrIdentifiers)
         {
             try
             {
@@ -86,19 +87,22 @@ namespace SOS.Administration.Api.Controllers
                 {
                     return new BadRequestObjectResult("harvestDataProviderIdOrIdentifiers is not set");
                 }
+
                 if (processDataProviderIdOrIdentifiers == null || processDataProviderIdOrIdentifiers.Count == 0)
                 {
                     return new BadRequestObjectResult("processDataProviderIdOrIdentifiers is not set");
                 }
 
-                var harvestDataProviders = await _dataProviderManager.GetDataProvidersByIdOrIdentifier(harvestDataProviderIdOrIdentifiers);
+                var harvestDataProviders =
+                    await _dataProviderManager.GetDataProvidersByIdOrIdentifier(harvestDataProviderIdOrIdentifiers);
                 var harvestDataProvidersResult = Result.Combine(harvestDataProviders);
                 if (harvestDataProvidersResult.IsFailure)
                 {
                     return new BadRequestObjectResult(harvestDataProvidersResult.Error);
                 }
 
-                var processDataProviders = await _dataProviderManager.GetDataProvidersByIdOrIdentifier(processDataProviderIdOrIdentifiers);
+                var processDataProviders =
+                    await _dataProviderManager.GetDataProvidersByIdOrIdentifier(processDataProviderIdOrIdentifiers);
                 var processDataProvidersResult = Result.Combine(processDataProviders);
                 if (processDataProvidersResult.IsFailure)
                 {
@@ -115,7 +119,7 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing process job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
     }

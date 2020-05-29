@@ -12,10 +12,19 @@ using Xunit;
 namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 {
     /// <summary>
-    /// Test site repository
+    ///     Test site repository
     /// </summary>
     public class SiteRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public SiteRepositoryTests()
+        {
+            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
+            _loggerMock = new Mock<ILogger<SiteRepository>>();
+        }
+
         private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
         private readonly Mock<ILogger<SiteRepository>> _loggerMock;
 
@@ -24,16 +33,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public SiteRepositoryTests()
-        {
-            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
-            _loggerMock = new Mock<ILogger<SiteRepository>>();
-        }
-
-        /// <summary>
-        /// Constructor tests
+        ///     Constructor tests
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -52,34 +52,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get sites success
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetAsyncSuccess()
-        {
-            IEnumerable<SiteEntity> projects = new []
-            {
-                    new SiteEntity { Id = 1, Name = "Site 1" },
-                    new SiteEntity { Id = 2, Name = "Site 2" }
-            };
-
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<SiteEntity>(It.IsAny<string>(), null))
-                .ReturnsAsync(projects);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetAsync();
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().HaveCount(2);
-        }
-
-        /// <summary>
-        /// Test get sites fail
+        ///     Test get sites fail
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -97,6 +70,33 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
 
             result.Should().BeNull();
+        }
+
+        /// <summary>
+        ///     Test get sites success
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetAsyncSuccess()
+        {
+            IEnumerable<SiteEntity> projects = new[]
+            {
+                new SiteEntity {Id = 1, Name = "Site 1"},
+                new SiteEntity {Id = 2, Name = "Site 2"}
+            };
+
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<SiteEntity>(It.IsAny<string>(), null))
+                .ReturnsAsync(projects);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.GetAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().HaveCount(2);
         }
     }
 }

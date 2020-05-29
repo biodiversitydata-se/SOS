@@ -5,12 +5,11 @@ using SOS.Lib.Models.Search;
 namespace SOS.Export.Repositories.Interfaces
 {
     /// <summary>
-    /// 
     /// </summary>
     public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, string>
     {
         /// <summary>
-        ///  Get project parameters.
+        ///     Get project parameters.
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="scrollId"></param>
@@ -18,7 +17,7 @@ namespace SOS.Export.Repositories.Interfaces
         Task<ScrollResult<ProcessedProject>> ScrollProjectParametersAsync(FilterBase filter, string scrollId);
 
         /// <summary>
-        /// Get observation by scroll
+        ///     Get observation by scroll
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="scrollId"></param>

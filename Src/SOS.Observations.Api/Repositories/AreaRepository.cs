@@ -13,12 +13,11 @@ using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Database.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Observations.Api.Repositories
 {
     /// <summary>
-    /// Area repository
+    ///     Area repository
     /// </summary>
     public class AreaRepository : ProcessBaseRepository<Area, int>, IAreaRepository
     {
@@ -26,7 +25,7 @@ namespace SOS.Observations.Api.Repositories
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
@@ -34,13 +33,14 @@ namespace SOS.Observations.Api.Repositories
             IProcessClient client,
             ILogger<AreaRepository> logger) : base(client, false, logger)
         {
-            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = nameof(Area) });
+            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions {BucketName = nameof(Area)});
             _jsonSerializerOptions = new JsonSerializerOptions();
             _jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip, int take)
+        public async Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString,
+            int skip, int take)
         {
             var filters = new List<FilterDefinition<Area>>();
 
@@ -48,7 +48,7 @@ namespace SOS.Observations.Api.Repositories
             {
                 filters.Add(Builders<Area>.Filter.In(a => a.AreaType, areaTypes));
             }
-            
+
             if (!string.IsNullOrEmpty(searchString))
             {
                 filters.Add(Builders<Area>.Filter
@@ -87,7 +87,7 @@ namespace SOS.Observations.Api.Repositories
         /// <inheritdoc />
         public async Task<IGeoShape> GetGeometryAsync(int areaId)
         {
-            var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync($"geometry-{ areaId }");
+            var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync($"geometry-{areaId}");
             var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
             return JsonSerializer.Deserialize<IGeoShape>(utfString, _jsonSerializerOptions);

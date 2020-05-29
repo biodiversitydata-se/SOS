@@ -1,177 +1,177 @@
 ﻿namespace SOS.Lib.Enums.FieldMappingValues
 {
     /// <summary>
-    /// Enumeration of Province.
+    ///     Enumeration of Province.
     /// </summary>
     public enum ProvinceId
     {
         /// <summary>
-        /// Skåne.
+        ///     Skåne.
         /// </summary>
         Skane = 8058,
 
         /// <summary>
-        /// Blekinge.
+        ///     Blekinge.
         /// </summary>
         Blekinge = 8059,
 
         /// <summary>
-        /// Småland.
+        ///     Småland.
         /// </summary>
         Smaland = 8060,
 
         /// <summary>
-        /// Öland.
+        ///     Öland.
         /// </summary>
         Oland = 8061,
 
         /// <summary>
-        /// Gotland.
+        ///     Gotland.
         /// </summary>
         Gotland = 8062,
 
         /// <summary>
-        /// Halland.
+        ///     Halland.
         /// </summary>
         Halland = 8063,
 
         /// <summary>
-        /// Bohuslän.
+        ///     Bohuslän.
         /// </summary>
         Bohuslan = 8064,
 
         /// <summary>
-        /// Dalsland.
+        ///     Dalsland.
         /// </summary>
         Dalsland = 8065,
 
         /// <summary>
-        /// Västergötland.
+        ///     Västergötland.
         /// </summary>
         Vastergotland = 8066,
 
         /// <summary>
-        /// Närke.
+        ///     Närke.
         /// </summary>
         Narke = 8067,
 
         /// <summary>
-        /// Östergötland.
+        ///     Östergötland.
         /// </summary>
         Ostergotland = 8068,
 
         /// <summary>
-        /// Södermanland.
+        ///     Södermanland.
         /// </summary>
         Sodermanland = 8069,
 
         /// <summary>
-        /// Uppland.
+        ///     Uppland.
         /// </summary>
         Uppland = 8070,
 
         /// <summary>
-        /// Västmanland.
+        ///     Västmanland.
         /// </summary>
         Vastmanland = 8071,
 
         /// <summary>
-        /// Värmland.
+        ///     Värmland.
         /// </summary>
         Varmland = 8072,
 
         /// <summary>
-        /// Dalarna.
+        ///     Dalarna.
         /// </summary>
         Dalarna = 8073,
 
         /// <summary>
-        /// Gästrikland.
+        ///     Gästrikland.
         /// </summary>
         Gastrikland = 8074,
 
         /// <summary>
-        /// Hälsingland.
+        ///     Hälsingland.
         /// </summary>
         Halsingland = 8075,
 
         /// <summary>
-        /// Medelpad.
+        ///     Medelpad.
         /// </summary>
         Medelpad = 8076,
 
         /// <summary>
-        /// Ångermanland.
+        ///     Ångermanland.
         /// </summary>
         Angermanland = 8077,
 
         /// <summary>
-        /// Västerbotten.
+        ///     Västerbotten.
         /// </summary>
         Vasterbotten = 8078,
 
         /// <summary>
-        /// Norrbotten.
+        ///     Norrbotten.
         /// </summary>
         Norrbotten = 8079,
 
         /// <summary>
-        /// Härjedalen.
+        ///     Härjedalen.
         /// </summary>
         Harjedalen = 8080,
 
         /// <summary>
-        /// Jämtland.
+        ///     Jämtland.
         /// </summary>
         Jamtland = 8081,
 
         /// <summary>
-        /// Åsele lappmark.
+        ///     Åsele lappmark.
         /// </summary>
         AseleLappmark = 8082,
 
         /// <summary>
-        /// Lycksele lappmark.
+        ///     Lycksele lappmark.
         /// </summary>
         LyckseleLappmark = 8083,
 
         /// <summary>
-        /// Pite lappmark.
+        ///     Pite lappmark.
         /// </summary>
         PiteLappmark = 8084,
 
         /// <summary>
-        /// Lule lappmark.
+        ///     Lule lappmark.
         /// </summary>
         LuleLappmark = 8085,
 
         /// <summary>
-        /// Torne lappmark.
+        ///     Torne lappmark.
         /// </summary>
         TorneLappmark = 8086,
 
         /// <summary>
-        /// Bottenviken.
+        ///     Bottenviken.
         /// </summary>
         Bottenviken = 55235,
 
         /// <summary>
-        /// Bottenhavet.
+        ///     Bottenhavet.
         /// </summary>
         Bottenhavet = 55236,
 
         /// <summary>
-        /// Östersjön.
+        ///     Östersjön.
         /// </summary>
         Ostersjon = 55237,
 
         /// <summary>
-        /// Kattegatt.
+        ///     Kattegatt.
         /// </summary>
         Kattegatt = 55238,
 
         /// <summary>
-        /// Skagerrak.
+        ///     Skagerrak.
         /// </summary>
         Skagerrak = 55239
     }

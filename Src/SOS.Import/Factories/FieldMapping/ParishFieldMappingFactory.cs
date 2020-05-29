@@ -7,7 +7,7 @@ using SOS.Lib.Enums;
 namespace SOS.Import.Factories.FieldMapping
 {
     /// <summary>
-    /// Class for creating Parish field mapping.
+    ///     Class for creating Parish field mapping.
     /// </summary>
     public class ParishFieldMappingFactory : GeoRegionFieldMappingFactoryBase, IFieldMappingCreatorFactory
     {
@@ -15,7 +15,6 @@ namespace SOS.Import.Factories.FieldMapping
             IAreaVerbatimRepository areaVerbatimRepository,
             ILogger<GeoRegionFieldMappingFactoryBase> logger) : base(areaVerbatimRepository, logger)
         {
-
         }
 
         public Task<Lib.Models.Shared.FieldMapping> CreateFieldMappingAsync()

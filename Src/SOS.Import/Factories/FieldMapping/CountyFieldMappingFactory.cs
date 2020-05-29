@@ -7,15 +7,14 @@ using SOS.Lib.Enums;
 namespace SOS.Import.Factories.FieldMapping
 {
     /// <summary>
-    /// Class for creating County field mapping.
+    ///     Class for creating County field mapping.
     /// </summary>
     public class CountyFieldMappingFactory : GeoRegionFieldMappingFactoryBase, IFieldMappingCreatorFactory
     {
         public CountyFieldMappingFactory(
-            IAreaVerbatimRepository areaVerbatimRepository, 
+            IAreaVerbatimRepository areaVerbatimRepository,
             ILogger<GeoRegionFieldMappingFactoryBase> logger) : base(areaVerbatimRepository, logger)
         {
-
         }
 
         public Task<Lib.Models.Shared.FieldMapping> CreateFieldMappingAsync()

@@ -13,15 +13,8 @@ namespace SOS.Process.UnitTests.Repositories.Destination
 {
     public class ProcessedObservationRepositoryTests
     {
-        private readonly Mock<IProcessClient> _processClient;
-        private readonly Mock<IElasticClient> _elasticClient;
-        private readonly Mock<IInvalidObservationRepository> _invalidObservationRepositoryMock;
-        private readonly ElasticSearchConfiguration _elasticSearchConfiguration;
-        private readonly Mock<ILogger<ProcessedObservationRepository>> _loggerMock;
-       
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public ProcessedObservationRepositoryTests()
         {
@@ -32,8 +25,14 @@ namespace SOS.Process.UnitTests.Repositories.Destination
             _loggerMock = new Mock<ILogger<ProcessedObservationRepository>>();
         }
 
+        private readonly Mock<IProcessClient> _processClient;
+        private readonly Mock<IElasticClient> _elasticClient;
+        private readonly Mock<IInvalidObservationRepository> _invalidObservationRepositoryMock;
+        private readonly ElasticSearchConfiguration _elasticSearchConfiguration;
+        private readonly Mock<ILogger<ProcessedObservationRepository>> _loggerMock;
+
         /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -75,7 +74,7 @@ namespace SOS.Process.UnitTests.Repositories.Destination
                 _elasticClient.Object,
                 _invalidObservationRepositoryMock.Object,
                 _elasticSearchConfiguration,
-            null);
+                null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
     }

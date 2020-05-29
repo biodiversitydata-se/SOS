@@ -7,34 +7,41 @@ using SOS.Lib.Models.Interfaces;
 namespace SOS.Process.Repositories.Destination.Interfaces
 {
     /// <summary>
-    /// Processed data class
+    ///     Processed data class
     /// </summary>
     public interface IProcessBaseRepository<TEntity, in TKey> : IDisposable where TEntity : IEntity<TKey>
     {
         /// <summary>
-        /// Get 0 or 1 depending of witch instance to update
+        ///     Get 0 or 1 depending of witch instance to update
         /// </summary>
         byte ActiveInstance { get; }
 
         /// <summary>
-        /// Name of active collection
+        ///     Name of active collection
         /// </summary>
         string ActiveCollectionName { get; }
 
         /// <summary>
-        /// Name of inactive collection
+        ///     Name of inactive collection
         /// </summary>
         string InactiveCollectionName { get; }
 
+        int BatchSize { get; }
+
         /// <summary>
-        /// Add one item
+        ///     Get 0 or 1 depending of witch instance to update
+        /// </summary>
+        byte InActiveInstance { get; }
+
+        /// <summary>
+        ///     Add one item
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
         Task<bool> AddAsync(TEntity item);
 
         /// <summary>
-        /// Add one item
+        ///     Add one item
         /// </summary>
         /// <param name="item"></param>
         /// <param name="mongoCollection"></param>
@@ -42,29 +49,27 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         Task<bool> AddAsync(TEntity item, IMongoCollection<TEntity> mongoCollection);
 
         /// <summary>
-        /// Add collection if not exists
+        ///     Add collection if not exists
         /// </summary>
         /// <returns></returns>
         Task<bool> AddCollectionAsync();
 
         /// <summary>
-        /// Add many items
+        ///     Add many items
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
         Task<bool> AddManyAsync(IEnumerable<TEntity> items);
 
         /// <summary>
-        /// Add or update item
+        ///     Add or update item
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
         Task<bool> AddOrUpdateAsync(TEntity item);
 
-        int BatchSize { get; }
-
         /// <summary>
-        /// Remove
+        ///     Remove
         /// </summary>
         /// <param name="id"></param>
         /// <remarks>Uses typeof(TEntity).Name as MongoDb collection name.</remarks>
@@ -72,7 +77,7 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         Task<bool> DeleteAsync(TKey id);
 
         /// <summary>
-        /// Remove
+        ///     Remove
         /// </summary>
         /// <param name="id"></param>
         /// <param name="mongoCollection"></param>
@@ -80,44 +85,39 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         Task<bool> DeleteAsync(TKey id, IMongoCollection<TEntity> mongoCollection);
 
         /// <summary>
-        /// Remove collection
+        ///     Remove collection
         /// </summary>
         /// <returns></returns>
         Task<bool> DeleteCollectionAsync();
 
         /// <summary>
-        /// Get all items.
+        ///     Get all items.
         /// </summary>
         /// <returns></returns>
         Task<List<TEntity>> GetAllAsync();
 
         /// <summary>
-        /// Get item by id
+        ///     Get item by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<TEntity> GetAsync(TKey id);
 
         /// <summary>
-        /// Get 0 or 1 depending of witch instance to update
-        /// </summary>
-        byte InActiveInstance { get; }
-
-        /// <summary>
-        /// Set active instance
+        ///     Set active instance
         /// </summary>
         /// <param name="instance"></param>
         /// <returns></returns>
         Task<bool> SetActiveInstanceAsync(byte instance);
 
         /// <summary>
-        ///  Make sure collection exists
+        ///     Make sure collection exists
         /// </summary>
         /// <returns>true if new collection was created</returns>
         Task<bool> VerifyCollectionAsync();
 
         /// <summary>
-        /// Update entity
+        ///     Update entity
         /// </summary>
         /// <param name="id"></param>
         /// <param name="entity"></param>
@@ -126,7 +126,7 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         Task<bool> UpdateAsync(TKey id, TEntity entity);
 
         /// <summary>
-        /// Update entity
+        ///     Update entity
         /// </summary>
         /// <param name="id"></param>
         /// <param name="entity"></param>

@@ -1,10 +1,7 @@
-﻿using System;
-using FluentAssertions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Jobs;
 using SOS.Lib.Jobs.Import;
-using Xunit;
 
 namespace SOS.Import.UnitTests.Managers
 {
@@ -36,7 +33,7 @@ namespace SOS.Import.UnitTests.Managers
         //    _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public ObservationsHarvestJobTests()
         {
@@ -220,29 +217,29 @@ namespace SOS.Import.UnitTests.Managers
         /// Run harvest job successfully
         /// </summary>
         /// <returns></returns>
-       /* [Fact]
-        public async Task RunAsyncSuccess()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _artportalenHarvestJobMock.Setup(ts => ts.RunAsync(JobCancellationToken.Null))
-                .ReturnsAsync(true);
-
-            _taxonHarvestJobMock.Setup(ts => ts.RunAsync())
-                .ReturnsAsync(true);
-
-            _fieldMappingImportJobMock.Setup(ts => ts.RunAsync())
-                .ReturnsAsync(true);
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.RunAsync(JobCancellationToken.Null);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeTrue();
-        }*/
+        /* [Fact]
+         public async Task RunAsyncSuccess()
+         {
+             // -----------------------------------------------------------------------------------------------------------
+             // Arrange
+             //-----------------------------------------------------------------------------------------------------------
+             _artportalenHarvestJobMock.Setup(ts => ts.RunAsync(JobCancellationToken.Null))
+                 .ReturnsAsync(true);
+ 
+             _taxonHarvestJobMock.Setup(ts => ts.RunAsync())
+                 .ReturnsAsync(true);
+ 
+             _fieldMappingImportJobMock.Setup(ts => ts.RunAsync())
+                 .ReturnsAsync(true);
+             //-----------------------------------------------------------------------------------------------------------
+             // Act
+             //-----------------------------------------------------------------------------------------------------------
+             var result = await TestObject.RunAsync(JobCancellationToken.Null);
+             //-----------------------------------------------------------------------------------------------------------
+             // Assert
+             //-----------------------------------------------------------------------------------------------------------
+ 
+             result.Should().BeTrue();
+         }*/
     }
 }

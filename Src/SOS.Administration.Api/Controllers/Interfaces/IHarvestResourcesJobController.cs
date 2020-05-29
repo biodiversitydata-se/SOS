@@ -3,12 +3,12 @@
 namespace SOS.Administration.Api.Controllers.Interfaces
 {
     /// <summary>
-    /// Resource harvest job controller
+    ///     Resource harvest job controller
     /// </summary>
     public interface IHarvestResourcesJobController
     {
         /// <summary>
-        /// Add daily harvest of geo data
+        ///     Add daily harvest of geo data
         /// </summary>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
@@ -16,13 +16,13 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult AddDailyAreasHarvestJob(int hour, int minute);
 
         /// <summary>
-        /// Run geo data harvest
+        ///     Run geo data harvest
         /// </summary>
         /// <returns></returns>
         IActionResult RunAreasHarvestJob();
 
         /// <summary>
-        /// Schedule daily taxon harvest job
+        ///     Schedule daily taxon harvest job
         /// </summary>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
@@ -30,13 +30,13 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult AddDailyTaxonHarvestJob(int hour, int minute);
 
         /// <summary>
-        /// Run taxon harvest
+        ///     Run taxon harvest
         /// </summary>
         /// <returns></returns>
         IActionResult RunTaxonHarvestJob();
 
         /// <summary>
-        /// Run import field mapping.
+        ///     Run import field mapping.
         /// </summary>
         /// <returns></returns>
         IActionResult RunImportFieldMappingJob();

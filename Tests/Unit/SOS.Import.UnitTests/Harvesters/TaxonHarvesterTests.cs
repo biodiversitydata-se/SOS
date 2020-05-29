@@ -16,6 +16,17 @@ namespace SOS.Import.UnitTests.Harvesters
 {
     public class TaxonHarvesterTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public TaxonHarvesterTests()
+        {
+            _taxonVerbatimRepositoryMock = new Mock<ITaxonVerbatimRepository>();
+            _taxonServiceMock = new Mock<ITaxonService>();
+            _taxonAttributeServiceMock = new Mock<ITaxonAttributeService>();
+            _loggerMock = new Mock<ILogger<TaxonHarvester>>();
+        }
+
         private readonly Mock<ITaxonVerbatimRepository> _taxonVerbatimRepositoryMock;
         private readonly Mock<ITaxonService> _taxonServiceMock;
         private readonly Mock<ITaxonAttributeService> _taxonAttributeServiceMock;
@@ -28,18 +39,7 @@ namespace SOS.Import.UnitTests.Harvesters
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public TaxonHarvesterTests()
-        {
-            _taxonVerbatimRepositoryMock = new Mock<ITaxonVerbatimRepository>();
-            _taxonServiceMock = new Mock<ITaxonService>();
-            _taxonAttributeServiceMock = new Mock<ITaxonAttributeService>();
-            _loggerMock = new Mock<ILogger<TaxonHarvester>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -67,7 +67,7 @@ namespace SOS.Import.UnitTests.Harvesters
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("taxonAttributeService");
 
-           
+
             create = () => new TaxonHarvester(
                 _taxonVerbatimRepositoryMock.Object,
                 _taxonServiceMock.Object,
@@ -77,48 +77,7 @@ namespace SOS.Import.UnitTests.Harvesters
         }
 
         /// <summary>
-        /// Make a successful clams harvest
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task HarvestTaxaAsyncSuccess()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _taxonServiceMock.Setup(ts => ts.GetTaxaAsync())
-                .ReturnsAsync(new[] { new DarwinCoreTaxon
-                {
-                    TaxonID = "urn:taxon:100024"
-                }  });
-
-            _taxonAttributeServiceMock.Setup(tas => tas.GetCurrentRedlistPeriodIdAsync())
-                .ReturnsAsync(1);
-
-            _taxonAttributeServiceMock.Setup(tas => tas.GetTaxonAttributesAsync(It.IsAny<IEnumerable<int>>(), It.IsAny<IEnumerable<int>>(), It.IsAny<IEnumerable<int>>()))
-                .ReturnsAsync(new List<TaxonAttributeModel>());
-
-            _taxonVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())
-                .ReturnsAsync(true);
-            _taxonVerbatimRepositoryMock.Setup(tr => tr.AddCollectionAsync())
-                .ReturnsAsync(true);
-            _taxonVerbatimRepositoryMock.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<DarwinCoreTaxon>>()))
-                .ReturnsAsync(true);
-
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.HarvestAsync();
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Status.Should().Be(RunStatus.Success);
-        }
-
-        /// <summary>
-        /// Test aggregation fail
+        ///     Test aggregation fail
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -140,6 +99,51 @@ namespace SOS.Import.UnitTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
 
             result.Status.Should().Be(RunStatus.Failed);
+        }
+
+        /// <summary>
+        ///     Make a successful clams harvest
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task HarvestTaxaAsyncSuccess()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _taxonServiceMock.Setup(ts => ts.GetTaxaAsync())
+                .ReturnsAsync(new[]
+                {
+                    new DarwinCoreTaxon
+                    {
+                        TaxonID = "urn:taxon:100024"
+                    }
+                });
+
+            _taxonAttributeServiceMock.Setup(tas => tas.GetCurrentRedlistPeriodIdAsync())
+                .ReturnsAsync(1);
+
+            _taxonAttributeServiceMock.Setup(tas => tas.GetTaxonAttributesAsync(It.IsAny<IEnumerable<int>>(),
+                    It.IsAny<IEnumerable<int>>(), It.IsAny<IEnumerable<int>>()))
+                .ReturnsAsync(new List<TaxonAttributeModel>());
+
+            _taxonVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())
+                .ReturnsAsync(true);
+            _taxonVerbatimRepositoryMock.Setup(tr => tr.AddCollectionAsync())
+                .ReturnsAsync(true);
+            _taxonVerbatimRepositoryMock.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<DarwinCoreTaxon>>()))
+                .ReturnsAsync(true);
+
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.HarvestAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Status.Should().Be(RunStatus.Success);
         }
     }
 }

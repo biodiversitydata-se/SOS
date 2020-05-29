@@ -1,7 +1,7 @@
 ﻿namespace SOS.Import.Entities.Artportalen
 {
     /// <summary>
-    /// Project parameter entity
+    ///     Project parameter entity
     /// </summary>
     public class ProjectParameterEntity
     {

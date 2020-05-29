@@ -1,6 +1,5 @@
-﻿using DwC_A.Meta;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using DwC_A.Meta;
 
 namespace DwC_A
 {
@@ -8,19 +7,19 @@ namespace DwC_A
     {
         public Row(IEnumerable<string> fields, IFieldMetaData fieldMetaData)
         {
-            this.FieldMetaData = fieldMetaData;
-            this.FieldValueById = new Dictionary<int, string>();
-            int index = 0;
+            FieldMetaData = fieldMetaData;
+            FieldValueById = new Dictionary<int, string>();
+            var index = 0;
             foreach (var val in fields)
             {
-                this.FieldValueById.Add(index, val);
+                FieldValueById.Add(index, val);
                 index++;
             }
         }
 
-        public IEnumerable<string> Fields => FieldValueById.Values;
-
         public IDictionary<int, string> FieldValueById { get; }
+
+        public IEnumerable<string> Fields => FieldValueById.Values;
 
         public IFieldMetaData FieldMetaData { get; }
 
@@ -33,16 +32,11 @@ namespace DwC_A
             }
         }
 
-        public string this[int index]
-        {
-            get
-            {
-                // todo - improve performance by introducing Dictionary
-                return FieldValueById[index];
-                //return Fields.ElementAt(index);
-            }
-        }
+        public string this[int index] =>
+            // todo - improve performance by introducing Dictionary
+            FieldValueById[index];
 
+        //return Fields.ElementAt(index);
         public bool TryGetValue(string term, out string val)
         {
             if (FieldMetaData.TryGetTermIndex(term, out var termIndex))

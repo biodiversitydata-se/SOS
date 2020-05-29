@@ -1,21 +1,25 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace SOS.Lib.DataStructures
 {
     /// <summary>
-    /// Dictionary that can contain multiple values for each key.
+    ///     Dictionary that can contain multiple values for each key.
     /// </summary>
     /// <typeparam name="TKey">Key type</typeparam>
     /// <typeparam name="TValue">Value type</typeparam>
     /// <remarks>
-    /// An alternative (perhaps faster) data structure to use, could be C5 MultiHashDictionary:
-    /// https://github.com/sestoft/C5/blob/master/C5.UserGuideExamples/MultiDictionary.cs
+    ///     An alternative (perhaps faster) data structure to use, could be C5 MultiHashDictionary:
+    ///     https://github.com/sestoft/C5/blob/master/C5.UserGuideExamples/MultiDictionary.cs
     /// </remarks>
     public class HashMapDictionary<TKey, TValue> : IEnumerable
     {
-        private readonly System.Collections.Concurrent.ConcurrentDictionary<TKey, List<TValue>> _keyValue = new System.Collections.Concurrent.ConcurrentDictionary<TKey, List<TValue>>();
-        private readonly System.Collections.Concurrent.ConcurrentDictionary<TValue, List<TKey>> _valueKey = new System.Collections.Concurrent.ConcurrentDictionary<TValue, List<TKey>>();
+        private readonly ConcurrentDictionary<TKey, List<TValue>> _keyValue =
+            new ConcurrentDictionary<TKey, List<TValue>>();
+
+        private readonly ConcurrentDictionary<TValue, List<TKey>> _valueKey =
+            new ConcurrentDictionary<TValue, List<TKey>>();
 
         public ICollection<TKey> Keys => _keyValue.Keys;
 
@@ -37,17 +41,22 @@ namespace SOS.Lib.DataStructures
             set => _valueKey[index] = value;
         }
 
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _keyValue.GetEnumerator();
+        }
+
         public void Add(TKey key, TValue value)
         {
             lock (this)
             {
-                if (!_keyValue.TryGetValue(key, out List<TValue> result))
-                    _keyValue.TryAdd(key, new List<TValue>() { value });
+                if (!_keyValue.TryGetValue(key, out var result))
+                    _keyValue.TryAdd(key, new List<TValue> {value});
                 else if (!result.Contains(value))
                     result.Add(value);
 
-                if (!_valueKey.TryGetValue(value, out List<TKey> result2))
-                    _valueKey.TryAdd(value, new List<TKey>() { key });
+                if (!_valueKey.TryGetValue(value, out var result2))
+                    _valueKey.TryAdd(value, new List<TKey> {key});
                 else if (!result2.Contains(key))
                     result2.Add(key);
             }
@@ -89,11 +98,11 @@ namespace SOS.Lib.DataStructures
         {
             lock (this)
             {
-                if (_keyValue.TryRemove(key, out List<TValue> values))
+                if (_keyValue.TryRemove(key, out var values))
                 {
                     foreach (var item in values)
                     {
-                        var remove2 = _valueKey.TryRemove(item, out List<TKey> keys);
+                        var remove2 = _valueKey.TryRemove(item, out var keys);
                     }
                 }
             }
@@ -103,11 +112,11 @@ namespace SOS.Lib.DataStructures
         {
             lock (this)
             {
-                if (_valueKey.TryRemove(value, out List<TKey> keys))
+                if (_valueKey.TryRemove(value, out var keys))
                 {
                     foreach (var item in keys)
                     {
-                        var remove2 = _keyValue.TryRemove(item, out List<TValue> values);
+                        var remove2 = _keyValue.TryRemove(item, out var values);
                     }
                 }
             }
@@ -117,11 +126,6 @@ namespace SOS.Lib.DataStructures
         {
             _keyValue.Clear();
             _valueKey.Clear();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _keyValue.GetEnumerator();
         }
     }
 }

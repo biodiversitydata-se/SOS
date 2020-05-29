@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using DwC_A;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Import.DarwinCore;
-using SOS.Lib.Models.Verbatim.DarwinCore;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.DarwinCore
@@ -33,7 +31,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             dwcEvents.Count.Should().Be(1970);
             var dwcEvent = dwcEvents.Single(e => e.EventID == "Station:NM20130901150");
             dwcEvent.ExtendedMeasurementOrFacts
-                .Count().Should().Be(6, "because there are 6 different event measurements for the 'Station:NM20130901150' event");
+                .Count().Should().Be(6,
+                    "because there are 6 different event measurements for the 'Station:NM20130901150' event");
             dwcEvent.ExtendedMeasurementOrFacts
                 .Single(m => m.MeasurementType == "air temperature")
                 .MeasurementValue.Should().Be("20");
@@ -63,7 +62,8 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             //-----------------------------------------------------------------------------------------------------------
             dwcEvents.Count.Should().Be(20449);
             var dwcEvent = dwcEvents.Single(observation => observation.EventID == "SEBMS:10015");
-            dwcEvent.MeasurementOrFacts.Count.Should().Be(6, "because there are 6 different event measurements for the 'SEBMS:10015:201062' event");
+            dwcEvent.MeasurementOrFacts.Count.Should().Be(6,
+                "because there are 6 different event measurements for the 'SEBMS:10015:201062' event");
             dwcEvent.MeasurementOrFacts
                 .Single(measurement => measurement.MeasurementType == "Temperature")
                 .MeasurementValue.Should().Be("19");
@@ -83,6 +83,5 @@ namespace SOS.Import.IntegrationTests.DarwinCore
                 .Single(measurement => measurement.MeasurementType == "Site type")
                 .MeasurementValue.Should().Be("Point site");
         }
-
     }
 }

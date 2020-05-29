@@ -18,6 +18,17 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
 {
     public class KulObservationHarvesterTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public KulObservationHarvesterTests()
+        {
+            _kulObservationVerbatimRepositoryMock = new Mock<IKulObservationVerbatimRepository>();
+            _kulObservationServiceMock = new Mock<IKulObservationService>();
+            _kulServiceConfiguration = new KulServiceConfiguration {StartHarvestYear = DateTime.Now.Year};
+            _loggerMock = new Mock<ILogger<KulObservationHarvester>>();
+        }
+
         private readonly Mock<IKulObservationVerbatimRepository> _kulObservationVerbatimRepositoryMock;
         private readonly Mock<IKulObservationService> _kulObservationServiceMock;
         private readonly KulServiceConfiguration _kulServiceConfiguration;
@@ -30,18 +41,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public KulObservationHarvesterTests()
-        {
-            _kulObservationVerbatimRepositoryMock = new Mock<IKulObservationVerbatimRepository>();
-            _kulObservationServiceMock = new Mock<IKulObservationService>();
-            _kulServiceConfiguration = new KulServiceConfiguration{StartHarvestYear = DateTime.Now.Year};
-            _loggerMock = new Mock<ILogger<KulObservationHarvester>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -57,10 +57,11 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
 
             create = () => new KulObservationHarvester(
                 _kulObservationServiceMock.Object,
-               null,
+                null,
                 _kulServiceConfiguration,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("kulObservationVerbatimRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
+                .Be("kulObservationVerbatimRepository");
 
             create = () => new KulObservationHarvester(
                 _kulObservationServiceMock.Object,
@@ -78,7 +79,31 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         }
 
         /// <summary>
-        /// Make a successful kuls harvest
+        ///     Test aggregation fail
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task HarvestKulsAsyncFail()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _kulObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+                .ThrowsAsync(new Exception("Fail"));
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.HarvestObservationsAsync(JobCancellationToken.Null);
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Status.Should().Be(RunStatus.Failed);
+        }
+
+        /// <summary>
+        ///     Make a successful kuls harvest
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -94,7 +119,8 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 .ReturnsAsync(true);
             _kulObservationVerbatimRepositoryMock.Setup(tr => tr.AddCollectionAsync())
                 .ReturnsAsync(true);
-            _kulObservationVerbatimRepositoryMock.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<KulObservationVerbatim>>()))
+            _kulObservationVerbatimRepositoryMock
+                .Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<KulObservationVerbatim>>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -106,30 +132,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
 
             result.Status.Should().Be(RunStatus.Success);
-        }
-
-        /// <summary>
-        /// Test aggregation fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task HarvestKulsAsyncFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _kulObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                 .ThrowsAsync(new Exception("Fail"));
-            
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.HarvestObservationsAsync(JobCancellationToken.Null);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Status.Should().Be(RunStatus.Failed);
         }
     }
 }

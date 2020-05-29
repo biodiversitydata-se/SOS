@@ -11,9 +11,9 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
     public interface IDwcArchiveFileWriter
     {
         /// <summary>
-        /// Creates a Darwin Core Archive file.
-        /// The file is stored in a random generated name in the exportPath folder.
-        /// The full path is returned by this function.
+        ///     Creates a Darwin Core Archive file.
+        ///     The file is stored in a random generated name in the exportPath folder.
+        ///     The full path is returned by this function.
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
@@ -31,9 +31,9 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
             IJobCancellationToken cancellationToken);
 
         /// <summary>
-        /// Creates a Darwin Core Archive file where the specified fields in <paramref name="fieldDescriptions"/> are used.
-        /// The file is stored in a random generated name in the exportPath folder.
-        /// The full path is returned by this function.
+        ///     Creates a Darwin Core Archive file where the specified fields in <paramref name="fieldDescriptions" /> are used.
+        ///     The file is stored in a random generated name in the exportPath folder.
+        ///     The full path is returned by this function.
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="fileName"></param>

@@ -7,18 +7,19 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 namespace SOS.Observations.Api.Swagger
 {
     /// <summary>
-    /// Swagger ignore filter
+    ///     Swagger ignore filter
     /// </summary>
     internal class SwaggerIgnoreFilter : ISchemaFilter
     {
         /// <summary>
-        /// Apply filter
+        ///     Apply filter
         /// </summary>
         /// <param name="schema"></param>
         /// <param name="context"></param>
         public void Apply(OpenApiSchema schema, SchemaFilterContext context)
         {
-            var excludeProperties = context.Type?.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.GetCustomAttributes(typeof(JsonIgnoreAttribute), true)?.Any() == true);
+            var excludeProperties = context.Type?.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.GetCustomAttributes(typeof(JsonIgnoreAttribute), true)?.Any() == true);
             if (excludeProperties != null)
             {
                 foreach (var property in excludeProperties)

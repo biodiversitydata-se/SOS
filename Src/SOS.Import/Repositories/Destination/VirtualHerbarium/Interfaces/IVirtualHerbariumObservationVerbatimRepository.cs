@@ -4,7 +4,9 @@ using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 
 namespace SOS.Import.Repositories.Destination.VirtualHerbarium.Interfaces
 {
-    public interface IVirtualHerbariumObservationVerbatimRepository : IVerbatimRepository<VirtualHerbariumObservationVerbatim, ObjectId>
+    public interface
+        IVirtualHerbariumObservationVerbatimRepository : IVerbatimRepository<VirtualHerbariumObservationVerbatim,
+            ObjectId>
     {
     }
 }

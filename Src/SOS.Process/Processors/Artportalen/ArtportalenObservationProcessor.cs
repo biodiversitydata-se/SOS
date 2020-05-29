@@ -11,26 +11,26 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Processors.Artportalen
 {
     /// <summary>
-    /// Process factory class
+    ///     Process factory class
     /// </summary>
-    public class ArtportalenObservationProcessor : ObservationProcessorBase<ArtportalenObservationProcessor>, Interfaces.IArtportalenObservationProcessor
+    public class ArtportalenObservationProcessor : ObservationProcessorBase<ArtportalenObservationProcessor>,
+        IArtportalenObservationProcessor
     {
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
+        private readonly ProcessConfiguration _processConfiguration;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly SemaphoreSlim _semaphore;
-        private readonly ProcessConfiguration _processConfiguration;
-        public override DataProviderType Type => DataProviderType.ArtportalenObservations;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="artportalenVerbatimRepository"></param>
         /// <param name="processedObservationRepository"></param>
@@ -44,11 +44,15 @@ namespace SOS.Process.Processors.Artportalen
             IProcessedFieldMappingRepository processedFieldMappingRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             ProcessConfiguration processConfiguration,
-            ILogger<ArtportalenObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, logger)
+            ILogger<ArtportalenObservationProcessor> logger) : base(processedObservationRepository,
+            fieldMappingResolverHelper, logger)
         {
-            _artportalenVerbatimRepository = artportalenVerbatimRepository ?? throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
-            _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
-            _processConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
+            _artportalenVerbatimRepository = artportalenVerbatimRepository ??
+                                             throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
+            _processedFieldMappingRepository = processedFieldMappingRepository ??
+                                               throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _processConfiguration =
+                processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
 
             if (processConfiguration == null)
             {
@@ -58,8 +62,10 @@ namespace SOS.Process.Processors.Artportalen
             _semaphore = new SemaphoreSlim(processConfiguration.NoOfThreads);
         }
 
+        public override DataProviderType Type => DataProviderType.ArtportalenObservations;
+
         /// <summary>
-        /// Process all observations
+        ///     Process all observations
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
@@ -74,7 +80,7 @@ namespace SOS.Process.Processors.Artportalen
             {
                 return await ProcessObservationsParallel(dataProvider, taxa, cancellationToken);
             }
-            
+
             // Sequential processing is used for easier debugging.
             return await ProcessObservationsSequential(dataProvider, taxa, cancellationToken);
         }
@@ -84,7 +90,8 @@ namespace SOS.Process.Processors.Artportalen
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository);
+            var observationFactory =
+                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository);
             // Get min and max id from db
             (await _artportalenVerbatimRepository.GetIdSpanAsync())
                 .Deconstruct(out var batchStartId, out var maxId);
@@ -95,16 +102,18 @@ namespace SOS.Process.Processors.Artportalen
                 await _semaphore.WaitAsync();
 
                 var batchEndId = batchStartId + _processedFieldMappingRepository.BatchSize - 1;
-                processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, observationFactory, cancellationToken));
+                processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, observationFactory,
+                    cancellationToken));
                 batchStartId = batchEndId + 1;
             }
+
             await Task.WhenAll(processBatchTasks);
 
             return processBatchTasks.Sum(t => t.Result);
         }
 
         /// <summary>
-        /// Process a batch of data
+        ///     Process a batch of data
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="startId"></param>
@@ -122,18 +131,19 @@ namespace SOS.Process.Processors.Artportalen
             try
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                Logger.LogDebug($"Start fetching Artportalen batch ({ startId }-{ endId })");
+                Logger.LogDebug($"Start fetching Artportalen batch ({startId}-{endId})");
                 var verbatimObservationsBatch = await _artportalenVerbatimRepository.GetBatchAsync(startId, endId);
-                Logger.LogDebug($"Finish fetching Artportalen batch ({ startId }-{ endId })");
+                Logger.LogDebug($"Finish fetching Artportalen batch ({startId}-{endId})");
 
-                Logger.LogDebug($"Start processing Artportalen batch ({ startId }-{ endId })");
-                var processedObservationsBatch = observationFactory.CreateProcessedObservations(verbatimObservationsBatch);
-                Logger.LogDebug($"Finish processing Artportalen batch ({ startId }-{ endId })");
+                Logger.LogDebug($"Start processing Artportalen batch ({startId}-{endId})");
+                var processedObservationsBatch =
+                    observationFactory.CreateProcessedObservations(verbatimObservationsBatch);
+                Logger.LogDebug($"Finish processing Artportalen batch ({startId}-{endId})");
 
-                Logger.LogDebug($"Start storing Artportalen batch ({ startId }-{ endId })");
+                Logger.LogDebug($"Start storing Artportalen batch ({startId}-{endId})");
                 var successCount = await CommitBatchAsync(dataProvider, processedObservationsBatch.ToArray());
-                Logger.LogDebug($"Finish storing Artportalen batch ({ startId }-{ endId })");
-                
+                Logger.LogDebug($"Finish storing Artportalen batch ({startId}-{endId})");
+
                 return successCount;
             }
             catch (JobAbortedException e)
@@ -152,13 +162,15 @@ namespace SOS.Process.Processors.Artportalen
 
             return 0;
         }
+
         private async Task<int> ProcessObservationsSequential(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
-            var observationFactory = await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository);
+            var observationFactory =
+                await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository);
             ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
             using var cursor = await _artportalenVerbatimRepository.GetAllByCursorAsync();
 

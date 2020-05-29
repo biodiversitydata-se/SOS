@@ -5,7 +5,7 @@ namespace SOS.Lib.Jobs.Import
     public interface ITaxonHarvestJob
     {
         /// <summary>
-        /// Run taxon harvest
+        ///     Run taxon harvest
         /// </summary>
         /// <returns></returns>
         Task<bool> RunAsync();

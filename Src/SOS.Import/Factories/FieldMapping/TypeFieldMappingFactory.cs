@@ -5,12 +5,13 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.FieldMapping
 {
     /// <summary>
-    /// Class for creating Type field mapping.
+    ///     Class for creating Type field mapping.
     /// </summary>
     public class TypeFieldMappingFactory : DwcFieldMappingFactoryBase
     {
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Type;
         protected override bool Localized => false;
+
         protected override ICollection<FieldMappingValue> GetFieldMappingValues()
         {
             var fieldMappingValues = new List<FieldMappingValue>

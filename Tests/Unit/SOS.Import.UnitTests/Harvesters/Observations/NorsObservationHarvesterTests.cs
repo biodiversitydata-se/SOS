@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
-using NorsService;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NorsService;
 using SOS.Import.Harvesters.Observations;
 using SOS.Import.Repositories.Destination.Nors.Interfaces;
 using SOS.Import.Services.Interfaces;
@@ -18,6 +18,18 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
 {
     public class NorsObservationHarvesterTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public NorsObservationHarvesterTests()
+        {
+            _norsObservationVerbatimRepositoryMock = new Mock<INorsObservationVerbatimRepository>();
+            _norsObservationServiceMock = new Mock<INorsObservationService>();
+            _norsServiceConfiguration = new NorsServiceConfiguration
+                {MaxReturnedChangesInOnePage = 10, MaxNumberOfSightingsHarvested = 1};
+            _loggerMock = new Mock<ILogger<NorsObservationHarvester>>();
+        }
+
         private readonly Mock<INorsObservationVerbatimRepository> _norsObservationVerbatimRepositoryMock;
         private readonly Mock<INorsObservationService> _norsObservationServiceMock;
         private readonly NorsServiceConfiguration _norsServiceConfiguration;
@@ -30,18 +42,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public NorsObservationHarvesterTests()
-        {
-            _norsObservationVerbatimRepositoryMock = new Mock<INorsObservationVerbatimRepository>();
-            _norsObservationServiceMock = new Mock<INorsObservationService>();
-            _norsServiceConfiguration = new NorsServiceConfiguration { MaxReturnedChangesInOnePage = 10, MaxNumberOfSightingsHarvested = 1 };
-            _loggerMock = new Mock<ILogger<NorsObservationHarvester>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -57,10 +58,11 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
 
             create = () => new NorsObservationHarvester(
                 _norsObservationServiceMock.Object,
-               null,
+                null,
                 _norsServiceConfiguration,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("norsObservationVerbatimRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
+                .Be("norsObservationVerbatimRepository");
 
             create = () => new NorsObservationHarvester(
                 _norsObservationServiceMock.Object,
@@ -78,7 +80,31 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         }
 
         /// <summary>
-        /// Make a successful norss harvest
+        ///     Test aggregation fail
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task HarvestNorsAsyncFail()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _norsObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
+                .ThrowsAsync(new Exception("Fail"));
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.HarvestObservationsAsync(JobCancellationToken.Null);
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Status.Should().Be(RunStatus.Failed);
+        }
+
+        /// <summary>
+        ///     Make a successful norss harvest
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -88,13 +114,15 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _norsObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
-                .ReturnsAsync(new Tuple<long, IEnumerable<WebSpeciesObservation>>(1, new List<WebSpeciesObservation>()));
+                .ReturnsAsync(
+                    new Tuple<long, IEnumerable<WebSpeciesObservation>>(1, new List<WebSpeciesObservation>()));
 
             _norsObservationVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())
                 .ReturnsAsync(true);
             _norsObservationVerbatimRepositoryMock.Setup(tr => tr.AddCollectionAsync())
                 .ReturnsAsync(true);
-            _norsObservationVerbatimRepositoryMock.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<NorsObservationVerbatim>>()))
+            _norsObservationVerbatimRepositoryMock
+                .Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<NorsObservationVerbatim>>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -106,30 +134,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
 
             result.Status.Should().Be(RunStatus.Success);
-        }
-
-        /// <summary>
-        /// Test aggregation fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task HarvestNorsAsyncFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _norsObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
-                 .ThrowsAsync(new Exception("Fail"));
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.HarvestObservationsAsync(JobCancellationToken.Null);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Status.Should().Be(RunStatus.Failed);
         }
     }
 }

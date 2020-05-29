@@ -5,7 +5,7 @@ using SOS.Export.Services.Interfaces;
 namespace SOS.Export.Services
 {
     /// <summary>
-    /// File services
+    ///     File services
     /// </summary>
     public class FileService : IFileService
     {

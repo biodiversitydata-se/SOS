@@ -1,10 +1,9 @@
 ﻿namespace SOS.Lib.Models.Search
 {
     /// <summary>
-    /// Filter for export
+    ///     Filter for export
     /// </summary>
     public class ExportFilter : FilterBase
     {
-       
     }
 }

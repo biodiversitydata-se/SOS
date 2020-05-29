@@ -5,12 +5,11 @@ using SOS.Lib.Models.Processed.Observation;
 namespace SOS.Observations.Api.Repositories.Interfaces
 {
     /// <summary>
-    /// 
     /// </summary>
     public interface IProcessedTaxonRepository : IBaseRepository<ProcessedTaxon, int>
     {
         /// <summary>
-        /// Get chunk of objects from repository
+        ///     Get chunk of objects from repository
         /// </summary>
         /// <param name="skip"></param>
         /// <param name="take"></param>
@@ -18,7 +17,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         Task<IEnumerable<ProcessedTaxon>> GetChunkAsync(int skip, int take);
 
         /// <summary>
-        /// Get chunk of ProcessedBasicTaxon objects from repository.
+        ///     Get chunk of ProcessedBasicTaxon objects from repository.
         /// </summary>
         /// <param name="skip"></param>
         /// <param name="take"></param>

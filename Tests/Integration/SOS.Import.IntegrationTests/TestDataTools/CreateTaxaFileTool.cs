@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,8 +17,37 @@ namespace SOS.Import.IntegrationTests.TestDataTools
 {
     public class CreateTaxaFileTool : TestBase
     {
+        [Fact]
+        [Trait("Category", "Tool")]
+        public async Task CreateBasicTaxaMessagePackFile()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            // 1. Remember to first remove JsonIgnore on properties in DarwinCoreTaxon class.
+            const string filePath = @"c:\temp\AllBasicTaxa.msgpck";
+            const int batchSize = 500000; // Get all taxa
+            var importConfiguration = GetImportConfiguration();
+            var importClient = new ImportClient(
+                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
+                importConfiguration.VerbatimDbConfiguration.DatabaseName,
+                batchSize);
+
+            var taxonVerbatimRepository =
+                new TaxonVerbatimRepository(importClient, new NullLogger<TaxonVerbatimRepository>());
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var taxa = await taxonVerbatimRepository.GetBatchAsync(0);
+            var basicTaxa = taxa.Select(m => m.ToProcessedBasicTaxon());
+            var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
+            var bin = MessagePackSerializer.Serialize(basicTaxa, options);
+            File.WriteAllBytes(filePath, bin);
+        }
+
         /// <summary>
-        /// Reads taxa from MongoDb and saves them as a JSON file.
+        ///     Reads taxa from MongoDb and saves them as a JSON file.
         /// </summary>
         [Fact]
         [Trait("Category", "Tool")]
@@ -42,12 +72,12 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var taxa = await taxonVerbatimRepository.GetBatchAsync(0);
-            var serializerSettings = new JsonSerializerSettings()
+            var serializerSettings = new JsonSerializerSettings
             {
-                Converters = new List<JsonConverter> { new ObjectIdConverter() }
+                Converters = new List<JsonConverter> {new ObjectIdConverter()}
             };
             var strJson = JsonConvert.SerializeObject(taxa, serializerSettings);
-            System.IO.File.WriteAllText(filePath, strJson, Encoding.UTF8);
+            File.WriteAllText(filePath, strJson, Encoding.UTF8);
         }
 
         [Fact]
@@ -74,38 +104,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             var taxa = await taxonVerbatimRepository.GetBatchAsync(0);
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
-            byte[] bin = MessagePackSerializer.Serialize(taxa, options);
-            System.IO.File.WriteAllBytes(filePath, bin);
+            var bin = MessagePackSerializer.Serialize(taxa, options);
+            File.WriteAllBytes(filePath, bin);
         }
-
-        [Fact]
-        [Trait("Category", "Tool")]
-        public async Task CreateBasicTaxaMessagePackFile()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            // 1. Remember to first remove JsonIgnore on properties in DarwinCoreTaxon class.
-            const string filePath = @"c:\temp\AllBasicTaxa.msgpck";
-            const int batchSize = 500000; // Get all taxa
-            var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                batchSize);
-
-            var taxonVerbatimRepository =
-                new TaxonVerbatimRepository(importClient, new NullLogger<TaxonVerbatimRepository>());
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var taxa = await taxonVerbatimRepository.GetBatchAsync(0);
-            var basicTaxa = taxa.Select(m => m.ToProcessedBasicTaxon());
-            var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
-            byte[] bin = MessagePackSerializer.Serialize(basicTaxa, options);
-            System.IO.File.WriteAllBytes(filePath, bin);
-        }
-
     }
 }

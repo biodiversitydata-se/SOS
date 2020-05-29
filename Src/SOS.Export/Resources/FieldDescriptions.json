@@ -1,2162 +1,2162 @@
 [
-  {
-    "Id": 1,
-    "Name": "accessRights",
-    "DwcIdentifier": "http://purl.org/dc/terms/accessRights",
-    "Class": "DarwinCore",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 2,
-    "Name": "basisOfRecord",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/basisOfRecord",
-    "Class": "DarwinCore",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 3,
-    "Name": "bibliographicCitation",
-    "DwcIdentifier": "http://purl.org/dc/terms/bibliographicCitation",
-    "Class": "DarwinCore",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 4,
-    "Name": "collectionCode",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/collectionCode",
-    "Class": "DarwinCore",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 5,
-    "Name": "collectionID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/collectionID",
-    "Class": "DarwinCore",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 6,
-    "Name": "dataGeneralizations",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/dataGeneralizations",
-    "Class": "DarwinCore",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 7,
-    "Name": "datasetID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/datasetID",
-    "Class": "DarwinCore",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 8,
-    "Name": "datasetName",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/datasetName",
-    "Class": "DarwinCore",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 9,
-    "Name": "dynamicProperties",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/dynamicProperties",
-    "Class": "DarwinCore",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 10,
-    "Name": "Id",
-    "DwcIdentifier": "",
-    "Class": "DarwinCore",
-    "Importance": 0,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 11,
-    "Name": "informationWithheld",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/informationWithheld",
-    "Class": "DarwinCore",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 12,
-    "Name": "institutionCode",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/institutionCode",
-    "Class": "DarwinCore",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 13,
-    "Name": "institutionID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/institutionID",
-    "Class": "DarwinCore",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 14,
-    "Name": "language",
-    "DwcIdentifier": "http://purl.org/dc/terms/language",
-    "Class": "DarwinCore",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 15,
-    "Name": "license",
-    "DwcIdentifier": "http://purl.org/dc/terms/license",
-    "Class": "DarwinCore",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 16,
-    "Name": "modified",
-    "DwcIdentifier": "http://purl.org/dc/terms/modified",
-    "Class": "DarwinCore",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 17,
-    "Name": "Owner",
-    "DwcIdentifier": "",
-    "Class": "DarwinCore",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 18,
-    "Name": "ownerInstitutionCode",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/ownerInstitutionCode",
-    "Class": "DarwinCore",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 19,
-    "Name": "references",
-    "DwcIdentifier": "http://purl.org/dc/terms/references",
-    "Class": "DarwinCore",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 20,
-    "Name": "ReportedBy",
-    "DwcIdentifier": "",
-    "Class": "DarwinCore",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 21,
-    "Name": "ReportedDate",
-    "DwcIdentifier": "",
-    "Class": "DarwinCore",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 22,
-    "Name": "rights",
-    "DwcIdentifier": "",
-    "Class": "DarwinCore",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 23,
-    "Name": "rightsHolder",
-    "DwcIdentifier": "http://purl.org/dc/terms/rightsHolder",
-    "Class": "DarwinCore",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 24,
-    "Name": "type",
-    "DwcIdentifier": "http://purl.org/dc/terms/type",
-    "Class": "DarwinCore",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 25,
-    "Name": "day",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/day",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 26,
-    "Name": "End",
-    "DwcIdentifier": "",
-    "Class": "Event",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 27,
-    "Name": "endDayOfYear",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/endDayOfYear",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 28,
-    "Name": "eventDate",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/eventDate",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 29,
-    "Name": "eventID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/eventID",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 30,
-    "Name": "eventRemarks",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/eventRemarks",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 31,
-    "Name": "eventTime",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/eventTime",
-    "Class": "Event",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 32,
-    "Name": "fieldNotes",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/fieldNotes",
-    "Class": "Event",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 33,
-    "Name": "fieldNumber",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/fieldNumber",
-    "Class": "Event",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 34,
-    "Name": "habitat",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/habitat",
-    "Class": "Event",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 35,
-    "Name": "month",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/month",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 36,
-    "Name": "parentEventID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/parentEventID",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 37,
-    "Name": "sampleSizeValue",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/sampleSizeValue",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 38,
-    "Name": "sampleSizeUnit",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/sampleSizeUnit",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 39,
-    "Name": "samplingEffort",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/samplingEffort",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 40,
-    "Name": "samplingProtocol",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/samplingProtocol",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 41,
-    "Name": "Start",
-    "DwcIdentifier": "",
-    "Class": "Event",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 42,
-    "Name": "startDayOfYear",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/startDayOfYear",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 43,
-    "Name": "verbatimEventDate",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimEventDate",
-    "Class": "Event",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 44,
-    "Name": "year",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/year",
-    "Class": "Event",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 45,
-    "Name": "dateIdentified",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/dateIdentified",
-    "Class": "Identification",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 46,
-    "Name": "identificationID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/identificationID",
-    "Class": "Identification",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 47,
-    "Name": "identificationQualifier",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/identificationQualifier",
-    "Class": "Identification",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 48,
-    "Name": "identificationReferences",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/identificationReferences",
-    "Class": "Identification",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 49,
-    "Name": "identificationRemarks",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/identificationRemarks",
-    "Class": "Identification",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 50,
-    "Name": "identificationVerificationStatus",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/identificationVerificationStatus",
-    "Class": "Identification",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 51,
-    "Name": "identifiedBy",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/identifiedBy",
-    "Class": "Identification",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 52,
-    "Name": "typeStatus",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/typeStatus",
-    "Class": "Identification",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 53,
-    "Name": "UncertainDetermination",
-    "DwcIdentifier": "",
-    "Class": "Identification",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 54,
-    "Name": "continent",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/continent",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 55,
-    "Name": "CoordinateM",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 56,
-    "Name": "coordinatePrecision",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/coordinatePrecision",
-    "Class": "Location",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 57,
-    "Name": "CoordinateSystemWkt",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 58,
-    "Name": "coordinateUncertaintyInMeters",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/coordinateUncertaintyInMeters",
-    "Class": "Location",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 59,
-    "Name": "CoordinateX",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 60,
-    "Name": "CoordinateX_ETRS89_LAEA",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 61,
-    "Name": "CoordinateX_RT90",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 62,
-    "Name": "CoordinateX_SWEREF99",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 63,
-    "Name": "CoordinateY",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 64,
-    "Name": "CoordinateY_ETRS89_LAEA",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 65,
-    "Name": "CoordinateY_RT90",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 66,
-    "Name": "CoordinateY_SWEREF99",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 67,
-    "Name": "CoordinateZ",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 68,
-    "Name": "country",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/country",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 69,
-    "Name": "countryCode",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/countryCode",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 70,
-    "Name": "county",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/county",
-    "Class": "Location",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 71,
-    "Name": "decimalLatitude",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/decimalLatitude",
-    "Class": "Location",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 72,
-    "Name": "decimalLongitude",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/decimalLongitude",
-    "Class": "Location",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 73,
-    "Name": "footprintSpatialFit",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/footprintSpatialFit",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 74,
-    "Name": "footprintSRS",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/footprintSRS",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 75,
-    "Name": "footprintWKT",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/footprintWKT",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 76,
-    "Name": "geodeticDatum",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/geodeticDatum",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 77,
-    "Name": "georeferencedBy",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/georeferencedBy",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 78,
-    "Name": "georeferencedDate",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/georeferencedDate",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 79,
-    "Name": "georeferenceProtocol",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/georeferenceProtocol",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 80,
-    "Name": "georeferenceRemarks",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/georeferenceRemarks",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 81,
-    "Name": "georeferenceSources",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/georeferenceSources",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 82,
-    "Name": "georeferenceVerificationStatus",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 83,
-    "Name": "higherGeography",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/higherGeography",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 84,
-    "Name": "higherGeographyID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/higherGeographyID",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 85,
-    "Name": "island",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/island",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 86,
-    "Name": "islandGroup",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/islandGroup",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 87,
-    "Name": "locality",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/locality",
-    "Class": "Location",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 88,
-    "Name": "locationAccordingTo",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/locationAccordingTo",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 89,
-    "Name": "locationID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/locationID",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 90,
-    "Name": "locationRemarks",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/locationRemarks",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 91,
-    "Name": "LocationURL",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 92,
-    "Name": "maximumDepthInMeters",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/maximumDepthInMeters",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 93,
-    "Name": "maximumDistanceAboveSurfaceInMeters",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/maximumDistanceAboveSurfaceInMeters",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 94,
-    "Name": "maximumElevationInMeters",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/maximumElevationInMeters",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 95,
-    "Name": "minimumDepthInMeters",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/minimumDepthInMeters",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 96,
-    "Name": "minimumDistanceAboveSurfaceInMeters",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/minimumDistanceAboveSurfaceInMeters",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 97,
-    "Name": "minimumElevationInMeters",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/minimumElevationInMeters",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 98,
-    "Name": "municipality",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/municipality",
-    "Class": "Location",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 99,
-    "Name": "Parish",
-    "DwcIdentifier": "",
-    "Class": "Location",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 100,
-    "Name": "pointRadiusSpatialFit",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/pointRadiusSpatialFit",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 101,
-    "Name": "stateProvince",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/stateProvince",
-    "Class": "Location",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 102,
-    "Name": "waterBody",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/waterBody",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 103,
-    "Name": "verbatimCoordinates",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimCoordinates",
-    "Class": "Location",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 104,
-    "Name": "verbatimCoordinateSystem",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimCoordinateSystem",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 105,
-    "Name": "verbatimDepth",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimDepth",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 106,
-    "Name": "verbatimElevation",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimElevation",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 107,
-    "Name": "verbatimLatitude",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimLatitude",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 108,
-    "Name": "verbatimLocality",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimLocality",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 109,
-    "Name": "verbatimLongitude",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimLongitude",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 110,
-    "Name": "verbatimSRS",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimSRS",
-    "Class": "Location",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 111,
-    "Name": "ActivityId",
-    "DwcIdentifier": "",
-    "Class": "Occurrence",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 112,
-    "Name": "associatedMedia",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedMedia",
-    "Class": "Occurrence",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 113,
-    "Name": "associatedReferences",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedReferences",
-    "Class": "Occurrence",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 114,
-    "Name": "associatedSequences",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedSequences",
-    "Class": "Occurrence",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 115,
-    "Name": "associatedTaxa",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedTaxa",
-    "Class": "Occurrence",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 116,
-    "Name": "behavior",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/behavior",
-    "Class": "Occurrence",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 117,
-    "Name": "BirdNestActivityId",
-    "DwcIdentifier": "",
-    "Class": "Occurrence",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 118,
-    "Name": "catalogNumber",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/catalogNumber",
-    "Class": "Occurrence",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 119,
-    "Name": "disposition",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/disposition",
-    "Class": "Occurrence",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 120,
-    "Name": "establishmentMeans",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/establishmentMeans",
-    "Class": "Occurrence",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 121,
-    "Name": "individualCount",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/individualCount",
-    "Class": "Occurrence",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 122,
-    "Name": "IsNaturalOccurrence",
-    "DwcIdentifier": "",
-    "Class": "Occurrence",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 123,
-    "Name": "IsNeverFoundObservation",
-    "DwcIdentifier": "",
-    "Class": "Occurrence",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 124,
-    "Name": "IsNotRediscoveredObservation",
-    "DwcIdentifier": "",
-    "Class": "Occurrence",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 125,
-    "Name": "IsPositiveObservation",
-    "DwcIdentifier": "",
-    "Class": "Occurrence",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 126,
-    "Name": "lifeStage",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/lifeStage",
-    "Class": "Occurrence",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 127,
-    "Name": "occurrenceID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/occurrenceID",
-    "Class": "Occurrence",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 128,
-    "Name": "occurrenceRemarks",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/occurrenceRemarks",
-    "Class": "Occurrence",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 129,
-    "Name": "occurrenceStatus",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/occurrenceStatus",
-    "Class": "Occurrence",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 130,
-    "Name": "OccurrenceURL",
-    "DwcIdentifier": "",
-    "Class": "Occurrence",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 131,
-    "Name": "organismQuantity",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/organismQuantity",
-    "Class": "Occurrence",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 132,
-    "Name": "organismQuantityType",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/organismQuantityType",
-    "Class": "Occurrence",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 133,
-    "Name": "otherCatalogNumbers",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/otherCatalogNumbers",
-    "Class": "Occurrence",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 134,
-    "Name": "preparations",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/preparations",
-    "Class": "Occurrence",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 135,
-    "Name": "Quantity",
-    "DwcIdentifier": "",
-    "Class": "Occurrence",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 136,
-    "Name": "QuantityUnit",
-    "DwcIdentifier": "",
-    "Class": "Occurrence",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 137,
-    "Name": "recordedBy",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/recordedBy",
-    "Class": "Occurrence",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 138,
-    "Name": "recordNumber",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/recordNumber",
-    "Class": "Occurrence",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 139,
-    "Name": "reproductiveCondition",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/reproductiveCondition",
-    "Class": "Occurrence",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 140,
-    "Name": "sex",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/sex",
-    "Class": "Occurrence",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 141,
-    "Name": "Substrate",
-    "DwcIdentifier": "",
-    "Class": "Occurrence",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 142,
-    "Name": "ActionPlan",
-    "DwcIdentifier": "",
-    "Class": "Conservation",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 143,
-    "Name": "ConservationRelevant",
-    "DwcIdentifier": "",
-    "Class": "Conservation",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 144,
-    "Name": "Natura2000",
-    "DwcIdentifier": "",
-    "Class": "Conservation",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 145,
-    "Name": "ProtectedByLaw",
-    "DwcIdentifier": "",
-    "Class": "Conservation",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 146,
-    "Name": "ProtectionLevel",
-    "DwcIdentifier": "",
-    "Class": "Conservation",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 147,
-    "Name": "RedlistCategory",
-    "DwcIdentifier": "",
-    "Class": "Conservation",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 148,
-    "Name": "SwedishImmigrationHistory",
-    "DwcIdentifier": "",
-    "Class": "Conservation",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 149,
-    "Name": "SwedishOccurrence",
-    "DwcIdentifier": "",
-    "Class": "Conservation",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 150,
-    "Name": "associatedOccurrences",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedOccurrences",
-    "Class": "Organism",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 151,
-    "Name": "associatedOrganisms",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedOrganisms",
-    "Class": "Organism",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 152,
-    "Name": "organismID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/organismID",
-    "Class": "Organism",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 153,
-    "Name": "organismName",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/organismName",
-    "Class": "Organism",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 154,
-    "Name": "organismRemarks",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/organismRemarks",
-    "Class": "Organism",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 155,
-    "Name": "organismScope",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/organismScope",
-    "Class": "Organism",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 156,
-    "Name": "previousIdentifications",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/previousIdentifications",
-    "Class": "Organism",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 157,
-    "Name": "acceptedNameUsage",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/acceptedNameUsage",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 158,
-    "Name": "acceptedNameUsageID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/acceptedNameUsageID",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 159,
-    "Name": "class",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/class",
-    "Class": "Taxon",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 160,
-    "Name": "DyntaxaTaxonID",
-    "DwcIdentifier": "",
-    "Class": "Taxon",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 161,
-    "Name": "family",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/family",
-    "Class": "Taxon",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 162,
-    "Name": "genus",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/genus",
-    "Class": "Taxon",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 163,
-    "Name": "higherClassification",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/higherClassification",
-    "Class": "Taxon",
-    "Importance": 2,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 164,
-    "Name": "infraspecificEpithet",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/infraspecificEpithet",
-    "Class": "Taxon",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 165,
-    "Name": "kingdom",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/kingdom",
-    "Class": "Taxon",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 166,
-    "Name": "nameAccordingTo",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/nameAccordingTo",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 167,
-    "Name": "nameAccordingToID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/nameAccordingToID",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 168,
-    "Name": "namePublishedIn",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/namePublishedIn",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 169,
-    "Name": "namePublishedInID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/namePublishedInID",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 170,
-    "Name": "namePublishedInYear",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/namePublishedInYear",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 171,
-    "Name": "nomenclaturalCode",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/nomenclaturalCode",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 172,
-    "Name": "nomenclaturalStatus",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/nomenclaturalStatus",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 173,
-    "Name": "order",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/order",
-    "Class": "Taxon",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 174,
-    "Name": "OrganismGroup",
-    "DwcIdentifier": "",
-    "Class": "Taxon",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 175,
-    "Name": "originalNameUsage",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/originalNameUsage",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 176,
-    "Name": "originalNameUsageID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/originalNameUsageID",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 177,
-    "Name": "parentNameUsage",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/parentNameUsage",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 178,
-    "Name": "parentNameUsageID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/parentNameUsageID",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 179,
-    "Name": "phylum",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/phylum",
-    "Class": "Taxon",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 180,
-    "Name": "scientificName",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/scientificName",
-    "Class": "Taxon",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 181,
-    "Name": "scientificNameAuthorship",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/scientificNameAuthorship",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 182,
-    "Name": "scientificNameID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/scientificNameID",
-    "Class": "Taxon",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 183,
-    "Name": "specificEpithet",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/specificEpithet",
-    "Class": "Taxon",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 184,
-    "Name": "subgenus",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/subgenus",
-    "Class": "Taxon",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 185,
-    "Name": "taxonConceptID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/taxonConceptID",
-    "Class": "Taxon",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 186,
-    "Name": "TaxonConceptStatus",
-    "DwcIdentifier": "",
-    "Class": "Taxon",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 187,
-    "Name": "taxonID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/taxonID",
-    "Class": "Taxon",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 188,
-    "Name": "taxonomicStatus",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/taxonomicStatus",
-    "Class": "Taxon",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 189,
-    "Name": "taxonRank",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/taxonRank",
-    "Class": "Taxon",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 190,
-    "Name": "taxonRemarks",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/taxonRemarks",
-    "Class": "Taxon",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 191,
-    "Name": "TaxonSortOrder",
-    "DwcIdentifier": "",
-    "Class": "Taxon",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 192,
-    "Name": "TaxonURL",
-    "DwcIdentifier": "",
-    "Class": "Taxon",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 193,
-    "Name": "VerbatimScientificName",
-    "DwcIdentifier": "",
-    "Class": "Taxon",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 194,
-    "Name": "verbatimTaxonRank",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimTaxonRank",
-    "Class": "Taxon",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 195,
-    "Name": "vernacularName",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/vernacularName",
-    "Class": "Taxon",
-    "Importance": 1,
-    "IncludedByDefaultInDwcExport": true,
-    "IsDwC": true
-  },
-  {
-    "Id": 196,
-    "Name": "relatedResourceID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/relatedResourceID",
-    "Class": "ResourceRelationship",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 197,
-    "Name": "relationshipAccordingTo",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/relationshipAccordingTo",
-    "Class": "ResourceRelationship",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 198,
-    "Name": "relationshipEstablishedDate",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/relationshipEstablishedDate",
-    "Class": "ResourceRelationship",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 199,
-    "Name": "relationshipOfResource",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/relationshipOfResource",
-    "Class": "ResourceRelationship",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 200,
-    "Name": "relationshipRemarks",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/relationshipRemarks",
-    "Class": "ResourceRelationship",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 201,
-    "Name": "resourceID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/resourceID",
-    "Class": "ResourceRelationship",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 202,
-    "Name": "resourceRelationshipID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/resourceRelationshipID",
-    "Class": "ResourceRelationship",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 203,
-    "Name": "measurementAccuracy",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementAccuracy",
-    "Class": "MeasurementOrFact",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 204,
-    "Name": "measurementDeterminedBy",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementDeterminedBy",
-    "Class": "MeasurementOrFact",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 205,
-    "Name": "measurementDeterminedDate",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementDeterminedDate",
-    "Class": "MeasurementOrFact",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 206,
-    "Name": "measurementID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementID",
-    "Class": "MeasurementOrFact",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 207,
-    "Name": "measurementMethod",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementMethod",
-    "Class": "MeasurementOrFact",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 208,
-    "Name": "measurementRemarks",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementRemarks",
-    "Class": "MeasurementOrFact",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 209,
-    "Name": "measurementType",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementType",
-    "Class": "MeasurementOrFact",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 210,
-    "Name": "measurementUnit",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementUnit",
-    "Class": "MeasurementOrFact",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 211,
-    "Name": "measurementValue",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementValue",
-    "Class": "MeasurementOrFact",
-    "Importance": 5,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 212,
-    "Name": "bed",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/bed",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 213,
-    "Name": "earliestAgeOrLowestStage",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/earliestAgeOrLowestStage",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 214,
-    "Name": "earliestEonOrLowestEonothem",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/earliestEonOrLowestEonothem",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 215,
-    "Name": "earliestEpochOrLowestSeries",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/earliestEpochOrLowestSeries",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 216,
-    "Name": "earliestEraOrLowestErathem",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/earliestEraOrLowestErathem",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 217,
-    "Name": "earliestPeriodOrLowestSystem",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/earliestPeriodOrLowestSystem",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 218,
-    "Name": "formation",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/formation",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 219,
-    "Name": "geologicalContextID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/geologicalContextID",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 220,
-    "Name": "group",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/group",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 221,
-    "Name": "highestBiostratigraphicZone",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/highestBiostratigraphicZone",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 222,
-    "Name": "latestAgeOrHighestStage",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/latestAgeOrHighestStage",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 223,
-    "Name": "latestEonOrHighestEonothem",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/latestEonOrHighestEonothem",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 224,
-    "Name": "latestEpochOrHighestSeries",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/latestEpochOrHighestSeries",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 225,
-    "Name": "latestEraOrHighestErathem",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/latestEraOrHighestErathem",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 226,
-    "Name": "latestPeriodOrHighestSystem",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/latestPeriodOrHighestSystem",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 227,
-    "Name": "lithostratigraphicTerms",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/lithostratigraphicTerms",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 228,
-    "Name": "lowestBiostratigraphicZone",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/lowestBiostratigraphicZone",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 229,
-    "Name": "member",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/member",
-    "Class": "GeologicalContext",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 230,
-    "Name": "materialSampleID",
-    "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/materialSampleID",
-    "Class": "MaterialSample",
-    "Importance": 6,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": true
-  },
-  {
-    "Id": 231,
-    "Name": "IsPublic",
-    "DwcIdentifier": "",
-    "Class": "Project",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 232,
-    "Name": "ProjectCategory",
-    "DwcIdentifier": "",
-    "Class": "Project",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 233,
-    "Name": "ProjectDescription",
-    "DwcIdentifier": "",
-    "Class": "Project",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 234,
-    "Name": "ProjectEndDate",
-    "DwcIdentifier": "",
-    "Class": "Project",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 235,
-    "Name": "ProjectID",
-    "DwcIdentifier": "",
-    "Class": "Project",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 236,
-    "Name": "ProjectName",
-    "DwcIdentifier": "",
-    "Class": "Project",
-    "Importance": 3,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 237,
-    "Name": "ProjectOwner",
-    "DwcIdentifier": "",
-    "Class": "Project",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 238,
-    "Name": "ProjectStartDate",
-    "DwcIdentifier": "",
-    "Class": "Project",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 239,
-    "Name": "ProjectURL",
-    "DwcIdentifier": "",
-    "Class": "Project",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  },
-  {
-    "Id": 240,
-    "Name": "SurveyMethod",
-    "DwcIdentifier": "",
-    "Class": "Project",
-    "Importance": 4,
-    "IncludedByDefaultInDwcExport": false,
-    "IsDwC": false
-  }
+    {
+        "Id": 1,
+        "Name": "accessRights",
+        "DwcIdentifier": "http://purl.org/dc/terms/accessRights",
+        "Class": "DarwinCore",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 2,
+        "Name": "basisOfRecord",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/basisOfRecord",
+        "Class": "DarwinCore",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 3,
+        "Name": "bibliographicCitation",
+        "DwcIdentifier": "http://purl.org/dc/terms/bibliographicCitation",
+        "Class": "DarwinCore",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 4,
+        "Name": "collectionCode",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/collectionCode",
+        "Class": "DarwinCore",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 5,
+        "Name": "collectionID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/collectionID",
+        "Class": "DarwinCore",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 6,
+        "Name": "dataGeneralizations",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/dataGeneralizations",
+        "Class": "DarwinCore",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 7,
+        "Name": "datasetID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/datasetID",
+        "Class": "DarwinCore",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 8,
+        "Name": "datasetName",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/datasetName",
+        "Class": "DarwinCore",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 9,
+        "Name": "dynamicProperties",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/dynamicProperties",
+        "Class": "DarwinCore",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 10,
+        "Name": "Id",
+        "DwcIdentifier": "",
+        "Class": "DarwinCore",
+        "Importance": 0,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 11,
+        "Name": "informationWithheld",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/informationWithheld",
+        "Class": "DarwinCore",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 12,
+        "Name": "institutionCode",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/institutionCode",
+        "Class": "DarwinCore",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 13,
+        "Name": "institutionID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/institutionID",
+        "Class": "DarwinCore",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 14,
+        "Name": "language",
+        "DwcIdentifier": "http://purl.org/dc/terms/language",
+        "Class": "DarwinCore",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 15,
+        "Name": "license",
+        "DwcIdentifier": "http://purl.org/dc/terms/license",
+        "Class": "DarwinCore",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 16,
+        "Name": "modified",
+        "DwcIdentifier": "http://purl.org/dc/terms/modified",
+        "Class": "DarwinCore",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 17,
+        "Name": "Owner",
+        "DwcIdentifier": "",
+        "Class": "DarwinCore",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 18,
+        "Name": "ownerInstitutionCode",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/ownerInstitutionCode",
+        "Class": "DarwinCore",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 19,
+        "Name": "references",
+        "DwcIdentifier": "http://purl.org/dc/terms/references",
+        "Class": "DarwinCore",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 20,
+        "Name": "ReportedBy",
+        "DwcIdentifier": "",
+        "Class": "DarwinCore",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 21,
+        "Name": "ReportedDate",
+        "DwcIdentifier": "",
+        "Class": "DarwinCore",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 22,
+        "Name": "rights",
+        "DwcIdentifier": "",
+        "Class": "DarwinCore",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 23,
+        "Name": "rightsHolder",
+        "DwcIdentifier": "http://purl.org/dc/terms/rightsHolder",
+        "Class": "DarwinCore",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 24,
+        "Name": "type",
+        "DwcIdentifier": "http://purl.org/dc/terms/type",
+        "Class": "DarwinCore",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 25,
+        "Name": "day",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/day",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 26,
+        "Name": "End",
+        "DwcIdentifier": "",
+        "Class": "Event",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 27,
+        "Name": "endDayOfYear",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/endDayOfYear",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 28,
+        "Name": "eventDate",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/eventDate",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 29,
+        "Name": "eventID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/eventID",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 30,
+        "Name": "eventRemarks",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/eventRemarks",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 31,
+        "Name": "eventTime",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/eventTime",
+        "Class": "Event",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 32,
+        "Name": "fieldNotes",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/fieldNotes",
+        "Class": "Event",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 33,
+        "Name": "fieldNumber",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/fieldNumber",
+        "Class": "Event",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 34,
+        "Name": "habitat",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/habitat",
+        "Class": "Event",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 35,
+        "Name": "month",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/month",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 36,
+        "Name": "parentEventID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/parentEventID",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 37,
+        "Name": "sampleSizeValue",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/sampleSizeValue",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 38,
+        "Name": "sampleSizeUnit",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/sampleSizeUnit",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 39,
+        "Name": "samplingEffort",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/samplingEffort",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 40,
+        "Name": "samplingProtocol",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/samplingProtocol",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 41,
+        "Name": "Start",
+        "DwcIdentifier": "",
+        "Class": "Event",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 42,
+        "Name": "startDayOfYear",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/startDayOfYear",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 43,
+        "Name": "verbatimEventDate",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimEventDate",
+        "Class": "Event",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 44,
+        "Name": "year",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/year",
+        "Class": "Event",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 45,
+        "Name": "dateIdentified",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/dateIdentified",
+        "Class": "Identification",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 46,
+        "Name": "identificationID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/identificationID",
+        "Class": "Identification",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 47,
+        "Name": "identificationQualifier",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/identificationQualifier",
+        "Class": "Identification",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 48,
+        "Name": "identificationReferences",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/identificationReferences",
+        "Class": "Identification",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 49,
+        "Name": "identificationRemarks",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/identificationRemarks",
+        "Class": "Identification",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 50,
+        "Name": "identificationVerificationStatus",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/identificationVerificationStatus",
+        "Class": "Identification",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 51,
+        "Name": "identifiedBy",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/identifiedBy",
+        "Class": "Identification",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 52,
+        "Name": "typeStatus",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/typeStatus",
+        "Class": "Identification",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 53,
+        "Name": "UncertainDetermination",
+        "DwcIdentifier": "",
+        "Class": "Identification",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 54,
+        "Name": "continent",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/continent",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 55,
+        "Name": "CoordinateM",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 56,
+        "Name": "coordinatePrecision",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/coordinatePrecision",
+        "Class": "Location",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 57,
+        "Name": "CoordinateSystemWkt",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 58,
+        "Name": "coordinateUncertaintyInMeters",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/coordinateUncertaintyInMeters",
+        "Class": "Location",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 59,
+        "Name": "CoordinateX",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 60,
+        "Name": "CoordinateX_ETRS89_LAEA",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 61,
+        "Name": "CoordinateX_RT90",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 62,
+        "Name": "CoordinateX_SWEREF99",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 63,
+        "Name": "CoordinateY",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 64,
+        "Name": "CoordinateY_ETRS89_LAEA",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 65,
+        "Name": "CoordinateY_RT90",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 66,
+        "Name": "CoordinateY_SWEREF99",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 67,
+        "Name": "CoordinateZ",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 68,
+        "Name": "country",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/country",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 69,
+        "Name": "countryCode",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/countryCode",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 70,
+        "Name": "county",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/county",
+        "Class": "Location",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 71,
+        "Name": "decimalLatitude",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/decimalLatitude",
+        "Class": "Location",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 72,
+        "Name": "decimalLongitude",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/decimalLongitude",
+        "Class": "Location",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 73,
+        "Name": "footprintSpatialFit",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/footprintSpatialFit",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 74,
+        "Name": "footprintSRS",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/footprintSRS",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 75,
+        "Name": "footprintWKT",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/footprintWKT",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 76,
+        "Name": "geodeticDatum",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/geodeticDatum",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 77,
+        "Name": "georeferencedBy",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/georeferencedBy",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 78,
+        "Name": "georeferencedDate",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/georeferencedDate",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 79,
+        "Name": "georeferenceProtocol",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/georeferenceProtocol",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 80,
+        "Name": "georeferenceRemarks",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/georeferenceRemarks",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 81,
+        "Name": "georeferenceSources",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/georeferenceSources",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 82,
+        "Name": "georeferenceVerificationStatus",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/georeferenceVerificationStatus",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 83,
+        "Name": "higherGeography",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/higherGeography",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 84,
+        "Name": "higherGeographyID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/higherGeographyID",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 85,
+        "Name": "island",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/island",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 86,
+        "Name": "islandGroup",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/islandGroup",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 87,
+        "Name": "locality",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/locality",
+        "Class": "Location",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 88,
+        "Name": "locationAccordingTo",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/locationAccordingTo",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 89,
+        "Name": "locationID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/locationID",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 90,
+        "Name": "locationRemarks",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/locationRemarks",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 91,
+        "Name": "LocationURL",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 92,
+        "Name": "maximumDepthInMeters",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/maximumDepthInMeters",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 93,
+        "Name": "maximumDistanceAboveSurfaceInMeters",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/maximumDistanceAboveSurfaceInMeters",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 94,
+        "Name": "maximumElevationInMeters",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/maximumElevationInMeters",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 95,
+        "Name": "minimumDepthInMeters",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/minimumDepthInMeters",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 96,
+        "Name": "minimumDistanceAboveSurfaceInMeters",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/minimumDistanceAboveSurfaceInMeters",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 97,
+        "Name": "minimumElevationInMeters",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/minimumElevationInMeters",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 98,
+        "Name": "municipality",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/municipality",
+        "Class": "Location",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 99,
+        "Name": "Parish",
+        "DwcIdentifier": "",
+        "Class": "Location",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 100,
+        "Name": "pointRadiusSpatialFit",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/pointRadiusSpatialFit",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 101,
+        "Name": "stateProvince",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/stateProvince",
+        "Class": "Location",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 102,
+        "Name": "waterBody",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/waterBody",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 103,
+        "Name": "verbatimCoordinates",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimCoordinates",
+        "Class": "Location",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 104,
+        "Name": "verbatimCoordinateSystem",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimCoordinateSystem",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 105,
+        "Name": "verbatimDepth",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimDepth",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 106,
+        "Name": "verbatimElevation",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimElevation",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 107,
+        "Name": "verbatimLatitude",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimLatitude",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 108,
+        "Name": "verbatimLocality",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimLocality",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 109,
+        "Name": "verbatimLongitude",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimLongitude",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 110,
+        "Name": "verbatimSRS",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimSRS",
+        "Class": "Location",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 111,
+        "Name": "ActivityId",
+        "DwcIdentifier": "",
+        "Class": "Occurrence",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 112,
+        "Name": "associatedMedia",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedMedia",
+        "Class": "Occurrence",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 113,
+        "Name": "associatedReferences",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedReferences",
+        "Class": "Occurrence",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 114,
+        "Name": "associatedSequences",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedSequences",
+        "Class": "Occurrence",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 115,
+        "Name": "associatedTaxa",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedTaxa",
+        "Class": "Occurrence",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 116,
+        "Name": "behavior",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/behavior",
+        "Class": "Occurrence",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 117,
+        "Name": "BirdNestActivityId",
+        "DwcIdentifier": "",
+        "Class": "Occurrence",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 118,
+        "Name": "catalogNumber",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/catalogNumber",
+        "Class": "Occurrence",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 119,
+        "Name": "disposition",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/disposition",
+        "Class": "Occurrence",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 120,
+        "Name": "establishmentMeans",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/establishmentMeans",
+        "Class": "Occurrence",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 121,
+        "Name": "individualCount",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/individualCount",
+        "Class": "Occurrence",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 122,
+        "Name": "IsNaturalOccurrence",
+        "DwcIdentifier": "",
+        "Class": "Occurrence",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 123,
+        "Name": "IsNeverFoundObservation",
+        "DwcIdentifier": "",
+        "Class": "Occurrence",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 124,
+        "Name": "IsNotRediscoveredObservation",
+        "DwcIdentifier": "",
+        "Class": "Occurrence",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 125,
+        "Name": "IsPositiveObservation",
+        "DwcIdentifier": "",
+        "Class": "Occurrence",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 126,
+        "Name": "lifeStage",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/lifeStage",
+        "Class": "Occurrence",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 127,
+        "Name": "occurrenceID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/occurrenceID",
+        "Class": "Occurrence",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 128,
+        "Name": "occurrenceRemarks",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/occurrenceRemarks",
+        "Class": "Occurrence",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 129,
+        "Name": "occurrenceStatus",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/occurrenceStatus",
+        "Class": "Occurrence",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 130,
+        "Name": "OccurrenceURL",
+        "DwcIdentifier": "",
+        "Class": "Occurrence",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 131,
+        "Name": "organismQuantity",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/organismQuantity",
+        "Class": "Occurrence",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 132,
+        "Name": "organismQuantityType",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/organismQuantityType",
+        "Class": "Occurrence",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 133,
+        "Name": "otherCatalogNumbers",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/otherCatalogNumbers",
+        "Class": "Occurrence",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 134,
+        "Name": "preparations",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/preparations",
+        "Class": "Occurrence",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 135,
+        "Name": "Quantity",
+        "DwcIdentifier": "",
+        "Class": "Occurrence",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 136,
+        "Name": "QuantityUnit",
+        "DwcIdentifier": "",
+        "Class": "Occurrence",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 137,
+        "Name": "recordedBy",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/recordedBy",
+        "Class": "Occurrence",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 138,
+        "Name": "recordNumber",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/recordNumber",
+        "Class": "Occurrence",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 139,
+        "Name": "reproductiveCondition",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/reproductiveCondition",
+        "Class": "Occurrence",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 140,
+        "Name": "sex",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/sex",
+        "Class": "Occurrence",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 141,
+        "Name": "Substrate",
+        "DwcIdentifier": "",
+        "Class": "Occurrence",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 142,
+        "Name": "ActionPlan",
+        "DwcIdentifier": "",
+        "Class": "Conservation",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 143,
+        "Name": "ConservationRelevant",
+        "DwcIdentifier": "",
+        "Class": "Conservation",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 144,
+        "Name": "Natura2000",
+        "DwcIdentifier": "",
+        "Class": "Conservation",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 145,
+        "Name": "ProtectedByLaw",
+        "DwcIdentifier": "",
+        "Class": "Conservation",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 146,
+        "Name": "ProtectionLevel",
+        "DwcIdentifier": "",
+        "Class": "Conservation",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 147,
+        "Name": "RedlistCategory",
+        "DwcIdentifier": "",
+        "Class": "Conservation",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 148,
+        "Name": "SwedishImmigrationHistory",
+        "DwcIdentifier": "",
+        "Class": "Conservation",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 149,
+        "Name": "SwedishOccurrence",
+        "DwcIdentifier": "",
+        "Class": "Conservation",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 150,
+        "Name": "associatedOccurrences",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedOccurrences",
+        "Class": "Organism",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 151,
+        "Name": "associatedOrganisms",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/associatedOrganisms",
+        "Class": "Organism",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 152,
+        "Name": "organismID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/organismID",
+        "Class": "Organism",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 153,
+        "Name": "organismName",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/organismName",
+        "Class": "Organism",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 154,
+        "Name": "organismRemarks",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/organismRemarks",
+        "Class": "Organism",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 155,
+        "Name": "organismScope",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/organismScope",
+        "Class": "Organism",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 156,
+        "Name": "previousIdentifications",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/previousIdentifications",
+        "Class": "Organism",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 157,
+        "Name": "acceptedNameUsage",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/acceptedNameUsage",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 158,
+        "Name": "acceptedNameUsageID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/acceptedNameUsageID",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 159,
+        "Name": "class",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/class",
+        "Class": "Taxon",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 160,
+        "Name": "DyntaxaTaxonID",
+        "DwcIdentifier": "",
+        "Class": "Taxon",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 161,
+        "Name": "family",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/family",
+        "Class": "Taxon",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 162,
+        "Name": "genus",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/genus",
+        "Class": "Taxon",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 163,
+        "Name": "higherClassification",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/higherClassification",
+        "Class": "Taxon",
+        "Importance": 2,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 164,
+        "Name": "infraspecificEpithet",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/infraspecificEpithet",
+        "Class": "Taxon",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 165,
+        "Name": "kingdom",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/kingdom",
+        "Class": "Taxon",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 166,
+        "Name": "nameAccordingTo",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/nameAccordingTo",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 167,
+        "Name": "nameAccordingToID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/nameAccordingToID",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 168,
+        "Name": "namePublishedIn",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/namePublishedIn",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 169,
+        "Name": "namePublishedInID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/namePublishedInID",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 170,
+        "Name": "namePublishedInYear",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/namePublishedInYear",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 171,
+        "Name": "nomenclaturalCode",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/nomenclaturalCode",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 172,
+        "Name": "nomenclaturalStatus",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/nomenclaturalStatus",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 173,
+        "Name": "order",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/order",
+        "Class": "Taxon",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 174,
+        "Name": "OrganismGroup",
+        "DwcIdentifier": "",
+        "Class": "Taxon",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 175,
+        "Name": "originalNameUsage",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/originalNameUsage",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 176,
+        "Name": "originalNameUsageID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/originalNameUsageID",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 177,
+        "Name": "parentNameUsage",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/parentNameUsage",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 178,
+        "Name": "parentNameUsageID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/parentNameUsageID",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 179,
+        "Name": "phylum",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/phylum",
+        "Class": "Taxon",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 180,
+        "Name": "scientificName",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/scientificName",
+        "Class": "Taxon",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 181,
+        "Name": "scientificNameAuthorship",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/scientificNameAuthorship",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 182,
+        "Name": "scientificNameID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/scientificNameID",
+        "Class": "Taxon",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 183,
+        "Name": "specificEpithet",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/specificEpithet",
+        "Class": "Taxon",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 184,
+        "Name": "subgenus",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/subgenus",
+        "Class": "Taxon",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 185,
+        "Name": "taxonConceptID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/taxonConceptID",
+        "Class": "Taxon",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 186,
+        "Name": "TaxonConceptStatus",
+        "DwcIdentifier": "",
+        "Class": "Taxon",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 187,
+        "Name": "taxonID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/taxonID",
+        "Class": "Taxon",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 188,
+        "Name": "taxonomicStatus",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/taxonomicStatus",
+        "Class": "Taxon",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 189,
+        "Name": "taxonRank",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/taxonRank",
+        "Class": "Taxon",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 190,
+        "Name": "taxonRemarks",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/taxonRemarks",
+        "Class": "Taxon",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 191,
+        "Name": "TaxonSortOrder",
+        "DwcIdentifier": "",
+        "Class": "Taxon",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 192,
+        "Name": "TaxonURL",
+        "DwcIdentifier": "",
+        "Class": "Taxon",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 193,
+        "Name": "VerbatimScientificName",
+        "DwcIdentifier": "",
+        "Class": "Taxon",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 194,
+        "Name": "verbatimTaxonRank",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/verbatimTaxonRank",
+        "Class": "Taxon",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 195,
+        "Name": "vernacularName",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/vernacularName",
+        "Class": "Taxon",
+        "Importance": 1,
+        "IncludedByDefaultInDwcExport": true,
+        "IsDwC": true
+    },
+    {
+        "Id": 196,
+        "Name": "relatedResourceID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/relatedResourceID",
+        "Class": "ResourceRelationship",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 197,
+        "Name": "relationshipAccordingTo",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/relationshipAccordingTo",
+        "Class": "ResourceRelationship",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 198,
+        "Name": "relationshipEstablishedDate",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/relationshipEstablishedDate",
+        "Class": "ResourceRelationship",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 199,
+        "Name": "relationshipOfResource",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/relationshipOfResource",
+        "Class": "ResourceRelationship",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 200,
+        "Name": "relationshipRemarks",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/relationshipRemarks",
+        "Class": "ResourceRelationship",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 201,
+        "Name": "resourceID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/resourceID",
+        "Class": "ResourceRelationship",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 202,
+        "Name": "resourceRelationshipID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/resourceRelationshipID",
+        "Class": "ResourceRelationship",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 203,
+        "Name": "measurementAccuracy",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementAccuracy",
+        "Class": "MeasurementOrFact",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 204,
+        "Name": "measurementDeterminedBy",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementDeterminedBy",
+        "Class": "MeasurementOrFact",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 205,
+        "Name": "measurementDeterminedDate",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementDeterminedDate",
+        "Class": "MeasurementOrFact",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 206,
+        "Name": "measurementID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementID",
+        "Class": "MeasurementOrFact",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 207,
+        "Name": "measurementMethod",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementMethod",
+        "Class": "MeasurementOrFact",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 208,
+        "Name": "measurementRemarks",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementRemarks",
+        "Class": "MeasurementOrFact",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 209,
+        "Name": "measurementType",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementType",
+        "Class": "MeasurementOrFact",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 210,
+        "Name": "measurementUnit",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementUnit",
+        "Class": "MeasurementOrFact",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 211,
+        "Name": "measurementValue",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/measurementValue",
+        "Class": "MeasurementOrFact",
+        "Importance": 5,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 212,
+        "Name": "bed",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/bed",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 213,
+        "Name": "earliestAgeOrLowestStage",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/earliestAgeOrLowestStage",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 214,
+        "Name": "earliestEonOrLowestEonothem",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/earliestEonOrLowestEonothem",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 215,
+        "Name": "earliestEpochOrLowestSeries",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/earliestEpochOrLowestSeries",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 216,
+        "Name": "earliestEraOrLowestErathem",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/earliestEraOrLowestErathem",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 217,
+        "Name": "earliestPeriodOrLowestSystem",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/earliestPeriodOrLowestSystem",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 218,
+        "Name": "formation",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/formation",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 219,
+        "Name": "geologicalContextID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/geologicalContextID",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 220,
+        "Name": "group",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/group",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 221,
+        "Name": "highestBiostratigraphicZone",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/highestBiostratigraphicZone",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 222,
+        "Name": "latestAgeOrHighestStage",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/latestAgeOrHighestStage",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 223,
+        "Name": "latestEonOrHighestEonothem",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/latestEonOrHighestEonothem",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 224,
+        "Name": "latestEpochOrHighestSeries",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/latestEpochOrHighestSeries",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 225,
+        "Name": "latestEraOrHighestErathem",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/latestEraOrHighestErathem",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 226,
+        "Name": "latestPeriodOrHighestSystem",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/latestPeriodOrHighestSystem",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 227,
+        "Name": "lithostratigraphicTerms",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/lithostratigraphicTerms",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 228,
+        "Name": "lowestBiostratigraphicZone",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/lowestBiostratigraphicZone",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 229,
+        "Name": "member",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/member",
+        "Class": "GeologicalContext",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 230,
+        "Name": "materialSampleID",
+        "DwcIdentifier": "http://rs.tdwg.org/dwc/terms/materialSampleID",
+        "Class": "MaterialSample",
+        "Importance": 6,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": true
+    },
+    {
+        "Id": 231,
+        "Name": "IsPublic",
+        "DwcIdentifier": "",
+        "Class": "Project",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 232,
+        "Name": "ProjectCategory",
+        "DwcIdentifier": "",
+        "Class": "Project",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 233,
+        "Name": "ProjectDescription",
+        "DwcIdentifier": "",
+        "Class": "Project",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 234,
+        "Name": "ProjectEndDate",
+        "DwcIdentifier": "",
+        "Class": "Project",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 235,
+        "Name": "ProjectID",
+        "DwcIdentifier": "",
+        "Class": "Project",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 236,
+        "Name": "ProjectName",
+        "DwcIdentifier": "",
+        "Class": "Project",
+        "Importance": 3,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 237,
+        "Name": "ProjectOwner",
+        "DwcIdentifier": "",
+        "Class": "Project",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 238,
+        "Name": "ProjectStartDate",
+        "DwcIdentifier": "",
+        "Class": "Project",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 239,
+        "Name": "ProjectURL",
+        "DwcIdentifier": "",
+        "Class": "Project",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    },
+    {
+        "Id": 240,
+        "Name": "SurveyMethod",
+        "DwcIdentifier": "",
+        "Class": "Project",
+        "Importance": 4,
+        "IncludedByDefaultInDwcExport": false,
+        "IsDwC": false
+    }
 ]

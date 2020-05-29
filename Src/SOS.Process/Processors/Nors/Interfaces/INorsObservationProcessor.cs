@@ -3,10 +3,9 @@
 namespace SOS.Process.Processors.Nors.Interfaces
 {
     /// <summary>
-    /// NORS observation processor
+    ///     NORS observation processor
     /// </summary>
     public interface INorsObservationProcessor : IProcessor
     {
-        
     }
 }

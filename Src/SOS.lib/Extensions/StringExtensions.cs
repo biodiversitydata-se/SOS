@@ -20,7 +20,7 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Truncates a string to a specific length.
+        ///     Truncates a string to a specific length.
         /// </summary>
         /// <param name="value">The string.</param>
         /// <param name="maxLength">The max length.</param>
@@ -51,29 +51,29 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Parse a Double value.
+        ///     Parse a Double value.
         /// </summary>
         /// <param name='value'>Double value to convert to a string.</param>
         /// <param name="trim">If true the value string will be trimmed.</param>
         /// <returns>The Double value.</returns>
         public static double? ParseDouble(this string value, bool trim = true)
         {
-            return TryParseDouble(value, out double result, trim) ? (double?) result : null;
+            return TryParseDouble(value, out var result, trim) ? (double?) result : null;
         }
 
         /// <summary>
-        /// Validates a Double value.
+        ///     Validates a Double value.
         /// </summary>
         /// <param name='value'>String Double value to validate</param>
         /// <param name="trim">If true the value string will be trimmed.</param>
         /// <returns>True if the value is a Double</returns>
         public static bool IsDouble(this string value, bool trim = true)
         {
-            return TryParseDouble(value, out double _, trim);
+            return TryParseDouble(value, out var _, trim);
         }
 
         /// <summary>
-        /// Try parse a Double value.
+        ///     Try parse a Double value.
         /// </summary>
         /// <param name='value'>Double string value to parse</param>
         /// <param name="result">The parsed value.</param>
@@ -87,41 +87,42 @@ namespace SOS.Lib.Extensions
                 return false;
             }
 
-            const NumberStyles styles = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign;
+            const NumberStyles styles = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent |
+                                        NumberStyles.AllowLeadingSign;
             if (trim)
             {
-                return double.TryParse(value.Trim().Replace(",", "."), styles, CultureInfo.CreateSpecificCulture("en-GB"), out result);
+                return double.TryParse(value.Trim().Replace(",", "."), styles,
+                    CultureInfo.CreateSpecificCulture("en-GB"), out result);
             }
-            else
-            {
-                return double.TryParse(value.Replace(",", "."), styles, CultureInfo.CreateSpecificCulture("en-GB"), out result);
-            }
+
+            return double.TryParse(value.Replace(",", "."), styles, CultureInfo.CreateSpecificCulture("en-GB"),
+                out result);
         }
 
         /// <summary>
-        /// Parse a Boolean value.
+        ///     Parse a Boolean value.
         /// </summary>
         /// <param name='value'>String Boolean value to parse.</param>
         /// <param name="trim">If true the value string will be trimmed.</param>
         /// <returns>The Boolean value.</returns>
         public static bool? ParseBoolean(this string value, bool trim = true)
         {
-            return TryParseBoolean(value, out bool result, trim) ? (bool?)result : null;
+            return TryParseBoolean(value, out var result, trim) ? (bool?) result : null;
         }
 
         /// <summary>
-        /// Validates a Boolean value.
+        ///     Validates a Boolean value.
         /// </summary>
         /// <param name='value'>Boolean string value to validate</param>
         /// <param name="trim">If true the value string will be trimmed.</param>
         /// <returns>True if the value is a Boolean</returns>
         public static bool IsBoolean(this string value, bool trim = true)
         {
-            return TryParseBoolean(value, out bool _, trim);
+            return TryParseBoolean(value, out var _, trim);
         }
 
         /// <summary>
-        /// Parse a Boolean value.
+        ///     Parse a Boolean value.
         /// </summary>
         /// <param name='value'>String Boolean value to parse.</param>
         /// <param name="result">The parsed value.</param>
@@ -144,29 +145,29 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Parse a DateTime value.
+        ///     Parse a DateTime value.
         /// </summary>
         /// <param name='value'>String DateTime value to parse.</param>
         /// <param name="trim">If true the value string will be trimmed.</param>
         /// <returns>The DateTime value.</returns>
         public static DateTime? ParseDateTime(this string value, bool trim = true)
         {
-            return TryParseDateTime(value, out DateTime result, trim) ? (DateTime?)result : null;
+            return TryParseDateTime(value, out var result, trim) ? (DateTime?) result : null;
         }
 
         /// <summary>
-        /// Validates a DateTime value.
+        ///     Validates a DateTime value.
         /// </summary>
         /// <param name='value'>DateTime string value to validate</param>
         /// <param name="trim">If true the value string will be trimmed.</param>
         /// <returns>True if the value is a DateTime</returns>
         public static bool IsDateTime(this string value, bool trim = true)
         {
-            return TryParseDateTime(value, out DateTime _, trim);
+            return TryParseDateTime(value, out var _, trim);
         }
 
         /// <summary>
-        /// Parse a DateTime value.
+        ///     Parse a DateTime value.
         /// </summary>
         /// <param name='value'>String DateTime value to parse.</param>
         /// <param name="result">The parsed value.</param>
@@ -189,29 +190,29 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Parse a Int32 value.
+        ///     Parse a Int32 value.
         /// </summary>
         /// <param name='value'>String Int32 value to parse.</param>
         /// <param name="trim">If true the value string will be trimmed.</param>
         /// <returns>The Int32 value.</returns>
         public static int? ParseInt(this string value, bool trim = true)
         {
-            return TryParseInt(value, out int result, trim) ? (int?)result : null;
+            return TryParseInt(value, out var result, trim) ? (int?) result : null;
         }
 
         /// <summary>
-        /// Validates a Int32 value.
+        ///     Validates a Int32 value.
         /// </summary>
         /// <param name='value'>Int32 string value to validate</param>
         /// <param name="trim">If true the value string will be trimmed.</param>
         /// <returns>True if the value is a Int32</returns>
         public static bool IsInt(this string value, bool trim = true)
         {
-            return TryParseInt(value, out int _, trim);
+            return TryParseInt(value, out var _, trim);
         }
 
         /// <summary>
-        /// Parse a Int32 value.
+        ///     Parse a Int32 value.
         /// </summary>
         /// <param name='value'>String Int32 value to parse.</param>
         /// <param name="result">The parsed value.</param>
@@ -234,29 +235,29 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Parse a Int64 value.
+        ///     Parse a Int64 value.
         /// </summary>
         /// <param name='value'>String Int64 value to parse.</param>
         /// <param name="trim">If true the value string will be trimmed.</param>
         /// <returns>The Int64 value.</returns>
         public static long? ParseLong(this string value, bool trim = true)
         {
-            return TryParseLong(value, out long result, trim) ? (long?)result : null;
+            return TryParseLong(value, out var result, trim) ? (long?) result : null;
         }
 
         /// <summary>
-        /// Validates a Int64 value.
+        ///     Validates a Int64 value.
         /// </summary>
         /// <param name='value'>Int64 string value to validate</param>
         /// <param name="trim">If true the value string will be trimmed.</param>
         /// <returns>True if the value is a Int64</returns>
         public static bool IsLong(this string value, bool trim = true)
         {
-            return TryParseLong(value, out long _, trim);
+            return TryParseLong(value, out var _, trim);
         }
 
         /// <summary>
-        /// Parse a Int64 value.
+        ///     Parse a Int64 value.
         /// </summary>
         /// <param name='value'>String Int64 value to parse.</param>
         /// <param name="result">The parsed value.</param>
@@ -279,7 +280,7 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Returns a boolean indicating whether the string has a value, returns false if it's null or empty
+        ///     Returns a boolean indicating whether the string has a value, returns false if it's null or empty
         /// </summary>
         /// <param name="value">The string to check</param>
         /// <returns>A boolean indicating whether the string has a value</returns>

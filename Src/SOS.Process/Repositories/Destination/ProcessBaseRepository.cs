@@ -14,34 +14,36 @@ using SOS.Process.Repositories.Destination.Interfaces;
 namespace SOS.Process.Repositories.Destination
 {
     /// <summary>
-    /// Base class for cosmos db repositories
+    ///     Base class for cosmos db repositories
     /// </summary>
-    public class ProcessBaseRepository<TEntity, TKey> : IProcessBaseRepository<TEntity, TKey> where TEntity : IEntity<TKey>
+    public class ProcessBaseRepository<TEntity, TKey> : IProcessBaseRepository<TEntity, TKey>
+        where TEntity : IEntity<TKey>
     {
+        private readonly IProcessClient _client;
+
+
+        private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
+        private readonly bool _toggleable;
+
         /// <summary>
-        /// Logger 
+        ///     Logger
         /// </summary>
         protected readonly ILogger<ProcessBaseRepository<TEntity, TKey>> Logger;
 
-        private readonly IProcessClient _client;
-        private readonly bool _toggleable;
         protected string _collectionName;
 
         /// <summary>
-        /// Mongo db
+        ///     Disposed
+        /// </summary>
+        private bool _disposed;
+
+        /// <summary>
+        ///     Mongo db
         /// </summary>
         protected IMongoDatabase Database;
 
         /// <summary>
-        /// Disposed
-        /// </summary>
-        private bool _disposed;
-
-
-        private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
-
-        /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="toggleable"></param>
@@ -65,32 +67,18 @@ namespace SOS.Process.Repositories.Destination
             InitializeConfiguration();
         }
 
+        /// <summary>
+        ///     Get collection
+        /// </summary>
+        /// <returns></returns>
+        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName);
 
         /// <summary>
-        /// Make sure configuration collection exists
+        ///     Configuration collection
         /// </summary>
-        private void InitializeConfiguration()
-        {
-            //filter by collection name
-            var exists = Database
-                .ListCollectionNames(new ListCollectionNamesOptions
-                {
-                    Filter = new BsonDocument("name", _collectionNameConfiguration)
-                })
-                .Any();
-
-            //check for existence
-            if (!exists)
-            {
-                // Create the collection
-                Database.CreateCollection(_collectionNameConfiguration);
-
-                MongoCollectionConfiguration.InsertOne(new ProcessedConfiguration
-                {
-                    ActiveInstance = 1
-                });
-            }
-        }
+        private IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration => Database
+            .GetCollection<ProcessedConfiguration>(_collectionNameConfiguration)
+            .WithWriteConcern(new WriteConcern(1, journal: true));
 
         /// <inheritdoc />
         public async Task<bool> UpdateAsync(TKey id, TEntity entity)
@@ -106,7 +94,7 @@ namespace SOS.Process.Repositories.Destination
                 var updateResult = await mongoCollection.ReplaceOneAsync(
                     x => x.Id.Equals(id),
                     entity,
-                    new ReplaceOptions { IsUpsert = true });
+                    new ReplaceOptions {IsUpsert = true});
                 return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
             }
             catch (Exception e)
@@ -116,56 +104,8 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
-        public byte ActiveInstance => (byte)(GetConfiguration()?.ActiveInstance ?? 1);
-        public byte InActiveInstance => (byte)(ActiveInstance == 0 ? 1 : 0);
-
-        /// <summary>
-        /// Get configuration object
-        /// </summary>
-        /// <returns></returns>
-        protected ProcessedConfiguration GetConfiguration()
-        {
-            try
-            {
-                return MongoCollectionConfiguration
-                    .Find(Builders<ProcessedConfiguration>.Filter.Empty)
-                    .FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-
-                return default;
-            }
-        }
-
-        protected string GetInstanceName(byte instance)
-        {
-            return _toggleable ? $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }-{ instance }" : $"{ typeof(TEntity).Name.UntilNonAlfanumeric() }";
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="instance"></param>
-        /// <returns></returns>
-        protected void SetCollectionName(byte instance)
-        {
-            _collectionName = GetInstanceName(instance);
-        }
-
-        /// <summary>
-        /// Get collection
-        /// </summary>
-        /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName);
-
-        /// <summary>
-        /// Configuration collection
-        /// </summary>
-        private IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration => Database
-            .GetCollection<ProcessedConfiguration>(_collectionNameConfiguration)
-            .WithWriteConcern(new WriteConcern(w:1, journal: true ));
+        public byte ActiveInstance => GetConfiguration()?.ActiveInstance ?? 1;
+        public byte InActiveInstance => (byte) (ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
         public async Task<List<TEntity>> GetAllAsync()
@@ -175,83 +115,10 @@ namespace SOS.Process.Repositories.Destination
             return res;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="batch"></param>
-        /// <returns></returns>
-        protected async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
-        {
-            if (!batch?.Any() ?? true)
-            {
-                return true;
-            }
-
-            try
-            {
-                await MongoCollection.InsertManyAsync(batch, new InsertManyOptions() { IsOrdered = false, BypassDocumentValidation = true});
-                
-                return true;
-            }
-            catch (MongoCommandException e)
-            {
-                switch (e.Code)
-                {
-                    case 16500: //Request Rate too Large
-                        // If attempt failed, try split items in half and try again
-                        var batchCount = batch.Count() / 2;
-
-                        // If we are down to less than 10 items something must be wrong
-                        if (batchCount > 5)
-                        {
-                            var addTasks = new List<Task<bool>>
-                            {
-                                AddBatchAsync(batch.Take(batchCount)),
-                                AddBatchAsync(batch.Skip(batchCount))
-                            };
-
-                            // Run all tasks async
-                            await Task.WhenAll(addTasks);
-                            return addTasks.All(t => t.Result);
-                        }
-
-                        break;
-                }
-
-                Logger.LogError(e.ToString());
-
-                return false;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Dispose
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-
-            }
-
-            _disposed = true;
-        }
-
         public int BatchSize { get; }
 
         /// <summary>
-        /// Dispose
+        ///     Dispose
         /// </summary>
         public void Dispose()
         {
@@ -259,7 +126,7 @@ namespace SOS.Process.Repositories.Destination
             GC.SuppressFinalize(this);
         }
 
-        public string ActiveCollectionName =>  GetInstanceName(ActiveInstance);
+        public string ActiveCollectionName => GetInstanceName(ActiveInstance);
 
         public string InactiveCollectionName => GetInstanceName(InActiveInstance);
 
@@ -324,7 +191,7 @@ namespace SOS.Process.Repositories.Destination
 
             return await UpdateAsync(item.Id, item);
         }
-        
+
         /// <inheritdoc />
         public async Task<bool> DeleteAsync(TKey id)
         {
@@ -395,7 +262,7 @@ namespace SOS.Process.Repositories.Destination
                 var updateResult = await MongoCollectionConfiguration.ReplaceOneAsync(
                     x => x.Id.Equals(config.Id),
                     config,
-                    new ReplaceOptions { IsUpsert = true });
+                    new ReplaceOptions {IsUpsert = true});
 
                 return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
             }
@@ -412,10 +279,10 @@ namespace SOS.Process.Repositories.Destination
         {
             //filter by collection name
             var exists = (await Database
-                .ListCollectionNamesAsync(new ListCollectionNamesOptions
-                {
-                    Filter = new BsonDocument("name", _collectionName)
-                }))
+                    .ListCollectionNamesAsync(new ListCollectionNamesOptions
+                    {
+                        Filter = new BsonDocument("name", _collectionName)
+                    }))
                 .Any();
 
             //check for existence
@@ -428,6 +295,141 @@ namespace SOS.Process.Repositories.Destination
             }
 
             return false;
+        }
+
+
+        /// <summary>
+        ///     Make sure configuration collection exists
+        /// </summary>
+        private void InitializeConfiguration()
+        {
+            //filter by collection name
+            var exists = Database
+                .ListCollectionNames(new ListCollectionNamesOptions
+                {
+                    Filter = new BsonDocument("name", _collectionNameConfiguration)
+                })
+                .Any();
+
+            //check for existence
+            if (!exists)
+            {
+                // Create the collection
+                Database.CreateCollection(_collectionNameConfiguration);
+
+                MongoCollectionConfiguration.InsertOne(new ProcessedConfiguration
+                {
+                    ActiveInstance = 1
+                });
+            }
+        }
+
+        /// <summary>
+        ///     Get configuration object
+        /// </summary>
+        /// <returns></returns>
+        protected ProcessedConfiguration GetConfiguration()
+        {
+            try
+            {
+                return MongoCollectionConfiguration
+                    .Find(Builders<ProcessedConfiguration>.Filter.Empty)
+                    .FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+
+                return default;
+            }
+        }
+
+        protected string GetInstanceName(byte instance)
+        {
+            return _toggleable
+                ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{instance}"
+                : $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <returns></returns>
+        protected void SetCollectionName(byte instance)
+        {
+            _collectionName = GetInstanceName(instance);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="batch"></param>
+        /// <returns></returns>
+        protected async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
+        {
+            if (!batch?.Any() ?? true)
+            {
+                return true;
+            }
+
+            try
+            {
+                await MongoCollection.InsertManyAsync(batch,
+                    new InsertManyOptions {IsOrdered = false, BypassDocumentValidation = true});
+
+                return true;
+            }
+            catch (MongoCommandException e)
+            {
+                switch (e.Code)
+                {
+                    case 16500: //Request Rate too Large
+                        // If attempt failed, try split items in half and try again
+                        var batchCount = batch.Count() / 2;
+
+                        // If we are down to less than 10 items something must be wrong
+                        if (batchCount > 5)
+                        {
+                            var addTasks = new List<Task<bool>>
+                            {
+                                AddBatchAsync(batch.Take(batchCount)),
+                                AddBatchAsync(batch.Skip(batchCount))
+                            };
+
+                            // Run all tasks async
+                            await Task.WhenAll(addTasks);
+                            return addTasks.All(t => t.Result);
+                        }
+
+                        break;
+                }
+
+                Logger.LogError(e.ToString());
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
+        }
+
+        /// <summary>
+        ///     Dispose
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+            }
+
+            _disposed = true;
         }
     }
 }

@@ -10,6 +10,15 @@ namespace SOS.Process.UnitTests.Repositories.Source
 {
     public class FieldMappingVerbatimRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public FieldMappingVerbatimRepositoryTests()
+        {
+            _processClient = new Mock<IVerbatimClient>();
+            _loggerMock = new Mock<ILogger<FieldMappingVerbatimRepository>>();
+        }
+
         private readonly Mock<IVerbatimClient> _processClient;
         private readonly Mock<ILogger<FieldMappingVerbatimRepository>> _loggerMock;
 
@@ -18,16 +27,7 @@ namespace SOS.Process.UnitTests.Repositories.Source
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public FieldMappingVerbatimRepositoryTests()
-        {
-            _processClient = new Mock<IVerbatimClient>();
-            _loggerMock = new Mock<ILogger<FieldMappingVerbatimRepository>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()

@@ -10,17 +10,17 @@ using SOS.Observations.Api.Managers.Interfaces;
 namespace SOS.Observations.Api.Controllers
 {
     /// <summary>
-    /// Sighting controller
+    ///     Sighting controller
     /// </summary>
     [Route("[controller]")]
     [ApiController]
     public class SystemsController : ControllerBase, ISystemsController
     {
-        private readonly IProcessInfoManager _processInfoManager;
         private readonly ILogger<SystemsController> _logger;
+        private readonly IProcessInfoManager _processInfoManager;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="processInfoManager"></param>
         /// <param name="logger"></param>
@@ -32,9 +32,9 @@ namespace SOS.Observations.Api.Controllers
 
         /// <inheritdoc />
         [HttpGet("ProcessInformation")]
-        [ProducesResponseType(typeof(ProcessInfo), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetProcessInfoAsync([FromQuery]bool active)
+        [ProducesResponseType(typeof(ProcessInfo), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetProcessInfoAsync([FromQuery] bool active)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting process information");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
     }

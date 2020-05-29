@@ -6,18 +6,18 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters.Interfaces
 {
     /// <summary>
-    /// Area harvester
+    ///     Area harvester
     /// </summary>
     public interface IAreaHarvester
     {
         /// <summary>
-        /// Aggregate all areas
+        ///     Aggregate all areas
         /// </summary>
         /// <returns></returns>
         Task<HarvestInfo> HarvestAreasAsync();
 
         /// <summary>
-        /// Get all areas.
+        ///     Get all areas.
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<Area>> GetAreasAsync();

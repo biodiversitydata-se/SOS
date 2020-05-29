@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
+using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
 
 namespace SOS.Import.Repositories.Source.Artportalen
-{ 
-    public class SightingRepository : BaseRepository<SightingRepository>, Interfaces.ISightingRepository
+{
+    public class SightingRepository : BaseRepository<SightingRepository>, ISightingRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="artportalenDataService"></param>
         /// <param name="logger"></param>
-        public SightingRepository(IArtportalenDataService artportalenDataService, ILogger<SightingRepository> logger) : base(artportalenDataService, logger)
+        public SightingRepository(IArtportalenDataService artportalenDataService, ILogger<SightingRepository> logger) :
+            base(artportalenDataService, logger)
         {
-           
         }
 
         /// <inheritdoc />
@@ -98,7 +98,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                AND ss.SightingStateTypeId = 30--Published
 	                AND(ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
 
-                return await QueryAsync<SightingEntity>(query, new { StartId = startId, EndId = startId + maxRows -1 });
+                return await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1});
             }
             catch (Exception e)
             {
@@ -108,16 +108,17 @@ namespace SOS.Import.Repositories.Source.Artportalen
             }
         }
 
-		/// <summary>
-		/// Get sightings for the specified sighting ids. Used for testing purpose for retrieving specific sightings from Artportalen.
-		/// This method should be the same as GetChunkAsync(int startId, int maxRows), with
-		/// the difference that this method uses a list of sighting ids instead of (startId, maxRows).
-		/// </summary>
-		public async Task<IEnumerable<SightingEntity>> GetChunkAsync(IEnumerable<int> sightingIds)
+        /// <summary>
+        ///     Get sightings for the specified sighting ids. Used for testing purpose for retrieving specific sightings from
+        ///     Artportalen.
+        ///     This method should be the same as GetChunkAsync(int startId, int maxRows), with
+        ///     the difference that this method uses a list of sighting ids instead of (startId, maxRows).
+        /// </summary>
+        public async Task<IEnumerable<SightingEntity>> GetChunkAsync(IEnumerable<int> sightingIds)
         {
-			try
-			{
-				var query = @"
+            try
+            {
+                var query = @"
                 SELECT DISTINCT
                     s.ActivityId,
 					s.BiotopeId,
@@ -190,15 +191,15 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                AND ss.SightingStateTypeId = 30--Published
 	                AND(ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
 
-				return await QueryAsync<SightingEntity>(query, new { ids = sightingIds});
-			}
-			catch (Exception e)
-			{
-				Logger.LogError(e, "Error getting sightings");
+                return await QueryAsync<SightingEntity>(query, new {ids = sightingIds});
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting sightings");
 
-				return null;
-			}
-		}
+                return null;
+            }
+        }
 
         /// <inheritdoc />
         public async Task<Tuple<int, int>> GetIdSpanAsync()
@@ -212,7 +213,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 		        FROM 
 		            SearchableSightings s";
 
-               return (await QueryAsync<Tuple<int, int>>(query)).FirstOrDefault();
+                return (await QueryAsync<Tuple<int, int>>(query)).FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -223,7 +224,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-		public async Task<DateTime?> GetLastModifiedDateAsyc()
+        public async Task<DateTime?> GetLastModifiedDateAsyc()
         {
             try
             {
@@ -241,10 +242,10 @@ namespace SOS.Import.Repositories.Source.Artportalen
 
                 return null;
             }
-		}
+        }
 
-		/// <inheritdoc />
-		public async Task<IEnumerable<(int SightingId, int ProjectId)>> GetProjectIdsAsync()
+        /// <inheritdoc />
+        public async Task<IEnumerable<(int SightingId, int ProjectId)>> GetProjectIdsAsync()
         {
             try
             {

@@ -8,24 +8,23 @@ using MongoDB.Driver;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Processors.Mvm.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Processors.Mvm
 {
     /// <summary>
-    /// Process factory class
+    ///     Process factory class
     /// </summary>
-    public class MvmObservationProcessor : ObservationProcessorBase<MvmObservationProcessor>, Interfaces.IMvmObservationProcessor
+    public class MvmObservationProcessor : ObservationProcessorBase<MvmObservationProcessor>, IMvmObservationProcessor
     {
-        private readonly IMvmObservationVerbatimRepository _mvmObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataProviderType Type => DataProviderType.MvmObservations;
+        private readonly IMvmObservationVerbatimRepository _mvmObservationVerbatimRepository;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="mvmObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
@@ -37,12 +36,17 @@ namespace SOS.Process.Processors.Mvm
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<MvmObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,logger)
+            ILogger<MvmObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,
+            logger)
         {
-            _mvmObservationVerbatimRepository = mvmObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(mvmObservationVerbatimRepository));
+            _mvmObservationVerbatimRepository = mvmObservationVerbatimRepository ??
+                                                throw new ArgumentNullException(
+                                                    nameof(mvmObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
-       
+
+        public override DataProviderType Type => DataProviderType.MvmObservations;
+
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
@@ -57,7 +61,7 @@ namespace SOS.Process.Processors.Mvm
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
-                ProcessedObservation processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
                 observations.Add(processedObservation);
                 if (IsBatchFilledToLimit(observations.Count))

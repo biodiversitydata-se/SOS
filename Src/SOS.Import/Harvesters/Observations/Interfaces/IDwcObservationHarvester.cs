@@ -1,7 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
-using SOS.Import.DarwinCore;
-using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 
@@ -10,7 +8,7 @@ namespace SOS.Import.Harvesters.Observations.Interfaces
     public interface IDwcObservationHarvester
     {
         /// <summary>
-        /// Harvest observations.
+        ///     Harvest observations.
         /// </summary>
         /// <returns></returns>
         Task<HarvestInfo> HarvestObservationsAsync(
@@ -19,7 +17,7 @@ namespace SOS.Import.Harvesters.Observations.Interfaces
             IJobCancellationToken cancellationToken);
 
         /// <summary>
-        /// Harvest multiple DwC-A files.
+        ///     Harvest multiple DwC-A files.
         /// </summary>
         /// <param name="filePaths"></param>
         /// <param name="emptyCollectionsBeforeHarvest"></param>

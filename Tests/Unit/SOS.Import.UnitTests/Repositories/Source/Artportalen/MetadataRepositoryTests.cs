@@ -13,10 +13,19 @@ using Xunit;
 namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 {
     /// <summary>
-    /// Meta data repository tests
+    ///     Meta data repository tests
     /// </summary>
     public class MetadataRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public MetadataRepositoryTests()
+        {
+            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
+            _loggerMock = new Mock<ILogger<MetadataRepository>>();
+        }
+
         private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
         private readonly Mock<ILogger<MetadataRepository>> _loggerMock;
 
@@ -25,16 +34,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public MetadataRepositoryTests()
-        {
-            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
-            _loggerMock = new Mock<ILogger<MetadataRepository>>();
-        }
-
-        /// <summary>
-        /// Test the constructor
+        ///     Test the constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -52,36 +52,8 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
-        #region Activities
         /// <summary>
-        /// Test get activities success
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetActivitiesAsyncSuccess()
-        {
-            IEnumerable<MetadataWithCategoryEntity> activities = new[]
-            {
-                new MetadataWithCategoryEntity { Id = 1, CategoryId = 1, CategoryName = "Category", Translation = "Activity 1", CultureCode = "sv-GB" },
-                new MetadataWithCategoryEntity { Id = 2, CategoryId = 1, CategoryName = "Category", Translation = "Activity 2", CultureCode = "sv-GB" }
-            };
-
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataWithCategoryEntity>(It.IsAny<string>(), null))
-                .ReturnsAsync(activities);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetActivitiesAsync();
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().HaveCount(2);
-        }
-
-        /// <summary>
-        /// Test get activities exception
+        ///     Test get activities exception
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -100,29 +72,34 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 
             result.Should().BeNull();
         }
-        #endregion Activities
 
-        #region Biotopes
         /// <summary>
-        /// Test get activities success
+        ///     Test get activities success
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetBiotopessAsyncSuccess()
+        public async Task GetActivitiesAsyncSuccess()
         {
-            IEnumerable<MetadataEntity> biotopes = new[]
+            IEnumerable<MetadataWithCategoryEntity> activities = new[]
             {
-                new MetadataEntity { Id = 1, Translation = "Biotope 1", CultureCode = Cultures.en_GB },
-                new MetadataEntity { Id = 2, Translation = "Biotope 2", CultureCode = Cultures.en_GB }
+                new MetadataWithCategoryEntity
+                {
+                    Id = 1, CategoryId = 1, CategoryName = "Category", Translation = "Activity 1", CultureCode = "sv-GB"
+                },
+                new MetadataWithCategoryEntity
+                {
+                    Id = 2, CategoryId = 1, CategoryName = "Category", Translation = "Activity 2", CultureCode = "sv-GB"
+                }
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
-                .ReturnsAsync(biotopes);
+            _artportalenDataServiceMock
+                .Setup(spds => spds.QueryAsync<MetadataWithCategoryEntity>(It.IsAny<string>(), null))
+                .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetBiotopesAsync();
+            var result = await TestObject.GetActivitiesAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -131,7 +108,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get activities exception
+        ///     Test get activities exception
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -150,29 +127,27 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 
             result.Should().BeNull();
         }
-        #endregion Biotopes
 
-        #region Genders
         /// <summary>
-        /// Test get genders success
+        ///     Test get activities success
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetGendersAsyncSuccess()
+        public async Task GetBiotopessAsyncSuccess()
         {
-            IEnumerable<MetadataEntity> activities = new[]
+            IEnumerable<MetadataEntity> biotopes = new[]
             {
-                new MetadataEntity { Id = 1, Translation = "Gender 1", CultureCode = Cultures.en_GB},
-                new MetadataEntity { Id = 2, Translation = "Gender 2", CultureCode = Cultures.en_GB }
+                new MetadataEntity {Id = 1, Translation = "Biotope 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity {Id = 2, Translation = "Biotope 2", CultureCode = Cultures.en_GB}
             };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
-                .ReturnsAsync(activities);
+                .ReturnsAsync(biotopes);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetGendersAsync();
+            var result = await TestObject.GetBiotopesAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -181,7 +156,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get genders exception
+        ///     Test get genders exception
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -200,20 +175,18 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 
             result.Should().BeNull();
         }
-        #endregion Activities
 
-        #region Stages
         /// <summary>
-        /// Test get stages success
+        ///     Test get genders success
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetStagesAsyncSuccess()
+        public async Task GetGendersAsyncSuccess()
         {
             IEnumerable<MetadataEntity> activities = new[]
             {
-                new MetadataEntity { Id = 1, Translation = "Stage 1", CultureCode = Cultures.en_GB },
-                new MetadataEntity { Id = 2, Translation = "Stage 2", CultureCode = Cultures.en_GB }
+                new MetadataEntity {Id = 1, Translation = "Gender 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity {Id = 2, Translation = "Gender 2", CultureCode = Cultures.en_GB}
             };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
@@ -222,7 +195,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetStagesAsync();
+            var result = await TestObject.GetGendersAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -231,7 +204,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get stages exception
+        ///     Test get stages exception
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -250,29 +223,27 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 
             result.Should().BeNull();
         }
-        #endregion Activities
 
-        #region Substrates
         /// <summary>
-        /// Test get activities success
+        ///     Test get stages success
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetSubstratesAsyncSuccess()
+        public async Task GetStagesAsyncSuccess()
         {
-            IEnumerable<MetadataEntity> substrates = new[]
+            IEnumerable<MetadataEntity> activities = new[]
             {
-                new MetadataEntity { Id = 1, Translation = "Substrate 1", CultureCode = Cultures.en_GB },
-                new MetadataEntity { Id = 2, Translation = "Substrate 2", CultureCode = Cultures.en_GB }
+                new MetadataEntity {Id = 1, Translation = "Stage 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity {Id = 2, Translation = "Stage 2", CultureCode = Cultures.en_GB}
             };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
-                .ReturnsAsync(substrates);
+                .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetSubstratesAsync();
+            var result = await TestObject.GetStagesAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -281,7 +252,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get activities exception
+        ///     Test get activities exception
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -300,29 +271,27 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 
             result.Should().BeNull();
         }
-        #endregion Substrates
 
-        #region Units
         /// <summary>
-        /// Test get units success
+        ///     Test get activities success
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetUnitsAsyncSuccess()
+        public async Task GetSubstratesAsyncSuccess()
         {
-            IEnumerable<MetadataEntity> activities = new[]
+            IEnumerable<MetadataEntity> substrates = new[]
             {
-                new MetadataEntity { Id = 1, Translation = "Unit 1", CultureCode = Cultures.en_GB },
-                new MetadataEntity { Id = 2, Translation = "Unit 2", CultureCode = Cultures.en_GB }
+                new MetadataEntity {Id = 1, Translation = "Substrate 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity {Id = 2, Translation = "Substrate 2", CultureCode = Cultures.en_GB}
             };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
-                .ReturnsAsync(activities);
+                .ReturnsAsync(substrates);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetUnitsAsync();
+            var result = await TestObject.GetSubstratesAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -331,7 +300,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get units exception
+        ///     Test get units exception
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -350,29 +319,27 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 
             result.Should().BeNull();
         }
-        #endregion Units
 
-        #region ValidationStatus
         /// <summary>
-        /// Test get units success
+        ///     Test get units success
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetValidationStatusAsyncSuccess()
+        public async Task GetUnitsAsyncSuccess()
         {
-            IEnumerable<MetadataEntity> validationStatus = new[]
+            IEnumerable<MetadataEntity> activities = new[]
             {
-                new MetadataEntity { Id = 1, Translation = "ValidationStatus 1", CultureCode = Cultures.en_GB },
-                new MetadataEntity { Id = 2, Translation = "ValidationStatus 2", CultureCode = Cultures.en_GB }
+                new MetadataEntity {Id = 1, Translation = "Unit 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity {Id = 2, Translation = "Unit 2", CultureCode = Cultures.en_GB}
             };
 
             _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
-                .ReturnsAsync(validationStatus);
+                .ReturnsAsync(activities);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetValidationStatusAsync();
+            var result = await TestObject.GetUnitsAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -381,7 +348,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get units exception
+        ///     Test get units exception
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -400,6 +367,32 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 
             result.Should().BeNull();
         }
-        #endregion ValidationStatus
+
+        /// <summary>
+        ///     Test get units success
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetValidationStatusAsyncSuccess()
+        {
+            IEnumerable<MetadataEntity> validationStatus = new[]
+            {
+                new MetadataEntity {Id = 1, Translation = "ValidationStatus 1", CultureCode = Cultures.en_GB},
+                new MetadataEntity {Id = 2, Translation = "ValidationStatus 2", CultureCode = Cultures.en_GB}
+            };
+
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<MetadataEntity>(It.IsAny<string>(), null))
+                .ReturnsAsync(validationStatus);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.GetValidationStatusAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().HaveCount(2);
+        }
     }
 }

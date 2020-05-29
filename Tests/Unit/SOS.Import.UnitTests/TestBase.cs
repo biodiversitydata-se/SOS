@@ -8,19 +8,19 @@ namespace SOS.Import.UnitTests
     {
         protected ImportConfiguration GetImportConfiguration()
         {
-            IConfigurationRoot config = new ConfigurationBuilder()
+            var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            ImportConfiguration importConfiguration = config.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();
+            var importConfiguration = config.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();
             return importConfiguration;
         }
 
         protected ProcessConfiguration GetProcessConfiguration()
         {
-            IConfigurationRoot config = new ConfigurationBuilder()
+            var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .AddUserSecrets<TestBase>()
@@ -29,6 +29,5 @@ namespace SOS.Import.UnitTests
             var processConfiguration = config.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
             return processConfiguration;
         }
-
     }
 }

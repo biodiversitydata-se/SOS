@@ -4,14 +4,14 @@
     {
         private readonly CoreFileType coreFileType;
 
-        public CoreFileMetaData(CoreFileType coreFileType):
+        public CoreFileMetaData(CoreFileType coreFileType) :
             base(coreFileType)
         {
             this.coreFileType = coreFileType ?? new CoreFileType();
             Fields = new FieldMetaData(this.coreFileType?.Id, this.coreFileType?.Field);
         }
 
-        public IdFieldType Id { get { return coreFileType.Id; } }
+        public IdFieldType Id => coreFileType.Id;
 
         public IFieldMetaData Fields { get; }
     }

@@ -1,16 +1,18 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Import.MongoDb.Interfaces;
+using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Repositories.Destination.Artportalen
 {
     /// <summary>
-    /// Species data service
+    ///     Species data service
     /// </summary>
-    public class SightingVerbatimRepository : VerbatimRepository<ArtportalenVerbatimObservation, int>, Interfaces.ISightingVerbatimRepository
+    public class SightingVerbatimRepository : VerbatimRepository<ArtportalenVerbatimObservation, int>,
+        ISightingVerbatimRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="importClient"></param>
         /// <param name="logger"></param>

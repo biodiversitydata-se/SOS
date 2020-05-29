@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
 
 namespace SOS.Import.UnitTests.TestData
@@ -8,7 +7,7 @@ namespace SOS.Import.UnitTests.TestData
     {
         public static List<SpeciesCollectionItemEntity> CreateItems()
         {
-            List<SpeciesCollectionItemEntity> entities = new List<SpeciesCollectionItemEntity>
+            var entities = new List<SpeciesCollectionItemEntity>
             {
                 new SpeciesCollectionItemEntity
                 {

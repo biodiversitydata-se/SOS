@@ -34,10 +34,37 @@ using Xunit;
 namespace SOS.Process.UnitTests.Jobs
 {
     /// <summary>
-    /// Tests for activate instance job
+    ///     Tests for activate instance job
     /// </summary>
     public class ProcessJobTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public ProcessJobTests()
+        {
+            _darwinCoreRepository = new Mock<IProcessedObservationRepository>();
+            _processInfoRepository = new Mock<IProcessInfoRepository>();
+            _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
+            _instanceManager = new Mock<IInstanceManager>();
+            _taxonProcessedRepository = new Mock<IProcessedTaxonRepository>();
+            _copyFieldMappingsJob = new Mock<ICopyFieldMappingsJob>();
+            _processTaxaJob = new Mock<IProcessTaxaJob>();
+            _clamPortalProcessor = new Mock<IClamPortalObservationProcessor>();
+            _kulProcessor = new Mock<IKulObservationProcessor>();
+            _mvmProcessor = new Mock<IMvmObservationProcessor>();
+            _norsProcessor = new Mock<INorsObservationProcessor>();
+            _sersProcessor = new Mock<ISersObservationProcessor>();
+            _sharkProcessor = new Mock<ISharkObservationProcessor>();
+            _virtualHerbariumProcessor = new Mock<IVirtualHerbariumObservationProcessor>();
+            _artportalenProcessor = new Mock<IArtportalenObservationProcessor>();
+            _taxonProcessedRepository = new Mock<IProcessedTaxonRepository>();
+            _areaHelper = new Mock<IAreaHelper>();
+            _loggerMock = new Mock<ILogger<ProcessJob>>();
+            _dwcaObservationProcessor = new Mock<IDwcaObservationProcessor>();
+            _dataProviderManager = new Mock<IDataProviderManager>();
+        }
+
         private readonly Mock<IProcessedObservationRepository> _darwinCoreRepository;
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
@@ -80,30 +107,51 @@ namespace SOS.Process.UnitTests.Jobs
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
+        ///     Test processing exception
         /// </summary>
-        public ProcessJobTests()
+        /// <returns></returns>
+        [Fact]
+        public async Task RunAsyncException()
         {
-            _darwinCoreRepository = new Mock<IProcessedObservationRepository>();
-            _processInfoRepository = new Mock<IProcessInfoRepository>();
-            _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
-            _instanceManager = new Mock<IInstanceManager>();
-            _taxonProcessedRepository = new Mock<IProcessedTaxonRepository>();
-            _copyFieldMappingsJob = new Mock<ICopyFieldMappingsJob>();
-            _processTaxaJob = new Mock<IProcessTaxaJob>();
-            _clamPortalProcessor = new Mock<IClamPortalObservationProcessor>();
-            _kulProcessor = new Mock<IKulObservationProcessor>();
-            _mvmProcessor = new Mock<IMvmObservationProcessor>();
-            _norsProcessor = new Mock<INorsObservationProcessor>();
-            _sersProcessor = new Mock<ISersObservationProcessor>();
-            _sharkProcessor = new Mock<ISharkObservationProcessor>();
-            _virtualHerbariumProcessor = new Mock<IVirtualHerbariumObservationProcessor>();
-            _artportalenProcessor = new Mock<IArtportalenObservationProcessor>();
-            _taxonProcessedRepository = new Mock<IProcessedTaxonRepository>();
-            _areaHelper = new Mock<IAreaHelper>();
-            _loggerMock = new Mock<ILogger<ProcessJob>>();
-            _dwcaObservationProcessor = new Mock<IDwcaObservationProcessor>();
-            _dataProviderManager = new Mock<IDataProviderManager>();
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _taxonProcessedRepository.Setup(r => r.GetAllAsync())
+                .ThrowsAsync(new Exception("Failed"));
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result =
+                await TestObject.RunAsync(It.IsAny<List<string>>(), false, false, true, JobCancellationToken.Null);
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeFalse();
+        }
+
+        /// <summary>
+        ///     Test processing fail
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task RunAsyncFail()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //----------------------------------------------------------------------------------------------------------
+            var result =
+                await TestObject.RunAsync(It.IsAny<List<string>>(), false, false, true, JobCancellationToken.Null);
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeFalse();
         }
 
         // todo - delete test?
@@ -462,7 +510,7 @@ namespace SOS.Process.UnitTests.Jobs
         //}
 
         /// <summary>
-        /// Make a successful test of processing
+        ///     Make a successful test of processing
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -479,26 +527,35 @@ namespace SOS.Process.UnitTests.Jobs
             _taxonProcessedRepository.Setup(r => r.GetAllAsync())
                 .ReturnsAsync(new List<ProcessedTaxon>
                 {
-                    new ProcessedTaxon {Id = 100024, ScientificName = "Canus Lupus"},
+                    new ProcessedTaxon {Id = 100024, ScientificName = "Canus Lupus"}
                 });
 
             _darwinCoreRepository.Setup(r => r.VerifyCollectionAsync());
 
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenVerbatimObservation)))
-                .ReturnsAsync(new HarvestInfo(nameof(ArtportalenVerbatimObservation), DataProviderType.ArtportalenObservations, DateTime.Now));
-            _artportalenProcessor.Setup(r => r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.Artportalen, DataProviderType.ArtportalenObservations, DateTime.Now, DateTime.Now, 1));
+                .ReturnsAsync(new HarvestInfo(nameof(ArtportalenVerbatimObservation),
+                    DataProviderType.ArtportalenObservations, DateTime.Now));
+            _artportalenProcessor.Setup(r =>
+                    r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.Artportalen,
+                    DataProviderType.ArtportalenObservations, DateTime.Now, DateTime.Now, 1));
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ClamObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(nameof(ClamObservationVerbatim), DataProviderType.ClamPortalObservations, DateTime.Now));
-            _clamPortalProcessor.Setup(r => r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.ClamGateway, DataProviderType.ClamPortalObservations, DateTime.Now, DateTime.Now, 1));
+                .ReturnsAsync(new HarvestInfo(nameof(ClamObservationVerbatim), DataProviderType.ClamPortalObservations,
+                    DateTime.Now));
+            _clamPortalProcessor.Setup(r =>
+                    r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.ClamGateway,
+                    DataProviderType.ClamPortalObservations, DateTime.Now, DateTime.Now, 1));
 
             _harvestInfoRepository.Setup(r => r.GetAsync(nameof(KulObservationVerbatim)))
-                .ReturnsAsync(new HarvestInfo(nameof(KulObservationVerbatim), DataProviderType.KULObservations, DateTime.Now));
-            _kulProcessor.Setup(r => r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
-                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.KUL, DataProviderType.KULObservations, DateTime.Now, DateTime.Now, 1));
+                .ReturnsAsync(new HarvestInfo(nameof(KulObservationVerbatim), DataProviderType.KULObservations,
+                    DateTime.Now));
+            _kulProcessor.Setup(r =>
+                    r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+                .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.KUL, DataProviderType.KULObservations,
+                    DateTime.Now, DateTime.Now, 1));
 
             _darwinCoreRepository.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()));
 
@@ -517,63 +574,18 @@ namespace SOS.Process.UnitTests.Jobs
             var result = await TestObject.RunAsync(
                 new List<string>
                 {
-                    DataProviderIdentifiers.Artportalen, DataProviderIdentifiers.ClamGateway, DataProviderIdentifiers.KUL
-                }, 
-                false, 
-                false, 
-                true, 
+                    DataProviderIdentifiers.Artportalen, DataProviderIdentifiers.ClamGateway,
+                    DataProviderIdentifiers.KUL
+                },
+                false,
+                false,
+                true,
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
             result.Should().BeTrue();
-        }
-
-        /// <summary>
-        /// Test processing fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task RunAsyncFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.RunAsync(It.IsAny<List<string>>(), false, false, true, JobCancellationToken.Null);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeFalse();
-        }
-
-        /// <summary>
-        /// Test processing exception
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task RunAsyncException()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _taxonProcessedRepository.Setup(r => r.GetAllAsync())
-                .ThrowsAsync(new Exception("Failed"));
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.RunAsync(It.IsAny<List<string>>(), false, false, true, JobCancellationToken.Null);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeFalse();
         }
     }
 }

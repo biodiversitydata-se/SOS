@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -12,17 +11,17 @@ using SOS.Lib.Jobs.Import;
 namespace SOS.Import.Jobs
 {
     /// <summary>
-    /// Artportalen harvest
+    ///     Artportalen harvest
     /// </summary>
     public class ArtportalenHarvestJob : IArtportalenHarvestJob
     {
         private readonly IArtportalenObservationHarvester _artportalenObservationHarvester;
-        private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly IDataProviderManager _dataProviderManager;
+        private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<ArtportalenHarvestJob> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="artportalenObservationHarvester"></param>
         /// <param name="harvestInfoRepository"></param>
@@ -34,8 +33,10 @@ namespace SOS.Import.Jobs
             IDataProviderManager dataProviderManager,
             ILogger<ArtportalenHarvestJob> logger)
         {
-            _artportalenObservationHarvester = artportalenObservationHarvester ?? throw new ArgumentNullException(nameof(artportalenObservationHarvester));
-            _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
+            _artportalenObservationHarvester = artportalenObservationHarvester ??
+                                               throw new ArgumentNullException(nameof(artportalenObservationHarvester));
+            _harvestInfoRepository =
+                harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -44,7 +45,8 @@ namespace SOS.Import.Jobs
         public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
             _logger.LogInformation("Start Artportalen Harvest Job");
-            var dataProvider = await _dataProviderManager.GetDataProviderByType(DataProviderType.ArtportalenObservations);
+            var dataProvider =
+                await _dataProviderManager.GetDataProviderByType(DataProviderType.ArtportalenObservations);
             var harvestInfoResult = await _artportalenObservationHarvester.HarvestSightingsAsync(cancellationToken);
             _logger.LogInformation($"End Artportalen Harvest Job. Status: {harvestInfoResult.Status}");
 
@@ -53,7 +55,9 @@ namespace SOS.Import.Jobs
             await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult);
 
             // return result of all imports
-            return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0 ? true : throw new Exception("Artportalen Harvest Job failed");
+            return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0
+                ? true
+                : throw new Exception("Artportalen Harvest Job failed");
         }
     }
 }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SOS.Lib.Models.Verbatim.DarwinCore
+﻿namespace SOS.Lib.Models.Verbatim.DarwinCore
 {
     /// <summary>
-    /// Simple Multimedia extension
-    /// http://rs.gbif.org/extension/gbif/1.0/multimedia.xml
+    ///     Simple Multimedia extension
+    ///     http://rs.gbif.org/extension/gbif/1.0/multimedia.xml
     /// </summary>
     public class DwcMultimedia
     {

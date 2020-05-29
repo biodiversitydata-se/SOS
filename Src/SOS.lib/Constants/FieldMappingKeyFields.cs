@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SOS.Lib.Constants
+﻿namespace SOS.Lib.Constants
 {
     public static class FieldMappingKeyFields
     {

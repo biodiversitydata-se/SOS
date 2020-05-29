@@ -10,17 +10,17 @@ using SOS.Observations.Api.Repositories.Interfaces;
 namespace SOS.Observations.Api.Repositories
 {
     /// <summary>
-    /// Process information repository
+    ///     Process information repository
     /// </summary>
     public class DOIRepository : ProcessBaseRepository<DOI, Guid>, IDOIRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
         public DOIRepository(
-            IProcessClient client, 
+            IProcessClient client,
             ILogger<DOIRepository> logger) : base(client, false, logger)
         {
         }

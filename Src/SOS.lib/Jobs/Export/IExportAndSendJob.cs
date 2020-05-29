@@ -5,12 +5,12 @@ using SOS.Lib.Models.Search;
 namespace SOS.Lib.Jobs.Export
 {
     /// <summary>
-    /// Interface for DOI export job
+    ///     Interface for DOI export job
     /// </summary>
     public interface IExportAndSendJob
     {
         /// <summary>
-        /// Run DOI export job
+        ///     Run DOI export job
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="email"></param>

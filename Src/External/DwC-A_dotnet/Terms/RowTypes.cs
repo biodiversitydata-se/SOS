@@ -2,7 +2,9 @@
 {
     public static class RowTypes
     {
-        public static string SimpleDarwinRecord { get; } = "http://rs.tdwg.org/dwc/xsd/simpledarwincore/SimpleDarwinRecord";
+        public static string SimpleDarwinRecord { get; } =
+            "http://rs.tdwg.org/dwc/xsd/simpledarwincore/SimpleDarwinRecord";
+
         public static string Occurrence { get; } = "http://rs.tdwg.org/dwc/terms/Occurrence";
         public static string Event { get; } = "http://rs.tdwg.org/dwc/terms/Event";
         public static string Location { get; } = "http://purl.org/dc/terms/Location";
@@ -11,7 +13,10 @@
         public static string Taxon { get; } = "http://rs.tdwg.org/dwc/terms/Taxon";
         public static string ResourceRelationship { get; } = "http://rs.tdwg.org/dwc/terms/ResourceRelationship";
         public static string MeasurementOrFact { get; } = "http://rs.tdwg.org/dwc/terms/MeasurementOrFact";
-        public static string ExtendedMeasurementOrFact { get; } = "http://rs.iobis.org/obis/terms/ExtendedMeasurementOrFact";
+
+        public static string ExtendedMeasurementOrFact { get; } =
+            "http://rs.iobis.org/obis/terms/ExtendedMeasurementOrFact";
+
         public static string Multimedia { get; } = "http://rs.gbif.org/terms/1.0/Multimedia";
         public static string AudubonMediaDescription { get; } = "http://rs.tdwg.org/ac/terms/Multimedia";
     }

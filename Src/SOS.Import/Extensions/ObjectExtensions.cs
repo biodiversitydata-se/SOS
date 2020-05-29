@@ -7,7 +7,7 @@ namespace SOS.Import.Extensions
     public static class ObjectExtensions
     {
         /// <summary>
-        /// Set object property by reflection
+        ///     Set object property by reflection
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="target"></param>

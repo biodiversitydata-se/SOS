@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
@@ -13,21 +12,20 @@ using Xunit;
 namespace SOS.Process.UnitTests.TestHelpers
 {
     /// <summary>
-    /// A fixture that creates an instance of DwcaObservationFactory with the following properties:
-    /// - Only Mammalia taxa are used.
-    /// - Only County and Province regions are used.
-    /// - All field mappings are used.
-    ///
-    /// All data is loaded from files in the Resources folder.
+    ///     A fixture that creates an instance of DwcaObservationFactory with the following properties:
+    ///     - Only Mammalia taxa are used.
+    ///     - Only County and Province regions are used.
+    ///     - All field mappings are used.
+    ///     All data is loaded from files in the Resources folder.
     /// </summary>
     public class DwcaObservationFactoryFixture : IDisposable
     {
-        public DwcaObservationFactory DwcaObservationFactory { get; private set; }
-
         public DwcaObservationFactoryFixture()
         {
             DwcaObservationFactory = CreateDwcaObservationFactory();
         }
+
+        public DwcaObservationFactory DwcaObservationFactory { get; private set; }
 
         public void Dispose()
         {
@@ -37,14 +35,17 @@ namespace SOS.Process.UnitTests.TestHelpers
         private DwcaObservationFactory CreateDwcaObservationFactory()
         {
             var dataProviderDummy = new DataProvider();
-            var mammaliaTaxa = MessagePackHelper.CreateListFromMessagePackFile<ProcessedTaxon>(@"Resources\MammaliaProcessedTaxa.msgpck");
+            var mammaliaTaxa =
+                MessagePackHelper.CreateListFromMessagePackFile<ProcessedTaxon>(
+                    @"Resources\MammaliaProcessedTaxa.msgpck");
             var mammaliaTaxonByTaxonId = mammaliaTaxa.ToDictionary(t => t.Id, t => t);
-            var processedAreaRepositoryStub = ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);
+            var processedAreaRepositoryStub =
+                ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);
             var processedFieldMappingRepository = ProcessedFieldMappingRepositoryStubFactory.Create();
             var areaHelper = new AreaHelper(processedAreaRepositoryStub.Object, processedFieldMappingRepository.Object);
             var factory = DwcaObservationFactory.CreateAsync(
-                dataProviderDummy, 
-                mammaliaTaxonByTaxonId, 
+                dataProviderDummy,
+                mammaliaTaxonByTaxonId,
                 processedFieldMappingRepository.Object,
                 areaHelper).Result;
             return factory;

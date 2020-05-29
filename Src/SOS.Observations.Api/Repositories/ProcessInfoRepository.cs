@@ -7,17 +7,17 @@ using SOS.Observations.Api.Repositories.Interfaces;
 namespace SOS.Observations.Api.Repositories
 {
     /// <summary>
-    /// Process information repository
+    ///     Process information repository
     /// </summary>
     public class ProcessInfoRepository : ProcessBaseRepository<ProcessInfo, string>, IProcessInfoRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
         public ProcessInfoRepository(
-            IProcessClient client, 
+            IProcessClient client,
             ILogger<ProcessInfoRepository> logger) : base(client, false, logger)
         {
         }
@@ -25,7 +25,7 @@ namespace SOS.Observations.Api.Repositories
         /// <inheritdoc />
         public async Task<ProcessInfo> GetProcessInfoAsync(bool current)
         {
-            return await GetAsync($"ProcessedObservation-{ (current ? ActiveInstance : ActiveInstance == 1 ? 0 : 1) }");
+            return await GetAsync($"ProcessedObservation-{(current ? ActiveInstance : ActiveInstance == 1 ? 0 : 1)}");
         }
     }
 }

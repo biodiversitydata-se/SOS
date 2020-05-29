@@ -10,15 +10,8 @@ namespace SOS.Process.UnitTests.Repositories.Source
 {
     public class VirtualHerbariumObservationVerbatimRepositoryTests
     {
-        private readonly Mock<IVerbatimClient> _processClient;
-        private readonly Mock<ILogger<VirtualHerbariumObservationVerbatimRepository>> _loggerMock;
-
-        private VirtualHerbariumObservationVerbatimRepository TestObject => new VirtualHerbariumObservationVerbatimRepository(
-            _processClient.Object,
-            _loggerMock.Object);
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public VirtualHerbariumObservationVerbatimRepositoryTests()
         {
@@ -26,8 +19,16 @@ namespace SOS.Process.UnitTests.Repositories.Source
             _loggerMock = new Mock<ILogger<VirtualHerbariumObservationVerbatimRepository>>();
         }
 
+        private readonly Mock<IVerbatimClient> _processClient;
+        private readonly Mock<ILogger<VirtualHerbariumObservationVerbatimRepository>> _loggerMock;
+
+        private VirtualHerbariumObservationVerbatimRepository TestObject =>
+            new VirtualHerbariumObservationVerbatimRepository(
+                _processClient.Object,
+                _loggerMock.Object);
+
         /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()

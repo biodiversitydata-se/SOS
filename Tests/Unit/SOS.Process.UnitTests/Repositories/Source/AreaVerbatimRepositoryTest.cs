@@ -10,6 +10,15 @@ namespace SOS.Process.UnitTests.Repositories.Source
 {
     public class AreaVerbatimRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public AreaVerbatimRepositoryTests()
+        {
+            _processClient = new Mock<IVerbatimClient>();
+            _loggerMock = new Mock<ILogger<AreaVerbatimRepository>>();
+        }
+
         private readonly Mock<IVerbatimClient> _processClient;
         private readonly Mock<ILogger<AreaVerbatimRepository>> _loggerMock;
 
@@ -18,16 +27,7 @@ namespace SOS.Process.UnitTests.Repositories.Source
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public AreaVerbatimRepositoryTests()
-        {
-            _processClient = new Mock<IVerbatimClient>();
-            _loggerMock = new Mock<ILogger<AreaVerbatimRepository>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()

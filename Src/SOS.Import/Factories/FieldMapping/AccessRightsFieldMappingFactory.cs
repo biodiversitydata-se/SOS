@@ -5,12 +5,13 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.FieldMapping
 {
     /// <summary>
-    /// Class for creating AccessRights field mapping.
+    ///     Class for creating AccessRights field mapping.
     /// </summary>
     public class AccessRightsFieldMappingFactory : DwcFieldMappingFactoryBase
     {
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.AccessRights;
         protected override bool Localized => false;
+
         protected override ICollection<FieldMappingValue> GetFieldMappingValues()
         {
             var fieldMappingValues = new List<FieldMappingValue>

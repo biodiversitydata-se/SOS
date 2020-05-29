@@ -16,10 +16,22 @@ using Xunit;
 namespace SOS.Process.UnitTests.Jobs
 {
     /// <summary>
-    /// Tests for activate instance job
+    ///     Tests for activate instance job
     /// </summary>
     public class CopyFieldMappingsJobTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public CopyFieldMappingsJobTests()
+        {
+            _fieldMappingVerbatimRepositoryMock = new Mock<IFieldMappingVerbatimRepository>();
+            _processedFieldMappingRepositoryMock = new Mock<IProcessedFieldMappingRepository>();
+            _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
+            _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
+            _loggerMock = new Mock<ILogger<CopyFieldMappingsJob>>();
+        }
+
         private readonly Mock<IFieldMappingVerbatimRepository> _fieldMappingVerbatimRepositoryMock;
         private readonly Mock<IProcessedFieldMappingRepository> _processedFieldMappingRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
@@ -34,19 +46,7 @@ namespace SOS.Process.UnitTests.Jobs
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public CopyFieldMappingsJobTests()
-        {
-            _fieldMappingVerbatimRepositoryMock = new Mock<IFieldMappingVerbatimRepository>();
-            _processedFieldMappingRepositoryMock = new Mock<IProcessedFieldMappingRepository>();
-            _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
-            _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
-            _loggerMock = new Mock<ILogger<CopyFieldMappingsJob>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -95,47 +95,30 @@ namespace SOS.Process.UnitTests.Jobs
         }
 
         /// <summary>
-        /// Make a successful test of processing
+        ///     Test processing exception
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task RunAsyncSuccess()
+        public async Task RunAsyncException()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _fieldMappingVerbatimRepositoryMock.Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new List<FieldMapping>
-                {
-                    new FieldMapping { Id = FieldMappingFieldId.Activity, Values = new List<FieldMappingValue>(), ExternalSystemsMapping = new List<ExternalSystemMapping>()},
-                });
-
-            _processedFieldMappingRepositoryMock.Setup(r => r.DeleteCollectionAsync())
-                .ReturnsAsync(true);
-
-            _processedFieldMappingRepositoryMock.Setup(r => r.AddManyAsync(It.IsAny<IEnumerable<FieldMapping>>()))
-                .ReturnsAsync(true);
-
-            _harvestInfoRepository.Setup(r => r.GetAsync(It.IsAny<string>()))
-                .ReturnsAsync(new HarvestInfo("ID", DataProviderType.Taxa, DateTime.Now){ Status = RunStatus.Success});
-
-            _processInfoRepositoryMock.Setup(r => r.VerifyCollectionAsync());
-
-            _processInfoRepositoryMock.Setup(r => r.AddOrUpdateAsync(It.IsAny<ProcessInfo>()));
-
+                .Throws<Exception>();
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.RunAsync();
+            Func<Task> act = async () => { await TestObject.RunAsync(); };
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeTrue();
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
-        /// Test processing fail
+        ///     Test processing fail
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -152,7 +135,11 @@ namespace SOS.Process.UnitTests.Jobs
             _fieldMappingVerbatimRepositoryMock.Setup(r => r.GetAllAsync())
                 .ReturnsAsync(new List<FieldMapping>
                 {
-                    new FieldMapping { Id = FieldMappingFieldId.Activity, Values = new List<FieldMappingValue>(), ExternalSystemsMapping = new List<ExternalSystemMapping>()},
+                    new FieldMapping
+                    {
+                        Id = FieldMappingFieldId.Activity, Values = new List<FieldMappingValue>(),
+                        ExternalSystemsMapping = new List<ExternalSystemMapping>()
+                    }
                 });
 
             _processedFieldMappingRepositoryMock.Setup(r => r.DeleteCollectionAsync())
@@ -170,26 +157,47 @@ namespace SOS.Process.UnitTests.Jobs
         }
 
         /// <summary>
-        /// Test processing exception
+        ///     Make a successful test of processing
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task RunAsyncException()
+        public async Task RunAsyncSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _fieldMappingVerbatimRepositoryMock.Setup(r => r.GetAllAsync())
-               .Throws<Exception>();
+                .ReturnsAsync(new List<FieldMapping>
+                {
+                    new FieldMapping
+                    {
+                        Id = FieldMappingFieldId.Activity, Values = new List<FieldMappingValue>(),
+                        ExternalSystemsMapping = new List<ExternalSystemMapping>()
+                    }
+                });
+
+            _processedFieldMappingRepositoryMock.Setup(r => r.DeleteCollectionAsync())
+                .ReturnsAsync(true);
+
+            _processedFieldMappingRepositoryMock.Setup(r => r.AddManyAsync(It.IsAny<IEnumerable<FieldMapping>>()))
+                .ReturnsAsync(true);
+
+            _harvestInfoRepository.Setup(r => r.GetAsync(It.IsAny<string>()))
+                .ReturnsAsync(new HarvestInfo("ID", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success});
+
+            _processInfoRepositoryMock.Setup(r => r.VerifyCollectionAsync());
+
+            _processInfoRepositoryMock.Setup(r => r.AddOrUpdateAsync(It.IsAny<ProcessInfo>()));
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.RunAsync(); };
+            var result = await TestObject.RunAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            await act.Should().ThrowAsync<Exception>();
+            result.Should().BeTrue();
         }
     }
 }

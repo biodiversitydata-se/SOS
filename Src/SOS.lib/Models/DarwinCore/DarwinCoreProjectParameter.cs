@@ -1,8 +1,7 @@
-﻿
-namespace SOS.Lib.Models.DarwinCore
+﻿namespace SOS.Lib.Models.DarwinCore
 {
     /// <summary>
-    /// Darwin Core Project Parameter.
+    ///     Darwin Core Project Parameter.
     /// </summary>
     public class DarwinCoreProjectParameter
     {

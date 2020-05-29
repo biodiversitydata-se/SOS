@@ -8,12 +8,13 @@ using JsonDiffPatchDotNet;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SOS.Lib.Models.Shared;
+using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Helpers
 {
-    public class FieldMappingDiffHelper : Interfaces.IFieldMappingDiffHelper
+    public class FieldMappingDiffHelper : IFieldMappingDiffHelper
     {
         private readonly IFieldMappingVerbatimRepository _fieldMappingVerbatimRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
@@ -22,12 +23,14 @@ namespace SOS.Process.Helpers
             IFieldMappingVerbatimRepository fieldMappingVerbatimRepository,
             IProcessedFieldMappingRepository processedFieldMappingRepository)
         {
-            _fieldMappingVerbatimRepository = fieldMappingVerbatimRepository ?? throw new ArgumentNullException(nameof(_fieldMappingVerbatimRepository));
-            _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _fieldMappingVerbatimRepository = fieldMappingVerbatimRepository ??
+                                              throw new ArgumentNullException(nameof(_fieldMappingVerbatimRepository));
+            _processedFieldMappingRepository = processedFieldMappingRepository ??
+                                               throw new ArgumentNullException(nameof(processedFieldMappingRepository));
         }
 
         /// <summary>
-        /// Get diff between generated, verbatim and processed field mappings.
+        ///     Get diff between generated, verbatim and processed field mappings.
         /// </summary>
         /// <param name="generatedFieldMappings"></param>
         /// <returns></returns>
@@ -38,10 +41,13 @@ namespace SOS.Process.Helpers
             var generatedFieldMappingsJtoken = JToken.FromObject(generatedFieldMappings);
             var verbatimFieldMappingsJtoken = JToken.FromObject(verbatimFieldMappings);
             var processedFieldMappingsJtoken = JToken.FromObject(processedFieldMappings);
-            var serializerSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
-            var generatedFieldMappingsJson = JsonConvert.SerializeObject(generatedFieldMappings, Formatting.Indented, serializerSettings);
-            var verbatimFieldMappingsJson = JsonConvert.SerializeObject(verbatimFieldMappings, Formatting.Indented, serializerSettings);
-            var processedFieldMappingsJson = JsonConvert.SerializeObject(processedFieldMappings, Formatting.Indented, serializerSettings);
+            var serializerSettings = new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore};
+            var generatedFieldMappingsJson =
+                JsonConvert.SerializeObject(generatedFieldMappings, Formatting.Indented, serializerSettings);
+            var verbatimFieldMappingsJson =
+                JsonConvert.SerializeObject(verbatimFieldMappings, Formatting.Indented, serializerSettings);
+            var processedFieldMappingsJson =
+                JsonConvert.SerializeObject(processedFieldMappings, Formatting.Indented, serializerSettings);
             var generatedFile = Encoding.UTF8.GetBytes(generatedFieldMappingsJson);
             var verbatimFile = Encoding.UTF8.GetBytes(verbatimFieldMappingsJson);
             var processedFile = Encoding.UTF8.GetBytes(processedFieldMappingsJson);
@@ -50,9 +56,12 @@ namespace SOS.Process.Helpers
                 (Filename: "1.GeneratedFieldMappings.json", Bytes: generatedFile),
                 (Filename: "2.VerbatimFieldMappings.json", Bytes: verbatimFile),
                 (Filename: "3.ProcessedFieldMappings.json", Bytes: processedFile),
-                CreateFieldMappingDiffResult(generatedFieldMappingsJtoken, verbatimFieldMappingsJtoken, "JsonDiffPatch - GeneratedComparedToVerbatim"),
-                CreateFieldMappingDiffResult(verbatimFieldMappingsJtoken, processedFieldMappingsJtoken, "JsonDiffPatch - VerbatimComparedToProcessed"),
-                CreateFieldMappingDiffResult(generatedFieldMappingsJtoken, processedFieldMappingsJtoken, "JsonDiffPatch - GeneratedComparedToProcessed"),
+                CreateFieldMappingDiffResult(generatedFieldMappingsJtoken, verbatimFieldMappingsJtoken,
+                    "JsonDiffPatch - GeneratedComparedToVerbatim"),
+                CreateFieldMappingDiffResult(verbatimFieldMappingsJtoken, processedFieldMappingsJtoken,
+                    "JsonDiffPatch - VerbatimComparedToProcessed"),
+                CreateFieldMappingDiffResult(generatedFieldMappingsJtoken, processedFieldMappingsJtoken,
+                    "JsonDiffPatch - GeneratedComparedToProcessed")
             });
 
             return zipFile;
@@ -60,9 +69,11 @@ namespace SOS.Process.Helpers
 
         private (string Filename, byte[] Bytes) CreateFieldMappingDiffResult(JToken left, JToken right, string fileName)
         {
-            JsonDiffPatch jdp = new JsonDiffPatch();
-            JToken diff = jdp.Diff(left, right);
-            var newFilename = diff == null ? $"{fileName} (No changes detected).json" : $"{fileName} (Changes detected).json";
+            var jdp = new JsonDiffPatch();
+            var diff = jdp.Diff(left, right);
+            var newFilename = diff == null
+                ? $"{fileName} (No changes detected).json"
+                : $"{fileName} (Changes detected).json";
             var diffBytes = Encoding.UTF8.GetBytes(diff == null ? "" : diff.ToString());
             return (Filename: newFilename, Bytes: diffBytes);
         }

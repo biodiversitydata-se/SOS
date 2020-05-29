@@ -3,10 +3,9 @@
 namespace SOS.Process.Processors.Kul.Interfaces
 {
     /// <summary>
-    /// KUL observation processor
+    ///     KUL observation processor
     /// </summary>
     public interface IKulObservationProcessor : IProcessor
     {
-        
     }
 }

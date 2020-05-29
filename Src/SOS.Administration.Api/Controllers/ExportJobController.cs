@@ -3,22 +3,23 @@ using System.Net;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Administration.Api.Controllers
 {
     /// <summary>
-    /// Import job controller
+    ///     Import job controller
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class ExportJobController : ControllerBase, Interfaces.IExportJobController
+    public class ExportJobController : ControllerBase, IExportJobController
     {
         private readonly ILogger<ExportJobController> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="logger"></param>
         public ExportJobController(ILogger<ExportJobController> logger)
@@ -28,10 +29,11 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost("DarwinCore/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunExportAndStoreJob([FromBody]ExportFilter filter, [FromQuery]string blobStorageContainer, [FromQuery]string fileName)
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public IActionResult RunExportAndStoreJob([FromBody] ExportFilter filter,
+            [FromQuery] string blobStorageContainer, [FromQuery] string fileName)
         {
             try
             {
@@ -45,20 +47,23 @@ namespace SOS.Administration.Api.Controllers
                     return BadRequest("You must provide a file name");
                 }
 
-                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndStoreJob>(job => job.RunAsync(filter, blobStorageContainer, fileName, false, JobCancellationToken.Null)));
+                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndStoreJob>(job =>
+                    job.RunAsync(filter, blobStorageContainer, fileName, false, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Running export failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
         [HttpPost("DarwinCore/Schedule/Daily")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult ScheduleDailyExportAndStoreJob([FromBody]ExportFilter filter, [FromQuery]string blobStorageContainer, [FromQuery]string fileName, [FromQuery]int hour, [FromQuery]int minute)
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public IActionResult ScheduleDailyExportAndStoreJob([FromBody] ExportFilter filter,
+            [FromQuery] string blobStorageContainer, [FromQuery] string fileName, [FromQuery] int hour,
+            [FromQuery] int minute)
         {
             try
             {
@@ -72,13 +77,15 @@ namespace SOS.Administration.Api.Controllers
                     return BadRequest("You must provide a file name");
                 }
 
-                RecurringJob.AddOrUpdate<IExportAndStoreJob>(nameof(IExportAndStoreJob), job => job.RunAsync(filter, blobStorageContainer, fileName, false, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
-                return new OkObjectResult($"Export Darwin Core Job Scheduled.");
+                RecurringJob.AddOrUpdate<IExportAndStoreJob>(nameof(IExportAndStoreJob),
+                    job => job.RunAsync(filter, blobStorageContainer, fileName, false, JobCancellationToken.Null),
+                    $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                return new OkObjectResult("Export Darwin Core Job Scheduled.");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Scheduling Darwin Core job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
     }

@@ -4,13 +4,11 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.DarwinCore;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Jobs;
 using SOS.Import.Managers.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using Xunit;
@@ -19,6 +17,17 @@ namespace SOS.Import.UnitTests.Managers
 {
     public class DwcArchiveHarvestJobTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public DwcArchiveHarvestJobTests()
+        {
+            _dwcObservationHarvesterMock = new Mock<IDwcObservationHarvester>();
+            _dataProviderManagerMock = new Mock<IDataProviderManager>();
+            _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
+            _loggerMock = new Mock<ILogger<DwcArchiveHarvestJob>>();
+        }
+
         private readonly Mock<IDwcObservationHarvester> _dwcObservationHarvesterMock;
         private readonly Mock<IDataProviderManager> _dataProviderManagerMock;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
@@ -31,18 +40,60 @@ namespace SOS.Import.UnitTests.Managers
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
+        ///     Harvest job throw exception
         /// </summary>
-        public DwcArchiveHarvestJobTests()
+        /// <returns></returns>
+        [Fact]
+        public async Task AddDataProviderException()
         {
-            _dwcObservationHarvesterMock = new Mock<IDwcObservationHarvester>();
-            _dataProviderManagerMock = new Mock<IDataProviderManager>();
-            _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
-            _loggerMock = new Mock<ILogger<DwcArchiveHarvestJob>>();
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _dataProviderManagerMock.Setup(ts => ts.GetDataProviderByIdAsync(It.IsAny<int>()))
+                .Throws<Exception>();
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            Func<Task> act = async () => { await TestObject.RunAsync(0, "", JobCancellationToken.Null); };
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
-        /// Test constructor
+        ///     Fail to run harvest job
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task AddDataProviderFail()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _dataProviderManagerMock.Setup(ts => ts.GetDataProviderByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(new DataProvider());
+
+            _dwcObservationHarvesterMock.Setup(ts =>
+                    ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<DataProvider>(),
+                        JobCancellationToken.Null))
+                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Failed});
+
+            _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            Func<Task> act = async () => { await TestObject.RunAsync(0, "", JobCancellationToken.Null); };
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            await act.Should().ThrowAsync<Exception>();
+        }
+
+        /// <summary>
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -66,7 +117,7 @@ namespace SOS.Import.UnitTests.Managers
             create = () => new DwcArchiveHarvestJob(
                 _dwcObservationHarvesterMock.Object,
                 _harvestInfoRepositoryMock.Object,
-               null,
+                null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("dataProviderManager");
 
@@ -74,12 +125,12 @@ namespace SOS.Import.UnitTests.Managers
                 _dwcObservationHarvesterMock.Object,
                 _harvestInfoRepositoryMock.Object,
                 _dataProviderManagerMock.Object,
-               null);
+                null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
         /// <summary>
-        /// Run harvest job successfully
+        ///     Run harvest job successfully
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -91,8 +142,10 @@ namespace SOS.Import.UnitTests.Managers
             _dataProviderManagerMock.Setup(ts => ts.GetDataProviderByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync(new DataProvider());
 
-            _dwcObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<DataProvider>(), JobCancellationToken.Null))
-                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now){ Status = RunStatus.Success});
+            _dwcObservationHarvesterMock.Setup(ts =>
+                    ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<DataProvider>(),
+                        JobCancellationToken.Null))
+                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success});
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             //-----------------------------------------------------------------------------------------------------------
@@ -105,57 +158,5 @@ namespace SOS.Import.UnitTests.Managers
 
             result.Should().BeTrue();
         }
-
-        /// <summary>
-        /// Fail to run harvest job
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task AddDataProviderFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _dataProviderManagerMock.Setup(ts => ts.GetDataProviderByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync(new DataProvider());
-
-            _dwcObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(It.IsAny<string>(), It.IsAny<DataProvider>(), JobCancellationToken.Null))
-                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) { Status = RunStatus.Failed });
-
-            _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.RunAsync(0, "", JobCancellationToken.Null); };
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            await act.Should().ThrowAsync<Exception>();
-        }
-
-        /// <summary>
-        /// Harvest job throw exception
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task AddDataProviderException()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _dataProviderManagerMock.Setup(ts => ts.GetDataProviderByIdAsync(It.IsAny<int>()))
-               .Throws<Exception>();
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.RunAsync(0, "", JobCancellationToken.Null); };
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            await act.Should().ThrowAsync<Exception>();
-        }
-
     }
 }

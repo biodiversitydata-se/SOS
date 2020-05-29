@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
+﻿using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
 
 namespace SOS.Lib.Models.Shared
 {
@@ -19,14 +16,13 @@ namespace SOS.Lib.Models.Shared
         [JsonConverter(typeof(ExpandoObjectConverter))]
         public dynamic Extra { get; set; }
 
-        [BsonIgnoreIfNull]
-        public FieldMappingValueCategory Category { get; set; }
+        [BsonIgnoreIfNull] public FieldMappingValueCategory Category { get; set; }
 
         /// <summary>
-        /// Translations.
+        ///     Translations.
         /// </summary>
         /// <remarks>
-        /// Translations exists if the <see cref="Localized"/> property is set to true.
+        ///     Translations exists if the <see cref="Localized" /> property is set to true.
         /// </remarks>
         [BsonIgnoreIfNull]
         public ICollection<FieldMappingTranslation> Translations { get; set; }

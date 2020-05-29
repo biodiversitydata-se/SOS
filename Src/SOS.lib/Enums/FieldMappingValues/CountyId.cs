@@ -1,112 +1,112 @@
 ﻿namespace SOS.Lib.Enums.FieldMappingValues
 {
     /// <summary>
-    /// Enumeration of County.
+    ///     Enumeration of County.
     /// </summary>
     public enum CountyId
     {
         /// <summary>
-        /// Blekinge.
+        ///     Blekinge.
         /// </summary>
         Blekinge = 1,
 
         /// <summary>
-        /// Dalarna.
+        ///     Dalarna.
         /// </summary>
         Dalarna = 2,
 
         /// <summary>
-        /// Gotland.
+        ///     Gotland.
         /// </summary>
         Gotland = 3,
 
         /// <summary>
-        /// Gävleborg.
+        ///     Gävleborg.
         /// </summary>
         Gavleborg = 4,
 
         /// <summary>
-        /// Halland.
+        ///     Halland.
         /// </summary>
         Halland = 5,
 
         /// <summary>
-        /// Jämtland.
+        ///     Jämtland.
         /// </summary>
         Jamtland = 6,
 
         /// <summary>
-        /// Jönköping.
+        ///     Jönköping.
         /// </summary>
         Jonkoping = 7,
 
         /// <summary>
-        /// Kalmar.
+        ///     Kalmar.
         /// </summary>
         Kalmar = 8,
 
         /// <summary>
-        /// Kronoberg.
+        ///     Kronoberg.
         /// </summary>
         Kronoberg = 9,
 
         /// <summary>
-        /// Norrbotten.
+        ///     Norrbotten.
         /// </summary>
         Norrbotten = 10,
 
         /// <summary>
-        /// Skåne.
+        ///     Skåne.
         /// </summary>
         Skane = 11,
 
         /// <summary>
-        /// Stockholm.
+        ///     Stockholm.
         /// </summary>
         Stockholm = 12,
 
         /// <summary>
-        /// Södermanland.
+        ///     Södermanland.
         /// </summary>
         Sodermanland = 13,
 
         /// <summary>
-        /// Uppsala.
+        ///     Uppsala.
         /// </summary>
         Uppsala = 14,
 
         /// <summary>
-        /// Värmland.
+        ///     Värmland.
         /// </summary>
         Varmland = 15,
 
         /// <summary>
-        /// Västerbotten.
+        ///     Västerbotten.
         /// </summary>
         Vasterbotten = 16,
 
         /// <summary>
-        /// Östergötland.
+        ///     Östergötland.
         /// </summary>
         Ostergotland = 17,
 
         /// <summary>
-        /// Västernorrland.
+        ///     Västernorrland.
         /// </summary>
         Vasternorrland = 18,
 
         /// <summary>
-        /// Västmanland.
+        ///     Västmanland.
         /// </summary>
         Vastmanland = 19,
 
         /// <summary>
-        /// Västra Götaland.
+        ///     Västra Götaland.
         /// </summary>
         VastraGotaland = 20,
 
         /// <summary>
-        /// Örebro.
+        ///     Örebro.
         /// </summary>
         Orebro = 21
     }

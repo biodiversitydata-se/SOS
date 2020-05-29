@@ -6,7 +6,7 @@ using SOS.Lib.Models.Processed.Observation;
 namespace SOS.Lib.Extensions
 {
     /// <summary>
-    /// Extensions for Darwin Core
+    ///     Extensions for Darwin Core
     /// </summary>
     public static class DarwinCoreTaxonExtensions
     {
@@ -35,9 +35,12 @@ namespace SOS.Lib.Extensions
                 NamePublishedIn = sourceTaxon.NamePublishedIn,
                 NamePublishedInId = sourceTaxon.NamePublishedInID,
                 NamePublishedInYear = sourceTaxon.NamePublishedInYear,
-                Natura2000HabitatsDirectiveArticle2 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle2,
-                Natura2000HabitatsDirectiveArticle4 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle4,
-                Natura2000HabitatsDirectiveArticle5 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle5,
+                Natura2000HabitatsDirectiveArticle2 =
+                    sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle2,
+                Natura2000HabitatsDirectiveArticle4 =
+                    sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle4,
+                Natura2000HabitatsDirectiveArticle5 =
+                    sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle5,
                 NomenclaturalCode = sourceTaxon.NomenclaturalCode,
                 NomenclaturalStatus = sourceTaxon.NomenclaturalStatus,
                 Order = sourceTaxon.Order,
@@ -70,7 +73,7 @@ namespace SOS.Lib.Extensions
 
         public static ProcessedBasicTaxon ToProcessedBasicTaxon(this DarwinCoreTaxon sourceTaxon)
         {
-            return new ProcessedBasicTaxon()
+            return new ProcessedBasicTaxon
             {
                 DyntaxaTaxonId = sourceTaxon.DynamicProperties.DyntaxaTaxonId,
                 ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties.ParentDyntaxaTaxonId,
@@ -81,17 +84,18 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Cast DarwinCoreVernacularNames to TaxonVernacularNames.
+        ///     Cast DarwinCoreVernacularNames to TaxonVernacularNames.
         /// </summary>
         /// <param name="darwinCoreVernacularNames"></param>
         /// <returns></returns>
-        private static IEnumerable<TaxonVernacularName> ToTaxonVernacularNames(this IEnumerable<DarwinCoreVernacularName> darwinCoreVernacularNames)
+        private static IEnumerable<TaxonVernacularName> ToTaxonVernacularNames(
+            this IEnumerable<DarwinCoreVernacularName> darwinCoreVernacularNames)
         {
             return darwinCoreVernacularNames?.Select(m => m.ToTaxonVernacularName());
         }
 
         /// <summary>
-        /// Cast DarwinCoreVernacularName object to TaxonVernacularName.
+        ///     Cast DarwinCoreVernacularName object to TaxonVernacularName.
         /// </summary>
         /// <param name="darwinCoreVernacularName"></param>
         /// <returns></returns>

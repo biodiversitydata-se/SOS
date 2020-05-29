@@ -10,6 +10,15 @@ namespace SOS.Process.UnitTests.Repositories.Source
 {
     public class KulObservationVerbatimRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public KulObservationVerbatimRepositoryTests()
+        {
+            _processClient = new Mock<IVerbatimClient>();
+            _loggerMock = new Mock<ILogger<KulObservationVerbatimRepository>>();
+        }
+
         private readonly Mock<IVerbatimClient> _processClient;
         private readonly Mock<ILogger<KulObservationVerbatimRepository>> _loggerMock;
 
@@ -18,16 +27,7 @@ namespace SOS.Process.UnitTests.Repositories.Source
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public KulObservationVerbatimRepositoryTests()
-        {
-            _processClient = new Mock<IVerbatimClient>();
-            _loggerMock = new Mock<ILogger<KulObservationVerbatimRepository>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()

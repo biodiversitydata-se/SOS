@@ -12,50 +12,32 @@ using SOS.Observations.Api.Repositories.Interfaces;
 namespace SOS.Observations.Api.Repositories
 {
     /// <summary>
-    /// Base class for cosmos db repositories
+    ///     Base class for cosmos db repositories
     /// </summary>
     public class ProcessBaseRepository<TEntity, TKey> : IBaseRepository<TEntity, TKey> where TEntity : IEntity<TKey>
     {
+        private readonly IProcessClient _client;
+
+        private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
+        private readonly bool _multipleInstances;
+
         /// <summary>
-        /// Logger 
+        ///     Mongo db
+        /// </summary>
+        protected readonly IMongoDatabase Database;
+
+        /// <summary>
+        ///     Logger
         /// </summary>
         protected readonly ILogger<ProcessBaseRepository<TEntity, TKey>> Logger;
 
-        private readonly IProcessClient _client;
-        private readonly bool _multipleInstances;
         /// <summary>
-        /// Mongo db
-        /// </summary>
-        protected readonly IMongoDatabase Database;
-        
-        /// <summary>
-        /// Batch size.
-        /// </summary>
-        protected int BatchSize { get; }
-
-        /// <summary>
-        /// Get collection name
-        /// </summary>
-        protected string CollectionName => _multipleInstances
-            ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{ActiveInstance}"
-            : typeof(TEntity).Name.UntilNonAlfanumeric();
-
-        /// <summary>
-        /// If multiple instances is supported, return inactive instance name
-        /// </summary>
-        protected string InactiveCollectionName => _multipleInstances
-            ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{ (ActiveInstance == 0 ? 1 : 0) }"
-            : typeof(TEntity).Name.UntilNonAlfanumeric();
-
-        /// <summary>
-        /// Disposed
+        ///     Disposed
         /// </summary>
         private bool _disposed;
 
-        private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="multipleInstances"></param>
@@ -71,45 +53,44 @@ namespace SOS.Observations.Api.Repositories
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             BatchSize = _client.BatchSize;
             Database = _client.GetDatabase();
-            
         }
 
         /// <summary>
-        /// Get configuration object
+        ///     Batch size.
         /// </summary>
-        /// <returns></returns>
-        private ProcessedConfiguration GetConfiguration()
-        {
-            try
-            {
-                return MongoCollectionConfiguration
-                    .Find(Builders<ProcessedConfiguration>.Filter.Empty)
-                    .FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-
-                return default;
-            }
-        }
+        protected int BatchSize { get; }
 
         /// <summary>
-        /// Get active instance
+        ///     Get collection name
+        /// </summary>
+        protected string CollectionName => _multipleInstances
+            ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{ActiveInstance}"
+            : typeof(TEntity).Name.UntilNonAlfanumeric();
+
+        /// <summary>
+        ///     If multiple instances is supported, return inactive instance name
+        /// </summary>
+        protected string InactiveCollectionName => _multipleInstances
+            ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{(ActiveInstance == 0 ? 1 : 0)}"
+            : typeof(TEntity).Name.UntilNonAlfanumeric();
+
+        /// <summary>
+        ///     Get active instance
         /// </summary>
         /// <returns></returns>
         protected byte ActiveInstance => GetConfiguration().ActiveInstance;
 
         /// <summary>
-        /// Get client
+        ///     Get client
         /// </summary>
         /// <returns></returns>
         protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(CollectionName);
 
         /// <summary>
-        /// Configuration collection
+        ///     Configuration collection
         /// </summary>
-        protected IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration => Database.GetCollection<ProcessedConfiguration>(_collectionNameConfiguration);
+        protected IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration =>
+            Database.GetCollection<ProcessedConfiguration>(_collectionNameConfiguration);
 
         /// <inheritdoc />
         public async Task<TEntity> GetAsync(TKey id)
@@ -139,7 +120,36 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <summary>
-        /// Dispose
+        ///     Dispose
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        ///     Get configuration object
+        /// </summary>
+        /// <returns></returns>
+        private ProcessedConfiguration GetConfiguration()
+        {
+            try
+            {
+                return MongoCollectionConfiguration
+                    .Find(Builders<ProcessedConfiguration>.Filter.Empty)
+                    .FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+
+                return default;
+            }
+        }
+
+        /// <summary>
+        ///     Dispose
         /// </summary>
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
@@ -151,19 +161,9 @@ namespace SOS.Observations.Api.Repositories
 
             if (disposing)
             {
-               
             }
 
             _disposed = true;
-        }
-
-        /// <summary>
-        /// Dispose
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

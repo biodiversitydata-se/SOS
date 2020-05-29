@@ -1,15 +1,15 @@
-﻿using DwC_A.Factories;
-using DwC_A.Meta;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using DwC_A.Factories;
+using DwC_A.Meta;
 
 namespace DwC_A
 {
-    internal class StreamReader 
+    internal class StreamReader
     {
-        private readonly ITokenizer tokenizer;
-        private readonly IRowFactory rowFactory;
         private readonly IFileMetaData fileMetaData;
+        private readonly IRowFactory rowFactory;
+        private readonly ITokenizer tokenizer;
 
         public StreamReader(
             IRowFactory rowFactory,
@@ -23,7 +23,7 @@ namespace DwC_A
 
         public IEnumerable<IRow> ReadRows(Stream stream)
         {
-            using(var reader = new System.IO.StreamReader(stream, fileMetaData.Encoding))
+            using (var reader = new System.IO.StreamReader(stream, fileMetaData.Encoding))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
@@ -35,10 +35,10 @@ namespace DwC_A
 
         public async IAsyncEnumerable<IRow> ReadRowsAsync(Stream stream)
         {
-            using(var reader = new System.IO.StreamReader(stream, fileMetaData.Encoding))
+            using (var reader = new System.IO.StreamReader(stream, fileMetaData.Encoding))
             {
                 string line;
-                while((line = await reader.ReadLineAsync()) != null)
+                while ((line = await reader.ReadLineAsync()) != null)
                 {
                     yield return rowFactory.CreateRow(tokenizer.Split(line), fileMetaData.Fields);
                 }

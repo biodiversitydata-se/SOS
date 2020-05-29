@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SOS.Export.Models
+﻿namespace SOS.Export.Models
 {
     public class FieldDescription
     {

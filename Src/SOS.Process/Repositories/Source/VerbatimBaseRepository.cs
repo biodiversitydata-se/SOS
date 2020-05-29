@@ -6,37 +6,39 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Models.Interfaces;
 using SOS.Process.Database.Interfaces;
+using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source
 {
     /// <summary>
-    /// Base class for verbatim repositories
+    ///     Base class for verbatim repositories
     /// </summary>
-    public class VerbatimBaseRepository<TEntity, TKey> : Interfaces.IVerbatimBaseRepository<TEntity, TKey> where TEntity : IEntity<TKey>
+    public class VerbatimBaseRepository<TEntity, TKey> : IVerbatimBaseRepository<TEntity, TKey>
+        where TEntity : IEntity<TKey>
     {
-        /// <summary>
-        /// Logger 
-        /// </summary>
-        protected readonly ILogger<VerbatimBaseRepository<TEntity, TKey>> Logger;
+        private readonly int _batchSize;
 
-        /// <summary>
-        /// Mongo db
-        /// </summary>
-        protected readonly IMongoDatabase Database;
+        private readonly string _collectionName;
 
         protected readonly IVerbatimClient Client;
 
         /// <summary>
-        /// Disposed
+        ///     Mongo db
+        /// </summary>
+        protected readonly IMongoDatabase Database;
+
+        /// <summary>
+        ///     Logger
+        /// </summary>
+        protected readonly ILogger<VerbatimBaseRepository<TEntity, TKey>> Logger;
+
+        /// <summary>
+        ///     Disposed
         /// </summary>
         private bool _disposed;
 
-        private readonly string _collectionName;
-
-        private readonly int _batchSize;
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
@@ -59,7 +61,7 @@ namespace SOS.Process.Repositories.Source
         }
 
         /// <summary>
-        /// Get client
+        ///     Get client
         /// </summary>
         /// <returns></returns>
         protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(_collectionName);
@@ -84,11 +86,6 @@ namespace SOS.Process.Repositories.Source
             return exists;
         }
 
-        protected IMongoCollection<TEntity> GetMongoCollection(string collectionName)
-        {
-            return Database.GetCollection<TEntity>(collectionName);
-        }
-
         /// <inheritdoc />
         public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync()
         {
@@ -96,9 +93,11 @@ namespace SOS.Process.Repositories.Source
         }
 
         /// <inheritdoc />
-        public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync(IMongoCollection<TEntity> mongoCollection, bool noCursorTimeout = false)
+        public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync(IMongoCollection<TEntity> mongoCollection,
+            bool noCursorTimeout = false)
         {
-            return await mongoCollection.FindAsync(FilterDefinition<TEntity>.Empty, new FindOptions<TEntity, TEntity> { NoCursorTimeout = noCursorTimeout});
+            return await mongoCollection.FindAsync(FilterDefinition<TEntity>.Empty,
+                new FindOptions<TEntity, TEntity> {NoCursorTimeout = noCursorTimeout});
         }
 
         /// <inheritdoc />
@@ -120,7 +119,8 @@ namespace SOS.Process.Repositories.Source
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId, IMongoCollection<TEntity> mongoCollection)
+        public async Task<IEnumerable<TEntity>> GetBatchAsync(TKey startId, TKey endId,
+            IMongoCollection<TEntity> mongoCollection)
         {
             try
             {
@@ -168,7 +168,7 @@ namespace SOS.Process.Repositories.Source
                     .Sort(Builders<TEntity>.Sort.Descending("_id"))
                     .Limit(1)
                     .FirstOrDefaultAsync();
-                
+
                 return new Tuple<TKey, TKey>(min, max);
             }
             catch (Exception e)
@@ -180,7 +180,21 @@ namespace SOS.Process.Repositories.Source
         }
 
         /// <summary>
-        /// Dispose
+        ///     Dispose
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected IMongoCollection<TEntity> GetMongoCollection(string collectionName)
+        {
+            return Database.GetCollection<TEntity>(collectionName);
+        }
+
+        /// <summary>
+        ///     Dispose
         /// </summary>
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
@@ -192,19 +206,9 @@ namespace SOS.Process.Repositories.Source
 
             if (disposing)
             {
-
             }
 
             _disposed = true;
-        }
-
-        /// <summary>
-        /// Dispose
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

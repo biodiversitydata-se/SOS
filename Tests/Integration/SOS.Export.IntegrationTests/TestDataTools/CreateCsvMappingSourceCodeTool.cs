@@ -14,7 +14,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var dic = DarwinCoreDynamicMap.CreateFieldMappingDictionary();
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

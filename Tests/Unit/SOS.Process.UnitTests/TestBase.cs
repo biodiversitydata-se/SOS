@@ -7,13 +7,13 @@ namespace SOS.Process.UnitTests
     {
         protected ProcessConfiguration GetProcessConfiguration()
         {
-            IConfigurationRoot config = new ConfigurationBuilder()
+            var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            ProcessConfiguration processConfiguration = config.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
+            var processConfiguration = config.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
             return processConfiguration;
         }
     }

@@ -7,7 +7,6 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Jobs.Process;
-using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.Verbatim.Shared;
@@ -18,12 +17,12 @@ namespace SOS.Process.Jobs
 {
     public class ProcessTaxaJob : ProcessJobBase, IProcessTaxaJob
     {
-        private readonly ITaxonVerbatimRepository _taxonVerbatimRepository;
-        private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly ILogger<ProcessTaxaJob> _logger;
+        private readonly IProcessedTaxonRepository _processedTaxonRepository;
+        private readonly ITaxonVerbatimRepository _taxonVerbatimRepository;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="taxonVerbatimRepository"></param>
         /// <param name="processedTaxonRepository"></param>
@@ -37,8 +36,10 @@ namespace SOS.Process.Jobs
             IProcessInfoRepository processInfoRepository,
             ILogger<ProcessTaxaJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
-            _taxonVerbatimRepository = taxonVerbatimRepository ?? throw new ArgumentNullException(nameof(taxonVerbatimRepository));
-            _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
+            _taxonVerbatimRepository = taxonVerbatimRepository ??
+                                       throw new ArgumentNullException(nameof(taxonVerbatimRepository));
+            _processedTaxonRepository = processedTaxonRepository ??
+                                        throw new ArgumentNullException(nameof(processedTaxonRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -64,6 +65,7 @@ namespace SOS.Process.Jobs
                 _logger.LogError("Failed to delete processed taxa");
                 return false;
             }
+
             _logger.LogDebug("Finish deleting processed taxa");
 
             _logger.LogDebug("Start saving processed taxa");
@@ -75,15 +77,15 @@ namespace SOS.Process.Jobs
             var providerInfo = CreateProviderInfo(DataProviderType.Taxa, harvestInfo, start, DateTime.Now,
                 success ? RunStatus.Success : RunStatus.Failed, taxa.Count);
             await SaveProcessInfo(nameof(ProcessedTaxon), start, taxa.Count,
-                success ? RunStatus.Success : RunStatus.Failed, new[] { providerInfo });
+                success ? RunStatus.Success : RunStatus.Failed, new[] {providerInfo});
             _logger.LogDebug("Finish updating process info for taxa");
-            
+
             return success ? true : throw new Exception("Process taxa job failed");
         }
 
         /// <summary>
-        /// Calculate higher classification tree by creating a taxon tree and iterate
-        /// each nodes parents.
+        ///     Calculate higher classification tree by creating a taxon tree and iterate
+        ///     each nodes parents.
         /// </summary>
         /// <param name="taxa"></param>
         private void CalculateHigherClassificationField(ICollection<ProcessedTaxon> taxa)
@@ -94,7 +96,7 @@ namespace SOS.Process.Jobs
             {
                 var parentNames = treeNode.AsParentsNodeIterator().Select(m => m.ScientificName);
                 var reversedParentNames = parentNames.Reverse();
-                string higherClassification = string.Join(" | ", reversedParentNames);
+                var higherClassification = string.Join(" | ", reversedParentNames);
                 taxonById[treeNode.TaxonId].HigherClassification = higherClassification;
             }
         }

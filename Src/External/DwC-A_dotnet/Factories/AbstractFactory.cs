@@ -4,7 +4,6 @@ namespace DwC_A.Factories
 {
     public abstract class AbstractFactory : IAbstractFactory
     {
-
         public ArchiveReader CreateArchiveReader(string fileName)
         {
             return new ArchiveReader(fileName, this);
@@ -12,7 +11,7 @@ namespace DwC_A.Factories
 
         public virtual IArchiveFolder CreateArchiveFolder(string fileName, string outputPath)
         {
-            return new ArchiveFolder(fileName, outputPath );
+            return new ArchiveFolder(fileName, outputPath);
         }
 
         public virtual IMetaDataReader CreateMetaDataReader()
@@ -32,9 +31,9 @@ namespace DwC_A.Factories
 
         public virtual IFileReaderAggregate CreateFileReader(string fileName, IFileMetaData fileMetaData)
         {
-            return new FileReader(fileName, 
-                CreateRowFactory(), 
-                CreateTokenizer(fileMetaData), 
+            return new FileReader(fileName,
+                CreateRowFactory(),
+                CreateTokenizer(fileMetaData),
                 fileMetaData);
         }
 

@@ -1,4 +1,4 @@
-﻿namespace   SOS.Lib.Models.DarwinCore.Vocabulary
+﻿namespace SOS.Lib.Models.DarwinCore.Vocabulary
 {
     public static class BasisOfRecord
     {

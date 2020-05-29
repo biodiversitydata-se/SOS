@@ -2,35 +2,37 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
     /// <summary>
-    /// Database base class
+    ///     Database base class
     /// </summary>
-    public class BaseRepository<T> : Interfaces.IBaseRepository<T>
+    public class BaseRepository<T> : IBaseRepository<T>
     {
         private readonly IArtportalenDataService _artportalenDataService;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="artportalenDataService"></param>
         /// <param name="logger"></param>
         public BaseRepository(IArtportalenDataService artportalenDataService, ILogger<T> logger)
         {
-            _artportalenDataService = artportalenDataService ?? throw new ArgumentNullException(nameof(artportalenDataService));
+            _artportalenDataService =
+                artportalenDataService ?? throw new ArgumentNullException(nameof(artportalenDataService));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
-        /// Logger
+        ///     Logger
         /// </summary>
-        protected ILogger<T> Logger { get; private set; }
+        protected ILogger<T> Logger { get; }
 
         /// <summary>
-        /// Query data base
+        ///     Query data base
         /// </summary>
         /// <typeparam name="E"></typeparam>
         /// <param name="query"></param>

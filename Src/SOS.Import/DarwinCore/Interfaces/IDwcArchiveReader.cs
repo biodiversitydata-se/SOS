@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using DwC_A;
 using SOS.Lib.Models.Interfaces;
@@ -11,7 +9,7 @@ namespace SOS.Import.DarwinCore.Interfaces
     public interface IDwcArchiveReader
     {
         /// <summary>
-        /// Reads a DwC-A file and returns the observations in batches.
+        ///     Reads a DwC-A file and returns the observations in batches.
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <param name="idIdentifierTuple"></param>
@@ -23,7 +21,7 @@ namespace SOS.Import.DarwinCore.Interfaces
             int batchSize);
 
         /// <summary>
-        /// Reads a DwC-A file and returns the observations.
+        ///     Reads a DwC-A file and returns the observations.
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <param name="idIdentifierTuple"></param>
@@ -33,7 +31,7 @@ namespace SOS.Import.DarwinCore.Interfaces
             IIdIdentifierTuple idIdentifierTuple);
 
         /// <summary>
-        /// Reads a Sampling Event DwC-A and returns the events in batches.
+        ///     Reads a Sampling Event DwC-A and returns the events in batches.
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <param name="idIdentifierTuple"></param>
@@ -45,7 +43,7 @@ namespace SOS.Import.DarwinCore.Interfaces
             int batchSize);
 
         /// <summary>
-        /// Reads a Sampling Event DwC-A and returns the events.
+        ///     Reads a Sampling Event DwC-A and returns the events.
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <param name="idIdentifierTuple"></param>

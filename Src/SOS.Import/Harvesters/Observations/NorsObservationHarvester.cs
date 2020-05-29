@@ -6,6 +6,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
+using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.Nors.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
@@ -15,15 +16,15 @@ using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Harvesters.Observations
 {
-    public class NorsObservationHarvester : Interfaces.INorsObservationHarvester
+    public class NorsObservationHarvester : INorsObservationHarvester
     {
+        private readonly ILogger<NorsObservationHarvester> _logger;
         private readonly INorsObservationService _norsObservationService;
         private readonly INorsObservationVerbatimRepository _norsObservationVerbatimRepository;
-        private readonly ILogger<NorsObservationHarvester> _logger;
         private readonly NorsServiceConfiguration _norsServiceConfiguration;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="norsObservationService"></param>
         /// <param name="norsObservationVerbatimRepository"></param>
@@ -35,24 +36,20 @@ namespace SOS.Import.Harvesters.Observations
             NorsServiceConfiguration norsServiceConfiguration,
             ILogger<NorsObservationHarvester> logger)
         {
-            _norsObservationService = norsObservationService ?? throw new ArgumentNullException(nameof(norsObservationService));
-            _norsObservationVerbatimRepository = norsObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(norsObservationVerbatimRepository));
-            _norsServiceConfiguration = norsServiceConfiguration ?? throw new ArgumentNullException(nameof(norsServiceConfiguration));
+            _norsObservationService =
+                norsObservationService ?? throw new ArgumentNullException(nameof(norsObservationService));
+            _norsObservationVerbatimRepository = norsObservationVerbatimRepository ??
+                                                 throw new ArgumentNullException(
+                                                     nameof(norsObservationVerbatimRepository));
+            _norsServiceConfiguration = norsServiceConfiguration ??
+                                        throw new ArgumentNullException(nameof(norsServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private string GetNorsHarvestSettingsInfoString()
+        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-           var sb = new StringBuilder();
-            sb.AppendLine("NORS Harvest settings:");
-            sb.AppendLine($"  Page size: {_norsServiceConfiguration.MaxReturnedChangesInOnePage}");
-            sb.AppendLine($"  Max Number Of Sightings Harvested: {_norsServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            return sb.ToString();
-        }
-        
-        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken  cancellationToken)
-        {
-            var harvestInfo = new HarvestInfo(nameof(NorsObservationVerbatim), DataProviderType.NorsObservations, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(NorsObservationVerbatim), DataProviderType.NorsObservations,
+                DateTime.Now);
 
             try
             {
@@ -77,7 +74,7 @@ namespace SOS.Import.Harvesters.Observations
                     var sightings = result?.Item2;
 
                     cancellationToken?.ThrowIfCancellationRequested();
-                    
+
                     var aggregates = sightings.ToVerbatims().ToArray();
                     nrSightingsHarvested += aggregates.Length;
 
@@ -104,7 +101,8 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogInformation("Finished harvesting sightings for NORS data provider");
 
                 // Update harvest info
-                harvestInfo.DataLastModified = dataLastModified == DateTime.MinValue ? (DateTime?)null : dataLastModified;
+                harvestInfo.DataLastModified =
+                    dataLastModified == DateTime.MinValue ? (DateTime?) null : dataLastModified;
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
@@ -121,6 +119,16 @@ namespace SOS.Import.Harvesters.Observations
             }
 
             return harvestInfo;
+        }
+
+        private string GetNorsHarvestSettingsInfoString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("NORS Harvest settings:");
+            sb.AppendLine($"  Page size: {_norsServiceConfiguration.MaxReturnedChangesInOnePage}");
+            sb.AppendLine(
+                $"  Max Number Of Sightings Harvested: {_norsServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            return sb.ToString();
         }
     }
 }

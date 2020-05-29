@@ -13,13 +13,14 @@ namespace SOS.Import.Factories.FieldMapping
     {
         protected abstract FieldMappingFieldId FieldId { get; }
         protected abstract bool Localized { get; }
-        protected abstract ICollection<FieldMappingValue> GetFieldMappingValues();
+
         public virtual async Task<Lib.Models.Shared.FieldMapping> CreateFieldMappingAsync()
         {
             var fieldMappingValues = GetFieldMappingValues();
 
-           return await Task.Run(() => {
-                Lib.Models.Shared.FieldMapping fieldMapping = new Lib.Models.Shared.FieldMapping
+            return await Task.Run(() =>
+            {
+                var fieldMapping = new Lib.Models.Shared.FieldMapping
                 {
                     Id = FieldId,
                     Name = FieldId.ToString(),
@@ -32,17 +33,21 @@ namespace SOS.Import.Factories.FieldMapping
             });
         }
 
-        protected virtual List<ExternalSystemMapping> GetExternalSystemMappings(ICollection<FieldMappingValue> fieldMappingValues)
+        protected abstract ICollection<FieldMappingValue> GetFieldMappingValues();
+
+        protected virtual List<ExternalSystemMapping> GetExternalSystemMappings(
+            ICollection<FieldMappingValue> fieldMappingValues)
         {
-            return new List<ExternalSystemMapping>()
+            return new List<ExternalSystemMapping>
             {
                 GetDwcExternalSystemMapping(fieldMappingValues)
             };
         }
 
-        protected virtual ExternalSystemMapping GetDwcExternalSystemMapping(ICollection<FieldMappingValue> fieldMappingValues)
+        protected virtual ExternalSystemMapping GetDwcExternalSystemMapping(
+            ICollection<FieldMappingValue> fieldMappingValues)
         {
-            ExternalSystemMapping dwcMapping = new ExternalSystemMapping
+            var dwcMapping = new ExternalSystemMapping
             {
                 Id = ExternalSystemId.DarwinCore,
                 Name = ExternalSystemId.DarwinCore.ToString(),
@@ -50,8 +55,8 @@ namespace SOS.Import.Factories.FieldMapping
                 Mappings = new List<ExternalSystemMappingField>()
             };
 
-            string term = FieldId.ToString().ToLowerFirstChar();
-            ExternalSystemMappingField mappingField = new ExternalSystemMappingField
+            var term = FieldId.ToString().ToLowerFirstChar();
+            var mappingField = new ExternalSystemMappingField
             {
                 Key = term,
                 Description = $"The {term} term (http://rs.tdwg.org/dwc/terms/{term})",
@@ -83,11 +88,11 @@ namespace SOS.Import.Factories.FieldMapping
 
         private List<string> GetStringVariations(string str)
         {
-            List<string> stringVariations = new List<string>();
-            string[] wordParts = SplitCamelCaseString(str);
+            var stringVariations = new List<string>();
+            var wordParts = SplitCamelCaseString(str);
             if (wordParts.Length > 1)
             {
-                string strVariation = string.Join(" ", wordParts);
+                var strVariation = string.Join(" ", wordParts);
                 if (strVariation != str)
                 {
                     stringVariations.Add(strVariation);

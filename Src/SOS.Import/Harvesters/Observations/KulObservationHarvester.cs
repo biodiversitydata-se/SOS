@@ -6,6 +6,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
+using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
@@ -15,15 +16,15 @@ using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Harvesters.Observations
 {
-    public class KulObservationHarvester : Interfaces.IKulObservationHarvester
+    public class KulObservationHarvester : IKulObservationHarvester
     {
         private readonly IKulObservationService _kulObservationService;
         private readonly IKulObservationVerbatimRepository _kulObservationVerbatimRepository;
-        private readonly ILogger<KulObservationHarvester> _logger;
         private readonly KulServiceConfiguration _kulServiceConfiguration;
+        private readonly ILogger<KulObservationHarvester> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="kulObservationService"></param>
         /// <param name="kulObservationVerbatimRepository"></param>
@@ -35,24 +36,20 @@ namespace SOS.Import.Harvesters.Observations
             KulServiceConfiguration kulServiceConfiguration,
             ILogger<KulObservationHarvester> logger)
         {
-            _kulObservationService = kulObservationService ?? throw new ArgumentNullException(nameof(kulObservationService));
-            _kulObservationVerbatimRepository = kulObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(kulObservationVerbatimRepository));
-            _kulServiceConfiguration = kulServiceConfiguration ?? throw new ArgumentNullException(nameof(kulServiceConfiguration));
+            _kulObservationService =
+                kulObservationService ?? throw new ArgumentNullException(nameof(kulObservationService));
+            _kulObservationVerbatimRepository = kulObservationVerbatimRepository ??
+                                                throw new ArgumentNullException(
+                                                    nameof(kulObservationVerbatimRepository));
+            _kulServiceConfiguration = kulServiceConfiguration ??
+                                       throw new ArgumentNullException(nameof(kulServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private string GetKulHarvestSettingsInfoString()
+        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("KUL Harvest settings:");
-            sb.AppendLine($"  Start Harvest Year: {_kulServiceConfiguration.StartHarvestYear}");
-            sb.AppendLine($"  Max Number Of Sightings Harvested: {_kulServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            return sb.ToString();
-        }
-        
-        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken  cancellationToken)
-        {
-            var harvestInfo = new HarvestInfo(nameof(KulObservationVerbatim), DataProviderType.KULObservations, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(KulObservationVerbatim), DataProviderType.KULObservations,
+                DateTime.Now);
 
             try
             {
@@ -110,6 +107,16 @@ namespace SOS.Import.Harvesters.Observations
             }
 
             return harvestInfo;
+        }
+
+        private string GetKulHarvestSettingsInfoString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("KUL Harvest settings:");
+            sb.AppendLine($"  Start Harvest Year: {_kulServiceConfiguration.StartHarvestYear}");
+            sb.AppendLine(
+                $"  Max Number Of Sightings Harvested: {_kulServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            return sb.ToString();
         }
     }
 }

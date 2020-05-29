@@ -11,22 +11,12 @@ using Xunit;
 namespace SOS.Export.UnitTests.Managers
 {
     /// <summary>
-    /// Tests for observation manager
+    ///     Tests for observation manager
     /// </summary>
     public class TaxonManagerTests
     {
-        private readonly Mock<IProcessedTaxonRepository> _processedTaxonRepositoryMock;
-        private readonly Mock<ILogger<TaxonManager>> _loggerMock;
-
         /// <summary>
-        /// Return object to be tested
-        /// </summary>
-        private TaxonManager TestObject => new TaxonManager(
-            _processedTaxonRepositoryMock.Object,
-            _loggerMock.Object);
-
-        /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public TaxonManagerTests()
         {
@@ -34,8 +24,18 @@ namespace SOS.Export.UnitTests.Managers
             _loggerMock = new Mock<ILogger<TaxonManager>>();
         }
 
+        private readonly Mock<IProcessedTaxonRepository> _processedTaxonRepositoryMock;
+        private readonly Mock<ILogger<TaxonManager>> _loggerMock;
+
         /// <summary>
-        /// Test constructor
+        ///     Return object to be tested
+        /// </summary>
+        private TaxonManager TestObject => new TaxonManager(
+            _processedTaxonRepositoryMock.Object,
+            _loggerMock.Object);
+
+        /// <summary>
+        ///     Test constructor
         /// </summary>
         [Fact]
         [Trait("Category", "Unit")]
@@ -55,34 +55,7 @@ namespace SOS.Export.UnitTests.Managers
         }
 
         /// <summary>
-        /// Make a successful taxon tree
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        [Trait("Category", "Unit")]
-        public async Task TaxonTreeSuccess()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _processedTaxonRepositoryMock.Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i == 0), It.IsAny<int>()))
-                .ReturnsAsync(new[] { new ProcessedBasicTaxon() });
-            _processedTaxonRepositoryMock.Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i != 0), It.IsAny<int>()))
-                .ReturnsAsync(new ProcessedBasicTaxon[0]);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var tree = TestObject.TaxonTree;
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            tree.Root.TaxonId.Should().Be(0);
-        }
-
-        /// <summary>
-        /// Test taxon tree fail
+        ///     Test taxon tree fail
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -107,7 +80,36 @@ namespace SOS.Export.UnitTests.Managers
         }
 
         /// <summary>
-        /// Test taxon tree throws
+        ///     Make a successful taxon tree
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        [Trait("Category", "Unit")]
+        public async Task TaxonTreeSuccess()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _processedTaxonRepositoryMock
+                .Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i == 0), It.IsAny<int>()))
+                .ReturnsAsync(new[] {new ProcessedBasicTaxon()});
+            _processedTaxonRepositoryMock
+                .Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i != 0), It.IsAny<int>()))
+                .ReturnsAsync(new ProcessedBasicTaxon[0]);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var tree = TestObject.TaxonTree;
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            tree.Root.TaxonId.Should().Be(0);
+        }
+
+        /// <summary>
+        ///     Test taxon tree throws
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -117,7 +119,8 @@ namespace SOS.Export.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _processedTaxonRepositoryMock.Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i == 0), It.IsAny<int>()))
+            _processedTaxonRepositoryMock
+                .Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i == 0), It.IsAny<int>()))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------

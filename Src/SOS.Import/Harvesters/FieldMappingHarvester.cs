@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Import.Factories.FieldMapping;
 using SOS.Import.Factories.FieldMapping.Interfaces;
+using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
@@ -18,16 +19,17 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters
 {
     /// <summary>
-    /// Class for handling field mappings.
+    ///     Class for handling field mappings.
     /// </summary>
-    public class FieldMappingHarvester : Interfaces.IFieldMappingHarvester { 
+    public class FieldMappingHarvester : IFieldMappingHarvester
+    {
+        private readonly Dictionary<FieldMappingFieldId, IFieldMappingCreatorFactory> _fieldMappingFactoryById;
 
         private readonly IFieldMappingRepository _fieldMappingRepository;
         private readonly ILogger<FieldMappingHarvester> _logger;
-        private readonly Dictionary<FieldMappingFieldId, IFieldMappingCreatorFactory> _fieldMappingFactoryById;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="fieldMappingRepository"></param>
         /// <param name="genderFieldMappingFactory"></param>
@@ -74,7 +76,8 @@ namespace SOS.Import.Harvesters
             AreaTypeFieldMappingFactory areaTypeFieldMappingFactory,
             ILogger<FieldMappingHarvester> logger)
         {
-            _fieldMappingRepository = fieldMappingRepository ?? throw new ArgumentNullException(nameof(fieldMappingRepository));
+            _fieldMappingRepository =
+                fieldMappingRepository ?? throw new ArgumentNullException(nameof(fieldMappingRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _fieldMappingFactoryById = new Dictionary<FieldMappingFieldId, IFieldMappingCreatorFactory>
             {
@@ -102,7 +105,7 @@ namespace SOS.Import.Harvesters
         }
 
         /// <summary>
-        /// Import field mappings.
+        ///     Import field mappings.
         /// </summary>
         /// <returns></returns>
         public async Task<HarvestInfo> HarvestAsync()
@@ -112,14 +115,15 @@ namespace SOS.Import.Harvesters
             try
             {
                 _logger.LogDebug("Start importing field mappings");
-               
-                foreach (string fileName in Directory.GetFiles(@"Resources\FieldMappings\"))
+
+                foreach (var fileName in Directory.GetFiles(@"Resources\FieldMappings\"))
                 {
                     var fieldMapping = CreateFieldMappingFromJsonFile(fileName);
                     fieldMappings.Add(fieldMapping);
                 }
+
                 fieldMappings = fieldMappings.OrderBy(m => m.Id).ToList();
-                
+
                 await _fieldMappingRepository.DeleteCollectionAsync();
                 await _fieldMappingRepository.AddCollectionAsync();
                 await _fieldMappingRepository.AddManyAsync(fieldMappings);
@@ -146,26 +150,29 @@ namespace SOS.Import.Harvesters
                 fielMappingFileTuples.Add(await CreateFieldMappingFileAsync(fieldMappingFieldId));
             }
 
-            byte[] zipFile = CreateZipFile(fielMappingFileTuples);
+            var zipFile = CreateZipFile(fielMappingFileTuples);
             return zipFile;
         }
 
-        public async Task<IEnumerable<FieldMapping>> CreateAllFieldMappingsAsync(IEnumerable<FieldMappingFieldId> fieldMappingFieldIds)
+        public async Task<IEnumerable<FieldMapping>> CreateAllFieldMappingsAsync(
+            IEnumerable<FieldMappingFieldId> fieldMappingFieldIds)
         {
-            List<FieldMapping> fieldMappings = new List<FieldMapping>();
+            var fieldMappings = new List<FieldMapping>();
             foreach (var fieldMappingFieldId in fieldMappingFieldIds)
             {
                 var fieldMapping = await CreateFieldMappingAsync(fieldMappingFieldId);
                 fieldMappings.Add(fieldMapping);
             }
+
             return fieldMappings;
         }
 
         /// <inheritdoc />
-        public async Task<(string Filename, byte[] Bytes)> CreateFieldMappingFileAsync(FieldMappingFieldId fieldMappingFieldId)
+        public async Task<(string Filename, byte[] Bytes)> CreateFieldMappingFileAsync(
+            FieldMappingFieldId fieldMappingFieldId)
         {
-            string filename = $"{fieldMappingFieldId.ToString()}FieldMapping.json";
-            FieldMapping fieldMapping = await CreateFieldMappingAsync(fieldMappingFieldId);
+            var filename = $"{fieldMappingFieldId.ToString()}FieldMapping.json";
+            var fieldMapping = await CreateFieldMappingAsync(fieldMappingFieldId);
             return CreateFieldMappingFileResult(fieldMapping, filename);
         }
 
@@ -177,20 +184,22 @@ namespace SOS.Import.Harvesters
 
         private FieldMapping CreateFieldMappingFromJsonFile(string filename)
         {
-            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, filename);
-            string str = File.ReadAllText(filePath, Encoding.UTF8);
+            var str = File.ReadAllText(filePath, Encoding.UTF8);
             var fieldMappings = JsonConvert.DeserializeObject<FieldMapping>(str);
             return fieldMappings;
         }
 
         private (string Filename, byte[] Bytes) CreateFieldMappingFileResult(FieldMapping fieldMapping, string fileName)
         {
-            var bytes = SerializeToJsonArray(fieldMapping, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }, Formatting.Indented);
+            var bytes = SerializeToJsonArray(fieldMapping,
+                new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore}, Formatting.Indented);
             return (Filename: fileName, Bytes: bytes);
         }
 
-        private byte[] SerializeToJsonArray(object value, JsonSerializerSettings jsonSerializerSettings, Formatting formatting)
+        private byte[] SerializeToJsonArray(object value, JsonSerializerSettings jsonSerializerSettings,
+            Formatting formatting)
         {
             var result = JsonConvert.SerializeObject(value, formatting, jsonSerializerSettings);
             return Encoding.UTF8.GetBytes(result);

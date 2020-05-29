@@ -7,7 +7,6 @@ using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services;
-using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using Xunit;
 
@@ -22,7 +21,7 @@ namespace SOS.Import.IntegrationTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            ImportConfiguration importConfiguration = GetImportConfiguration();
+            var importConfiguration = GetImportConfiguration();
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
             var areaVerbatimRepository = new AreaVerbatimRepository(
                 new ImportClient(
@@ -54,7 +53,7 @@ namespace SOS.Import.IntegrationTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            ImportConfiguration importConfiguration = GetImportConfiguration();
+            var importConfiguration = GetImportConfiguration();
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
             var areaVerbatimRepository = new AreaVerbatimRepository(
                 new ImportClient(

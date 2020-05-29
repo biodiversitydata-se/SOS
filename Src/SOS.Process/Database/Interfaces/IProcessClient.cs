@@ -7,7 +7,7 @@ namespace SOS.Process.Database.Interfaces
         int BatchSize { get; }
 
         /// <summary>
-        /// Get database
+        ///     Get database
         /// </summary>
         /// <returns></returns>
         IMongoDatabase GetDatabase();

@@ -6,154 +6,154 @@ using SOS.Lib.Models.Interfaces;
 namespace SOS.Lib.Models.Verbatim.Shark
 {
     /// <summary>
-    /// Verbatim from Shark
+    ///     Verbatim from Shark
     /// </summary>
     public class SharkObservationVerbatimold : IEntity<ObjectId>
     {
         /// <summary>
-        /// Analytical laboratory code
+        ///     Analytical laboratory code
         /// </summary>
         public string AnalyticalLaboratoryCode { get; set; }
 
         /// <summary>
-        /// Class
+        ///     Class
         /// </summary>
         public string Class { get; set; }
 
         /// <summary>
-        /// Dataset name
+        ///     Dataset name
         /// </summary>
         public string DatasetName { get; set; }
 
         /// <summary>
-        /// Dataset file name
+        ///     Dataset file name
         /// </summary>
         public string DatasetFileName { get; set; }
 
         /// <summary>
-        /// Data Type
+        ///     Data Type
         /// </summary>
         public string DataType { get; set; }
 
         /// <summary>
-        /// Day
+        ///     Day
         /// </summary>
         public int Day { get; set; }
 
         /// <summary>
-        /// Latitude
+        ///     Latitude
         /// </summary>
         public double DecimalLatitude { get; set; }
 
         /// <summary>
-        /// Longitude
+        ///     Longitude
         /// </summary>
         public double DecimalLongitude { get; set; }
 
         /// <summary>
-        /// Dyntaxa taxon id
+        ///     Dyntaxa taxon id
         /// </summary>
         public int DyntaxaTaxonId { get; set; }
 
         /// <summary>
-        /// Date of event
+        ///     Date of event
         /// </summary>
         public DateTime EventDate { get; set; }
 
         /// <summary>
-        /// Family
+        ///     Family
         /// </summary>
         public string Family { get; set; }
 
         /// <summary>
-        /// Genus
+        ///     Genus
         /// </summary>
         public string Genus { get; set; }
 
         /// <summary>
-        /// Unique id
-        /// </summary>
-        [BsonId]
-        public ObjectId Id { get; set; }
-
-        /// <summary>
-        /// Kingdom
+        ///     Kingdom
         /// </summary>
         public string Kingdom { get; set; }
 
         /// <summary>
-        /// Maximum depth in meters
+        ///     Maximum depth in meters
         /// </summary>
         public double? MaximumDepthInMeters { get; set; }
 
         /// <summary>
-        /// Minimum depth in meters
+        ///     Minimum depth in meters
         /// </summary>
         public double? MinimumDepthInMeters { get; set; }
 
         /// <summary>
-        /// Month
+        ///     Month
         /// </summary>
         public int Month { get; set; }
 
         /// <summary>
-        /// Occurrence id
+        ///     Occurrence id
         /// </summary>
         public string OccurrenceId { get; set; }
 
         /// <summary>
-        /// Order
+        ///     Order
         /// </summary>
         public string Order { get; set; }
 
         /// <summary>
-        /// Owner institution code
+        ///     Owner institution code
         /// </summary>
         public string OwnerInstitutionCode { get; set; }
 
         /// <summary>
-        /// Phylum
+        ///     Phylum
         /// </summary>
         public string Phylum { get; set; }
 
         /// <summary>
-        /// Reporting institution code
+        ///     Reporting institution code
         /// </summary>
         public string ReportingInstitutionCode { get; set; }
 
         /// <summary>
-        /// Recorded by
+        ///     Recorded by
         /// </summary>
         public string RecordedBy { get; set; }
 
         /// <summary>
-        /// Sampler type
+        ///     Sampler type
         /// </summary>
         public string SamplerType { get; set; }
 
         /// <summary>
-        /// Taxon scientific name
+        ///     Taxon scientific name
         /// </summary>
         public string ScientificName { get; set; }
 
         /// <summary>
-        /// Scientific name authorship
+        ///     Scientific name authorship
         /// </summary>
         public string ScientificNameAuthorship { get; set; }
 
         /// <summary>
-        /// Species
+        ///     Species
         /// </summary>
         public string Species { get; set; }
 
         /// <summary>
-        /// Status
+        ///     Status
         /// </summary>
         public string Status { get; set; }
 
         /// <summary>
-        /// Year
+        ///     Year
         /// </summary>
         public int Year { get; set; }
+
+        /// <summary>
+        ///     Unique id
+        /// </summary>
+        [BsonId]
+        public ObjectId Id { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using SOS.Lib.Configuration.Process;
-using SOS.Lib.Configuration.Shared;
+﻿using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Lib.Configuration.ObservationApi
 {

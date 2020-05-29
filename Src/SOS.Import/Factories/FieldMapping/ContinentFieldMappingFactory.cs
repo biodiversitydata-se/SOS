@@ -5,12 +5,13 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.FieldMapping
 {
     /// <summary>
-    /// Class for creating Continent field mapping.
+    ///     Class for creating Continent field mapping.
     /// </summary>
     public class ContinentFieldMappingFactory : DwcFieldMappingFactoryBase
     {
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.Continent;
         protected override bool Localized => false;
+
         protected override ICollection<FieldMappingValue> GetFieldMappingValues()
         {
             // Vocabulary from https://dwc.tdwg.org/terms/#dwc:continent

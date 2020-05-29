@@ -5,38 +5,40 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Import.MongoDb.Interfaces;
+using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Import.Repositories.Destination
 {
     /// <summary>
-    /// Base class for cosmos db repositories
+    ///     Base class for cosmos db repositories
     /// </summary>
-    public class VerbatimRepository<TEntity, TKey> : Interfaces.IVerbatimRepository<TEntity, TKey> where TEntity : IEntity<TKey>
+    public class VerbatimRepository<TEntity, TKey> : IVerbatimRepository<TEntity, TKey> where TEntity : IEntity<TKey>
     {
-        /// <summary>
-        /// Logger 
-        /// </summary>
-        protected readonly ILogger<VerbatimRepository<TEntity, TKey>> Logger;
+        private readonly int _batchSize;
 
-        /// <summary>
-        /// Mongo db
-        /// </summary>
-        protected readonly IMongoDatabase Database;
+        private readonly string _collectionName;
 
         protected readonly IMongoClient Client;
 
         /// <summary>
-        /// Disposed
+        ///     Mongo db
+        /// </summary>
+        protected readonly IMongoDatabase Database;
+
+        /// <summary>
+        ///     Logger
+        /// </summary>
+        protected readonly ILogger<VerbatimRepository<TEntity, TKey>> Logger;
+
+        /// <summary>
+        ///     Disposed
         /// </summary>
         private bool _disposed;
 
-        private readonly string _collectionName;
-        private readonly int _batchSize;
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
@@ -54,7 +56,7 @@ namespace SOS.Import.Repositories.Destination
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Database = importClient.GetDatabase();
-            
+
             _batchSize = importClient.BatchSize;
 
             // Clean name from non alfa numeric chats
@@ -62,16 +64,10 @@ namespace SOS.Import.Repositories.Destination
         }
 
         /// <summary>
-        /// Get client
+        ///     Get client
         /// </summary>
         /// <returns></returns>
         protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(_collectionName);
-
-        protected IMongoCollection<TEntity> GetMongoCollection(string collectionName)
-        {
-            return Database.GetCollection<TEntity>(collectionName)
-                .WithWriteConcern(new WriteConcern(w: 1, journal: true));
-        }
 
         /// <inheritdoc />
         public async Task<bool> AddAsync(TEntity item)
@@ -92,66 +88,6 @@ namespace SOS.Import.Repositories.Destination
             {
                 // Item allready exists
                 return true;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="batch"></param>
-        /// <returns></returns>
-        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
-        {
-            return await AddBatchAsync(batch, MongoCollection);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="batch"></param>
-        /// <param name="mongoCollection"></param>
-        /// <returns></returns>
-        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch, IMongoCollection<TEntity> mongoCollection)
-        {
-            var items = batch?.ToArray();
-            try
-            {
-                await mongoCollection.InsertManyAsync(batch, new InsertManyOptions() { IsOrdered = false, BypassDocumentValidation = true });
-                return true;
-            }
-            catch (MongoCommandException e)
-            {
-                switch (e.Code)
-                {
-                    case 16500: //Request Rate too Large
-                        // If attempt failed, try split items in half and try again
-                        var batchCount = batch.Count() / 2;
-
-                        // If we are down to less than 10 items something must be wrong
-                        if (batchCount > 5)
-                        {
-                            var addTasks = new List<Task<bool>>
-                            {
-                                AddBatchAsync(batch.Take(batchCount)),
-                                AddBatchAsync(batch.Skip(batchCount))
-                            };
-
-                            // Run all tasks async
-                            await Task.WhenAll(addTasks);
-                            return addTasks.All(t => t.Result);
-                        }
-
-                        break;
-                }
-
-                Logger.LogError(e.ToString());
-
-                return false;
             }
             catch (Exception e)
             {
@@ -293,7 +229,7 @@ namespace SOS.Import.Repositories.Destination
                 var res = await mongoCollection.Find(x => ids.Contains(x.Id)).ToListAsync();
                 if (res != null && res.Any())
                 {
-                    var removeFilter = Builders<TEntity>.Filter.In("_id", res.Select(x=>x.Id));
+                    var removeFilter = Builders<TEntity>.Filter.In("_id", res.Select(x => x.Id));
                     var deleteResult = await mongoCollection // todo - is this correct?
                         .DeleteManyAsync(removeFilter);
                     //var deleteResult = await Database.GetCollection<TEntity>(typeof(TEntity).Name)
@@ -378,7 +314,81 @@ namespace SOS.Import.Repositories.Destination
         }
 
         /// <summary>
-        /// Dispose
+        ///     Dispose
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected IMongoCollection<TEntity> GetMongoCollection(string collectionName)
+        {
+            return Database.GetCollection<TEntity>(collectionName)
+                .WithWriteConcern(new WriteConcern(1, journal: true));
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="batch"></param>
+        /// <returns></returns>
+        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
+        {
+            return await AddBatchAsync(batch, MongoCollection);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="batch"></param>
+        /// <param name="mongoCollection"></param>
+        /// <returns></returns>
+        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch, IMongoCollection<TEntity> mongoCollection)
+        {
+            var items = batch?.ToArray();
+            try
+            {
+                await mongoCollection.InsertManyAsync(batch,
+                    new InsertManyOptions {IsOrdered = false, BypassDocumentValidation = true});
+                return true;
+            }
+            catch (MongoCommandException e)
+            {
+                switch (e.Code)
+                {
+                    case 16500: //Request Rate too Large
+                        // If attempt failed, try split items in half and try again
+                        var batchCount = batch.Count() / 2;
+
+                        // If we are down to less than 10 items something must be wrong
+                        if (batchCount > 5)
+                        {
+                            var addTasks = new List<Task<bool>>
+                            {
+                                AddBatchAsync(batch.Take(batchCount)),
+                                AddBatchAsync(batch.Skip(batchCount))
+                            };
+
+                            // Run all tasks async
+                            await Task.WhenAll(addTasks);
+                            return addTasks.All(t => t.Result);
+                        }
+
+                        break;
+                }
+
+                Logger.LogError(e.ToString());
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
+        }
+
+        /// <summary>
+        ///     Dispose
         /// </summary>
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
@@ -390,19 +400,9 @@ namespace SOS.Import.Repositories.Destination
 
             if (disposing)
             {
-               
             }
 
             _disposed = true;
-        }
-
-        /// <summary>
-        /// Dispose
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

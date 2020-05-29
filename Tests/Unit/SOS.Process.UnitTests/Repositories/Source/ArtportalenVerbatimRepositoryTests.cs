@@ -10,6 +10,15 @@ namespace SOS.Process.UnitTests.Repositories.Source
 {
     public class ArtportalenVerbatimRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public ArtportalenVerbatimRepositoryTests()
+        {
+            _processClient = new Mock<IVerbatimClient>();
+            _loggerMock = new Mock<ILogger<ArtportalenVerbatimRepository>>();
+        }
+
         private readonly Mock<IVerbatimClient> _processClient;
         private readonly Mock<ILogger<ArtportalenVerbatimRepository>> _loggerMock;
 
@@ -18,16 +27,7 @@ namespace SOS.Process.UnitTests.Repositories.Source
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public ArtportalenVerbatimRepositoryTests()
-        {
-            _processClient = new Mock<IVerbatimClient>();
-            _loggerMock = new Mock<ILogger<ArtportalenVerbatimRepository>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()

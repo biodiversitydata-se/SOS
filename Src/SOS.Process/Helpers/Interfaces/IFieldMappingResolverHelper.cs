@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Process.Helpers.Interfaces
@@ -8,13 +6,13 @@ namespace SOS.Process.Helpers.Interfaces
     public interface IFieldMappingResolverHelper
     {
         /// <summary>
-        /// Resolve field mapped values.
+        ///     Resolve field mapped values.
         /// </summary>
         /// <param name="processedObservations"></param>
         void ResolveFieldMappedValues(IEnumerable<ProcessedObservation> processedObservations);
-        
+
         /// <summary>
-        /// Resolve field mapped values.
+        ///     Resolve field mapped values.
         /// </summary>
         /// <param name="processedObservations"></param>
         /// <param name="cultureCode"></param>

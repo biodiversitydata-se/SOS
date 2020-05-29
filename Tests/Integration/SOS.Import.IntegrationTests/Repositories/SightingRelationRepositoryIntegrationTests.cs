@@ -12,7 +12,7 @@ namespace SOS.Import.IntegrationTests.Repositories
     public class SightingRelationRepositoryIntegrationTests : TestBase
     {
         [Fact]
-        [Trait("Category","Integration")]
+        [Trait("Category", "Integration")]
         public async Task TestGetSightingRelations()
         {
             //-----------------------------------------------------------------------------------------------------------

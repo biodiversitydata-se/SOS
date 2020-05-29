@@ -2,25 +2,23 @@
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
-using SOS.Import.DarwinCore;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Managers.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
-using SOS.Lib.Models.Shared;
 
 namespace SOS.Import.Jobs
 {
     public class DwcArchiveHarvestJob : IDwcArchiveHarvestJob
     {
+        private readonly IDataProviderManager _dataProviderManager;
         private readonly IDwcObservationHarvester _dwcObservationHarvester;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
-        private readonly IDataProviderManager _dataProviderManager;
         private readonly ILogger<DwcArchiveHarvestJob> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="dwcObservationHarvester"></param>
         /// <param name="harvestInfoRepository"></param>
@@ -32,15 +30,17 @@ namespace SOS.Import.Jobs
             IDataProviderManager dataProviderManager,
             ILogger<DwcArchiveHarvestJob> logger)
         {
-            _dwcObservationHarvester = dwcObservationHarvester ?? throw new ArgumentNullException(nameof(dwcObservationHarvester));
-            _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
+            _dwcObservationHarvester = dwcObservationHarvester ??
+                                       throw new ArgumentNullException(nameof(dwcObservationHarvester));
+            _harvestInfoRepository =
+                harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
         public async Task<bool> RunAsync(
-            int dataProviderId, 
+            int dataProviderId,
             string archivePath,
             IJobCancellationToken cancellationToken)
         {
@@ -50,18 +50,24 @@ namespace SOS.Import.Jobs
             {
                 throw new Exception($"Data provider with Id={dataProviderId} is not found");
             }
+
             if (dataProvider.Type != DataProviderType.DwcA)
             {
                 throw new Exception($"The data provider \"{dataProvider}\" is not a DwC-A provider");
             }
 
-            var harvestInfoResult = await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, dataProvider, cancellationToken);
+            var harvestInfoResult =
+                await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, dataProvider, cancellationToken);
             _logger.LogInformation($"End DwC-A Harvest Job. Status: {harvestInfoResult.Status}");
 
             // Save harvest info
-            await _harvestInfoRepository.AddOrUpdateAsync(harvestInfoResult); // todo - decide whether we should store harvestInfo in two places or not.
-            await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult); 
-            return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0 ? true : throw new Exception("DwC-A Harvest Job failed");
+            await _harvestInfoRepository
+                .AddOrUpdateAsync(
+                    harvestInfoResult); // todo - decide whether we should store harvestInfo in two places or not.
+            await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult);
+            return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0
+                ? true
+                : throw new Exception("DwC-A Harvest Job failed");
         }
 
         public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)

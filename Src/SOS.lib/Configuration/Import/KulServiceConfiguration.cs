@@ -3,7 +3,7 @@
     public class KulServiceConfiguration : SluWcfConfiguration
     {
         /// <summary>
-        /// The year to start harvest from.
+        ///     The year to start harvest from.
         /// </summary>
         public int StartHarvestYear { get; set; } = 1987;
     }

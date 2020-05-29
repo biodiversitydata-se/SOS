@@ -7,7 +7,7 @@ namespace SOS.Import.Extensions
     public static class SharkObservationExtensions
     {
         /// <summary>
-        /// Cast shark file data to verbatims
+        ///     Cast shark file data to verbatims
         /// </summary>
         /// <param name="fileData"></param>
         /// <returns></returns>
@@ -35,12 +35,12 @@ namespace SOS.Import.Extensions
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="rowData"></param>
         /// <param name="propertyMapping"></param>
         /// <returns></returns>
-        private static SharkObservationVerbatim ToVerbatim(this IReadOnlyList<string> rowData, IDictionary<string, int> propertyMapping)
+        private static SharkObservationVerbatim ToVerbatim(this IReadOnlyList<string> rowData,
+            IDictionary<string, int> propertyMapping)
         {
             var observation = new SharkObservationVerbatim();
             foreach (var propertyName in propertyMapping)
@@ -52,9 +52,8 @@ namespace SOS.Import.Extensions
 
                 observation.SetProperty(propertyName.Key, rowData[propertyName.Value]);
             }
+
             return observation;
         }
-
-       
     }
 }

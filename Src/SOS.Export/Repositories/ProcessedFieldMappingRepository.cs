@@ -12,12 +12,13 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Export.Repositories
 {
     /// <summary>
-    /// Field mappings repository.
+    ///     Field mappings repository.
     /// </summary>
-    public class ProcessedFieldMappingRepository : BaseRepository<FieldMapping, FieldMappingFieldId>, IProcessedFieldMappingRepository
+    public class ProcessedFieldMappingRepository : BaseRepository<FieldMapping, FieldMappingFieldId>,
+        IProcessedFieldMappingRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="exportClient"></param>
         /// <param name="logger"></param>
@@ -25,7 +26,6 @@ namespace SOS.Export.Repositories
             IExportClient exportClient,
             ILogger<ProcessedFieldMappingRepository> logger) : base(exportClient, false, logger)
         {
-            
         }
 
         /// <inheritdoc />

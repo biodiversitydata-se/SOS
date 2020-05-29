@@ -17,6 +17,17 @@ namespace SOS.Import.UnitTests.Services
 {
     public class TaxonServiceTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public TaxonServiceTests()
+        {
+            _taxonServiceConfiguration = new TaxonServiceConfiguration
+                {BaseAddress = "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile"};
+            _loggerMock = new Mock<ILogger<TaxonService>>();
+            _taxonServiceProxyMock = new Mock<ITaxonServiceProxy>();
+        }
+
         private readonly Mock<ITaxonServiceProxy> _taxonServiceProxyMock;
         private readonly TaxonServiceConfiguration _taxonServiceConfiguration;
         private readonly Mock<ILogger<TaxonService>> _loggerMock;
@@ -26,18 +37,41 @@ namespace SOS.Import.UnitTests.Services
             _taxonServiceConfiguration,
             _loggerMock.Object);
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public TaxonServiceTests()
+        private List<DarwinCoreVernacularName> CreateExpectedBeechSpeciesTaxonVernacularNames()
         {
-            _taxonServiceConfiguration = new TaxonServiceConfiguration { BaseAddress = "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile" };
-            _loggerMock = new Mock<ILogger<TaxonService>>();
-            _taxonServiceProxyMock = new Mock<ITaxonServiceProxy>();
+            var beechVernacularNames = new List<DarwinCoreVernacularName>
+            {
+                new DarwinCoreVernacularName
+                {
+                    VernacularName = "bok", Language = "sv", CountryCode = "SE", IsPreferredName = true,
+                    Source = "Dyntaxa. Svensk taxonomisk databas", TaxonID = "urn:lsid:dyntaxa.se:Taxon:220778",
+                    TaxonRemarks = ""
+                },
+                new DarwinCoreVernacularName
+                {
+                    VernacularName = "vanlig bok", Language = "sv", CountryCode = "SE", IsPreferredName = false,
+                    Source = "Dyntaxa. Svensk taxonomisk databas", TaxonID = "urn:lsid:dyntaxa.se:Taxon:220778",
+                    TaxonRemarks = ""
+                },
+                new DarwinCoreVernacularName
+                {
+                    VernacularName = "rödbok", Language = "sv", CountryCode = "SE", IsPreferredName = false,
+                    Source = "Dyntaxa. Svensk taxonomisk databas", TaxonID = "urn:lsid:dyntaxa.se:Taxon:220778",
+                    TaxonRemarks = ""
+                },
+                new DarwinCoreVernacularName
+                {
+                    VernacularName = "Beech", Language = "en", CountryCode = "GB", IsPreferredName = false,
+                    Source = "Dyntaxa. Svensk taxonomisk databas", TaxonID = "urn:lsid:dyntaxa.se:Taxon:220778",
+                    TaxonRemarks = ""
+                }
+            };
+
+            return beechVernacularNames;
         }
 
         /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -51,38 +85,14 @@ namespace SOS.Import.UnitTests.Services
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("taxonServiceConfiguration");
 
             create = () => new TaxonService(
-                _taxonServiceProxyMock.Object, 
+                _taxonServiceProxyMock.Object,
                 _taxonServiceConfiguration,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
 
         /// <summary>
-        /// Get taxa success
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetTaxaAsyncSuccess()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetTaxaAsync();
-          
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Count().Should().BeGreaterThan(0);
-        }
-
-        /// <summary>
-        /// Get taxa fail
+        ///     Get taxa fail
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -105,20 +115,45 @@ namespace SOS.Import.UnitTests.Services
             result.Should().BeNull();
         }
 
+        /// <summary>
+        ///     Get taxa success
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetTaxaAsyncSuccess()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.GetTaxaAsync();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Count().Should().BeGreaterThan(0);
+        }
+
         [Fact]
         public async Task Parse_a_static_dyntaxa_dwca_file_and_verifies_multiple_taxon_properties()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            TaxonServiceConfiguration taxonServiceConfiguration = new TaxonServiceConfiguration { BaseAddress = "..." };
+            var taxonServiceConfiguration = new TaxonServiceConfiguration {BaseAddress = "..."};
             var taxonServiceProxyStub = TaxonServiceProxyStubFactory.Create(@"Resources\dyntaxa.custom.dwca.zip");
-            var sut = new TaxonService(taxonServiceProxyStub.Object, taxonServiceConfiguration, new NullLogger<TaxonService>());
+            var sut = new TaxonService(taxonServiceProxyStub.Object, taxonServiceConfiguration,
+                new NullLogger<TaxonService>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            IEnumerable<DarwinCoreTaxon> taxa = await sut.GetTaxaAsync();
+            var taxa = await sut.GetTaxaAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert - Beech species DarwinCore properties
@@ -132,7 +167,8 @@ namespace SOS.Import.UnitTests.Services
             beechSpeciesTaxon.NomenclaturalStatus.Should().Be("valid");
             beechSpeciesTaxon.TaxonomicStatus.Should().Be("accepted");
             beechSpeciesTaxon.DynamicProperties.DyntaxaTaxonId.Should().Be(220778);
-            beechSpeciesTaxon.HigherClassification.Should().BeNull("because this isn't calculated in this step. It is calculated in ProcessTaxa job.");
+            beechSpeciesTaxon.HigherClassification.Should()
+                .BeNull("because this isn't calculated in this step. It is calculated in ProcessTaxa job.");
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert - Beech (bok) species has one recommended swedish vernacular name,
@@ -145,21 +181,10 @@ namespace SOS.Import.UnitTests.Services
             // Assert - Beech (bok) genus has one main parent and one secondary parent.
             //-----------------------------------------------------------------------------------------------------------
             var beechGenusTaxon = taxa.Single(t => t.Id == 1006037);
-            beechGenusTaxon.DynamicProperties.ParentDyntaxaTaxonId.Should().Be(2002757); // Family - Fagaceae (bokväxter)
-            beechGenusTaxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds.Should().BeEquivalentTo(new List<int> { 6005257 }); // Organism group - Hardwood forest trees (ädellövträd)
-        }
-
-        private List<DarwinCoreVernacularName> CreateExpectedBeechSpeciesTaxonVernacularNames()
-        {
-            var beechVernacularNames = new List<DarwinCoreVernacularName>
-            {
-                new DarwinCoreVernacularName { VernacularName = "bok", Language = "sv", CountryCode = "SE", IsPreferredName = true, Source = "Dyntaxa. Svensk taxonomisk databas", TaxonID = "urn:lsid:dyntaxa.se:Taxon:220778", TaxonRemarks = ""},
-                new DarwinCoreVernacularName { VernacularName = "vanlig bok", Language = "sv", CountryCode = "SE", IsPreferredName = false, Source = "Dyntaxa. Svensk taxonomisk databas", TaxonID = "urn:lsid:dyntaxa.se:Taxon:220778", TaxonRemarks = "" },
-                new DarwinCoreVernacularName { VernacularName = "rödbok", Language = "sv", CountryCode = "SE", IsPreferredName = false, Source = "Dyntaxa. Svensk taxonomisk databas", TaxonID = "urn:lsid:dyntaxa.se:Taxon:220778", TaxonRemarks = "" },
-                new DarwinCoreVernacularName { VernacularName = "Beech", Language = "en", CountryCode = "GB", IsPreferredName = false, Source = "Dyntaxa. Svensk taxonomisk databas", TaxonID = "urn:lsid:dyntaxa.se:Taxon:220778", TaxonRemarks = "" }
-            };
-
-            return beechVernacularNames;
+            beechGenusTaxon.DynamicProperties.ParentDyntaxaTaxonId.Should()
+                .Be(2002757); // Family - Fagaceae (bokväxter)
+            beechGenusTaxon.DynamicProperties.SecondaryParentDyntaxaTaxonIds.Should()
+                .BeEquivalentTo(new List<int> {6005257}); // Organism group - Hardwood forest trees (ädellövträd)
         }
     }
 }

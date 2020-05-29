@@ -12,13 +12,13 @@ namespace SOS.Import.Jobs
 {
     public class SersHarvestJob : ISersHarvestJob
     {
-        private readonly ISersObservationHarvester _sersObservationHarvester;
-        private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly IDataProviderManager _dataProviderManager;
+        private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<SersHarvestJob> _logger;
+        private readonly ISersObservationHarvester _sersObservationHarvester;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="sersObservationHarvester"></param>
         /// <param name="harvestInfoRepository"></param>
@@ -30,14 +30,16 @@ namespace SOS.Import.Jobs
             IDataProviderManager dataProviderManager,
             ILogger<SersHarvestJob> logger)
         {
-            _sersObservationHarvester = sersObservationHarvester ?? throw new ArgumentNullException(nameof(sersObservationHarvester));
-            _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
+            _sersObservationHarvester = sersObservationHarvester ??
+                                        throw new ArgumentNullException(nameof(sersObservationHarvester));
+            _harvestInfoRepository =
+                harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(IJobCancellationToken  cancellationToken)
+        public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
             _logger.LogInformation("Start SERS Harvest Job");
             var dataProvider = await _dataProviderManager.GetDataProviderByType(DataProviderType.SersObservations);
@@ -48,7 +50,9 @@ namespace SOS.Import.Jobs
             await _harvestInfoRepository.AddOrUpdateAsync(harvestInfoResult);
             await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult);
 
-            return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0 ? true : throw new Exception("SERS Harvest Job failed");
+            return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0
+                ? true
+                : throw new Exception("SERS Harvest Job failed");
         }
     }
 }

@@ -13,7 +13,8 @@
 
         public override string ToString()
         {
-            return $"{nameof(SightingId)}: {SightingId}, {nameof(CollectorId)}: {CollectorId}, {nameof(OrganizationId)}: {OrganizationId}, {nameof(DeterminerText)}: {DeterminerText}, {nameof(DeterminerYear)}: {DeterminerYear}, {nameof(Description)}: {Description}, {nameof(ConfirmatorText)}: {ConfirmatorText}, {nameof(ConfirmatorYear)}: {ConfirmatorYear}";
+            return
+                $"{nameof(SightingId)}: {SightingId}, {nameof(CollectorId)}: {CollectorId}, {nameof(OrganizationId)}: {OrganizationId}, {nameof(DeterminerText)}: {DeterminerText}, {nameof(DeterminerYear)}: {DeterminerYear}, {nameof(Description)}: {Description}, {nameof(ConfirmatorText)}: {ConfirmatorText}, {nameof(ConfirmatorYear)}: {ConfirmatorYear}";
         }
     }
 }

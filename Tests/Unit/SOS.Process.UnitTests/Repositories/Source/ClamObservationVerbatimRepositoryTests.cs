@@ -10,16 +10,8 @@ namespace SOS.Process.UnitTests.Repositories.Source
 {
     public class ClamObservationVerbatimRepositoryTests
     {
-        private readonly Mock<IVerbatimClient> _processClient;
-        private readonly Mock<ILogger<ClamObservationVerbatimRepository>> _loggerMock;
-
-        private ClamObservationVerbatimRepository TestObject => new ClamObservationVerbatimRepository(
-            _processClient.Object,
-            _loggerMock.Object);
-
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public ClamObservationVerbatimRepositoryTests()
         {
@@ -27,8 +19,15 @@ namespace SOS.Process.UnitTests.Repositories.Source
             _loggerMock = new Mock<ILogger<ClamObservationVerbatimRepository>>();
         }
 
+        private readonly Mock<IVerbatimClient> _processClient;
+        private readonly Mock<ILogger<ClamObservationVerbatimRepository>> _loggerMock;
+
+        private ClamObservationVerbatimRepository TestObject => new ClamObservationVerbatimRepository(
+            _processClient.Object,
+            _loggerMock.Object);
+
         /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()

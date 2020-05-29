@@ -1,20 +1,4 @@
-﻿using System.Collections.Generic;
-using FluentAssertions;
-using Moq;
-using SOS.Lib.Enums;
-using SOS.Lib.Enums.FieldMappingValues;
-using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Process.Helpers;
-using SOS.Process.Repositories.Destination.Interfaces;
-using SOS.Process.Repositories.Source.Interfaces;
-using SOS.Process.UnitTests.TestHelpers;
-using SOS.Process.UnitTests.TestHelpers.Factories;
-using SOS.TestHelpers.Gis;
-using Xunit;
-
-namespace SOS.Process.UnitTests.Helpers
+﻿namespace SOS.Process.UnitTests.Helpers
 {
     public class AreaHelperTests
     {

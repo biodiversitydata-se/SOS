@@ -2,18 +2,54 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using SOS.Lib.Extensions;
 
 namespace SOS.Lib.Helpers
 {
     /// <summary>
-    /// DarwinCore parser.
+    ///     DarwinCore parser.
     /// </summary>
     public static class DwcParser
     {
         /// <summary>
-        /// Try parse event date.
+        ///     Default date formats used by ParseDate().
+        ///     At least Year, Month & Day must be specified.
+        /// </summary>
+        private static IEnumerable<string> DatePatterns
+        {
+            get
+            {
+                return new[]
+                {
+                    "yyyy-MM-dd'T'HH:mm:ssK",
+                    "yyyy-MM-dd'T'HH:mmK",
+                    "yyyy-MM-dd'T'HHK",
+                    "yyyy-MM-dd",
+                    "dddd, dd MMMM yyyy",
+                    "dddd, dd MMMM yyyy HH:mm",
+                    "dddd, dd MMMM yyyy hh:mm tt",
+                    "dddd, dd MMMM yyyy H:mm",
+                    "dddd, dd MMMM yyyy h:mm tt",
+                    "dddd, dd MMMM yyyy HH:mm:ss",
+                    "yyyy-MM-dd HH:mm",
+                    "yyyy-MM-dd hh:mm tt",
+                    "yyyy-MM-dd H:mm",
+                    "yyyy-MM-dd h:mm tt",
+                    "yyyy-MM-dd HH:mm:ss",
+                    "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK",
+                    "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK",
+                    "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'",
+                    "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'",
+                    "yyyy'-'MM'-'dd'T'HH':'mm':'ss",
+                    "yyyy'-'MM'-'dd HH':'mm':'ss'Z'",
+                    "dddd, dd MMMM yyyy HH:mm:ss",
+                    "yyyy MMMM"
+                };
+            }
+        }
+
+        /// <summary>
+        ///     Try parse event date.
         /// </summary>
         /// <param name="eventDate"></param>
         /// <param name="year"></param>
@@ -23,11 +59,11 @@ namespace SOS.Lib.Helpers
         /// <param name="endDate"></param>
         /// <returns></returns>
         public static bool TryParseEventDate(
-            string eventDate, 
-            string year, 
-            string month, 
-            string day, 
-            out DateTime? startDate, 
+            string eventDate,
+            string year,
+            string month,
+            string day,
+            out DateTime? startDate,
             out DateTime? endDate)
         {
             if (string.IsNullOrEmpty(eventDate))
@@ -35,7 +71,7 @@ namespace SOS.Lib.Helpers
                 return TryParseEventDate(year, month, day, out startDate, out endDate);
             }
 
-            string[] dateParts = eventDate.Split("/");
+            var dateParts = eventDate.Split("/");
             if (dateParts.Length == 2) // Interval
             {
                 return TryParseIntervalEventDate(dateParts[0], dateParts[1], out startDate, out endDate);
@@ -52,7 +88,8 @@ namespace SOS.Lib.Helpers
             startDate = ParseDate(eventDate, "yyyy-MM");
             if (startDate.HasValue) // start date is year and month
             {
-                endDate = new DateTime(startDate.Value.Year, startDate.Value.Month, DateTime.DaysInMonth(startDate.Value.Year, startDate.Value.Month));
+                endDate = new DateTime(startDate.Value.Year, startDate.Value.Month,
+                    DateTime.DaysInMonth(startDate.Value.Year, startDate.Value.Month));
                 return true;
             }
 
@@ -67,7 +104,7 @@ namespace SOS.Lib.Helpers
         }
 
         /// <summary>
-        /// Try parse event date from year, month and day.
+        ///     Try parse event date from year, month and day.
         /// </summary>
         /// <param name="year"></param>
         /// <param name="month"></param>
@@ -84,9 +121,9 @@ namespace SOS.Lib.Helpers
         {
             try
             {
-                int? parsedYear = year.ParseInt();
-                int? parsedMonth = month.ParseInt();
-                int? parsedDay = day.ParseInt();
+                var parsedYear = year.ParseInt();
+                var parsedMonth = month.ParseInt();
+                var parsedDay = day.ParseInt();
                 if (parsedYear.HasValue && parsedMonth.HasValue && parsedDay.HasValue)
                 {
                     startDate = new DateTime(parsedYear.Value, parsedMonth.Value, parsedDay.Value);
@@ -97,7 +134,8 @@ namespace SOS.Lib.Helpers
                 if (parsedYear.HasValue && parsedMonth.HasValue)
                 {
                     startDate = new DateTime(parsedYear.Value, parsedMonth.Value, 1);
-                    endDate = new DateTime(parsedYear.Value, parsedMonth.Value, DateTime.DaysInMonth(parsedYear.Value, parsedMonth.Value));
+                    endDate = new DateTime(parsedYear.Value, parsedMonth.Value,
+                        DateTime.DaysInMonth(parsedYear.Value, parsedMonth.Value));
                     return true;
                 }
 
@@ -121,7 +159,7 @@ namespace SOS.Lib.Helpers
         }
 
         /// <summary>
-        /// Try parse an interval date.
+        ///     Try parse an interval date.
         /// </summary>
         /// <param name="strStartDate"></param>
         /// <param name="strEndDate"></param>
@@ -129,9 +167,9 @@ namespace SOS.Lib.Helpers
         /// <param name="endDate"></param>
         /// <returns></returns>
         public static bool TryParseIntervalEventDate(
-            string strStartDate, 
-            string strEndDate, 
-            out DateTime? startDate, 
+            string strStartDate,
+            string strEndDate,
+            out DateTime? startDate,
             out DateTime? endDate)
         {
             startDate = ParseDate(strStartDate, "yyyy");
@@ -188,7 +226,7 @@ namespace SOS.Lib.Helpers
         }
 
         /// <summary>
-        /// Parse a date string to a DateTime?
+        ///     Parse a date string to a DateTime?
         /// </summary>
         /// <param name="dateTimeStr">The date string.</param>
         /// <param name="dateFormats">The date formats.</param>
@@ -206,45 +244,10 @@ namespace SOS.Lib.Helpers
                 dateFormats,
                 CultureInfo.InvariantCulture,
                 style,
-                out var dt) ? dt : null as DateTime?;
+                out var dt)
+                ? dt
+                : null as DateTime?;
             return result;
-        }
-
-        /// <summary>
-        /// Default date formats used by ParseDate().
-        /// At least Year, Month & Day must be specified.
-        /// </summary>
-        private static IEnumerable<string> DatePatterns
-        {
-            get
-            {
-                return new[]
-                {
-                    "yyyy-MM-dd'T'HH:mm:ssK",
-                    "yyyy-MM-dd'T'HH:mmK",
-                    "yyyy-MM-dd'T'HHK",
-                    "yyyy-MM-dd",
-                    "dddd, dd MMMM yyyy",
-                    "dddd, dd MMMM yyyy HH:mm",
-                    "dddd, dd MMMM yyyy hh:mm tt",
-                    "dddd, dd MMMM yyyy H:mm",
-                    "dddd, dd MMMM yyyy h:mm tt",
-                    "dddd, dd MMMM yyyy HH:mm:ss",
-                    "yyyy-MM-dd HH:mm",
-                    "yyyy-MM-dd hh:mm tt",
-                    "yyyy-MM-dd H:mm",
-                    "yyyy-MM-dd h:mm tt",
-                    "yyyy-MM-dd HH:mm:ss",
-                    "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK",
-                    "yyyy'-'MM'-'dd'T'HH':'mm':'ss.fffffffK",
-                    "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'",
-                    "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'",
-                    "yyyy'-'MM'-'dd'T'HH':'mm':'ss",
-                    "yyyy'-'MM'-'dd HH':'mm':'ss'Z'",
-                    "dddd, dd MMMM yyyy HH:mm:ss",
-                    "yyyy MMMM"
-                };
-            }
         }
     }
 }

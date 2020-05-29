@@ -1,31 +1,31 @@
 {
-  "Id": 17,
-  "Name": "Country",
-  "Localized": false,
-  "Values": [
-    {
-      "Id": 0,
-      "Value": "Sweden",
-      "Localized": false
-    }
-  ],
-  "ExternalSystemsMapping": [
-    {
-      "Id": 1,
-      "Name": "DarwinCore",
-      "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
-      "Mappings": [
+    "Id": 17,
+    "Name": "Country",
+    "Localized": false,
+    "Values": [
         {
-          "Key": "country",
-          "Description": "The country term (http://rs.tdwg.org/dwc/terms/country)",
-          "Values": [
-            {
-              "Value": "Sweden",
-              "SosId": 0
-            }
-          ]
+            "Id": 0,
+            "Value": "Sweden",
+            "Localized": false
         }
-      ]
-    }
-  ]
+    ],
+    "ExternalSystemsMapping": [
+        {
+            "Id": 1,
+            "Name": "DarwinCore",
+            "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
+            "Mappings": [
+                {
+                    "Key": "country",
+                    "Description": "The country term (http://rs.tdwg.org/dwc/terms/country)",
+                    "Values": [
+                        {
+                            "Value": "Sweden",
+                            "SosId": 0
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 }

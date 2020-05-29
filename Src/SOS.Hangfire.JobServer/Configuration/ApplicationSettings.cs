@@ -3,12 +3,12 @@
 namespace SOS.Hangfire.JobServer.Configuration
 {
     /// <summary>
-    /// Application settings
+    ///     Application settings
     /// </summary>
     public class ApplicationSettings
     {
         /// <summary>
-        /// Mongo db connection settings
+        ///     Mongo db connection settings
         /// </summary>
         public MongoDbConfiguration HangfireDbConfiguration { get; set; }
     }

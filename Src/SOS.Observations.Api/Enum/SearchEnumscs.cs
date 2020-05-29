@@ -4,17 +4,18 @@ using Newtonsoft.Json.Converters;
 namespace SOS.Observations.Api.Enum
 {
     /// <summary>
-    /// Sort order enum
+    ///     Sort order enum
     /// </summary>
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SearchSortOrder
     {
         /// <summary>
-        /// Sort ascending
+        ///     Sort ascending
         /// </summary>
         Asc = 0,
+
         /// <summary>
-        /// Sort descending
+        ///     Sort descending
         /// </summary>
         Desc = 1
     }

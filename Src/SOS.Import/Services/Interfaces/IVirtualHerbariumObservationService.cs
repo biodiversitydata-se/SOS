@@ -7,7 +7,7 @@ namespace SOS.Import.Services.Interfaces
     public interface IVirtualHerbariumObservationService
     {
         /// <summary>
-        /// Get observations
+        ///     Get observations
         /// </summary>
         /// <param name="from"></param>
         /// <param name="pageIndex"></param>
@@ -16,7 +16,7 @@ namespace SOS.Import.Services.Interfaces
         Task<XDocument> GetAsync(DateTime from, int pageIndex, int pageSize);
 
         /// <summary>
-        /// Get list of localities
+        ///     Get list of localities
         /// </summary>
         /// <returns></returns>
         Task<XDocument> GetLocalitiesAsync();

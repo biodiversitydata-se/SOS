@@ -14,6 +14,16 @@ namespace SOS.Import.UnitTests.Managers
 {
     public class AreasHarvestJobTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public AreasHarvestJobTests()
+        {
+            _areaHarvesterMock = new Mock<IAreaHarvester>();
+            _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
+            _loggerMock = new Mock<ILogger<AreasHarvestJob>>();
+        }
+
         private readonly Mock<IAreaHarvester> _areaHarvesterMock;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
         private readonly Mock<ILogger<AreasHarvestJob>> _loggerMock;
@@ -24,17 +34,55 @@ namespace SOS.Import.UnitTests.Managers
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
+        ///     Harvest job throw exception
         /// </summary>
-        public AreasHarvestJobTests()
+        /// <returns></returns>
+        [Fact]
+        public async Task AddDataProviderException()
         {
-            _areaHarvesterMock = new Mock<IAreaHarvester>();
-            _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
-            _loggerMock = new Mock<ILogger<AreasHarvestJob>>();
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _areaHarvesterMock.Setup(ts => ts.HarvestAreasAsync())
+                .Throws<Exception>();
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            Func<Task> act = async () => { await TestObject.RunAsync(); };
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            await act.Should().ThrowAsync<Exception>();
         }
 
         /// <summary>
-        /// Test constructor
+        ///     Fail to run harvest job
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task AddDataProviderFail()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _areaHarvesterMock.Setup(ts => ts.HarvestAreasAsync())
+                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Failed});
+
+            _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            Func<Task> act = async () => { await TestObject.RunAsync(); };
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            await act.Should().ThrowAsync<Exception>();
+        }
+
+        /// <summary>
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -42,14 +90,14 @@ namespace SOS.Import.UnitTests.Managers
             TestObject.Should().NotBeNull();
 
             Action create = () => new AreasHarvestJob(
-               null,
+                null,
                 _harvestInfoRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHarvester");
 
             create = () => new AreasHarvestJob(
                 _areaHarvesterMock.Object,
-               null,
+                null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
 
@@ -61,7 +109,7 @@ namespace SOS.Import.UnitTests.Managers
         }
 
         /// <summary>
-        /// Run harvest job successfully
+        ///     Run harvest job successfully
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -71,7 +119,7 @@ namespace SOS.Import.UnitTests.Managers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _areaHarvesterMock.Setup(ts => ts.HarvestAreasAsync())
-                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now){ Status = RunStatus.Success});
+                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success});
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             //-----------------------------------------------------------------------------------------------------------
@@ -84,54 +132,5 @@ namespace SOS.Import.UnitTests.Managers
 
             result.Should().BeTrue();
         }
-
-        /// <summary>
-        /// Fail to run harvest job
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task AddDataProviderFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _areaHarvesterMock.Setup(ts => ts.HarvestAreasAsync())
-                 .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) { Status = RunStatus.Failed });
-
-            _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.RunAsync(); };
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            await act.Should().ThrowAsync<Exception>();
-        }
-
-        /// <summary>
-        /// Harvest job throw exception
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task AddDataProviderException()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _areaHarvesterMock.Setup(ts => ts.HarvestAreasAsync())
-               .Throws<Exception>();
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.RunAsync(); };
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            await act.Should().ThrowAsync<Exception>();
-        }
-
     }
 }

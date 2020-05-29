@@ -7,13 +7,13 @@ namespace SOS.Export.IntegrationTests
     {
         protected ExportConfiguration GetExportConfiguration()
         {
-            IConfigurationRoot config = new ConfigurationBuilder()
+            var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            ExportConfiguration exportConfiguration = config.GetSection(typeof(ExportConfiguration).Name).Get<ExportConfiguration>();
+            var exportConfiguration = config.GetSection(typeof(ExportConfiguration).Name).Get<ExportConfiguration>();
             return exportConfiguration;
         }
     }

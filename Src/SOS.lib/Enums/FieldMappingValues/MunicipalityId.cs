@@ -1,1457 +1,1457 @@
 ﻿namespace SOS.Lib.Enums.FieldMappingValues
 {
     /// <summary>
-    /// Enumeration of Municipality.
+    ///     Enumeration of Municipality.
     /// </summary>
     public enum MunicipalityId
     {
         /// <summary>
-        /// Ale.
+        ///     Ale.
         /// </summary>
         Ale = 53,
 
         /// <summary>
-        /// Alingsås.
+        ///     Alingsås.
         /// </summary>
         Alingsas = 54,
 
         /// <summary>
-        /// Alvesta.
+        ///     Alvesta.
         /// </summary>
         Alvesta = 55,
 
         /// <summary>
-        /// Aneby.
+        ///     Aneby.
         /// </summary>
         Aneby = 56,
 
         /// <summary>
-        /// Arboga.
+        ///     Arboga.
         /// </summary>
         Arboga = 57,
 
         /// <summary>
-        /// Arjeplog.
+        ///     Arjeplog.
         /// </summary>
         Arjeplog = 58,
 
         /// <summary>
-        /// Bjurholm.
+        ///     Bjurholm.
         /// </summary>
         Bjurholm = 59,
 
         /// <summary>
-        /// Arvidsjaur.
+        ///     Arvidsjaur.
         /// </summary>
         Arvidsjaur = 60,
 
         /// <summary>
-        /// Arvika.
+        ///     Arvika.
         /// </summary>
         Arvika = 61,
 
         /// <summary>
-        /// Askersund.
+        ///     Askersund.
         /// </summary>
         Askersund = 62,
 
         /// <summary>
-        /// Avesta.
+        ///     Avesta.
         /// </summary>
         Avesta = 63,
 
         /// <summary>
-        /// Bengtsfors.
+        ///     Bengtsfors.
         /// </summary>
         Bengtsfors = 64,
 
         /// <summary>
-        /// Berg.
+        ///     Berg.
         /// </summary>
         Berg = 65,
 
         /// <summary>
-        /// Bjuv.
+        ///     Bjuv.
         /// </summary>
         Bjuv = 66,
 
         /// <summary>
-        /// Boden.
+        ///     Boden.
         /// </summary>
         Boden = 67,
 
         /// <summary>
-        /// Bollebygd.
+        ///     Bollebygd.
         /// </summary>
         Bollebygd = 68,
 
         /// <summary>
-        /// Bollnäs.
+        ///     Bollnäs.
         /// </summary>
         Bollnas = 69,
 
         /// <summary>
-        /// Lycksele.
+        ///     Lycksele.
         /// </summary>
         Lycksele = 70,
 
         /// <summary>
-        /// Lysekil.
+        ///     Lysekil.
         /// </summary>
         Lysekil = 71,
 
         /// <summary>
-        /// Malmö.
+        ///     Malmö.
         /// </summary>
         Malmo = 72,
 
         /// <summary>
-        /// Malung-Sälen.
+        ///     Malung-Sälen.
         /// </summary>
         MalungSalen = 73,
 
         /// <summary>
-        /// Malå.
+        ///     Malå.
         /// </summary>
         Mala = 74,
 
         /// <summary>
-        /// Mariestad.
+        ///     Mariestad.
         /// </summary>
         Mariestad = 75,
 
         /// <summary>
-        /// Mark.
+        ///     Mark.
         /// </summary>
         Mark = 76,
 
         /// <summary>
-        /// Markaryd.
+        ///     Markaryd.
         /// </summary>
         Markaryd = 77,
 
         /// <summary>
-        /// Mellerud.
+        ///     Mellerud.
         /// </summary>
         Mellerud = 78,
 
         /// <summary>
-        /// Mjölby.
+        ///     Mjölby.
         /// </summary>
         Mjolby = 79,
 
         /// <summary>
-        /// Mora.
+        ///     Mora.
         /// </summary>
         Mora = 80,
 
         /// <summary>
-        /// Motala.
+        ///     Motala.
         /// </summary>
         Motala = 81,
 
         /// <summary>
-        /// Mullsjö.
+        ///     Mullsjö.
         /// </summary>
         Mullsjo = 82,
 
         /// <summary>
-        /// Munkedal.
+        ///     Munkedal.
         /// </summary>
         Munkedal = 83,
 
         /// <summary>
-        /// Munkfors.
+        ///     Munkfors.
         /// </summary>
         Munkfors = 84,
 
         /// <summary>
-        /// Mölndal.
+        ///     Mölndal.
         /// </summary>
         Molndal = 85,
 
         /// <summary>
-        /// Mönsterås.
+        ///     Mönsterås.
         /// </summary>
         Monsteras = 86,
 
         /// <summary>
-        /// Mörbylånga.
+        ///     Mörbylånga.
         /// </summary>
         Morbylanga = 87,
 
         /// <summary>
-        /// Nacka.
+        ///     Nacka.
         /// </summary>
         Nacka = 88,
 
         /// <summary>
-        /// Nordmaling.
+        ///     Nordmaling.
         /// </summary>
         Nordmaling = 89,
 
         /// <summary>
-        /// Norrköping.
+        ///     Norrköping.
         /// </summary>
         Norrkoping = 90,
 
         /// <summary>
-        /// Norrtälje.
+        ///     Norrtälje.
         /// </summary>
         Norrtalje = 91,
 
         /// <summary>
-        /// Norsjö.
+        ///     Norsjö.
         /// </summary>
         Norsjo = 92,
 
         /// <summary>
-        /// Nora.
+        ///     Nora.
         /// </summary>
         Nora = 93,
 
         /// <summary>
-        /// Norberg.
+        ///     Norberg.
         /// </summary>
         Norberg = 94,
 
         /// <summary>
-        /// Nordanstig.
+        ///     Nordanstig.
         /// </summary>
         Nordanstig = 95,
 
         /// <summary>
-        /// Nykvarn.
+        ///     Nykvarn.
         /// </summary>
         Nykvarn = 96,
 
         /// <summary>
-        /// Nyköping.
+        ///     Nyköping.
         /// </summary>
         Nykoping = 97,
 
         /// <summary>
-        /// Nynäshamn.
+        ///     Nynäshamn.
         /// </summary>
         Nynashamn = 98,
 
         /// <summary>
-        /// Nässjö.
+        ///     Nässjö.
         /// </summary>
         Nassjo = 99,
 
         /// <summary>
-        /// Ockelbo.
+        ///     Ockelbo.
         /// </summary>
         Ockelbo = 100,
 
         /// <summary>
-        /// Olofström.
+        ///     Olofström.
         /// </summary>
         Olofstrom = 101,
 
         /// <summary>
-        /// Orsa.
+        ///     Orsa.
         /// </summary>
         Orsa = 102,
 
         /// <summary>
-        /// Orust.
+        ///     Orust.
         /// </summary>
         Orust = 103,
 
         /// <summary>
-        /// Osby.
+        ///     Osby.
         /// </summary>
         Osby = 104,
 
         /// <summary>
-        /// Oskarshamn.
+        ///     Oskarshamn.
         /// </summary>
         Oskarshamn = 105,
 
         /// <summary>
-        /// Ovanåker.
+        ///     Ovanåker.
         /// </summary>
         Ovanaker = 106,
 
         /// <summary>
-        /// Oxelösund.
+        ///     Oxelösund.
         /// </summary>
         Oxelosund = 107,
 
         /// <summary>
-        /// Pajala.
+        ///     Pajala.
         /// </summary>
         Pajala = 108,
 
         /// <summary>
-        /// Partille.
+        ///     Partille.
         /// </summary>
         Partille = 109,
 
         /// <summary>
-        /// Perstorp.
+        ///     Perstorp.
         /// </summary>
         Perstorp = 110,
 
         /// <summary>
-        /// Piteå.
+        ///     Piteå.
         /// </summary>
         Pitea = 111,
 
         /// <summary>
-        /// Ragunda.
+        ///     Ragunda.
         /// </summary>
         Ragunda = 112,
 
         /// <summary>
-        /// Robertsfors.
+        ///     Robertsfors.
         /// </summary>
         Robertsfors = 113,
 
         /// <summary>
-        /// Ronneby.
+        ///     Ronneby.
         /// </summary>
         Ronneby = 114,
 
         /// <summary>
-        /// Rättvik.
+        ///     Rättvik.
         /// </summary>
         Rattvik = 115,
 
         /// <summary>
-        /// Sala.
+        ///     Sala.
         /// </summary>
         Sala = 116,
 
         /// <summary>
-        /// Salem.
+        ///     Salem.
         /// </summary>
         Salem = 117,
 
         /// <summary>
-        /// Sandviken.
+        ///     Sandviken.
         /// </summary>
         Sandviken = 118,
 
         /// <summary>
-        /// Sigtuna.
+        ///     Sigtuna.
         /// </summary>
         Sigtuna = 119,
 
         /// <summary>
-        /// Simrishamn.
+        ///     Simrishamn.
         /// </summary>
         Simrishamn = 120,
 
         /// <summary>
-        /// Sjöbo.
+        ///     Sjöbo.
         /// </summary>
         Sjobo = 121,
 
         /// <summary>
-        /// Skara.
+        ///     Skara.
         /// </summary>
         Skara = 122,
 
         /// <summary>
-        /// Skellefteå.
+        ///     Skellefteå.
         /// </summary>
         Skelleftea = 123,
 
         /// <summary>
-        /// Tingsryd.
+        ///     Tingsryd.
         /// </summary>
         Tingsryd = 124,
 
         /// <summary>
-        /// Tjörn.
+        ///     Tjörn.
         /// </summary>
         Tjorn = 125,
 
         /// <summary>
-        /// Tomelilla.
+        ///     Tomelilla.
         /// </summary>
         Tomelilla = 126,
 
         /// <summary>
-        /// Skinnskatteberg.
+        ///     Skinnskatteberg.
         /// </summary>
         Skinnskatteberg = 127,
 
         /// <summary>
-        /// Sorsele.
+        ///     Sorsele.
         /// </summary>
         Sorsele = 128,
 
         /// <summary>
-        /// Sotenäs.
+        ///     Sotenäs.
         /// </summary>
         Sotenas = 129,
 
         /// <summary>
-        /// Skurup.
+        ///     Skurup.
         /// </summary>
         Skurup = 130,
 
         /// <summary>
-        /// Skövde.
+        ///     Skövde.
         /// </summary>
         Skovde = 131,
 
         /// <summary>
-        /// Smedjebacken.
+        ///     Smedjebacken.
         /// </summary>
         Smedjebacken = 132,
 
         /// <summary>
-        /// Sollefteå.
+        ///     Sollefteå.
         /// </summary>
         Solleftea = 133,
 
         /// <summary>
-        /// Sollentuna.
+        ///     Sollentuna.
         /// </summary>
         Sollentuna = 134,
 
         /// <summary>
-        /// Solna.
+        ///     Solna.
         /// </summary>
         Solna = 135,
 
         /// <summary>
-        /// Staffanstorp.
+        ///     Staffanstorp.
         /// </summary>
         Staffanstorp = 136,
 
         /// <summary>
-        /// Stenungsund.
+        ///     Stenungsund.
         /// </summary>
         Stenungsund = 137,
 
         /// <summary>
-        /// Stockholm.
+        ///     Stockholm.
         /// </summary>
         Stockholm = 138,
 
         /// <summary>
-        /// Storfors.
+        ///     Storfors.
         /// </summary>
         Storfors = 139,
 
         /// <summary>
-        /// Storuman.
+        ///     Storuman.
         /// </summary>
         Storuman = 140,
 
         /// <summary>
-        /// Strängnäs.
+        ///     Strängnäs.
         /// </summary>
         Strangnas = 141,
 
         /// <summary>
-        /// Strömstad.
+        ///     Strömstad.
         /// </summary>
         Stromstad = 142,
 
         /// <summary>
-        /// Strömsund.
+        ///     Strömsund.
         /// </summary>
         Stromsund = 143,
 
         /// <summary>
-        /// Sundbyberg.
+        ///     Sundbyberg.
         /// </summary>
         Sundbyberg = 144,
 
         /// <summary>
-        /// Sundsvall.
+        ///     Sundsvall.
         /// </summary>
         Sundsvall = 145,
 
         /// <summary>
-        /// Sunne.
+        ///     Sunne.
         /// </summary>
         Sunne = 146,
 
         /// <summary>
-        /// Borgholm.
+        ///     Borgholm.
         /// </summary>
         Borgholm = 147,
 
         /// <summary>
-        /// Borlänge.
+        ///     Borlänge.
         /// </summary>
         Borlange = 148,
 
         /// <summary>
-        /// Borås.
+        ///     Borås.
         /// </summary>
         Boras = 149,
 
         /// <summary>
-        /// Botkyrka.
+        ///     Botkyrka.
         /// </summary>
         Botkyrka = 150,
 
         /// <summary>
-        /// Boxholm.
+        ///     Boxholm.
         /// </summary>
         Boxholm = 151,
 
         /// <summary>
-        /// Bromölla.
+        ///     Bromölla.
         /// </summary>
         Bromolla = 152,
 
         /// <summary>
-        /// Bräcke.
+        ///     Bräcke.
         /// </summary>
         Bracke = 153,
 
         /// <summary>
-        /// Burlöv.
+        ///     Burlöv.
         /// </summary>
         Burlov = 154,
 
         /// <summary>
-        /// Båstad.
+        ///     Båstad.
         /// </summary>
         Bastad = 155,
 
         /// <summary>
-        /// Dals-Ed.
+        ///     Dals-Ed.
         /// </summary>
         DalsEd = 156,
 
         /// <summary>
-        /// Danderyd.
+        ///     Danderyd.
         /// </summary>
         Danderyd = 157,
 
         /// <summary>
-        /// Degerfors.
+        ///     Degerfors.
         /// </summary>
         Degerfors = 158,
 
         /// <summary>
-        /// Dorotea.
+        ///     Dorotea.
         /// </summary>
         Dorotea = 159,
 
         /// <summary>
-        /// Eda.
+        ///     Eda.
         /// </summary>
         Eda = 160,
 
         /// <summary>
-        /// Ekerö.
+        ///     Ekerö.
         /// </summary>
         Ekero = 161,
 
         /// <summary>
-        /// Eksjö.
+        ///     Eksjö.
         /// </summary>
         Eksjo = 162,
 
         /// <summary>
-        /// Emmaboda.
+        ///     Emmaboda.
         /// </summary>
         Emmaboda = 163,
 
         /// <summary>
-        /// Enköping.
+        ///     Enköping.
         /// </summary>
         Enkoping = 164,
 
         /// <summary>
-        /// Eskilstuna.
+        ///     Eskilstuna.
         /// </summary>
         Eskilstuna = 165,
 
         /// <summary>
-        /// Eslöv.
+        ///     Eslöv.
         /// </summary>
         Eslov = 166,
 
         /// <summary>
-        /// Essunga.
+        ///     Essunga.
         /// </summary>
         Essunga = 167,
 
         /// <summary>
-        /// Fagersta.
+        ///     Fagersta.
         /// </summary>
         Fagersta = 168,
 
         /// <summary>
-        /// Falkenberg.
+        ///     Falkenberg.
         /// </summary>
         Falkenberg = 169,
 
         /// <summary>
-        /// Falköping.
+        ///     Falköping.
         /// </summary>
         Falkoping = 170,
 
         /// <summary>
-        /// Falun.
+        ///     Falun.
         /// </summary>
         Falun = 171,
 
         /// <summary>
-        /// Gagnef.
+        ///     Gagnef.
         /// </summary>
         Gagnef = 172,
 
         /// <summary>
-        /// Gislaved.
+        ///     Gislaved.
         /// </summary>
         Gislaved = 173,
 
         /// <summary>
-        /// Filipstad.
+        ///     Filipstad.
         /// </summary>
         Filipstad = 174,
 
         /// <summary>
-        /// Finspång.
+        ///     Finspång.
         /// </summary>
         Finspang = 175,
 
         /// <summary>
-        /// Flen.
+        ///     Flen.
         /// </summary>
         Flen = 176,
 
         /// <summary>
-        /// Forshaga.
+        ///     Forshaga.
         /// </summary>
         Forshaga = 177,
 
         /// <summary>
-        /// Färgelanda.
+        ///     Färgelanda.
         /// </summary>
         Fargelanda = 178,
 
         /// <summary>
-        /// Gnesta.
+        ///     Gnesta.
         /// </summary>
         Gnesta = 179,
 
         /// <summary>
-        /// Gnosjö.
+        ///     Gnosjö.
         /// </summary>
         Gnosjo = 180,
 
         /// <summary>
-        /// Gotland.
+        ///     Gotland.
         /// </summary>
         Gotland = 181,
 
         /// <summary>
-        /// Grums.
+        ///     Grums.
         /// </summary>
         Grums = 182,
 
         /// <summary>
-        /// Grästorp.
+        ///     Grästorp.
         /// </summary>
         Grastorp = 183,
 
         /// <summary>
-        /// Gullspång.
+        ///     Gullspång.
         /// </summary>
         Gullspang = 184,
 
         /// <summary>
-        /// Gällivare.
+        ///     Gällivare.
         /// </summary>
         Gallivare = 185,
 
         /// <summary>
-        /// Gävle.
+        ///     Gävle.
         /// </summary>
         Gavle = 186,
 
         /// <summary>
-        /// Hallstahammar.
+        ///     Hallstahammar.
         /// </summary>
         Hallstahammar = 187,
 
         /// <summary>
-        /// Halmstad.
+        ///     Halmstad.
         /// </summary>
         Halmstad = 188,
 
         /// <summary>
-        /// Göteborg.
+        ///     Göteborg.
         /// </summary>
         Goteborg = 189,
 
         /// <summary>
-        /// Hammarö.
+        ///     Hammarö.
         /// </summary>
         Hammaro = 190,
 
         /// <summary>
-        /// Krokom.
+        ///     Krokom.
         /// </summary>
         Krokom = 191,
 
         /// <summary>
-        /// Götene.
+        ///     Götene.
         /// </summary>
         Gotene = 192,
 
         /// <summary>
-        /// Habo.
+        ///     Habo.
         /// </summary>
         Habo = 193,
 
         /// <summary>
-        /// Hagfors.
+        ///     Hagfors.
         /// </summary>
         Hagfors = 194,
 
         /// <summary>
-        /// Hallsberg.
+        ///     Hallsberg.
         /// </summary>
         Hallsberg = 195,
 
         /// <summary>
-        /// Haninge.
+        ///     Haninge.
         /// </summary>
         Haninge = 196,
 
         /// <summary>
-        /// Haparanda.
+        ///     Haparanda.
         /// </summary>
         Haparanda = 197,
 
         /// <summary>
-        /// Hedemora.
+        ///     Hedemora.
         /// </summary>
         Hedemora = 198,
 
         /// <summary>
-        /// Heby.
+        ///     Heby.
         /// </summary>
         Heby = 199,
 
         /// <summary>
-        /// Helsingborg.
+        ///     Helsingborg.
         /// </summary>
         Helsingborg = 200,
 
         /// <summary>
-        /// Herrljunga.
+        ///     Herrljunga.
         /// </summary>
         Herrljunga = 201,
 
         /// <summary>
-        /// Hjo.
+        ///     Hjo.
         /// </summary>
         Hjo = 202,
 
         /// <summary>
-        /// Hofors.
+        ///     Hofors.
         /// </summary>
         Hofors = 203,
 
         /// <summary>
-        /// Huddinge.
+        ///     Huddinge.
         /// </summary>
         Huddinge = 204,
 
         /// <summary>
-        /// Hudiksvall.
+        ///     Hudiksvall.
         /// </summary>
         Hudiksvall = 205,
 
         /// <summary>
-        /// Hultsfred.
+        ///     Hultsfred.
         /// </summary>
         Hultsfred = 206,
 
         /// <summary>
-        /// Hylte.
+        ///     Hylte.
         /// </summary>
         Hylte = 207,
 
         /// <summary>
-        /// Hällefors.
+        ///     Hällefors.
         /// </summary>
         Hallefors = 208,
 
         /// <summary>
-        /// Härjedalen.
+        ///     Härjedalen.
         /// </summary>
         Harjedalen = 209,
 
         /// <summary>
-        /// Härnösand.
+        ///     Härnösand.
         /// </summary>
         Harnosand = 210,
 
         /// <summary>
-        /// Härryda.
+        ///     Härryda.
         /// </summary>
         Harryda = 211,
 
         /// <summary>
-        /// Hässleholm.
+        ///     Hässleholm.
         /// </summary>
         Hassleholm = 212,
 
         /// <summary>
-        /// Håbo.
+        ///     Håbo.
         /// </summary>
         Haabo = 213,
 
         /// <summary>
-        /// Höganäs.
+        ///     Höganäs.
         /// </summary>
         Hoganas = 214,
 
         /// <summary>
-        /// Högsby.
+        ///     Högsby.
         /// </summary>
         Hogsby = 215,
 
         /// <summary>
-        /// Hörby.
+        ///     Hörby.
         /// </summary>
         Horby = 216,
 
         /// <summary>
-        /// Höör.
+        ///     Höör.
         /// </summary>
         Hoor = 217,
 
         /// <summary>
-        /// Jokkmokk.
+        ///     Jokkmokk.
         /// </summary>
         Jokkmokk = 218,
 
         /// <summary>
-        /// Järfälla.
+        ///     Järfälla.
         /// </summary>
         Jarfalla = 219,
 
         /// <summary>
-        /// Jönköping.
+        ///     Jönköping.
         /// </summary>
         Jonkoping = 220,
 
         /// <summary>
-        /// Kalix.
+        ///     Kalix.
         /// </summary>
         Kalix = 221,
 
         /// <summary>
-        /// Kalmar.
+        ///     Kalmar.
         /// </summary>
         Kalmar = 222,
 
         /// <summary>
-        /// Karlsborg.
+        ///     Karlsborg.
         /// </summary>
         Karlsborg = 223,
 
         /// <summary>
-        /// Karlshamn.
+        ///     Karlshamn.
         /// </summary>
         Karlshamn = 224,
 
         /// <summary>
-        /// Karlskoga.
+        ///     Karlskoga.
         /// </summary>
         Karlskoga = 225,
 
         /// <summary>
-        /// Karlskrona.
+        ///     Karlskrona.
         /// </summary>
         Karlskrona = 226,
 
         /// <summary>
-        /// Karlstad.
+        ///     Karlstad.
         /// </summary>
         Karlstad = 227,
 
         /// <summary>
-        /// Katrineholm.
+        ///     Katrineholm.
         /// </summary>
         Katrineholm = 228,
 
         /// <summary>
-        /// Kil.
+        ///     Kil.
         /// </summary>
         Kil = 229,
 
         /// <summary>
-        /// Kinda.
+        ///     Kinda.
         /// </summary>
         Kinda = 230,
 
         /// <summary>
-        /// Kiruna.
+        ///     Kiruna.
         /// </summary>
         Kiruna = 231,
 
         /// <summary>
-        /// Klippan.
+        ///     Klippan.
         /// </summary>
         Klippan = 232,
 
         /// <summary>
-        /// Knivsta.
+        ///     Knivsta.
         /// </summary>
         Knivsta = 233,
 
         /// <summary>
-        /// Kramfors.
+        ///     Kramfors.
         /// </summary>
         Kramfors = 234,
 
         /// <summary>
-        /// Kristianstad.
+        ///     Kristianstad.
         /// </summary>
         Kristianstad = 235,
 
         /// <summary>
-        /// Kristinehamn.
+        ///     Kristinehamn.
         /// </summary>
         Kristinehamn = 236,
 
         /// <summary>
-        /// Kumla.
+        ///     Kumla.
         /// </summary>
         Kumla = 237,
 
         /// <summary>
-        /// Kungsbacka.
+        ///     Kungsbacka.
         /// </summary>
         Kungsbacka = 238,
 
         /// <summary>
-        /// Nybro.
+        ///     Nybro.
         /// </summary>
         Nybro = 239,
 
         /// <summary>
-        /// Kungsör.
+        ///     Kungsör.
         /// </summary>
         Kungsor = 240,
 
         /// <summary>
-        /// Kungälv.
+        ///     Kungälv.
         /// </summary>
         Kungalv = 241,
 
         /// <summary>
-        /// Kävlinge.
+        ///     Kävlinge.
         /// </summary>
         Kavlinge = 242,
 
         /// <summary>
-        /// Landskrona.
+        ///     Landskrona.
         /// </summary>
         Landskrona = 243,
 
         /// <summary>
-        /// Laxå.
+        ///     Laxå.
         /// </summary>
         Laxa = 244,
 
         /// <summary>
-        /// Lekeberg.
+        ///     Lekeberg.
         /// </summary>
         Lekeberg = 245,
 
         /// <summary>
-        /// Leksand.
+        ///     Leksand.
         /// </summary>
         Leksand = 246,
 
         /// <summary>
-        /// Köping.
+        ///     Köping.
         /// </summary>
         Koping = 247,
 
         /// <summary>
-        /// Laholm.
+        ///     Laholm.
         /// </summary>
         Laholm = 248,
 
         /// <summary>
-        /// Lerum.
+        ///     Lerum.
         /// </summary>
         Lerum = 249,
 
         /// <summary>
-        /// Ljusnarsberg.
+        ///     Ljusnarsberg.
         /// </summary>
         Ljusnarsberg = 250,
 
         /// <summary>
-        /// Lomma.
+        ///     Lomma.
         /// </summary>
         Lomma = 251,
 
         /// <summary>
-        /// Lessebo.
+        ///     Lessebo.
         /// </summary>
         Lessebo = 252,
 
         /// <summary>
-        /// Lidingö.
+        ///     Lidingö.
         /// </summary>
         Lidingo = 253,
 
         /// <summary>
-        /// Lidköping.
+        ///     Lidköping.
         /// </summary>
         Lidkoping = 254,
 
         /// <summary>
-        /// Lilla Edet.
+        ///     Lilla Edet.
         /// </summary>
         LillaEdet = 255,
 
         /// <summary>
-        /// Lindesberg.
+        ///     Lindesberg.
         /// </summary>
         Lindesberg = 256,
 
         /// <summary>
-        /// Linköping.
+        ///     Linköping.
         /// </summary>
         Linkoping = 257,
 
         /// <summary>
-        /// Ljungby.
+        ///     Ljungby.
         /// </summary>
         Ljungby = 258,
 
         /// <summary>
-        /// Ljusdal.
+        ///     Ljusdal.
         /// </summary>
         Ljusdal = 259,
 
         /// <summary>
-        /// Ludvika.
+        ///     Ludvika.
         /// </summary>
         Ludvika = 260,
 
         /// <summary>
-        /// Luleå.
+        ///     Luleå.
         /// </summary>
         Lulea = 261,
 
         /// <summary>
-        /// Lund.
+        ///     Lund.
         /// </summary>
         Lund = 262,
 
         /// <summary>
-        /// Surahammar.
+        ///     Surahammar.
         /// </summary>
         Surahammar = 263,
 
         /// <summary>
-        /// Svalöv.
+        ///     Svalöv.
         /// </summary>
         Svalov = 264,
 
         /// <summary>
-        /// Svedala.
+        ///     Svedala.
         /// </summary>
         Svedala = 265,
 
         /// <summary>
-        /// Svenljunga.
+        ///     Svenljunga.
         /// </summary>
         Svenljunga = 266,
 
         /// <summary>
-        /// Säffle.
+        ///     Säffle.
         /// </summary>
         Saffle = 267,
 
         /// <summary>
-        /// Säter.
+        ///     Säter.
         /// </summary>
         Sater = 268,
 
         /// <summary>
-        /// Sävsjö.
+        ///     Sävsjö.
         /// </summary>
         Savsjo = 269,
 
         /// <summary>
-        /// Söderhamn.
+        ///     Söderhamn.
         /// </summary>
         Soderhamn = 270,
 
         /// <summary>
-        /// Söderköping.
+        ///     Söderköping.
         /// </summary>
         Soderkoping = 271,
 
         /// <summary>
-        /// Södertälje.
+        ///     Södertälje.
         /// </summary>
         Sodertalje = 272,
 
         /// <summary>
-        /// Sölvesborg.
+        ///     Sölvesborg.
         /// </summary>
         Solvesborg = 273,
 
         /// <summary>
-        /// Tanum.
+        ///     Tanum.
         /// </summary>
         Tanum = 274,
 
         /// <summary>
-        /// Tibro.
+        ///     Tibro.
         /// </summary>
         Tibro = 275,
 
         /// <summary>
-        /// Tidaholm.
+        ///     Tidaholm.
         /// </summary>
         Tidaholm = 276,
 
         /// <summary>
-        /// Tierp.
+        ///     Tierp.
         /// </summary>
         Tierp = 277,
 
         /// <summary>
-        /// Timrå.
+        ///     Timrå.
         /// </summary>
         Timra = 278,
 
         /// <summary>
-        /// Torsby.
+        ///     Torsby.
         /// </summary>
         Torsby = 279,
 
         /// <summary>
-        /// Torsås.
+        ///     Torsås.
         /// </summary>
         Torsas = 280,
 
         /// <summary>
-        /// Älvsbyn.
+        ///     Älvsbyn.
         /// </summary>
         Alvsbyn = 281,
 
         /// <summary>
-        /// Tranemo.
+        ///     Tranemo.
         /// </summary>
         Tranemo = 282,
 
         /// <summary>
-        /// Tranås.
+        ///     Tranås.
         /// </summary>
         Tranas = 283,
 
         /// <summary>
-        /// Trelleborg.
+        ///     Trelleborg.
         /// </summary>
         Trelleborg = 284,
 
         /// <summary>
-        /// Trollhättan.
+        ///     Trollhättan.
         /// </summary>
         Trollhattan = 285,
 
         /// <summary>
-        /// Trosa.
+        ///     Trosa.
         /// </summary>
         Trosa = 286,
 
         /// <summary>
-        /// Tyresö.
+        ///     Tyresö.
         /// </summary>
         Tyreso = 287,
 
         /// <summary>
-        /// Täby.
+        ///     Täby.
         /// </summary>
         Taby = 288,
 
         /// <summary>
-        /// Töreboda.
+        ///     Töreboda.
         /// </summary>
         Toreboda = 289,
 
         /// <summary>
-        /// Upplands Väsby.
+        ///     Upplands Väsby.
         /// </summary>
         UpplandsVasby = 290,
 
         /// <summary>
-        /// Uppsala.
+        ///     Uppsala.
         /// </summary>
         Uppsala = 291,
 
         /// <summary>
-        /// Uppvidinge.
+        ///     Uppvidinge.
         /// </summary>
         Uppvidinge = 292,
 
         /// <summary>
-        /// Uddevalla.
+        ///     Uddevalla.
         /// </summary>
         Uddevalla = 293,
 
         /// <summary>
-        /// Ulricehamn.
+        ///     Ulricehamn.
         /// </summary>
         Ulricehamn = 294,
 
         /// <summary>
-        /// Umeå.
+        ///     Umeå.
         /// </summary>
         Umea = 295,
 
         /// <summary>
-        /// Upplands-Bro.
+        ///     Upplands-Bro.
         /// </summary>
         UpplandsBro = 296,
 
         /// <summary>
-        /// Vadstena.
+        ///     Vadstena.
         /// </summary>
         Vadstena = 297,
 
         /// <summary>
-        /// Vaggeryd.
+        ///     Vaggeryd.
         /// </summary>
         Vaggeryd = 298,
 
         /// <summary>
-        /// Valdemarsvik.
+        ///     Valdemarsvik.
         /// </summary>
         Valdemarsvik = 299,
 
         /// <summary>
-        /// Vallentuna.
+        ///     Vallentuna.
         /// </summary>
         Vallentuna = 300,
 
         /// <summary>
-        /// Vansbro.
+        ///     Vansbro.
         /// </summary>
         Vansbro = 301,
 
         /// <summary>
-        /// Vara.
+        ///     Vara.
         /// </summary>
         Vara = 302,
 
         /// <summary>
-        /// Varberg.
+        ///     Varberg.
         /// </summary>
         Varberg = 303,
 
         /// <summary>
-        /// Vaxholm.
+        ///     Vaxholm.
         /// </summary>
         Vaxholm = 304,
 
         /// <summary>
-        /// Vellinge.
+        ///     Vellinge.
         /// </summary>
         Vellinge = 305,
 
         /// <summary>
-        /// Vetlanda.
+        ///     Vetlanda.
         /// </summary>
         Vetlanda = 306,
 
         /// <summary>
-        /// Vilhelmina.
+        ///     Vilhelmina.
         /// </summary>
         Vilhelmina = 307,
 
         /// <summary>
-        /// Vimmerby.
+        ///     Vimmerby.
         /// </summary>
         Vimmerby = 308,
 
         /// <summary>
-        /// Vindeln.
+        ///     Vindeln.
         /// </summary>
         Vindeln = 309,
 
         /// <summary>
-        /// Vingåker.
+        ///     Vingåker.
         /// </summary>
         Vingaker = 310,
 
         /// <summary>
-        /// Vänersborg.
+        ///     Vänersborg.
         /// </summary>
         Vanersborg = 311,
 
         /// <summary>
-        /// Vännäs.
+        ///     Vännäs.
         /// </summary>
         Vannas = 312,
 
         /// <summary>
-        /// Älvdalen.
+        ///     Älvdalen.
         /// </summary>
         Alvdalen = 313,
 
         /// <summary>
-        /// Älvkarleby.
+        ///     Älvkarleby.
         /// </summary>
         Alvkarleby = 314,
 
         /// <summary>
-        /// Värmdö.
+        ///     Värmdö.
         /// </summary>
         Varmdo = 315,
 
         /// <summary>
-        /// Värnamo.
+        ///     Värnamo.
         /// </summary>
         Varnamo = 316,
 
         /// <summary>
-        /// Västervik.
+        ///     Västervik.
         /// </summary>
         Vastervik = 317,
 
         /// <summary>
-        /// Västerås.
+        ///     Västerås.
         /// </summary>
         Vasteras = 318,
 
         /// <summary>
-        /// Växjö.
+        ///     Växjö.
         /// </summary>
         Vaxjo = 319,
 
         /// <summary>
-        /// Vårgårda.
+        ///     Vårgårda.
         /// </summary>
         Vargarda = 320,
 
         /// <summary>
-        /// Ydre.
+        ///     Ydre.
         /// </summary>
         Ydre = 321,
 
         /// <summary>
-        /// Ystad.
+        ///     Ystad.
         /// </summary>
         Ystad = 322,
 
         /// <summary>
-        /// Älmhult.
+        ///     Älmhult.
         /// </summary>
         Almhult = 323,
 
         /// <summary>
-        /// Ängelholm.
+        ///     Ängelholm.
         /// </summary>
         Angelholm = 324,
 
         /// <summary>
-        /// Åmål.
+        ///     Åmål.
         /// </summary>
         Amal = 325,
 
         /// <summary>
-        /// Ånge.
+        ///     Ånge.
         /// </summary>
         Ange = 326,
 
         /// <summary>
-        /// Åre.
+        ///     Åre.
         /// </summary>
         Are = 327,
 
         /// <summary>
-        /// Årjäng.
+        ///     Årjäng.
         /// </summary>
         Arjang = 328,
 
         /// <summary>
-        /// Åsele.
+        ///     Åsele.
         /// </summary>
         Asele = 329,
 
         /// <summary>
-        /// Åstorp.
+        ///     Åstorp.
         /// </summary>
         Astorp = 330,
 
         /// <summary>
-        /// Åtvidaberg.
+        ///     Åtvidaberg.
         /// </summary>
         Atvidaberg = 331,
 
         /// <summary>
-        /// Öckerö.
+        ///     Öckerö.
         /// </summary>
         Ockero = 332,
 
         /// <summary>
-        /// Ödeshög.
+        ///     Ödeshög.
         /// </summary>
         Odeshog = 333,
 
         /// <summary>
-        /// Örebro.
+        ///     Örebro.
         /// </summary>
         Orebro = 334,
 
         /// <summary>
-        /// Örkelljunga.
+        ///     Örkelljunga.
         /// </summary>
         Orkelljunga = 335,
 
         /// <summary>
-        /// Örnsköldsvik.
+        ///     Örnsköldsvik.
         /// </summary>
         Ornskoldsvik = 336,
 
         /// <summary>
-        /// Östersund.
+        ///     Östersund.
         /// </summary>
         Ostersund = 337,
 
         /// <summary>
-        /// Österåker.
+        ///     Österåker.
         /// </summary>
         Osteraker = 338,
 
         /// <summary>
-        /// Östhammar.
+        ///     Östhammar.
         /// </summary>
         Osthammar = 339,
 
         /// <summary>
-        /// Östra Göinge.
+        ///     Östra Göinge.
         /// </summary>
         OstraGoinge = 340,
 
         /// <summary>
-        /// Överkalix.
+        ///     Överkalix.
         /// </summary>
         Overkalix = 341,
 
         /// <summary>
-        /// Övertorneå.
+        ///     Övertorneå.
         /// </summary>
         Overtornea = 342
     }

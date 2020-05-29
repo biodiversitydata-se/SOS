@@ -11,10 +11,19 @@ using Xunit;
 namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
 {
     /// <summary>
-    /// Test site repository
+    ///     Test site repository
     /// </summary>
     public class SpeciesCollectionItemRepositoryTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public SpeciesCollectionItemRepositoryTests()
+        {
+            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
+            _loggerMock = new Mock<ILogger<SpeciesCollectionItemRepository>>();
+        }
+
         private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
         private readonly Mock<ILogger<SpeciesCollectionItemRepository>> _loggerMock;
 
@@ -23,16 +32,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public SpeciesCollectionItemRepositoryTests()
-        {
-            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
-            _loggerMock = new Mock<ILogger<SpeciesCollectionItemRepository>>();
-        }
-
-        /// <summary>
-        /// Constructor tests
+        ///     Constructor tests
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -51,40 +51,14 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         }
 
         /// <summary>
-        /// Test get sites success
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetAsyncSuccess()
-        {
-            var speciesCollectionItemEntities = new []
-            {
-                    new SpeciesCollectionItemEntity(),
-                    new SpeciesCollectionItemEntity()
-            };
-
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<SpeciesCollectionItemEntity>(It.IsAny<string>(), null))
-                .ReturnsAsync(speciesCollectionItemEntities);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetAsync();
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().HaveCount(2);
-        }
-
-        /// <summary>
-        /// Test get sites fail
+        ///     Test get sites fail
         /// </summary>
         /// <returns></returns>
         [Fact]
         public async Task GetAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<SpeciesCollectionItemEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock
+                .Setup(spds => spds.QueryAsync<SpeciesCollectionItemEntity>(It.IsAny<string>(), null))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -96,6 +70,34 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
 
             result.Should().BeNull();
+        }
+
+        /// <summary>
+        ///     Test get sites success
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task GetAsyncSuccess()
+        {
+            var speciesCollectionItemEntities = new[]
+            {
+                new SpeciesCollectionItemEntity(),
+                new SpeciesCollectionItemEntity()
+            };
+
+            _artportalenDataServiceMock
+                .Setup(spds => spds.QueryAsync<SpeciesCollectionItemEntity>(It.IsAny<string>(), null))
+                .ReturnsAsync(speciesCollectionItemEntities);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.GetAsync();
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().HaveCount(2);
         }
     }
 }

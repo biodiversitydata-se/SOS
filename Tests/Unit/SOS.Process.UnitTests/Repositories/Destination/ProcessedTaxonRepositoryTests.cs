@@ -10,11 +10,8 @@ namespace SOS.Process.UnitTests.Repositories.Destination
 {
     public class ProcessedTaxonRepositoryTests
     {
-        private readonly Mock<IProcessClient> _processClient;
-        private readonly Mock<ILogger<ProcessedTaxonRepository>> _loggerMock;
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public ProcessedTaxonRepositoryTests()
         {
@@ -22,8 +19,11 @@ namespace SOS.Process.UnitTests.Repositories.Destination
             _loggerMock = new Mock<ILogger<ProcessedTaxonRepository>>();
         }
 
+        private readonly Mock<IProcessClient> _processClient;
+        private readonly Mock<ILogger<ProcessedTaxonRepository>> _loggerMock;
+
         /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -33,7 +33,7 @@ namespace SOS.Process.UnitTests.Repositories.Destination
                 _loggerMock.Object);
             create.Should().Throw<NullReferenceException>();
 
-           create = () => new ProcessedTaxonRepository(
+            create = () => new ProcessedTaxonRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");

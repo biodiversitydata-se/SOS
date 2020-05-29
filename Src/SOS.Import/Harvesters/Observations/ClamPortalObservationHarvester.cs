@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.ClamPortal.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
@@ -13,16 +14,16 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters.Observations
 {
     /// <summary>
-    /// Clam Portal observation harvester
+    ///     Clam Portal observation harvester
     /// </summary>
-    public class ClamPortalObservationHarvester : Interfaces.IClamPortalObservationHarvester
+    public class ClamPortalObservationHarvester : IClamPortalObservationHarvester
     {
-        private readonly IClamObservationVerbatimRepository _clamObservationVerbatimRepository;
         private readonly IClamObservationService _clamObservationService;
+        private readonly IClamObservationVerbatimRepository _clamObservationVerbatimRepository;
         private readonly ILogger<ClamPortalObservationHarvester> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="clamObservationVerbatimRepository"></param>
         /// <param name="clamObservationService"></param>
@@ -32,18 +33,22 @@ namespace SOS.Import.Harvesters.Observations
             IClamObservationService clamObservationService,
             ILogger<ClamPortalObservationHarvester> logger)
         {
-            _clamObservationVerbatimRepository = clamObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(clamObservationVerbatimRepository));
-            _clamObservationService = clamObservationService ?? throw new ArgumentNullException(nameof(clamObservationService));
+            _clamObservationVerbatimRepository = clamObservationVerbatimRepository ??
+                                                 throw new ArgumentNullException(
+                                                     nameof(clamObservationVerbatimRepository));
+            _clamObservationService =
+                clamObservationService ?? throw new ArgumentNullException(nameof(clamObservationService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
-        /// Aggregate clams
+        ///     Aggregate clams
         /// </summary>
         /// <returns></returns>
         public async Task<HarvestInfo> HarvestClamsAsync(IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo(nameof(ClamObservationVerbatim), DataProviderType.ClamPortalObservations, DateTime.Now);
+            var harvestInfo = new HarvestInfo(nameof(ClamObservationVerbatim), DataProviderType.ClamPortalObservations,
+                DateTime.Now);
             try
             {
                 _logger.LogDebug("Start storing clams verbatim");
@@ -73,6 +78,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogError(e, "Failed harvest of clams");
                 harvestInfo.Status = RunStatus.Failed;
             }
+
             return harvestInfo;
         }
     }

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Nest;
 using Newtonsoft.Json;
-using SOS.Export.Managers;
 using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Lib.Configuration.Shared;
@@ -18,10 +18,10 @@ namespace SOS.Export.IntegrationTests.TestDataTools
     public class CreateObservationsJsonFileTool : TestBase
     {
         /// <summary>
-        /// Reads observations from MongoDb and saves them as a JSON file.
+        ///     Reads observations from MongoDb and saves them as a JSON file.
         /// </summary>
         [Fact]
-        [Trait("Category","Tool")]
+        [Trait("Category", "Tool")]
         public async Task CreateObservationsJsonFile()
         {
             //-----------------------------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             var processedObservationRepository = new ProcessedObservationRepository(
                 elasticClient,
                 exportClient,
-                new ElasticSearchConfiguration(), 
+                new ElasticSearchConfiguration(),
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -45,12 +45,12 @@ namespace SOS.Export.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             var observations = await processedObservationRepository.ScrollObservationsAsync(new SearchFilter(), null);
 
-            var serializerSettings = new JsonSerializerSettings()
+            var serializerSettings = new JsonSerializerSettings
             {
-                Converters = new List<JsonConverter> { new ObjectIdConverter() }
+                Converters = new List<JsonConverter> {new ObjectIdConverter()}
             };
             var strJson = JsonConvert.SerializeObject(observations, serializerSettings);
-            System.IO.File.WriteAllText(filePath, strJson, Encoding.UTF8);
+            File.WriteAllText(filePath, strJson, Encoding.UTF8);
         }
     }
 }

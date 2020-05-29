@@ -35,7 +35,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             var namespaceManager = new XmlNamespaceManager(new NameTable());
             namespaceManager.AddNamespace("eml", "eml://ecoinformatics.org/eml-2.1.1");
             var pubDate = xmlDocument.XPathSelectElement("/eml:eml/dataset/pubDate", namespaceManager);
-            
+
             ////-----------------------------------------------------------------------------------------------------------
             //// Assert
             ////-----------------------------------------------------------------------------------------------------------

@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 using SOS.Process.Managers.Interfaces;
 
 namespace SOS.Process.Jobs
 {
     /// <summary>
-    /// Artportalen harvest
+    ///     Artportalen harvest
     /// </summary>
     public class CopyProviderDataJob : ICopyProviderDataJob
     {
-        private readonly IInstanceManager _instanceManager;
         private readonly IDataProviderManager _dataProviderManager;
+        private readonly IInstanceManager _instanceManager;
         private readonly ILogger<CopyProviderDataJob> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="instanceManager"></param>
         /// <param name="dataProviderManager"></param>

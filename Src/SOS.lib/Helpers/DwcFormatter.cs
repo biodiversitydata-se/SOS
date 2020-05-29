@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace SOS.Lib.Helpers
 {
     public static class DwcFormatter
     {
         /// <summary>
-        /// Create a date formatted according to the ISO 8601 standard.
+        ///     Create a date formatted according to the ISO 8601 standard.
         /// </summary>
         /// <param name="date">The date.</param>
         /// <returns>A date that is formatted according to the ISO 8601 standard.</returns>
@@ -18,7 +16,7 @@ namespace SOS.Lib.Helpers
         }
 
         /// <summary>
-        /// Create a time formatted according to the ISO 8601 standard.
+        ///     Create a time formatted according to the ISO 8601 standard.
         /// </summary>
         /// <param name="date">The date.</param>
         /// <returns>A time that is formatted according to the ISO 8601 standard.</returns>
@@ -28,7 +26,7 @@ namespace SOS.Lib.Helpers
         }
 
         /// <summary>
-        /// Create a date interval formatting according to the ISO 8601 standard.
+        ///     Create a date interval formatting according to the ISO 8601 standard.
         /// </summary>
         /// <param name="date1">From date.</param>
         /// <param name="date2">To date.</param>
@@ -52,7 +50,7 @@ namespace SOS.Lib.Helpers
         }
 
         /// <summary>
-        /// Create a time interval formatting according to the ISO 8601 standard.
+        ///     Create a time interval formatting according to the ISO 8601 standard.
         /// </summary>
         /// <param name="date1">From date.</param>
         /// <param name="date2">To date.</param>

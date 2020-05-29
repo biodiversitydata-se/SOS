@@ -10,11 +10,8 @@ namespace SOS.Process.UnitTests.Repositories.Destination
 {
     public class ProcessedFieldMappingRepositoryTests
     {
-        private readonly Mock<IProcessClient> _processClient;
-        private readonly Mock<ILogger<ProcessedFieldMappingRepository>> _loggerMock;
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public ProcessedFieldMappingRepositoryTests()
         {
@@ -22,8 +19,11 @@ namespace SOS.Process.UnitTests.Repositories.Destination
             _loggerMock = new Mock<ILogger<ProcessedFieldMappingRepository>>();
         }
 
+        private readonly Mock<IProcessClient> _processClient;
+        private readonly Mock<ILogger<ProcessedFieldMappingRepository>> _loggerMock;
+
         /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -33,7 +33,7 @@ namespace SOS.Process.UnitTests.Repositories.Destination
                 _loggerMock.Object);
             create.Should().Throw<NullReferenceException>();
 
-           create = () => new ProcessedFieldMappingRepository(
+            create = () => new ProcessedFieldMappingRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");

@@ -5,12 +5,13 @@ using SOS.Lib.Models.Shared;
 namespace SOS.Import.Factories.FieldMapping
 {
     /// <summary>
-    /// Class for creating BasisOfRecord field mapping.
+    ///     Class for creating BasisOfRecord field mapping.
     /// </summary>
     public class BasisOfRecordFieldMappingFactory : DwcFieldMappingFactoryBase
     {
         protected override FieldMappingFieldId FieldId => FieldMappingFieldId.BasisOfRecord;
         protected override bool Localized => false;
+
         protected override ICollection<FieldMappingValue> GetFieldMappingValues()
         {
             // Vocabulary from https://dwc.tdwg.org/terms/#dwc:basisOfRecord and GBIF website.

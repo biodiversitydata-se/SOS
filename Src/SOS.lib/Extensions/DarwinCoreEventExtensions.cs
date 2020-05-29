@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Globalization;
-using  SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Lib.Extensions
 {
     public static class DarwinCoreEventExtensions
     {
         public static void PopulateDateFields(
-            this DarwinCoreEvent darwinCoreEvent, 
+            this DarwinCoreEvent darwinCoreEvent,
             DateTime observationDateStart,
             DateTime? observationDateEnd)
         {

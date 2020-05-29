@@ -28,17 +28,18 @@ namespace SOS.Process.Processors.Nors
         }
 
         /// <summary>
-        /// Cast multiple clam observations to ProcessedObservation
+        ///     Cast multiple clam observations to ProcessedObservation
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public IEnumerable<ProcessedObservation> CreateProcessedObservations(IEnumerable<NorsObservationVerbatim> verbatims)
+        public IEnumerable<ProcessedObservation> CreateProcessedObservations(
+            IEnumerable<NorsObservationVerbatim> verbatims)
         {
             return verbatims.Select(CreateProcessedObservation);
         }
 
         /// <summary>
-        /// Cast NORS observation verbatim to ProcessedObservation
+        ///     Cast NORS observation verbatim to ProcessedObservation
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
@@ -47,15 +48,16 @@ namespace SOS.Process.Processors.Nors
             Point wgs84Point = null;
             if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
             {
-                wgs84Point = new Point(verbatim.DecimalLongitude, verbatim.DecimalLatitude) { SRID = (int)CoordinateSys.WGS84 };
+                wgs84Point = new Point(verbatim.DecimalLongitude, verbatim.DecimalLatitude)
+                    {SRID = (int) CoordinateSys.WGS84};
             }
 
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
 
             var obs = new ProcessedObservation
             {
-                BasisOfRecord = new ProcessedFieldMapValue { Id = (int)BasisOfRecordId.HumanObservation },
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{ DataProviderIdentifiers.NORS }",
+                BasisOfRecord = new ProcessedFieldMapValue {Id = (int) BasisOfRecordId.HumanObservation},
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.NORS}",
                 DatasetName = "NORS",
                 Event = new ProcessedEvent
                 {
@@ -70,21 +72,23 @@ namespace SOS.Process.Processors.Nors
                 },
                 Location = new ProcessedLocation
                 {
-                    CoordinateUncertaintyInMeters = verbatim.CoordinateUncertaintyInMeters ?? DefaultCoordinateUncertaintyInMeters,
+                    CoordinateUncertaintyInMeters =
+                        verbatim.CoordinateUncertaintyInMeters ?? DefaultCoordinateUncertaintyInMeters,
                     CountryCode = CountryCode.Sweden,
                     DecimalLatitude = verbatim.DecimalLatitude,
                     DecimalLongitude = verbatim.DecimalLongitude,
                     GeodeticDatum = GeodeticDatum.Wgs84,
-                    Continent = new ProcessedFieldMapValue { Id = (int)ContinentId.Europe },
-                    Country = new ProcessedFieldMapValue { Id = (int)CountryId.Sweden },
+                    Continent = new ProcessedFieldMapValue {Id = (int) ContinentId.Europe},
+                    Country = new ProcessedFieldMapValue {Id = (int) CountryId.Sweden},
                     Locality = verbatim.Locality,
                     Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
                     PointLocation = wgs84Point?.ToGeoLocation(),
-                    PointWithBuffer = (PolygonGeoShape)wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoShape(),
+                    PointWithBuffer =
+                        (PolygonGeoShape) wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoShape(),
                     VerbatimLatitude = verbatim.DecimalLatitude,
                     VerbatimLongitude = verbatim.DecimalLongitude
                 },
-                Modified = verbatim.Modified.HasValue ? verbatim.Modified.Value.ToUniversalTime() : (DateTime?)null,
+                Modified = verbatim.Modified.HasValue ? verbatim.Modified.Value.ToUniversalTime() : (DateTime?) null,
                 Occurrence = new ProcessedOccurrence
                 {
                     CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
@@ -107,7 +111,7 @@ namespace SOS.Process.Processors.Nors
         }
 
         /// <summary>
-        /// Creates occurrence id.
+        ///     Creates occurrence id.
         /// </summary>
         /// <returns>The Catalog Number.</returns>
         private string GetCatalogNumber(string occurrenceId)
@@ -117,23 +121,24 @@ namespace SOS.Process.Processors.Nors
         }
 
         /// <summary>
-        /// Gets the occurrence status. Set to Present if DyntaxaTaxonId from provider is greater than 0 and Absent if DyntaxaTaxonId is 0
+        ///     Gets the occurrence status. Set to Present if DyntaxaTaxonId from provider is greater than 0 and Absent if
+        ///     DyntaxaTaxonId is 0
         /// </summary>
         private ProcessedFieldMapValue GetOccurrenceStatusId(int dyntaxaTaxonId)
         {
             if (dyntaxaTaxonId == 0)
             {
-                return new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Absent };
+                return new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Absent};
             }
 
-            return new ProcessedFieldMapValue { Id = (int)OccurrenceStatusId.Present };
+            return new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Present};
         }
 
         /// <summary>
-        /// An integer value corresponding to the Enum of the Main field of the SpeciesFact FactorId 761.
-        /// By default the value is 1. If the taxon is subordinate to the taxon category Species it is nessecary
-        /// to check the Species Fact values of parent taxa.
-        /// If the value is greater than 1 for any parent then the value should equal to the max value among parents.
+        ///     An integer value corresponding to the Enum of the Main field of the SpeciesFact FactorId 761.
+        ///     By default the value is 1. If the taxon is subordinate to the taxon category Species it is nessecary
+        ///     to check the Species Fact values of parent taxa.
+        ///     If the value is greater than 1 for any parent then the value should equal to the max value among parents.
         /// </summary>
         /// <returns></returns>
         private int GetProtectionLevel()
@@ -142,7 +147,7 @@ namespace SOS.Process.Processors.Nors
         }
 
         /// <summary>
-        /// Set to False if DyntaxaTaxonId from provider is greater than 0 and True if DyntaxaTaxonId is 0.
+        ///     Set to False if DyntaxaTaxonId from provider is greater than 0 and True if DyntaxaTaxonId is 0.
         /// </summary>
         private bool GetIsNeverFoundObservation(int dyntaxaTaxonId)
         {
@@ -150,7 +155,7 @@ namespace SOS.Process.Processors.Nors
         }
 
         /// <summary>
-        /// Set to True if DyntaxaTaxonId from provider is greater than 0 and False if DyntaxaTaxonId is 0.
+        ///     Set to True if DyntaxaTaxonId from provider is greater than 0 and False if DyntaxaTaxonId is 0.
         /// </summary>
         private bool GetIsPositiveObservation(int dyntaxaTaxonId)
         {

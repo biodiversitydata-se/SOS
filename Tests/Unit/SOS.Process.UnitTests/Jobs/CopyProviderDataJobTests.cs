@@ -3,9 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Jobs;
 using SOS.Process.Managers.Interfaces;
 using Xunit;
@@ -13,20 +11,76 @@ using Xunit;
 namespace SOS.Process.UnitTests.Jobs
 {
     /// <summary>
-    /// Tests for activate instance job
+    ///     Tests for activate instance job
     /// </summary>
     public class CopyProviderDataJobTests
     {
-        private readonly Mock<IInstanceManager> _instanceManagerMock;
-        private readonly Mock<ILogger<CopyProviderDataJob>> _loggerMock;
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public CopyProviderDataJobTests()
         {
             _instanceManagerMock = new Mock<IInstanceManager>();
             _loggerMock = new Mock<ILogger<CopyProviderDataJob>>();
+        }
+
+        private readonly Mock<IInstanceManager> _instanceManagerMock;
+        private readonly Mock<ILogger<CopyProviderDataJob>> _loggerMock;
+
+        /// <summary>
+        ///     Test processing exception
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task RunAsyncException()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _instanceManagerMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
+                .ThrowsAsync(new Exception("Failed"));
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var job = new CopyProviderDataJob(
+                _instanceManagerMock.Object,
+                null,
+                _loggerMock.Object);
+
+            var result = await job.RunAsync(It.IsAny<int>());
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeFalse();
+        }
+
+        /// <summary>
+        ///     Test processing fail
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task RunAsyncFail()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var job = new CopyProviderDataJob(
+                _instanceManagerMock.Object,
+                null,
+                _loggerMock.Object);
+
+            var result = await job.RunAsync(It.IsAny<int>());
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Should().BeFalse();
         }
 
         // todo - delete test?
@@ -59,7 +113,7 @@ namespace SOS.Process.UnitTests.Jobs
         //}
 
         /// <summary>
-        /// Make a successful test of processing
+        ///     Make a successful test of processing
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -85,62 +139,6 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
 
             result.Should().BeTrue();
-        }
-
-        /// <summary>
-        /// Test processing fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task RunAsyncFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var job = new CopyProviderDataJob(
-                _instanceManagerMock.Object,
-                null,
-                _loggerMock.Object);
-
-            var result = await job.RunAsync(It.IsAny<int>());
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeFalse();
-        }
-
-        /// <summary>
-        /// Test processing exception
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task RunAsyncException()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _instanceManagerMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
-                .ThrowsAsync(new Exception("Failed"));
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var job = new CopyProviderDataJob(
-                _instanceManagerMock.Object,
-                null,
-                _loggerMock.Object);
-
-            var result = await job.RunAsync(It.IsAny<int>());
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeFalse();
         }
     }
 }

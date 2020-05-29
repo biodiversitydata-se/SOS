@@ -7,7 +7,7 @@ using SOS.Lib.Models.Search;
 namespace SOS.Lib.Extensions
 {
     public static class SearchExtensions
-    {        
+    {
         private static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateQuery(FilterBase filter)
         {
             var queryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
@@ -62,6 +62,7 @@ namespace SOS.Lib.Extensions
                                     )
                                 );
                             }
+
                             break;
                     }
                 }
@@ -71,8 +72,10 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .DateRange(r => r
-                        .Field("event.endDate")
-                        .LessThanOrEquals(DateMath.Anchored(filter.EndDate.Value.ToUniversalTime()))//.RoundTo(DateMathTimeUnit.Day))
+                            .Field("event.endDate")
+                            .LessThanOrEquals(
+                                DateMath.Anchored(filter.EndDate.Value
+                                    .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
                     )
                 );
             }
@@ -143,8 +146,10 @@ namespace SOS.Lib.Extensions
             {
                 queryContainers.Add(q => q
                     .DateRange(r => r
-                        .Field("event.startDate")
-                        .GreaterThanOrEquals(DateMath.Anchored(filter.StartDate.Value.ToUniversalTime()))//.RoundTo(DateMathTimeUnit.Day))
+                            .Field("event.startDate")
+                            .GreaterThanOrEquals(
+                                DateMath.Anchored(filter.StartDate.Value
+                                    .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
                     )
                 );
             }
@@ -164,11 +169,12 @@ namespace SOS.Lib.Extensions
 
 
         /// <summary>
-        /// Create project parameter filter.
+        ///     Create project parameter filter.
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToProjectParameterQuery(this FilterBase filter)
+        public static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToProjectParameterQuery(
+            this FilterBase filter)
         {
             var query = CreateQuery(filter);
             query.Add(q => q
@@ -191,11 +197,12 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        /// Create search filter
+        ///     Create search filter
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToQuery(this FilterBase filter)
+        public static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToQuery(
+            this FilterBase filter)
         {
             if (!filter.IsFilterActive)
             {
@@ -207,37 +214,40 @@ namespace SOS.Lib.Extensions
 
 
         /// <summary>
-        /// Build a projection string
+        ///     Build a projection string
         /// </summary>
         /// <param name="fields"></param>
         /// <returns></returns>
-        public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> fields, bool isInternal)
+        public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> fields,
+            bool isInternal)
         {
             var projection = new SourceFilterDescriptor<dynamic>();
             if (isInternal)
             {
                 projection.Excludes(e => e
-                  .Field("defects")
-                  .Field("location.point")
-                  .Field("location.pointLocation")
-                  .Field("location.pointWithBuffer")) ;
+                    .Field("defects")
+                    .Field("location.point")
+                    .Field("location.pointLocation")
+                    .Field("location.pointWithBuffer"));
             }
-            else {
+            else
+            {
                 projection.Excludes(e => e
                     .Field("defects")
                     .Field("occurrence.recordedByInternal")
                     .Field("reportedByUserAlias")
-                    .Field("identification.identifiedByInternal")                    
+                    .Field("identification.identifiedByInternal")
                     .Field("location.point")
                     .Field("location.pointLocation")
-                    .Field("location.pointWithBuffer")                    
+                    .Field("location.pointWithBuffer")
                     .Field("location.parentLocationId")
                 );
             }
+
             if (fields?.Any() ?? false)
             {
                 projection.Includes(i => i
-                    .Fields(fields.Select(f =>new Field(f) ))
+                    .Fields(fields.Select(f => new Field(f)))
                 );
             }
 

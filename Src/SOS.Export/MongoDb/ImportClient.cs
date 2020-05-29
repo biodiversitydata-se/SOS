@@ -1,22 +1,20 @@
 ﻿using MongoDB.Driver;
+using SOS.Export.MongoDb.Interfaces;
 
 namespace SOS.Export.MongoDb
 {
     /// <summary>
-    /// Export client
+    ///     Export client
     /// </summary>
-    public class ExportClient : MongoClient, Interfaces.IExportClient
+    public class ExportClient : MongoClient, IExportClient
     {
         /// <summary>
-        /// Name of database
+        ///     Name of database
         /// </summary>
         private readonly string _dataBaseName;
 
-        /// <inheritdoc />
-        public int BatchSize { get; }
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="settings"></param>
         /// <param name="dataBaseName"></param>
@@ -26,6 +24,9 @@ namespace SOS.Export.MongoDb
             _dataBaseName = dataBaseName;
             BatchSize = batchSize;
         }
+
+        /// <inheritdoc />
+        public int BatchSize { get; }
 
         public IMongoDatabase GetDatabase()
         {

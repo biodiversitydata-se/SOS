@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
+using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
 
 namespace SOS.Import.Repositories.Source.Artportalen
-{ 
-    public class MetadataRepository : BaseRepository<MetadataRepository>, Interfaces.IMetadataRepository
+{
+    public class MetadataRepository : BaseRepository<MetadataRepository>, IMetadataRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="artportalenDataService"></param>
         /// <param name="logger"></param>
-        public MetadataRepository(IArtportalenDataService artportalenDataService, ILogger<MetadataRepository> logger) : base(artportalenDataService, logger)
+        public MetadataRepository(IArtportalenDataService artportalenDataService, ILogger<MetadataRepository> logger) :
+            base(artportalenDataService, logger)
         {
-           
         }
 
         /// <inheritdoc />
@@ -107,7 +107,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 						g.Id,
 						gc.CultureCode";
 
-                    return await QueryAsync<MetadataEntity>(query);
+                return await QueryAsync<MetadataEntity>(query);
             }
             catch (Exception e)
             {
@@ -219,7 +219,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 						u.Id,
 						gc.CultureCode";
 
-                    return await QueryAsync<MetadataEntity>(query);
+                return await QueryAsync<MetadataEntity>(query);
             }
             catch (Exception e)
             {
@@ -257,6 +257,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 return null;
             }
         }
+
         /// <inheritdoc />
         public async Task<IEnumerable<MetadataEntity>> GetAreaTypesAsync()
         {
@@ -281,8 +282,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     WHERE 
                         CountryIsoCode = 752 AND Id IN @AreaTypes";
 
-                var areaTypes = (int[])Enum.GetValues(typeof(AreaType));
-                return await QueryAsync<MetadataEntity>(query, new { AreaTypes = areaTypes });
+                var areaTypes = (int[]) Enum.GetValues(typeof(AreaType));
+                return await QueryAsync<MetadataEntity>(query, new {AreaTypes = areaTypes});
             }
             catch (Exception e)
             {

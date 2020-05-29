@@ -10,11 +10,8 @@ namespace SOS.Process.UnitTests.Repositories.Destination
 {
     public class InvalidObservationRepositoryTests
     {
-        private readonly Mock<IProcessClient> _processClient;
-        private readonly Mock<ILogger<InvalidObservationRepository>> _loggerMock;
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public InvalidObservationRepositoryTests()
         {
@@ -22,8 +19,11 @@ namespace SOS.Process.UnitTests.Repositories.Destination
             _loggerMock = new Mock<ILogger<InvalidObservationRepository>>();
         }
 
+        private readonly Mock<IProcessClient> _processClient;
+        private readonly Mock<ILogger<InvalidObservationRepository>> _loggerMock;
+
         /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -33,7 +33,7 @@ namespace SOS.Process.UnitTests.Repositories.Destination
                 _loggerMock.Object);
             create.Should().Throw<NullReferenceException>();
 
-           create = () => new InvalidObservationRepository(
+            create = () => new InvalidObservationRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");

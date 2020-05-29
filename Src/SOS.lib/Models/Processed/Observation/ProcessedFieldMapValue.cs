@@ -9,12 +9,13 @@ namespace SOS.Lib.Models.Processed.Observation
 
         public static ProcessedFieldMapValue Create(int? val)
         {
-            return !val.HasValue ? null : new ProcessedFieldMapValue { Id = val.Value };
+            return !val.HasValue ? null : new ProcessedFieldMapValue {Id = val.Value};
         }
 
         public static ProcessedFieldMapValue Create(string val)
         {
-            return new ProcessedFieldMapValue { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
+            return new ProcessedFieldMapValue
+                {Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
         }
     }
 }

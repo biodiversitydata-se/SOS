@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
+using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
@@ -14,16 +15,16 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters
 {
     /// <summary>
-    /// Area factory class
+    ///     Area factory class
     /// </summary>
-    public class AreaHarvester : Interfaces.IAreaHarvester
+    public class AreaHarvester : IAreaHarvester
     {
         private readonly IAreaRepository _areaRepository;
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
         private readonly ILogger<AreaHarvester> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="areaRepository"></param>
         /// <param name="areaVerbatimRepository"></param>
@@ -34,7 +35,8 @@ namespace SOS.Import.Harvesters
             ILogger<AreaHarvester> logger)
         {
             _areaRepository = areaRepository ?? throw new ArgumentNullException(nameof(areaRepository));
-            _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
+            _areaVerbatimRepository =
+                areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -84,6 +86,7 @@ namespace SOS.Import.Harvesters
                         }
                     }
                 }
+
                 _logger.LogDebug("Failed harvest of areas");
                 harvestInfo.Status = RunStatus.Failed;
             }

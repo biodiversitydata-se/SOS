@@ -9,17 +9,18 @@ namespace DwC_A.Meta
         private const string MetaFileName = "meta.xml";
 
         /// <summary>
-        /// Deserializes the meta.xml file into an Archive object
+        ///     Deserializes the meta.xml file into an Archive object
         /// </summary>
         /// <param name="path">Path to the meta.xml file (excluding filename)</param>
         /// <returns>Archive object</returns>
         public Archive ReadMetaData(string path)
         {
-            string fileName = Path.Combine(path, MetaFileName);
+            var fileName = Path.Combine(path, MetaFileName);
             if (File.Exists(fileName))
             {
                 return DeserializeMetaDataFile(fileName);
             }
+
             return DefaultMetaData(path);
         }
 
@@ -27,7 +28,7 @@ namespace DwC_A.Meta
         {
             var fileNames = Directory.GetFiles(path);
             var coreFileName = Path.GetFileName(fileNames.Single());
-            var archive = new Archive()
+            var archive = new Archive
             {
                 Core = new CoreFileType()
             };
@@ -37,7 +38,7 @@ namespace DwC_A.Meta
 
         private Archive DeserializeMetaDataFile(string fileName)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(Archive));
+            var serializer = new XmlSerializer(typeof(Archive));
             using (Stream stream = new FileStream(fileName, FileMode.Open))
             {
                 return serializer.Deserialize(stream) as Archive;

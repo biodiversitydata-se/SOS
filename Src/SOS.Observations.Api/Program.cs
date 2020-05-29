@@ -1,23 +1,21 @@
 ﻿using System;
-using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NLog;
 using NLog.Web;
-using SOS.Lib.Configuration.ObservationApi;
-using SOS.Observations.Api.IoC.Modules;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace SOS.Observations.Api
 {
     /// <summary>
-    /// Program class
+    ///     Program class
     /// </summary>
     public class Program
     {
         /// <summary>
-        /// Main 
+        ///     Main
         /// </summary>
         /// <param name="args"></param>
         public static void Main(string[] args)
@@ -40,27 +38,26 @@ namespace SOS.Observations.Api
             finally
             {
                 // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-                NLog.LogManager.Shutdown();
+                LogManager.Shutdown();
             }
         }
 
         /// <summary>
-        /// Create a host builder
+        ///     Create a host builder
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                })
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
-                    logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                    logging.SetMinimumLevel(LogLevel.Trace);
                 })
                 .UseNLog();
+        }
     }
 }

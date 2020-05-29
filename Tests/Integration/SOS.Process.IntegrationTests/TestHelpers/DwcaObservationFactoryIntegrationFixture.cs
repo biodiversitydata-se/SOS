@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Models.Processed.Observation;
@@ -15,12 +14,12 @@ namespace SOS.Process.IntegrationTests.TestHelpers
 {
     public class DwcaObservationFactoryIntegrationFixture : TestBase, IDisposable
     {
-        public DwcaObservationFactory DwcaObservationFactory { get; private set; }
-
         public DwcaObservationFactoryIntegrationFixture()
         {
             DwcaObservationFactory = CreateDwcaObservationFactoryAsync().Result;
         }
+
+        public DwcaObservationFactory DwcaObservationFactory { get; private set; }
 
         public void Dispose()
         {
@@ -36,12 +35,13 @@ namespace SOS.Process.IntegrationTests.TestHelpers
                 processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 processConfiguration.ProcessedDbConfiguration.DatabaseName,
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
-            var processedFieldMappingRepository = new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
+            var processedFieldMappingRepository =
+                new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
             var areaHelper =
                 new AreaHelper(new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()),
                     processedFieldMappingRepository);
             var dwcaObservationFactory = await DwcaObservationFactory.CreateAsync(
-                dataProviderDummy, 
+                dataProviderDummy,
                 taxonByTaxonId,
                 processedFieldMappingRepository,
                 areaHelper);
@@ -68,5 +68,4 @@ namespace SOS.Process.IntegrationTests.TestHelpers
                 new NullLogger<ProcessedTaxonRepository>());
         }
     }
-
 }

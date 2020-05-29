@@ -6,20 +6,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Controllers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
 {
     /// <summary>
-    /// Import job controller
+    ///     Import job controller
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class ExportsController : ControllerBase, Interfaces.IExportsController
+    public class ExportsController : ControllerBase, IExportsController
     {
         private readonly ILogger<ExportsController> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
@@ -28,12 +29,12 @@ namespace SOS.Observations.Api.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         [HttpPost("Create")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunExportAndSendJob([FromBody]ExportFilter filter, [FromQuery]string email)
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public IActionResult RunExportAndSendJob([FromBody] ExportFilter filter, [FromQuery] string email)
         {
             try
             {
@@ -42,26 +43,29 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest("You must provide a e-mail address");
                 }
 
-                var emailRegex = new Regex(@"^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
+                var emailRegex =
+                    new Regex(
+                        @"^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
                 if (!emailRegex.IsMatch(email))
                 {
                     return BadRequest("Not a valid e-mail");
                 }
 
-                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job => job.RunAsync(filter, email, JobCancellationToken.Null)));
+                return new OkObjectResult(BackgroundJob.Enqueue<IExportAndSendJob>(job =>
+                    job.RunAsync(filter, email, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Running export failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         [HttpGet("Status")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult GetExportStatus([FromQuery]string jobId)
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public IActionResult GetExportStatus([FromQuery] string jobId)
         {
             try
             {
@@ -73,7 +77,7 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Getting export job status failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
     }

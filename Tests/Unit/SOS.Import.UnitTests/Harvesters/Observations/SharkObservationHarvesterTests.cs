@@ -15,6 +15,17 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
 {
     public class SharkObservationHarvesterTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public SharkObservationHarvesterTests()
+        {
+            _sharkObservationVerbatimRepositoryMock = new Mock<ISharkObservationVerbatimRepository>();
+            _sharkObservationServiceMock = new Mock<ISharkObservationService>();
+            _sharkServiceConfiguration = new SharkServiceConfiguration {MaxNumberOfSightingsHarvested = 1};
+            _loggerMock = new Mock<ILogger<SharkObservationHarvester>>();
+        }
+
         private readonly Mock<ISharkObservationVerbatimRepository> _sharkObservationVerbatimRepositoryMock;
         private readonly Mock<ISharkObservationService> _sharkObservationServiceMock;
         private readonly SharkServiceConfiguration _sharkServiceConfiguration;
@@ -27,18 +38,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public SharkObservationHarvesterTests()
-        {
-            _sharkObservationVerbatimRepositoryMock = new Mock<ISharkObservationVerbatimRepository>();
-            _sharkObservationServiceMock = new Mock<ISharkObservationService>();
-            _sharkServiceConfiguration = new SharkServiceConfiguration { MaxNumberOfSightingsHarvested = 1 };
-            _loggerMock = new Mock<ILogger<SharkObservationHarvester>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -54,10 +54,11 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
 
             create = () => new SharkObservationHarvester(
                 _sharkObservationServiceMock.Object,
-               null,
+                null,
                 _sharkServiceConfiguration,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sharkObservationVerbatimRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
+                .Be("sharkObservationVerbatimRepository");
 
             create = () => new SharkObservationHarvester(
                 _sharkObservationServiceMock.Object,
@@ -106,7 +107,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
          }*/
 
         /// <summary>
-        /// Test aggregation fail
+        ///     Test aggregation fail
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -116,7 +117,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _sharkObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<string>()))
-                 .ThrowsAsync(new Exception("Fail"));
+                .ThrowsAsync(new Exception("Fail"));
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

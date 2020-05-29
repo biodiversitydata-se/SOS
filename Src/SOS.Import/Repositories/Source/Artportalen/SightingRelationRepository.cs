@@ -4,16 +4,16 @@ using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
+using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
-    public class SightingRelationRepository : BaseRepository<SightingRelationRepository>, Interfaces.ISightingRelationRepository
+    public class SightingRelationRepository : BaseRepository<SightingRelationRepository>, ISightingRelationRepository
     {
         public SightingRelationRepository(
-            IArtportalenDataService artportalenDataService, 
+            IArtportalenDataService artportalenDataService,
             ILogger<SightingRelationRepository> logger) : base(artportalenDataService, logger)
         {
         }
@@ -42,7 +42,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 INNER JOIN @tvp t ON sr.SightingId = t.Id 
                     AND sr.IsPublic = 1";
 
-                return await QueryAsync<SightingRelationEntity>(query, new { tvp = tvpTable.AsTableValuedParameter("dbo.IdValueTable") });
+                return await QueryAsync<SightingRelationEntity>(query,
+                    new {tvp = tvpTable.AsTableValuedParameter("dbo.IdValueTable")});
             }
             catch (Exception e)
             {

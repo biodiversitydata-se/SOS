@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Enums;
+using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Repositories.Destination.Taxon.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
@@ -13,17 +14,18 @@ using SOS.Lib.Models.Verbatim.Shared;
 namespace SOS.Import.Harvesters
 {
     /// <summary>
-    /// Taxon harvester class
+    ///     Taxon harvester class
     /// </summary>
-    public class TaxonHarvester : Interfaces.ITaxonHarvester { 
+    public class TaxonHarvester : ITaxonHarvester
+    {
+        private readonly ILogger<TaxonHarvester> _logger;
+        private readonly ITaxonAttributeService _taxonAttributeService;
+        private readonly ITaxonService _taxonService;
 
         private readonly ITaxonVerbatimRepository _taxonVerbatimRepository;
-        private readonly ITaxonService _taxonService;
-        private readonly ITaxonAttributeService _taxonAttributeService;
-        private readonly ILogger<TaxonHarvester> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="taxonVerbatimRepository"></param>
         /// <param name="taxonService"></param>
@@ -35,14 +37,16 @@ namespace SOS.Import.Harvesters
             ITaxonAttributeService taxonAttributeService,
             ILogger<TaxonHarvester> logger)
         {
-            _taxonVerbatimRepository = taxonVerbatimRepository ?? throw new ArgumentNullException(nameof(taxonVerbatimRepository));
+            _taxonVerbatimRepository = taxonVerbatimRepository ??
+                                       throw new ArgumentNullException(nameof(taxonVerbatimRepository));
             _taxonService = taxonService ?? throw new ArgumentNullException(nameof(taxonService));
-            _taxonAttributeService = taxonAttributeService ?? throw new ArgumentNullException(nameof(taxonAttributeService));
+            _taxonAttributeService =
+                taxonAttributeService ?? throw new ArgumentNullException(nameof(taxonAttributeService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
-        /// Aggregate clams
+        ///     Aggregate clams
         /// </summary>
         /// <returns></returns>
         public async Task<HarvestInfo> HarvestAsync()
@@ -63,7 +67,7 @@ namespace SOS.Import.Harvesters
                 await _taxonVerbatimRepository.DeleteCollectionAsync();
                 await _taxonVerbatimRepository.AddCollectionAsync();
                 await _taxonVerbatimRepository.AddManyAsync(taxa);
-                
+
                 _logger.LogDebug("Finish storing taxa verbatim");
 
                 // Update harvest info
@@ -79,8 +83,9 @@ namespace SOS.Import.Harvesters
 
             return harvestInfo;
         }
+
         /// <summary>
-        /// Populate dynamic properties from taxon attributes
+        ///     Populate dynamic properties from taxon attributes
         /// </summary>
         /// <param name="taxa"></param>
         /// <returns></returns>
@@ -111,7 +116,8 @@ namespace SOS.Import.Harvesters
                         {
                             continue;
                         }
-                        taxon.SortOrder = sortOrder.Value;                        
+
+                        taxon.SortOrder = sortOrder.Value;
                     }
                 }
 
@@ -120,7 +126,7 @@ namespace SOS.Import.Harvesters
         }
 
         /// <summary>
-        /// Populate dynamic properties from taxon attributes
+        ///     Populate dynamic properties from taxon attributes
         /// </summary>
         /// <param name="taxa"></param>
         /// <returns></returns>
@@ -144,8 +150,8 @@ namespace SOS.Import.Harvesters
 
                 var taxonAttributes =
                     await _taxonAttributeService.GetTaxonAttributesAsync(taxonIds,
-                        (int[])Enum.GetValues(typeof(FactorEnum)),
-                        new[] { 0, currentRedlistPeriodId });
+                        (int[]) Enum.GetValues(typeof(FactorEnum)),
+                        new[] {0, currentRedlistPeriodId});
 
                 if (taxonAttributes?.Any() ?? false)
                 {
@@ -163,43 +169,60 @@ namespace SOS.Import.Harvesters
 
                         foreach (var factor in taxonAttribute.Factors)
                         {
-                            switch ((FactorEnum)factor.Id)
+                            switch ((FactorEnum) factor.Id)
                             {
                                 case FactorEnum.ActionPlan:
-                                    taxon.DynamicProperties.ActionPlan = factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
+                                    taxon.DynamicProperties.ActionPlan =
+                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
                                     break;
                                 case FactorEnum.BirdDirective:
-                                    taxon.DynamicProperties.BirdDirective = factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja", StringComparison.CurrentCultureIgnoreCase);
+                                    taxon.DynamicProperties.BirdDirective = factor.Attributes
+                                        ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
+                                            StringComparison.CurrentCultureIgnoreCase);
                                     break;
                                 case FactorEnum.DisturbanceRadius:
-                                    taxon.DynamicProperties.DisturbanceRadius = int.Parse(factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value ?? "0");
+                                    taxon.DynamicProperties.DisturbanceRadius =
+                                        int.Parse(factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value ?? "0");
                                     break;
                                 case FactorEnum.Natura2000HabitatsDirectiveArticle2:
-                                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2 = factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja", StringComparison.CurrentCultureIgnoreCase);
+                                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2 = factor.Attributes
+                                        ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
+                                            StringComparison.CurrentCultureIgnoreCase);
                                     break;
                                 case FactorEnum.Natura2000HabitatsDirectiveArticle4:
-                                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4 = factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja", StringComparison.CurrentCultureIgnoreCase);
+                                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4 = factor.Attributes
+                                        ?.FirstOrDefault(a => a.IsMainField)?.Value?.Contains("ja",
+                                            StringComparison.CurrentCultureIgnoreCase);
                                     break;
                                 case FactorEnum.Natura2000HabitatsDirectiveArticle5:
-                                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5 = factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value.Contains("ja", StringComparison.CurrentCultureIgnoreCase);
+                                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5 = factor.Attributes
+                                        ?.FirstOrDefault(a => a.IsMainField)?.Value.Contains("ja",
+                                            StringComparison.CurrentCultureIgnoreCase);
                                     break;
                                 case FactorEnum.OrganismGroup:
-                                    taxon.DynamicProperties.OrganismGroup = factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
+                                    taxon.DynamicProperties.OrganismGroup =
+                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
                                     break;
                                 case FactorEnum.ProtectedByLaw:
-                                    taxon.DynamicProperties.ProtectedByLaw = factor.Attributes?.FirstOrDefault(a => a.CompFieldIdx == 1)?.Value?.Contains("ja", StringComparison.CurrentCultureIgnoreCase);
+                                    taxon.DynamicProperties.ProtectedByLaw = factor.Attributes
+                                        ?.FirstOrDefault(a => a.CompFieldIdx == 1)?.Value?.Contains("ja",
+                                            StringComparison.CurrentCultureIgnoreCase);
                                     break;
                                 case FactorEnum.ProtectionLevel:
-                                    taxon.DynamicProperties.ProtectionLevel = factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
+                                    taxon.DynamicProperties.ProtectionLevel =
+                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
                                     break;
                                 case FactorEnum.RedlistCategory:
-                                    taxon.DynamicProperties.RedlistCategory = factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
+                                    taxon.DynamicProperties.RedlistCategory =
+                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
                                     break;
                                 case FactorEnum.SwedishHistory:
-                                    taxon.DynamicProperties.SwedishHistory = factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
+                                    taxon.DynamicProperties.SwedishHistory =
+                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
                                     break;
                                 case FactorEnum.SwedishOccurrence:
-                                    taxon.DynamicProperties.SwedishOccurrence = factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
+                                    taxon.DynamicProperties.SwedishOccurrence =
+                                        factor.Attributes?.FirstOrDefault(a => a.IsMainField)?.Value;
                                     break;
                             }
                         }

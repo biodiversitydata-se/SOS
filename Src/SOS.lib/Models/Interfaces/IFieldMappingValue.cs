@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Models.Interfaces

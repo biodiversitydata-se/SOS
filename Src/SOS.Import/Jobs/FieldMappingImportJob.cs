@@ -9,7 +9,7 @@ using SOS.Lib.Jobs.Import;
 namespace SOS.Import.Jobs
 {
     /// <summary>
-    /// Field mapping import job.
+    ///     Field mapping import job.
     /// </summary>
     public class FieldMappingImportJob : IFieldMappingImportJob
     {
@@ -18,7 +18,7 @@ namespace SOS.Import.Jobs
         private readonly ILogger<FieldMappingImportJob> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="fieldMappingHarvester"></param>
         /// <param name="logger"></param>
@@ -27,8 +27,10 @@ namespace SOS.Import.Jobs
             IHarvestInfoRepository harvestInfoRepository,
             ILogger<FieldMappingImportJob> logger)
         {
-            _fieldMappingHarvester = fieldMappingHarvester ?? throw new ArgumentNullException(nameof(fieldMappingHarvester));
-            _harvestInfoRepository = harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
+            _fieldMappingHarvester =
+                fieldMappingHarvester ?? throw new ArgumentNullException(nameof(fieldMappingHarvester));
+            _harvestInfoRepository =
+                harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -44,7 +46,9 @@ namespace SOS.Import.Jobs
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(result);
 
-            return result.Status == RunStatus.Success && result.Count > 0 ? true : throw new Exception("Field Mapping Import Job failed");
+            return result.Status == RunStatus.Success && result.Count > 0
+                ? true
+                : throw new Exception("Field Mapping Import Job failed");
         }
     }
 }

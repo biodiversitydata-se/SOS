@@ -3,12 +3,12 @@
 namespace SOS.TestHelpers.IO
 {
     /// <summary>
-    /// Contains functions for generating file names that contain today's date and time.
+    ///     Contains functions for generating file names that contain today's date and time.
     /// </summary>
     public static class FilenameGenerator
     {
         /// <summary>
-        /// Creates a filename by joining: name, file extension and current date & time.
+        ///     Creates a filename by joining: name, file extension and current date & time.
         /// </summary>
         /// <param name="name">The name part of the filename.</param>
         /// <param name="fileExtension">The file extension.</param>
@@ -19,18 +19,18 @@ namespace SOS.TestHelpers.IO
         }
 
         /// <summary>
-        /// Creates a filename by joining: name and current date & time. File extension is excluded.
+        ///     Creates a filename by joining: name and current date & time. File extension is excluded.
         /// </summary>
         /// <param name="name">The name part of the filename.</param>
         /// <returns>A valid filename.</returns>
         public static string CreateFilename(string name)
         {
-            string dateFilenamePart = GenerateDateFilenamePart(DateTime.Now);
+            var dateFilenamePart = GenerateDateFilenamePart(DateTime.Now);
             return $"{name}-{dateFilenamePart}";
         }
 
         /// <summary>
-        /// Creates a filename.
+        ///     Creates a filename.
         /// </summary>
         /// <param name="name">The name part of the filename.</param>
         /// <param name="fileExtension">The file extension.</param>
@@ -38,12 +38,12 @@ namespace SOS.TestHelpers.IO
         /// <returns>A valid filename.</returns>
         public static string CreateFilename(string name, string fileExtension, DateTime date)
         {
-            string dateFilenamePart = GenerateDateFilenamePart(date);
+            var dateFilenamePart = GenerateDateFilenamePart(date);
             return $"{name}-{dateFilenamePart}.{fileExtension}";
         }
 
         /// <summary>
-        /// Generates the date filename part.
+        ///     Generates the date filename part.
         /// </summary>
         /// <param name="date">The date.</param>
         /// <returns>Date part in a filename.</returns>

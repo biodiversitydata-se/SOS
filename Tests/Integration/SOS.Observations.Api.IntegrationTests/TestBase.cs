@@ -7,7 +7,7 @@ namespace SOS.Observations.Api.IntegrationTests
     {
         protected MongoDbConfiguration GetMongoDbConfiguration()
         {
-            IConfigurationRoot config = new ConfigurationBuilder()
+            var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .AddUserSecrets<TestBase>()

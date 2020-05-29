@@ -21,7 +21,7 @@ namespace SOS.Lib.Models.Verbatim.Shared
     public class HarvestInfo : IEntity<string>
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="id"></param>
         /// <param name="provider"></param>
@@ -34,40 +34,40 @@ namespace SOS.Lib.Models.Verbatim.Shared
         }
 
         /// <summary>
-        /// Number of items
+        ///     Number of items
         /// </summary>
         public int Count { get; set; }
 
         /// <summary>
-        /// Last time data was modified
+        ///     Last time data was modified
         /// </summary>
         public DateTime? DataLastModified { get; set; }
 
         /// <summary>
-        /// Id of data provider
+        ///     Id of data provider
         /// </summary>
         public DataProviderType DataProvider { get; }
 
         /// <summary>
-        /// Harvest end date and time
+        ///     Harvest end date and time
         /// </summary>
         public DateTime End { get; set; }
 
         /// <summary>
-        /// Id of data set
-        /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
-        /// Harvest start date and time
+        ///     Harvest start date and time
         /// </summary>
         public DateTime Start { get; set; }
 
         /// <summary>
-        /// Running status
+        ///     Running status
         /// </summary>
         [BsonRepresentation(BsonType.String)]
         public RunStatus Status { get; set; }
+
+        /// <summary>
+        ///     Id of data set
+        /// </summary>
+        public string Id { get; set; }
 
         public static string GetIdFromDataProvider(DataProvider dataProvider)
         {
@@ -108,7 +108,8 @@ namespace SOS.Lib.Models.Verbatim.Shared
                     return nameof(DarwinCoreTaxon);
                 default:
                     throw new ArgumentException(
-                        $"{MethodBase.GetCurrentMethod()?.Name}() does not support the value {dataProviderType}", nameof(dataProviderType));
+                        $"{MethodBase.GetCurrentMethod()?.Name}() does not support the value {dataProviderType}",
+                        nameof(dataProviderType));
             }
         }
     }

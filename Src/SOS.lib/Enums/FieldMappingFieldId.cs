@@ -1,7 +1,7 @@
 ﻿namespace SOS.Lib.Enums
 {
     /// <summary>
-    /// Fields that are using lookup tables for their values.
+    ///     Fields that are using lookup tables for their values.
     /// </summary>
     public enum FieldMappingFieldId
     {
@@ -24,6 +24,6 @@
         AccessRights = 16,
         Country = 17,
         Type = 18,
-        AreaType = 19,
+        AreaType = 19
     }
 }

@@ -1,28 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace SOS.Lib.Models.TaxonTree
 {
     /// <summary>
-    /// Taxon tree node.
-    /// </summary>    
+    ///     Taxon tree node.
+    /// </summary>
     public class TaxonTreeNode<T>
     {
         private const int BiotaTaxonId = 0;
-        public int TaxonId { get; }
-        public string ScientificName { get; }
-        public T Data { get; }
-        public TaxonTreeNode<T> Parent { get; set; }
-        public List<TaxonTreeNode<T>> MainChildren { get; set; }
-        public List<TaxonTreeNode<T>> Children { get; set; }
-        public List<TaxonTreeNode<T>> SecondaryChildren { get; set; }
-        public List<TaxonTreeNode<T>> SecondaryParents { get; set; }
 
-        public TaxonTreeNode(int taxonId) 
+        public TaxonTreeNode(int taxonId)
             : this(taxonId, null)
         {
-        } 
+        }
 
         public TaxonTreeNode(int taxonId, string scientificName)
         {
@@ -45,12 +35,21 @@ namespace SOS.Lib.Models.TaxonTree
             SecondaryParents = new List<TaxonTreeNode<T>>();
         }
 
+        public int TaxonId { get; }
+        public string ScientificName { get; }
+        public T Data { get; }
+        public TaxonTreeNode<T> Parent { get; set; }
+        public List<TaxonTreeNode<T>> MainChildren { get; set; }
+        public List<TaxonTreeNode<T>> Children { get; set; }
+        public List<TaxonTreeNode<T>> SecondaryChildren { get; set; }
+        public List<TaxonTreeNode<T>> SecondaryParents { get; set; }
+
         /// <summary>
-        /// Determines whether the specified <see cref="TaxonTreeNode{T}" />, is equal to this instance.
+        ///     Determines whether the specified <see cref="TaxonTreeNode{T}" />, is equal to this instance.
         /// </summary>
         /// <param name="other">The <see cref="TaxonTreeNode{T}" /> to compare with this instance.</param>
         /// <returns>
-        ///   <c>true</c> if the specified <see cref="TaxonTreeNode{T}" /> is equal to this instance; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified <see cref="TaxonTreeNode{T}" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         protected bool Equals(TaxonTreeNode<T> other)
         {
@@ -58,11 +57,11 @@ namespace SOS.Lib.Models.TaxonTree
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
+        ///     Determines whether the specified <see cref="System.Object" />, is equal to this instance.
         /// </summary>
         /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
         /// <returns>
-        ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         public override bool Equals(object obj)
         {
@@ -76,19 +75,19 @@ namespace SOS.Lib.Models.TaxonTree
                 return true;
             }
 
-            if (obj.GetType() != this.GetType())
+            if (obj.GetType() != GetType())
             {
                 return false;
             }
 
-            return Equals((TaxonTreeNode<T>)obj);
+            return Equals((TaxonTreeNode<T>) obj);
         }
 
         /// <summary>
-        /// Returns a hash code for this instance.
+        ///     Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        ///     A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
@@ -96,10 +95,10 @@ namespace SOS.Lib.Models.TaxonTree
         }
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        ///     Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
+        ///     A <see cref="System.String" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {

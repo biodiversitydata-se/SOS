@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace SOS.Lib.Models.TaxonTree
@@ -15,10 +14,8 @@ namespace SOS.Lib.Models.TaxonTree
             {
                 return treeNodes.AsUniqueDepthFirstNodeIterator(returnSelfs);
             }
-            else
-            {
-                return treeNodes.AsDepthFirstNodeIterator(returnSelfs);
-            }
+
+            return treeNodes.AsDepthFirstNodeIterator(returnSelfs);
         }
 
         public static IEnumerable<TaxonTreeNode<T>> AsDepthFirstNodeIterator<T>(
@@ -30,17 +27,15 @@ namespace SOS.Lib.Models.TaxonTree
             {
                 return treeNode.AsUniqueDepthFirstNodeIterator(returnSelf);
             }
-            else
-            {
-                return treeNode.AsDepthFirstNodeIterator(returnSelf);
-            }
+
+            return treeNode.AsDepthFirstNodeIterator(returnSelf);
         }
 
         private static IEnumerable<TaxonTreeNode<T>> AsDepthFirstNodeIterator<T>(
             this IEnumerable<TaxonTreeNode<T>> treeNodes,
             bool returnSelf = false)
         {
-            Stack<TaxonTreeNode<T>> stack = new Stack<TaxonTreeNode<T>>();
+            var stack = new Stack<TaxonTreeNode<T>>();
             foreach (var treeNode in treeNodes)
             {
                 foreach (var childNode in treeNode.Children)
@@ -51,7 +46,7 @@ namespace SOS.Lib.Models.TaxonTree
 
             while (stack.Any())
             {
-                TaxonTreeNode<T> currentNode = stack.Pop();
+                var currentNode = stack.Pop();
                 yield return currentNode;
                 foreach (var childNode in currentNode.Children)
                 {
@@ -72,8 +67,8 @@ namespace SOS.Lib.Models.TaxonTree
             this IEnumerable<TaxonTreeNode<T>> treeNodes,
             bool returnSelf = false)
         {
-            Stack<TaxonTreeNode<T>> stack = new Stack<TaxonTreeNode<T>>();
-            HashSet<TaxonTreeNode<T>> visitedNodes = new HashSet<TaxonTreeNode<T>>();
+            var stack = new Stack<TaxonTreeNode<T>>();
+            var visitedNodes = new HashSet<TaxonTreeNode<T>>();
             foreach (var treeNode in treeNodes)
             {
                 foreach (var childNode in treeNode.Children)
@@ -84,7 +79,7 @@ namespace SOS.Lib.Models.TaxonTree
 
             while (stack.Any())
             {
-                TaxonTreeNode<T> currentNode = stack.Pop();
+                var currentNode = stack.Pop();
                 if (!visitedNodes.Contains(currentNode))
                 {
                     yield return currentNode;
@@ -114,15 +109,15 @@ namespace SOS.Lib.Models.TaxonTree
             this TaxonTreeNode<T> treeNode,
             bool returnSelf = false)
         {
-            Stack<TaxonTreeNode<T>> stack = new Stack<TaxonTreeNode<T>>();
+            var stack = new Stack<TaxonTreeNode<T>>();
             foreach (var childNode in treeNode.Children)
             {
                 stack.Push(childNode);
             }
-            
+
             while (stack.Any())
             {
-                TaxonTreeNode<T> currentNode = stack.Pop();
+                var currentNode = stack.Pop();
                 yield return currentNode;
                 foreach (var childNode in currentNode.Children)
                 {
@@ -137,8 +132,8 @@ namespace SOS.Lib.Models.TaxonTree
             this TaxonTreeNode<T> treeNode,
             bool returnSelf = false)
         {
-            Stack<TaxonTreeNode<T>> stack = new Stack<TaxonTreeNode<T>>();
-            HashSet<TaxonTreeNode<T>> visitedNodes = new HashSet<TaxonTreeNode<T>>();
+            var stack = new Stack<TaxonTreeNode<T>>();
+            var visitedNodes = new HashSet<TaxonTreeNode<T>>();
             foreach (var childNode in treeNode.Children)
             {
                 stack.Push(childNode);
@@ -146,7 +141,7 @@ namespace SOS.Lib.Models.TaxonTree
 
             while (stack.Any())
             {
-                TaxonTreeNode<T> currentNode = stack.Pop();
+                var currentNode = stack.Pop();
                 if (!visitedNodes.Contains(currentNode))
                 {
                     yield return currentNode;

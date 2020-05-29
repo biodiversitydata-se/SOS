@@ -9,12 +9,11 @@ using SOS.Observations.Api.Repositories.Interfaces;
 namespace SOS.Observations.Api.Repositories
 {
     /// <summary>
-    /// 
     /// </summary>
     public class ProcessedTaxonRepository : ProcessBaseRepository<ProcessedTaxon, int>, IProcessedTaxonRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
@@ -25,7 +24,7 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <summary>
-        /// Get chunk of taxa
+        ///     Get chunk of taxa
         /// </summary>
         /// <param name="skip"></param>
         /// <param name="take"></param>
@@ -36,10 +35,10 @@ namespace SOS.Observations.Api.Repositories
                 .Find(x => true)
                 .Project(m => new ProcessedBasicTaxon
                 {
-                    DyntaxaTaxonId = m.DyntaxaTaxonId, 
-                    Id = m.Id, 
-                    ParentDyntaxaTaxonId = m.ParentDyntaxaTaxonId, 
-                    SecondaryParentDyntaxaTaxonIds = m.SecondaryParentDyntaxaTaxonIds, 
+                    DyntaxaTaxonId = m.DyntaxaTaxonId,
+                    Id = m.Id,
+                    ParentDyntaxaTaxonId = m.ParentDyntaxaTaxonId,
+                    SecondaryParentDyntaxaTaxonIds = m.SecondaryParentDyntaxaTaxonIds,
                     ScientificName = m.ScientificName
                 })
                 .Skip(skip)
@@ -50,7 +49,7 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <summary>
-        /// Get chunk of taxa
+        ///     Get chunk of taxa
         /// </summary>
         /// <param name="skip"></param>
         /// <param name="take"></param>

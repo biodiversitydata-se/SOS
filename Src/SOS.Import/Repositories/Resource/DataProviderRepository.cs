@@ -12,7 +12,7 @@ namespace SOS.Import.Repositories.Resource
     public class DataProviderRepository : ResourceRepositoryBase<DataProvider, int>, IDataProviderRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="resourceDbClient"></param>
         /// <param name="logger"></param>
@@ -20,7 +20,6 @@ namespace SOS.Import.Repositories.Resource
             IResourceDbClient resourceDbClient,
             ILogger<DataProviderRepository> logger) : base(resourceDbClient, false, logger)
         {
-            
         }
 
         public async Task<bool> UpdateHarvestInfo(int dataProviderId, HarvestInfo harvestInfo)

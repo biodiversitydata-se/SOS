@@ -7,12 +7,11 @@ using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Factories.FieldMapping
 {
     /// <summary>
-    /// Class for creating geographical region field mappings.
+    ///     Class for creating geographical region field mappings.
     /// </summary>
     public abstract class GeoRegionFieldMappingFactoryBase
     {
@@ -20,7 +19,7 @@ namespace SOS.Import.Factories.FieldMapping
         private readonly ILogger<GeoRegionFieldMappingFactoryBase> _logger;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="areaVerbatimRepository"></param>
         /// <param name="logger"></param>
@@ -28,22 +27,25 @@ namespace SOS.Import.Factories.FieldMapping
             IAreaVerbatimRepository areaVerbatimRepository,
             ILogger<GeoRegionFieldMappingFactoryBase> logger)
         {
-            _areaVerbatimRepository = areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
+            _areaVerbatimRepository =
+                areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
 
-        protected async Task<Lib.Models.Shared.FieldMapping> CreateFieldMappingAsync(FieldMappingFieldId fieldMappingFieldId, AreaType areaType)
+        protected async Task<Lib.Models.Shared.FieldMapping> CreateFieldMappingAsync(
+            FieldMappingFieldId fieldMappingFieldId, AreaType areaType)
         {
             var areas = (await _areaVerbatimRepository.GetAllAsync()).ToArray();
             var fieldMapping = CreateFieldMapping(areas, fieldMappingFieldId, areaType);
             return fieldMapping;
         }
 
-        private Lib.Models.Shared.FieldMapping CreateFieldMapping(ICollection<Area> areas, FieldMappingFieldId fieldMappingFieldId, AreaType areaType)
+        private Lib.Models.Shared.FieldMapping CreateFieldMapping(ICollection<Area> areas,
+            FieldMappingFieldId fieldMappingFieldId, AreaType areaType)
         {
             var selectedAreas = areas.Where(m => m.AreaType == areaType).ToArray();
-            Lib.Models.Shared.FieldMapping fieldMapping = new Lib.Models.Shared.FieldMapping
+            var fieldMapping = new Lib.Models.Shared.FieldMapping
             {
                 Id = fieldMappingFieldId,
                 Name = fieldMappingFieldId.ToString(),
@@ -64,7 +66,7 @@ namespace SOS.Import.Factories.FieldMapping
 
         private ExternalSystemMapping GetDarwinCoreExternalSystemMapping(IEnumerable<Area> areas, AreaType areaType)
         {
-            ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping
+            var externalSystemMapping = new ExternalSystemMapping
             {
                 Id = ExternalSystemId.DarwinCore,
                 Name = ExternalSystemId.DarwinCore.ToString(),
@@ -93,8 +95,8 @@ namespace SOS.Import.Factories.FieldMapping
 
         private ExternalSystemMappingField GetDarwinCoreTermMapping(IEnumerable<Area> areas, AreaType areaType)
         {
-            string darwinCoreTerm = GetDarwinCoreTerm(areaType);
-            ExternalSystemMappingField mappingField = new ExternalSystemMappingField
+            var darwinCoreTerm = GetDarwinCoreTerm(areaType);
+            var mappingField = new ExternalSystemMappingField
             {
                 Key = darwinCoreTerm,
                 Description = $"The {darwinCoreTerm} term (http://rs.tdwg.org/dwc/terms/{darwinCoreTerm})",
@@ -116,7 +118,7 @@ namespace SOS.Import.Factories.FieldMapping
 
         private ExternalSystemMapping GetArtportalenExternalSystemMapping(ICollection<Area> areas)
         {
-            ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping
+            var externalSystemMapping = new ExternalSystemMapping
             {
                 Id = ExternalSystemId.Artportalen,
                 Name = ExternalSystemId.Artportalen.ToString(),
@@ -132,7 +134,7 @@ namespace SOS.Import.Factories.FieldMapping
 
         private ExternalSystemMappingField GetArtportalenTupleMapping(IEnumerable<Area> areas)
         {
-            ExternalSystemMappingField mappingField = new ExternalSystemMappingField
+            var mappingField = new ExternalSystemMappingField
             {
                 Key = FieldMappingKeyFields.AreaDatasetIdFeatureIdTuple,
                 Description = "The key is a tuple of <AreaDatasetId, FeatureId>",
@@ -143,7 +145,7 @@ namespace SOS.Import.Factories.FieldMapping
             {
                 mappingField.Values.Add(new ExternalSystemMappingValue
                 {
-                    Value = new { AreaDatasetId = areaEntity.AreaType, FeatureId = areaEntity.FeatureId },
+                    Value = new {AreaDatasetId = areaEntity.AreaType, areaEntity.FeatureId},
                     SosId = areaEntity.Id
                 });
             }
@@ -153,7 +155,7 @@ namespace SOS.Import.Factories.FieldMapping
 
         private ExternalSystemMappingField GetArtportalenFeatureIdMapping(IEnumerable<Area> areas)
         {
-            ExternalSystemMappingField mappingField = new ExternalSystemMappingField
+            var mappingField = new ExternalSystemMappingField
             {
                 Key = FieldMappingKeyFields.FeatureId,
                 Description = "The key is FeatureId",
@@ -175,7 +177,7 @@ namespace SOS.Import.Factories.FieldMapping
 
         private ExternalSystemMappingField GetArtportalenIdMapping(IEnumerable<Area> areas)
         {
-            ExternalSystemMappingField mappingField = new ExternalSystemMappingField
+            var mappingField = new ExternalSystemMappingField
             {
                 Key = FieldMappingKeyFields.Id,
                 Description = "The Area.Id field",
@@ -197,7 +199,7 @@ namespace SOS.Import.Factories.FieldMapping
 
         private ICollection<FieldMappingValue> CreateFieldMappingValues(IEnumerable<Area> areas, AreaType areaType)
         {
-            List<FieldMappingValue> values = new List<FieldMappingValue>();
+            var values = new List<FieldMappingValue>();
             foreach (var area in areas)
             {
                 values.Add(new FieldMappingValue
@@ -205,7 +207,7 @@ namespace SOS.Import.Factories.FieldMapping
                     Id = area.Id,
                     Value = area.Name,
                     Localized = false,
-                    Extra = new { AreaDatasetId = area.AreaType, FeatureId = area.FeatureId }
+                    Extra = new {AreaDatasetId = area.AreaType, area.FeatureId}
                 });
             }
 
@@ -214,7 +216,7 @@ namespace SOS.Import.Factories.FieldMapping
 
         private ExternalSystemMapping GetSSosExternalSystemMapping(ICollection<Area> areas)
         {
-            ExternalSystemMapping externalSystemMapping = new ExternalSystemMapping
+            var externalSystemMapping = new ExternalSystemMapping
             {
                 Id = ExternalSystemId.SwedishSpeciesObservationService,
                 Name = "Swedish Species Observation Service (SSOS)",
@@ -228,7 +230,7 @@ namespace SOS.Import.Factories.FieldMapping
 
         private ExternalSystemMappingField GetSsosGuidMapping(ICollection<Area> areas)
         {
-            ExternalSystemMappingField mappingField = new ExternalSystemMappingField
+            var mappingField = new ExternalSystemMappingField
             {
                 Key = FieldMappingKeyFields.Guid,
                 Description = "The key is WebRegion.GUID in SSOS",
@@ -239,7 +241,8 @@ namespace SOS.Import.Factories.FieldMapping
             {
                 mappingField.Values.Add(new ExternalSystemMappingValue
                 {
-                    Value = $"URN:LSID:artportalen.se:area:DataSet{(int)areaEntity.AreaType}Feature{areaEntity.FeatureId}",
+                    Value =
+                        $"URN:LSID:artportalen.se:area:DataSet{(int) areaEntity.AreaType}Feature{areaEntity.FeatureId}",
                     SosId = areaEntity.Id
                 });
             }

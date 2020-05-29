@@ -1,22 +1,18 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using SOS.Import.Services.Interfaces;
 
 namespace SOS.Import.Services
 {
-    public class TaxonServiceProxy : Interfaces.ITaxonServiceProxy
+    public class TaxonServiceProxy : ITaxonServiceProxy
     {
-        class GetTaxonBody
-        {
-            public IEnumerable<int> TaxonIds { get; set; }
-        }
         /// <summary>
-        /// Gets a checklist DwC-A file from a web service.
+        ///     Gets a checklist DwC-A file from a web service.
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -33,6 +29,7 @@ namespace SOS.Import.Services
             var bytes = await result.Content.ReadAsByteArrayAsync();
             return new MemoryStream(bytes);
         }
+
         public async Task<string> GetTaxonAsync(string url, IEnumerable<int> taxonIds)
         {
             using var client = new HttpClient();
@@ -44,14 +41,19 @@ namespace SOS.Import.Services
 
             var postBody = new StringContent(filterJson, Encoding.UTF8, "application/json");
 
-            using var result = await client.PostAsync(url,postBody);
+            using var result = await client.PostAsync(url, postBody);
 
             if (!result.IsSuccessStatusCode)
             {
                 return null;
             }
-            
+
             return await result.Content.ReadAsStringAsync();
+        }
+
+        private class GetTaxonBody
+        {
+            public IEnumerable<int> TaxonIds { get; set; }
         }
     }
 }

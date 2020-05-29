@@ -1,24 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DwC_A;
-using DwC_A.Meta;
 using DwC_A.Terms;
 using Microsoft.Extensions.Logging;
-using NetTopologySuite.Operation.Buffer;
 using SOS.Import.DarwinCore.Factories;
-using SOS.Import.Harvesters.Observations;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
 namespace SOS.Import.DarwinCore
 {
     /// <summary>
-    /// DwC-A reader for sampling event based DwC-A as DwcEvent collection.
+    ///     DwC-A reader for sampling event based DwC-A as DwcEvent collection.
     /// </summary>
     public class DwcSamplingEventArchiveReader
     {
@@ -30,7 +24,7 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <summary>
-        /// Reads a sampling event based DwC-A, and returns events in batches.
+        ///     Reads a sampling event based DwC-A, and returns events in batches.
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <param name="idIdentifierTuple"></param>
@@ -42,10 +36,10 @@ namespace SOS.Import.DarwinCore
             int batchSize)
         {
             var occurrenceFileReader = archiveReader.GetAsyncFileReader(RowTypes.Event);
-            int idIndex = occurrenceFileReader.GetIdIndex();
+            var idIndex = occurrenceFileReader.GetIdIndex();
             var eventRecords = new List<DwcEvent>();
 
-            await foreach (IRow row in occurrenceFileReader.GetDataRowsAsync())
+            await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
             {
                 var eventRecord = DwcEventFactory.Create(row, idIdentifierTuple, idIndex);
                 eventRecords.Add(eventRecord);
@@ -63,7 +57,7 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <summary>
-        /// Reads a sampling event based DwC-A.
+        ///     Reads a sampling event based DwC-A.
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <param name="idIdentifierTuple"></param>
@@ -75,10 +69,10 @@ namespace SOS.Import.DarwinCore
             const int batchSize = 100000;
             var observationsBatches = ReadArchiveInBatchesAsync(
                 archiveReader,
-                idIdentifierTuple, 
+                idIdentifierTuple,
                 batchSize);
-            List<DwcEvent> dwcEvents = new List<DwcEvent>();
-            await foreach (List<DwcEvent> observationsBatch in observationsBatches)
+            var dwcEvents = new List<DwcEvent>();
+            await foreach (var observationsBatch in observationsBatches)
             {
                 dwcEvents.AddRange(observationsBatch);
             }
@@ -87,7 +81,7 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <summary>
-        /// Add event data from DwC-A extensions.
+        ///     Add event data from DwC-A extensions.
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <param name="eventRecords"></param>
@@ -102,15 +96,15 @@ namespace SOS.Import.DarwinCore
 
         private async Task AddMofExtensionDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
         {
-            IAsyncFileReader mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
+            var mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
             if (mofFileReader == null) return;
-            int idIndex = mofFileReader.GetIdIndex();
+            var idIndex = mofFileReader.GetIdIndex();
             var dwcEventByRecordId = dwcEvents.ToDictionary(e => e.RecordId, e => e);
 
-            await foreach (IRow row in mofFileReader.GetDataRowsAsync())
+            await foreach (var row in mofFileReader.GetDataRowsAsync())
             {
                 var id = row[idIndex];
-                if (dwcEventByRecordId.TryGetValue(id, out DwcEvent dwcEvent))
+                if (dwcEventByRecordId.TryGetValue(id, out var dwcEvent))
                 {
                     if (dwcEvent.MeasurementOrFacts == null)
                     {
@@ -127,14 +121,14 @@ namespace SOS.Import.DarwinCore
         {
             try
             {
-                IAsyncFileReader multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
+                var multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
                 if (multimediaFileReader == null) return;
-                int idIndex = multimediaFileReader.GetIdIndex();
+                var idIndex = multimediaFileReader.GetIdIndex();
                 var dwcEventByRecordId = dwcEvents.ToDictionary(e => e.RecordId, e => e);
-                await foreach (IRow row in multimediaFileReader.GetDataRowsAsync())
+                await foreach (var row in multimediaFileReader.GetDataRowsAsync())
                 {
                     var id = row[idIndex];
-                    if (dwcEventByRecordId.TryGetValue(id, out DwcEvent dwcEvent))
+                    if (dwcEventByRecordId.TryGetValue(id, out var dwcEvent))
                     {
                         if (dwcEvent.Multimedia == null)
                         {
@@ -157,14 +151,14 @@ namespace SOS.Import.DarwinCore
         {
             try
             {
-                IAsyncFileReader audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
+                var audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
                 if (audubonFileReader == null) return;
-                int idIndex = audubonFileReader.GetIdIndex();
+                var idIndex = audubonFileReader.GetIdIndex();
                 var dwcEventByRecordId = dwcEvents.ToDictionary(e => e.RecordId, e => e);
-                await foreach (IRow row in audubonFileReader.GetDataRowsAsync())
+                await foreach (var row in audubonFileReader.GetDataRowsAsync())
                 {
                     var id = row[idIndex];
-                    if (dwcEventByRecordId.TryGetValue(id, out DwcEvent dwcEvent))
+                    if (dwcEventByRecordId.TryGetValue(id, out var dwcEvent))
                     {
                         if (dwcEvent.AudubonMedia == null)
                         {
@@ -184,30 +178,30 @@ namespace SOS.Import.DarwinCore
         }
 
         /// <summary>
-        /// Add Extended Measurement Or Fact data to DwcEvent objects.
+        ///     Add Extended Measurement Or Fact data to DwcEvent objects.
         /// </summary>
         /// <param name="dwcEvents"></param>
         /// <param name="archiveReader"></param>
         /// <returns></returns>
         private async Task AddEmofExtensionDataAsync(List<DwcEvent> dwcEvents, ArchiveReader archiveReader)
         {
-            IAsyncFileReader emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
+            var emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
             if (emofFileReader == null) return;
-            int idIndex = emofFileReader.GetIdIndex();
+            var idIndex = emofFileReader.GetIdIndex();
 
             var dwcEventByRecordId = dwcEvents.ToDictionary(e => e.RecordId, e => e);
-            FieldType occurrenceIdFieldMetaData = emofFileReader.TryGetFieldMetaData(Terms.occurrenceID);
+            var occurrenceIdFieldMetaData = emofFileReader.TryGetFieldMetaData(Terms.occurrenceID);
 
-            await foreach (IRow row in emofFileReader.GetDataRowsAsync())
+            await foreach (var row in emofFileReader.GetDataRowsAsync())
             {
                 if (occurrenceIdFieldMetaData != null)
                 {
-                    string occurrenceId = row[occurrenceIdFieldMetaData.Index];
+                    var occurrenceId = row[occurrenceIdFieldMetaData.Index];
                     if (!string.IsNullOrEmpty(occurrenceId)) continue; // skip occurrence measurements.
                 }
-               
+
                 var id = row[idIndex];
-                if (dwcEventByRecordId.TryGetValue(id, out DwcEvent dwcEvent))
+                if (dwcEventByRecordId.TryGetValue(id, out var dwcEvent))
                 {
                     if (dwcEvent.ExtendedMeasurementOrFacts == null)
                     {

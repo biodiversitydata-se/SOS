@@ -4,40 +4,38 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Observations.Api.Models.Area;
 
 namespace SOS.Observations.Api.Controllers
 {
     /// <summary>
-    /// Observation controller
+    ///     Observation controller
     /// </summary>
     [Route("[controller]")]
     [ApiController]
     public class ObservationsController : ControllerBase, IObservationsController
     {
-        private readonly IObservationManager _observationManager;
-        private readonly IFieldMappingManager _fieldMappingManager;
-        private readonly IAreaManager _areaManager;
-        private readonly ILogger<ObservationsController> _logger;
         private const int MaxBatchSize = 1000;
         private const int ElasticSearchMaxRecords = 10000;
+        private readonly IAreaManager _areaManager;
+        private readonly IFieldMappingManager _fieldMappingManager;
+        private readonly ILogger<ObservationsController> _logger;
+        private readonly IObservationManager _observationManager;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="fieldMappingManager"></param>
         /// <param name="areaManager"></param>
         /// <param name="logger"></param>
         public ObservationsController(
-            IObservationManager observationManager, 
+            IObservationManager observationManager,
             IFieldMappingManager fieldMappingManager,
             IAreaManager areaManager,
             ILogger<ObservationsController> logger)
@@ -50,62 +48,50 @@ namespace SOS.Observations.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost("search")]
-        [ProducesResponseType(typeof(PagedResult<ProcessedObservation>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetChunkAsync([FromBody] SearchFilter filter, 
-            [FromQuery]int skip = 0, 
-            [FromQuery]int take = 100, 
-            [FromQuery]string sortBy = "" , 
-            [FromQuery]SearchSortOrder sortOrder = SearchSortOrder.Asc)
+        [ProducesResponseType(typeof(PagedResult<ProcessedObservation>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetChunkAsync([FromBody] SearchFilter filter,
+            [FromQuery] int skip = 0,
+            [FromQuery] int take = 100,
+            [FromQuery] string sortBy = "",
+            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc)
         {
             try
             {
-                
-                if (!filter.IsFilterActive )
+                if (!filter.IsFilterActive)
                 {
                     return BadRequest("You must provide a filter.");
                 }
+
                 //Remove the limitations if we use the internal functions
                 if (!(filter is SearchFilterInternal))
                 {
                     if (skip < 0 || take <= 0 || take > MaxBatchSize)
                     {
-                        return BadRequest($"You can't take more than { MaxBatchSize } at a time.");
-                    }                                    
+                        return BadRequest($"You can't take more than {MaxBatchSize} at a time.");
+                    }
                 }
+
                 if (skip + take > ElasticSearchMaxRecords)
                 {
-                    return BadRequest($"Skip + take ");
+                    return BadRequest("Skip + take ");
                 }
-                return new OkObjectResult(await _observationManager.GetChunkAsync(filter, skip, take, sortBy, sortOrder));
+
+                return new OkObjectResult(
+                    await _observationManager.GetChunkAsync(filter, skip, take, sortBy, sortOrder));
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting batch of sightings");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
-        [HttpPost("searchinternal")]
-        [ProducesResponseType(typeof(PagedResult<ProcessedObservation>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> GetChunkInternalAsync([FromBody] SearchFilterInternal filter,
-            [FromQuery]int skip = 0,
-            [FromQuery]int take = 100,
-            [FromQuery]string sortBy = "",
-            [FromQuery]SearchSortOrder sortOrder = SearchSortOrder.Asc)
-        {
-            return await GetChunkAsync(filter, skip, take, sortBy, sortOrder);            
-        }
-
-        /// <inheritdoc />
         [HttpGet("FieldMapping")]
-        [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetFieldMappingAsync()
         {
             try
@@ -115,8 +101,23 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting field mappings");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
-        }    
+        }
+
+        /// <inheritdoc />
+        [HttpPost("searchinternal")]
+        [ProducesResponseType(typeof(PagedResult<ProcessedObservation>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> GetChunkInternalAsync([FromBody] SearchFilterInternal filter,
+            [FromQuery] int skip = 0,
+            [FromQuery] int take = 100,
+            [FromQuery] string sortBy = "",
+            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc)
+        {
+            return await GetChunkAsync(filter, skip, take, sortBy, sortOrder);
+        }
     }
 }

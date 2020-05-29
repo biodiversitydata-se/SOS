@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
-using SersService;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SersService;
 using SOS.Import.Harvesters.Observations;
 using SOS.Import.Repositories.Destination.Sers.Interfaces;
 using SOS.Import.Services.Interfaces;
@@ -18,6 +18,18 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
 {
     public class SersObservationHarvesterTests
     {
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        public SersObservationHarvesterTests()
+        {
+            _sersObservationVerbatimRepositoryMock = new Mock<ISersObservationVerbatimRepository>();
+            _sersObservationServiceMock = new Mock<ISersObservationService>();
+            _sersServiceConfiguration = new SersServiceConfiguration
+                {MaxReturnedChangesInOnePage = 10, MaxNumberOfSightingsHarvested = 1};
+            _loggerMock = new Mock<ILogger<SersObservationHarvester>>();
+        }
+
         private readonly Mock<ISersObservationVerbatimRepository> _sersObservationVerbatimRepositoryMock;
         private readonly Mock<ISersObservationService> _sersObservationServiceMock;
         private readonly SersServiceConfiguration _sersServiceConfiguration;
@@ -30,18 +42,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _loggerMock.Object);
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public SersObservationHarvesterTests()
-        {
-            _sersObservationVerbatimRepositoryMock = new Mock<ISersObservationVerbatimRepository>();
-            _sersObservationServiceMock = new Mock<ISersObservationService>();
-            _sersServiceConfiguration = new SersServiceConfiguration { MaxReturnedChangesInOnePage = 10, MaxNumberOfSightingsHarvested = 1 };
-            _loggerMock = new Mock<ILogger<SersObservationHarvester>>();
-        }
-
-        /// <summary>
-        /// Test constructor
+        ///     Test constructor
         /// </summary>
         [Fact]
         public void ConstructorTest()
@@ -57,10 +58,11 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
 
             create = () => new SersObservationHarvester(
                 _sersObservationServiceMock.Object,
-               null,
+                null,
                 _sersServiceConfiguration,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sersObservationVerbatimRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
+                .Be("sersObservationVerbatimRepository");
 
             create = () => new SersObservationHarvester(
                 _sersObservationServiceMock.Object,
@@ -78,7 +80,31 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         }
 
         /// <summary>
-        /// Make a successful serss harvest
+        ///     Test aggregation fail
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task HarvestSersAsyncFail()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
+                .ThrowsAsync(new Exception("Fail"));
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await TestObject.HarvestObservationsAsync(JobCancellationToken.Null);
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            result.Status.Should().Be(RunStatus.Failed);
+        }
+
+        /// <summary>
+        ///     Make a successful serss harvest
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -88,13 +114,15 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
-                .ReturnsAsync(new Tuple<long, IEnumerable<WebSpeciesObservation>>(1, new List<WebSpeciesObservation>()));
+                .ReturnsAsync(
+                    new Tuple<long, IEnumerable<WebSpeciesObservation>>(1, new List<WebSpeciesObservation>()));
 
             _sersObservationVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())
                 .ReturnsAsync(true);
             _sersObservationVerbatimRepositoryMock.Setup(tr => tr.AddCollectionAsync())
                 .ReturnsAsync(true);
-            _sersObservationVerbatimRepositoryMock.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<SersObservationVerbatim>>()))
+            _sersObservationVerbatimRepositoryMock
+                .Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<SersObservationVerbatim>>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -106,30 +134,6 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
 
             result.Status.Should().Be(RunStatus.Success);
-        }
-
-        /// <summary>
-        /// Test aggregation fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task HarvestSersAsyncFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
-                 .ThrowsAsync(new Exception("Fail"));
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.HarvestObservationsAsync(JobCancellationToken.Null);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Status.Should().Be(RunStatus.Failed);
         }
     }
 }

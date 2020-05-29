@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-using DwC_A;
-using DwC_A.Meta;
+﻿using DwC_A;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
@@ -17,12 +15,12 @@ namespace SOS.Import.DarwinCore.Factories
                 verbatimRecord.DataProviderIdentifier = idIdentifierTuple.Identifier;
             }
 
-            foreach (FieldType fieldType in row.FieldMetaData)
+            foreach (var fieldType in row.FieldMetaData)
             {
                 var val = row[fieldType.Index];
                 DwcTermValueMapper.MapValueByTerm(verbatimRecord, fieldType.Term, val);
             }
-            
+
             verbatimRecord.RecordId = row[idIndex];
             return verbatimRecord;
         }

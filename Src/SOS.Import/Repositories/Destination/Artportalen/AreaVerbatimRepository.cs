@@ -6,22 +6,22 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver.GridFS;
 using NetTopologySuite.Geometries;
 using SOS.Import.MongoDb.Interfaces;
+using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Import.Repositories.Destination.Artportalen
 {
     /// <summary>
-    /// Area repository
+    ///     Area repository
     /// </summary>
-    public class AreaVerbatimRepository : VerbatimRepository<Area, int>, Interfaces.IAreaVerbatimRepository
+    public class AreaVerbatimRepository : VerbatimRepository<Area, int>, IAreaVerbatimRepository
     {
         private readonly GridFSBucket _gridFSBucket;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
@@ -32,7 +32,7 @@ namespace SOS.Import.Repositories.Destination.Artportalen
             _jsonSerializerOptions = new JsonSerializerOptions();
             _jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
 
-            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = nameof(Area) });
+            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions {BucketName = nameof(Area)});
         }
 
         /// <inheritdoc />

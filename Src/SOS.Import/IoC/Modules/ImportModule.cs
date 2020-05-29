@@ -1,8 +1,8 @@
-﻿using Autofac;
+﻿using System.Text;
+using Autofac;
+using KulService;
 using SOS.Import.DarwinCore;
 using SOS.Import.DarwinCore.Interfaces;
-using SOS.Lib.Configuration.Import;
-using SOS.Lib.Jobs.Import;
 using SOS.Import.Factories.FieldMapping;
 using SOS.Import.Harvesters;
 using SOS.Import.Harvesters.Interfaces;
@@ -43,6 +43,8 @@ using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Configuration.Import;
+using SOS.Lib.Jobs.Import;
 
 namespace SOS.Import.IoC.Modules
 {
@@ -52,36 +54,46 @@ namespace SOS.Import.IoC.Modules
 
         protected override void Load(ContainerBuilder builder)
         {
-            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             // Add configuration
             if (Configuration.ArtportalenConfiguration != null)
-                builder.RegisterInstance(Configuration.ArtportalenConfiguration).As<ArtportalenConfiguration>().SingleInstance();
+                builder.RegisterInstance(Configuration.ArtportalenConfiguration).As<ArtportalenConfiguration>()
+                    .SingleInstance();
             if (Configuration.ClamServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.ClamServiceConfiguration).As<ClamServiceConfiguration>().SingleInstance();
+                builder.RegisterInstance(Configuration.ClamServiceConfiguration).As<ClamServiceConfiguration>()
+                    .SingleInstance();
             if (Configuration.KulServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.KulServiceConfiguration).As<KulServiceConfiguration>().SingleInstance();
+                builder.RegisterInstance(Configuration.KulServiceConfiguration).As<KulServiceConfiguration>()
+                    .SingleInstance();
             if (Configuration.MvmServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.MvmServiceConfiguration).As<MvmServiceConfiguration>().SingleInstance();
+                builder.RegisterInstance(Configuration.MvmServiceConfiguration).As<MvmServiceConfiguration>()
+                    .SingleInstance();
             if (Configuration.NorsServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.NorsServiceConfiguration).As<NorsServiceConfiguration>().SingleInstance();
+                builder.RegisterInstance(Configuration.NorsServiceConfiguration).As<NorsServiceConfiguration>()
+                    .SingleInstance();
             if (Configuration.SersServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.SersServiceConfiguration).As<SersServiceConfiguration>().SingleInstance();
+                builder.RegisterInstance(Configuration.SersServiceConfiguration).As<SersServiceConfiguration>()
+                    .SingleInstance();
             if (Configuration.SharkServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.SharkServiceConfiguration).As<SharkServiceConfiguration>().SingleInstance();
+                builder.RegisterInstance(Configuration.SharkServiceConfiguration).As<SharkServiceConfiguration>()
+                    .SingleInstance();
             if (Configuration.TaxonAttributeServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.TaxonAttributeServiceConfiguration).As<TaxonAttributeServiceConfiguration>().SingleInstance();
+                builder.RegisterInstance(Configuration.TaxonAttributeServiceConfiguration)
+                    .As<TaxonAttributeServiceConfiguration>().SingleInstance();
             if (Configuration.TaxonServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.TaxonServiceConfiguration).As<TaxonServiceConfiguration>().SingleInstance();
+                builder.RegisterInstance(Configuration.TaxonServiceConfiguration).As<TaxonServiceConfiguration>()
+                    .SingleInstance();
             if (Configuration.VirtualHerbariumServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.VirtualHerbariumServiceConfiguration).As<VirtualHerbariumServiceConfiguration>().SingleInstance();
+                builder.RegisterInstance(Configuration.VirtualHerbariumServiceConfiguration)
+                    .As<VirtualHerbariumServiceConfiguration>().SingleInstance();
 
             // Init verbatim mongodb
             if (Configuration.VerbatimDbConfiguration != null)
             {
                 var importSettings = Configuration.VerbatimDbConfiguration.GetMongoDbSettings();
                 var importClient = new ImportClient(
-                    importSettings, 
+                    importSettings,
                     Configuration.VerbatimDbConfiguration.DatabaseName,
                     Configuration.VerbatimDbConfiguration.BatchSize);
                 builder.RegisterInstance(importClient).As<IImportClient>().SingleInstance();
@@ -112,40 +124,56 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SiteRepository>().As<ISiteRepository>().InstancePerLifetimeScope();
             builder.RegisterType<OrganizationRepository>().As<IOrganizationRepository>().InstancePerLifetimeScope();
             builder.RegisterType<PersonRepository>().As<IPersonRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<SightingRelationRepository>().As<ISightingRelationRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<SpeciesCollectionItemRepository>().As<ISpeciesCollectionItemRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<DarwinCoreArchiveVerbatimRepository>().As<IDarwinCoreArchiveVerbatimRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<DarwinCoreArchiveEventRepository>().As<IDarwinCoreArchiveEventRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<SightingRelationRepository>().As<ISightingRelationRepository>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<SpeciesCollectionItemRepository>().As<ISpeciesCollectionItemRepository>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<DarwinCoreArchiveVerbatimRepository>().As<IDarwinCoreArchiveVerbatimRepository>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<DarwinCoreArchiveEventRepository>().As<IDarwinCoreArchiveEventRepository>()
+                .InstancePerLifetimeScope();
 
             // Repositories destination
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<KulObservationVerbatimRepository>().As<IKulObservationVerbatimRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<MvmObservationVerbatimRepository>().As<IMvmObservationVerbatimRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<NorsObservationVerbatimRepository>().As<INorsObservationVerbatimRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<SersObservationVerbatimRepository>().As<ISersObservationVerbatimRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<SharkObservationVerbatimRepository>().As<ISharkObservationVerbatimRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<SightingVerbatimRepository>().As<ISightingVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<KulObservationVerbatimRepository>().As<IKulObservationVerbatimRepository>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<MvmObservationVerbatimRepository>().As<IMvmObservationVerbatimRepository>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<NorsObservationVerbatimRepository>().As<INorsObservationVerbatimRepository>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<SersObservationVerbatimRepository>().As<ISersObservationVerbatimRepository>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<SharkObservationVerbatimRepository>().As<ISharkObservationVerbatimRepository>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<SightingVerbatimRepository>().As<ISightingVerbatimRepository>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<TaxonVerbatimRepository>().As<ITaxonVerbatimRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>().As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>()
+                .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
 
 
             // Add harvesters
             builder.RegisterType<AreaHarvester>().As<IAreaHarvester>().InstancePerLifetimeScope();
-            builder.RegisterType<ArtportalenObservationHarvester>().As<IArtportalenObservationHarvester>().InstancePerLifetimeScope();
-            builder.RegisterType<ClamPortalObservationHarvester>().As<IClamPortalObservationHarvester>().InstancePerLifetimeScope();
+            builder.RegisterType<ArtportalenObservationHarvester>().As<IArtportalenObservationHarvester>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<ClamPortalObservationHarvester>().As<IClamPortalObservationHarvester>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<DwcObservationHarvester>().As<IDwcObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingHarvester>().As<IFieldMappingHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationHarvester>().As<IKulObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<MvmObservationHarvester>().As<IMvmObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationHarvester>().As<INorsObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationHarvester>().As<ISersObservationHarvester>().InstancePerLifetimeScope();
-            builder.RegisterType<SharkObservationHarvester>().As<ISharkObservationHarvester>().InstancePerLifetimeScope();
+            builder.RegisterType<SharkObservationHarvester>().As<ISharkObservationHarvester>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<TaxonHarvester>().As<ITaxonHarvester>().InstancePerLifetimeScope();
-            builder.RegisterType<VirtualHerbariumObservationHarvester>().As<IVirtualHerbariumObservationHarvester>().InstancePerLifetimeScope();
+            builder.RegisterType<VirtualHerbariumObservationHarvester>().As<IVirtualHerbariumObservationHarvester>()
+                .InstancePerLifetimeScope();
 
             // Add factories
             builder.RegisterType<ActivityFieldMappingFactory>().InstancePerLifetimeScope();
@@ -181,13 +209,18 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<TaxonServiceProxy>().As<ITaxonServiceProxy>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonService>().As<ITaxonService>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonAttributeService>().As<ITaxonAttributeService>().InstancePerLifetimeScope();
-            builder.RegisterType<VirtualHerbariumObservationService>().As<IVirtualHerbariumObservationService>().InstancePerLifetimeScope();
+            builder.RegisterType<VirtualHerbariumObservationService>().As<IVirtualHerbariumObservationService>()
+                .InstancePerLifetimeScope();
 
             // Service Clients
-            builder.RegisterType<KulService.SpeciesObservationChangeServiceClient>().As<KulService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
-            builder.RegisterType<MvmService.SpeciesObservationChangeServiceClient>().As<MvmService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
-            builder.RegisterType<NorsService.SpeciesObservationChangeServiceClient>().As<NorsService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
-            builder.RegisterType<SersService.SpeciesObservationChangeServiceClient>().As<SersService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
+            builder.RegisterType<SpeciesObservationChangeServiceClient>().As<ISpeciesObservationChangeService>()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<MvmService.SpeciesObservationChangeServiceClient>()
+                .As<MvmService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
+            builder.RegisterType<NorsService.SpeciesObservationChangeServiceClient>()
+                .As<NorsService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
+            builder.RegisterType<SersService.SpeciesObservationChangeServiceClient>()
+                .As<SersService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ArtportalenHarvestJob>().As<IArtportalenHarvestJob>().InstancePerLifetimeScope();
@@ -202,7 +235,8 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SharkHarvestJob>().As<ISharkHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationsHarvestJob>().As<IObservationsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonHarvestJob>().As<ITaxonHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<VirtualHerbariumHarvestJob>().As<IVirtualHerbariumHarvestJob>().InstancePerLifetimeScope();
+            builder.RegisterType<VirtualHerbariumHarvestJob>().As<IVirtualHerbariumHarvestJob>()
+                .InstancePerLifetimeScope();
         }
     }
 }

@@ -1,76 +1,76 @@
 {
-  "Id": 14,
-  "Name": "EstablishmentMeans",
-  "Localized": false,
-  "Values": [
-    {
-      "Id": 0,
-      "Value": "native",
-      "Localized": false
-    },
-    {
-      "Id": 1,
-      "Value": "introduced",
-      "Localized": false
-    },
-    {
-      "Id": 2,
-      "Value": "naturalised",
-      "Localized": false
-    },
-    {
-      "Id": 3,
-      "Value": "invasive",
-      "Localized": false
-    },
-    {
-      "Id": 4,
-      "Value": "managed",
-      "Localized": false
-    },
-    {
-      "Id": 5,
-      "Value": "uncertain",
-      "Localized": false
-    }
-  ],
-  "ExternalSystemsMapping": [
-    {
-      "Id": 1,
-      "Name": "DarwinCore",
-      "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
-      "Mappings": [
+    "Id": 14,
+    "Name": "EstablishmentMeans",
+    "Localized": false,
+    "Values": [
         {
-          "Key": "establishmentMeans",
-          "Description": "The establishmentMeans term (http://rs.tdwg.org/dwc/terms/establishmentMeans)",
-          "Values": [
-            {
-              "Value": "native",
-              "SosId": 0
-            },
-            {
-              "Value": "introduced",
-              "SosId": 1
-            },
-            {
-              "Value": "naturalised",
-              "SosId": 2
-            },
-            {
-              "Value": "invasive",
-              "SosId": 3
-            },
-            {
-              "Value": "managed",
-              "SosId": 4
-            },
-            {
-              "Value": "uncertain",
-              "SosId": 5
-            }
-          ]
+            "Id": 0,
+            "Value": "native",
+            "Localized": false
+        },
+        {
+            "Id": 1,
+            "Value": "introduced",
+            "Localized": false
+        },
+        {
+            "Id": 2,
+            "Value": "naturalised",
+            "Localized": false
+        },
+        {
+            "Id": 3,
+            "Value": "invasive",
+            "Localized": false
+        },
+        {
+            "Id": 4,
+            "Value": "managed",
+            "Localized": false
+        },
+        {
+            "Id": 5,
+            "Value": "uncertain",
+            "Localized": false
         }
-      ]
-    }
-  ]
+    ],
+    "ExternalSystemsMapping": [
+        {
+            "Id": 1,
+            "Name": "DarwinCore",
+            "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
+            "Mappings": [
+                {
+                    "Key": "establishmentMeans",
+                    "Description": "The establishmentMeans term (http://rs.tdwg.org/dwc/terms/establishmentMeans)",
+                    "Values": [
+                        {
+                            "Value": "native",
+                            "SosId": 0
+                        },
+                        {
+                            "Value": "introduced",
+                            "SosId": 1
+                        },
+                        {
+                            "Value": "naturalised",
+                            "SosId": 2
+                        },
+                        {
+                            "Value": "invasive",
+                            "SosId": 3
+                        },
+                        {
+                            "Value": "managed",
+                            "SosId": 4
+                        },
+                        {
+                            "Value": "uncertain",
+                            "SosId": 5
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 }

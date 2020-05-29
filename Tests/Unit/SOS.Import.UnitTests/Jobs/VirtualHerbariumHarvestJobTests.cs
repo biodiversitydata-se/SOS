@@ -16,19 +16,8 @@ namespace SOS.Import.UnitTests.Managers
 {
     public class VirtualHerbariumHarvestJobTests
     {
-        private readonly Mock<IVirtualHerbariumObservationHarvester> _virtualHerbariumObservationHarvesterMock;
-        private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
-        private readonly Mock<IDataProviderManager> _dataProviderManagerMock;
-        private readonly Mock<ILogger<VirtualHerbariumHarvestJob>> _loggerMock;
-
-        private VirtualHerbariumHarvestJob TestObject => new VirtualHerbariumHarvestJob(
-            _virtualHerbariumObservationHarvesterMock.Object,
-            _harvestInfoRepositoryMock.Object, 
-            _dataProviderManagerMock.Object,
-            _loggerMock.Object);
-
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         public VirtualHerbariumHarvestJobTests()
         {
@@ -36,6 +25,67 @@ namespace SOS.Import.UnitTests.Managers
             _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
             _dataProviderManagerMock = new Mock<IDataProviderManager>();
             _loggerMock = new Mock<ILogger<VirtualHerbariumHarvestJob>>();
+        }
+
+        private readonly Mock<IVirtualHerbariumObservationHarvester> _virtualHerbariumObservationHarvesterMock;
+        private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
+        private readonly Mock<IDataProviderManager> _dataProviderManagerMock;
+        private readonly Mock<ILogger<VirtualHerbariumHarvestJob>> _loggerMock;
+
+        private VirtualHerbariumHarvestJob TestObject => new VirtualHerbariumHarvestJob(
+            _virtualHerbariumObservationHarvesterMock.Object,
+            _harvestInfoRepositoryMock.Object,
+            _dataProviderManagerMock.Object,
+            _loggerMock.Object);
+
+        /// <summary>
+        ///     Harvest job throw exception
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task AddDataProviderException()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _virtualHerbariumObservationHarvesterMock
+                .Setup(ts => ts.HarvestObservationsAsync(JobCancellationToken.Null))
+                .Throws<Exception>();
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            Func<Task> act = async () => { await TestObject.RunAsync(JobCancellationToken.Null); };
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            await act.Should().ThrowAsync<Exception>();
+        }
+
+        /// <summary>
+        ///     Fail to run harvest job
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task AddDataProviderFail()
+        {
+            // -----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            _virtualHerbariumObservationHarvesterMock
+                .Setup(ts => ts.HarvestObservationsAsync(JobCancellationToken.Null))
+                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Failed});
+
+            _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            Func<Task> act = async () => { await TestObject.RunAsync(JobCancellationToken.Null); };
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+
+            await act.Should().ThrowAsync<Exception>();
         }
 
         // todo - delete test?
@@ -71,7 +121,7 @@ namespace SOS.Import.UnitTests.Managers
         //}
 
         /// <summary>
-        /// Run harvest job successfully
+        ///     Run harvest job successfully
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -80,8 +130,9 @@ namespace SOS.Import.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _virtualHerbariumObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(JobCancellationToken.Null))
-                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now){ Status = RunStatus.Success});
+            _virtualHerbariumObservationHarvesterMock
+                .Setup(ts => ts.HarvestObservationsAsync(JobCancellationToken.Null))
+                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success});
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             //-----------------------------------------------------------------------------------------------------------
@@ -94,54 +145,5 @@ namespace SOS.Import.UnitTests.Managers
 
             result.Should().BeTrue();
         }
-
-        /// <summary>
-        /// Fail to run harvest job
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task AddDataProviderFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _virtualHerbariumObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(JobCancellationToken.Null))
-                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) { Status = RunStatus.Failed });
-
-            _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.RunAsync(JobCancellationToken.Null); };
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            await act.Should().ThrowAsync<Exception>();
-        }
-
-        /// <summary>
-        /// Harvest job throw exception
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task AddDataProviderException()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _virtualHerbariumObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(JobCancellationToken.Null))
-               .Throws<Exception>();
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () => { await TestObject.RunAsync(JobCancellationToken.Null); };
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            await act.Should().ThrowAsync<Exception>();
-        }
-
     }
 }

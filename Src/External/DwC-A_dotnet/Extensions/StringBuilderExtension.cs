@@ -6,7 +6,7 @@ namespace DwC_A.Extensions
     {
         public static string Flush(this StringBuilder stringBuilder)
         {
-            string toString = stringBuilder.ToString();
+            var toString = stringBuilder.ToString();
             stringBuilder.Clear();
             return toString;
         }

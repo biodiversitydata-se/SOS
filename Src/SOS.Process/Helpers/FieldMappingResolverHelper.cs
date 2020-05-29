@@ -6,27 +6,86 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Helpers
 {
     /// <summary>
-    /// Class that can be used for resolve field mapped values.
+    ///     Class that can be used for resolve field mapped values.
     /// </summary>
-    public class FieldMappingResolverHelper : Interfaces.IFieldMappingResolverHelper
+    public class FieldMappingResolverHelper : IFieldMappingResolverHelper
     {
-        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
-        private Dictionary<string, Dictionary<FieldMappingFieldId, Dictionary<int, string>>> _valueMappingDictionariesByCultureCode;
         private readonly FieldMappingConfiguration _fieldMappingConfiguration;
+        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
+
+        private Dictionary<string, Dictionary<FieldMappingFieldId, Dictionary<int, string>>>
+            _valueMappingDictionariesByCultureCode;
+
         public FieldMappingResolverHelper(
             IProcessedFieldMappingRepository processedFieldMappingRepository,
             FieldMappingConfiguration fieldMappingConfiguration)
         {
-            _processedFieldMappingRepository = processedFieldMappingRepository ?? throw new ArgumentNullException(nameof(processedFieldMappingRepository));
-            _fieldMappingConfiguration = fieldMappingConfiguration ?? throw new ArgumentNullException(nameof(fieldMappingConfiguration));
+            _processedFieldMappingRepository = processedFieldMappingRepository ??
+                                               throw new ArgumentNullException(nameof(processedFieldMappingRepository));
+            _fieldMappingConfiguration = fieldMappingConfiguration ??
+                                         throw new ArgumentNullException(nameof(fieldMappingConfiguration));
             if (fieldMappingConfiguration.ResolveValues)
             {
                 Task.Run(InitializeAsync).Wait();
+            }
+        }
+
+        public void ResolveFieldMappedValues(IEnumerable<ProcessedObservation> processedObservations)
+        {
+            ResolveFieldMappedValues(processedObservations, _fieldMappingConfiguration.LocalizationCultureCode);
+        }
+
+        public void ResolveFieldMappedValues(IEnumerable<ProcessedObservation> processedObservations,
+            string cultureCode)
+        {
+            if (!_fieldMappingConfiguration.ResolveValues) return;
+            var valueMappingDictionaries = _valueMappingDictionariesByCultureCode[cultureCode];
+
+            foreach (var observation in processedObservations)
+            {
+                ResolveFieldMappedValue(observation.BasisOfRecord,
+                    valueMappingDictionaries[FieldMappingFieldId.BasisOfRecord]);
+                ResolveFieldMappedValue(observation.Type, valueMappingDictionaries[FieldMappingFieldId.Type]);
+                ResolveFieldMappedValue(observation.AccessRights,
+                    valueMappingDictionaries[FieldMappingFieldId.AccessRights]);
+                ResolveFieldMappedValue(observation.InstitutionId,
+                    valueMappingDictionaries[FieldMappingFieldId.Institution]);
+                ResolveFieldMappedValue(observation.Location?.County,
+                    valueMappingDictionaries[FieldMappingFieldId.County]);
+                ResolveFieldMappedValue(observation.Location?.Municipality,
+                    valueMappingDictionaries[FieldMappingFieldId.Municipality]);
+                ResolveFieldMappedValue(observation.Location?.Parish,
+                    valueMappingDictionaries[FieldMappingFieldId.Parish]);
+                ResolveFieldMappedValue(observation.Location?.Province,
+                    valueMappingDictionaries[FieldMappingFieldId.Province]);
+                ResolveFieldMappedValue(observation.Location?.Country,
+                    valueMappingDictionaries[FieldMappingFieldId.Country]);
+                ResolveFieldMappedValue(observation.Location?.Continent,
+                    valueMappingDictionaries[FieldMappingFieldId.Continent]);
+                ResolveFieldMappedValue(observation.Event?.Biotope,
+                    valueMappingDictionaries[FieldMappingFieldId.Biotope]);
+                ResolveFieldMappedValue(observation.Event?.Substrate,
+                    valueMappingDictionaries[FieldMappingFieldId.Substrate]);
+                ResolveFieldMappedValue(observation.Identification?.ValidationStatus,
+                    valueMappingDictionaries[FieldMappingFieldId.ValidationStatus]);
+                ResolveFieldMappedValue(observation.Occurrence?.LifeStage,
+                    valueMappingDictionaries[FieldMappingFieldId.LifeStage]);
+                ResolveFieldMappedValue(observation.Occurrence?.Activity,
+                    valueMappingDictionaries[FieldMappingFieldId.Activity]);
+                ResolveFieldMappedValue(observation.Occurrence?.Gender,
+                    valueMappingDictionaries[FieldMappingFieldId.Gender]);
+                ResolveFieldMappedValue(observation.Occurrence?.OrganismQuantityUnit,
+                    valueMappingDictionaries[FieldMappingFieldId.Unit]);
+                ResolveFieldMappedValue(observation.Occurrence?.EstablishmentMeans,
+                    valueMappingDictionaries[FieldMappingFieldId.EstablishmentMeans]);
+                ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatus,
+                    valueMappingDictionaries[FieldMappingFieldId.OccurrenceStatus]);
             }
         }
 
@@ -36,43 +95,17 @@ namespace SOS.Process.Helpers
             _valueMappingDictionariesByCultureCode =
                 new Dictionary<string, Dictionary<FieldMappingFieldId, Dictionary<int, string>>>
                 {
-                    {Cultures.en_GB, fieldMappings.ToDictionary(fieldMapping => fieldMapping.Id, m => m.CreateValueDictionary(Cultures.en_GB))},
-                    {Cultures.sv_SE, fieldMappings.ToDictionary(fieldMapping => fieldMapping.Id, m => m.CreateValueDictionary(Cultures.sv_SE))}
+                    {
+                        Cultures.en_GB,
+                        fieldMappings.ToDictionary(fieldMapping => fieldMapping.Id,
+                            m => m.CreateValueDictionary(Cultures.en_GB))
+                    },
+                    {
+                        Cultures.sv_SE,
+                        fieldMappings.ToDictionary(fieldMapping => fieldMapping.Id,
+                            m => m.CreateValueDictionary(Cultures.sv_SE))
+                    }
                 };
-        }
-
-        public void ResolveFieldMappedValues(IEnumerable<ProcessedObservation> processedObservations)
-        {
-            ResolveFieldMappedValues(processedObservations, _fieldMappingConfiguration.LocalizationCultureCode);
-        }
-
-        public void ResolveFieldMappedValues(IEnumerable<ProcessedObservation> processedObservations, string cultureCode)
-        {
-            if (!_fieldMappingConfiguration.ResolveValues) return;
-            var valueMappingDictionaries = _valueMappingDictionariesByCultureCode[cultureCode];
-
-            foreach (var observation in processedObservations)
-            {
-                ResolveFieldMappedValue(observation.BasisOfRecord, valueMappingDictionaries[FieldMappingFieldId.BasisOfRecord]);
-                ResolveFieldMappedValue(observation.Type, valueMappingDictionaries[FieldMappingFieldId.Type]);
-                ResolveFieldMappedValue(observation.AccessRights, valueMappingDictionaries[FieldMappingFieldId.AccessRights]);
-                ResolveFieldMappedValue(observation.InstitutionId, valueMappingDictionaries[FieldMappingFieldId.Institution]);
-                ResolveFieldMappedValue(observation.Location?.County, valueMappingDictionaries[FieldMappingFieldId.County]);
-                ResolveFieldMappedValue(observation.Location?.Municipality, valueMappingDictionaries[FieldMappingFieldId.Municipality]);
-                ResolveFieldMappedValue(observation.Location?.Parish, valueMappingDictionaries[FieldMappingFieldId.Parish]);
-                ResolveFieldMappedValue(observation.Location?.Province, valueMappingDictionaries[FieldMappingFieldId.Province]);
-                ResolveFieldMappedValue(observation.Location?.Country, valueMappingDictionaries[FieldMappingFieldId.Country]);
-                ResolveFieldMappedValue(observation.Location?.Continent, valueMappingDictionaries[FieldMappingFieldId.Continent]);
-                ResolveFieldMappedValue(observation.Event?.Biotope, valueMappingDictionaries[FieldMappingFieldId.Biotope]);
-                ResolveFieldMappedValue(observation.Event?.Substrate, valueMappingDictionaries[FieldMappingFieldId.Substrate]);
-                ResolveFieldMappedValue(observation.Identification?.ValidationStatus, valueMappingDictionaries[FieldMappingFieldId.ValidationStatus]);
-                ResolveFieldMappedValue(observation.Occurrence?.LifeStage, valueMappingDictionaries[FieldMappingFieldId.LifeStage]);
-                ResolveFieldMappedValue(observation.Occurrence?.Activity, valueMappingDictionaries[FieldMappingFieldId.Activity]);
-                ResolveFieldMappedValue(observation.Occurrence?.Gender, valueMappingDictionaries[FieldMappingFieldId.Gender]);
-                ResolveFieldMappedValue(observation.Occurrence?.OrganismQuantityUnit, valueMappingDictionaries[FieldMappingFieldId.Unit]);
-                ResolveFieldMappedValue(observation.Occurrence?.EstablishmentMeans, valueMappingDictionaries[FieldMappingFieldId.EstablishmentMeans]);
-                ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatus, valueMappingDictionaries[FieldMappingFieldId.OccurrenceStatus]);
-            }
         }
 
         private void ResolveFieldMappedValue(

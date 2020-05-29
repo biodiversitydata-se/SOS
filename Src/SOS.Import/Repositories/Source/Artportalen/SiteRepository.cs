@@ -2,25 +2,25 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Entities;
 using SOS.Import.Entities.Artportalen;
+using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
     /// <summary>
-    /// Site repository
+    ///     Site repository
     /// </summary>
-    public class SiteRepository : BaseRepository<SiteRepository>, Interfaces.ISiteRepository
+    public class SiteRepository : BaseRepository<SiteRepository>, ISiteRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="artportalenDataService"></param>
         /// <param name="logger"></param>
-        public SiteRepository(IArtportalenDataService artportalenDataService, ILogger<SiteRepository> logger) : base(artportalenDataService, logger)
+        public SiteRepository(IArtportalenDataService artportalenDataService, ILogger<SiteRepository> logger) : base(
+            artportalenDataService, logger)
         {
-           
         }
 
         /// <inheritdoc />
@@ -28,7 +28,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-               
                 const string query = @"
                 SELECT 
 	                s.Id,
@@ -100,12 +99,11 @@ namespace SOS.Import.Repositories.Source.Artportalen
 
                 return await QueryAsync<SiteEntity>(query);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Logger.LogError(e, "Error getting sites");
                 return null;
             }
-            
         }
     }
 }

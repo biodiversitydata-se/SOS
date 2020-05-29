@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Nest;
-using SOS.Lib.Constants;
 using SOS.Lib.Helpers;
-using  SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Extensions
 {
     /// <summary>
-    /// Extensions for Darwin Core
+    ///     Extensions for Darwin Core
     /// </summary>
     public static class ProcessedExtensions
     {
         #region Event
+
         public static DarwinCoreEvent ToDarwinCore(this ProcessedEvent source)
         {
             if (source == null)
@@ -43,9 +42,11 @@ namespace SOS.Lib.Extensions
                 SamplingEffort = source.SamplingEffort
             };
         }
+
         #endregion Event
 
         #region Identification
+
         public static DarwinCoreIdentification ToDarwinCore(this ProcessedIdentification source)
         {
             if (source == null)
@@ -61,13 +62,17 @@ namespace SOS.Lib.Extensions
                 IdentificationRemarks = source.IdentificationRemarks,
                 IdentificationID = source.IdentificationId,
                 IdentificationQualifier = source.IdentificationQualifier,
-                DateIdentified = source.DateIdentified.HasValue ? $"{source.DateIdentified.Value.ToString("s")}Z" ?? "" : null,
+                DateIdentified = source.DateIdentified.HasValue
+                    ? $"{source.DateIdentified.Value.ToString("s")}Z" ?? ""
+                    : null,
                 TypeStatus = source.TypeStatus
             };
         }
+
         #endregion Identification
 
         #region Location
+
         public static DarwinCoreLocation ToDarwinCore(this ProcessedLocation source)
         {
             if (source == null)
@@ -123,9 +128,11 @@ namespace SOS.Lib.Extensions
                 WaterBody = source.WaterBody
             };
         }
+
         #endregion Location
 
         #region Occurrence
+
         public static DarwinCoreOccurrence ToDarwinCore(this ProcessedOccurrence source)
         {
             if (source == null)
@@ -158,64 +165,13 @@ namespace SOS.Lib.Extensions
                 Sex = source.Gender?.Value
             };
         }
+
         #endregion Occurrence
 
-        #region Sighting
-        /// <summary>
-        /// Cast processed observation object to Darwin Core
-        /// </summary>
-        /// <param name="processedObservation"></param>
-        /// <returns></returns>
-        public static DarwinCore ToDarwinCore(this ProcessedObservation processedObservation)
-        {
-            if (processedObservation == null)
-            {
-                return null;
-            }
-
-            return new DarwinCore
-            {
-                AccessRights = processedObservation.AccessRights?.Value,
-                BasisOfRecord = processedObservation.BasisOfRecord?.Value,
-                BibliographicCitation = processedObservation.BasisOfRecord?.Value,
-                CollectionCode = processedObservation.CollectionCode,
-                CollectionID = processedObservation.CollectionId,
-                DataGeneralizations = processedObservation.DataGeneralizations,
-                DatasetID = processedObservation.DatasetId,
-                DatasetName = processedObservation.DatasetName,
-                Event = processedObservation.Event?.ToDarwinCore(),
-                Identification = processedObservation.Identification?.ToDarwinCore(),
-                InformationWithheld = processedObservation.InformationWithheld,
-                InstitutionCode = processedObservation.InstitutionId?.Value,
-                InstitutionID = processedObservation.InstitutionId == null ? null : $"urn:lsid:artdata.slu.se:organization:{processedObservation.InstitutionId.Id}",
-                Language = processedObservation.Language,
-                Location = processedObservation.Location?.ToDarwinCore(),
-                MeasurementOrFact = null,
-                Modified = processedObservation.Modified,
-                Occurrence = processedObservation.Occurrence?.ToDarwinCore(),
-                OwnerInstitutionCode = processedObservation.OwnerInstitutionCode,
-                References = processedObservation.References,
-                Rights = processedObservation.Rights,
-                RightsHolder = processedObservation.RightsHolder,
-                Taxon = processedObservation.Taxon.ToDarwinCore(),
-                Type = processedObservation.Type?.Value
-            };
-        }
-
-        /// <summary>
-        ///  Cast processed Darwin Core objects to Darwin Core 
-        /// </summary>
-        /// <param name="processedObservations"></param>
-        /// <returns></returns>
-        public static IEnumerable<DarwinCore> ToDarwinCore(this IEnumerable<ProcessedObservation> processedObservations)
-        {
-            return processedObservations?.Select(m => m.ToDarwinCore());
-        }
-        #endregion Sighting
-
         #region Taxon
+
         /// <summary>
-        /// Cats processed taxon to darwin core
+        ///     Cats processed taxon to darwin core
         /// </summary>
         /// <param name="taxon"></param>
         /// <returns></returns>
@@ -258,6 +214,64 @@ namespace SOS.Lib.Extensions
                 VerbatimTaxonRank = taxon.VerbatimTaxonRank
             };
         }
+
         #endregion Taxon
+
+        #region Sighting
+
+        /// <summary>
+        ///     Cast processed observation object to Darwin Core
+        /// </summary>
+        /// <param name="processedObservation"></param>
+        /// <returns></returns>
+        public static DarwinCore ToDarwinCore(this ProcessedObservation processedObservation)
+        {
+            if (processedObservation == null)
+            {
+                return null;
+            }
+
+            return new DarwinCore
+            {
+                AccessRights = processedObservation.AccessRights?.Value,
+                BasisOfRecord = processedObservation.BasisOfRecord?.Value,
+                BibliographicCitation = processedObservation.BasisOfRecord?.Value,
+                CollectionCode = processedObservation.CollectionCode,
+                CollectionID = processedObservation.CollectionId,
+                DataGeneralizations = processedObservation.DataGeneralizations,
+                DatasetID = processedObservation.DatasetId,
+                DatasetName = processedObservation.DatasetName,
+                Event = processedObservation.Event?.ToDarwinCore(),
+                Identification = processedObservation.Identification?.ToDarwinCore(),
+                InformationWithheld = processedObservation.InformationWithheld,
+                InstitutionCode = processedObservation.InstitutionId?.Value,
+                InstitutionID = processedObservation.InstitutionId == null
+                    ? null
+                    : $"urn:lsid:artdata.slu.se:organization:{processedObservation.InstitutionId.Id}",
+                Language = processedObservation.Language,
+                Location = processedObservation.Location?.ToDarwinCore(),
+                MeasurementOrFact = null,
+                Modified = processedObservation.Modified,
+                Occurrence = processedObservation.Occurrence?.ToDarwinCore(),
+                OwnerInstitutionCode = processedObservation.OwnerInstitutionCode,
+                References = processedObservation.References,
+                Rights = processedObservation.Rights,
+                RightsHolder = processedObservation.RightsHolder,
+                Taxon = processedObservation.Taxon.ToDarwinCore(),
+                Type = processedObservation.Type?.Value
+            };
+        }
+
+        /// <summary>
+        ///     Cast processed Darwin Core objects to Darwin Core
+        /// </summary>
+        /// <param name="processedObservations"></param>
+        /// <returns></returns>
+        public static IEnumerable<DarwinCore> ToDarwinCore(this IEnumerable<ProcessedObservation> processedObservations)
+        {
+            return processedObservations?.Select(m => m.ToDarwinCore());
+        }
+
+        #endregion Sighting
     }
 }

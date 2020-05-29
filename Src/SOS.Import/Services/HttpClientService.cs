@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,20 +7,24 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using SOS.Import.Services.Interfaces;
 
 namespace SOS.Import.Services
 {
     /// <inheritdoc />
-    public class HttpClientService : Interfaces.IHttpClientService
+    public class HttpClientService : IHttpClientService
     {
+        private readonly ILogger<HttpClientService> _logger;
+
         /// <summary>
-        /// Disposed
+        ///     Disposed
         /// </summary>
         private bool _disposed;
-        private readonly ILogger<HttpClientService> _logger;
-        
+
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="logger"></param>
         public HttpClientService(ILogger<HttpClientService> logger)
@@ -30,45 +32,8 @@ namespace SOS.Import.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private HttpClient GetClient(Dictionary<string, string> headerData = null)
-        {
-            var httpClient = new HttpClient
-            {
-                Timeout = TimeSpan.FromMinutes(30),
-                DefaultRequestHeaders = { }
-            };
-
-            if (headerData?.Any() ?? false)
-            {
-                foreach (var data in headerData)
-                {
-                    httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
-                }
-            }
-
-            return httpClient;
-        }
-
         /// <summary>
-        /// Dispose
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-            }
-
-            _disposed = true;
-        }
-
-        /// <summary>
-        /// Dispose
+        ///     Dispose
         /// </summary>
         public void Dispose()
         {
@@ -94,7 +59,6 @@ namespace SOS.Import.Services
                     var httpResponseMessage = await httpClient.GetAsync(requestUri);
                     var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<T>(jsonString);
-
                 }
                 catch (Exception ex)
                 {
@@ -108,7 +72,8 @@ namespace SOS.Import.Services
                     httpClient.Dispose();
                 }
             }
-            return default(T);
+
+            return default;
         }
 
         /// <inheritdoc />
@@ -159,7 +124,7 @@ namespace SOS.Import.Services
                 }
             }
 
-            return default(T);
+            return default;
         }
 
         /// <inheritdoc />
@@ -188,13 +153,12 @@ namespace SOS.Import.Services
                 }
             }
 
-            return default(T);
+            return default;
         }
 
         /// <inheritdoc />
         public async Task<T> DeleteDataAsync<T>(Uri requestUri)
         {
-           
             var attempts = 0;
             while (attempts < 3)
             {
@@ -204,7 +168,6 @@ namespace SOS.Import.Services
                     var httpResponseMessage = await httpClient.DeleteAsync(requestUri);
                     var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<T>(jsonString);
-
                 }
                 catch (Exception ex)
                 {
@@ -219,21 +182,58 @@ namespace SOS.Import.Services
                 }
             }
 
-            return default(T);
+            return default;
+        }
+
+        private HttpClient GetClient(Dictionary<string, string> headerData = null)
+        {
+            var httpClient = new HttpClient
+            {
+                Timeout = TimeSpan.FromMinutes(30)
+            };
+
+            if (headerData?.Any() ?? false)
+            {
+                foreach (var data in headerData)
+                {
+                    httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
+                }
+            }
+
+            return httpClient;
+        }
+
+        /// <summary>
+        ///     Dispose
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+            }
+
+            _disposed = true;
         }
     }
 
     /// <summary>
-    /// Create json conetent
+    ///     Create json conetent
     /// </summary>
     public class JsonContent : StringContent
     {
         /// <summary>
-        /// Serialize object to json
+        ///     Serialize object to json
         /// </summary>
         /// <param name="obj"></param>
         public JsonContent(object obj) :
             base(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")
-        { }
+        {
+        }
     }
 }

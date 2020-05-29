@@ -5,7 +5,7 @@ using SOS.Lib.Models.Interfaces;
 namespace SOS.Lib.Models.Verbatim.ClamPortal
 {
     /// <summary>
-    /// Clams verbatim model
+    ///     Clams verbatim model
     /// </summary>
     public class ClamObservationVerbatim : IEntity<ObjectId>
     {
@@ -21,7 +21,6 @@ namespace SOS.Lib.Models.Verbatim.ClamPortal
         public double DecimalLatitude { get; set; }
         public double DecimalLongitude { get; set; }
         public int? DyntaxaTaxonId { get; set; }
-        public ObjectId Id { get; set; }
         public string IdentificationVerificationStatus { get; set; }
         public string IndividualCount { get; set; }
         public string InstitutionCode { get; set; }
@@ -53,5 +52,6 @@ namespace SOS.Lib.Models.Verbatim.ClamPortal
         public string VerbatimScientificName { get; set; }
         public string WaterBody { get; set; }
         public string SmallestLivingClam { get; set; }
+        public ObjectId Id { get; set; }
     }
 }

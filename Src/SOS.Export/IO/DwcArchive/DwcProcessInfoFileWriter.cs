@@ -5,14 +5,14 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 namespace SOS.Export.IO.DwcArchive
 {
     /// <summary>
-    /// Creates an DwC Archive meta.xml file.
+    ///     Creates an DwC Archive meta.xml file.
     /// </summary>
     public static class DwcProcessInfoFileWriter
     {
-        private static string _elementNamespace = "http://rs.tdwg.org/dwc/text/";
+        private static readonly string _elementNamespace = "http://rs.tdwg.org/dwc/text/";
 
         /// <summary>
-        /// Create a process info xml file
+        ///     Create a process info xml file
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="processInfo"></param>
@@ -26,7 +26,7 @@ namespace SOS.Export.IO.DwcArchive
 
             // Create root node
             var processNode = doc.CreateElement("process", _elementNamespace);
-            
+
             // Add root attributes
             var processStartAttribute = doc.CreateAttribute("start");
             processStartAttribute.Value = processInfo.Start.ToString("O");
@@ -67,7 +67,7 @@ namespace SOS.Export.IO.DwcArchive
         }
 
         /// <summary>
-        /// Create a provider information node
+        ///     Create a provider information node
         /// </summary>
         /// <param name="doc"></param>
         /// <param name="nodeName"></param>

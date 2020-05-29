@@ -7,7 +7,6 @@ namespace SOS.Observations.Api.UnitTests
         [Fact]
         public void Test1()
         {
-
         }
     }
 }

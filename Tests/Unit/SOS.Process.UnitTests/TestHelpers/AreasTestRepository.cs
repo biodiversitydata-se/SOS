@@ -7,9 +7,7 @@ using System.Text;
 using NetTopologySuite.Features;
 using NetTopologySuite.IO;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Process.UnitTests.TestHelpers
 {
@@ -17,8 +15,8 @@ namespace SOS.Process.UnitTests.TestHelpers
     {
         public static IEnumerable<Area> LoadAreas(IEnumerable<AreaType> areaTypes)
         {
-            List<Area> areaCollection = new List<Area>();
-            string assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var areaCollection = new List<Area>();
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             foreach (var areaType in areaTypes)
             {
                 IEnumerable<Area> areas;
@@ -42,7 +40,7 @@ namespace SOS.Process.UnitTests.TestHelpers
 
         private static IEnumerable<Area> LoadAreas(string filePath, AreaType areaType)
         {
-            FeatureCollection featureCollection = LoadFeatureCollection(filePath);
+            var featureCollection = LoadFeatureCollection(filePath);
             var areas = ConvertToAreas(featureCollection, areaType);
             return areas;
         }
@@ -50,7 +48,7 @@ namespace SOS.Process.UnitTests.TestHelpers
         private static FeatureCollection LoadFeatureCollection(string filePath)
         {
             var geoJsonReader = new GeoJsonReader();
-            string str = File.ReadAllText(filePath, Encoding.UTF8);
+            var str = File.ReadAllText(filePath, Encoding.UTF8);
             var featureCollection = geoJsonReader.Read<FeatureCollection>(str);
             return featureCollection;
         }

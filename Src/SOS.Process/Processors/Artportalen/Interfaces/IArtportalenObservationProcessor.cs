@@ -3,10 +3,9 @@
 namespace SOS.Process.Processors.Artportalen.Interfaces
 {
     /// <summary>
-    /// Artportalen observation processor
+    ///     Artportalen observation processor
     /// </summary>
     public interface IArtportalenObservationProcessor : IProcessor
     {
-        
     }
 }

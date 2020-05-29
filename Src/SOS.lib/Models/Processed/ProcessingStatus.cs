@@ -5,10 +5,10 @@ using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.Processed
 {
-    public class ProcessingStatus 
+    public class ProcessingStatus
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="type"></param>
         protected ProcessingStatus(DataProviderType type)
@@ -17,7 +17,7 @@ namespace SOS.Lib.Models.Processed
         }
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="dataProviderIdentifier"></param>
         /// <param name="type"></param>
@@ -28,33 +28,33 @@ namespace SOS.Lib.Models.Processed
         }
 
         /// <summary>
-        /// Number of items
+        ///     Number of items
         /// </summary>
         public int Count { get; set; }
 
         /// <summary>
-        /// Data provider identifier
+        ///     Data provider identifier
         /// </summary>
         public string DataProviderIdentifier { get; set; }
 
         /// <summary>
-        /// Type
+        ///     Type
         /// </summary>
         [BsonRepresentation(BsonType.String)]
         public DataProviderType Type { get; }
 
         /// <summary>
-        /// Harvest end date and time
+        ///     Harvest end date and time
         /// </summary>
         public DateTime End { get; set; }
 
         /// <summary>
-        /// Harvest start date and time
+        ///     Harvest start date and time
         /// </summary>
         public DateTime Start { get; set; }
 
         /// <summary>
-        /// Running status
+        ///     Running status
         /// </summary>
         [BsonRepresentation(BsonType.String)]
         public RunStatus Status { get; set; }

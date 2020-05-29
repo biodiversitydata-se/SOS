@@ -8,24 +8,24 @@ using MongoDB.Driver;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Processors.Shark.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Processors.Shark
 {
     /// <summary>
-    /// Process factory class
+    ///     Process factory class
     /// </summary>
-    public class SharkObservationProcessor : ObservationProcessorBase<SharkObservationProcessor>, Interfaces.ISharkObservationProcessor
+    public class SharkObservationProcessor : ObservationProcessorBase<SharkObservationProcessor>,
+        ISharkObservationProcessor
     {
-        private readonly ISharkObservationVerbatimRepository _sharkObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataProviderType Type => DataProviderType.SharkObservations;
+        private readonly ISharkObservationVerbatimRepository _sharkObservationVerbatimRepository;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="sharkObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
@@ -37,12 +37,17 @@ namespace SOS.Process.Processors.Shark
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<SharkObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,logger)
+            ILogger<SharkObservationProcessor> logger) : base(processedObservationRepository,
+            fieldMappingResolverHelper, logger)
         {
-            _sharkObservationVerbatimRepository = sharkObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(sharkObservationVerbatimRepository));
+            _sharkObservationVerbatimRepository = sharkObservationVerbatimRepository ??
+                                                  throw new ArgumentNullException(
+                                                      nameof(sharkObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
-       
+
+        public override DataProviderType Type => DataProviderType.SharkObservations;
+
         /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,

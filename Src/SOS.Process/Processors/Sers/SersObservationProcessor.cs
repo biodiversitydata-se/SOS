@@ -8,24 +8,24 @@ using MongoDB.Driver;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Processors.Sers
 {
     /// <summary>
-    /// Process factory class
+    ///     Process factory class
     /// </summary>
-    public class SersObservationProcessor : ObservationProcessorBase<SersObservationProcessor>, Interfaces.ISersObservationProcessor
+    public class SersObservationProcessor : ObservationProcessorBase<SersObservationProcessor>,
+        ISersObservationProcessor
     {
-        private readonly ISersObservationVerbatimRepository _sersObservationVerbatimRepository;
         private readonly IAreaHelper _areaHelper;
-        public override DataProviderType Type => DataProviderType.SersObservations;
+        private readonly ISersObservationVerbatimRepository _sersObservationVerbatimRepository;
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="sersObservationVerbatimRepository"></param>
         /// <param name="areaHelper"></param>
@@ -37,12 +37,17 @@ namespace SOS.Process.Processors.Sers
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<SersObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,logger)
+            ILogger<SersObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,
+            logger)
         {
-            _sersObservationVerbatimRepository = sersObservationVerbatimRepository ?? throw new ArgumentNullException(nameof(sersObservationVerbatimRepository));
+            _sersObservationVerbatimRepository = sersObservationVerbatimRepository ??
+                                                 throw new ArgumentNullException(
+                                                     nameof(sersObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
-       
+
+        public override DataProviderType Type => DataProviderType.SersObservations;
+
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
@@ -57,7 +62,7 @@ namespace SOS.Process.Processors.Sers
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
-                ProcessedObservation processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
                 observations.Add(processedObservation);
                 if (IsBatchFilledToLimit(observations.Count))

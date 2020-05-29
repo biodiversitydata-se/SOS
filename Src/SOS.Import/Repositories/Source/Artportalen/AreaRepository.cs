@@ -3,24 +3,25 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
+using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
     /// <summary>
-    /// Area repository
+    ///     Area repository
     /// </summary>
-    public class AreaRepository : BaseRepository<AreaRepository>, Interfaces.IAreaRepository
+    public class AreaRepository : BaseRepository<AreaRepository>, IAreaRepository
     {
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="artportalenDataService"></param>
         /// <param name="logger"></param>
-        public AreaRepository(IArtportalenDataService artportalenDataService, ILogger<AreaRepository> logger) : base(artportalenDataService, logger)
+        public AreaRepository(IArtportalenDataService artportalenDataService, ILogger<AreaRepository> logger) : base(
+            artportalenDataService, logger)
         {
-           
         }
 
         /// <inheritdoc />
@@ -57,7 +58,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-                var areaTypes = (int[])Enum.GetValues(typeof(AreaType));
+                var areaTypes = (int[]) Enum.GetValues(typeof(AreaType));
 
                 var query = @"
                 SELECT 

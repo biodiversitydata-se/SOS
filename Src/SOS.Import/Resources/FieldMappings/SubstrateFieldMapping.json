@@ -1,2244 +1,2244 @@
 {
-  "Id": 8,
-  "Name": "Substrate",
-  "Localized": true,
-  "Values": [
-    {
-      "Id": 1,
-      "Value": "Ground/bottom",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Mark/botten"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Ground/bottom"
-        }
-      ]
-    },
-    {
-      "Id": 2,
-      "Value": "Stone/rock on land",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Sten/berg på land"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Stone/rock on land"
-        }
-      ]
-    },
-    {
-      "Id": 3,
-      "Value": "Acidic rock",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Sur bergart"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Acidic rock"
-        }
-      ]
-    },
-    {
-      "Id": 4,
-      "Value": "Granite",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Granit"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Granite"
-        }
-      ]
-    },
-    {
-      "Id": 5,
-      "Value": "Pegmatite",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Pegmatit"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Pegmatite"
-        }
-      ]
-    },
-    {
-      "Id": 6,
-      "Value": "Porphyry",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Porfyr"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Porphyry"
-        }
-      ]
-    },
-    {
-      "Id": 7,
-      "Value": "Quartzite",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Kvartsit"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Quartzite"
-        }
-      ]
-    },
-    {
-      "Id": 8,
-      "Value": "Mica slate",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Glimmerskiffer"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Mica slate"
-        }
-      ]
-    },
-    {
-      "Id": 9,
-      "Value": "Gneiss",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Gnejs"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Gneiss"
-        }
-      ]
-    },
-    {
-      "Id": 10,
-      "Value": "Sandstone",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Sandsten"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Sandstone"
-        }
-      ]
-    },
-    {
-      "Id": 11,
-      "Value": "Basic rock",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Basisk bergart (grönsten)"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Basic rock"
-        }
-      ]
-    },
-    {
-      "Id": 12,
-      "Value": "Basalt",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Basalt"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Basalt"
-        }
-      ]
-    },
-    {
-      "Id": 13,
-      "Value": "Gabbro",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Gabbro"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Gabbro"
-        }
-      ]
-    },
-    {
-      "Id": 14,
-      "Value": "Diabase",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Diabas"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Diabase"
-        }
-      ]
-    },
-    {
-      "Id": 15,
-      "Value": "Hyperit",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Hyperit"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Hyperit"
-        }
-      ]
-    },
-    {
-      "Id": 16,
-      "Value": "Diorite",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Diorit"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Diorite"
-        }
-      ]
-    },
-    {
-      "Id": 17,
-      "Value": "Amphibolite",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Amfibolit"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Amphibolite"
-        }
-      ]
-    },
-    {
-      "Id": 18,
-      "Value": "Limestone",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Kalksten"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Limestone"
-        }
-      ]
-    },
-    {
-      "Id": 19,
-      "Value": "Hard bottom",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Hårdbotten"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Hard bottom"
-        }
-      ]
-    },
-    {
-      "Id": 20,
-      "Value": "Ground/soil on land",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Mark/jord på land"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Ground/soil on land"
-        }
-      ]
-    },
-    {
-      "Id": 21,
-      "Value": "Mineral soil",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Mineraljord"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Mineral soil"
-        }
-      ]
-    },
-    {
-      "Id": 22,
-      "Value": "Moraine",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Morän"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Moraine"
-        }
-      ]
-    },
-    {
-      "Id": 23,
-      "Value": "Rock (> 200 mm)",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Block (> 200 mm)"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Rock (> 200 mm)"
-        }
-      ]
-    },
-    {
-      "Id": 24,
-      "Value": "Stone (60 - 200 mm)",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Sten (60 - 200 mm)"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Stone (60 - 200 mm)"
-        }
-      ]
-    },
-    {
-      "Id": 25,
-      "Value": "Gravel (2-60 mm)",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Grus (2-60 mm)"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Gravel (2-60 mm)"
-        }
-      ]
-    },
-    {
-      "Id": 26,
-      "Value": "Sand (0,06-2 mm)",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Sand (0,06-2 mm)"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Sand (0,06-2 mm)"
-        }
-      ]
-    },
-    {
-      "Id": 27,
-      "Value": "Fine sand/Silt (0,002-0,06 mm)",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Silt/mo/mjäla (0,002-0,06 mm)"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Fine sand/Silt (0,002-0,06 mm)"
-        }
-      ]
-    },
-    {
-      "Id": 28,
-      "Value": "Clay (< 0,002 mm)",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Lera (< 0,002 mm)"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Clay (< 0,002 mm)"
-        }
-      ]
-    },
-    {
-      "Id": 29,
-      "Value": "Organogen soil",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Organogen jord"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Organogen soil"
-        }
-      ]
-    },
-    {
-      "Id": 30,
-      "Value": "Humus",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Humus"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Humus"
-        }
-      ]
-    },
-    {
-      "Id": 31,
-      "Value": "Peloid",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Dy"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Peloid"
-        }
-      ]
-    },
-    {
-      "Id": 32,
-      "Value": "Mull",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Mull"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Mull"
-        }
-      ]
-    },
-    {
-      "Id": 33,
-      "Value": "Mud",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Gyttja"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Mud"
-        }
-      ]
-    },
-    {
-      "Id": 34,
-      "Value": "Peat",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Torv"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Peat"
-        }
-      ]
-    },
-    {
-      "Id": 35,
-      "Value": "Litter",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Förna"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Litter"
-        }
-      ]
-    },
-    {
-      "Id": 36,
-      "Value": "Seaweed Wall",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Tångvall eller annan driftrand"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Seaweed Wall"
-        }
-      ]
-    },
-    {
-      "Id": 37,
-      "Value": "Shell gravel",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Skalgrus"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Shell gravel"
-        }
-      ]
-    },
-    {
-      "Id": 38,
-      "Value": "Soft bottom",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Mjukbotten"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Soft bottom"
-        }
-      ]
-    },
-    {
-      "Id": 39,
-      "Value": "Inorganic substrate",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Oorganiskt bottenmaterial"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Inorganic substrate"
-        }
-      ]
-    },
-    {
-      "Id": 40,
-      "Value": "Rock on bottom (> 200 mm)",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Block på botten (> 200 mm)"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Rock on bottom (> 200 mm)"
-        }
-      ]
-    },
-    {
-      "Id": 41,
-      "Value": "Stone on bottom (60 - 200 mm)",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Sten på botten (60 - 200 mm)"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Stone on bottom (60 - 200 mm)"
-        }
-      ]
-    },
-    {
-      "Id": 42,
-      "Value": "Gravel on bottom (2-60 mm)",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Grus på botten (2-60 mm)"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Gravel on bottom (2-60 mm)"
-        }
-      ]
-    },
-    {
-      "Id": 43,
-      "Value": "Sand on bottom (0,06-2 mm)",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Sand på botten (0,06-2 mm)"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Sand on bottom (0,06-2 mm)"
-        }
-      ]
-    },
-    {
-      "Id": 44,
-      "Value": "Fine sediment on bottom",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Finsediment på botten "
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Fine sediment on bottom"
-        }
-      ]
-    },
-    {
-      "Id": 45,
-      "Value": "Organic material on bottom",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Organiskt material på botten"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Organic material on bottom"
-        }
-      ]
-    },
-    {
-      "Id": 46,
-      "Value": "Fine detritus",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Findetritus på botten"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Fine detritus"
-        }
-      ]
-    },
-    {
-      "Id": 47,
-      "Value": "Coarse detritus",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Grovdetritus på botten"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Coarse detritus"
-        }
-      ]
-    },
-    {
-      "Id": 48,
-      "Value": "Organisms as a substrate",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Organismer som substrat"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Organisms as a substrate"
-        }
-      ]
-    },
-    {
-      "Id": 49,
-      "Value": "Fungi, fruit bodies, etc.",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Svamp, fruktkropp mm"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Fungi, fruit bodies, etc."
-        }
-      ]
-    },
-    {
-      "Id": 50,
-      "Value": "Plant",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Växt"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Plant"
-        }
-      ]
-    },
-    {
-      "Id": 51,
-      "Value": "Herb/grass",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Ört/gräs"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Herb/grass"
-        }
-      ]
-    },
-    {
-      "Id": 52,
-      "Value": "Living part of  herb/grass",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Levande del av ört/gräs"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Living part of  herb/grass"
-        }
-      ]
-    },
-    {
-      "Id": 53,
-      "Value": "Flower on living herb/grass",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Blomma på levande ört"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Flower on living herb/grass"
-        }
-      ]
-    },
-    {
-      "Id": 54,
-      "Value": "Fruit on living herb/grass",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Frukt"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Fruit on living herb/grass"
-        }
-      ]
-    },
-    {
-      "Id": 55,
-      "Value": "Seed on living herb/grass",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Frö från ört/gräs"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Seed on living herb/grass"
-        }
-      ]
-    },
-    {
-      "Id": 56,
-      "Value": "Leaf on living herb/grass",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Blad"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Leaf on living herb/grass"
-        }
-      ]
-    },
-    {
-      "Id": 57,
-      "Value": "Bud on living herb/grass",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Knopp från ört/gräs"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Bud on living herb/grass"
-        }
-      ]
-    },
-    {
-      "Id": 58,
-      "Value": "Stem/straw on living herb/grass",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Stjälk/strå"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Stem/straw on living herb/grass"
-        }
-      ]
-    },
-    {
-      "Id": 59,
-      "Value": "Root of living herb/grass",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Rot av ört/gräs"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Root of living herb/grass"
-        }
-      ]
-    },
-    {
-      "Id": 60,
-      "Value": "Dead part of  herb/grass",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Död delar av ört/gräs"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Dead part of  herb/grass"
-        }
-      ]
-    },
-    {
-      "Id": 61,
-      "Value": "Woody plant",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Vedartad växt"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Woody plant"
-        }
-      ]
-    },
-    {
-      "Id": 62,
-      "Value": "Living woody plant",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Levande vedartad växt"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Living woody plant"
-        }
-      ]
-    },
-    {
-      "Id": 63,
-      "Value": "Flower on living woody plant",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Blomma på levande träd/buske"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Flower on living woody plant"
-        }
-      ]
-    },
-    {
-      "Id": 64,
-      "Value": "Seed on living woody plant",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Frö från träd/buske"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Seed on living woody plant"
-        }
-      ]
-    },
-    {
-      "Id": 65,
-      "Value": "Cone on living woody plant",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Kotte"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Cone on living woody plant"
-        }
-      ]
-    },
-    {
-      "Id": 66,
-      "Value": "Needle/Leaf on living woody plant",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Barr/blad"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Needle/Leaf on living woody plant"
-        }
-      ]
-    },
-    {
-      "Id": 67,
-      "Value": "Bark on living woody plant",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Bark på levande träd"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Bark on living woody plant"
-        }
-      ]
-    },
-    {
-      "Id": 68,
-      "Value": "Cambium on living woody plant",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Kambium på levande träd"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Cambium on living woody plant"
-        }
-      ]
-    },
-    {
-      "Id": 69,
-      "Value": "Inside living wood",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Inuti levande ved"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Inside living wood"
-        }
-      ]
-    },
-    {
-      "Id": 70,
-      "Value": "Bud on living woody plant",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Knopp från träd/buske"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Bud on living woody plant"
-        }
-      ]
-    },
-    {
-      "Id": 71,
-      "Value": "Branch on living tree",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Gren på levande träd"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Branch on living tree"
-        }
-      ]
-    },
-    {
-      "Id": 72,
-      "Value": "Stem on living tree",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Trädstam på levande träd"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Stem on living tree"
-        }
-      ]
-    },
-    {
-      "Id": 73,
-      "Value": "Tree base",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Trädbas"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Tree base"
-        }
-      ]
-    },
-    {
-      "Id": 74,
-      "Value": "Tree root",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Trädrot"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Tree root"
-        }
-      ]
-    },
-    {
-      "Id": 75,
-      "Value": "Cavity in living tree ",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Hålighet i levande träd med/utan mulm"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Cavity in living tree "
-        }
-      ]
-    },
-    {
-      "Id": 76,
-      "Value": "Sap flow",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Savflöde"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Sap flow"
-        }
-      ]
-    },
-    {
-      "Id": 77,
-      "Value": "Fire affected living tree",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Brandpåverkad levande träd"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Fire affected living tree"
-        }
-      ]
-    },
-    {
-      "Id": 78,
-      "Value": "Dead wood",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Död ved  vedartad växt"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Dead wood"
-        }
-      ]
-    },
-    {
-      "Id": 79,
-      "Value": "Bark of dead wood",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Bark på dött träd"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Bark of dead wood"
-        }
-      ]
-    },
-    {
-      "Id": 80,
-      "Value": "Under bark of dead wood",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Under bark på död ved"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Under bark of dead wood"
-        }
-      ]
-    },
-    {
-      "Id": 81,
-      "Value": "Wood surface of dead wood",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Vedyta på död ved"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Wood surface of dead wood"
-        }
-      ]
-    },
-    {
-      "Id": 82,
-      "Value": "Inside dead wood",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Inuti död ved"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Inside dead wood"
-        }
-      ]
-    },
-    {
-      "Id": 83,
-      "Value": "Dead branch ",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Död gren"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Dead branch "
-        }
-      ]
-    },
-    {
-      "Id": 84,
-      "Value": "Dead tree stem",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Död trädstam"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Dead tree stem"
-        }
-      ]
-    },
-    {
-      "Id": 85,
-      "Value": "Standing dead tree/snags",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Stående död trädstam/högstubbe"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Standing dead tree/snags"
-        }
-      ]
-    },
-    {
-      "Id": 86,
-      "Value": "Horizontal, dead without ground contact",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Liggande död trädstam, utan markontakt"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Horizontal, dead without ground contact"
-        }
-      ]
-    },
-    {
-      "Id": 87,
-      "Value": "Horizontal, dead with ground contact",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Liggande död trädstam, markontakt"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Horizontal, dead with ground contact"
-        }
-      ]
-    },
-    {
-      "Id": 88,
-      "Value": "Cavity in dead tree",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Hålighet i dött träd med/utan mulm"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Cavity in dead tree"
-        }
-      ]
-    },
-    {
-      "Id": 89,
-      "Value": "Stump",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Stubbe"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Stump"
-        }
-      ]
-    },
-    {
-      "Id": 90,
-      "Value": "Fire killed tree",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Branddödat träd"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Fire killed tree"
-        }
-      ]
-    },
-    {
-      "Id": 91,
-      "Value": "Wood under water",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Ved under vatten "
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Wood under water"
-        }
-      ]
-    },
-    {
-      "Id": 92,
-      "Value": "Animal",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Djur"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Animal"
-        }
-      ]
-    },
-    {
-      "Id": 93,
-      "Value": "Living animal",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Levande djur"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Living animal"
-        }
-      ]
-    },
-    {
-      "Id": 94,
-      "Value": "Adult animal",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Vuxet djur"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Adult animal"
-        }
-      ]
-    },
-    {
-      "Id": 95,
-      "Value": "Pupa",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Puppa"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Pupa"
-        }
-      ]
-    },
-    {
-      "Id": 96,
-      "Value": "Larvae",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Larv"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Larvae"
-        }
-      ]
-    },
-    {
-      "Id": 97,
-      "Value": "Egg",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Ägg"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Egg"
-        }
-      ]
-    },
-    {
-      "Id": 98,
-      "Value": "Body part of living animal",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Kroppsdel hos levande djur"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Body part of living animal"
-        }
-      ]
-    },
-    {
-      "Id": 99,
-      "Value": "Hair, fur, scale or feather",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Hår, päls, fjäll eller fjädrar"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Hair, fur, scale or feather"
-        }
-      ]
-    },
-    {
-      "Id": 100,
-      "Value": "Skin/shell",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Hud, skal"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Skin/shell"
-        }
-      ]
-    },
-    {
-      "Id": 101,
-      "Value": "Dead animal, carcass",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Dött djur, kadaver"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Dead animal, carcass"
-        }
-      ]
-    },
-    {
-      "Id": 102,
-      "Value": "After leaving from animals",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Efterlämning av djur"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "After leaving from animals"
-        }
-      ]
-    },
-    {
-      "Id": 103,
-      "Value": "Exposed nest",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Friliggande bo"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Exposed nest"
-        }
-      ]
-    },
-    {
-      "Id": 104,
-      "Value": "Dug nest in the ground",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Grävt bo i marken"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Dug nest in the ground"
-        }
-      ]
-    },
-    {
-      "Id": 105,
-      "Value": "Gallery in wood",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Gång I ved"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Gallery in wood"
-        }
-      ]
-    },
-    {
-      "Id": 106,
-      "Value": "Gall",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Gallbildning"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Gall"
-        }
-      ]
-    },
-    {
-      "Id": 107,
-      "Value": "Dropping",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Spillning"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Dropping"
-        }
-      ]
-    },
-    {
-      "Id": 108,
-      "Value": "Man-made substrate",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Människoskapat substrat"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Man-made substrate"
-        }
-      ]
-    },
-    {
-      "Id": 109,
-      "Value": "Post/wooden fences etc.",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Stolpe, trägärdesgård mm"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Post/wooden fences etc."
-        }
-      ]
-    },
-    {
-      "Id": 110,
-      "Value": "Stone wall/cairn",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Stenmur och -röse"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Stone wall/cairn"
-        }
-      ]
-    },
-    {
-      "Id": 111,
-      "Value": "Bridge",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Bro"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Bridge"
-        }
-      ]
-    },
-    {
-      "Id": 112,
-      "Value": "Jetty",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Brygga/pir"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Jetty"
-        }
-      ]
-    },
-    {
-      "Id": 113,
-      "Value": "Roof tops",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Hustak"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Roof tops"
-        }
-      ]
-    },
-    {
-      "Id": 114,
-      "Value": "House wall",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Husvägg"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "House wall"
-        }
-      ]
-    },
-    {
-      "Id": 115,
-      "Value": "Manure",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Gödselstack"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Manure"
-        }
-      ]
-    },
-    {
-      "Id": 116,
-      "Value": "Compost",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Kompost"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Compost"
-        }
-      ]
-    },
-    {
-      "Id": 117,
-      "Value": "Sawdust",
-      "Localized": true,
-      "Translations": [
-        {
-          "CultureCode": "sv-SE",
-          "Value": "Sågspån"
-        },
-        {
-          "CultureCode": "en-GB",
-          "Value": "Sawdust"
-        }
-      ]
-    }
-  ],
-  "ExternalSystemsMapping": [
-    {
-      "Id": 0,
-      "Name": "Artportalen",
-      "Mappings": [
-        {
-          "Key": "Id",
-          "Description": "Id field mapping",
-          "Values": [
-            {
-              "Value": 1,
-              "SosId": 1
-            },
-            {
-              "Value": 2,
-              "SosId": 2
-            },
-            {
-              "Value": 3,
-              "SosId": 3
-            },
-            {
-              "Value": 4,
-              "SosId": 4
-            },
-            {
-              "Value": 5,
-              "SosId": 5
-            },
-            {
-              "Value": 6,
-              "SosId": 6
-            },
-            {
-              "Value": 7,
-              "SosId": 7
-            },
-            {
-              "Value": 8,
-              "SosId": 8
-            },
-            {
-              "Value": 9,
-              "SosId": 9
-            },
-            {
-              "Value": 10,
-              "SosId": 10
-            },
-            {
-              "Value": 11,
-              "SosId": 11
-            },
-            {
-              "Value": 12,
-              "SosId": 12
-            },
-            {
-              "Value": 13,
-              "SosId": 13
-            },
-            {
-              "Value": 14,
-              "SosId": 14
-            },
-            {
-              "Value": 15,
-              "SosId": 15
-            },
-            {
-              "Value": 16,
-              "SosId": 16
-            },
-            {
-              "Value": 17,
-              "SosId": 17
-            },
-            {
-              "Value": 18,
-              "SosId": 18
-            },
-            {
-              "Value": 19,
-              "SosId": 19
-            },
-            {
-              "Value": 20,
-              "SosId": 20
-            },
-            {
-              "Value": 21,
-              "SosId": 21
-            },
-            {
-              "Value": 22,
-              "SosId": 22
-            },
-            {
-              "Value": 23,
-              "SosId": 23
-            },
-            {
-              "Value": 24,
-              "SosId": 24
-            },
-            {
-              "Value": 25,
-              "SosId": 25
-            },
-            {
-              "Value": 26,
-              "SosId": 26
-            },
-            {
-              "Value": 27,
-              "SosId": 27
-            },
-            {
-              "Value": 28,
-              "SosId": 28
-            },
-            {
-              "Value": 29,
-              "SosId": 29
-            },
-            {
-              "Value": 30,
-              "SosId": 30
-            },
-            {
-              "Value": 31,
-              "SosId": 31
-            },
-            {
-              "Value": 32,
-              "SosId": 32
-            },
-            {
-              "Value": 33,
-              "SosId": 33
-            },
-            {
-              "Value": 34,
-              "SosId": 34
-            },
-            {
-              "Value": 35,
-              "SosId": 35
-            },
-            {
-              "Value": 36,
-              "SosId": 36
-            },
-            {
-              "Value": 37,
-              "SosId": 37
-            },
-            {
-              "Value": 38,
-              "SosId": 38
-            },
-            {
-              "Value": 39,
-              "SosId": 39
-            },
-            {
-              "Value": 40,
-              "SosId": 40
-            },
-            {
-              "Value": 41,
-              "SosId": 41
-            },
-            {
-              "Value": 42,
-              "SosId": 42
-            },
-            {
-              "Value": 43,
-              "SosId": 43
-            },
-            {
-              "Value": 44,
-              "SosId": 44
-            },
-            {
-              "Value": 45,
-              "SosId": 45
-            },
-            {
-              "Value": 46,
-              "SosId": 46
-            },
-            {
-              "Value": 47,
-              "SosId": 47
-            },
-            {
-              "Value": 48,
-              "SosId": 48
-            },
-            {
-              "Value": 49,
-              "SosId": 49
-            },
-            {
-              "Value": 50,
-              "SosId": 50
-            },
-            {
-              "Value": 51,
-              "SosId": 51
-            },
-            {
-              "Value": 52,
-              "SosId": 52
-            },
-            {
-              "Value": 53,
-              "SosId": 53
-            },
-            {
-              "Value": 54,
-              "SosId": 54
-            },
-            {
-              "Value": 55,
-              "SosId": 55
-            },
-            {
-              "Value": 56,
-              "SosId": 56
-            },
-            {
-              "Value": 57,
-              "SosId": 57
-            },
-            {
-              "Value": 58,
-              "SosId": 58
-            },
-            {
-              "Value": 59,
-              "SosId": 59
-            },
-            {
-              "Value": 60,
-              "SosId": 60
-            },
-            {
-              "Value": 61,
-              "SosId": 61
-            },
-            {
-              "Value": 62,
-              "SosId": 62
-            },
-            {
-              "Value": 63,
-              "SosId": 63
-            },
-            {
-              "Value": 64,
-              "SosId": 64
-            },
-            {
-              "Value": 65,
-              "SosId": 65
-            },
-            {
-              "Value": 66,
-              "SosId": 66
-            },
-            {
-              "Value": 67,
-              "SosId": 67
-            },
-            {
-              "Value": 68,
-              "SosId": 68
-            },
-            {
-              "Value": 69,
-              "SosId": 69
-            },
-            {
-              "Value": 70,
-              "SosId": 70
-            },
-            {
-              "Value": 71,
-              "SosId": 71
-            },
-            {
-              "Value": 72,
-              "SosId": 72
-            },
-            {
-              "Value": 73,
-              "SosId": 73
-            },
-            {
-              "Value": 74,
-              "SosId": 74
-            },
-            {
-              "Value": 75,
-              "SosId": 75
-            },
-            {
-              "Value": 76,
-              "SosId": 76
-            },
-            {
-              "Value": 77,
-              "SosId": 77
-            },
-            {
-              "Value": 78,
-              "SosId": 78
-            },
-            {
-              "Value": 79,
-              "SosId": 79
-            },
-            {
-              "Value": 80,
-              "SosId": 80
-            },
-            {
-              "Value": 81,
-              "SosId": 81
-            },
-            {
-              "Value": 82,
-              "SosId": 82
-            },
-            {
-              "Value": 83,
-              "SosId": 83
-            },
-            {
-              "Value": 84,
-              "SosId": 84
-            },
-            {
-              "Value": 85,
-              "SosId": 85
-            },
-            {
-              "Value": 86,
-              "SosId": 86
-            },
-            {
-              "Value": 87,
-              "SosId": 87
-            },
-            {
-              "Value": 88,
-              "SosId": 88
-            },
-            {
-              "Value": 89,
-              "SosId": 89
-            },
-            {
-              "Value": 90,
-              "SosId": 90
-            },
-            {
-              "Value": 91,
-              "SosId": 91
-            },
-            {
-              "Value": 92,
-              "SosId": 92
-            },
-            {
-              "Value": 93,
-              "SosId": 93
-            },
-            {
-              "Value": 94,
-              "SosId": 94
-            },
-            {
-              "Value": 95,
-              "SosId": 95
-            },
-            {
-              "Value": 96,
-              "SosId": 96
-            },
-            {
-              "Value": 97,
-              "SosId": 97
-            },
-            {
-              "Value": 98,
-              "SosId": 98
-            },
-            {
-              "Value": 99,
-              "SosId": 99
-            },
-            {
-              "Value": 100,
-              "SosId": 100
-            },
-            {
-              "Value": 101,
-              "SosId": 101
-            },
-            {
-              "Value": 102,
-              "SosId": 102
-            },
-            {
-              "Value": 103,
-              "SosId": 103
-            },
-            {
-              "Value": 104,
-              "SosId": 104
-            },
-            {
-              "Value": 105,
-              "SosId": 105
-            },
-            {
-              "Value": 106,
-              "SosId": 106
-            },
-            {
-              "Value": 107,
-              "SosId": 107
-            },
-            {
-              "Value": 108,
-              "SosId": 108
-            },
-            {
-              "Value": 109,
-              "SosId": 109
-            },
-            {
-              "Value": 110,
-              "SosId": 110
-            },
-            {
-              "Value": 111,
-              "SosId": 111
-            },
-            {
-              "Value": 112,
-              "SosId": 112
-            },
-            {
-              "Value": 113,
-              "SosId": 113
-            },
-            {
-              "Value": 114,
-              "SosId": 114
-            },
-            {
-              "Value": 115,
-              "SosId": 115
-            },
-            {
-              "Value": 116,
-              "SosId": 116
-            },
-            {
-              "Value": 117,
-              "SosId": 117
-            }
-          ]
-        }
-      ]
-    }
-  ]
+    "Id": 8,
+    "Name": "Substrate",
+    "Localized": true,
+    "Values": [
+        {
+            "Id": 1,
+            "Value": "Ground/bottom",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Mark/botten"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Ground/bottom"
+                }
+            ]
+        },
+        {
+            "Id": 2,
+            "Value": "Stone/rock on land",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Sten/berg på land"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Stone/rock on land"
+                }
+            ]
+        },
+        {
+            "Id": 3,
+            "Value": "Acidic rock",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Sur bergart"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Acidic rock"
+                }
+            ]
+        },
+        {
+            "Id": 4,
+            "Value": "Granite",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Granit"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Granite"
+                }
+            ]
+        },
+        {
+            "Id": 5,
+            "Value": "Pegmatite",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Pegmatit"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Pegmatite"
+                }
+            ]
+        },
+        {
+            "Id": 6,
+            "Value": "Porphyry",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Porfyr"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Porphyry"
+                }
+            ]
+        },
+        {
+            "Id": 7,
+            "Value": "Quartzite",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Kvartsit"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Quartzite"
+                }
+            ]
+        },
+        {
+            "Id": 8,
+            "Value": "Mica slate",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Glimmerskiffer"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Mica slate"
+                }
+            ]
+        },
+        {
+            "Id": 9,
+            "Value": "Gneiss",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Gnejs"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Gneiss"
+                }
+            ]
+        },
+        {
+            "Id": 10,
+            "Value": "Sandstone",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Sandsten"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Sandstone"
+                }
+            ]
+        },
+        {
+            "Id": 11,
+            "Value": "Basic rock",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Basisk bergart (grönsten)"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Basic rock"
+                }
+            ]
+        },
+        {
+            "Id": 12,
+            "Value": "Basalt",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Basalt"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Basalt"
+                }
+            ]
+        },
+        {
+            "Id": 13,
+            "Value": "Gabbro",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Gabbro"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Gabbro"
+                }
+            ]
+        },
+        {
+            "Id": 14,
+            "Value": "Diabase",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Diabas"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Diabase"
+                }
+            ]
+        },
+        {
+            "Id": 15,
+            "Value": "Hyperit",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Hyperit"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Hyperit"
+                }
+            ]
+        },
+        {
+            "Id": 16,
+            "Value": "Diorite",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Diorit"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Diorite"
+                }
+            ]
+        },
+        {
+            "Id": 17,
+            "Value": "Amphibolite",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Amfibolit"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Amphibolite"
+                }
+            ]
+        },
+        {
+            "Id": 18,
+            "Value": "Limestone",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Kalksten"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Limestone"
+                }
+            ]
+        },
+        {
+            "Id": 19,
+            "Value": "Hard bottom",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Hårdbotten"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Hard bottom"
+                }
+            ]
+        },
+        {
+            "Id": 20,
+            "Value": "Ground/soil on land",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Mark/jord på land"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Ground/soil on land"
+                }
+            ]
+        },
+        {
+            "Id": 21,
+            "Value": "Mineral soil",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Mineraljord"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Mineral soil"
+                }
+            ]
+        },
+        {
+            "Id": 22,
+            "Value": "Moraine",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Morän"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Moraine"
+                }
+            ]
+        },
+        {
+            "Id": 23,
+            "Value": "Rock (> 200 mm)",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Block (> 200 mm)"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Rock (> 200 mm)"
+                }
+            ]
+        },
+        {
+            "Id": 24,
+            "Value": "Stone (60 - 200 mm)",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Sten (60 - 200 mm)"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Stone (60 - 200 mm)"
+                }
+            ]
+        },
+        {
+            "Id": 25,
+            "Value": "Gravel (2-60 mm)",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Grus (2-60 mm)"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Gravel (2-60 mm)"
+                }
+            ]
+        },
+        {
+            "Id": 26,
+            "Value": "Sand (0,06-2 mm)",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Sand (0,06-2 mm)"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Sand (0,06-2 mm)"
+                }
+            ]
+        },
+        {
+            "Id": 27,
+            "Value": "Fine sand/Silt (0,002-0,06 mm)",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Silt/mo/mjäla (0,002-0,06 mm)"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Fine sand/Silt (0,002-0,06 mm)"
+                }
+            ]
+        },
+        {
+            "Id": 28,
+            "Value": "Clay (< 0,002 mm)",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Lera (< 0,002 mm)"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Clay (< 0,002 mm)"
+                }
+            ]
+        },
+        {
+            "Id": 29,
+            "Value": "Organogen soil",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Organogen jord"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Organogen soil"
+                }
+            ]
+        },
+        {
+            "Id": 30,
+            "Value": "Humus",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Humus"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Humus"
+                }
+            ]
+        },
+        {
+            "Id": 31,
+            "Value": "Peloid",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Dy"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Peloid"
+                }
+            ]
+        },
+        {
+            "Id": 32,
+            "Value": "Mull",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Mull"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Mull"
+                }
+            ]
+        },
+        {
+            "Id": 33,
+            "Value": "Mud",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Gyttja"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Mud"
+                }
+            ]
+        },
+        {
+            "Id": 34,
+            "Value": "Peat",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Torv"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Peat"
+                }
+            ]
+        },
+        {
+            "Id": 35,
+            "Value": "Litter",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Förna"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Litter"
+                }
+            ]
+        },
+        {
+            "Id": 36,
+            "Value": "Seaweed Wall",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Tångvall eller annan driftrand"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Seaweed Wall"
+                }
+            ]
+        },
+        {
+            "Id": 37,
+            "Value": "Shell gravel",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Skalgrus"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Shell gravel"
+                }
+            ]
+        },
+        {
+            "Id": 38,
+            "Value": "Soft bottom",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Mjukbotten"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Soft bottom"
+                }
+            ]
+        },
+        {
+            "Id": 39,
+            "Value": "Inorganic substrate",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Oorganiskt bottenmaterial"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Inorganic substrate"
+                }
+            ]
+        },
+        {
+            "Id": 40,
+            "Value": "Rock on bottom (> 200 mm)",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Block på botten (> 200 mm)"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Rock on bottom (> 200 mm)"
+                }
+            ]
+        },
+        {
+            "Id": 41,
+            "Value": "Stone on bottom (60 - 200 mm)",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Sten på botten (60 - 200 mm)"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Stone on bottom (60 - 200 mm)"
+                }
+            ]
+        },
+        {
+            "Id": 42,
+            "Value": "Gravel on bottom (2-60 mm)",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Grus på botten (2-60 mm)"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Gravel on bottom (2-60 mm)"
+                }
+            ]
+        },
+        {
+            "Id": 43,
+            "Value": "Sand on bottom (0,06-2 mm)",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Sand på botten (0,06-2 mm)"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Sand on bottom (0,06-2 mm)"
+                }
+            ]
+        },
+        {
+            "Id": 44,
+            "Value": "Fine sediment on bottom",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Finsediment på botten "
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Fine sediment on bottom"
+                }
+            ]
+        },
+        {
+            "Id": 45,
+            "Value": "Organic material on bottom",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Organiskt material på botten"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Organic material on bottom"
+                }
+            ]
+        },
+        {
+            "Id": 46,
+            "Value": "Fine detritus",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Findetritus på botten"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Fine detritus"
+                }
+            ]
+        },
+        {
+            "Id": 47,
+            "Value": "Coarse detritus",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Grovdetritus på botten"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Coarse detritus"
+                }
+            ]
+        },
+        {
+            "Id": 48,
+            "Value": "Organisms as a substrate",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Organismer som substrat"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Organisms as a substrate"
+                }
+            ]
+        },
+        {
+            "Id": 49,
+            "Value": "Fungi, fruit bodies, etc.",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Svamp, fruktkropp mm"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Fungi, fruit bodies, etc."
+                }
+            ]
+        },
+        {
+            "Id": 50,
+            "Value": "Plant",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Växt"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Plant"
+                }
+            ]
+        },
+        {
+            "Id": 51,
+            "Value": "Herb/grass",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Ört/gräs"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Herb/grass"
+                }
+            ]
+        },
+        {
+            "Id": 52,
+            "Value": "Living part of  herb/grass",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Levande del av ört/gräs"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Living part of  herb/grass"
+                }
+            ]
+        },
+        {
+            "Id": 53,
+            "Value": "Flower on living herb/grass",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Blomma på levande ört"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Flower on living herb/grass"
+                }
+            ]
+        },
+        {
+            "Id": 54,
+            "Value": "Fruit on living herb/grass",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Frukt"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Fruit on living herb/grass"
+                }
+            ]
+        },
+        {
+            "Id": 55,
+            "Value": "Seed on living herb/grass",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Frö från ört/gräs"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Seed on living herb/grass"
+                }
+            ]
+        },
+        {
+            "Id": 56,
+            "Value": "Leaf on living herb/grass",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Blad"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Leaf on living herb/grass"
+                }
+            ]
+        },
+        {
+            "Id": 57,
+            "Value": "Bud on living herb/grass",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Knopp från ört/gräs"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Bud on living herb/grass"
+                }
+            ]
+        },
+        {
+            "Id": 58,
+            "Value": "Stem/straw on living herb/grass",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Stjälk/strå"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Stem/straw on living herb/grass"
+                }
+            ]
+        },
+        {
+            "Id": 59,
+            "Value": "Root of living herb/grass",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Rot av ört/gräs"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Root of living herb/grass"
+                }
+            ]
+        },
+        {
+            "Id": 60,
+            "Value": "Dead part of  herb/grass",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Död delar av ört/gräs"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Dead part of  herb/grass"
+                }
+            ]
+        },
+        {
+            "Id": 61,
+            "Value": "Woody plant",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Vedartad växt"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Woody plant"
+                }
+            ]
+        },
+        {
+            "Id": 62,
+            "Value": "Living woody plant",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Levande vedartad växt"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Living woody plant"
+                }
+            ]
+        },
+        {
+            "Id": 63,
+            "Value": "Flower on living woody plant",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Blomma på levande träd/buske"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Flower on living woody plant"
+                }
+            ]
+        },
+        {
+            "Id": 64,
+            "Value": "Seed on living woody plant",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Frö från träd/buske"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Seed on living woody plant"
+                }
+            ]
+        },
+        {
+            "Id": 65,
+            "Value": "Cone on living woody plant",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Kotte"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Cone on living woody plant"
+                }
+            ]
+        },
+        {
+            "Id": 66,
+            "Value": "Needle/Leaf on living woody plant",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Barr/blad"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Needle/Leaf on living woody plant"
+                }
+            ]
+        },
+        {
+            "Id": 67,
+            "Value": "Bark on living woody plant",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Bark på levande träd"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Bark on living woody plant"
+                }
+            ]
+        },
+        {
+            "Id": 68,
+            "Value": "Cambium on living woody plant",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Kambium på levande träd"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Cambium on living woody plant"
+                }
+            ]
+        },
+        {
+            "Id": 69,
+            "Value": "Inside living wood",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Inuti levande ved"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Inside living wood"
+                }
+            ]
+        },
+        {
+            "Id": 70,
+            "Value": "Bud on living woody plant",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Knopp från träd/buske"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Bud on living woody plant"
+                }
+            ]
+        },
+        {
+            "Id": 71,
+            "Value": "Branch on living tree",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Gren på levande träd"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Branch on living tree"
+                }
+            ]
+        },
+        {
+            "Id": 72,
+            "Value": "Stem on living tree",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Trädstam på levande träd"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Stem on living tree"
+                }
+            ]
+        },
+        {
+            "Id": 73,
+            "Value": "Tree base",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Trädbas"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Tree base"
+                }
+            ]
+        },
+        {
+            "Id": 74,
+            "Value": "Tree root",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Trädrot"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Tree root"
+                }
+            ]
+        },
+        {
+            "Id": 75,
+            "Value": "Cavity in living tree ",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Hålighet i levande träd med/utan mulm"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Cavity in living tree "
+                }
+            ]
+        },
+        {
+            "Id": 76,
+            "Value": "Sap flow",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Savflöde"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Sap flow"
+                }
+            ]
+        },
+        {
+            "Id": 77,
+            "Value": "Fire affected living tree",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Brandpåverkad levande träd"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Fire affected living tree"
+                }
+            ]
+        },
+        {
+            "Id": 78,
+            "Value": "Dead wood",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Död ved  vedartad växt"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Dead wood"
+                }
+            ]
+        },
+        {
+            "Id": 79,
+            "Value": "Bark of dead wood",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Bark på dött träd"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Bark of dead wood"
+                }
+            ]
+        },
+        {
+            "Id": 80,
+            "Value": "Under bark of dead wood",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Under bark på död ved"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Under bark of dead wood"
+                }
+            ]
+        },
+        {
+            "Id": 81,
+            "Value": "Wood surface of dead wood",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Vedyta på död ved"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Wood surface of dead wood"
+                }
+            ]
+        },
+        {
+            "Id": 82,
+            "Value": "Inside dead wood",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Inuti död ved"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Inside dead wood"
+                }
+            ]
+        },
+        {
+            "Id": 83,
+            "Value": "Dead branch ",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Död gren"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Dead branch "
+                }
+            ]
+        },
+        {
+            "Id": 84,
+            "Value": "Dead tree stem",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Död trädstam"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Dead tree stem"
+                }
+            ]
+        },
+        {
+            "Id": 85,
+            "Value": "Standing dead tree/snags",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Stående död trädstam/högstubbe"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Standing dead tree/snags"
+                }
+            ]
+        },
+        {
+            "Id": 86,
+            "Value": "Horizontal, dead without ground contact",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Liggande död trädstam, utan markontakt"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Horizontal, dead without ground contact"
+                }
+            ]
+        },
+        {
+            "Id": 87,
+            "Value": "Horizontal, dead with ground contact",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Liggande död trädstam, markontakt"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Horizontal, dead with ground contact"
+                }
+            ]
+        },
+        {
+            "Id": 88,
+            "Value": "Cavity in dead tree",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Hålighet i dött träd med/utan mulm"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Cavity in dead tree"
+                }
+            ]
+        },
+        {
+            "Id": 89,
+            "Value": "Stump",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Stubbe"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Stump"
+                }
+            ]
+        },
+        {
+            "Id": 90,
+            "Value": "Fire killed tree",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Branddödat träd"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Fire killed tree"
+                }
+            ]
+        },
+        {
+            "Id": 91,
+            "Value": "Wood under water",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Ved under vatten "
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Wood under water"
+                }
+            ]
+        },
+        {
+            "Id": 92,
+            "Value": "Animal",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Djur"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Animal"
+                }
+            ]
+        },
+        {
+            "Id": 93,
+            "Value": "Living animal",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Levande djur"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Living animal"
+                }
+            ]
+        },
+        {
+            "Id": 94,
+            "Value": "Adult animal",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Vuxet djur"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Adult animal"
+                }
+            ]
+        },
+        {
+            "Id": 95,
+            "Value": "Pupa",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Puppa"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Pupa"
+                }
+            ]
+        },
+        {
+            "Id": 96,
+            "Value": "Larvae",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Larv"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Larvae"
+                }
+            ]
+        },
+        {
+            "Id": 97,
+            "Value": "Egg",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Ägg"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Egg"
+                }
+            ]
+        },
+        {
+            "Id": 98,
+            "Value": "Body part of living animal",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Kroppsdel hos levande djur"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Body part of living animal"
+                }
+            ]
+        },
+        {
+            "Id": 99,
+            "Value": "Hair, fur, scale or feather",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Hår, päls, fjäll eller fjädrar"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Hair, fur, scale or feather"
+                }
+            ]
+        },
+        {
+            "Id": 100,
+            "Value": "Skin/shell",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Hud, skal"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Skin/shell"
+                }
+            ]
+        },
+        {
+            "Id": 101,
+            "Value": "Dead animal, carcass",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Dött djur, kadaver"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Dead animal, carcass"
+                }
+            ]
+        },
+        {
+            "Id": 102,
+            "Value": "After leaving from animals",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Efterlämning av djur"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "After leaving from animals"
+                }
+            ]
+        },
+        {
+            "Id": 103,
+            "Value": "Exposed nest",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Friliggande bo"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Exposed nest"
+                }
+            ]
+        },
+        {
+            "Id": 104,
+            "Value": "Dug nest in the ground",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Grävt bo i marken"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Dug nest in the ground"
+                }
+            ]
+        },
+        {
+            "Id": 105,
+            "Value": "Gallery in wood",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Gång I ved"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Gallery in wood"
+                }
+            ]
+        },
+        {
+            "Id": 106,
+            "Value": "Gall",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Gallbildning"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Gall"
+                }
+            ]
+        },
+        {
+            "Id": 107,
+            "Value": "Dropping",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Spillning"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Dropping"
+                }
+            ]
+        },
+        {
+            "Id": 108,
+            "Value": "Man-made substrate",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Människoskapat substrat"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Man-made substrate"
+                }
+            ]
+        },
+        {
+            "Id": 109,
+            "Value": "Post/wooden fences etc.",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Stolpe, trägärdesgård mm"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Post/wooden fences etc."
+                }
+            ]
+        },
+        {
+            "Id": 110,
+            "Value": "Stone wall/cairn",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Stenmur och -röse"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Stone wall/cairn"
+                }
+            ]
+        },
+        {
+            "Id": 111,
+            "Value": "Bridge",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Bro"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Bridge"
+                }
+            ]
+        },
+        {
+            "Id": 112,
+            "Value": "Jetty",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Brygga/pir"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Jetty"
+                }
+            ]
+        },
+        {
+            "Id": 113,
+            "Value": "Roof tops",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Hustak"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Roof tops"
+                }
+            ]
+        },
+        {
+            "Id": 114,
+            "Value": "House wall",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Husvägg"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "House wall"
+                }
+            ]
+        },
+        {
+            "Id": 115,
+            "Value": "Manure",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Gödselstack"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Manure"
+                }
+            ]
+        },
+        {
+            "Id": 116,
+            "Value": "Compost",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Kompost"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Compost"
+                }
+            ]
+        },
+        {
+            "Id": 117,
+            "Value": "Sawdust",
+            "Localized": true,
+            "Translations": [
+                {
+                    "CultureCode": "sv-SE",
+                    "Value": "Sågspån"
+                },
+                {
+                    "CultureCode": "en-GB",
+                    "Value": "Sawdust"
+                }
+            ]
+        }
+    ],
+    "ExternalSystemsMapping": [
+        {
+            "Id": 0,
+            "Name": "Artportalen",
+            "Mappings": [
+                {
+                    "Key": "Id",
+                    "Description": "Id field mapping",
+                    "Values": [
+                        {
+                            "Value": 1,
+                            "SosId": 1
+                        },
+                        {
+                            "Value": 2,
+                            "SosId": 2
+                        },
+                        {
+                            "Value": 3,
+                            "SosId": 3
+                        },
+                        {
+                            "Value": 4,
+                            "SosId": 4
+                        },
+                        {
+                            "Value": 5,
+                            "SosId": 5
+                        },
+                        {
+                            "Value": 6,
+                            "SosId": 6
+                        },
+                        {
+                            "Value": 7,
+                            "SosId": 7
+                        },
+                        {
+                            "Value": 8,
+                            "SosId": 8
+                        },
+                        {
+                            "Value": 9,
+                            "SosId": 9
+                        },
+                        {
+                            "Value": 10,
+                            "SosId": 10
+                        },
+                        {
+                            "Value": 11,
+                            "SosId": 11
+                        },
+                        {
+                            "Value": 12,
+                            "SosId": 12
+                        },
+                        {
+                            "Value": 13,
+                            "SosId": 13
+                        },
+                        {
+                            "Value": 14,
+                            "SosId": 14
+                        },
+                        {
+                            "Value": 15,
+                            "SosId": 15
+                        },
+                        {
+                            "Value": 16,
+                            "SosId": 16
+                        },
+                        {
+                            "Value": 17,
+                            "SosId": 17
+                        },
+                        {
+                            "Value": 18,
+                            "SosId": 18
+                        },
+                        {
+                            "Value": 19,
+                            "SosId": 19
+                        },
+                        {
+                            "Value": 20,
+                            "SosId": 20
+                        },
+                        {
+                            "Value": 21,
+                            "SosId": 21
+                        },
+                        {
+                            "Value": 22,
+                            "SosId": 22
+                        },
+                        {
+                            "Value": 23,
+                            "SosId": 23
+                        },
+                        {
+                            "Value": 24,
+                            "SosId": 24
+                        },
+                        {
+                            "Value": 25,
+                            "SosId": 25
+                        },
+                        {
+                            "Value": 26,
+                            "SosId": 26
+                        },
+                        {
+                            "Value": 27,
+                            "SosId": 27
+                        },
+                        {
+                            "Value": 28,
+                            "SosId": 28
+                        },
+                        {
+                            "Value": 29,
+                            "SosId": 29
+                        },
+                        {
+                            "Value": 30,
+                            "SosId": 30
+                        },
+                        {
+                            "Value": 31,
+                            "SosId": 31
+                        },
+                        {
+                            "Value": 32,
+                            "SosId": 32
+                        },
+                        {
+                            "Value": 33,
+                            "SosId": 33
+                        },
+                        {
+                            "Value": 34,
+                            "SosId": 34
+                        },
+                        {
+                            "Value": 35,
+                            "SosId": 35
+                        },
+                        {
+                            "Value": 36,
+                            "SosId": 36
+                        },
+                        {
+                            "Value": 37,
+                            "SosId": 37
+                        },
+                        {
+                            "Value": 38,
+                            "SosId": 38
+                        },
+                        {
+                            "Value": 39,
+                            "SosId": 39
+                        },
+                        {
+                            "Value": 40,
+                            "SosId": 40
+                        },
+                        {
+                            "Value": 41,
+                            "SosId": 41
+                        },
+                        {
+                            "Value": 42,
+                            "SosId": 42
+                        },
+                        {
+                            "Value": 43,
+                            "SosId": 43
+                        },
+                        {
+                            "Value": 44,
+                            "SosId": 44
+                        },
+                        {
+                            "Value": 45,
+                            "SosId": 45
+                        },
+                        {
+                            "Value": 46,
+                            "SosId": 46
+                        },
+                        {
+                            "Value": 47,
+                            "SosId": 47
+                        },
+                        {
+                            "Value": 48,
+                            "SosId": 48
+                        },
+                        {
+                            "Value": 49,
+                            "SosId": 49
+                        },
+                        {
+                            "Value": 50,
+                            "SosId": 50
+                        },
+                        {
+                            "Value": 51,
+                            "SosId": 51
+                        },
+                        {
+                            "Value": 52,
+                            "SosId": 52
+                        },
+                        {
+                            "Value": 53,
+                            "SosId": 53
+                        },
+                        {
+                            "Value": 54,
+                            "SosId": 54
+                        },
+                        {
+                            "Value": 55,
+                            "SosId": 55
+                        },
+                        {
+                            "Value": 56,
+                            "SosId": 56
+                        },
+                        {
+                            "Value": 57,
+                            "SosId": 57
+                        },
+                        {
+                            "Value": 58,
+                            "SosId": 58
+                        },
+                        {
+                            "Value": 59,
+                            "SosId": 59
+                        },
+                        {
+                            "Value": 60,
+                            "SosId": 60
+                        },
+                        {
+                            "Value": 61,
+                            "SosId": 61
+                        },
+                        {
+                            "Value": 62,
+                            "SosId": 62
+                        },
+                        {
+                            "Value": 63,
+                            "SosId": 63
+                        },
+                        {
+                            "Value": 64,
+                            "SosId": 64
+                        },
+                        {
+                            "Value": 65,
+                            "SosId": 65
+                        },
+                        {
+                            "Value": 66,
+                            "SosId": 66
+                        },
+                        {
+                            "Value": 67,
+                            "SosId": 67
+                        },
+                        {
+                            "Value": 68,
+                            "SosId": 68
+                        },
+                        {
+                            "Value": 69,
+                            "SosId": 69
+                        },
+                        {
+                            "Value": 70,
+                            "SosId": 70
+                        },
+                        {
+                            "Value": 71,
+                            "SosId": 71
+                        },
+                        {
+                            "Value": 72,
+                            "SosId": 72
+                        },
+                        {
+                            "Value": 73,
+                            "SosId": 73
+                        },
+                        {
+                            "Value": 74,
+                            "SosId": 74
+                        },
+                        {
+                            "Value": 75,
+                            "SosId": 75
+                        },
+                        {
+                            "Value": 76,
+                            "SosId": 76
+                        },
+                        {
+                            "Value": 77,
+                            "SosId": 77
+                        },
+                        {
+                            "Value": 78,
+                            "SosId": 78
+                        },
+                        {
+                            "Value": 79,
+                            "SosId": 79
+                        },
+                        {
+                            "Value": 80,
+                            "SosId": 80
+                        },
+                        {
+                            "Value": 81,
+                            "SosId": 81
+                        },
+                        {
+                            "Value": 82,
+                            "SosId": 82
+                        },
+                        {
+                            "Value": 83,
+                            "SosId": 83
+                        },
+                        {
+                            "Value": 84,
+                            "SosId": 84
+                        },
+                        {
+                            "Value": 85,
+                            "SosId": 85
+                        },
+                        {
+                            "Value": 86,
+                            "SosId": 86
+                        },
+                        {
+                            "Value": 87,
+                            "SosId": 87
+                        },
+                        {
+                            "Value": 88,
+                            "SosId": 88
+                        },
+                        {
+                            "Value": 89,
+                            "SosId": 89
+                        },
+                        {
+                            "Value": 90,
+                            "SosId": 90
+                        },
+                        {
+                            "Value": 91,
+                            "SosId": 91
+                        },
+                        {
+                            "Value": 92,
+                            "SosId": 92
+                        },
+                        {
+                            "Value": 93,
+                            "SosId": 93
+                        },
+                        {
+                            "Value": 94,
+                            "SosId": 94
+                        },
+                        {
+                            "Value": 95,
+                            "SosId": 95
+                        },
+                        {
+                            "Value": 96,
+                            "SosId": 96
+                        },
+                        {
+                            "Value": 97,
+                            "SosId": 97
+                        },
+                        {
+                            "Value": 98,
+                            "SosId": 98
+                        },
+                        {
+                            "Value": 99,
+                            "SosId": 99
+                        },
+                        {
+                            "Value": 100,
+                            "SosId": 100
+                        },
+                        {
+                            "Value": 101,
+                            "SosId": 101
+                        },
+                        {
+                            "Value": 102,
+                            "SosId": 102
+                        },
+                        {
+                            "Value": 103,
+                            "SosId": 103
+                        },
+                        {
+                            "Value": 104,
+                            "SosId": 104
+                        },
+                        {
+                            "Value": 105,
+                            "SosId": 105
+                        },
+                        {
+                            "Value": 106,
+                            "SosId": 106
+                        },
+                        {
+                            "Value": 107,
+                            "SosId": 107
+                        },
+                        {
+                            "Value": 108,
+                            "SosId": 108
+                        },
+                        {
+                            "Value": 109,
+                            "SosId": 109
+                        },
+                        {
+                            "Value": 110,
+                            "SosId": 110
+                        },
+                        {
+                            "Value": 111,
+                            "SosId": 111
+                        },
+                        {
+                            "Value": 112,
+                            "SosId": 112
+                        },
+                        {
+                            "Value": 113,
+                            "SosId": 113
+                        },
+                        {
+                            "Value": 114,
+                            "SosId": 114
+                        },
+                        {
+                            "Value": 115,
+                            "SosId": 115
+                        },
+                        {
+                            "Value": 116,
+                            "SosId": 116
+                        },
+                        {
+                            "Value": 117,
+                            "SosId": 117
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
 }

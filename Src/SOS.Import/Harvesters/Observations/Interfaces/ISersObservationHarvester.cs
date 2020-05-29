@@ -7,7 +7,7 @@ namespace SOS.Import.Harvesters.Observations.Interfaces
     public interface ISersObservationHarvester
     {
         /// <summary>
-        /// Harvest Observations
+        ///     Harvest Observations
         /// </summary>
         /// <returns></returns>
         Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken);
