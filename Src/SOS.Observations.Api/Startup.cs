@@ -116,11 +116,25 @@ namespace SOS.Observations.Api
                             Version = "v1",
                             Description = "Search sightings"
                         });
-                    // Set the comments path for the Swagger JSON and UI.
-                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                    var currentAssembly = Assembly.GetExecutingAssembly();
+                    var xmlDocs = currentAssembly.GetReferencedAssemblies()
+                        .Union(new AssemblyName[] { currentAssembly.GetName() })
+                        .Select(a => Path.Combine(Path.GetDirectoryName(currentAssembly.Location), $"{a.Name}.xml"))
+                        .Where(f => File.Exists(f)).ToArray();
 
-                    options.IncludeXmlComments(xmlPath);
+                    Array.ForEach(xmlDocs, (d) =>
+                    {
+                        options.IncludeXmlComments(d);
+                    });
+
+                    // Set the comments path for the Swagger JSON and UI.
+                    //   var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    // var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+                  //  options.IncludeXmlComments(Path.Combine(
+                   //     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $"{this.GetType().Assembly.GetName().Name}.xml"
+                   // ));
+                   // options.IncludeXmlComments(xmlPath);
 
                     options.SchemaFilter<SwaggerIgnoreFilter>();
                 });
