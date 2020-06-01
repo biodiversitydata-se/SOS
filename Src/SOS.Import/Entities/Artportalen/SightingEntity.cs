@@ -15,12 +15,12 @@ namespace SOS.Import.Entities.Artportalen
         /// <summary>
         ///     Id of biotope
         /// </summary>
-        public int? BiptopeId { get; set; }
+        public int? BiotopeId { get; set; }
 
         /// <summary>
         ///     Description of biotope
         /// </summary>
-        public string BiptopeDescription { get; set; }
+        public string BiotopeDescription { get; set; }
 
         /// <summary>
         ///     Id of collection
@@ -36,6 +36,11 @@ namespace SOS.Import.Entities.Artportalen
         ///     Id of controlling organisation
         /// </summary>
         public int? ControlingOrganisationId { get; set; }
+
+        /// <summary>
+        ///     Id of DiscoveryMethod
+        /// </summary>
+        public int? DiscoveryMethodId { get; set; }
 
         /// <summary>
         ///     Sigthing end data
@@ -151,6 +156,11 @@ namespace SOS.Import.Entities.Artportalen
         ///     Id of site
         /// </summary>
         public int? SiteId { get; set; }
+
+        /// <summary>
+        ///     Id of SightingSpeciesCollectionItem
+        /// </summary>
+        public int? SightingSpeciesCollectionItemId { get; set; }
 
         /// <summary>
         ///     Taxon stage id

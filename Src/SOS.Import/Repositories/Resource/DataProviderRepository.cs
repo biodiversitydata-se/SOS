@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -36,6 +38,12 @@ namespace SOS.Import.Repositories.Resource
                 Logger.LogError(e.ToString());
                 return false;
             }
+        }
+
+        public override async Task<List<DataProvider>> GetAllAsync()
+        {
+            var allDataProviders = await base.GetAllAsync();
+            return allDataProviders.OrderBy(provider => provider.Id).ToList();
         }
     }
 }

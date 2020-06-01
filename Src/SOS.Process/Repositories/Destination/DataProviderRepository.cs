@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -24,6 +26,12 @@ namespace SOS.Process.Repositories.Destination
             ILogger<DataProviderRepository> logger)
             : base(client, false, logger)
         {
+        }
+
+        public override async Task<List<DataProvider>> GetAllAsync()
+        {
+            var allDataProviders = await base.GetAllAsync();
+            return allDataProviders.OrderBy(provider => provider.Id).ToList();
         }
 
         public async Task<bool> UpdateProcessInfo(int dataProviderId, string collectionName, ProviderInfo providerInfo)

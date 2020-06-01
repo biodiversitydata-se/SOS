@@ -76,6 +76,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public string CatalogNumber { get; set; }
 
         /// <summary>
+        ///    Id of DiscoveryMethod from Artportalen
+        /// </summary>
+        public int? DiscoveryMethodId { get; set; }
+
+        /// <summary>
         ///     The current state of a specimen with respect to the
         ///     collection identified in collectionCode or collectionID.
         ///     Recommended best practice is to use a controlled vocabulary.

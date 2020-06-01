@@ -18,7 +18,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// <summary>
         ///     Biotope
         /// </summary>
-        public Metadata Bioptope { get; set; }
+        public Metadata Biotope { get; set; }
 
         /// <summary>
         ///     Description of bioptpe
@@ -34,6 +34,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         ///     SightingCommentPublic comment
         /// </summary>
         public string Comment { get; set; }
+
+        /// <summary>
+        ///     Id of DiscoveryMethod
+        /// </summary>
+        public int? DiscoveryMethodId { get; set; }
 
         /// <summary>
         ///     Sigthing end data
@@ -149,6 +154,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         ///     Id of site
         /// </summary>
         public Site Site { get; set; }
+
+        /// <summary>
+        ///     Id of SightingSpeciesCollectionItem
+        /// </summary>
+        public int? SightingSpeciesCollectionItemId { get; set; }
 
         /// <summary>
         ///     Taxon stage id

@@ -77,7 +77,7 @@ namespace SOS.Lib.Models.Processed.ProcessInfo
         ///     Id of data provider
         /// </summary>
         [BsonRepresentation(BsonType.String)]
-        public DataProviderType DataProviderType { get; }
+        public DataProviderType DataProviderType { get; private set; }
 
         /// <summary>
         ///     Provider information about meta data

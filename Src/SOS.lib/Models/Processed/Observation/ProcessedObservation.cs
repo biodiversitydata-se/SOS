@@ -136,6 +136,12 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public string CollectionId { get; set; }
 
+
+        /// <summary>
+        ///     Id of SightingSpeciesCollectionItem in Artportalen.
+        /// </summary>
+        public int? SightingSpeciesCollectionItemId { get; set; }
+
         /// <summary>
         ///     Actions taken to make the shared data less specific or
         ///     complete than in its original form.

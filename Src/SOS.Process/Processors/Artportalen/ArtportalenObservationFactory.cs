@@ -102,6 +102,7 @@ namespace SOS.Process.Processors.Artportalen
                     ? "Artportalen"
                     : verbatimObservation.SpeciesCollection,
                 CollectionId = verbatimObservation.CollectionID,
+                SightingSpeciesCollectionItemId = verbatimObservation.SightingSpeciesCollectionItemId,
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}",
                 DatasetName = "Artportalen",
                 Event = new ProcessedEvent
@@ -158,6 +159,7 @@ namespace SOS.Process.Processors.Artportalen
                     AssociatedReferences = GetAssociatedReferences(verbatimObservation),
                     BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon),
                     CatalogNumber = verbatimObservation.Id.ToString(),
+                    DiscoveryMethodId = verbatimObservation.DiscoveryMethodId,
                     //EstablishmentMeansId = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
                     OccurrenceId = $"urn:lsid:artportalen.se:Sighting:{verbatimObservation.Id}",
                     IndividualCount = verbatimObservation.Quantity?.ToString() ?? "",
@@ -212,8 +214,8 @@ namespace SOS.Process.Processors.Artportalen
             obs.Location.Parish = GetSosId(verbatimObservation.Site?.Parish?.Id,
                 _fieldMappings[FieldMappingFieldId.Parish]);
             obs.Event.Biotope =
-                GetSosId(verbatimObservation?.Bioptope?.Id, _fieldMappings[FieldMappingFieldId.Biotope]);
-            obs.Event.Substrate = GetSosId(verbatimObservation?.Bioptope?.Id,
+                GetSosId(verbatimObservation?.Biotope?.Id, _fieldMappings[FieldMappingFieldId.Biotope]);
+            obs.Event.Substrate = GetSosId(verbatimObservation?.Biotope?.Id,
                 _fieldMappings[FieldMappingFieldId.Substrate]);
             obs.Identification.ValidationStatus = GetSosId(verbatimObservation?.ValidationStatus?.Id,
                 _fieldMappings[FieldMappingFieldId.ValidationStatus]);

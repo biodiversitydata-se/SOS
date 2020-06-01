@@ -108,7 +108,7 @@ namespace SOS.Import.Repositories.Resource
         public byte InActiveInstance => (byte) (ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
-        public async Task<List<TEntity>> GetAllAsync()
+        public virtual async Task<List<TEntity>> GetAllAsync()
         {
             var res = await MongoCollection.AsQueryable().ToListAsync();
 
