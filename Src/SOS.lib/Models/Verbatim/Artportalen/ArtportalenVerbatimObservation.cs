@@ -36,6 +36,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public string Comment { get; set; }
 
         /// <summary>
+        ///     Id of DiscoveryMethod
+        /// </summary>
+        public int? DiscoveryMethodId { get; set; }
+
+        /// <summary>
         ///     Sigthing end data
         /// </summary>
         public DateTime? EndDate { get; set; }

@@ -38,6 +38,11 @@ namespace SOS.Import.Entities.Artportalen
         public int? ControlingOrganisationId { get; set; }
 
         /// <summary>
+        ///     Id of DiscoveryMethod
+        /// </summary>
+        public int? DiscoveryMethodId { get; set; }
+
+        /// <summary>
         ///     Sigthing end data
         /// </summary>
         public DateTime? EndDate { get; set; }

@@ -159,6 +159,7 @@ namespace SOS.Process.Processors.Artportalen
                     AssociatedReferences = GetAssociatedReferences(verbatimObservation),
                     BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon),
                     CatalogNumber = verbatimObservation.Id.ToString(),
+                    DiscoveryMethodId = verbatimObservation.DiscoveryMethodId,
                     //EstablishmentMeansId = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
                     OccurrenceId = $"urn:lsid:artportalen.se:Sighting:{verbatimObservation.Id}",
                     IndividualCount = verbatimObservation.Quantity?.ToString() ?? "",

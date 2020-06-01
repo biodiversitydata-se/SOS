@@ -29,6 +29,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 var query = @"
                 SELECT DISTINCT
                     s.ActivityId,
+                    s.DiscoveryMethodId,
 					s.BiotopeId,
 					sdb.[Description] AS BiotopeDescription,
                     ssci.Label AS CollectionID,
@@ -121,6 +122,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 var query = @"
                 SELECT DISTINCT
                     s.ActivityId,
+                    s.DiscoveryMethodId,
 					s.BiotopeId,
 					sdb.[Description] AS BiotopeDescription,
                     ssci.Label AS CollectionID,

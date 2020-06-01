@@ -123,6 +123,7 @@ namespace SOS.Import.Extensions
                 BiotopeDescription = entity.BiotopeDescription,
                 CollectionID = entity.CollectionID,
                 Comment = entity.Comment,
+                DiscoveryMethodId = entity.DiscoveryMethodId,
                 EndDate = entity.EndDate,
                 EndTime = entity.EndTime,
                 Gender = entity.GenderId.HasValue && genders.ContainsKey(entity.GenderId.Value)
