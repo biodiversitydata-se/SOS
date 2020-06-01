@@ -11,6 +11,9 @@ namespace SOS.Lib.Models.Search
     {
         public IEnumerable<int> CountyIds { get; set; }
 
+        /// <summary>
+        ///     Geometry filter 
+        /// </summary>
         public GeometryFilter GeometryFilter { get; set; }
 
         /// <summary>

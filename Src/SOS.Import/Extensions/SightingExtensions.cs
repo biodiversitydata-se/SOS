@@ -123,6 +123,7 @@ namespace SOS.Import.Extensions
                 BiotopeDescription = entity.BiotopeDescription,
                 CollectionID = entity.CollectionID,
                 Comment = entity.Comment,
+                DiscoveryMethodId = entity.DiscoveryMethodId,
                 EndDate = entity.EndDate,
                 EndTime = entity.EndTime,
                 Gender = entity.GenderId.HasValue && genders.ContainsKey(entity.GenderId.Value)
@@ -154,6 +155,7 @@ namespace SOS.Import.Extensions
                 Site = entity.SiteId.HasValue && sites.ContainsKey(entity.SiteId.Value)
                     ? sites[entity.SiteId.Value]
                     : null,
+                SightingSpeciesCollectionItemId = entity.SightingSpeciesCollectionItemId,
                 Stage = entity.StageId.HasValue && stages.ContainsKey(entity.StageId.Value)
                     ? stages[entity.StageId.Value]
                     : null,

@@ -38,6 +38,11 @@ namespace SOS.Import.Entities.Artportalen
         public int? ControlingOrganisationId { get; set; }
 
         /// <summary>
+        ///     Id of DiscoveryMethod
+        /// </summary>
+        public int? DiscoveryMethodId { get; set; }
+
+        /// <summary>
         ///     Sigthing end data
         /// </summary>
         public DateTime? EndDate { get; set; }
@@ -151,6 +156,11 @@ namespace SOS.Import.Entities.Artportalen
         ///     Id of site
         /// </summary>
         public int? SiteId { get; set; }
+
+        /// <summary>
+        ///     Id of SightingSpeciesCollectionItem
+        /// </summary>
+        public int? SightingSpeciesCollectionItemId { get; set; }
 
         /// <summary>
         ///     Taxon stage id

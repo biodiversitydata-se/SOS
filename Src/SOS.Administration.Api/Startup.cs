@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Autofac;
@@ -97,10 +98,16 @@ namespace SOS.Administration.Api
                             //TermsOfService = "None"
                         });
                     // Set the comments path for the Swagger JSON and UI.
-                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                    Debug.WriteLine(xmlPath);
-                    options.IncludeXmlComments(xmlPath);
+                    var currentAssembly = Assembly.GetExecutingAssembly();
+                    var xmlDocs = currentAssembly.GetReferencedAssemblies()
+                        .Union(new AssemblyName[] { currentAssembly.GetName() })
+                        .Select(a => Path.Combine(Path.GetDirectoryName(currentAssembly.Location), $"{a.Name}.xml"))
+                        .Where(f => File.Exists(f)).ToArray();
+
+                    Array.ForEach(xmlDocs, (d) =>
+                    {
+                        options.IncludeXmlComments(d);
+                    });
                 });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);

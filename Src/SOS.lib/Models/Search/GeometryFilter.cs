@@ -31,6 +31,9 @@ namespace SOS.Lib.Models.Search
         /// </summary>
         public ICollection<IGeoShape> Geometries { get; set; }
 
+        /// <summary>
+        /// Makes a simple validation of the geometry
+        /// </summary>
         public bool IsValid
         {
             get

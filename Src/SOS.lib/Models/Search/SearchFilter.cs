@@ -2,9 +2,6 @@
 
 namespace SOS.Lib.Models.Search
 {
-    /// <summary>
-    ///     Search filter for advanced search.
-    /// </summary>
     public class SearchFilter : FilterBase
     {
         /// <summary>
