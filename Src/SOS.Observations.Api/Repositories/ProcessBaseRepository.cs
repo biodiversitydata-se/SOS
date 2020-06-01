@@ -114,7 +114,7 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<List<TEntity>> GetAllAsync()
+        public virtual async Task<List<TEntity>> GetAllAsync()
         {
             return await MongoCollection.AsQueryable().ToListAsync();
         }
