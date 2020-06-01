@@ -110,6 +110,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.IsInEconomicZoneOfSweden = hasPosition;
                 obs.Language = Language.Swedish;
                 obs.Modified = endDate ?? verbatimObservation.ReportedDate;
+                obs.SightingSpeciesCollectionItemId = verbatimObservation.SightingSpeciesCollectionItemId;
                 obs.Type = null;
 
                 // Event
@@ -161,6 +162,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
                 obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon);
                 obs.Occurrence.CatalogNumber = verbatimObservation.Id.ToString();
+                obs.Occurrence.DiscoveryMethodId = verbatimObservation.DiscoveryMethodId;
                 obs.Occurrence.OccurrenceId = $"urn:lsid:artportalen.se:Sighting:{verbatimObservation.Id}";
                 obs.Occurrence.IndividualCount = verbatimObservation.Quantity?.ToString() ?? "";
                 obs.Occurrence.IsNaturalOccurrence = !verbatimObservation.Unspontaneous;
