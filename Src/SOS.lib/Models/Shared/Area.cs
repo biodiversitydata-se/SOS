@@ -22,7 +22,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         ///     Type of area
         /// </summary>
-        public AreaType AreaType { get; }
+        public AreaType AreaType { get; private set; }
 
         /// <summary>
         ///     Feature Id.

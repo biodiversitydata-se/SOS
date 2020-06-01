@@ -89,7 +89,15 @@ namespace SOS.Process.Repositories.Source
         /// <inheritdoc />
         public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync()
         {
-            return await GetAllByCursorAsync(MongoCollection);
+            try
+            {
+                return await GetAllByCursorAsync(MongoCollection);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error when executing GetAllByCursorAsync()");
+                throw;
+            }
         }
 
         /// <inheritdoc />
