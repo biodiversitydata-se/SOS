@@ -127,15 +127,6 @@ namespace SOS.Observations.Api
                         options.IncludeXmlComments(d);
                     });
 
-                    // Set the comments path for the Swagger JSON and UI.
-                    //   var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                    // var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-
-                  //  options.IncludeXmlComments(Path.Combine(
-                   //     Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), $"{this.GetType().Assembly.GetName().Name}.xml"
-                   // ));
-                   // options.IncludeXmlComments(xmlPath);
-
                     options.SchemaFilter<SwaggerIgnoreFilter>();
                 });
 
