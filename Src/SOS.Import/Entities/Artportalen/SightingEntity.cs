@@ -153,6 +153,11 @@ namespace SOS.Import.Entities.Artportalen
         public int? SiteId { get; set; }
 
         /// <summary>
+        ///     Id of SightingSpeciesCollectionItem
+        /// </summary>
+        public int? SightingSpeciesCollectionItemId { get; set; }
+
+        /// <summary>
         ///     Taxon stage id
         /// </summary>
         public int? StageId { get; set; }

@@ -154,6 +154,7 @@ namespace SOS.Import.Extensions
                 Site = entity.SiteId.HasValue && sites.ContainsKey(entity.SiteId.Value)
                     ? sites[entity.SiteId.Value]
                     : null,
+                SightingSpeciesCollectionItemId = entity.SightingSpeciesCollectionItemId,
                 Stage = entity.StageId.HasValue && stages.ContainsKey(entity.StageId.Value)
                     ? stages[entity.StageId.Value]
                     : null,

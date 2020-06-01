@@ -102,6 +102,7 @@ namespace SOS.Process.Processors.Artportalen
                     ? "Artportalen"
                     : verbatimObservation.SpeciesCollection,
                 CollectionId = verbatimObservation.CollectionID,
+                SightingSpeciesCollectionItemId = verbatimObservation.SightingSpeciesCollectionItemId,
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}",
                 DatasetName = "Artportalen",
                 Event = new ProcessedEvent

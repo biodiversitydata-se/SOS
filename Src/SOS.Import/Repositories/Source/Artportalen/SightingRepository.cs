@@ -32,6 +32,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					s.BiotopeId,
 					sdb.[Description] AS BiotopeDescription,
                     ssci.Label AS CollectionID,
+                    ssci.Id as SightingSpeciesCollectionItemId,
 	                scp.Comment,
 	                s.EndDate,
 	                s.EndTime,
@@ -39,7 +40,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     s.HasImages,
 	                s.HiddenByProvider,
 	                s.SightingId AS Id, 
-	                ssc.Label,
+	                ssci.Label,
 	                s.[Length],
                     s.MaxDepth,
 					s.MaxHeight,
@@ -78,11 +79,10 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					INNER JOIN Sighting si ON s.SightingId = si.Id
 	                INNER JOIN SightingState ss ON s.SightingId = ss.SightingId
 	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId
-	                LEFT JOIN SightingSpeciesCollectionItem ssc ON s.SightingId = ssc.SightingId
+	                LEFT JOIN SightingSpeciesCollectionItem ssci ON s.SightingId = ssci.SightingId
 	                LEFT JOIN SightingBarcode sb ON s.SightingId = sb.SightingId
                     LEFT JOIN [User] u ON s.OwnerUserId = u.Id 
 	                LEFT JOIN Person p ON u.PersonId = p.Id
-                    LEFT JOIN SightingSpeciesCollectionItem ssci ON s.SightingId = ssci.SightingId
                     LEFT JOIN MigrateSightingid msi ON s.SightingId = msi.Id
 					LEFT JOIN SightingDescription sdb ON si.SightingBiotopeDescriptionId = sdb.Id 
 					LEFT JOIN SightingDescription sds ON si.SightingSubstrateDescriptionId = sds.Id 
@@ -124,6 +124,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					s.BiotopeId,
 					sdb.[Description] AS BiotopeDescription,
                     ssci.Label AS CollectionID,
+                    ssci.Id AS SightingSpeciesCollectionItemId,
 	                scp.Comment,
 					si.ControlingOrganisationId,
 	                s.EndDate,
@@ -132,7 +133,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     s.HasImages,
 	                s.HiddenByProvider,
 	                s.Id, 
-	                ssc.Label,
+	                ssci.Label,
 	                s.[Length],
                     s.MaxDepth,
 					s.MaxHeight,
@@ -171,11 +172,10 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					INNER JOIN Sighting si ON s.SightingId = si.Id
 	                INNER JOIN SightingState ss ON s.SightingId = ss.SightingId
 	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId
-	                LEFT JOIN SightingSpeciesCollectionItem ssc ON s.SightingId = ssc.SightingId
+                    LEFT JOIN SightingSpeciesCollectionItem ssci ON s.SightingId = ssci.SightingId
 	                LEFT JOIN SightingBarcode sb ON s.SightingId = sb.SightingId
                     LEFT JOIN [User] u ON s.OwnerUserId = u.Id 
 	                LEFT JOIN Person p ON u.PersonId = p.Id
-                    LEFT JOIN SightingSpeciesCollectionItem ssci ON s.SightingId = ssci.SightingId
                     LEFT JOIN MigrateSightingid msi ON s.SightingId = msi.Id
 					LEFT JOIN SightingDescription sdb ON si.SightingBiotopeDescriptionId = sdb.Id 
 					LEFT JOIN SightingDescription sds ON si.SightingSubstrateDescriptionId = sds.Id 

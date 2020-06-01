@@ -151,6 +151,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public Site Site { get; set; }
 
         /// <summary>
+        ///     Id of SightingSpeciesCollectionItem
+        /// </summary>
+        public int? SightingSpeciesCollectionItemId { get; set; }
+
+        /// <summary>
         ///     Taxon stage id
         /// </summary>
         public Metadata Stage { get; set; }
