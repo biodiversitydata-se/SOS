@@ -143,6 +143,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? SightingSpeciesCollectionItemId { get; set; }
 
         /// <summary>
+        ///     Has Triggered Validation Rules
+        /// </summary>
+        public bool HasTriggeredValidationRules { get; set; }
+
+        /// <summary>
+        ///     Has any Triggered Validation Rule with Warning
+        /// </summary>
+        public bool HasAnyTriggeredValidationRuleWithWarning { get; set; }
+
+        /// <summary>
         ///     Actions taken to make the shared data less specific or
         ///     complete than in its original form.
         ///     Suggests that alternative data of higher quality

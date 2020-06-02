@@ -106,6 +106,8 @@ namespace SOS.Process.Processors.Artportalen
                 obs.CollectionId = verbatimObservation.CollectionID;
                 obs.DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}";
                 obs.DatasetName = "Artportalen";
+                obs.HasTriggeredValidationRules = verbatimObservation.HasTriggeredValidationRules;
+                obs.HasAnyTriggeredValidationRuleWithWarning = verbatimObservation.HasAnyTriggeredValidationRuleWithWarning;
                 obs.InformationWithheld = null;
                 obs.IsInEconomicZoneOfSweden = hasPosition;
                 obs.Language = Language.Swedish;
