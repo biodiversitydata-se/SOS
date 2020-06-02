@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
-using SOS.Observations.Api.Enum;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {

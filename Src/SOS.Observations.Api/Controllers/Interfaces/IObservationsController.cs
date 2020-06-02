@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
-using SOS.Observations.Api.Enum;
 
 namespace SOS.Observations.Api.Controllers.Interfaces
 {

@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Database.Interfaces;
-using SOS.Observations.Api.Enum;
 using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Repositories
@@ -56,13 +56,7 @@ namespace SOS.Observations.Api.Repositories
             query = AddInternalFilters(filter, query);
 
             var excludeQuery = CreateExcludeQuery(filter);
-
-            var sortDescriptor = new SortDescriptor<dynamic>();
-            if (!string.IsNullOrEmpty(sortBy))
-            {
-                sortDescriptor.Field(sortBy,
-                    sortOrder == SearchSortOrder.Desc ? SortOrder.Descending : SortOrder.Ascending);
-            }
+            var sortDescriptor = sortBy.ToSortDescriptor<ProcessedObservation>(sortOrder);
 
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(_indexName)

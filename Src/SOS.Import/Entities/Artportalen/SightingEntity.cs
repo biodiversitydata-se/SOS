@@ -63,6 +63,16 @@ namespace SOS.Import.Entities.Artportalen
         public bool HasImages { get; set; }
 
         /// <summary>
+        ///     Has Triggered Validation Rules
+        /// </summary>
+        public bool HasTriggeredValidationRules { get; set; }
+
+        /// <summary>
+        ///     Has any Triggered Validation Rule with Warning
+        /// </summary>
+        public bool HasAnyTriggeredValidationRuleWithWarning { get; set; }
+
+        /// <summary>
         ///     Hidden by provider date
         /// </summary>
         public DateTime? HiddenByProvider { get; set; }
