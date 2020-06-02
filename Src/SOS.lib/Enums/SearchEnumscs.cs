@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace SOS.Observations.Api.Enum
+namespace SOS.Lib.Enums
 {
     /// <summary>
     ///     Sort order enum

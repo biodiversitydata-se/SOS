@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 
 namespace SOS.Import.Extensions

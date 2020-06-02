@@ -7,7 +7,6 @@ using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
-using SOS.Observations.Api.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 

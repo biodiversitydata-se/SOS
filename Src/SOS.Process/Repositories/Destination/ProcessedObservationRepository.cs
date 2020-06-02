@@ -34,7 +34,6 @@ namespace SOS.Process.Repositories.Destination
         /// <param name="invalidObservationRepository"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
-        /// <param name="elasticClient"></param>
         public ProcessedObservationRepository(
             IProcessClient client,
             IElasticClient elasticClient,
