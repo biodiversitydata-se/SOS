@@ -467,6 +467,7 @@ namespace SOS.Import.Extensions
         public static Site ToVerbatim(this SiteEntity entity)
         {
             Point wgs84Point = null;
+            const int defaultAccuracy = 100;
 
             if (entity.XCoord > 0 && entity.YCoord > 0)
             {
@@ -476,9 +477,10 @@ namespace SOS.Import.Extensions
                 wgs84Point = (Point) webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
             }
 
+            var accuracy = entity.Accuracy > 0 ? entity.Accuracy : defaultAccuracy; // If Artportalen site accuracy is <= 0, this is due to an old import. Set the accuracy to 100.
             return new Site
             {
-                Accuracy = entity.Accuracy,
+                Accuracy = accuracy,
                 County = entity.CountyId.HasValue
                     ? new GeographicalArea {Id = entity.CountyId.Value, Name = entity.CountyName}
                     : null,
@@ -496,7 +498,7 @@ namespace SOS.Import.Extensions
                     ? new GeographicalArea {Id = entity.ParishId.Value, Name = entity.ParishName}
                     : null,
                 Point = wgs84Point?.ToGeoJson(),
-                PointWithBuffer = wgs84Point?.ToCircle(entity.Accuracy)?.ToGeoJson(),
+                PointWithBuffer = wgs84Point?.ToCircle(accuracy)?.ToGeoJson(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,
