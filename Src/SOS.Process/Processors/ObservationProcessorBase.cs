@@ -38,7 +38,7 @@ namespace SOS.Process.Processors
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
-            Logger.LogDebug($"Start Processing {dataProvider} verbatim observations");
+            Logger.LogInformation($"Start Processing {dataProvider} verbatim observations");
             var startTime = DateTime.Now;
             try
             {
@@ -53,7 +53,7 @@ namespace SOS.Process.Processors
 
                 Logger.LogDebug($"Start processing {dataProvider} data");
                 var verbatimCount = await ProcessObservations(dataProvider, taxa, cancellationToken);
-                Logger.LogDebug($"Finish processing {dataProvider} data.");
+                Logger.LogInformation($"Finish processing {dataProvider} data.");
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, verbatimCount);
             }
