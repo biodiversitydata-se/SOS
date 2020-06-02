@@ -61,9 +61,6 @@ namespace SOS.Import.Harvesters
                 _logger.LogDebug("Adding taxon attributes");
                 await AddTaxonAttributesAsync(taxa);
                 _logger.LogDebug("Finish adding taxon attributes");
-                _logger.LogDebug("Start adding taxon sort orders");
-                await AddTaxonSortOrdersAsync(taxa);
-                _logger.LogDebug("Finish adding taxon sort orders");
                 await _taxonVerbatimRepository.DeleteCollectionAsync();
                 await _taxonVerbatimRepository.AddCollectionAsync();
                 await _taxonVerbatimRepository.AddManyAsync(taxa);
@@ -83,48 +80,6 @@ namespace SOS.Import.Harvesters
 
             return harvestInfo;
         }
-
-        /// <summary>
-        ///     Populate dynamic properties from taxon attributes
-        /// </summary>
-        /// <param name="taxa"></param>
-        /// <returns></returns>
-        private async Task AddTaxonSortOrdersAsync(IEnumerable<DarwinCoreTaxon> taxa)
-        {
-            if (!taxa?.Any() ?? true)
-            {
-                return;
-            }
-
-            var taxaDictonary = taxa.ToDictionary(t => t.Id, t => t);
-            var taxonCount = taxa.Count();
-            var skip = 0;
-            const int take = 1000;
-
-            while (skip < taxonCount)
-            {
-                var taxonIds = taxa.Skip(skip).Take(take).Select(t => t.Id);
-
-                var sortOrders =
-                    await _taxonService.GetSortOrdersByTaxonId(taxonIds);
-
-                if (sortOrders?.Any() ?? false)
-                {
-                    foreach (var sortOrder in sortOrders)
-                    {
-                        if (!taxaDictonary.TryGetValue(sortOrder.Key, out var taxon))
-                        {
-                            continue;
-                        }
-
-                        taxon.SortOrder = sortOrder.Value;
-                    }
-                }
-
-                skip += take;
-            }
-        }
-
         /// <summary>
         ///     Populate dynamic properties from taxon attributes
         /// </summary>

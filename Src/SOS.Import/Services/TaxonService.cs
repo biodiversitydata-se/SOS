@@ -57,6 +57,7 @@ namespace SOS.Import.Services
                 var taxa = GetTaxonCoreData(zipArchive, csvFieldDelimiter);
                 AddVernacularNames(taxa, zipArchive, csvFieldDelimiter);
                 AddTaxonRelations(taxa, zipArchive, csvFieldDelimiter);
+                AddTaxonSortOrders(taxa, zipArchive, csvFieldDelimiter);
                 return taxa.Values;
             }
             catch (Exception e)
@@ -66,26 +67,6 @@ namespace SOS.Import.Services
 
             return null;
         }
-
-        public async Task<Dictionary<int, int>> GetSortOrdersByTaxonId(IEnumerable<int> taxonIds)
-        {
-            try
-            {
-                var uri = new Uri(_taxonDwcUrl);
-                var host = uri.Scheme + Uri.SchemeDelimiter + uri.Host;
-                var resultsString = await _taxonServiceProxy.GetTaxonAsync(host + "/api/Taxon/byIds", taxonIds);
-                if (resultsString == null) return null;
-                var info = JsonConvert.DeserializeObject<IEnumerable<TaxonInfo>>(resultsString);
-                return info.ToDictionary(x => x.Id, x => x.SortOrder);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-            }
-
-            return null;
-        }
-
         private string GetCsvFieldDelimiterFromMetaFile(ZipArchive zipArchive)
         {
             var csvFieldDelimiter = "\t";
@@ -211,7 +192,56 @@ namespace SOS.Import.Services
         }
 
         /// <summary>
-        ///     Reads vernacular names from zip file and adds them to taxa.
+        /// Reads taxon sort orders from zip file
+        /// </summary>
+        /// <param name="taxa"></param>
+        /// <param name="zipArchive"></param>
+        /// <param name="csvFieldDelimiter"></param>
+        private void AddTaxonSortOrders(
+            Dictionary<string, DarwinCoreTaxon> taxa,
+            ZipArchive zipArchive,
+            string csvFieldDelimiter)
+        {
+            // Try to get TaxonSortOrders.csv
+            var taxonSortOrdersFile = zipArchive.Entries.FirstOrDefault(f =>
+                f.Name.Equals("TaxonSortOrders.csv", StringComparison.CurrentCultureIgnoreCase));
+            if (taxonSortOrdersFile == null) return; // If no taxon sort orders file found, we can't do anything more
+
+            // Read taxon sort order data
+            using var taxonSortOrdersReader = new StreamReader(taxonSortOrdersFile.Open(), Encoding.UTF8);
+            using var taxonSortOrdersCsv = new CsvReader(taxonSortOrdersReader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                Delimiter = csvFieldDelimiter,
+                Encoding = Encoding.UTF8,
+                HasHeaderRecord = true
+            });
+
+            taxonSortOrdersCsv.Configuration.RegisterClassMap<TaxonSortOrderMapper>();
+
+            // Get taxon sort orders by guid
+            var allTaxonSortOrders = taxonSortOrdersCsv
+                .GetRecords<TaxonSortOrder<string>>()
+                .Select(m => new TaxonSortOrder<int>
+                {
+                    SortOrder = m.SortOrder,
+                    TaxonId = GetTaxonIdfromDyntaxaGuid(m.TaxonId),                    
+                });
+
+            var taxonSortOrdersById = allTaxonSortOrders                
+                .ToDictionary(g => g.TaxonId, g => g.SortOrder);
+
+            foreach (var taxon in taxa.Values)
+            {
+                if (taxonSortOrdersById.TryGetValue(taxon.DynamicProperties.DyntaxaTaxonId, out var sortOrder))
+                {
+                    taxon.SortOrder = sortOrder.HasValue ? sortOrder.Value : 0;                    
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Reads vernacular names from zip file and adds them to taxa.
         /// </summary>
         /// <param name="taxa"></param>
         /// <param name="zipArchive"></param>

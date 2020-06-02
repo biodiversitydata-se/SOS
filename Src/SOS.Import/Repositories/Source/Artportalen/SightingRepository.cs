@@ -74,7 +74,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.UnitId,
 	                sb.URL,
                     s.ValidationStatusId,
-	                s.[Weight]
+	                s.[Weight], 
+	                s.HasTriggeredValidationRules, 
+	                s.HasAnyTriggeredValidationRuleWithWarning 
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id
@@ -126,15 +128,14 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					s.BiotopeId,
 					sdb.[Description] AS BiotopeDescription,
                     ssci.Label AS CollectionID,
-                    ssci.Id AS SightingSpeciesCollectionItemId,
+                    ssci.Id as SightingSpeciesCollectionItemId,
 	                scp.Comment,
-					si.ControlingOrganisationId,
 	                s.EndDate,
 	                s.EndTime,
 	                s.GenderId,
                     s.HasImages,
 	                s.HiddenByProvider,
-	                s.Id, 
+	                s.SightingId AS Id, 
 	                ssci.Label,
 	                s.[Length],
                     s.MaxDepth,
@@ -168,13 +169,15 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.UnitId,
 	                sb.URL,
                     s.ValidationStatusId,
-	                s.[Weight]
+	                s.[Weight], 
+	                s.HasTriggeredValidationRules, 
+	                s.HasAnyTriggeredValidationRuleWithWarning 
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id
 	                INNER JOIN SightingState ss ON s.SightingId = ss.SightingId
 	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId
-                    LEFT JOIN SightingSpeciesCollectionItem ssci ON s.SightingId = ssci.SightingId
+	                LEFT JOIN SightingSpeciesCollectionItem ssci ON s.SightingId = ssci.SightingId
 	                LEFT JOIN SightingBarcode sb ON s.SightingId = sb.SightingId
                     LEFT JOIN [User] u ON s.OwnerUserId = u.Id 
 	                LEFT JOIN Person p ON u.PersonId = p.Id
@@ -183,7 +186,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					LEFT JOIN SightingDescription sds ON si.SightingSubstrateDescriptionId = sds.Id 
 					LEFT JOIN SightingDescription sdss ON si.SightingSubstrateSpeciesDescriptionId = sdss.Id
                 WHERE
-	                s.Id in @ids
+	                s.SightingId in @ids
 	                AND s.TaxonId IS NOT NULL
 	                AND s.SightingTypeId IN(0, 3) 
 	                AND s.HiddenByProvider IS NULL

@@ -130,6 +130,8 @@ namespace SOS.Import.Extensions
                     ? genders[entity.GenderId.Value]
                     : null,
                 HasImages = entity.HasImages,
+                HasTriggeredValidationRules = entity.HasTriggeredValidationRules,
+                HasAnyTriggeredValidationRuleWithWarning = entity.HasAnyTriggeredValidationRuleWithWarning,
                 HiddenByProvider = entity.HiddenByProvider,
                 Id = entity.Id,
                 OwnerOrganization =

@@ -61,173 +61,180 @@ namespace SOS.Process.Processors.Artportalen
         /// <returns></returns>
         public ProcessedObservation CreateProcessedObservation(ArtportalenVerbatimObservation verbatimObservation)
         {
-            if (verbatimObservation == null)
+            try
             {
-                return null;
-            }
+                if (verbatimObservation == null)
+                {
+                    return null;
+                }
 
-            var taxonId = verbatimObservation.TaxonId ?? -1;
+                var taxonId = verbatimObservation.TaxonId ?? -1;
 
-            var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
-                              (verbatimObservation.Site?.YCoord ?? 0) > 0;
-            var point = (PointGeoShape) verbatimObservation.Site?.Point?.ToGeoShape();
+                var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
+                                  (verbatimObservation.Site?.YCoord ?? 0) > 0;
+                var point = (PointGeoShape) verbatimObservation.Site?.Point?.ToGeoShape();
 
-            if (_taxa.TryGetValue(taxonId, out var taxon))
-            {
-                taxon.IndividualId = verbatimObservation.URL;
-            }
+                if (_taxa.TryGetValue(taxonId, out var taxon))
+                {
+                    taxon.IndividualId = verbatimObservation.URL;
+                }
 
-            // Add time to start date if it exists
-            var startDate = verbatimObservation.StartDate.HasValue && verbatimObservation.StartTime.HasValue
-                ? verbatimObservation.StartDate.Value.ToLocalTime() + verbatimObservation.StartTime
-                : verbatimObservation.StartDate.Value;
+                // Add time to start date if it exists
+                var startDate = verbatimObservation.StartDate.HasValue && verbatimObservation.StartTime.HasValue
+                    ? verbatimObservation.StartDate.Value.ToLocalTime() + verbatimObservation.StartTime
+                    : verbatimObservation.StartDate.Value;
 
-            // Add time to end date if it exists
-            var endDate = verbatimObservation.EndDate.HasValue && verbatimObservation.EndTime.HasValue
-                ? verbatimObservation.EndDate.Value.ToLocalTime() + verbatimObservation.EndTime
-                : verbatimObservation.EndDate;
+                // Add time to end date if it exists
+                var endDate = verbatimObservation.EndDate.HasValue && verbatimObservation.EndTime.HasValue
+                    ? verbatimObservation.EndDate.Value.ToLocalTime() + verbatimObservation.EndTime
+                    : verbatimObservation.EndDate;
 
-            var obs = new ProcessedObservation
-            {
-                DataProviderId = _dataProvider.Id,
-                AccessRights =
-                    !verbatimObservation.ProtectedBySystem && verbatimObservation.HiddenByProvider.HasValue &&
-                    verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now
-                        ? new ProcessedFieldMapValue {Id = (int) AccessRightsId.FreeUsage}
-                        : new ProcessedFieldMapValue {Id = (int) AccessRightsId.NotForPublicUsage},
-                BasisOfRecord = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
+                var obs = new ProcessedObservation();
+
+                // Record level
+                obs.DataProviderId = _dataProvider.Id;
+                obs.AccessRights = !verbatimObservation.ProtectedBySystem && verbatimObservation.HiddenByProvider.HasValue &&
+                                   verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now
+                    ? new ProcessedFieldMapValue {Id = (int) AccessRightsId.FreeUsage}
+                    : new ProcessedFieldMapValue {Id = (int) AccessRightsId.NotForPublicUsage};
+                obs.BasisOfRecord = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
                     ? new ProcessedFieldMapValue {Id = (int) BasisOfRecordId.HumanObservation}
-                    : new ProcessedFieldMapValue {Id = (int) BasisOfRecordId.PreservedSpecimen},
-                CollectionCode = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
+                    : new ProcessedFieldMapValue {Id = (int) BasisOfRecordId.PreservedSpecimen};
+                obs.CollectionCode = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
                     ? "Artportalen"
-                    : verbatimObservation.SpeciesCollection,
-                CollectionId = verbatimObservation.CollectionID,
-                SightingSpeciesCollectionItemId = verbatimObservation.SightingSpeciesCollectionItemId,
-                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}",
-                DatasetName = "Artportalen",
-                Event = new ProcessedEvent
-                {
-                    BiotopeDescription = verbatimObservation.BiotopeDescription,
-                    EndDate = endDate?.ToUniversalTime(),
-                    QuantityOfSubstrate = verbatimObservation.QuantityOfSubstrate,
-                    SamplingProtocol = GetSamplingProtocol(verbatimObservation.Projects),
-                    StartDate = startDate?.ToUniversalTime(),
-                    SubstrateSpeciesDescription = verbatimObservation.SubstrateSpeciesDescription,
-                    SubstrateDescription = GetSubstrateDescription(verbatimObservation, _taxa),
-                    VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate, endDate)
-                },
-                Identification = new ProcessedIdentification
-                {
-                    IdentifiedBy = verbatimObservation.VerifiedBy,
-                    IdentifiedByInternal = verbatimObservation.VerifiedByInternal,
-                    Validated = new[] {60, 61, 62, 63, 64, 65}.Contains(verbatimObservation.ValidationStatus?.Id ?? 0),
-                    UncertainDetermination = verbatimObservation.UnsureDetermination
-                },
-                InformationWithheld = null,
-                IsInEconomicZoneOfSweden =
-                    hasPosition, // Artportalen validate all sightings, we rely on that validation as long it has coordinates
-                Language = Language.Swedish,
-                Location = new ProcessedLocation
-                {
-                    Continent = new ProcessedFieldMapValue {Id = (int) ContinentId.Europe},
-                    CoordinateUncertaintyInMeters = verbatimObservation.Site?.Accuracy,
-                    Country = new ProcessedFieldMapValue {Id = (int) CountryId.Sweden},
-                    CountryCode = CountryCode.Sweden,
-                    DecimalLatitude = point?.Coordinates?.Latitude ?? 0,
-                    DecimalLongitude = point?.Coordinates?.Longitude ?? 0,
-                    GeodeticDatum = GeodeticDatum.Wgs84,
-                    Locality = verbatimObservation.Site?.Name.Trim(),
-                    LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}",
-                    MaximumDepthInMeters = verbatimObservation.MaxDepth,
-                    MaximumElevationInMeters = verbatimObservation.MaxHeight,
-                    MinimumDepthInMeters = verbatimObservation.MinDepth,
-                    MinimumElevationInMeters = verbatimObservation.MinHeight,
-                    Point = point,
-                    PointLocation = verbatimObservation.Site?.Point?.ToGeoLocation(),
-                    PointWithBuffer = (PolygonGeoShape) verbatimObservation.Site?.PointWithBuffer.ToGeoShape(),
-                    VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord : 0,
-                    VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0,
-                    VerbatimCoordinateSystem = "EPSG:3857",
-                    ParentLocationId = verbatimObservation.Site?.ParentSiteId
-                },
-                Modified = endDate ?? verbatimObservation.ReportedDate,
-                Occurrence = new ProcessedOccurrence
-                {
-                    AssociatedMedia = verbatimObservation.HasImages
-                        ? $"http://www.artportalen.se/sighting/{verbatimObservation.Id}#SightingDetailImages"
-                        : "",
-                    AssociatedReferences = GetAssociatedReferences(verbatimObservation),
-                    BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon),
-                    CatalogNumber = verbatimObservation.Id.ToString(),
-                    DiscoveryMethodId = verbatimObservation.DiscoveryMethodId,
-                    //EstablishmentMeansId = verbatim.Unspontaneous ? "Unspontaneous" : "Natural", // todo - "Unspontaneous" & "Natural" is not in the DwC recomended vocabulary. Get value from Dyntaxa instead?
-                    OccurrenceId = $"urn:lsid:artportalen.se:Sighting:{verbatimObservation.Id}",
-                    IndividualCount = verbatimObservation.Quantity?.ToString() ?? "",
-                    IsNaturalOccurrence = !verbatimObservation.Unspontaneous,
-                    IsNeverFoundObservation = verbatimObservation.NotPresent,
-                    IsNotRediscoveredObservation = verbatimObservation.NotRecovered,
-                    IsPositiveObservation = !(verbatimObservation.NotPresent || verbatimObservation.NotRecovered),
-                    OrganismQuantityInt = verbatimObservation.Quantity,
-                    OrganismQuantity = verbatimObservation.Quantity.ToString(),
-                    RecordedBy = verbatimObservation.Observers,
-                    RecordedByInternal = verbatimObservation.ObserversInternal,
-                    RecordNumber = verbatimObservation.Label,
-                    OccurrenceRemarks = verbatimObservation.Comment,
-                    OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
-                        ? new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Absent}
-                        : new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Present},
-                    URL = $"http://www.artportalen.se/sighting/{verbatimObservation.Id}"
-                },
-                OwnerInstitutionCode =
-                    verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken",
-                Projects = verbatimObservation.Projects?.Select(CreateProcessedProject),
-                ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider,
-                    verbatimObservation.ProtectedBySystem),
-                ReportedBy = verbatimObservation.ReportedBy,
-                ReportedByUserId = verbatimObservation.ReportedByUserId,
-                ReportedByUserAlias = verbatimObservation.ReportedByUserAlias,
-                ReportedDate = verbatimObservation.ReportedDate,
-                RightsHolder = verbatimObservation.RightsHolder ??
-                               verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ??
-                               "Data saknas",
-                Taxon = taxon,
-                Type = null
-            };
+                    : verbatimObservation.SpeciesCollection;
+                obs.CollectionId = verbatimObservation.CollectionID;
+                obs.DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}";
+                obs.DatasetName = "Artportalen";
+                obs.HasTriggeredValidationRules = verbatimObservation.HasTriggeredValidationRules;
+                obs.HasAnyTriggeredValidationRuleWithWarning = verbatimObservation.HasAnyTriggeredValidationRuleWithWarning;
+                obs.InformationWithheld = null;
+                obs.IsInEconomicZoneOfSweden = hasPosition;
+                obs.Language = Language.Swedish;
+                obs.Modified = endDate ?? verbatimObservation.ReportedDate;
+                obs.SightingSpeciesCollectionItemId = verbatimObservation.SightingSpeciesCollectionItemId;
+                obs.Type = null;
 
-            // Set dependent properties
-            var biotope = obs.Event.Biotope?.Value;
-            obs.Event.Habitat = (biotope != null
-                ? $"{biotope}{(string.IsNullOrEmpty(obs.Event.BiotopeDescription) ? "" : " # ")}{obs.Event.BiotopeDescription}"
-                : obs.Event.BiotopeDescription).WithMaxLength(255);
+                // Event
+                obs.Event = new ProcessedEvent();
+                obs.Event.BiotopeDescription = verbatimObservation.BiotopeDescription;
+                obs.Event.EndDate = endDate?.ToUniversalTime();
+                obs.Event.QuantityOfSubstrate = verbatimObservation.QuantityOfSubstrate;
+                obs.Event.SamplingProtocol = GetSamplingProtocol(verbatimObservation.Projects);
+                obs.Event.StartDate = startDate?.ToUniversalTime();
+                obs.Event.SubstrateSpeciesDescription = verbatimObservation.SubstrateSpeciesDescription;
+                obs.Event.SubstrateDescription = GetSubstrateDescription(verbatimObservation, _taxa);
+                obs.Event.VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate, endDate);
+                
+                // Identification
+                obs.Identification = new ProcessedIdentification();
+                obs.Identification.IdentifiedBy = verbatimObservation.VerifiedBy;
+                obs.Identification.IdentifiedByInternal = verbatimObservation.VerifiedByInternal;
+                obs.Identification.Validated = new[] {60, 61, 62, 63, 64, 65}.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);
+                obs.Identification.UncertainDetermination = verbatimObservation.UnsureDetermination;
 
-            // Get field mapping values
-            obs.Occurrence.Gender =
-                GetSosId(verbatimObservation.Gender?.Id, _fieldMappings[FieldMappingFieldId.Gender]);
-            obs.Occurrence.Activity =
-                GetSosId(verbatimObservation.Activity?.Id, _fieldMappings[FieldMappingFieldId.Activity]);
-            obs.Location.County = GetSosId(verbatimObservation.Site?.County?.Id,
-                _fieldMappings[FieldMappingFieldId.County]);
-            obs.Location.Municipality = GetSosId(verbatimObservation.Site?.Municipality?.Id,
-                _fieldMappings[FieldMappingFieldId.Municipality]);
-            obs.Location.Province = GetSosId(verbatimObservation.Site?.Province?.Id,
-                _fieldMappings[FieldMappingFieldId.Province]);
-            obs.Location.Parish = GetSosId(verbatimObservation.Site?.Parish?.Id,
-                _fieldMappings[FieldMappingFieldId.Parish]);
-            obs.Event.Biotope =
-                GetSosId(verbatimObservation?.Biotope?.Id, _fieldMappings[FieldMappingFieldId.Biotope]);
-            obs.Event.Substrate = GetSosId(verbatimObservation?.Biotope?.Id,
-                _fieldMappings[FieldMappingFieldId.Substrate]);
-            obs.Identification.ValidationStatus = GetSosId(verbatimObservation?.ValidationStatus?.Id,
-                _fieldMappings[FieldMappingFieldId.ValidationStatus]);
-            obs.Occurrence.LifeStage =
-                GetSosId(verbatimObservation?.Stage?.Id, _fieldMappings[FieldMappingFieldId.LifeStage]);
-            obs.InstitutionId = GetSosId(verbatimObservation?.OwnerOrganization?.Id,
-                _fieldMappings[FieldMappingFieldId.Institution]);
-            obs.Occurrence.OrganismQuantityUnit = GetSosId(verbatimObservation?.Unit?.Id,
-                _fieldMappings[FieldMappingFieldId.Unit],
-                (int) UnitId
-                    .Individuals); // todo - if verbatimObservation.Unit is null, should the value be set to "Individuals"? This is how it works in SSOS.
-            return obs;
+                // Location
+                obs.Location = new ProcessedLocation();
+                obs.Location.Continent = new ProcessedFieldMapValue {Id = (int) ContinentId.Europe};
+                obs.Location.CoordinateUncertaintyInMeters = verbatimObservation.Site?.Accuracy;
+                obs.Location.Country = new ProcessedFieldMapValue {Id = (int) CountryId.Sweden};
+                obs.Location.CountryCode = CountryCode.Sweden;
+                obs.Location.DecimalLatitude = point?.Coordinates?.Latitude ?? 0;
+                obs.Location.DecimalLongitude = point?.Coordinates?.Longitude ?? 0;
+                obs.Location.GeodeticDatum = GeodeticDatum.Wgs84;
+                obs.Location.Locality = verbatimObservation.Site?.Name.Trim();
+                obs.Location.LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}";
+                obs.Location.MaximumDepthInMeters = verbatimObservation.MaxDepth;
+                obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
+                obs.Location.MinimumDepthInMeters = verbatimObservation.MinDepth;
+                obs.Location.MinimumElevationInMeters = verbatimObservation.MinHeight;
+                obs.Location.Point = point;
+                obs.Location.PointLocation = verbatimObservation.Site?.Point?.ToGeoLocation();
+                obs.Location.PointWithBuffer = (PolygonGeoShape) verbatimObservation.Site?.PointWithBuffer.ToGeoShape();
+                obs.Location.VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord : 0;
+                obs.Location.VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0;
+                obs.Location.VerbatimCoordinateSystem = "EPSG:3857";
+                obs.Location.ParentLocationId = verbatimObservation.Site?.ParentSiteId;
+                
+                // Occurrence
+                obs.Occurrence = new ProcessedOccurrence();
+                obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages
+                    ? $"http://www.artportalen.se/sighting/{verbatimObservation.Id}#SightingDetailImages"
+                    : "";
+                obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
+                obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon);
+                obs.Occurrence.CatalogNumber = verbatimObservation.Id.ToString();
+                obs.Occurrence.DiscoveryMethodId = verbatimObservation.DiscoveryMethodId;
+                obs.Occurrence.OccurrenceId = $"urn:lsid:artportalen.se:Sighting:{verbatimObservation.Id}";
+                obs.Occurrence.IndividualCount = verbatimObservation.Quantity?.ToString() ?? "";
+                obs.Occurrence.IsNaturalOccurrence = !verbatimObservation.Unspontaneous;
+                obs.Occurrence.IsNeverFoundObservation = verbatimObservation.NotPresent;
+                obs.Occurrence.IsNotRediscoveredObservation = verbatimObservation.NotRecovered;
+                obs.Occurrence.IsPositiveObservation = !(verbatimObservation.NotPresent || verbatimObservation.NotRecovered);
+                obs.Occurrence.OrganismQuantityInt = verbatimObservation.Quantity;
+                obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
+                obs.Occurrence.RecordedBy = verbatimObservation.Observers;
+                obs.Occurrence.RecordedByInternal = verbatimObservation.ObserversInternal;
+                obs.Occurrence.RecordNumber = verbatimObservation.Label;
+                obs.Occurrence.OccurrenceRemarks = verbatimObservation.Comment;
+                obs.Occurrence.OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
+                    ? new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Absent}
+                    : new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Present};
+                obs.Occurrence.URL = $"http://www.artportalen.se/sighting/{verbatimObservation.Id}";
+                obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
+                obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
+                obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider,
+                    verbatimObservation.ProtectedBySystem);
+                obs.ReportedBy = verbatimObservation.ReportedBy;
+                obs.ReportedByUserId = verbatimObservation.ReportedByUserId;
+                obs.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
+                obs.ReportedDate = verbatimObservation.ReportedDate;
+                obs.RightsHolder = verbatimObservation.RightsHolder ??
+                                   verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ??
+                                   "Data saknas";
+                
+                // Taxon
+                obs.Taxon = taxon;
+
+                // Set dependent properties
+                var biotope = obs.Event.Biotope?.Value;
+                obs.Event.Habitat = (biotope != null
+                    ? $"{biotope}{(string.IsNullOrEmpty(obs.Event.BiotopeDescription) ? "" : " # ")}{obs.Event.BiotopeDescription}"
+                    : obs.Event.BiotopeDescription).WithMaxLength(255);
+
+                // Get field mapping values
+                obs.Occurrence.Gender =
+                    GetSosId(verbatimObservation.Gender?.Id, _fieldMappings[FieldMappingFieldId.Gender]);
+                obs.Occurrence.Activity =
+                    GetSosId(verbatimObservation.Activity?.Id, _fieldMappings[FieldMappingFieldId.Activity]);
+                obs.Location.County = GetSosId(verbatimObservation.Site?.County?.Id,
+                    _fieldMappings[FieldMappingFieldId.County]);
+                obs.Location.Municipality = GetSosId(verbatimObservation.Site?.Municipality?.Id,
+                    _fieldMappings[FieldMappingFieldId.Municipality]);
+                obs.Location.Province = GetSosId(verbatimObservation.Site?.Province?.Id,
+                    _fieldMappings[FieldMappingFieldId.Province]);
+                obs.Location.Parish = GetSosId(verbatimObservation.Site?.Parish?.Id,
+                    _fieldMappings[FieldMappingFieldId.Parish]);
+                obs.Event.Biotope =
+                    GetSosId(verbatimObservation?.Biotope?.Id, _fieldMappings[FieldMappingFieldId.Biotope]);
+                obs.Event.Substrate = GetSosId(verbatimObservation?.Biotope?.Id,
+                    _fieldMappings[FieldMappingFieldId.Substrate]);
+                obs.Identification.ValidationStatus = GetSosId(verbatimObservation?.ValidationStatus?.Id,
+                    _fieldMappings[FieldMappingFieldId.ValidationStatus]);
+                obs.Occurrence.LifeStage =
+                    GetSosId(verbatimObservation?.Stage?.Id, _fieldMappings[FieldMappingFieldId.LifeStage]);
+                obs.InstitutionId = GetSosId(verbatimObservation?.OwnerOrganization?.Id,
+                    _fieldMappings[FieldMappingFieldId.Institution]);
+                obs.Occurrence.OrganismQuantityUnit = GetSosId(verbatimObservation?.Unit?.Id,
+                    _fieldMappings[FieldMappingFieldId.Unit],
+                    (int) UnitId
+                        .Individuals); // todo - if verbatimObservation.Unit is null, should the value be set to "Individuals"? This is how it works in SSOS.
+                return obs;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error when processing Artportalen verbatim observation with Id={verbatimObservation.Id}", e);
+            }
         }
 
         /// <summary>
