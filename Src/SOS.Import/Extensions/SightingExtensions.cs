@@ -67,6 +67,7 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> substrates,
             IDictionary<int, Metadata> validationStatus,
             IDictionary<int, Metadata> units,
+            IDictionary<int, Metadata> discoveryMethods,
             ProjectEntityDictionaries projectEntityDictionaries)
         {
             return entities.Select(e => e.ToVerbatim(
@@ -80,6 +81,7 @@ namespace SOS.Import.Extensions
                 substrates,
                 validationStatus,
                 units,
+                discoveryMethods,
                 projectEntityDictionaries));
         }
 
@@ -97,6 +99,7 @@ namespace SOS.Import.Extensions
         /// <param name="substrates"></param>
         /// <param name="validationStatus"></param>
         /// <param name="units"></param>
+        /// <param name="discoveryMethods"></param>
         /// <param name="projectEntityDictionaries"></param>
         /// <returns></returns>
         public static ArtportalenVerbatimObservation ToVerbatim(this SightingEntity entity,
@@ -110,6 +113,7 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> substrates,
             IDictionary<int, Metadata> validationStatus,
             IDictionary<int, Metadata> units,
+            IDictionary<int, Metadata> discoveryMethods,
             ProjectEntityDictionaries projectEntityDictionaries)
         {
             var observation = new ArtportalenVerbatimObservation
@@ -123,7 +127,9 @@ namespace SOS.Import.Extensions
                 BiotopeDescription = entity.BiotopeDescription,
                 CollectionID = entity.CollectionID,
                 Comment = entity.Comment,
-                DiscoveryMethodId = entity.DiscoveryMethodId,
+                DiscoveryMethod = entity.DiscoveryMethodId.HasValue && discoveryMethods.ContainsKey(entity.DiscoveryMethodId.Value) 
+                    ? discoveryMethods[entity.DiscoveryMethodId.Value] 
+                    : null,
                 EndDate = entity.EndDate,
                 EndTime = entity.EndTime,
                 Gender = entity.GenderId.HasValue && genders.ContainsKey(entity.GenderId.Value)
@@ -467,6 +473,7 @@ namespace SOS.Import.Extensions
         public static Site ToVerbatim(this SiteEntity entity)
         {
             Point wgs84Point = null;
+            const int defaultAccuracy = 100;
 
             if (entity.XCoord > 0 && entity.YCoord > 0)
             {
@@ -476,9 +483,10 @@ namespace SOS.Import.Extensions
                 wgs84Point = (Point) webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
             }
 
+            var accuracy = entity.Accuracy > 0 ? entity.Accuracy : defaultAccuracy; // If Artportalen site accuracy is <= 0, this is due to an old import. Set the accuracy to 100.
             return new Site
             {
-                Accuracy = entity.Accuracy,
+                Accuracy = accuracy,
                 County = entity.CountyId.HasValue
                     ? new GeographicalArea {Id = entity.CountyId.Value, Name = entity.CountyName}
                     : null,
@@ -496,7 +504,7 @@ namespace SOS.Import.Extensions
                     ? new GeographicalArea {Id = entity.ParishId.Value, Name = entity.ParishName}
                     : null,
                 Point = wgs84Point?.ToGeoJson(),
-                PointWithBuffer = wgs84Point?.ToCircle(entity.Accuracy)?.ToGeoJson(),
+                PointWithBuffer = wgs84Point?.ToCircle(accuracy)?.ToGeoJson(),
                 Name = entity.Name,
                 XCoord = entity.XCoord,
                 YCoord = entity.YCoord,

@@ -214,23 +214,23 @@ namespace SOS.Process.Jobs
                     return false;
                 }
 
-                _logger.LogDebug("Finish copying taxonomy and fieldmapping from verbatim to processed db");
+                _logger.LogInformation("Finish copying taxonomy and fieldmapping from verbatim to processed db");
 
 
                 //--------------------------------------
                 // 4. Get taxonomy
                 //--------------------------------------
-                _logger.LogDebug("Start getting processed taxa");
+                _logger.LogInformation("Start getting processed taxa");
                 var taxa = await _processedTaxonRepository.GetAllAsync();
                 if (!taxa?.Any() ?? true)
                 {
-                    _logger.LogDebug("Failed to get processed taxa");
+                    _logger.LogWarning("Failed to get processed taxa");
                     return false;
                 }
 
                 var taxonById = taxa.ToDictionary(m => m.Id, m => m);
                 cancellationToken?.ThrowIfCancellationRequested();
-                _logger.LogDebug("Finish getting processed taxa");
+                _logger.LogInformation("Finish getting processed taxa");
 
                 //------------------------------------------------------------------------
                 // 5. Ensure ElasticSearch (ES) index ProcessedObservation-{0/1} exists
@@ -242,17 +242,17 @@ namespace SOS.Process.Jobs
                 bool newCollection;
                 if (cleanStart)
                 {
-                    _logger.LogDebug($"Start clear ElasticSearch index: {_processedObservationRepository.IndexName}");
+                    _logger.LogInformation($"Start clear ElasticSearch index: {_processedObservationRepository.IndexName}");
                     await _processedObservationRepository.ClearCollectionAsync();
                     newCollection = true;
-                    _logger.LogDebug($"Finish clear ElasticSearch index: {_processedObservationRepository.IndexName}");
+                    _logger.LogInformation($"Finish clear ElasticSearch index: {_processedObservationRepository.IndexName}");
                 }
                 else
                 {
-                    _logger.LogDebug("Start ensure collection exists");
+                    _logger.LogInformation("Start ensure collection exists");
                     // Create ES index ProcessedObservation-{0/1} if it doesn't exist. Empty MongoDB InvalidObservation-{0/1} collection.
                     newCollection = await _processedObservationRepository.VerifyCollectionAsync();
-                    _logger.LogDebug("Finish ensure collection exists");
+                    _logger.LogInformation("Finish ensure collection exists");
                 }
 
                 cancellationToken?.ThrowIfCancellationRequested();
@@ -305,7 +305,7 @@ namespace SOS.Process.Jobs
                 //-----------------------------------------
                 // 9. Save process info
                 //-----------------------------------------
-                _logger.LogDebug("Start updating process info for observations");
+                _logger.LogInformation("Start updating process info for observations");
                 foreach (var dataProvider in dataProvidersToProcess)
                 {
                     await _dataProviderManager.UpdateProcessInfo(
@@ -320,7 +320,7 @@ namespace SOS.Process.Jobs
                     providerInfoByDataProvider.Sum(pi => pi.Value.ProcessCount ?? 0),
                     success ? RunStatus.Success : RunStatus.Failed,
                     providerInfoByDataProvider.Values);
-                _logger.LogDebug("Finish updating process info for observations");
+                _logger.LogInformation("Finish updating process info for observations");
 
                 //----------------------------------------------------------------------------
                 // 10. If a data provider failed to process and it was not Artportalen,
@@ -347,14 +347,14 @@ namespace SOS.Process.Jobs
                 {
                     if (newCollection)
                     {
-                        _logger.LogDebug("Start creating indexes");
+                        _logger.LogInformation("Start creating indexes");
                         await _processedObservationRepository.CreateIndexAsync();
-                        _logger.LogDebug("Finish creating indexes");
+                        _logger.LogInformation("Finish creating indexes");
                     }
 
                     if (toggleInstanceOnSuccess)
                     {
-                        _logger.LogDebug("Toggle instance");
+                        _logger.LogInformation("Toggle instance");
                         await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
                             .InActiveInstance);
                     }

@@ -224,13 +224,22 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="point"></param>
         /// <param name="accuracy"></param>
+        /// <param name="defaultWhenAccuracyIsUnknown"></param>
         /// <returns></returns>
-        public static Geometry ToCircle(this Point point, int? accuracy)
+        public static Geometry ToCircle(this Point point, int? accuracy, int defaultWhenAccuracyIsUnknown = 10000)
         {
-            if (point?.Coordinate == null || point.Coordinate.X.Equals(0) || point.Coordinate.Y.Equals(0) ||
-                accuracy == null || accuracy < 0.0)
+            if (point?.Coordinate == null || point.Coordinate.X.Equals(0) || point.Coordinate.Y.Equals(0))
             {
                 return null;
+            }
+
+            if (accuracy == null || accuracy < 0)
+            {
+                accuracy = defaultWhenAccuracyIsUnknown;
+            }
+            else if (accuracy == 0)
+            {
+                accuracy = 1;
             }
 
             Geometry circle = null;
