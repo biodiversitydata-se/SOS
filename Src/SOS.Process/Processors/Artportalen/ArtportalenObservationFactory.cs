@@ -164,7 +164,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
                 obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(verbatimObservation, taxon);
                 obs.Occurrence.CatalogNumber = verbatimObservation.Id.ToString();
-                obs.Occurrence.DiscoveryMethodId = verbatimObservation.DiscoveryMethodId;
                 obs.Occurrence.OccurrenceId = $"urn:lsid:artportalen.se:Sighting:{verbatimObservation.Id}";
                 obs.Occurrence.IndividualCount = verbatimObservation.Quantity?.ToString() ?? "";
                 obs.Occurrence.IsNaturalOccurrence = !verbatimObservation.Unspontaneous;
@@ -229,6 +228,9 @@ namespace SOS.Process.Processors.Artportalen
                     _fieldMappings[FieldMappingFieldId.Unit],
                     (int) UnitId
                         .Individuals); // todo - if verbatimObservation.Unit is null, should the value be set to "Individuals"? This is how it works in SSOS.
+                obs.Occurrence.DiscoveryMethod = GetSosId(verbatimObservation?.DiscoveryMethod?.Id,
+                    _fieldMappings[FieldMappingFieldId.DiscoveryMethod]);
+
                 return obs;
             }
             catch (Exception e)
@@ -519,6 +521,7 @@ namespace SOS.Process.Processors.Artportalen
                 case FieldMappingFieldId.Institution:
                 case FieldMappingFieldId.AreaType:
                 case FieldMappingFieldId.Unit:
+                case FieldMappingFieldId.DiscoveryMethod:
                     return "Id";
                 default:
                     throw new ArgumentException($"No mapping exist for the field: {fieldMappingFieldId}");

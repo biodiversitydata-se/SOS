@@ -67,6 +67,7 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> substrates,
             IDictionary<int, Metadata> validationStatus,
             IDictionary<int, Metadata> units,
+            IDictionary<int, Metadata> discoveryMethods,
             ProjectEntityDictionaries projectEntityDictionaries)
         {
             return entities.Select(e => e.ToVerbatim(
@@ -80,6 +81,7 @@ namespace SOS.Import.Extensions
                 substrates,
                 validationStatus,
                 units,
+                discoveryMethods,
                 projectEntityDictionaries));
         }
 
@@ -97,6 +99,7 @@ namespace SOS.Import.Extensions
         /// <param name="substrates"></param>
         /// <param name="validationStatus"></param>
         /// <param name="units"></param>
+        /// <param name="discoveryMethods"></param>
         /// <param name="projectEntityDictionaries"></param>
         /// <returns></returns>
         public static ArtportalenVerbatimObservation ToVerbatim(this SightingEntity entity,
@@ -110,6 +113,7 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> substrates,
             IDictionary<int, Metadata> validationStatus,
             IDictionary<int, Metadata> units,
+            IDictionary<int, Metadata> discoveryMethods,
             ProjectEntityDictionaries projectEntityDictionaries)
         {
             var observation = new ArtportalenVerbatimObservation
@@ -123,7 +127,9 @@ namespace SOS.Import.Extensions
                 BiotopeDescription = entity.BiotopeDescription,
                 CollectionID = entity.CollectionID,
                 Comment = entity.Comment,
-                DiscoveryMethodId = entity.DiscoveryMethodId,
+                DiscoveryMethod = entity.DiscoveryMethodId.HasValue && discoveryMethods.ContainsKey(entity.DiscoveryMethodId.Value) 
+                    ? discoveryMethods[entity.DiscoveryMethodId.Value] 
+                    : null,
                 EndDate = entity.EndDate,
                 EndTime = entity.EndTime,
                 Gender = entity.GenderId.HasValue && genders.ContainsKey(entity.GenderId.Value)

@@ -291,5 +291,35 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 return null;
             }
         }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<MetadataEntity>> GetDiscoveryMethodsAsync()
+        {
+            try
+            {
+                const string query = @"
+                    SELECT 
+                        dm.Id, 
+                        t.Value AS Translation,
+	                    gc.CultureCode
+                    FROM 
+                        DiscoveryMethod dm 
+                        INNER JOIN [Resource] r ON dm.ResourceLabel = r.Label
+                        INNER JOIN Translation t ON r.Id = t.ResourceId 
+	                    INNER JOIN GlobalizationCulture gc ON t.GlobalizationCultureId = gc.Id
+                    WHERE
+	                    gc.Id IN (49, 175)
+                    ORDER BY
+	                    dm.Id,
+	                    gc.CultureCode";
+                
+                return await QueryAsync<MetadataEntity>(query);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting discovery methods");
+                return null;
+            }
+        }
     }
 }

@@ -74,6 +74,7 @@ namespace SOS.Import.Harvesters
             OccurrenceStatusFieldMappingFactory occurrenceStatusFieldMappingFactory,
             EstablishmentMeansFieldMappingFactory establishmentMeansFieldMappingFactory,
             AreaTypeFieldMappingFactory areaTypeFieldMappingFactory,
+            DiscoveryMethodFieldMappingFactory discoveryMethodFieldMappingFactory,
             ILogger<FieldMappingHarvester> logger)
         {
             _fieldMappingRepository =
@@ -100,7 +101,8 @@ namespace SOS.Import.Harvesters
                 {FieldMappingFieldId.AccessRights, accessRightsFieldMappingFactory},
                 {FieldMappingFieldId.OccurrenceStatus, occurrenceStatusFieldMappingFactory},
                 {FieldMappingFieldId.EstablishmentMeans, establishmentMeansFieldMappingFactory},
-                {FieldMappingFieldId.AreaType, areaTypeFieldMappingFactory}
+                {FieldMappingFieldId.AreaType, areaTypeFieldMappingFactory},
+                {FieldMappingFieldId.DiscoveryMethod, discoveryMethodFieldMappingFactory}
             };
         }
 
