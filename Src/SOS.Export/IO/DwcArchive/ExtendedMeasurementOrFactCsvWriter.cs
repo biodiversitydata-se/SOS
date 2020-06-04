@@ -39,19 +39,16 @@ namespace SOS.Export.IO.DwcArchive
         {
             try
             {
-                var skip = 0;
-                const int take = 10000;
                 var map = new ExtendedMeasurementOrFactRowMap();
                 var results = await processedObservationRepository.ScrollProjectParametersAsync(filter, null);
-
+                bool writeHeader = true;
                 while (results?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     var records = results?.Records.ToExtendedMeasurementOrFactRows();
-                    await WriteEmofCsvAsync(stream, records, map);
-                    skip += take;
-                    results = await processedObservationRepository.ScrollProjectParametersAsync(filter,
-                        results.ScrollId);
+                    await WriteEmofCsvAsync(stream, records, map, writeHeader);
+                    results = await processedObservationRepository.ScrollProjectParametersAsync(filter, results.ScrollId);
+                    writeHeader = false;
                 }
 
                 return true;
@@ -68,8 +65,11 @@ namespace SOS.Export.IO.DwcArchive
             }
         }
 
-        private async Task WriteEmofCsvAsync<T>(Stream stream, IEnumerable<ExtendedMeasurementOrFactRow> records,
-            ClassMap<T> map)
+        private async Task WriteEmofCsvAsync<T>(
+            Stream stream, 
+            IEnumerable<ExtendedMeasurementOrFactRow> records,
+            ClassMap<T> map,
+            bool writeHeader)
         {
             if (!records?.Any() ?? true)
             {
@@ -83,10 +83,10 @@ namespace SOS.Export.IO.DwcArchive
                 Delimiter = "\t", // tab
                 Encoding = Encoding.UTF8
             };
-            using var csv = new CsvWriter(streamWriter, csvConfig);
-
+            await using var csv = new CsvWriter(streamWriter, csvConfig);
+            csv.Configuration.HasHeaderRecord = writeHeader;
             csv.Configuration.RegisterClassMap(map);
-            csv.WriteRecords(records);
+            await csv.WriteRecordsAsync(records);
         }
     }
 }
