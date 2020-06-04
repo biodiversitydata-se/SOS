@@ -19,6 +19,7 @@ using Microsoft.OpenApi.Models;
 using Nest;
 using NLog.Web;
 using SOS.Lib.Configuration.ObservationApi;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.JsonConverters;
 using SOS.Observations.Api.Database;
 using SOS.Observations.Api.Database.Interfaces;
@@ -91,11 +92,22 @@ namespace SOS.Observations.Api
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            var observationApiConfiguration = Configuration.GetSection("ObservationApiConfiguration")
-                .Get<ObservationApiConfiguration>();
+            
 
             services.AddControllers()
                 .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter()); });
+
+            // Identity service configuration
+            var identityServerConfiguration = Configuration.GetSection("IdentityServer").Get<IdentityServerConfiguration>();
+
+            // Authentication
+            services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.Authority = identityServerConfiguration.Authority;
+                    options.RequireHttpsMetadata = identityServerConfiguration.RequireHttpsMetadata;
+                    options.Audience = "SOS.Observations.Api";
+                });
 
             // Add Mvc Core services
             services.AddMvcCore(option => { option.EnableEndpointRouting = false; })
@@ -132,6 +144,9 @@ namespace SOS.Observations.Api
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
+            var observationApiConfiguration = Configuration.GetSection("ObservationApiConfiguration")
+                .Get<ObservationApiConfiguration>();
 
             // Hangfire
             var mongoConfiguration = observationApiConfiguration.HangfireDbConfiguration;
@@ -226,6 +241,7 @@ namespace SOS.Observations.Api
             app.UseStaticFiles();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
