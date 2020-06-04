@@ -45,7 +45,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                acp.Name AS CountryPartName,
 	                apa.Id AS ParishId,
 	                apa.Name AS ParishName,
-					s.ParentId AS ParentSiteId
+					s.ParentId AS ParentSiteId,
+					s.PresentationNameParishRegion
                 FROM 
 	                Site s 
 	                LEFT JOIN -- Bad data exists, some sites are connected to more than one Municipality

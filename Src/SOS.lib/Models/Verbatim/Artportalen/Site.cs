@@ -54,6 +54,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public GeographicalArea Parish { get; set; }
 
         /// <summary>
+        ///     Presentation name Parish
+        /// </summary>
+        public string PresentationNameParishRegion { get; set; }
+
+        /// <summary>
         ///     Point (WGS84)
         /// </summary>
         public GeoJsonGeometry Point
