@@ -155,6 +155,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0;
                 obs.Location.VerbatimCoordinateSystem = "EPSG:3857";
                 obs.Location.ParentLocationId = verbatimObservation.Site?.ParentSiteId;
+                obs.Location.PresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
                 
                 // Occurrence
                 obs.Occurrence = new ProcessedOccurrence();

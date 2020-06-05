@@ -503,6 +503,7 @@ namespace SOS.Import.Extensions
                 Parish = entity.ParishId.HasValue
                     ? new GeographicalArea {Id = entity.ParishId.Value, Name = entity.ParishName}
                     : null,
+                PresentationNameParishRegion = entity.PresentationNameParishRegion,
                 Point = wgs84Point?.ToGeoJson(),
                 PointWithBuffer = wgs84Point?.ToCircle(accuracy)?.ToGeoJson(),
                 Name = entity.Name,

@@ -100,6 +100,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public ProcessedFieldMapValue Parish { get; set; }
 
         /// <summary>
+        ///     The original presentation name for ParisRegion from data provider
+        /// </summary>
+        public string PresentationNameParishRegion { get; set; }
+ 
+        /// <summary>
         ///     Darwin Core term name: stateProvince.
         ///     The name of the next smaller administrative region than
         ///     country (state, province, canton, department, region, etc.)
