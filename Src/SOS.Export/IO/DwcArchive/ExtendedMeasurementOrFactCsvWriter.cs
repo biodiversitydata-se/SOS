@@ -40,14 +40,14 @@ namespace SOS.Export.IO.DwcArchive
             try
             {
                 var map = new ExtendedMeasurementOrFactRowMap();
-                var results = await processedObservationRepository.ScrollProjectParametersAsync(filter, null);
+                var results = await processedObservationRepository.TypedScrollProjectParametersAsync(filter, null);
                 bool writeHeader = true;
                 while (results?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     var records = results?.Records.ToExtendedMeasurementOrFactRows();
                     await WriteEmofCsvAsync(stream, records, map, writeHeader);
-                    results = await processedObservationRepository.ScrollProjectParametersAsync(filter, results.ScrollId);
+                    results = await processedObservationRepository.TypedScrollProjectParametersAsync(filter, results.ScrollId);
                     writeHeader = false;
                 }
 

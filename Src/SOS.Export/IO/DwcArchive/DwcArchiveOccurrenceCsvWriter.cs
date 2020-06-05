@@ -51,11 +51,11 @@ namespace SOS.Export.IO.DwcArchive
             try
             {
                 filter = PrepareFilter(filter);
-
                 var darwinCoreMap = new DarwinCoreDynamicMap(fieldDescriptions);
                 var fieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
                 var valueMappingDictionaries = fieldMappings.ToDictionary(m => m.Id, m => m.CreateValueDictionary());
-                var scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, null);
+                var scrollResult = await processedObservationRepository.TypedScrollObservationsAsync(filter, null);
+
                 await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
                 var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
@@ -75,8 +75,8 @@ namespace SOS.Export.IO.DwcArchive
                     csv.Configuration.HasHeaderRecord = writeHeader;
                     var dwcObservations = processedObservations.ToDarwinCore().ToArray();
                     await csv.WriteRecordsAsync(dwcObservations);
-                    scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
                     writeHeader = false;
+                    scrollResult = await processedObservationRepository.TypedScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
 
                 return true;

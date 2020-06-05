@@ -4,12 +4,177 @@ using System.Linq;
 using System.Reflection;
 using Nest;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Lib.Extensions
 {
     public static class SearchExtensions
     {
+        private static List<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> CreateTypedQuery(FilterBase filter)
+        {
+            var queryContainers = new List<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>>();
+
+            if (filter.CountyIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field(f => f.Location.County.Id)
+                        .Terms(filter.CountyIds)
+                    )
+                );
+            }
+
+            if (filter.GeometryFilter?.IsValid ?? false)
+            {
+                foreach (var geom in filter.GeometryFilter.Geometries)
+                {
+                    switch (geom.Type.ToLower())
+                    {
+                        case "point":
+                            queryContainers.Add(q => q
+                                .GeoDistance(gd => gd
+                                    .Field(f => f.Location.PointLocation)
+                                    .DistanceType(GeoDistanceType.Arc)
+                                    .Location(geom.ToGeoLocation())
+                                    .Distance(filter.GeometryFilter.MaxDistanceFromPoint ?? 0, DistanceUnit.Meters)
+                                    .ValidationMethod(GeoValidationMethod.IgnoreMalformed)
+                                )
+                            );
+
+                            break;
+                        case "polygon":
+                        case "multipolygon":
+                            if (filter.GeometryFilter.UsePointAccuracy)
+                            {
+                                queryContainers.Add(q => q
+                                    .GeoShape(gd => gd
+                                        .Field(f => f.Location.PointWithBuffer)
+                                        .Shape(s => geom)
+                                        .Relation(GeoShapeRelation.Intersects)
+                                    )
+                                );
+                            }
+                            else
+                            {
+                                queryContainers.Add(q => q
+                                    .GeoShape(gd => gd
+                                        .Field(f => f.Location.Point)
+                                        .Shape(s => geom)
+                                        .Relation(GeoShapeRelation.Within)
+                                    )
+                                );
+                            }
+
+                            break;
+                    }
+                }
+            }
+
+            if (filter.EndDate.HasValue)
+            {
+                queryContainers.Add(q => q
+                    .DateRange(r => r
+                            .Field(f => f.Event.EndDate)
+                            .LessThanOrEquals(
+                                DateMath.Anchored(filter.EndDate.Value
+                                    .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                    )
+                );
+            }
+
+            if (filter.GenderIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field(f => f.Occurrence.Gender.Id)
+                        .Terms(filter.GenderIds)
+                    )
+                );
+            }
+
+            if (filter.MunicipalityIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field(f => f.Location.Municipality.Id)
+                        .Terms(filter.MunicipalityIds)
+                    )
+                );
+            }
+
+            if (filter.OnlyValidated.HasValue && filter.OnlyValidated.Value.Equals(true))
+            {
+                queryContainers.Add(q => q
+                    .Term(m => m
+                        .Field(f => f.Identification.Validated)
+                        .Value(true)));
+            }
+
+            if (filter.PositiveSightings.HasValue)
+            {
+                queryContainers.Add(q => q
+                    .Term(m => m
+                        .Field(f => f.Occurrence.IsPositiveObservation)
+                        .Value(filter.PositiveSightings.Value)));
+            }
+
+            if (filter.DataProviderIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field(f => f.DataProviderId)
+                        .Terms(filter.DataProviderIds)
+                    )
+                );
+            }
+
+            if (filter.ProvinceIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field(f => f.Location.Province.Id)
+                        .Terms(filter.ProvinceIds)
+                    )
+                );
+            }
+
+            if (filter.RedListCategories?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field(f => f.Taxon.RedlistCategory)
+                        .Terms(filter.RedListCategories)
+                    )
+                );
+            }
+
+            if (filter.StartDate.HasValue)
+            {
+                queryContainers.Add(q => q
+                    .DateRange(r => r
+                            .Field(f => f.Event.StartDate)
+                            .GreaterThanOrEquals(
+                                DateMath.Anchored(filter.StartDate.Value
+                                    .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                    )
+                );
+            }
+
+            if (filter.TaxonIds?.Any() ?? false)
+            {
+                queryContainers.Add(q => q
+                    .Terms(t => t
+                        .Field(f => f.Taxon.Id)
+                        .Terms(filter.TaxonIds)
+                    )
+                );
+            }
+
+            return queryContainers;
+        }
+
+
         private static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateQuery(FilterBase filter)
         {
             var queryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
@@ -199,6 +364,36 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        ///     Create project parameter filter.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public static IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> ToTypedProjectParameterQuery(
+            this FilterBase filter)
+        {
+            var query = CreateTypedQuery(filter);
+            query.Add(q => q
+                .Nested(n => n
+                    .Path(p => p.Projects)
+                    .Query(q => q
+                        .Nested(n => n
+                            .Path("projects.projectParameters")
+                            .Query(q => q
+                                .Exists(e => e
+                                    .Field("projects.projectParameters")
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+
+            return query;
+        }
+
+
+
+        /// <summary>
         ///     Create search filter
         /// </summary>
         /// <param name="filter"></param>
@@ -212,6 +407,17 @@ namespace SOS.Lib.Extensions
             }
 
             return CreateQuery(filter);
+        }
+
+        public static IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> ToTypedObservationQuery(
+            this FilterBase filter)
+        {
+            if (!filter.IsFilterActive)
+            {
+                return new List<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>>();
+            }
+
+            return CreateTypedQuery(filter);
         }
 
 

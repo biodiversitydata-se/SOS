@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -84,6 +86,90 @@ namespace SOS.Export.Repositories
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
         }
+
+        /// <inheritdoc />
+        public async Task<ScrollResult<ProcessedProject>> TypedScrollProjectParametersAsync(
+            FilterBase filter,
+            string scrollId)
+        {
+            ISearchResponse<ProcessedObservation> searchResponse;
+            if (string.IsNullOrEmpty(scrollId))
+            {
+                searchResponse = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                    .Index(_indexName)
+                    .Source(source => source
+                        .Includes(i => i
+                            .Field(f => f.Projects)))
+                    .Query(query => query
+                        .Bool(boolQueryDescriptor => boolQueryDescriptor
+                            .Filter(filter.ToTypedProjectParameterQuery())
+                        )
+                    )
+                    .Scroll(ScrollTimeOut)
+                    .Size(_batchSize)
+                );
+            }
+            else
+            {
+                searchResponse = await _elasticClient
+                    .ScrollAsync<ProcessedObservation>(ScrollTimeOut, scrollId);
+            }
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            return new ScrollResult<ProcessedProject>
+            {
+                Records = searchResponse.Documents.SelectMany(p => p.Projects),
+                ScrollId = searchResponse.ScrollId,
+                TotalCount = searchResponse.HitsMetadata.Total.Value
+            };
+        }
+
+
+        /// <inheritdoc />
+        public async Task<ScrollResult<ProcessedObservation>> TypedScrollObservationsAsync(
+            FilterBase filter,
+            string scrollId)
+        {
+            ISearchResponse<ProcessedObservation> searchResponse;
+            
+            if (string.IsNullOrEmpty(scrollId))
+            {
+                var query = filter.ToTypedObservationQuery();
+                var projection = new SourceFilterDescriptor<ProcessedObservation>()
+                    .Excludes(e => e.Fields(
+                        f => f.Location.Point,
+                        f => f.Location.PointLocation,
+                        f => f.Location.PointWithBuffer));
+
+                searchResponse = await _elasticClient
+                    .SearchAsync<ProcessedObservation>(s => s
+                        .Index(_indexName)
+                        .Source(p => projection)
+                        .Query(q => q
+                            .Bool(b => b
+                                .Filter(query)
+                            )
+                        )
+                        .Scroll(ScrollTimeOut)
+                        .Size(_batchSize)
+                    );
+
+            }
+            else
+            {
+                searchResponse = await _elasticClient
+                    .ScrollAsync<ProcessedObservation>(ScrollTimeOut, scrollId);
+            }
+
+            return new ScrollResult<ProcessedObservation>
+            {
+                Records = searchResponse.Documents,
+                ScrollId = searchResponse.ScrollId,
+                TotalCount = searchResponse.HitsMetadata.Total.Value
+            };
+        }
+
 
         /// <inheritdoc />
         public async Task<ScrollResult<ProcessedObservation>> ScrollObservationsAsync(FilterBase filter,
