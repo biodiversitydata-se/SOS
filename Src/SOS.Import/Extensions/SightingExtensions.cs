@@ -153,6 +153,7 @@ namespace SOS.Import.Extensions
                 MigrateSightingPortalId = entity.MigrateSightingPortalId,
                 MinDepth = entity.MinDepth,
                 MinHeight = entity.MinHeight,
+                NoteOfInterest = entity.NoteOfInterest,
                 NotPresent = entity.NotPresent,
                 NotRecovered = entity.NotRecovered,
                 ProtectedBySystem = entity.ProtectedBySystem,

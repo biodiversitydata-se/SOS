@@ -117,6 +117,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public int? MinHeight { get; set; }
 
         /// <summary>
+        ///     Note of Interest
+        /// </summary>
+        public bool NoteOfInterest { get; set; }
+
+        /// <summary>
         ///     Not present flag
         /// </summary>
         public bool NotPresent { get; set; }

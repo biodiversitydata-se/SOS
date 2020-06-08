@@ -158,6 +158,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public ProcessedFieldMapValue LifeStage { get; set; }
 
         /// <summary>
+        ///     Note of Interest
+        /// </summary>
+        public bool NoteOfInterest { get; set; }
+
+        /// <summary>
         ///     An identifier for the Occurrence (as opposed to a
         ///     particular digital record of the occurrence).
         ///     In the absence of a persistent global unique identifier,
