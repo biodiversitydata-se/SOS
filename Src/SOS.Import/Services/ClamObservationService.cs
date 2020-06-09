@@ -13,8 +13,8 @@ namespace SOS.Import.Services
     /// </summary>
     public class ClamObservationService : IClamObservationService
     {
-        private readonly ClamServiceConfiguration _clamServiceConfiguration;
         private readonly IHttpClientService _httpClientService;
+        private readonly ClamServiceConfiguration _clamServiceConfiguration;
         private readonly ILogger<ClamObservationService> _logger;
 
         /// <summary>

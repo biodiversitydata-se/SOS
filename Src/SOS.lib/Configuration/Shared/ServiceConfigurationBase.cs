@@ -1,6 +1,6 @@
-﻿namespace SOS.Lib.Configuration.Import
+﻿namespace SOS.Lib.Configuration.Shared
 {
-    public class SluWcfConfiguration
+    public class ServiceConfigurationBase
     {
         /// <summary>
         ///     A secret token is needed for authorization when making calls to KUL web service.

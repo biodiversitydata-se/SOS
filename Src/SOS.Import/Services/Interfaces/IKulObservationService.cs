@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using KulService;
+﻿using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SOS.Import.Services.Interfaces
 {
     public interface IKulObservationService
     {
         /// <summary>
-        ///     Get KUL observations between changedFrom and changedTo.
+        ///  Get KUL observations 
         /// </summary>
-        /// <param name="changedFrom">From date.</param>
-        /// <param name="changedTo">To date.</param>
+        /// <param name="changeId"></param>
         /// <returns></returns>
-        Task<IEnumerable<WebSpeciesObservation>> GetAsync(DateTime changedFrom, DateTime changedTo);
+        Task<XDocument> GetAsync(long changeId);
     }
 }

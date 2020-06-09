@@ -1,11 +1,13 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SersService;
+using MvmService;
 using SOS.Import.Services;
+using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using Xunit;
 
@@ -18,18 +20,18 @@ namespace SOS.Import.UnitTests.Services
         /// </summary>
         public SersObservationServiceTests()
         {
-            _speciesObservationChangeServiceMock = new Mock<ISpeciesObservationChangeService>();
+            _httpClientService = new Mock<IHttpClientService>();
             _sersServiceConfiguration = new SersServiceConfiguration
                 {MaxNumberOfSightingsHarvested = 10, MaxReturnedChangesInOnePage = 10};
             _loggerMock = new Mock<ILogger<SersObservationService>>();
         }
 
-        private readonly Mock<ISpeciesObservationChangeService> _speciesObservationChangeServiceMock;
+        private readonly Mock<IHttpClientService> _httpClientService;
         private readonly SersServiceConfiguration _sersServiceConfiguration;
         private readonly Mock<ILogger<SersObservationService>> _loggerMock;
 
         private SersObservationService TestObject => new SersObservationService(
-            _speciesObservationChangeServiceMock.Object,
+            _httpClientService.Object,
             _sersServiceConfiguration,
             _loggerMock.Object);
 
@@ -46,16 +48,16 @@ namespace SOS.Import.UnitTests.Services
                 _sersServiceConfiguration,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should()
-                .Be("speciesObservationChangeServiceClient");
+                .Be("httpClientService");
 
             create = () => new SersObservationService(
-                _speciesObservationChangeServiceMock.Object,
+                _httpClientService.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sersServiceConfiguration");
 
             create = () => new SersObservationService(
-                _speciesObservationChangeServiceMock.Object,
+                _httpClientService.Object,
                 _sersServiceConfiguration,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
@@ -71,18 +73,12 @@ namespace SOS.Import.UnitTests.Services
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _speciesObservationChangeServiceMock.Setup(s => s.GetSpeciesObservationChangeAsSpeciesAsync(
-                    It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<bool>(),
-                    It.IsAny<DateTime>(), It.IsAny<bool>(), It.IsAny<long>(), It.IsAny<bool>(), It.IsAny<long>()))
+            _httpClientService.Setup(s => s.GetFileStreamAsync(It.IsAny<Uri>(), null))
                 .Throws(new Exception("Exception"));
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () =>
-            {
-                await TestObject.GetAsync(It.IsAny<int>());
-                ;
-            };
+            Func<Task> act = async () => { await TestObject.GetAsync(0); };
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -100,22 +96,20 @@ namespace SOS.Import.UnitTests.Services
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _speciesObservationChangeServiceMock.Setup(s => s.GetSpeciesObservationChangeAsSpeciesAsync(
-                    It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<bool>(),
-                    It.IsAny<DateTime>(), It.IsAny<bool>(), It.IsAny<long>(), It.IsAny<bool>(), It.IsAny<long>()))
-                .ReturnsAsync(new WebSpeciesObservationChange
-                    {CreatedSpeciesObservations = new WebSpeciesObservation[0]});
+            //TODO fix test file
+            _httpClientService.Setup(s => s.GetFileStreamAsync(It.IsAny<Uri>(), It.IsAny<Dictionary<string, string>>()))
+                .ReturnsAsync(new FileStream("", FileMode.Open));
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetAsync(It.IsAny<int>());
+            var result = await TestObject.GetAsync(0);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Item2.Count().Should().Be(0);
+            result.Should().BeNull();
         }
     }
 }

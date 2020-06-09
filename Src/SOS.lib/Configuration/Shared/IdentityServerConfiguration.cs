@@ -13,7 +13,7 @@
         /// <summary>
         /// Api name
         /// </summary>
-        public string ClientId { get; set; }
+        public string Audience { get; set; }
 
         /// <summary>
         /// Required https meta data

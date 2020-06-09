@@ -38,7 +38,7 @@ namespace SOS.Observations.Api.Controllers
 
         /// <inheritdoc />
         [HttpGet]
-     //   [Authorize]
+        [Authorize]
         [ProducesResponseType(typeof(PagedResult<ExternalSimpleArea>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetAreasAsync([FromQuery] IEnumerable<AreaType> areaTypes = null,

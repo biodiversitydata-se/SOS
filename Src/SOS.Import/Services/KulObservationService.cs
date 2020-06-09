@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
-using KulService;
+using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
@@ -10,9 +12,9 @@ namespace SOS.Import.Services
 {
     public class KulObservationService : IKulObservationService
     {
+        private readonly IHttpClientService _httpClientService;
         private readonly KulServiceConfiguration _kulServiceConfiguration;
         private readonly ILogger<KulObservationService> _logger;
-        private readonly ISpeciesObservationChangeService _speciesObservationChangeServiceClient;
 
         /// <summary>
         ///     Constructor
@@ -21,34 +23,48 @@ namespace SOS.Import.Services
         /// <param name="kulServiceConfiguration"></param>
         /// <param name="logger"></param>
         public KulObservationService(
-            ISpeciesObservationChangeService speciesObservationChangeServiceClient,
+            IHttpClientService httpClientService,
             KulServiceConfiguration kulServiceConfiguration,
             ILogger<KulObservationService> logger)
         {
-            _speciesObservationChangeServiceClient = speciesObservationChangeServiceClient ??
-                                                     throw new ArgumentNullException(
-                                                         nameof(speciesObservationChangeServiceClient));
+            _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
             _kulServiceConfiguration = kulServiceConfiguration ??
                                        throw new ArgumentNullException(nameof(kulServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<IEnumerable<WebSpeciesObservation>> GetAsync(DateTime changedFrom, DateTime changedTo)
+        /// <inheritdoc />
+        public async Task<XDocument> GetAsync(long changeId)
         {
-            var result = await _speciesObservationChangeServiceClient.GetSpeciesObservationChangeAsSpeciesAsync(
-                _kulServiceConfiguration.Token,
-                changedFrom,
-                true,
-                changedTo,
-                true,
-                0,
-                false,
-                _kulServiceConfiguration.MaxReturnedChangesInOnePage);
+            try
+            {
+                var xmlStream = await _httpClientService.GetFileStreamAsync(
+                    new Uri($"{_kulServiceConfiguration.BaseAddress}/api/v1/KulSpeciesObservation/?token={_kulServiceConfiguration.Token}" +
+                            $"&changedFrom=1900-01-01" +
+                            $"&isChangedFromSpecified=false" +
+                            $"&changedTo=1900-01-01" +
+                            $"&isChangedToSpecified=false" +
+                            $"&changeId={changeId}" +
+                            $"&isChangedIdSpecified=true" +
+                            $"&maxReturnedChanges={_kulServiceConfiguration.MaxReturnedChangesInOnePage}"),
+                    new Dictionary<string, string>(new[]
+                        {
+                            new KeyValuePair<string, string>("Accept", _kulServiceConfiguration.AcceptHeaderContentType),
+                        }
+                        )
+                    );
 
-            _logger.LogDebug(
-                $"Getting observations from KUL Service: ChangedFrom: {changedFrom.ToShortDateString()}, ChangedTo: {changedTo.ToShortDateString()}, Created: {result.CreatedSpeciesObservations?.Length ?? 0}, Updated: {result.UpdatedSpeciesObservations?.Length ?? 0}, Deleted: {result.DeletedSpeciesObservationGuids?.Length ?? 0}");
+                xmlStream.Seek(0, SeekOrigin.Begin);
 
-            return result.CreatedSpeciesObservations;
+                var xDocument = await XDocument.LoadAsync(xmlStream, LoadOptions.None, CancellationToken.None);
+
+                return xDocument;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Failed to get data from KUL", e);
+                return null;
+            }
         }
     }
 }

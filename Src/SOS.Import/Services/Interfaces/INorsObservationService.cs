@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using NorsService;
+﻿using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SOS.Import.Services.Interfaces
 {
@@ -12,6 +10,6 @@ namespace SOS.Import.Services.Interfaces
         /// </summary>
         /// <param name="getFromId"></param>
         /// <returns></returns>
-        Task<Tuple<long, IEnumerable<WebSpeciesObservation>>> GetAsync(long getFromId);
+        Task<XDocument> GetAsync(long changeId);
     }
 }

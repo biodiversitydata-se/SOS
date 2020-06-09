@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
@@ -63,41 +64,45 @@ namespace SOS.Import.Harvesters.Observations
                 await _sersObservationVerbatimRepository.AddCollectionAsync();
                 _logger.LogInformation("Finish empty collection for SERS verbatim collection");
 
+                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+                var changeId = 0L;
                 var nrSightingsHarvested = 0;
-                var result = await _sersObservationService.GetAsync(0);
-                var maxId = result?.Item1 ?? 0;
+                var xmlDocument = await _sersObservationService.GetAsync(changeId);
                 var dataLastModified = DateTime.MinValue;
 
+                var verbatims = xmlDocument.ToVerbatims<SersObservationVerbatim>(ns);
+
                 // Loop until all sightings are fetched.
-                while (maxId != 0)
+                while (verbatims?.Any() ?? false)
                 {
-                    var sightings = result?.Item2;
-
-                    cancellationToken?.ThrowIfCancellationRequested();
-
-                    var aggregates = sightings.ToVerbatims().ToArray();
-                    nrSightingsHarvested += aggregates.Length;
-
                     // Add sightings to MongoDb
-                    await _sersObservationVerbatimRepository.AddManyAsync(aggregates);
+                    await _sersObservationVerbatimRepository.AddManyAsync(verbatims);
 
-                    var batchDataLastModified = aggregates.Select(a => a.Modified).Max();
+                    nrSightingsHarvested += verbatims.Count();
+
+                    _logger.LogInformation($"{ nrSightingsHarvested } SERS observations harvested");
+
+                    var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
 
                     if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
                     {
                         dataLastModified = batchDataLastModified.Value;
                     }
 
+                    cancellationToken?.ThrowIfCancellationRequested();
                     if (_sersServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         nrSightingsHarvested >= _sersServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
+                        _logger.LogInformation("Max SERS observations reached");
                         break;
                     }
 
-                    result = await _sersObservationService.GetAsync(maxId + 1);
-                    maxId = result?.Item1 ?? 0;
-                }
+                    var maxIdField = xmlDocument.Descendants(ns + "MaxChangeId").FirstOrDefault();
 
+                    changeId = long.Parse(maxIdField.Value);
+                    xmlDocument = await _sersObservationService.GetAsync(changeId);
+                    verbatims = xmlDocument.ToVerbatims<SersObservationVerbatim>(ns);
+                }
                 _logger.LogInformation("Finished harvesting sightings for SERS data provider");
 
                 // Update harvest info

@@ -1,5 +1,5 @@
-﻿using System;
-using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Models.Interfaces;
+using System;
 
 namespace SOS.Lib.Models.Verbatim.Kul
 {
