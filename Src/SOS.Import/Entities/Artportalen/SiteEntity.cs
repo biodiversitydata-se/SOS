@@ -56,6 +56,11 @@
         public string ParishName { get; set; }
 
         /// <summary>
+        ///     Presentation name with Parish
+        /// </summary>
+        public string PresentationNameParishRegion { get; set; }
+
+        /// <summary>
         ///     Id of province
         /// </summary>
         public int? ProvinceId { get; set; }

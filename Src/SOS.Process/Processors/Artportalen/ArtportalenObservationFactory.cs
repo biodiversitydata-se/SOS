@@ -155,6 +155,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0;
                 obs.Location.VerbatimCoordinateSystem = "EPSG:3857";
                 obs.Location.ParentLocationId = verbatimObservation.Site?.ParentSiteId;
+                obs.Location.PresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
                 
                 // Occurrence
                 obs.Occurrence = new ProcessedOccurrence();
@@ -170,6 +171,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.IsNeverFoundObservation = verbatimObservation.NotPresent;
                 obs.Occurrence.IsNotRediscoveredObservation = verbatimObservation.NotRecovered;
                 obs.Occurrence.IsPositiveObservation = !(verbatimObservation.NotPresent || verbatimObservation.NotRecovered);
+                obs.Occurrence.NoteOfInterest = verbatimObservation.NoteOfInterest;
                 obs.Occurrence.OrganismQuantityInt = verbatimObservation.Quantity;
                 obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
                 obs.Occurrence.RecordedBy = verbatimObservation.Observers;
@@ -180,6 +182,7 @@ namespace SOS.Process.Processors.Artportalen
                     ? new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Absent}
                     : new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Present};
                 obs.Occurrence.URL = $"http://www.artportalen.se/sighting/{verbatimObservation.Id}";
+
                 obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
                 obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
                 obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider,

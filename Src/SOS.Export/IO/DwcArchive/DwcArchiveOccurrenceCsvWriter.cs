@@ -39,7 +39,7 @@ namespace SOS.Export.IO.DwcArchive
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
+        
         /// <inheritdoc />
         public async Task<bool> CreateOccurrenceCsvFileAsync(
             FilterBase filter,
@@ -51,21 +51,32 @@ namespace SOS.Export.IO.DwcArchive
             try
             {
                 filter = PrepareFilter(filter);
-
                 var darwinCoreMap = new DarwinCoreDynamicMap(fieldDescriptions);
                 var fieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
                 var valueMappingDictionaries = fieldMappings.ToDictionary(m => m.Id, m => m.CreateValueDictionary());
-                var scrollResult = await processedObservationRepository.ScrollObservationsAsync(filter, null);
+                var scrollResult = await processedObservationRepository.TypedScrollObservationsAsync(filter, null);
 
+                await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
+                var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = true,
+                    Delimiter = "\t", // tab
+                    Encoding = Encoding.UTF8
+                };
+                
+                await using var csv = new CsvWriter(streamWriter, csvConfig);
+                csv.Configuration.RegisterClassMap(darwinCoreMap);
+                bool writeHeader = true;
                 while (scrollResult?.Records?.Any() ?? false)
                 {
-                    var processedObservations = scrollResult.Records;
+                    var processedObservations = scrollResult.Records.ToArray();
                     cancellationToken?.ThrowIfCancellationRequested();
                     ResolveFieldMappedValues(processedObservations, valueMappingDictionaries);
-                    await WriteOccurrenceCsvAsync(stream, processedObservations.ToDarwinCore(), darwinCoreMap);
-
-                    scrollResult =
-                        await processedObservationRepository.ScrollObservationsAsync(filter, scrollResult.ScrollId);
+                    csv.Configuration.HasHeaderRecord = writeHeader;
+                    var dwcObservations = processedObservations.ToDarwinCore().ToArray();
+                    await csv.WriteRecordsAsync(dwcObservations);
+                    writeHeader = false;
+                    scrollResult = await processedObservationRepository.TypedScrollObservationsAsync(filter, scrollResult.ScrollId);
                 }
 
                 return true;
@@ -157,25 +168,5 @@ namespace SOS.Export.IO.DwcArchive
             }
         }
 
-        private async Task WriteOccurrenceCsvAsync<T>(Stream stream, IEnumerable<T> records, ClassMap<T> map)
-        {
-            if (!records?.Any() ?? true)
-            {
-                return;
-            }
-
-            await using var streamWriter = new StreamWriter(stream, null, -1, true);
-            var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                HasHeaderRecord = true,
-                Delimiter = "\t", // tab
-                Encoding = Encoding.UTF8
-            };
-            await using var csv = new CsvWriter(streamWriter, csvConfig);
-
-            csv.Configuration.RegisterClassMap(map);
-            csv.WriteRecords(records);
-            csv.Flush();
-        }
     }
 }

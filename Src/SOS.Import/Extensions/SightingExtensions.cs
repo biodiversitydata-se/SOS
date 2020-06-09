@@ -153,6 +153,7 @@ namespace SOS.Import.Extensions
                 MigrateSightingPortalId = entity.MigrateSightingPortalId,
                 MinDepth = entity.MinDepth,
                 MinHeight = entity.MinHeight,
+                NoteOfInterest = entity.NoteOfInterest,
                 NotPresent = entity.NotPresent,
                 NotRecovered = entity.NotRecovered,
                 ProtectedBySystem = entity.ProtectedBySystem,
@@ -503,6 +504,7 @@ namespace SOS.Import.Extensions
                 Parish = entity.ParishId.HasValue
                     ? new GeographicalArea {Id = entity.ParishId.Value, Name = entity.ParishName}
                     : null,
+                PresentationNameParishRegion = entity.PresentationNameParishRegion,
                 Point = wgs84Point?.ToGeoJson(),
                 PointWithBuffer = wgs84Point?.ToCircle(accuracy)?.ToGeoJson(),
                 Name = entity.Name,

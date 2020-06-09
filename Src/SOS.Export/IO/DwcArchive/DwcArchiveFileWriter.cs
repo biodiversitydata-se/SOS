@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -87,7 +88,7 @@ namespace SOS.Export.IO.DwcArchive
                 var processInfoXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "processinfo.xml");
 
                 // Create Occurrence.csv
-                using (var fileStream = File.Create(occurrenceCsvFilePath))
+                using (var fileStream = File.Create(occurrenceCsvFilePath, 128 * 1024))
                 {
                     await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
                         filter,
