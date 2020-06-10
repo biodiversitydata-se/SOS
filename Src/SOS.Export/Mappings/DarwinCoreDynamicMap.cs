@@ -1037,7 +1037,7 @@ namespace SOS.Export.Mappings
             dic.Add(FieldDescriptionId.OtherCatalogNumbers, m => m.Occurrence.OtherCatalogNumbers);
             dic.Add(FieldDescriptionId.OccurrenceRemarks, m => m.Occurrence.OccurrenceRemarks);
 
-            // DarwinCore
+            // DarwinCore (Record level)
             dic.Add(FieldDescriptionId.DatasetID, m => m.DatasetID);
             dic.Add(FieldDescriptionId.Type, m => m.Type);
             dic.Add(FieldDescriptionId.Modified, m => m.Modified);

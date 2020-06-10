@@ -4,6 +4,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using SOS.Export.Enums;
 using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Managers.Interfaces;
@@ -151,12 +152,14 @@ namespace SOS.Export.Managers
             try
             {
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.CollectionName);
+                var fieldDescriptions = FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose();
 
                 var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     filter,
                     fileName,
                     _processedObservationRepository,
-                    FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
+                    fieldDescriptions,
+                    //FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                     processInfo,
                     _exportPath,
                     cancellationToken);

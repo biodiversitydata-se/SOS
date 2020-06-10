@@ -8,6 +8,7 @@ using SOS.Export.Models;
 
 namespace SOS.Export.Helpers
 {
+    // todo - move to SOS.Lib
     /// <summary>
     ///     Field descriptions.
     /// </summary>
@@ -28,10 +29,9 @@ namespace SOS.Export.Helpers
             FieldDescriptionId.ScientificName,
             FieldDescriptionId.DecimalLongitude,
             FieldDescriptionId.DecimalLatitude,
+            FieldDescriptionId.GeodeticDatum,
             FieldDescriptionId.CoordinateUncertaintyInMeters,
-            FieldDescriptionId.Year,
-            FieldDescriptionId.Month,
-            FieldDescriptionId.Day
+            FieldDescriptionId.EventDate
         };
 
         static FieldDescriptionHelper()
@@ -65,6 +65,11 @@ namespace SOS.Export.Helpers
                 .AddMandatoryFieldDescriptionIdsFirst();
         }
 
+        public static IEnumerable<FieldDescription> GetAllFieldDescriptions()
+        {
+            return AllFields;
+        }
+
         public static IEnumerable<FieldDescription> AddMandatoryFieldDescriptions(
             IEnumerable<FieldDescriptionId> fieldDescriptions)
         {
@@ -81,7 +86,7 @@ namespace SOS.Export.Helpers
             return AllFieldsByFieldDescriptionId
                 .Where(x => list.Contains(x.Key))
                 .Select(x => x.Value)
-                .OrderBy(x => list.IndexOf((FieldDescriptionId) x.Id));
+                .OrderBy(x => x.Id);
         }
 
         public static IEnumerable<FieldDescriptionId> AddMandatoryFieldDescriptionIds(
@@ -106,5 +111,62 @@ namespace SOS.Export.Helpers
         {
             return AllFields.Select(x => (FieldDescriptionId) x.Id).Except(fieldDescriptionIds);
         }
+
+        /// <summary>
+        /// Create a bool array that holds data about whether a field should be written to a DwC-A occurrence CSV file.
+        /// </summary>
+        /// <param name="fieldDescriptions"></param>
+        /// <remarks>A bool array is much faster to use than using a Dictionary of {FieldDescriptionId, bool}</remarks>
+        /// <returns></returns>
+        public static bool[] CreateWriteFieldsArray(IEnumerable<FieldDescription> fieldDescriptions)
+        {
+            var fieldDescriptionIdsSet = new HashSet<FieldDescriptionId>();
+            foreach (var fieldDescription in fieldDescriptions)
+            {
+                fieldDescriptionIdsSet.Add((FieldDescriptionId) fieldDescription.Id);
+            }
+
+            bool[] writeField = new bool[AllFields.Max(f => f.Id) +1];
+            foreach (var field in AllFields.OrderBy(m => m.Id))
+            {
+                if (fieldDescriptionIdsSet.Contains(field.FieldDescriptionId))
+                {
+                    writeField[field.Id] = true;
+                }
+            }
+
+            return writeField;
+        }
+
+        /// <summary>
+        /// Get a subset of important DwC fields used for testing purpose. It's easier to debug data and the exports are faster.
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<FieldDescription> GetDwcFieldDescriptionsForTestingPurpose()
+        {
+            return GetFieldDescriptions(DwcFieldDescriptionForTestingPurpose);
+        }
+
+        private static readonly FieldDescriptionId[] DwcFieldDescriptionForTestingPurpose = {
+            FieldDescriptionId.OccurrenceID,
+            FieldDescriptionId.BasisOfRecord,
+            FieldDescriptionId.ScientificName,
+            FieldDescriptionId.Kingdom,
+            FieldDescriptionId.DecimalLongitude,
+            FieldDescriptionId.DecimalLatitude,
+            FieldDescriptionId.CoordinateUncertaintyInMeters,
+            FieldDescriptionId.GeodeticDatum,
+            FieldDescriptionId.EventDate,
+            FieldDescriptionId.EventTime,
+            FieldDescriptionId.CollectionCode,
+            FieldDescriptionId.DatasetName,
+            FieldDescriptionId.RecordedBy,
+            FieldDescriptionId.LifeStage,
+            FieldDescriptionId.IdentificationVerificationStatus,
+            FieldDescriptionId.SamplingProtocol,
+            FieldDescriptionId.Country,
+            FieldDescriptionId.InstitutionCode,
+            FieldDescriptionId.CatalogNumber
+        };
     }
 }
