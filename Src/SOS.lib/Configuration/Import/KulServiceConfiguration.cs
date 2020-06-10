@@ -1,6 +1,8 @@
-﻿namespace SOS.Lib.Configuration.Import
+﻿using SOS.Lib.Configuration.Shared;
+
+namespace SOS.Lib.Configuration.Import
 {
-    public class KulServiceConfiguration : SluWcfConfiguration
+    public class KulServiceConfiguration : RestServiceConfiguration
     {
         /// <summary>
         ///     The year to start harvest from.

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
@@ -63,39 +64,44 @@ namespace SOS.Import.Harvesters.Observations
                 await _norsObservationVerbatimRepository.AddCollectionAsync();
                 _logger.LogInformation("Finish empty collection for NORS verbatim collection");
 
+                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+                var changeId = 0L;
                 var nrSightingsHarvested = 0;
-                var result = await _norsObservationService.GetAsync(0);
-                var maxId = result?.Item1 ?? 0;
+                var xmlDocument = await _norsObservationService.GetAsync(changeId);
                 var dataLastModified = DateTime.MinValue;
 
+                var verbatims = xmlDocument.ToVerbatims<NorsObservationVerbatim>(ns);
+
                 // Loop until all sightings are fetched.
-                while (maxId != 0)
+                while (verbatims?.Any() ?? false)
                 {
-                    var sightings = result?.Item2;
-
-                    cancellationToken?.ThrowIfCancellationRequested();
-
-                    var aggregates = sightings.ToVerbatims().ToArray();
-                    nrSightingsHarvested += aggregates.Length;
-
                     // Add sightings to MongoDb
-                    await _norsObservationVerbatimRepository.AddManyAsync(aggregates);
+                    await _norsObservationVerbatimRepository.AddManyAsync(verbatims);
 
-                    var batchDataLastModified = aggregates.Select(a => a.Modified).Max();
+                    nrSightingsHarvested += verbatims.Count();
+
+                    _logger.LogInformation($"{ nrSightingsHarvested } NORS observations harvested");
+
+                    var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
 
                     if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
                     {
                         dataLastModified = batchDataLastModified.Value;
                     }
 
+                    cancellationToken?.ThrowIfCancellationRequested();
                     if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         nrSightingsHarvested >= _norsServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
+                        _logger.LogInformation("Max NORS observations reached");
                         break;
                     }
 
-                    result = await _norsObservationService.GetAsync(maxId + 1);
-                    maxId = result?.Item1 ?? 0;
+                    var maxIdField = xmlDocument.Descendants(ns + "MaxChangeId").FirstOrDefault();
+
+                    changeId = long.Parse(maxIdField.Value);
+                    xmlDocument = await _norsObservationService.GetAsync(changeId);
+                    verbatims = xmlDocument.ToVerbatims<NorsObservationVerbatim>(ns);
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for NORS data provider");

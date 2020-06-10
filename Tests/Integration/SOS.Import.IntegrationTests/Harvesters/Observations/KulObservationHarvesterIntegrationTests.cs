@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Hangfire;
-using KulService;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -29,7 +28,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
 
             var kulObservationService = new KulObservationService(
-                new SpeciesObservationChangeServiceClient(),
+                new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), 
                 importConfiguration.KulServiceConfiguration,
                 new NullLogger<KulObservationService>());
 
@@ -70,7 +69,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
 
             var kulObservationHarvester = new KulObservationHarvester(
                 new KulObservationService(
-                    new SpeciesObservationChangeServiceClient(),
+                    new HttpClientService(new Mock<ILogger<HttpClientService>>().Object),
                     importConfiguration.KulServiceConfiguration,
                     new NullLogger<KulObservationService>()),
                 new Mock<IKulObservationVerbatimRepository>().Object,

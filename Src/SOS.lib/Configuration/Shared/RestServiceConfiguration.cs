@@ -3,7 +3,7 @@
     /// <summary>
     ///     Configuration parameters for a REST service
     /// </summary>
-    public class RestServiceConfiguration
+    public class RestServiceConfiguration : ServiceConfigurationBase
     {
         /// <summary>
         ///     Address for the service

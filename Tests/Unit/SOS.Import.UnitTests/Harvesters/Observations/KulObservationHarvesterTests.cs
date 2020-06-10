@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using FluentAssertions;
 using Hangfire;
-using KulService;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Harvesters.Observations;
@@ -88,7 +88,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _kulObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
+            _kulObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<long>()))
                 .ThrowsAsync(new Exception("Fail"));
 
             //-----------------------------------------------------------------------------------------------------------
@@ -112,8 +112,8 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _kulObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                .ReturnsAsync(new List<WebSpeciesObservation>());
+            _kulObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<long>()))
+                .ReturnsAsync(new XDocument());
 
             _kulObservationVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())
                 .ReturnsAsync(true);

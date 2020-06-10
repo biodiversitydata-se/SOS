@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Entities\Kul\**" />
+    <EmbeddedResource Remove="Entities\Kul\**" />
+    <None Remove="Entities\Kul\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.8.0" />
     <PackageReference Include="CsvHelper" Version="15.0.5" />
@@ -27,7 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\Kul\" />
     <Folder Include="Resources\FieldMappings\" />
   </ItemGroup>
 

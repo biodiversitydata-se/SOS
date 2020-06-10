@@ -1,6 +1,8 @@
-﻿namespace SOS.Lib.Configuration.Import
+﻿using SOS.Lib.Configuration.Shared;
+
+namespace SOS.Lib.Configuration.Import
 {
-    public class MvmServiceConfiguration : SluWcfConfiguration
+    public class MvmServiceConfiguration : ServiceConfigurationBase
     {
     }
 }

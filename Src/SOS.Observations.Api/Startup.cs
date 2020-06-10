@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.Json.Serialization;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -15,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Nest;
 using NLog.Web;
@@ -106,7 +108,7 @@ namespace SOS.Observations.Api
                 {
                     options.Authority = identityServerConfiguration.Authority;
                     options.RequireHttpsMetadata = identityServerConfiguration.RequireHttpsMetadata;
-                    options.Audience = "SOS.Observations.Api";
+                    options.Audience = identityServerConfiguration.Audience;
                 });
 
             // Add Mvc Core services

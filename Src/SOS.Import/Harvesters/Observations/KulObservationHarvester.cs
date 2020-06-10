@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
@@ -63,29 +64,36 @@ namespace SOS.Import.Harvesters.Observations
                 await _kulObservationVerbatimRepository.AddCollectionAsync();
                 _logger.LogInformation("Finish empty collection for KUL verbatim collection");
 
-                var changedFrom = new DateTime(_kulServiceConfiguration.StartHarvestYear, 1, 1);
-                var changedToEnd = DateTime.Now;
+                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+                var changeId = 0L;
                 var nrSightingsHarvested = 0;
-
+                var xmlDocument = await _kulObservationService.GetAsync(changeId);
+                
+                var verbatims = xmlDocument.ToVerbatims<KulObservationVerbatim>(ns);
+                
                 // Loop until all sightings are fetched.
-                while (changedFrom < changedToEnd)
+                while (verbatims?.Any() ?? false)
                 {
+                    // Add sightings to MongoDb
+                    await _kulObservationVerbatimRepository.AddManyAsync(verbatims);
+
+                    nrSightingsHarvested += verbatims.Count();
+
+                    _logger.LogInformation($"{ nrSightingsHarvested } KUL observations harvested");
+
                     cancellationToken?.ThrowIfCancellationRequested();
                     if (_kulServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         nrSightingsHarvested >= _kulServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
+                        _logger.LogInformation("Max KUL observations reached");
                         break;
                     }
 
-                    // Get sightings for one year
-                    var sightings = await _kulObservationService.GetAsync(changedFrom, changedFrom.AddYears(1));
-                    var aggregates = sightings.ToVerbatims().ToArray();
-                    nrSightingsHarvested += aggregates.Length;
+                    var maxIdField = xmlDocument.Descendants(ns + "MaxChangeId").FirstOrDefault();
 
-                    // Add sightings to MongoDb
-                    await _kulObservationVerbatimRepository.AddManyAsync(aggregates);
-
-                    changedFrom = changedFrom.AddYears(1);
+                    changeId = long.Parse(maxIdField.Value);
+                    xmlDocument = await _kulObservationService.GetAsync(changeId);
+                    verbatims = xmlDocument.ToVerbatims<KulObservationVerbatim>(ns);
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for KUL data provider");

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SersService;
+
 using SOS.Import.Harvesters.Observations;
 using SOS.Import.Repositories.Destination.Sers.Interfaces;
 using SOS.Import.Services.Interfaces;
@@ -114,8 +115,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _sersObservationServiceMock.Setup(cts => cts.GetAsync(It.IsAny<int>()))
-                .ReturnsAsync(
-                    new Tuple<long, IEnumerable<WebSpeciesObservation>>(1, new List<WebSpeciesObservation>()));
+                .ReturnsAsync(new XDocument());
 
             _sersObservationVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())
                 .ReturnsAsync(true);

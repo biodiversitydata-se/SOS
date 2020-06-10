@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
@@ -49,11 +50,22 @@ namespace SOS.Lib.Extensions
            
             var targetPropertyType = property.GetPropertyType();
 
-            if (targetPropertyType.IsInstanceOfType(value))
+            // Make sure decimal separator is dot
+            if (targetPropertyType == typeof(double) || targetPropertyType == typeof(float))
+            {
+                value = value.ToString().Replace(',', '.');
+            }
+
+            try
             {
                 property.SetValue(target,
                     Convert.ChangeType(value, targetPropertyType,
                         CultureInfo.InvariantCulture));
+            }
+            catch
+            {
+                property.SetValue(target,
+                    default(T));
             }
         }
     }

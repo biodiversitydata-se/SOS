@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using Autofac;
-using KulService;
 using SOS.Import.DarwinCore;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Import.Factories.FieldMapping;
@@ -214,14 +213,8 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
 
             // Service Clients
-            builder.RegisterType<SpeciesObservationChangeServiceClient>().As<ISpeciesObservationChangeService>()
-                .InstancePerLifetimeScope();
             builder.RegisterType<MvmService.SpeciesObservationChangeServiceClient>()
                 .As<MvmService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
-            builder.RegisterType<NorsService.SpeciesObservationChangeServiceClient>()
-                .As<NorsService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
-            builder.RegisterType<SersService.SpeciesObservationChangeServiceClient>()
-                .As<SersService.ISpeciesObservationChangeService>().InstancePerLifetimeScope();
 
             // Add jobs
             builder.RegisterType<ArtportalenHarvestJob>().As<IArtportalenHarvestJob>().InstancePerLifetimeScope();
