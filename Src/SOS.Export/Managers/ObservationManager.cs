@@ -4,13 +4,12 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SOS.Export.Enums;
-using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Managers.Interfaces;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DOI;
 using SOS.Lib.Models.Search;
 

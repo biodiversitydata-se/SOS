@@ -3,10 +3,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using SOS.Export.Enums;
 using SOS.Export.Models;
+using SOS.Lib.Enums;
 
-namespace SOS.Export.Helpers
+namespace SOS.Lib.Helpers
 {
     // todo - move to SOS.Lib
     /// <summary>

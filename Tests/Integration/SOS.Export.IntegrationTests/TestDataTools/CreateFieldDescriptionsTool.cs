@@ -4,10 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using FluentAssertions;
-using SOS.Export.Enums;
-using SOS.Export.Helpers;
 using SOS.Export.Mappings;
 using SOS.Export.Models;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using Xunit;
 

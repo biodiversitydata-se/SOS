@@ -1,4 +1,4 @@
-﻿namespace SOS.Export.Enums
+﻿namespace SOS.Lib.Enums
 {
     public enum FieldDescriptionId
     {

@@ -5,8 +5,8 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using FluentAssertions;
-using SOS.Export.Helpers;
 using SOS.Export.IO.DwcArchive;
+using SOS.Lib.Helpers;
 using Xunit;
 
 namespace SOS.Export.UnitTests.IO.DwcArchive

@@ -1,9 +1,8 @@
 ﻿using Newtonsoft.Json;
-using SOS.Export.Enums;
+using SOS.Lib.Enums;
 
 namespace SOS.Export.Models
 {
-    // todo - move to SOS.Lib
     public class FieldDescription
     {
         public int Id { get; set; }

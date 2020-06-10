@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using SOS.Export.Enums;
 using SOS.Export.Models;
+using SOS.Lib.Enums;
 
 namespace SOS.Export.IO.DwcArchive
 {
