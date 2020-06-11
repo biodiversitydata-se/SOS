@@ -93,7 +93,7 @@ namespace SOS.Export.IO.DwcArchive
                 }
 
                 stopwatch.Stop();
-                _logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch}. Elapsed time for CSV writing: {csvWritingStopwatch}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch}");
+                _logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch.Elapsed.Duration()}. Elapsed time for CSV writing: {csvWritingStopwatch.Elapsed.Duration()}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch.Elapsed.Duration()}");
                 return true;
             }
             catch (JobAbortedException)
