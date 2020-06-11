@@ -182,6 +182,8 @@ namespace SOS.Process.Processors.Artportalen
                     ? new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Absent}
                     : new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Present};
                 obs.Occurrence.URL = $"http://www.artportalen.se/sighting/{verbatimObservation.Id}";
+                obs.Occurrence.Length = verbatimObservation.Length;
+                obs.Occurrence.Weight = verbatimObservation.Weight;
 
                 obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
                 obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
