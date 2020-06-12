@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -31,14 +32,16 @@ namespace SOS.Process.Processors.Shark
         /// <param name="areaHelper"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
+        /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="logger"></param>
         public SharkObservationProcessor(
             ISharkObservationVerbatimRepository sharkObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             ILogger<SharkObservationProcessor> logger) : base(processedObservationRepository,
-            fieldMappingResolverHelper, logger)
+            fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, logger)
         {
             _sharkObservationVerbatimRepository = sharkObservationVerbatimRepository ??
                                                   throw new ArgumentNullException(
@@ -70,6 +73,7 @@ namespace SOS.Process.Processors.Shark
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     verbatimCount += await CommitBatchAsync(dataProvider, observations);
+                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
                     observations.Clear();
                     Logger.LogDebug($"SHARK Sightings processed: {verbatimCount}");
                 }
@@ -80,6 +84,7 @@ namespace SOS.Process.Processors.Shark
             {
                 cancellationToken?.ThrowIfCancellationRequested();
                 verbatimCount += await CommitBatchAsync(dataProvider, observations);
+                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
                 Logger.LogDebug($"SHARK Sightings processed: {verbatimCount}");
             }
 

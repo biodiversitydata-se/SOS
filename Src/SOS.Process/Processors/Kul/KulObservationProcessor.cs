@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -30,13 +31,15 @@ namespace SOS.Process.Processors.Kul
         /// <param name="areaHelper"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
+        /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="logger"></param>
         public KulObservationProcessor(
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<KulObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,
+            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+            ILogger<KulObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator,
             logger)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository ??
@@ -68,6 +71,7 @@ namespace SOS.Process.Processors.Kul
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     verbatimCount += await CommitBatchAsync(dataProvider, observations);
+                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
                     observations.Clear();
                     Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
                 }
@@ -78,6 +82,7 @@ namespace SOS.Process.Processors.Kul
             {
                 cancellationToken?.ThrowIfCancellationRequested();
                 verbatimCount += await CommitBatchAsync(dataProvider, observations);
+                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
                 Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
             }
 

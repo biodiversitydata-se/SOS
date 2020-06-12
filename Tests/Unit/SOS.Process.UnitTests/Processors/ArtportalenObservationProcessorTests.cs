@@ -5,6 +5,7 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
@@ -33,6 +34,7 @@ namespace SOS.Process.UnitTests.Processors
             _processedFieldMappingRepositoryMock = new Mock<IProcessedFieldMappingRepository>();
             _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
             _processConfiguration = new ProcessConfiguration();
+            _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
         }
 
@@ -41,6 +43,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IProcessedFieldMappingRepository> _processedFieldMappingRepositoryMock;
         private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
         private readonly ProcessConfiguration _processConfiguration;
+        private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
 
         private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
@@ -49,6 +52,7 @@ namespace SOS.Process.UnitTests.Processors
             _processedFieldMappingRepositoryMock.Object,
             _fieldMappingResolverHelperMock.Object,
             _processConfiguration,
+            _dwcArchiveFileWriterCoordinatorMock.Object,
             _loggerMock.Object);
 
         /// <summary>

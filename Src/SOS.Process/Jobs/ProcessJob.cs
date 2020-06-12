@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Processed;
@@ -34,6 +35,7 @@ namespace SOS.Process.Jobs
     /// </summary>
     public class ProcessJob : ProcessJobBase, IProcessJob
     {
+        private readonly IDwcArchiveFileWriterCoordinator _dwcArchiveFileWriterCoordinator;
         private readonly IAreaHelper _areaHelper;
         private readonly ICopyFieldMappingsJob _copyFieldMappingsJob;
         private readonly IDataProviderManager _dataProviderManager;
@@ -65,9 +67,9 @@ namespace SOS.Process.Jobs
         /// <param name="copyFieldMappingsJob"></param>
         /// <param name="processTaxaJob"></param>
         /// <param name="areaHelper"></param>
+        /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="logger"></param>
-        public ProcessJob(
-            IProcessedObservationRepository processedObservationRepository,
+        public ProcessJob(IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IClamPortalObservationProcessor clamPortalObservationProcessor,
@@ -85,6 +87,7 @@ namespace SOS.Process.Jobs
             ICopyFieldMappingsJob copyFieldMappingsJob,
             IProcessTaxaJob processTaxaJob,
             IAreaHelper areaHelper,
+            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             ILogger<ProcessJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -98,6 +101,7 @@ namespace SOS.Process.Jobs
             _instanceManager = instanceManager ?? throw new ArgumentNullException(nameof(instanceManager));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));
 
             if (clamPortalObservationProcessor == null)
                 throw new ArgumentNullException(nameof(clamPortalObservationProcessor));
@@ -242,10 +246,12 @@ namespace SOS.Process.Jobs
                 bool newCollection;
                 if (cleanStart)
                 {
-                    _logger.LogInformation($"Start clear ElasticSearch index: {_processedObservationRepository.IndexName}");
+                    _logger.LogInformation(
+                        $"Start clear ElasticSearch index: {_processedObservationRepository.IndexName}");
                     await _processedObservationRepository.ClearCollectionAsync();
                     newCollection = true;
-                    _logger.LogInformation($"Finish clear ElasticSearch index: {_processedObservationRepository.IndexName}");
+                    _logger.LogInformation(
+                        $"Finish clear ElasticSearch index: {_processedObservationRepository.IndexName}");
                 }
                 else
                 {
@@ -270,6 +276,7 @@ namespace SOS.Process.Jobs
                 //------------------------------------------------------------------------
                 // 7. Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------
+                _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
                 var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
                 foreach (var dataProvider in dataProvidersToProcess)
                 {
@@ -290,8 +297,14 @@ namespace SOS.Process.Jobs
                 var processingResult = await Task.WhenAll(processTaskByDataProvider.Values);
                 var success = processTaskByDataProvider.Values.All(t => t.Result.Status == RunStatus.Success);
 
+                //----------------------------------------------------------------------------
+                // 8. End create DwC CSV files and merge the files into multiple DwC-A files.
+                //----------------------------------------------------------------------------
+                _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
+                _dwcArchiveFileWriterCoordinator.DeleteCreatedCsvFiles();
+
                 //----------------------------------------------
-                // 8. Update provider info 
+                // 9. Update provider info 
                 //----------------------------------------------
                 foreach (var task in processTaskByDataProvider)
                 {
@@ -303,7 +316,7 @@ namespace SOS.Process.Jobs
                 }
 
                 //-----------------------------------------
-                // 9. Save process info
+                // 10. Save process info
                 //-----------------------------------------
                 _logger.LogInformation("Start updating process info for observations");
                 foreach (var dataProvider in dataProvidersToProcess)
@@ -323,7 +336,7 @@ namespace SOS.Process.Jobs
                 _logger.LogInformation("Finish updating process info for observations");
 
                 //----------------------------------------------------------------------------
-                // 10. If a data provider failed to process and it was not Artportalen,
+                // 11. If a data provider failed to process and it was not Artportalen,
                 //     then try to copy that data from the active instance.
                 //----------------------------------------------------------------------------
                 var artportalenSuccededOrDidntRun = !processTaskByDataProvider.Any(pair =>
@@ -341,7 +354,7 @@ namespace SOS.Process.Jobs
                 }
 
                 //---------------------------------
-                // 11. Create ElasticSearch index
+                // 12. Create ElasticSearch index
                 //---------------------------------
                 if (success)
                 {
@@ -363,13 +376,13 @@ namespace SOS.Process.Jobs
                 _logger.LogInformation($"Processing done: {success}");
 
                 //------------------------
-                // 12. Store area cache
+                // 13. Store area cache
                 //------------------------
                 _logger.LogDebug("Persist area cache");
                 _areaHelper.PersistCache();
 
                 //-------------------------------
-                // 13. Return processing result
+                // 14. Return processing result
                 //-------------------------------
                 return success ? true : throw new Exception("Process sightings job failed");
             }
@@ -382,6 +395,10 @@ namespace SOS.Process.Jobs
             {
                 _logger.LogError(e, "Process sightings job failed");
                 throw new Exception("Process sightings job failed");
+            }
+            finally
+            {
+                _dwcArchiveFileWriterCoordinator.DeleteCreatedCsvFiles();
             }
         }
 

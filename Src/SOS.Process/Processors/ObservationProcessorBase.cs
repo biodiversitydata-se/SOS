@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
@@ -15,20 +16,22 @@ namespace SOS.Process.Processors
 {
     public abstract class ObservationProcessorBase<TEntity>
     {
+        protected readonly IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator;
         protected readonly IFieldMappingResolverHelper FieldMappingResolverHelper;
         protected readonly ILogger<TEntity> Logger;
         protected readonly IProcessedObservationRepository ProcessRepository;
 
-        protected ObservationProcessorBase(
-            IProcessedObservationRepository processedObservationRepository,
+        protected ObservationProcessorBase(IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             ILogger<TEntity> logger)
         {
             ProcessRepository = processedObservationRepository ??
                                 throw new ArgumentNullException(nameof(processedObservationRepository));
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             FieldMappingResolverHelper = fieldMappingResolverHelper ??
                                          throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
+            this.dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public abstract DataProviderType Type { get; }
@@ -83,8 +86,13 @@ namespace SOS.Process.Processors
                 .ResolveFieldMappedValues(
                     processedObservations); // used for testing purpose. A setting decides whether values should be resolved for easier debugging of field mapped data.
             var successCount = await ProcessRepository.AddManyAsync(processedObservations);
-
+            await WriteCsv(processedObservations);
             return successCount;
+        }
+
+        private async Task WriteCsv(ICollection<ProcessedObservation> processedObservations)
+        {
+
         }
 
         protected bool IsBatchFilledToLimit(int count)

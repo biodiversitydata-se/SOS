@@ -11,6 +11,10 @@ using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Driver;
 using Moq;
 using Nest;
+using SOS.Export.IO.DwcArchive;
+using SOS.Export.Managers;
+using SOS.Export.MongoDb;
+using SOS.Export.Services;
 using SOS.Import.DarwinCore;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
@@ -60,6 +64,10 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 processConfiguration.ProcessedDbConfiguration.DatabaseName,
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
+            var exportClient = new ExportClient(
+                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
+                processConfiguration.ProcessedDbConfiguration.DatabaseName,
+                processConfiguration.ProcessedDbConfiguration.BatchSize);
             var mockCursor = new Mock<IAsyncCursor<DwcObservationVerbatim>>();
             mockCursor.Setup(_ => _.Current).Returns(dwcObservationVerbatims); //<-- Note the entities here
             mockCursor
@@ -89,6 +97,16 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
             var processedFieldMappingRepository =
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
+            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
+                new DwcArchiveOccurrenceCsvWriter(
+                    new Export.Repositories.ProcessedFieldMappingRepository(exportClient, new NullLogger<Export.Repositories.ProcessedFieldMappingRepository>()),
+                    new TaxonManager(
+                        new Export.Repositories.ProcessedTaxonRepository(exportClient, new NullLogger<Export.Repositories.ProcessedTaxonRepository>()),
+                        new NullLogger<Export.Managers.TaxonManager>()), new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new FileService(),
+                new NullLogger<DwcArchiveFileWriter>()
+            ), new NullLogger<DwcArchiveFileWriterCoordinator>());
             return new DwcaObservationProcessor(
                 dwcaVerbatimRepository.Object,
                 processedObservationRepository,
@@ -96,7 +114,8 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new AreaHelper(new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()),
                     processedFieldMappingRepository),
-                processConfiguration,
+                processConfiguration, 
+                dwcArchiveFileWriterCoordinator,
                 new NullLogger<DwcaObservationProcessor>());
         }
 

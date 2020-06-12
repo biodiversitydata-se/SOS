@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -31,14 +32,16 @@ namespace SOS.Process.Processors.VirtualHerbarium
         /// <param name="areaHelper"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
+        /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="logger"></param>
         public VirtualHerbariumObservationProcessor(
             IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
+            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             ILogger<VirtualHerbariumObservationProcessor> logger) : base(processedObservationRepository,
-            fieldMappingResolverHelper, logger)
+            fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, logger)
         {
             _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ??
                                                              throw new ArgumentNullException(
@@ -70,9 +73,8 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-
                     verbatimCount += await CommitBatchAsync(dataProvider, observations);
-
+                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
                     observations.Clear();
                     Logger.LogDebug($"Virtual Herbarium Sightings processed: {verbatimCount}");
                 }
@@ -83,6 +85,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
             {
                 cancellationToken?.ThrowIfCancellationRequested();
                 verbatimCount += await CommitBatchAsync(dataProvider, observations);
+                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
                 Logger.LogDebug($"Virtual Herbarium Sightings processed: {verbatimCount}");
             }
 
