@@ -175,7 +175,7 @@ namespace SOS.Observations.Api.Managers
                     ResolveFieldMappedValue(obs, FieldMappingFieldId.Institution,
                         nameof(ProcessedObservation.InstitutionId));
 
-                    if (obs.TryGetValue(nameof(ProcessedObservation.Location), out var locationObject))
+                    if (obs.TryGetValue(nameof(ProcessedObservation.Location).ToLower(), out var locationObject))
                     {
                         var locationDictionary = locationObject as IDictionary<string, object>;
                         ResolveFieldMappedValue(locationDictionary, FieldMappingFieldId.County,
@@ -188,7 +188,7 @@ namespace SOS.Observations.Api.Managers
                             nameof(ProcessedObservation.Location.Parish));
                     }
 
-                    if (obs.TryGetValue(nameof(ProcessedObservation.Occurrence), out var occurrenceObject))
+                    if (obs.TryGetValue(nameof(ProcessedObservation.Occurrence).ToLower(), out var occurrenceObject))
                     {
                         var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
                         ResolveFieldMappedValue(occurrenceDictionary, FieldMappingFieldId.EstablishmentMeans,
@@ -286,12 +286,13 @@ namespace SOS.Observations.Api.Managers
         {
             if (observationNode == null) return;
 
-            if (observationNode.ContainsKey(fieldName))
+            var camelCaseName = char.ToLower(fieldName[0]) + fieldName.Substring(1);
+            if (observationNode.ContainsKey(camelCaseName))
             {
-                if (observationNode[fieldName] is IDictionary<string, object> fieldNode &&
-                    fieldNode.ContainsKey("Value") && fieldNode.ContainsKey("_id"))
+                if (observationNode[camelCaseName] is IDictionary<string, object> fieldNode && 
+                    fieldNode.ContainsKey("id"))
                 {
-                    var id = (int) fieldNode["_id"];
+                    var id = Convert.ToInt32(fieldNode["id"]);
                     if (id != FieldMappingConstants.NoMappingFoundCustomValueIsUsedId &&
                         _fieldMappingManager.TryGetValue(fieldMappingFieldId, id, out var translatedValue))
                     {
