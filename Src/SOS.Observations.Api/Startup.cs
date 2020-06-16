@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.Json.Serialization;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -16,7 +15,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Nest;
 using NLog.Web;
@@ -29,6 +27,8 @@ using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
+using SOS.Observations.Api.Services;
+using SOS.Observations.Api.Services.Interfaces;
 using SOS.Observations.Api.Swagger;
 using SOS.Observations.Services;
 using SOS.Observations.Services.Interfaces;
@@ -176,6 +176,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IElasticClient>(
                 new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))));
 
+
             // Processed Mongo Db
             var processedDbConfiguration = observationApiConfiguration.ProcessedDbConfiguration;
             var processedSettings = processedDbConfiguration.GetMongoDbSettings();
@@ -186,6 +187,7 @@ namespace SOS.Observations.Api
             // Add configuration
             services.AddSingleton(observationApiConfiguration.BlobStorageConfiguration);
             services.AddSingleton(elasticConfiguration);
+            services.AddSingleton(observationApiConfiguration.UserServiceConfiguration);
 
             // Add managers
             services.AddSingleton<IAreaManager, AreaManager>();
@@ -207,6 +209,8 @@ namespace SOS.Observations.Api
 
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();
+            services.AddSingleton<IHttpClientService, HttpClientService>();
+            services.AddSingleton<IUserService, UserService>();
         }
 
         /// <summary>

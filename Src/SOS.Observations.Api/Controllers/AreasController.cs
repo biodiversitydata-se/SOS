@@ -18,7 +18,7 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class AreasController : ControllerBase, IAreasController
+    public class AreasController : BaseController, IAreasController
     {
         private readonly IAreaManager _areaManager;
         private readonly ILogger<AreasController> _logger;
