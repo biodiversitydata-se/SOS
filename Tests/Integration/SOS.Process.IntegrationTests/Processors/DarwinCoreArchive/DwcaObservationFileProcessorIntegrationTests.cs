@@ -106,7 +106,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>()
-            ), new NullLogger<DwcArchiveFileWriterCoordinator>());
+            ), new FileService(), new NullLogger<DwcArchiveFileWriterCoordinator>());
             return new DwcaObservationProcessor(
                 dwcaVerbatimRepository.Object,
                 processedObservationRepository,

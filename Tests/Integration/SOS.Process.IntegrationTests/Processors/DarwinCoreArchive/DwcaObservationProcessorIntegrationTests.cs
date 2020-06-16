@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
 using FluentAssertions;
@@ -37,9 +38,13 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
         private readonly ITestOutputHelper _testOutputHelper;
 
-        private DwcaObservationProcessor CreateDwcaObservationProcessor(bool storeProcessedObservations)
+        private DwcaObservationProcessor CreateDwcaObservationProcessor(
+            DwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator, 
+            bool storeProcessedObservations,
+            int batchSize)
         {
             var processConfiguration = GetProcessConfiguration();
+            var exportConfiguration = GetExportConfiguration();
             var elasticConfiguration = GetElasticConfiguration();
             var uris = new Uri[elasticConfiguration.Hosts.Length];
             for (var i = 0; i < uris.Length; i++)
@@ -53,10 +58,6 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processConfiguration.VerbatimDbConfiguration.DatabaseName,
                 processConfiguration.VerbatimDbConfiguration.BatchSize);
             var processClient = new ProcessClient(
-                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                processConfiguration.ProcessedDbConfiguration.BatchSize);
-            var exportClient = new ExportClient(
                 processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
                 processConfiguration.ProcessedDbConfiguration.DatabaseName,
                 processConfiguration.ProcessedDbConfiguration.BatchSize);
@@ -74,21 +75,11 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             }
             else
             {
-                processedObservationRepository = CreateProcessedObservationRepositoryMock().Object;
+                processedObservationRepository = CreateProcessedObservationRepositoryMock(batchSize).Object;
             }
 
             var processedFieldMappingRepository =
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
-            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(
-                    new Export.Repositories.ProcessedFieldMappingRepository(exportClient, new NullLogger<Export.Repositories.ProcessedFieldMappingRepository>()),
-                    new TaxonManager(
-                        new Export.Repositories.ProcessedTaxonRepository(exportClient, new NullLogger<Export.Repositories.ProcessedTaxonRepository>()),
-                        new NullLogger<Export.Managers.TaxonManager>()), new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
-                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
-                new FileService(),
-                new NullLogger<DwcArchiveFileWriter>()
-            ), new NullLogger<DwcArchiveFileWriterCoordinator>());
 
             return new DwcaObservationProcessor(
                 dwcaVerbatimRepository,
@@ -101,10 +92,34 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new NullLogger<DwcaObservationProcessor>());
         }
 
-        private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock()
+        private DwcArchiveFileWriterCoordinator CreateDwcArchiveFileWriterCoordinator()
+        {
+            var processConfiguration = GetProcessConfiguration();
+            var exportClient = new ExportClient(
+                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
+                processConfiguration.ProcessedDbConfiguration.DatabaseName,
+                processConfiguration.ProcessedDbConfiguration.BatchSize);
+
+            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
+                new DwcArchiveOccurrenceCsvWriter(
+                    new Export.Repositories.ProcessedFieldMappingRepository(exportClient,
+                        new NullLogger<Export.Repositories.ProcessedFieldMappingRepository>()),
+                    new TaxonManager(
+                        new Export.Repositories.ProcessedTaxonRepository(exportClient,
+                            new NullLogger<Export.Repositories.ProcessedTaxonRepository>()),
+                        new NullLogger<TaxonManager>()), new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new FileService(),
+                new NullLogger<DwcArchiveFileWriter>()
+            ), new FileService(), new NullLogger<DwcArchiveFileWriterCoordinator>());
+            return dwcArchiveFileWriterCoordinator;
+        }
+
+        private Mock<IProcessedObservationRepository> CreateProcessedObservationRepositoryMock(int batchSize)
         {
             var mock = new Mock<IProcessedObservationRepository>();
             mock.Setup(m => m.DeleteProviderDataAsync(It.IsAny<DataProvider>())).ReturnsAsync(true);
+            mock.Setup(m => m.BatchSize).Returns(batchSize);
             return mock;
         }
 
@@ -133,7 +148,8 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var dwcaProcessor = CreateDwcaObservationProcessor(false);
+            var dwcArchiveFileWriterCoordinator = CreateDwcArchiveFileWriterCoordinator();
+            var dwcaProcessor = CreateDwcaObservationProcessor(dwcArchiveFileWriterCoordinator, storeProcessedObservations: false, batchSize: 10000);
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
             var dataProvider = new DataProvider
             {
@@ -154,5 +170,40 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             processingStatus.Status.Should().Be(RunStatus.Success);
         }
+
+        [Fact]
+        public async Task Process_Dwca_observations_with_CSV_writing()
+        {
+            // Current test
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var dwcArchiveFileWriterCoordinator = CreateDwcArchiveFileWriterCoordinator();
+            var dwcaProcessor = CreateDwcaObservationProcessor(dwcArchiveFileWriterCoordinator, storeProcessedObservations: false, 10000);
+            
+            var taxonByTaxonId = await GetTaxonDictionaryAsync();
+            var dataProvider = new DataProvider
+            {
+                Id = 13,
+                Identifier = "ButterflyMonitoring",
+                Name = "Swedish Butterfly Monitoring Scheme (SeBMS)",
+                Type = DataProviderType.DwcA
+            };
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
+            var processingStatus = await dwcaProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobCancellationToken.Null);
+            await dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles(); // FinishAndWriteDwcaFiles()
+            dwcArchiveFileWriterCoordinator.DeleteCreatedCsvFiles();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            processingStatus.Status.Should().Be(RunStatus.Success);
+        }
+
     }
 }

@@ -86,13 +86,7 @@ namespace SOS.Process.Processors
                 .ResolveFieldMappedValues(
                     processedObservations); // used for testing purpose. A setting decides whether values should be resolved for easier debugging of field mapped data.
             var successCount = await ProcessRepository.AddManyAsync(processedObservations);
-            await WriteCsv(processedObservations);
             return successCount;
-        }
-
-        private async Task WriteCsv(ICollection<ProcessedObservation> processedObservations)
-        {
-
         }
 
         protected bool IsBatchFilledToLimit(int count)

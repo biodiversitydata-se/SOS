@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
 
@@ -51,5 +52,22 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
             ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken);
+
+        /// <summary>
+        /// Write part of DwC-A CSV files to disk.
+        /// </summary>
+        /// <param name="dwcObservations"></param>
+        /// <param name="filePathByFilePart"></param>
+        /// <returns></returns>
+        Task WriteObservations(
+            IEnumerable<DarwinCore> dwcObservations,
+            Dictionary<DwcaFilePart, string> filePathByFilePart);
+
+        /// <summary>
+        /// Generate DwC-A files for data providers and one with all data providers.
+        /// </summary>
+        /// <param name="dwcaFileCreationInfo"></param>
+        /// <returns></returns>
+        Task CreateDwcArchiveFileAsync(DwcaFilesCreationInfo dwcaFileCreationInfo);
     }
 }

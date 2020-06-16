@@ -324,7 +324,7 @@ namespace SOS.Export.IO.DwcArchive
             return coordinateUncertaintyInMeters.Value.ToString();
         }
 
-        private static void WriteHeaderRow(NReco.Csv.CsvWriter csvWriter, IEnumerable<FieldDescription> fieldDescriptions)
+        public void WriteHeaderRow(NReco.Csv.CsvWriter csvWriter, IEnumerable<FieldDescription> fieldDescriptions)
         {
             foreach (var fieldDescription in fieldDescriptions)
             {
@@ -410,5 +410,31 @@ namespace SOS.Export.IO.DwcArchive
             }
         }
 
+        public async Task CreateOccurrenceCsvFileAsync(
+            IEnumerable<DarwinCore> dwcObservations,
+            StreamWriter streamWriter,
+            IEnumerable<FieldDescription> fieldDescriptions)
+        {
+            try
+            {
+                bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
+                //await using StreamWriter streamWriter = new StreamWriter(stream, Encoding.UTF8);
+                var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
+
+                // Write occurrence rows to CSV file.
+                foreach (var dwcObservation in dwcObservations)
+                {
+                    WriteOccurrenceRow(csvWriter, dwcObservation, fieldsToWriteArray);
+                }
+                await streamWriter.FlushAsync();
+
+                //_logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch.Elapsed.Duration()}. Elapsed time for CSV writing: {csvWritingStopwatch.Elapsed.Duration()}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch.Elapsed.Duration()}");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to create occurrence CSV file.");
+                throw;
+            }
+        }
     }
 }
