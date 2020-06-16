@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 
@@ -16,6 +17,18 @@ namespace SOS.Process.IntegrationTests
 
             var processConfiguration = config.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
             return processConfiguration;
+        }
+
+        protected ExportConfiguration GetExportConfiguration()
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .AddUserSecrets<TestBase>()
+                .Build();
+
+            var exportConfiguration = config.GetSection(typeof(ExportConfiguration).Name).Get<ExportConfiguration>();
+            return exportConfiguration;
         }
 
         protected ElasticSearchConfiguration GetElasticConfiguration()

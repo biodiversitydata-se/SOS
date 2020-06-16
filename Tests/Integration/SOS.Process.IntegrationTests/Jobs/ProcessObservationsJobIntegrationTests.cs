@@ -92,7 +92,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()), 
                 new FileService(), 
                 new NullLogger<DwcArchiveFileWriter>()
-                ), new NullLogger<DwcArchiveFileWriterCoordinator>());
+            ), new FileService(), new NullLogger<DwcArchiveFileWriterCoordinator>());
             var processInfoRepository =
                 new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository =

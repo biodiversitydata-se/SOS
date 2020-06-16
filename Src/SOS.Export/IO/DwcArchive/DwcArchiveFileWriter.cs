@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
+using Ionic.Zip;
 using Microsoft.Extensions.Logging;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Helpers;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
 
@@ -145,6 +149,52 @@ namespace SOS.Export.IO.DwcArchive
             {
                 _fileService.DeleteFolder(temporaryZipExportFolderPath);
             }
+        }
+
+        public async Task WriteObservations(
+            IEnumerable<DarwinCore> dwcObservations,
+            Dictionary<DwcaFilePart, string> filePathByFilePart)
+        {
+            string occurrenceCsvFilePath = filePathByFilePart[DwcaFilePart.Occurrence];
+            var fieldDescriptions = FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose();
+            
+            // Create Occurrence CSV file
+            await using StreamWriter fileStream = File.AppendText(occurrenceCsvFilePath);
+            await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                dwcObservations,
+                fileStream,
+                fieldDescriptions);
+
+            // Create EMOF CSV file
+            // todo
+
+            // Create Multimedia CSV file
+            // todo
+        }
+
+        public async Task CreateDwcArchiveFileAsync(DwcaFilesCreationInfo dwcaFileCreationInfo)
+        {
+            await using var stream = File.Create(@"c:\temp\minfil.zip");
+            await using var compressedFileStream = new ZipOutputStream(stream, true);
+            compressedFileStream.EnableZip64 = Zip64Option.AsNecessary;
+            
+            compressedFileStream.PutNextEntry("occurrence.csv");
+            await WriteOccurrenceHeader(compressedFileStream);
+            foreach (var value in dwcaFileCreationInfo.FilePathByBatchIdAndFilePart.Values)
+            {
+                string occurrenceCsvFilePath = value[DwcaFilePart.Occurrence];
+                await using var readStream = File.OpenRead(occurrenceCsvFilePath);
+                await readStream.CopyToAsync(compressedFileStream);
+            }
+        }
+
+        private async Task WriteOccurrenceHeader(ZipOutputStream compressedFileStream)
+        {
+            await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
+            var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
+            _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvWriter,
+                FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose());
+            await streamWriter.FlushAsync();
         }
     }
 }
