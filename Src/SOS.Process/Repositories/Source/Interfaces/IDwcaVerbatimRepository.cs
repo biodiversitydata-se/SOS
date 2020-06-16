@@ -15,5 +15,9 @@ namespace SOS.Process.Repositories.Source.Interfaces
         Task<List<DwcObservationVerbatim>> GetAllAsync(
             int dataProviderId,
             string dataProviderIdentifier);
+
+        Task<bool> CheckIfCollectionExistsAsync(
+            int dataProviderId,
+            string dataProviderIdentifier);
     }
 }

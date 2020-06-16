@@ -77,13 +77,14 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IDictionary<int, ProcessedTaxon> taxa,
             IJobCancellationToken cancellationToken)
         {
-            Logger.LogDebug($"Start Processing {dataProvider} verbatim observations");
+            Logger.LogInformation($"Start Processing {dataProvider} verbatim observations");
             var startTime = DateTime.Now;
             try
             {
-                var dataExists = await DoesVerbatimDataExist();
+                var dataExists = await _dwcaVerbatimRepository.CheckIfCollectionExistsAsync(dataProvider.Id, dataProvider.Identifier);
                 if (!dataExists)
                 {
+                    Logger.LogInformation($"Processing {dataProvider} failed because no harvested data existed.");
                     return ProcessingStatus.Failed(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now);
                 }
 
@@ -101,10 +102,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                     dataProvider,
                     taxa,
                     cancellationToken);
-                Logger.LogDebug($"Finish processing {dataProvider} data.");
-
-                return ProcessingStatus.Success(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now,
-                    verbatimCount);
+                
+                Logger.LogInformation($"Finish processing {dataProvider} data.");
+                return ProcessingStatus.Success(dataProvider.Identifier, dataProvider.Type, startTime, DateTime.Now, verbatimCount);
             }
             catch (JobAbortedException)
             {
@@ -145,9 +145,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 _processedFieldMappingRepository,
                 _areaHelper);
             ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
-            using var cursor =
-                await _dwcaVerbatimRepository.GetAllByCursorAsync(dataProvider.Id, dataProvider.Identifier);
-
+            using var cursor = await _dwcaVerbatimRepository.GetAllByCursorAsync(dataProvider.Id, dataProvider.Identifier);
+            int counter = 0;
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
@@ -158,7 +157,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     verbatimCount += await CommitBatchAsync(dataProvider, sightings);
-                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider);
+                    //var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider);
+                    //var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider, counter++.ToString());
                     sightings.Clear();
                     Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
                 }
@@ -169,7 +169,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             {
                 cancellationToken?.ThrowIfCancellationRequested();
                 verbatimCount += await CommitBatchAsync(dataProvider, sightings);
-                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider);
+                //var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider);
+                //var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider, counter.ToString());
                 Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
             }
 
