@@ -286,5 +286,15 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     URL to occurrence
         /// </summary>
         public string URL { get; set; }
+
+        /// <summary>
+        ///     The reported length
+        /// </summary>
+        public int? Length { get; set; }
+
+        /// <summary>
+        ///     The reported weight
+        /// </summary>
+        public int? Weight { get; set; }
     }
 }

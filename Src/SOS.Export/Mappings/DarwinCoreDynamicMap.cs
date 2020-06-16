@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using CsvHelper.Configuration;
-using SOS.Export.Enums;
-using SOS.Export.Helpers;
 using SOS.Export.IO.Csv.Converters;
 using SOS.Export.Models;
+using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 
 namespace SOS.Export.Mappings
@@ -1037,7 +1037,7 @@ namespace SOS.Export.Mappings
             dic.Add(FieldDescriptionId.OtherCatalogNumbers, m => m.Occurrence.OtherCatalogNumbers);
             dic.Add(FieldDescriptionId.OccurrenceRemarks, m => m.Occurrence.OccurrenceRemarks);
 
-            // DarwinCore
+            // DarwinCore (Record level)
             dic.Add(FieldDescriptionId.DatasetID, m => m.DatasetID);
             dic.Add(FieldDescriptionId.Type, m => m.Type);
             dic.Add(FieldDescriptionId.Modified, m => m.Modified);

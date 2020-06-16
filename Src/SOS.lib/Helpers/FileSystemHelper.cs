@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 
-namespace SOS.Export.Helpers
+namespace SOS.Lib.Helpers
 {
     public static class FileSystemHelper
     {

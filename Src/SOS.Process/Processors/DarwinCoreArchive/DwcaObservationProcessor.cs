@@ -6,6 +6,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed;
@@ -38,16 +39,16 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processConfiguration"></param>
+        /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="logger"></param>
-        public DwcaObservationProcessor(
-            IDwcaVerbatimRepository dwcaVerbatimRepository,
+        public DwcaObservationProcessor(IDwcaVerbatimRepository dwcaVerbatimRepository,
             IProcessedObservationRepository processedObservationRepository,
             IProcessedFieldMappingRepository processedFieldMappingRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
-            ILogger<DwcaObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,
-            logger)
+            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+            ILogger<DwcaObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, logger)
         {
             _dwcaVerbatimRepository =
                 dwcaVerbatimRepository ?? throw new ArgumentNullException(nameof(dwcaVerbatimRepository));
@@ -157,6 +158,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     verbatimCount += await CommitBatchAsync(dataProvider, sightings);
+                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider);
                     sightings.Clear();
                     Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
                 }
@@ -167,6 +169,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             {
                 cancellationToken?.ThrowIfCancellationRequested();
                 verbatimCount += await CommitBatchAsync(dataProvider, sightings);
+                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider);
                 Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
             }
 

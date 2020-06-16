@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using FluentAssertions;
-using SOS.Export.Enums;
-using SOS.Export.Helpers;
+using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using Xunit;
 
-namespace SOS.Export.UnitTests.Helpers
+namespace SOS.Lib.UnitTests.Helpers
 {
     public class FieldDescriptionHelperTests
     {

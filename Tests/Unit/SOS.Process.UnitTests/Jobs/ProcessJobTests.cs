@@ -5,6 +5,7 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
@@ -62,6 +63,7 @@ namespace SOS.Process.UnitTests.Jobs
             _areaHelper = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<ProcessJob>>();
             _dwcaObservationProcessor = new Mock<IDwcaObservationProcessor>();
+            _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _dataProviderManager = new Mock<IDataProviderManager>();
         }
 
@@ -83,6 +85,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IDataProviderManager> _dataProviderManager;
         private readonly Mock<IDwcaObservationProcessor> _dwcaObservationProcessor;
         private readonly Mock<IAreaHelper> _areaHelper;
+        private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<ILogger<ProcessJob>> _loggerMock;
 
         private ProcessJob TestObject => new ProcessJob(
@@ -104,6 +107,7 @@ namespace SOS.Process.UnitTests.Jobs
             _copyFieldMappingsJob.Object,
             _processTaxaJob.Object,
             _areaHelper.Object,
+            _dwcArchiveFileWriterCoordinatorMock.Object,
             _loggerMock.Object);
 
         /// <summary>

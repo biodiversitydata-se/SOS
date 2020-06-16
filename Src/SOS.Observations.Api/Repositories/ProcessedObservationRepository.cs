@@ -140,7 +140,7 @@ namespace SOS.Observations.Api.Repositories
                             break;
                     }
                 }
-            }
+            }          
 
             return queryContainers;
         }
@@ -185,6 +185,29 @@ namespace SOS.Observations.Api.Repositories
                                 internalFilter.BoundingBox[0],
                                 internalFilter.BoundingBox[3],
                                 internalFilter.BoundingBox[2])));
+                }
+                if (internalFilter.OnlyWithMedia)
+                {
+                    queryInternal.Add(q => q
+                        .Wildcard(w => w
+                            .Field("occurrence.associatedMedia")
+                            .Value("?*")));
+                }
+
+                if (internalFilter.OnlyWithNotes)
+                {
+                    queryInternal.Add(q => q
+                        .Wildcard(w => w
+                            .Field("occurrence.occurrenceRemarks")
+                            .Value("?*")));
+                }
+
+                if (internalFilter.OnlyWithNotesOfInterest)
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("occurrence.noteOfInterest")
+                            .Value(true)));
                 }
             }
 

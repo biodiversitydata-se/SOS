@@ -23,6 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\SOS.Export\SOS.Export.csproj" />
         <ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
     </ItemGroup>
 

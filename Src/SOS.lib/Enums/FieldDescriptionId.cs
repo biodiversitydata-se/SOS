@@ -1,8 +1,8 @@
-﻿namespace SOS.Export.Enums
+﻿namespace SOS.Lib.Enums
 {
     public enum FieldDescriptionId
     {
-        AccessRights = 1,
+        OccurrenceID = 1,
         BasisOfRecord = 2,
         BibliographicCitation = 3,
         CollectionCode = 4,
@@ -128,7 +128,7 @@
         IsNotRediscoveredObservation = 124,
         IsPositiveObservation = 125,
         LifeStage = 126,
-        OccurrenceID = 127,
+        AccessRights = 127,
         OccurrenceRemarks = 128,
         OccurrenceStatus = 129,
         OccurrenceURL = 130,

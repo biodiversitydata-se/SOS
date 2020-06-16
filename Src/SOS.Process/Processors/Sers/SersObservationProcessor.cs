@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -31,13 +32,15 @@ namespace SOS.Process.Processors.Sers
         /// <param name="areaHelper"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
+        /// <param name="dwcArchiveFileWriterCoordinator"></param>
         /// <param name="logger"></param>
         public SersObservationProcessor(
             ISersObservationVerbatimRepository sersObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            ILogger<SersObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper,
+            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+            ILogger<SersObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator,
             logger)
         {
             _sersObservationVerbatimRepository = sersObservationVerbatimRepository ??

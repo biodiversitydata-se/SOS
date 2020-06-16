@@ -12,6 +12,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.4" />
         <PackageReference Include="MongoDB.Driver" Version="2.10.4" />
         <PackageReference Include="MongoDB.Driver.GridFS" Version="2.10.4" />
+        <PackageReference Include="NReco.Csv" Version="1.0.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -25,9 +26,11 @@
       <None Update="Resources\DarwinCore\meta.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="Resources\FieldDescriptions.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Enums\" />
+      <Folder Include="Helpers\" />
     </ItemGroup>
 
 </Project>
