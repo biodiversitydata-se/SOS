@@ -15,5 +15,9 @@ namespace SOS.Lib.Models.Search
         /// Only include hits with media associated
         /// </summary>
         public bool OnlyWithMedia { get; set; }
+
+        public bool OnlyWithNotes { get; set; }
+
+        public bool OnlyWithNotesOfInterest { get; set; }
     }
 }

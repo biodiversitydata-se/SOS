@@ -193,6 +193,22 @@ namespace SOS.Observations.Api.Repositories
                             .Field("occurrence.associatedMedia")
                             .Value("?*")));
                 }
+
+                if (internalFilter.OnlyWithNotes)
+                {
+                    queryInternal.Add(q => q
+                        .Wildcard(w => w
+                            .Field("occurrence.occurrenceRemarks")
+                            .Value("?*")));
+                }
+
+                if (internalFilter.OnlyWithNotesOfInterest)
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("occurrence.noteOfInterest")
+                            .Value(true)));
+                }
             }
 
             return queryInternal;
