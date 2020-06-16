@@ -89,7 +89,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpGet("FieldMapping")]
+        [HttpGet("Dictionary")]
         [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetFieldMappingAsync()
