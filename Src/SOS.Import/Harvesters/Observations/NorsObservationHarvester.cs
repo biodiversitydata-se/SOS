@@ -54,7 +54,6 @@ namespace SOS.Import.Harvesters.Observations
 
             try
             {
-                var start = DateTime.Now;
                 _logger.LogInformation("Start harvesting sightings for NORS data provider");
                 _logger.LogInformation(GetNorsHarvestSettingsInfoString());
 
@@ -70,11 +69,17 @@ namespace SOS.Import.Harvesters.Observations
                 var xmlDocument = await _norsObservationService.GetAsync(changeId);
                 var dataLastModified = DateTime.MinValue;
 
-                var verbatims = xmlDocument.ToVerbatims<NorsObservationVerbatim>(ns);
-
                 // Loop until all sightings are fetched.
-                while (verbatims?.Any() ?? false)
+                while (xmlDocument != null)
                 {
+                    changeId = long.Parse(xmlDocument.Descendants(ns + "MaxChangeId").FirstOrDefault()?.Value ?? "0");
+                    if (changeId.Equals(0))
+                    {
+                        break;
+                    }
+
+                    var verbatims = xmlDocument.ToVerbatims<NorsObservationVerbatim>(ns);
+
                     // Add sightings to MongoDb
                     await _norsObservationVerbatimRepository.AddManyAsync(verbatims);
 
@@ -97,11 +102,7 @@ namespace SOS.Import.Harvesters.Observations
                         break;
                     }
 
-                    var maxIdField = xmlDocument.Descendants(ns + "MaxChangeId").FirstOrDefault();
-
-                    changeId = long.Parse(maxIdField.Value);
-                    xmlDocument = await _norsObservationService.GetAsync(changeId);
-                    verbatims = xmlDocument.ToVerbatims<NorsObservationVerbatim>(ns);
+                    xmlDocument = await _norsObservationService.GetAsync(changeId + 1);
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for NORS data provider");
