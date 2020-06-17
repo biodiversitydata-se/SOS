@@ -86,6 +86,10 @@ namespace SOS.Process.Helpers
                     valueMappingDictionaries[FieldMappingFieldId.EstablishmentMeans]);
                 ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatus,
                     valueMappingDictionaries[FieldMappingFieldId.OccurrenceStatus]);
+                ResolveFieldMappedValue(observation.Occurrence?.DiscoveryMethod, 
+                    valueMappingDictionaries[FieldMappingFieldId.DiscoveryMethod]);
+                ResolveFieldMappedValue(observation.Identification?.DeterminationMethod,
+                    valueMappingDictionaries[FieldMappingFieldId.DeterminationMethod]);
             }
         }
 

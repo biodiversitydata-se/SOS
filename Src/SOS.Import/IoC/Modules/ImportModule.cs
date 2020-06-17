@@ -196,6 +196,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<EstablishmentMeansFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<AreaTypeFieldMappingFactory>().InstancePerLifetimeScope();
             builder.RegisterType<DiscoveryMethodFieldMappingFactory>().InstancePerLifetimeScope();
+            builder.RegisterType<DeterminationMethodFieldMappingFactory>().InstancePerLifetimeScope();
 
             // Add Services
             builder.RegisterType<ArtportalenDataService>().As<IArtportalenDataService>().InstancePerLifetimeScope();

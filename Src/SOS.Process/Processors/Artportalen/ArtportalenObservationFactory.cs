@@ -235,6 +235,8 @@ namespace SOS.Process.Processors.Artportalen
                         .Individuals); // todo - if verbatimObservation.Unit is null, should the value be set to "Individuals"? This is how it works in SSOS.
                 obs.Occurrence.DiscoveryMethod = GetSosId(verbatimObservation?.DiscoveryMethod?.Id,
                     _fieldMappings[FieldMappingFieldId.DiscoveryMethod]);
+                obs.Identification.DeterminationMethod = GetSosId(verbatimObservation?.DeterminationMethod?.Id,
+                    _fieldMappings[FieldMappingFieldId.DeterminationMethod]);
 
                 return obs;
             }
@@ -527,6 +529,7 @@ namespace SOS.Process.Processors.Artportalen
                 case FieldMappingFieldId.AreaType:
                 case FieldMappingFieldId.Unit:
                 case FieldMappingFieldId.DiscoveryMethod:
+                case FieldMappingFieldId.DeterminationMethod:
                     return "Id";
                 default:
                     throw new ArgumentException($"No mapping exist for the field: {fieldMappingFieldId}");

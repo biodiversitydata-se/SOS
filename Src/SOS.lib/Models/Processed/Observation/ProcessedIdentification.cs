@@ -88,5 +88,11 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     True if determination is uncertain
         /// </summary>
         public bool UncertainDetermination { get; set; }
+
+        /// <summary>
+        ///    Method used in species determination
+        /// </summary>
+        [Object]
+        public ProcessedFieldMapValue DeterminationMethod { get; set; }
     }
 }

@@ -41,6 +41,7 @@ namespace SOS.Import.Harvesters
         /// <param name="continentFieldMappingFactory"></param>
         /// <param name="parishFieldMappingFactory"></param>
         /// <param name="establishmentMeansFieldMappingFactory"></param>
+        /// <param name="determinationMethodFieldMappingFactory"></param>
         /// <param name="logger"></param>
         /// <param name="activityFieldMappingFactory"></param>
         /// <param name="biotopeFieldMappingFactory"></param>
@@ -75,6 +76,7 @@ namespace SOS.Import.Harvesters
             EstablishmentMeansFieldMappingFactory establishmentMeansFieldMappingFactory,
             AreaTypeFieldMappingFactory areaTypeFieldMappingFactory,
             DiscoveryMethodFieldMappingFactory discoveryMethodFieldMappingFactory,
+            DeterminationMethodFieldMappingFactory determinationMethodFieldMappingFactory,
             ILogger<FieldMappingHarvester> logger)
         {
             _fieldMappingRepository =
@@ -102,7 +104,8 @@ namespace SOS.Import.Harvesters
                 {FieldMappingFieldId.OccurrenceStatus, occurrenceStatusFieldMappingFactory},
                 {FieldMappingFieldId.EstablishmentMeans, establishmentMeansFieldMappingFactory},
                 {FieldMappingFieldId.AreaType, areaTypeFieldMappingFactory},
-                {FieldMappingFieldId.DiscoveryMethod, discoveryMethodFieldMappingFactory}
+                {FieldMappingFieldId.DiscoveryMethod, discoveryMethodFieldMappingFactory},
+                {FieldMappingFieldId.DeterminationMethod, determinationMethodFieldMappingFactory}
             };
         }
 

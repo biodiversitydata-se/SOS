@@ -107,7 +107,8 @@ namespace SOS.Import.Harvesters.Observations
                     _metadataRepository.GetSubstratesAsync(),
                     _metadataRepository.GetUnitsAsync(),
                     _metadataRepository.GetValidationStatusAsync(),
-                    _metadataRepository.GetDiscoveryMethodsAsync()
+                    _metadataRepository.GetDiscoveryMethodsAsync(),
+                    _metadataRepository.GetDeterminationMethodsAsync()
                 };
 
                 _logger.LogDebug("Start getting meta data");
@@ -121,6 +122,7 @@ namespace SOS.Import.Harvesters.Observations
                 var units = metaDataTasks[5].Result.ToVerbatims().ToDictionary(u => u.Id, u => u);
                 var validationStatus = metaDataTasks[6].Result.ToVerbatims().ToDictionary(v => v.Id, v => v);
                 var discoveryMethods = metaDataTasks[7].Result.ToVerbatims().ToDictionary(v => v.Id, v => v);
+                var determinationMethods = metaDataTasks[8].Result.ToVerbatims().ToDictionary(v => v.Id, v => v);
                 _logger.LogDebug("Finish getting meta data");
 
                 _logger.LogDebug("Start getting persons & organizations data");
@@ -177,7 +179,7 @@ namespace SOS.Import.Harvesters.Observations
                     // Add batch task to list
                     harvestBatchTasks.Add(HarvestBatchAsync(currentId, activities, biotopes, genders, organizations,
                         sites, stages, substrates,
-                        validationStatus, units, discoveryMethods,
+                        validationStatus, units, discoveryMethods, determinationMethods,
                         personByUserId, organizationById, speciesCollections, sightingProjectIds, projectEntityById,
                         projectParameterEntities));
 
@@ -225,6 +227,7 @@ namespace SOS.Import.Harvesters.Observations
             IDictionary<int, Metadata> validationStatus,
             IDictionary<int, Metadata> units,
             IDictionary<int, Metadata> discoveryMethods,
+            IDictionary<int, Metadata> determinationMethods,
             IDictionary<int, Person> personByUserId,
             IDictionary<int, Organization> organizationById,
             IList<SpeciesCollectionItem> speciesCollections,
@@ -286,6 +289,7 @@ namespace SOS.Import.Harvesters.Observations
                     validationStatus,
                     units,
                     discoveryMethods,
+                    determinationMethods,
                     projectEntityDictionaries);
                 _logger.LogDebug("Finsih casting entities to verbatim");
 

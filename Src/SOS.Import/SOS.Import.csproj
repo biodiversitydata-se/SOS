@@ -141,6 +141,9 @@
     <None Update="Resources\FieldMappings\CountyFieldMapping.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\FieldMappings\DeterminationMethodFieldMapping.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\FieldMappings\DiscoveryMethodFieldMapping.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
