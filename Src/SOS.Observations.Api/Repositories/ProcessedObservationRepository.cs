@@ -209,6 +209,34 @@ namespace SOS.Observations.Api.Repositories
                             .Field("occurrence.noteOfInterest")
                             .Value(true)));
                 }
+
+                if (internalFilter.ReportedDateFrom.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .DateRange(r => r
+                            .Field("reportedDate")
+                            .GreaterThanOrEquals(
+                                DateMath.Anchored(
+                                    internalFilter.ReportedDateFrom.Value.ToUniversalTime()
+                                )
+                            )
+                        )
+                    );
+                }
+
+                if (internalFilter.ReportedDateTo.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .DateRange(r => r
+                            .Field("reportedDate")
+                            .LessThanOrEquals(
+                                DateMath.Anchored(
+                                    internalFilter.ReportedDateTo.Value.ToUniversalTime()
+                                )
+                            )
+                        )
+                    );
+                }
             }
 
             return queryInternal;

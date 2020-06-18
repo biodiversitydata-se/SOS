@@ -8,8 +8,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DnsClient.Internal;
 using Microsoft.Extensions.Logging;
+using SOS.Export.Enums;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Services.Interfaces;
+using SOS.Lib.Configuration.Export;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
@@ -19,20 +21,22 @@ namespace SOS.Export.IO.DwcArchive
 {
     public class DwcArchiveFileWriterCoordinator : Interfaces.IDwcArchiveFileWriterCoordinator
     {
-        public static bool IsEnabled = false;
+        private readonly object _initWriteCsvLock = new object();
         private readonly IFileService _fileService;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
+        private readonly DwcaFilesCreationConfiguration _dwcaFilesCreationConfiguration;
         private readonly ILogger<DwcArchiveFileWriterCoordinator> _logger;
-        private Dictionary<DataProvider, DwcaFilesCreationInfo> _dwcaFilesCreationInfoByDataProvider;
-        private string _exportFolderPath = @"c:\temp"; // todo - change to read from settings.
+        private Dictionary<DataProvider, DwcaFilePartsInfo> _dwcaFilePartsInfoByDataProvider;
 
         public DwcArchiveFileWriterCoordinator(
             IDwcArchiveFileWriter dwcArchiveFileWriter,
             IFileService fileService,
+            DwcaFilesCreationConfiguration dwcaFilesCreationConfiguration,
             ILogger<DwcArchiveFileWriterCoordinator> logger)
         {
             _dwcArchiveFileWriter = dwcArchiveFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            _dwcaFilesCreationConfiguration = dwcaFilesCreationConfiguration ?? throw new ArgumentNullException(nameof(dwcaFilesCreationConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -41,7 +45,7 @@ namespace SOS.Export.IO.DwcArchive
         /// </summary>
         public void BeginWriteDwcCsvFiles()
         {
-            _dwcaFilesCreationInfoByDataProvider = new Dictionary<DataProvider, DwcaFilesCreationInfo>();
+            _dwcaFilePartsInfoByDataProvider = new Dictionary<DataProvider, DwcaFilePartsInfo>();
         }
 
         /// <summary>
@@ -49,91 +53,113 @@ namespace SOS.Export.IO.DwcArchive
         /// </summary>
         /// <param name="processedObservations"></param>
         /// <param name="dataProvider"></param>
-        /// <param name="batchId">If the processing is done in parallel for a data provider, use the batchId to identify tha specifc batch that was processed.</param>
+        /// <param name="batchId">If the processing is done in parallel for a data provider, use the batchId to identify the specific batch that was processed.</param>
         /// <returns></returns>
         public async Task<bool> WriteObservations(
             IEnumerable<ProcessedObservation> processedObservations, 
             DataProvider dataProvider,
             string batchId = "")
         {
-            if (!IsEnabled) return true;
-            if (batchId == null) throw new ArgumentException($"{MethodBase.GetCurrentMethod()?.Name}() does not support the value null", nameof(batchId));
-            Dictionary<DwcaFilePart, string> filePathByFilePart;
-            if (!_dwcaFilesCreationInfoByDataProvider.ContainsKey(dataProvider))
+            try
             {
-                _dwcaFilesCreationInfoByDataProvider.Add(dataProvider, DwcaFilesCreationInfo.Create(dataProvider, _exportFolderPath));
+                if (!_dwcaFilesCreationConfiguration.IsEnabled) return true;
+                if (string.IsNullOrEmpty(dataProvider.Identifier)) return false;
+                if (batchId == null) batchId = "";
+                Dictionary<DwcaFilePart, string> filePathByFilePart;
+                lock (_initWriteCsvLock)
+                {
+                    if (!_dwcaFilePartsInfoByDataProvider.TryGetValue(dataProvider, out var dwcaFilePartsInfo))
+                    {
+                        dwcaFilePartsInfo = CreateDwcaFilePartsInfo(dataProvider);
+                    }
+
+                    filePathByFilePart = dwcaFilePartsInfo.GetOrCreateFilePathByFilePart(batchId);
+                }
+
+                var dwcObservations = processedObservations.ToDarwinCore();
+                await _dwcArchiveFileWriter.WriteObservations(dwcObservations, filePathByFilePart);
+                return true;
             }
-            var dwcaFilesCreationInfo = _dwcaFilesCreationInfoByDataProvider[dataProvider];
-            _fileService.CreateFolder(dwcaFilesCreationInfo.ExportFolder);
-            if (dwcaFilesCreationInfo.FilePathByBatchIdAndFilePart.ContainsKey(batchId))
+            catch (Exception e)
             {
-                filePathByFilePart = dwcaFilesCreationInfo.FilePathByBatchIdAndFilePart[batchId];
+                _logger.LogError(e, $"Write observations failed for {dataProvider} and batchId={batchId}");
+                return false;
+            }
+        }
+
+        private DwcaFilePartsInfo CreateDwcaFilePartsInfo(DataProvider dataProvider)
+        {
+            var dwcaFilePartsInfo = DwcaFilePartsInfo.Create(dataProvider, _dwcaFilesCreationConfiguration.FolderPath);
+            _dwcaFilePartsInfoByDataProvider.Add(dataProvider, dwcaFilePartsInfo);
+            if (!Directory.Exists(dwcaFilePartsInfo.ExportFolder))
+            {
+                _fileService.CreateFolder(dwcaFilePartsInfo.ExportFolder);
             }
             else
             {
-                filePathByFilePart = CreateFilePathByFilePart(dwcaFilesCreationInfo, batchId);
-                dwcaFilesCreationInfo.FilePathByBatchIdAndFilePart.Add(batchId, filePathByFilePart);
+                // Empty folder from CSV files before we start to create new ones.
+                foreach (string file in Directory.GetFiles(dwcaFilePartsInfo.ExportFolder, "*.csv")
+                    .Where(item => item.EndsWith(".csv")))
+                {
+                    File.Delete(file);
+                }
             }
 
-            var dwcObservations = processedObservations.ToDarwinCore();
-            await _dwcArchiveFileWriter.WriteObservations(dwcObservations, filePathByFilePart);
-            return true;
+            return dwcaFilePartsInfo;
         }
 
-        private static Dictionary<DwcaFilePart, string> CreateFilePathByFilePart(DwcaFilesCreationInfo dwcaFilesCreationInfo, string batchId)
+        /// <summary>
+        /// Delete temporary created CSV files.
+        /// </summary>
+        public void DeleteTemporaryCreatedCsvFiles()
         {
-            string occurrenceCsvFilename = batchId == "" ? "Occurrence.csv" : $"Occurrence-{batchId}.csv";
-            string emofCsvFilename = batchId == "" ? "Emof.csv" : $"Emof-{batchId}.csv";
-            string multimediaCsvFilename = batchId == "" ? "Multimedia.csv" : $"Multimedia-{batchId}.csv";
-
-            var filePathByFilePart = new Dictionary<DwcaFilePart, string>
+            if (_dwcaFilePartsInfoByDataProvider == null) return;
+            foreach (var dwcaFileCreationInfo in _dwcaFilePartsInfoByDataProvider.Values)
             {
-                {DwcaFilePart.Occurrence, Path.Combine(dwcaFilesCreationInfo.ExportFolder,  occurrenceCsvFilename)},
-                {DwcaFilePart.Emof, Path.Combine(dwcaFilesCreationInfo.ExportFolder, emofCsvFilename)},
-                {DwcaFilePart.Multimedia, Path.Combine(dwcaFilesCreationInfo.ExportFolder, multimediaCsvFilename)}
-            };
+                foreach (string filePath in dwcaFileCreationInfo.FilePathByBatchIdAndFilePart.Values.SelectMany(f => f.Values))
+                {
+                    try
+                    {
+                        if (File.Exists(filePath)) File.Delete(filePath);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError(e, $"Failed to delete file: {filePath}");
+                    }
+                }
 
-            return filePathByFilePart;
-        }
-
-        public void DeleteCreatedCsvFiles()
-        {
-            
+                try
+                {
+                    if (Directory.Exists(dwcaFileCreationInfo.ExportFolder)) Directory.Delete(dwcaFileCreationInfo.ExportFolder);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, $"Failed to delete directory: {dwcaFileCreationInfo.ExportFolder}");
+                }
+            }
         }
 
         /// <summary>
         /// Create DwC-A for each data provider and DwC-A for all data providers combined.
         /// </summary>
-        public async Task CreateDwcaFilesFromCreatedCsvFiles()
+        public async Task<bool> CreateDwcaFilesFromCreatedCsvFiles()
         {
-            if (!IsEnabled) return;
-            foreach (var dwcaFileCreationInfo in _dwcaFilesCreationInfoByDataProvider.Values)
+            try
             {
-                await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(dwcaFileCreationInfo);
+                if (!_dwcaFilesCreationConfiguration.IsEnabled) return true;
+                foreach (var dwcaFileCreationInfo in _dwcaFilePartsInfoByDataProvider.Values)
+                {
+                    await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath, dwcaFileCreationInfo);
+                }
+
+                DeleteTemporaryCreatedCsvFiles();
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Merge CSV files into DwC-A failed");
+                return false;
             }
         }
-    }
-
-    public class DwcaFilesCreationInfo
-    {
-        public DataProvider DataProvider { get; set; }
-        public string ExportFolder { get; set; }
-        public Dictionary<string, Dictionary<DwcaFilePart, string>> FilePathByBatchIdAndFilePart { get; set; }
-
-        public static DwcaFilesCreationInfo Create(DataProvider dataProvider, string exportFolderPath)
-        {
-            var dwcaFilesCreationInfo = new DwcaFilesCreationInfo();
-            dwcaFilesCreationInfo.DataProvider = dataProvider;
-            dwcaFilesCreationInfo.ExportFolder = Path.Combine(exportFolderPath, $"{dataProvider.Identifier} {DateTime.Now:yyyy-MM-dd}");
-            dwcaFilesCreationInfo.FilePathByBatchIdAndFilePart = new Dictionary<string, Dictionary<DwcaFilePart, string>>();
-            return dwcaFilesCreationInfo;
-        }
-    }
-
-    public enum DwcaFilePart
-    {
-        Occurrence,
-        Emof,
-        Multimedia
     }
 }

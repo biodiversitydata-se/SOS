@@ -35,6 +35,7 @@ namespace SOS.Export.IoC.Modules
             // Add configuration
             builder.RegisterInstance(Configuration.BlobStorageConfiguration).As<BlobStorageConfiguration>()
                 .SingleInstance();
+            builder.RegisterInstance(Configuration.DwcaFilesCreationConfiguration).As<DwcaFilesCreationConfiguration>().SingleInstance();
             builder.RegisterInstance(Configuration.FileDestination).As<FileDestination>().SingleInstance();
             builder.RegisterInstance(Configuration.ZendToConfiguration).As<ZendToConfiguration>().SingleInstance();
 

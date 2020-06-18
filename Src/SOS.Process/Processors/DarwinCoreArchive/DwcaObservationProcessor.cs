@@ -158,7 +158,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                     cancellationToken?.ThrowIfCancellationRequested();
                     verbatimCount += await CommitBatchAsync(dataProvider, sightings);
                     //var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider);
-                    //var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider, counter++.ToString());
+                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider, counter++.ToString());
                     sightings.Clear();
                     Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
                 }
@@ -170,7 +170,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 cancellationToken?.ThrowIfCancellationRequested();
                 verbatimCount += await CommitBatchAsync(dataProvider, sightings);
                 //var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider);
-                //var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider, counter.ToString());
+                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider, counter.ToString());
                 Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
             }
 

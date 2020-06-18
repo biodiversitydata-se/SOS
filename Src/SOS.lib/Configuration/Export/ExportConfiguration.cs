@@ -18,6 +18,11 @@ namespace SOS.Lib.Configuration.Export
         public FileDestination FileDestination { get; set; }
 
         /// <summary>
+        /// DwC-A file creation configuration.
+        /// </summary>
+        public DwcaFilesCreationConfiguration DwcaFilesCreationConfiguration { get; set; }
+
+        /// <summary>
         ///     Host
         /// </summary>
         public MongoDbConfiguration ProcessedDbConfiguration { get; set; }

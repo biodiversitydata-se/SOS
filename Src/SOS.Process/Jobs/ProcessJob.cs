@@ -300,8 +300,8 @@ namespace SOS.Process.Jobs
                 //----------------------------------------------------------------------------
                 // 8. End create DwC CSV files and merge the files into multiple DwC-A files.
                 //----------------------------------------------------------------------------
-                _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
-                _dwcArchiveFileWriterCoordinator.DeleteCreatedCsvFiles();
+                await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
+                _dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
 
                 //----------------------------------------------
                 // 9. Update provider info 
@@ -398,7 +398,7 @@ namespace SOS.Process.Jobs
             }
             finally
             {
-                _dwcArchiveFileWriterCoordinator.DeleteCreatedCsvFiles();
+                _dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
             }
         }
 

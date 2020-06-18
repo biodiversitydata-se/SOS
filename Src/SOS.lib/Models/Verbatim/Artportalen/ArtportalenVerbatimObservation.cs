@@ -41,6 +41,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public Metadata DiscoveryMethod { get; set; }
 
         /// <summary>
+        ///     DeterminationMethod
+        /// </summary>
+        public Metadata DeterminationMethod { get; set; }
+
+        /// <summary>
         ///     Sigthing end data
         /// </summary>
         public DateTime? EndDate { get; set; }

@@ -1,0 +1,97 @@
+{
+  "Name": "DeterminationMethod",
+  "Localized": true,
+  "Values": [
+    {
+      "Id": 0,
+      "Value": "empty",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": " "
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": " "
+        }
+      ]
+    },
+    {
+      "Id": 1,
+      "Value": "microscoped",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "mikroskoperad"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "microscoped"
+        }
+      ]
+    },
+    {
+      "Id": 2,
+      "Value": "barcode",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "barcode"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "barcode"
+        }
+      ]
+    },
+    {
+      "Id": 3,
+      "Value": "stereo microscope",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "stereolupp"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "stereo microscope"
+        }
+      ]
+    }
+  ],
+  "ExternalSystemsMapping": [
+    {
+      "Id": 0,
+      "Name": "Artportalen",
+      "Mappings": [
+        {
+          "Key": "Id",
+          "Description": "Id field mapping",
+          "Values": [
+            {
+              "Value": 0,
+              "SosId": 0
+            },
+            {
+              "Value": 1,
+              "SosId": 1
+            },
+            {
+              "Value": 2,
+              "SosId": 2
+            },
+            {
+              "Value": 3,
+              "SosId": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "Id": 21
+}
