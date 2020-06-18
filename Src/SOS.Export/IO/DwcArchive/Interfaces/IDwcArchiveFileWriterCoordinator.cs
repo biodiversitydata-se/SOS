@@ -24,16 +24,16 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         Task<bool> WriteObservations(
             IEnumerable<ProcessedObservation> processedObservations,
             DataProvider dataProvider,
-            string batchId = null);
+            string batchId = "");
 
         /// <summary>
-        /// Delete created CSV files.
+        /// Delete temporary created CSV files.
         /// </summary>
-        void DeleteCreatedCsvFiles();
+        void DeleteTemporaryCreatedCsvFiles();
 
         /// <summary>
         /// Create DwC-A for each data provider and DwC-A for all data providers combined.
         /// </summary>
-        Task CreateDwcaFilesFromCreatedCsvFiles();
+        Task<bool> CreateDwcaFilesFromCreatedCsvFiles();
     }
 }

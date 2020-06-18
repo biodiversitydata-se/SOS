@@ -13,6 +13,7 @@ using SOS.Export.IO.DwcArchive;
 using SOS.Export.Managers;
 using SOS.Export.MongoDb;
 using SOS.Export.Services;
+using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -111,7 +112,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), new NullLogger<DwcArchiveFileWriterCoordinator>());
+            ), new FileService(), new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
             return dwcArchiveFileWriterCoordinator;
         }
 
@@ -197,7 +198,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
             var processingStatus = await dwcaProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobCancellationToken.Null);
             await dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles(); // FinishAndWriteDwcaFiles()
-            dwcArchiveFileWriterCoordinator.DeleteCreatedCsvFiles();
+            dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

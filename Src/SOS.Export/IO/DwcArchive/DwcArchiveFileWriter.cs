@@ -10,6 +10,7 @@ using Hangfire;
 using Hangfire.Server;
 using Ionic.Zip;
 using Microsoft.Extensions.Logging;
+using SOS.Export.Enums;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
@@ -172,15 +173,45 @@ namespace SOS.Export.IO.DwcArchive
             // todo
         }
 
-        public async Task CreateDwcArchiveFileAsync(DwcaFilesCreationInfo dwcaFileCreationInfo)
+        public async Task CreateDwcArchiveFileAsync(string exportFolderPath, DwcaFilePartsInfo dwcaFilePartsInfo)
         {
-            await using var stream = File.Create(@"c:\temp\minfil.zip");
+            try
+            {
+                string tempFilePath = Path.Combine(exportFolderPath, $"Temp_{Path.GetRandomFileName()}.dwca.zip");
+                string filePath = Path.Combine(exportFolderPath, $"{dwcaFilePartsInfo.DataProvider.Identifier}.dwca.zip");
+                string previousFilePath = Path.Combine(exportFolderPath, $"{dwcaFilePartsInfo.DataProvider.Identifier}.previous.dwca.zip");
+
+                // Create the DwC-A file
+                await CreateDwcArchiveFileAsync(dwcaFilePartsInfo, tempFilePath);
+
+                // Move the new new .zip file to correct path and archive the old .zip like <name>.previous.dwca.zip
+                if (File.Exists(filePath))
+                {
+                    // Replace the distributed .zip with the one just created
+                    File.Replace(tempFilePath, filePath, previousFilePath);
+                    _logger.LogInformation($"The .zip({filePath}) was replaced with the new file({tempFilePath}). Backup of the previous .zip created at {previousFilePath}.");
+                }
+                else
+                {
+                    File.Move(tempFilePath, filePath);
+                    _logger.LogInformation($"The .zip({filePath}) was missing. Moved the new file({tempFilePath}) to be the new distributed .zip.");
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Creating DwC-A .zip for {dwcaFilePartsInfo?.DataProvider} failed");
+                throw;
+            }
+        }
+
+        private async Task CreateDwcArchiveFileAsync(DwcaFilePartsInfo dwcaFilePartsInfo, string tempFilePath)
+        {
+            await using var stream = File.Create(tempFilePath);
             await using var compressedFileStream = new ZipOutputStream(stream, true);
             compressedFileStream.EnableZip64 = Zip64Option.AsNecessary;
-            
             compressedFileStream.PutNextEntry("occurrence.csv");
             await WriteOccurrenceHeader(compressedFileStream);
-            foreach (var value in dwcaFileCreationInfo.FilePathByBatchIdAndFilePart.Values)
+            foreach (var value in dwcaFilePartsInfo.FilePathByBatchIdAndFilePart.Values)
             {
                 string occurrenceCsvFilePath = value[DwcaFilePart.Occurrence];
                 await using var readStream = File.OpenRead(occurrenceCsvFilePath);

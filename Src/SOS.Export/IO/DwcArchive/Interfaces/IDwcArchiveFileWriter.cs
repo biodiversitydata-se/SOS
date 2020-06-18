@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hangfire;
+using SOS.Export.Enums;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Models.DarwinCore;
@@ -64,10 +65,11 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
             Dictionary<DwcaFilePart, string> filePathByFilePart);
 
         /// <summary>
-        /// Generate DwC-A files for data providers and one with all data providers.
+        /// Generate DwC-A files for a data provider.
         /// </summary>
-        /// <param name="dwcaFileCreationInfo"></param>
+        /// <param name="exportFolderPath"></param>
+        /// <param name="dwcaFilePartsInfo"></param>
         /// <returns></returns>
-        Task CreateDwcArchiveFileAsync(DwcaFilesCreationInfo dwcaFileCreationInfo);
+        Task CreateDwcArchiveFileAsync(string exportFolderPath, DwcaFilePartsInfo dwcaFilePartsInfo);
     }
 }
