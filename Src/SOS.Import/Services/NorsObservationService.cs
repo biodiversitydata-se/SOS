@@ -39,9 +39,9 @@ namespace SOS.Import.Services
             {
                 var xmlStream = await _httpClientService.GetFileStreamAsync(
                     new Uri($"{_norsServiceConfiguration.BaseAddress}/api/v1/NorsSpeciesObservation/?token={_norsServiceConfiguration.Token}" +
-                            $"&changedFrom=1900-01-01" +
+                            $"&changedFrom={ new DateTime(_norsServiceConfiguration.StartHarvestYear, 1, 1).ToString("yyyy-MM-dd") }" +
                             $"&isChangedFromSpecified=false" +
-                            $"&changedTo=1900-01-01" +
+                            $"&changedTo={ DateTime.Now.ToString("yyyy-MM-dd") }" +
                             $"&isChangedToSpecified=false" +
                             $"&changeId={changeId}" +
                             $"&isChangedIdSpecified=true" +

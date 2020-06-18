@@ -68,5 +68,11 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<MetadataEntity>> GetDiscoveryMethodsAsync();
+
+        /// <summary>
+        ///     Gets all determination methods
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<MetadataEntity>> GetDeterminationMethodsAsync();
     }
 }

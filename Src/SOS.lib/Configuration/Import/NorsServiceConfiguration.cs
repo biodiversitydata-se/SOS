@@ -1,8 +1,6 @@
-﻿using SOS.Lib.Configuration.Shared;
-
-namespace SOS.Lib.Configuration.Import
+﻿namespace SOS.Lib.Configuration.Import
 {
-    public class NorsServiceConfiguration : RestServiceConfiguration
+    public class NorsServiceConfiguration : AquaSupportConfiguration
     {
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Search
 {
@@ -19,5 +20,8 @@ namespace SOS.Lib.Models.Search
         public bool OnlyWithNotes { get; set; }
 
         public bool OnlyWithNotesOfInterest { get; set; }
+
+        public DateTime? ReportedDateFrom { get; set; }
+        public DateTime? ReportedDateTo { get; set; }
     }
 }

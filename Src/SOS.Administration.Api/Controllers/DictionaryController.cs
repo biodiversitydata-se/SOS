@@ -17,11 +17,11 @@ namespace SOS.Administration.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class FieldMappingController : ControllerBase, IFieldMappingController
+    public class DictionaryController : ControllerBase, IFieldMappingController
     {
         private readonly IFieldMappingDiffHelper _fieldMappingDiffHelper;
         private readonly IFieldMappingHarvester _fieldMappingHarvester;
-        private readonly ILogger<FieldMappingController> _logger;
+        private readonly ILogger<DictionaryController> _logger;
 
         /// <summary>
         ///     Constructor
@@ -29,10 +29,10 @@ namespace SOS.Administration.Api.Controllers
         /// <param name="fieldMappingHarvester"></param>
         /// <param name="fieldMappingDiffHelper"></param>
         /// <param name="logger"></param>
-        public FieldMappingController(
+        public DictionaryController(
             IFieldMappingHarvester fieldMappingHarvester,
             IFieldMappingDiffHelper fieldMappingDiffHelper,
-            ILogger<FieldMappingController> logger)
+            ILogger<DictionaryController> logger)
         {
             _fieldMappingHarvester =
                 fieldMappingHarvester ?? throw new ArgumentNullException(nameof(fieldMappingHarvester));

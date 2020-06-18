@@ -77,7 +77,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.[Weight], 
 	                s.HasTriggeredValidationRules, 
 	                s.HasAnyTriggeredValidationRuleWithWarning,
-	                s.NoteOfInterest
+	                s.NoteOfInterest,
+	                si.DeterminationMethodId
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id
@@ -173,7 +174,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.[Weight], 
 	                s.HasTriggeredValidationRules, 
 	                s.HasAnyTriggeredValidationRuleWithWarning,
-	                s.NoteOfInterest
+	                s.NoteOfInterest,
+	                si.DeterminationMethodId
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id

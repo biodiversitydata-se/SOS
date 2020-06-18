@@ -11,5 +11,7 @@ namespace SOS.Lib.Configuration.ObservationApi
         public HangfireDbConfiguration HangfireDbConfiguration { get; set; }
 
         public ElasticSearchConfiguration SearchDbConfiguration { get; set; }
+
+        public UserServiceConfiguration UserServiceConfiguration { get; set; }
     }
 }

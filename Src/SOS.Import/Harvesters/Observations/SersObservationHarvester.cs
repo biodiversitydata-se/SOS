@@ -54,7 +54,6 @@ namespace SOS.Import.Harvesters.Observations
 
             try
             {
-                var start = DateTime.Now;
                 _logger.LogInformation("Start harvesting sightings for SERS data provider");
                 _logger.LogInformation(GetSersHarvestSettingsInfoString());
 
@@ -70,11 +69,17 @@ namespace SOS.Import.Harvesters.Observations
                 var xmlDocument = await _sersObservationService.GetAsync(changeId);
                 var dataLastModified = DateTime.MinValue;
 
-                var verbatims = xmlDocument.ToVerbatims<SersObservationVerbatim>(ns);
-
                 // Loop until all sightings are fetched.
-                while (verbatims?.Any() ?? false)
+                while (xmlDocument != null)
                 {
+                    changeId = long.Parse(xmlDocument.Descendants(ns + "MaxChangeId").FirstOrDefault()?.Value ?? "0");
+                    if (changeId.Equals(0))
+                    {
+                        break;
+                    }
+
+                    var verbatims = xmlDocument.ToVerbatims<SersObservationVerbatim>(ns);
+
                     // Add sightings to MongoDb
                     await _sersObservationVerbatimRepository.AddManyAsync(verbatims);
 
@@ -97,11 +102,7 @@ namespace SOS.Import.Harvesters.Observations
                         break;
                     }
 
-                    var maxIdField = xmlDocument.Descendants(ns + "MaxChangeId").FirstOrDefault();
-
-                    changeId = long.Parse(maxIdField.Value);
-                    xmlDocument = await _sersObservationService.GetAsync(changeId);
-                    verbatims = xmlDocument.ToVerbatims<SersObservationVerbatim>(ns);
+                    xmlDocument = await _sersObservationService.GetAsync(changeId + 1);
                 }
                 _logger.LogInformation("Finished harvesting sightings for SERS data provider");
 

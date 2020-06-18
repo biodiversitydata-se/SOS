@@ -34,6 +34,26 @@ namespace SOS.Import.Extensions
 
                 verbatims.Add((T)verbatim);
             }
+
+            foreach (var observatioElement in xmlDocument.Root
+                .Element(ns + "UpdatedSpeciesObservations")
+                .Elements(ns + "WebSpeciesObservation"))
+            {
+                var verbatim = Activator.CreateInstance(typeof(T));
+                foreach (var fieldElement in observatioElement
+                    .Elements(ns + "Fields")
+                    .Elements(ns + "WebSpeciesObservationField"))
+                {
+
+                    var property = fieldElement.Element(ns + "Property").Value;
+                    var value = fieldElement.Element(ns + "Value").Value;
+
+                    verbatim.SetProperty(property, value);
+                }
+
+                verbatims.Add((T)verbatim);
+            }
+
             return verbatims;
         }
     }

@@ -54,7 +54,6 @@ namespace SOS.Import.Harvesters.Observations
 
             try
             {
-                var start = DateTime.Now;
                 _logger.LogInformation("Start harvesting sightings for KUL data provider");
                 _logger.LogInformation(GetKulHarvestSettingsInfoString());
 
@@ -69,11 +68,17 @@ namespace SOS.Import.Harvesters.Observations
                 var nrSightingsHarvested = 0;
                 var xmlDocument = await _kulObservationService.GetAsync(changeId);
                 
-                var verbatims = xmlDocument.ToVerbatims<KulObservationVerbatim>(ns);
-                
                 // Loop until all sightings are fetched.
-                while (verbatims?.Any() ?? false)
+                while (xmlDocument != null)
                 {
+                    changeId = long.Parse(xmlDocument.Descendants(ns + "MaxChangeId").FirstOrDefault()?.Value ?? "0");
+                    if (changeId.Equals(0))
+                    {
+                        break;
+                    }
+
+                    var verbatims = xmlDocument.ToVerbatims<KulObservationVerbatim>(ns);
+
                     // Add sightings to MongoDb
                     await _kulObservationVerbatimRepository.AddManyAsync(verbatims);
 
@@ -88,12 +93,8 @@ namespace SOS.Import.Harvesters.Observations
                         _logger.LogInformation("Max KUL observations reached");
                         break;
                     }
-
-                    var maxIdField = xmlDocument.Descendants(ns + "MaxChangeId").FirstOrDefault();
-
-                    changeId = long.Parse(maxIdField.Value);
-                    xmlDocument = await _kulObservationService.GetAsync(changeId);
-                    verbatims = xmlDocument.ToVerbatims<KulObservationVerbatim>(ns);
+             
+                    xmlDocument = await _kulObservationService.GetAsync(changeId + 1 );
                 }
 
                 _logger.LogInformation("Finished harvesting sightings for KUL data provider");
