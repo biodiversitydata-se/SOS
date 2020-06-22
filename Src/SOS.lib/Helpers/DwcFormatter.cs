@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace SOS.Lib.Helpers
 {
@@ -71,6 +72,19 @@ namespace SOS.Lib.Helpers
                 "{0}/{1}",
                 date1.Value.ToUniversalTime().ToString("HH:mm:ssK", CultureInfo.InvariantCulture),
                 date2.Value.ToUniversalTime().ToString("HH:mm:ssK", CultureInfo.InvariantCulture));
+        }
+
+        private static readonly Regex RxNewLineTab = new Regex(@"\r\n?|\n|\t", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Replace new line and tabs with the specified string.
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="replacement"></param>
+        /// <returns></returns>
+        public static string RemoveNewLineTabs(string str, string replacement = " ")
+        {
+            return str == null ? "" : RxNewLineTab.Replace(str, replacement);
         }
     }
 }

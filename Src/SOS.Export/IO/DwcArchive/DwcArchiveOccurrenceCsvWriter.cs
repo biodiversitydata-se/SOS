@@ -98,7 +98,7 @@ namespace SOS.Export.IO.DwcArchive
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation($"{nameof(CreateOccurrenceCsvFileAsync)} was canceled.");
+                _logger.LogInformation($"{nameof(WriteHeaderlessOccurrenceCsvFileAsync)} was canceled.");
                 throw;
             }
             catch (Exception e)
@@ -410,7 +410,7 @@ namespace SOS.Export.IO.DwcArchive
             }
         }
 
-        public async Task CreateOccurrenceCsvFileAsync(
+        public async Task WriteHeaderlessOccurrenceCsvFileAsync(
             IEnumerable<DarwinCore> dwcObservations,
             StreamWriter streamWriter,
             IEnumerable<FieldDescription> fieldDescriptions)

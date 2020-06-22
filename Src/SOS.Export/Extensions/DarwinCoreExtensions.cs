@@ -394,29 +394,41 @@ namespace SOS.Export.Extensions
         }
 
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
-            IEnumerable<ProcessedProject> projects)
+            IEnumerable<ProcessedObservation> processedObservations)
         {
-            return projects.SelectMany(ToExtendedMeasurementOrFactRows);
+            return processedObservations
+                .Where(observation => observation.Taxon != null) // todo - remove when the validation code is moved to processor.
+                .SelectMany(observation => observation.Projects != null ? 
+                    observation.Projects.SelectMany(project => ToExtendedMeasurementOrFactRows(project, observation.Occurrence.OccurrenceId)) : 
+                    Enumerable.Empty<ExtendedMeasurementOrFactRow>());
+        }
+
+        public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
+            IEnumerable<ProcessedProject> projects, string occurrenceId)
+        {
+            return projects.SelectMany(project => ToExtendedMeasurementOrFactRows(project, occurrenceId));
         }
 
         private static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(
-            ProcessedProject project)
+            ProcessedProject project, string occurrenceId)
         {
             if (project?.ProjectParameters == null || !project.ProjectParameters.Any())
             {
-                return null;
+                return Enumerable.Empty<ExtendedMeasurementOrFactRow>();
             }
 
             var rows = project.ProjectParameters.Select(projectParameter =>
-                ToExtendedMeasurementOrFactRow(project, projectParameter));
+                ToExtendedMeasurementOrFactRow(occurrenceId, project, projectParameter));
             return rows;
         }
 
         private static ExtendedMeasurementOrFactRow ToExtendedMeasurementOrFactRow(
+            string occurrenceId,
             ProcessedProject project,
             ProcessedProjectParameter projectParameter)
         {
             var row = new ExtendedMeasurementOrFactRow();
+            row.OccurrenceID = occurrenceId;
             row.MeasurementID = project.Id; // Should this be ProjectId or ProjectParameterId?
             //row.MeasurementID = projectParameter.ProjectParameterId.ToString(); // Should this be ProjectId or ProjectParameterId?
             row.MeasurementType = projectParameter.Name;

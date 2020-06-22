@@ -5,6 +5,7 @@ using SOS.Export.Enums;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
 
@@ -60,12 +61,12 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="dwcObservations"></param>
         /// <param name="filePathByFilePart"></param>
         /// <returns></returns>
-        Task WriteObservations(
-            IEnumerable<DarwinCore> dwcObservations,
+        Task WriteHeaderlessDwcaFiles(
+            ICollection<ProcessedObservation> dwcObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart);
 
         /// <summary>
-        /// Generate DwC-A files for a data provider.
+        /// Create a DwC-A file for a data provider.
         /// </summary>
         /// <param name="exportFolderPath"></param>
         /// <param name="dwcaFilePartsInfo"></param>

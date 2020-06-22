@@ -60,6 +60,7 @@ namespace SOS.Export.IO.DwcArchive
             DataProvider dataProvider,
             string batchId = "")
         {
+            // todo - change name to [WriteHeaderlessDwcaFile] or [WriteHeaderlessDwcaFileParts] ?
             try
             {
                 if (!_dwcaFilesCreationConfiguration.IsEnabled) return true;
@@ -76,8 +77,7 @@ namespace SOS.Export.IO.DwcArchive
                     filePathByFilePart = dwcaFilePartsInfo.GetOrCreateFilePathByFilePart(batchId);
                 }
 
-                var dwcObservations = processedObservations.ToDarwinCore();
-                await _dwcArchiveFileWriter.WriteObservations(dwcObservations, filePathByFilePart);
+                await _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(processedObservations.ToArray(), filePathByFilePart);
                 return true;
             }
             catch (Exception e)
@@ -86,6 +86,30 @@ namespace SOS.Export.IO.DwcArchive
                 return false;
             }
         }
+
+        /// <summary>
+        /// Create DwC-A for each data provider and DwC-A for all data providers combined.
+        /// </summary>
+        public async Task<bool> CreateDwcaFilesFromCreatedCsvFiles()
+        {
+            try
+            {
+                if (!_dwcaFilesCreationConfiguration.IsEnabled) return true;
+                foreach (var dwcaFileCreationInfo in _dwcaFilePartsInfoByDataProvider.Values)
+                {
+                    await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath, dwcaFileCreationInfo);
+                }
+
+                DeleteTemporaryCreatedCsvFiles();
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Merge CSV files into DwC-A failed");
+                return false;
+            }
+        }
+
 
         private DwcaFilePartsInfo CreateDwcaFilePartsInfo(DataProvider dataProvider)
         {
@@ -136,29 +160,6 @@ namespace SOS.Export.IO.DwcArchive
                 {
                     _logger.LogError(e, $"Failed to delete directory: {dwcaFileCreationInfo.ExportFolder}");
                 }
-            }
-        }
-
-        /// <summary>
-        /// Create DwC-A for each data provider and DwC-A for all data providers combined.
-        /// </summary>
-        public async Task<bool> CreateDwcaFilesFromCreatedCsvFiles()
-        {
-            try
-            {
-                if (!_dwcaFilesCreationConfiguration.IsEnabled) return true;
-                foreach (var dwcaFileCreationInfo in _dwcaFilePartsInfoByDataProvider.Values)
-                {
-                    await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath, dwcaFileCreationInfo);
-                }
-
-                DeleteTemporaryCreatedCsvFiles();
-                return true;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Merge CSV files into DwC-A failed");
-                return false;
             }
         }
     }

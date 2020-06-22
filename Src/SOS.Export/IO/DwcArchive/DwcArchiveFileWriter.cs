@@ -11,12 +11,15 @@ using Hangfire.Server;
 using Ionic.Zip;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Enums;
+using SOS.Export.Extensions;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
 
@@ -152,22 +155,28 @@ namespace SOS.Export.IO.DwcArchive
             }
         }
 
-        public async Task WriteObservations(
-            IEnumerable<DarwinCore> dwcObservations,
+        public async Task WriteHeaderlessDwcaFiles(
+            ICollection<ProcessedObservation> processedObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart)
         {
-            string occurrenceCsvFilePath = filePathByFilePart[DwcaFilePart.Occurrence];
             var fieldDescriptions = FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose();
-            
+
             // Create Occurrence CSV file
-            await using StreamWriter fileStream = File.AppendText(occurrenceCsvFilePath);
-            await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+            string occurrenceCsvFilePath = filePathByFilePart[DwcaFilePart.Occurrence];
+            var dwcObservations = processedObservations.ToDarwinCore();
+            await using StreamWriter occurrenceFileStream = File.AppendText(occurrenceCsvFilePath);
+            await _dwcArchiveOccurrenceCsvWriter.WriteHeaderlessOccurrenceCsvFileAsync(
                 dwcObservations,
-                fileStream,
+                occurrenceFileStream,
                 fieldDescriptions);
 
             // Create EMOF CSV file
-            // todo
+            string emofCsvFilePath = filePathByFilePart[DwcaFilePart.Emof];
+            var emofRows = processedObservations.ToExtendedMeasurementOrFactRows();
+            await using StreamWriter emofFileStream = File.AppendText(emofCsvFilePath);
+            await _extendedMeasurementOrFactCsvWriter.WriteHeaderlessEmofCsvFileAsync(
+                emofRows,
+                emofFileStream);
 
             // Create Multimedia CSV file
             // todo
@@ -175,9 +184,10 @@ namespace SOS.Export.IO.DwcArchive
 
         public async Task CreateDwcArchiveFileAsync(string exportFolderPath, DwcaFilePartsInfo dwcaFilePartsInfo)
         {
+            string tempFilePath = null;
             try
             {
-                string tempFilePath = Path.Combine(exportFolderPath, $"Temp_{Path.GetRandomFileName()}.dwca.zip");
+                tempFilePath = Path.Combine(exportFolderPath, $"Temp_{Path.GetRandomFileName()}.dwca.zip");
                 string filePath = Path.Combine(exportFolderPath, $"{dwcaFilePartsInfo.DataProvider.Identifier}.dwca.zip");
                 string previousFilePath = Path.Combine(exportFolderPath, $"{dwcaFilePartsInfo.DataProvider.Identifier}.previous.dwca.zip");
 
@@ -202,29 +212,61 @@ namespace SOS.Export.IO.DwcArchive
                 _logger.LogError(e, $"Creating DwC-A .zip for {dwcaFilePartsInfo?.DataProvider} failed");
                 throw;
             }
+            finally
+            {
+                if (tempFilePath != null && File.Exists(tempFilePath)) File.Delete(tempFilePath);
+            }
         }
 
         private async Task CreateDwcArchiveFileAsync(DwcaFilePartsInfo dwcaFilePartsInfo, string tempFilePath)
         {
+            var fieldDescriptions = FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose().ToList();
             await using var stream = File.Create(tempFilePath);
-            await using var compressedFileStream = new ZipOutputStream(stream, true);
-            compressedFileStream.EnableZip64 = Zip64Option.AsNecessary;
+            await using var compressedFileStream = new ZipOutputStream(stream, true) { EnableZip64 = Zip64Option.AsNecessary };
+
+            // Create meta.xml
+            compressedFileStream.PutNextEntry("meta.xml");
+            DwcArchiveMetaFileWriter.CreateMetaXmlFile(compressedFileStream, fieldDescriptions.ToList());
+
+            // Create eml.xml
+            compressedFileStream.PutNextEntry("eml.xml");
+            await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(compressedFileStream);
+
+            // Create occurrence.csv
             compressedFileStream.PutNextEntry("occurrence.csv");
-            await WriteOccurrenceHeader(compressedFileStream);
+            await WriteOccurrenceHeaderRow(compressedFileStream);
             foreach (var value in dwcaFilePartsInfo.FilePathByBatchIdAndFilePart.Values)
             {
                 string occurrenceCsvFilePath = value[DwcaFilePart.Occurrence];
                 await using var readStream = File.OpenRead(occurrenceCsvFilePath);
                 await readStream.CopyToAsync(compressedFileStream);
             }
+
+            // Create emof.csv
+            compressedFileStream.PutNextEntry("extendedMeasurementOrFact.csv");
+            await WriteEmofHeaderRow(compressedFileStream);
+            foreach (var value in dwcaFilePartsInfo.FilePathByBatchIdAndFilePart.Values)
+            {
+                string emofCsvFilePath = value[DwcaFilePart.Emof];
+                await using var readStream = File.OpenRead(emofCsvFilePath);
+                await readStream.CopyToAsync(compressedFileStream);
+            }
         }
 
-        private async Task WriteOccurrenceHeader(ZipOutputStream compressedFileStream)
+        private async Task WriteOccurrenceHeaderRow(ZipOutputStream compressedFileStream)
         {
             await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
             var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
             _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvWriter,
                 FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose());
+            await streamWriter.FlushAsync();
+        }
+
+        private async Task WriteEmofHeaderRow(ZipOutputStream compressedFileStream)
+        {
+            await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
+            var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
+            _extendedMeasurementOrFactCsvWriter.WriteHeaderRow(csvWriter);
             await streamWriter.FlushAsync();
         }
     }

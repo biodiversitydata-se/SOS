@@ -44,7 +44,7 @@ namespace SOS.Export.IntegrationTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var extendedMeasurementOrFactRows = projectParameters.ToExtendedMeasurementOrFactRows();
+            var extendedMeasurementOrFactRows = projectParameters.ToExtendedMeasurementOrFactRows(null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

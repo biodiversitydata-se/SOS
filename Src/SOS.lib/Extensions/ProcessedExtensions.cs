@@ -269,7 +269,9 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static IEnumerable<DarwinCore> ToDarwinCore(this IEnumerable<ProcessedObservation> processedObservations)
         {
-            return processedObservations?.Select(m => m.ToDarwinCore());
+            return processedObservations?
+                .Where(observation => observation.Taxon != null) // todo - remove when the validation code is moved to processor.
+                .Select(observation => observation.ToDarwinCore());
         }
 
         #endregion Sighting

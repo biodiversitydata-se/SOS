@@ -21,70 +21,33 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
+using SOS.Process.Processors.Artportalen;
 using SOS.Process.Processors.DarwinCoreArchive;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
 using Xunit;
-using Xunit.Abstractions;
 
-namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
+namespace SOS.Process.IntegrationTests.Processors.Artportalen
 {
-    public class DwcaObservationProcessorIntegrationTests : TestBase
+    public class ArtportalenObservationProcessorIntegrationTests : TestBase
     {
-        public DwcaObservationProcessorIntegrationTests(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
-
-        private readonly ITestOutputHelper _testOutputHelper;
-
         [Fact]
-        public async Task Process_Dwca_observations()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var dwcArchiveFileWriterCoordinator = CreateDwcArchiveFileWriterCoordinator();
-            var dwcaProcessor = CreateDwcaObservationProcessor(dwcArchiveFileWriterCoordinator, storeProcessedObservations: false, batchSize: 10000);
-            var taxonByTaxonId = await GetTaxonDictionaryAsync();
-            var dataProvider = new DataProvider
-            {
-                Id = 13,
-                Identifier = "ButterflyMonitoring",
-                Name = "Swedish Butterfly Monitoring Scheme (SeBMS)",
-                Type = DataProviderType.DwcA
-            };
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var processingStatus =
-                await dwcaProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobCancellationToken.Null);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            processingStatus.Status.Should().Be(RunStatus.Success);
-        }
-
-        [Fact]
-        public async Task Process_Dwca_observations_with_CSV_writing()
+        public async Task Process_Artportalen_observations_with_CSV_writing()
         {
             // Current test
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var dwcArchiveFileWriterCoordinator = CreateDwcArchiveFileWriterCoordinator();
-            var dwcaProcessor = CreateDwcaObservationProcessor(dwcArchiveFileWriterCoordinator, storeProcessedObservations: false, 10000);
-            
+            var artportalenProcessor = CreateArtportalenObservationProcessor(dwcArchiveFileWriterCoordinator, storeProcessedObservations: false, 10000);
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
             var dataProvider = new DataProvider
             {
-                Id = 13,
-                Identifier = "ButterflyMonitoring",
-                Name = "Swedish Butterfly Monitoring Scheme (SeBMS)",
-                Type = DataProviderType.DwcA
+                Id = 1,
+                Identifier = "Artportalen",
+                Name = "Artportalen",
+                Type = DataProviderType.ArtportalenObservations
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -92,7 +55,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
-            var processingStatus = await dwcaProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobCancellationToken.Null);
+            var processingStatus = await artportalenProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobCancellationToken.Null);
             await dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles(); // FinishAndWriteDwcaFiles()
             dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
 
@@ -102,7 +65,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             processingStatus.Status.Should().Be(RunStatus.Success);
         }
 
-        private DwcaObservationProcessor CreateDwcaObservationProcessor(
+        private ArtportalenObservationProcessor CreateArtportalenObservationProcessor(
             DwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
             bool storeProcessedObservations,
             int batchSize)
@@ -144,16 +107,16 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
             var processedFieldMappingRepository =
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
+            var artportalenVerbatimRepository = new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>());
 
-            return new DwcaObservationProcessor(
-                dwcaVerbatimRepository,
+            return new ArtportalenObservationProcessor(
+                artportalenVerbatimRepository,
                 processedObservationRepository,
                 processedFieldMappingRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
-                new AreaHelper(new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()),
-                    processedFieldMappingRepository),
-                processConfiguration, dwcArchiveFileWriterCoordinator,
-                new NullLogger<DwcaObservationProcessor>());
+                processConfiguration, 
+                dwcArchiveFileWriterCoordinator,
+                new NullLogger<ArtportalenObservationProcessor>());
         }
 
         private DwcArchiveFileWriterCoordinator CreateDwcArchiveFileWriterCoordinator()

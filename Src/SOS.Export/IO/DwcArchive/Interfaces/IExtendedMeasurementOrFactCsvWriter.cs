@@ -2,18 +2,44 @@
 using System.IO;
 using System.Threading.Tasks;
 using Hangfire;
+using NReco.Csv;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive.Interfaces
 {
     public interface IExtendedMeasurementOrFactCsvWriter
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Create a Emof CSV file.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="stream"></param>
+        /// <param name="fieldDescriptions"></param>
+        /// <param name="processedObservationRepository"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         Task<bool> CreateCsvFileAsync(FilterBase filter, Stream stream,
             IEnumerable<FieldDescription> fieldDescriptions,
             IProcessedObservationRepository processedObservationRepository,
             IJobCancellationToken cancellationToken);
+
+        /// <summary>
+        /// Create a headerless Emof CSV file.
+        /// </summary>
+        /// <param name="emofRows"></param>
+        /// <param name="streamWriter"></param>
+        /// <returns></returns>
+        Task WriteHeaderlessEmofCsvFileAsync(
+            IEnumerable<ExtendedMeasurementOrFactRow> emofRows,
+            StreamWriter streamWriter);
+
+        /// <summary>
+        /// Write Emof header row.
+        /// </summary>
+        /// <param name="csvWriter"></param>
+        void WriteHeaderRow(CsvWriter csvWriter);
     }
 }

@@ -34,7 +34,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="streamWriter"></param>
         /// <param name="fieldDescriptions"></param>
         /// <returns></returns>
-        Task CreateOccurrenceCsvFileAsync(
+        Task WriteHeaderlessOccurrenceCsvFileAsync(
             IEnumerable<DarwinCore> dwcObservations,
             StreamWriter streamWriter,
             IEnumerable<FieldDescription> fieldDescriptions);
