@@ -131,6 +131,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         /// </summary>
         public int? ParentSiteId { get; set; }
 
+        /// <summary>
+        ///     Name of the parent site
+        /// </summary>
+        public string ParentSiteName { get; set; }
+
         private void InitGeometries()
         {
             if (XCoord > 0 && YCoord > 0)

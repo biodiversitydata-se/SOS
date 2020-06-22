@@ -201,6 +201,15 @@ namespace SOS.Import.Extensions
                     projectEntityDictionaries)
             };
 
+            if (observation.Site?.ParentSiteId != null)
+            {
+                if (sites.ContainsKey(observation.Site.ParentSiteId.Value))
+                {
+                    var s = sites[observation.Site.ParentSiteId.Value];
+                    observation.Site.ParentSiteName = s.Name;
+                }
+            }
+
             if (personSightings.TryGetValue(entity.Id, out var personSighting))
             {
                 observation.VerifiedBy = personSighting.VerifiedBy;
