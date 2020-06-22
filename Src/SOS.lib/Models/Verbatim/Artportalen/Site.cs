@@ -34,6 +34,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public GeographicalArea CountryRegion { get; set; }
 
         /// <summary>
+        ///     External Id of site
+        /// </summary>
+        public string ExternalId { get; set; }
+
+        /// <summary>
         ///     Id of site
         /// </summary>
         public int Id { get; set; }

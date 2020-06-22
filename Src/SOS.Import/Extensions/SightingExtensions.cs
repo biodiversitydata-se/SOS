@@ -210,6 +210,8 @@ namespace SOS.Import.Extensions
                 }
             }
 
+            if (observation.Site != null) observation.Site.ExternalId = entity.SiteExternalId;
+
             if (personSightings.TryGetValue(entity.Id, out var personSighting))
             {
                 observation.VerifiedBy = personSighting.VerifiedBy;

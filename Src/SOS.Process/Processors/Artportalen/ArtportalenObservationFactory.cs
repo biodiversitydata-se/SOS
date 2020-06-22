@@ -157,6 +157,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.ParentLocationId = verbatimObservation.Site?.ParentSiteId;
                 obs.Location.ParentLocality = verbatimObservation.Site?.ParentSiteName?.Trim();
                 obs.Location.PresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
+                obs.Location.ExternalId = verbatimObservation.Site?.ExternalId;
                 
                 // Occurrence
                 obs.Occurrence = new ProcessedOccurrence();

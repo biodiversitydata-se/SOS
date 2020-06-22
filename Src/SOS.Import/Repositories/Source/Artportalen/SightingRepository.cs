@@ -78,7 +78,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.HasTriggeredValidationRules, 
 	                s.HasAnyTriggeredValidationRuleWithWarning,
 	                s.NoteOfInterest,
-	                si.DeterminationMethodId
+	                si.DeterminationMethodId,
+	                site.ExternalId AS SiteExternalId
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id
@@ -92,6 +93,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					LEFT JOIN SightingDescription sdb ON si.SightingBiotopeDescriptionId = sdb.Id 
 					LEFT JOIN SightingDescription sds ON si.SightingSubstrateDescriptionId = sds.Id 
 					LEFT JOIN SightingDescription sdss ON si.SightingSubstrateSpeciesDescriptionId = sdss.Id
+                    LEFT JOIN Site site on site.Id=s.SiteId 
                 WHERE
 	                s.Id BETWEEN @StartId AND @EndId
 	                AND s.TaxonId IS NOT NULL
@@ -175,7 +177,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.HasTriggeredValidationRules, 
 	                s.HasAnyTriggeredValidationRuleWithWarning,
 	                s.NoteOfInterest,
-	                si.DeterminationMethodId
+	                si.DeterminationMethodId,
+	                site.ExternalId AS SiteExternalId
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id
@@ -189,6 +192,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					LEFT JOIN SightingDescription sdb ON si.SightingBiotopeDescriptionId = sdb.Id 
 					LEFT JOIN SightingDescription sds ON si.SightingSubstrateDescriptionId = sds.Id 
 					LEFT JOIN SightingDescription sdss ON si.SightingSubstrateSpeciesDescriptionId = sdss.Id
+                    LEFT JOIN Site site on site.Id=s.SiteId 
                 WHERE
 	                s.SightingId in @ids
 	                AND s.TaxonId IS NOT NULL

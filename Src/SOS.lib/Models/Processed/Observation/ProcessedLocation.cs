@@ -523,5 +523,10 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Internal field: Name of parent location, if any.
         /// </summary>
         public string ParentLocality { get; set; }
+
+        /// <summary>
+        ///     Internal field: ExternalId of Site in Artportalen.
+        /// </summary>
+        public string ExternalId { get; set; }
     }
 }
