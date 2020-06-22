@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace SOS.Lib.Models.Search
 {
@@ -9,6 +10,15 @@ namespace SOS.Lib.Models.Search
     /// </summary>
     public class FilterBase
     {
+        /// <summary>
+        /// Convert filter to string
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
+        }
+
         public IEnumerable<int> CountyIds { get; set; }
 
         /// <summary>

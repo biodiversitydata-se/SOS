@@ -34,6 +34,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public GeographicalArea CountryRegion { get; set; }
 
         /// <summary>
+        ///     External Id of site
+        /// </summary>
+        public string ExternalId { get; set; }
+
+        /// <summary>
         ///     Id of site
         /// </summary>
         public int Id { get; set; }
@@ -130,6 +135,11 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         ///     The parent site id
         /// </summary>
         public int? ParentSiteId { get; set; }
+
+        /// <summary>
+        ///     Name of the parent site
+        /// </summary>
+        public string ParentSiteName { get; set; }
 
         private void InitGeometries()
         {

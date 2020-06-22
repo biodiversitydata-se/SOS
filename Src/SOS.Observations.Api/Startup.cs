@@ -119,6 +119,9 @@ namespace SOS.Observations.Api
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
+            // Add application insights.
+            services.AddApplicationInsightsTelemetry(Configuration);
+
             // Configure swagger
             services.AddSwaggerGen(
                 options =>

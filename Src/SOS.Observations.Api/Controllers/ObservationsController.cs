@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -22,10 +23,58 @@ namespace SOS.Observations.Api.Controllers
     {
         private const int MaxBatchSize = 1000;
         private const int ElasticSearchMaxRecords = 10000;
-        private readonly IAreaManager _areaManager;
         private readonly IFieldMappingManager _fieldMappingManager;
         private readonly ILogger<ObservationsController> _logger;
         private readonly IObservationManager _observationManager;
+
+        /// <summary>
+        /// Basic validation of search filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        private Tuple<bool, IEnumerable<string>> ValidateFilter(SearchFilter filter, int skip, int take)
+        {
+            var errors = new List<string>();
+
+            if (!filter.IsFilterActive)
+            {
+                errors.Add("You must provide a filter."); ;
+            }
+            else
+            {
+
+                // No culture code, set default
+                if (string.IsNullOrEmpty(filter?.FieldTranslationCultureCode))
+                {
+                    filter.FieldTranslationCultureCode = "sv-SE";
+                }
+
+                if (!new[] { "sv-SE", "en-GB" }.Contains(filter.FieldTranslationCultureCode,
+                    StringComparer.CurrentCultureIgnoreCase))
+                {
+                    errors.Add("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
+                }
+
+                //Remove the limitations if we use the internal functions
+                if (!(filter is SearchFilterInternal))
+                {
+                    if (skip < 0 || take <= 0 || take > MaxBatchSize)
+                    {
+                        errors.Add($"You can't take more than {MaxBatchSize} at a time.");
+                    }
+                }
+
+                if (skip + take > ElasticSearchMaxRecords)
+                {
+                    errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }" );
+                }
+            }
+
+
+            return new Tuple<bool, IEnumerable<string>>(!errors.Any(), errors);
+        }
 
         /// <summary>
         ///     Constructor
@@ -37,12 +86,10 @@ namespace SOS.Observations.Api.Controllers
         public ObservationsController(
             IObservationManager observationManager,
             IFieldMappingManager fieldMappingManager,
-            IAreaManager areaManager,
             ILogger<ObservationsController> logger)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
-            _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -59,23 +106,10 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                if (!filter.IsFilterActive)
+                var validateResult = ValidateFilter(filter, skip, take);
+                if (!validateResult.Item1)
                 {
-                    return BadRequest("You must provide a filter.");
-                }
-
-                //Remove the limitations if we use the internal functions
-                if (!(filter is SearchFilterInternal))
-                {
-                    if (skip < 0 || take <= 0 || take > MaxBatchSize)
-                    {
-                        return BadRequest($"You can't take more than {MaxBatchSize} at a time.");
-                    }
-                }
-
-                if (skip + take > ElasticSearchMaxRecords)
-                {
-                    return BadRequest("Skip + take ");
+                    return BadRequest( string.Join(". ", validateResult.Item2));
                 }
 
                 return new OkObjectResult(
@@ -117,6 +151,12 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = "",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc)
         {
+            var validateResult = ValidateFilter(filter, skip, take);
+            if (!validateResult.Item1)
+            {
+                return BadRequest(string.Join(". ", validateResult.Item2));
+            }
+
             return await GetChunkAsync(filter, skip, take, sortBy, sortOrder);
         }
     }
