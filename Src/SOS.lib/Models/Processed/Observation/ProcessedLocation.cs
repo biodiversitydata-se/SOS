@@ -518,5 +518,10 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     have one main location and several sublocation
         /// </summary>
         public int? ParentLocationId { get; set; }
+
+        /// <summary>
+        ///     Internal field: Name of parent location, if any.
+        /// </summary>
+        public string ParentLocality { get; set; }
     }
 }
