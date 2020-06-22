@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Configuration.Shared;
@@ -21,6 +23,7 @@ namespace SOS.Observations.Api.Repositories
         IProcessedObservationRepository
     {
         private readonly IElasticClient _elasticClient;
+        private readonly TelemetryClient _telemetry;
         private readonly string _indexName;
 
         /// <summary>
@@ -34,6 +37,7 @@ namespace SOS.Observations.Api.Repositories
             IElasticClient elasticClient,
             IProcessClient client,
             ElasticSearchConfiguration elasticConfiguration,
+            TelemetryClient telemetry,
             ILogger<ProcessedObservationRepository> logger) : base(client, true, logger)
         {
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
@@ -41,6 +45,8 @@ namespace SOS.Observations.Api.Repositories
             _indexName = string.IsNullOrEmpty(elasticConfiguration.IndexPrefix)
                 ? $"{CollectionName.ToLower()}"
                 : $"{elasticConfiguration.IndexPrefix.ToLower()}-{CollectionName.ToLower()}";
+
+            _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry)); ;
         }
 
         /// <inheritdoc />
@@ -57,6 +63,10 @@ namespace SOS.Observations.Api.Repositories
 
             var excludeQuery = CreateExcludeQuery(filter);
             var sortDescriptor = sortBy.ToSortDescriptor<ProcessedObservation>(sortOrder);
+
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
+
+            operation.Telemetry.Properties["Filter"] = filter.ToString(); 
 
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(_indexName)
@@ -95,6 +105,9 @@ namespace SOS.Observations.Api.Repositories
                 }
             }
 
+            // Optional: explicitly send telemetry item:
+            _telemetry.StopOperation(operation);
+
             return new PagedResult<dynamic>
             {
                 Records = searchResponse.Documents,
@@ -102,6 +115,8 @@ namespace SOS.Observations.Api.Repositories
                 Take = take,
                 TotalCount = totalCount
             };
+
+            // When operation is disposed, telemetry item is sent.
         }
 
         private static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateExcludeQuery(
@@ -140,7 +155,7 @@ namespace SOS.Observations.Api.Repositories
                             break;
                     }
                 }
-            }          
+            }
 
             return queryContainers;
         }
