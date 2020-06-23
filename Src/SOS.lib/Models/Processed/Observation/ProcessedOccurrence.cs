@@ -296,5 +296,13 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     The reported weight
         /// </summary>
         public int? Weight { get; set; }
+        /// <summary>
+        /// Sighting type
+        /// </summary>
+        public int SightingTypeId { get; set; }
+        /// <summary>
+        /// Sighting type search group id
+        /// </summary>
+        public int SightingTypeSearchGroupId { get; set; }
     }
 }

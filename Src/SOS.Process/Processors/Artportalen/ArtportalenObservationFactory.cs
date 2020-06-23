@@ -186,6 +186,8 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.URL = $"http://www.artportalen.se/sighting/{verbatimObservation.Id}";
                 obs.Occurrence.Length = verbatimObservation.Length;
                 obs.Occurrence.Weight = verbatimObservation.Weight;
+                obs.Occurrence.SightingTypeId = verbatimObservation.SightingTypeId;
+                obs.Occurrence.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
 
                 obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
                 obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);

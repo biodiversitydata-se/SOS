@@ -198,7 +198,9 @@ namespace SOS.Import.Extensions
                 Weight = entity.Weight,
                 Projects = GetProjects(
                     entity.Id,
-                    projectEntityDictionaries)
+                    projectEntityDictionaries),
+                SightingTypeId = entity.SightingTypeId,
+                SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId
             };
 
             if (observation.Site?.ParentSiteId != null)

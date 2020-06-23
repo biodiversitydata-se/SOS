@@ -59,6 +59,7 @@ namespace SOS.Observations.Api.Repositories
             }
 
             var query = filter.ToQuery();
+            query = AddSightingTypeFilters(filter, query);
             query = AddInternalFilters(filter, query);
 
             var excludeQuery = CreateExcludeQuery(filter);
@@ -117,6 +118,57 @@ namespace SOS.Observations.Api.Repositories
             };
 
             // When operation is disposed, telemetry item is sent.
+        }
+
+        private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddSightingTypeFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
+        {
+            var queryList = query.ToList();
+            
+            if(filter is SearchFilterInternal)
+            {
+                var internalFilter = filter as SearchFilterInternal;                
+                int[] sightingTypeSearchGroupFilter = null;
+                if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowMerged)
+                {                    
+                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 4, 16, 32, 128 };
+                }
+                else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowBoth)
+                {                 
+                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 16, 32, 128 };
+                }
+                else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
+                {                 
+                    sightingTypeSearchGroupFilter = new int[] { 0, 2 };
+                }
+                else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowSightingsInMerged)
+                {                 
+                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 32, 128 };
+                }             
+                queryList.Add(q => q
+                        .Terms(t => t
+                            .Field("occurrence.sightingTypeSearchGroupId")
+                            .Terms(sightingTypeSearchGroupFilter)
+                        )
+                    );
+            }
+            else
+            {
+                queryList.Add(q => q
+                        .Terms(t => t
+                            .Field("occurrence.sightingTypeId")
+                            .Terms(new int[] { 0, 3 })
+                        )
+                    );
+                queryList.Add(q => q
+                        .Terms(t => t
+                            .Field("occurrence.sightingTypeSearchGroupId")
+                            .Terms(new int[] { 0, 1, 32 })
+                        )
+                    );
+
+            }
+            query = queryList;
+            return query;
         }
 
         private static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateExcludeQuery(

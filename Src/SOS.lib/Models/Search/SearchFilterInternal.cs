@@ -8,6 +8,13 @@ namespace SOS.Lib.Models.Search
     /// </summary>
     public class SearchFilterInternal : SearchFilter
     {
+        public enum SightingTypeFilter
+        {
+            DoNotShowMerged,
+            ShowOnlyMerged,
+            ShowBoth,
+            DoNotShowSightingsInMerged
+        }
         public int? UserId { get; set; }
         public int? ProjectId { get; set; }
         public bool IncludeRealCount { get; set; }
@@ -23,5 +30,6 @@ namespace SOS.Lib.Models.Search
 
         public DateTime? ReportedDateFrom { get; set; }
         public DateTime? ReportedDateTo { get; set; }
+        public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
     }
 }

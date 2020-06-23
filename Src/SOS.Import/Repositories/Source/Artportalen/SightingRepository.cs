@@ -80,6 +80,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.NoteOfInterest,
 	                si.DeterminationMethodId,
 	                site.ExternalId AS SiteExternalId
+                    s.SightingTypeId,
+                    s.SightingTypeSearchGroupId
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id
@@ -96,11 +98,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     LEFT JOIN Site site on site.Id=s.SiteId 
                 WHERE
 	                s.Id BETWEEN @StartId AND @EndId
-	                AND s.TaxonId IS NOT NULL
-	                AND s.SightingTypeId IN(0, 3) 
+	                AND s.TaxonId IS NOT NULL	                
 	                AND s.HiddenByProvider IS NULL
-	                AND s.ValidationStatusId NOT IN(50)
-	                AND s.SightingTypeSearchGroupId & 33 > 0
+	                AND s.ValidationStatusId NOT IN(50)	                
 	                AND ss.IsActive = 1
 	                AND ss.SightingStateTypeId = 30--Published
 	                AND(ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
@@ -179,6 +179,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.NoteOfInterest,
 	                si.DeterminationMethodId,
 	                site.ExternalId AS SiteExternalId
+                    s.SightingTypeId,
+                    s.SightingTypeSearchGroupId
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id
@@ -195,11 +197,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     LEFT JOIN Site site on site.Id=s.SiteId 
                 WHERE
 	                s.SightingId in @ids
-	                AND s.TaxonId IS NOT NULL
-	                AND s.SightingTypeId IN(0, 3) 
+	                AND s.TaxonId IS NOT NULL	                
 	                AND s.HiddenByProvider IS NULL
-	                AND s.ValidationStatusId NOT IN(50)
-	                AND s.SightingTypeSearchGroupId & 33 > 0
+	                AND s.ValidationStatusId NOT IN(50)	                
 	                AND ss.IsActive = 1
 	                AND ss.SightingStateTypeId = 30--Published
 	                AND(ss.EndDate IS NULL OR ss.EndDate > GETDATE())";

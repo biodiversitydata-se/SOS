@@ -434,6 +434,7 @@ namespace SOS.Lib.Extensions
             {
                 projection.Excludes(e => e
                     .Field("defects")
+                    .Field("occurrence.sightingTypeSearchGroupId")
                     .Field("location.point")
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer"));
@@ -443,6 +444,8 @@ namespace SOS.Lib.Extensions
                 projection.Excludes(e => e
                     .Field("defects")
                     .Field("occurrence.recordedByInternal")
+                    .Field("occurrence.sightingTypeId")
+                    .Field("occurrence.sightingTypeSearchGroupId")
                     .Field("reportedByUserAlias")
                     .Field("identification.identifiedByInternal")
                     .Field("location.point")

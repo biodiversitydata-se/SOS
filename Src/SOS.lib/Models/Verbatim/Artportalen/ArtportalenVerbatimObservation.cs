@@ -264,5 +264,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         ///     Id of sighting
         /// </summary>
         public int Id { get; set; }
+        public int SightingTypeSearchGroupId { get; set; }
+        public int SightingTypeId { get; set; }
     }
 }
