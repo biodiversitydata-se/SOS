@@ -79,9 +79,11 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.HasAnyTriggeredValidationRuleWithWarning,
 	                s.NoteOfInterest,
 	                si.DeterminationMethodId,
-	                site.ExternalId AS SiteExternalId
+	                site.ExternalId AS SiteExternalId,
                     s.SightingTypeId,
-                    s.SightingTypeSearchGroupId
+                    s.SightingTypeSearchGroupId,
+	                ssci.OrganizationId as OrganizationCollectorId,
+	                ssci.CollectorId AS UserCollectorId
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id
@@ -178,9 +180,11 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.HasAnyTriggeredValidationRuleWithWarning,
 	                s.NoteOfInterest,
 	                si.DeterminationMethodId,
-	                site.ExternalId AS SiteExternalId
+	                site.ExternalId AS SiteExternalId,
                     s.SightingTypeId,
-                    s.SightingTypeSearchGroupId
+                    s.SightingTypeSearchGroupId,
+	                ssci.OrganizationId as OrganizationCollectorId,
+	                ssci.CollectorId AS UserCollectorId
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id

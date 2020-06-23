@@ -200,6 +200,8 @@ namespace SOS.Process.Processors.Artportalen
                 obs.RightsHolder = verbatimObservation.RightsHolder ??
                                    verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ??
                                    "Data saknas";
+                obs.PrivateCollection = verbatimObservation.PrivateCollection;
+                obs.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
                 
                 // Taxon
                 obs.Taxon = taxon;

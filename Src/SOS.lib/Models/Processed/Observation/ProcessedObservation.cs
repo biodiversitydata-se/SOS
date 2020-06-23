@@ -246,6 +246,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OwnerInstitutionCode { get; set; }
 
         /// <summary>
+        ///     Private Collection
+        /// </summary>
+        public string PrivateCollection { get; set; }
+
+        /// <summary>
+        ///     Public Collection
+        /// </summary>
+        public string PublicCollection { get; set; }
+
+        /// <summary>
         ///     Protection level
         /// </summary>
         public int ProtectionLevel { get; set; }
