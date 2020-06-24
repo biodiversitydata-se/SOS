@@ -73,7 +73,13 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                si.DeterminationMethodId,
 	                site.ExternalId AS SiteExternalId,
                     s.SightingTypeId,
-                    s.SightingTypeSearchGroupId
+                    s.SightingTypeSearchGroupId,
+                    ssci.OrganizationId AS OrganizationCollectorId,
+	                ssci.CollectorId AS UserCollectorId,
+	                srDeterminer.UserId AS DeterminerUserId,
+	                srDeterminer.DeterminationYear AS DeterminationYear,
+	                srConfirmator.UserId AS ConfirmatorUserId,
+	                srConfirmator.DeterminationYear AS ConfirmationYear
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id
@@ -88,11 +94,15 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					LEFT JOIN SightingDescription sds ON si.SightingSubstrateDescriptionId = sds.Id 
 					LEFT JOIN SightingDescription sdss ON si.SightingSubstrateSpeciesDescriptionId = sdss.Id
                     LEFT JOIN Site site on site.Id = s.SiteId 
+                    LEFT JOIN SightingRelation srDeterminer ON srDeterminer.SightingId = s.SightingId AND srDeterminer.IsPublic = 1 AND srDeterminer.SightingRelationTypeId = 3
+                    LEFT JOIN SightingRelation srConfirmator ON srConfirmator.SightingId = s.SightingId AND srConfirmator.IsPublic = 1 AND srConfirmator.SightingRelationTypeId = 5
                 WHERE
 	                { where }
-	                AND s.TaxonId IS NOT NULL	                
+	                AND s.TaxonId IS NOT NULL	 
+                    AND s.SightingTypeId IN(0, 3) 
 	                AND s.HiddenByProvider IS NULL
-	                AND s.ValidationStatusId NOT IN(50)	                
+	                AND s.ValidationStatusId NOT IN(50)	   
+                    AND s.SightingTypeSearchGroupId & 33 > 0
 	                AND ss.IsActive = 1
 	                AND ss.SightingStateTypeId = 30--Published
 	                AND(ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
