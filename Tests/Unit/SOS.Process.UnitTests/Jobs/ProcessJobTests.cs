@@ -21,6 +21,7 @@ using SOS.Process.Jobs;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Processors.ClamPortal.Interfaces;
+using SOS.Process.Processors.FishData.Interfaces;
 using SOS.Process.Processors.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
 using SOS.Process.Processors.Mvm.Interfaces;
@@ -52,6 +53,7 @@ namespace SOS.Process.UnitTests.Jobs
             _copyFieldMappingsJob = new Mock<ICopyFieldMappingsJob>();
             _processTaxaJob = new Mock<IProcessTaxaJob>();
             _clamPortalProcessor = new Mock<IClamPortalObservationProcessor>();
+            _fishDataProcessor = new Mock<IFishDataObservationProcessor>();
             _kulProcessor = new Mock<IKulObservationProcessor>();
             _mvmProcessor = new Mock<IMvmObservationProcessor>();
             _norsProcessor = new Mock<INorsObservationProcessor>();
@@ -74,6 +76,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<ICopyFieldMappingsJob> _copyFieldMappingsJob;
         private readonly Mock<IProcessTaxaJob> _processTaxaJob;
         private readonly Mock<IClamPortalObservationProcessor> _clamPortalProcessor;
+        private readonly Mock<IFishDataObservationProcessor> _fishDataProcessor;
         private readonly Mock<IKulObservationProcessor> _kulProcessor;
         private readonly Mock<IMvmObservationProcessor> _mvmProcessor;
         private readonly Mock<INorsObservationProcessor> _norsProcessor;
@@ -93,6 +96,7 @@ namespace SOS.Process.UnitTests.Jobs
             _processInfoRepository.Object,
             _harvestInfoRepository.Object,
             _clamPortalProcessor.Object,
+            _fishDataProcessor.Object,
             _kulProcessor.Object,
             _mvmProcessor.Object,
             _norsProcessor.Object,

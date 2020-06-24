@@ -8,24 +8,19 @@ namespace SOS.Lib.Configuration.Import
     public class ImportConfiguration
     {
         /// <summary>
-        ///     Configuration for clam tree service
-        /// </summary>
-        public ClamServiceConfiguration ClamServiceConfiguration { get; set; }
-
-        /// <summary>
         ///     Configuration for Artportalen
         /// </summary>
         public ArtportalenConfiguration ArtportalenConfiguration { get; set; }
 
         /// <summary>
-        ///     Host
+        ///     Configuration for clam tree service
         /// </summary>
-        public MongoDbConfiguration VerbatimDbConfiguration { get; set; }
+        public ClamServiceConfiguration ClamServiceConfiguration { get; set; }
 
         /// <summary>
-        ///     Resource db
+        /// Fish data configuration
         /// </summary>
-        public MongoDbConfiguration ResourceDbConfiguration { get; set; }
+        public FishDataServiceConfiguration FishDataServiceConfiguration { get; set; }
 
         /// <summary>
         ///     KUL Service/repository configuration.
@@ -41,6 +36,11 @@ namespace SOS.Lib.Configuration.Import
         ///     NORS configuration
         /// </summary>
         public NorsServiceConfiguration NorsServiceConfiguration { get; set; }
+
+        /// <summary>
+        ///     Resource db
+        /// </summary>
+        public MongoDbConfiguration ResourceDbConfiguration { get; set; }
 
         /// <summary>
         ///     SERS configuration
@@ -61,6 +61,11 @@ namespace SOS.Lib.Configuration.Import
         ///     Taxon service configuration
         /// </summary>
         public TaxonServiceConfiguration TaxonServiceConfiguration { get; set; }
+
+        /// <summary>
+        ///     Host
+        /// </summary>
+        public MongoDbConfiguration VerbatimDbConfiguration { get; set; }
 
         /// <summary>
         ///     Virtual Herbarium service configuration

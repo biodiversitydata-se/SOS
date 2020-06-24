@@ -15,6 +15,8 @@ using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Processors.ClamPortal;
 using SOS.Process.Processors.ClamPortal.Interfaces;
 using SOS.Process.Processors.DarwinCoreArchive;
+using SOS.Process.Processors.FishData;
+using SOS.Process.Processors.FishData.Interfaces;
 using SOS.Process.Processors.Interfaces;
 using SOS.Process.Processors.Kul;
 using SOS.Process.Processors.Kul.Interfaces;
@@ -80,6 +82,8 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<FieldMappingVerbatimRepository>().As<IFieldMappingVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<FishDataObservationVerbatimRepository>().As<IFishDataObservationVerbatimRepository>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<KulObservationVerbatimRepository>().As<IKulObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<MvmObservationVerbatimRepository>().As<IMvmObservationVerbatimRepository>()
@@ -112,6 +116,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<DwcaObservationProcessor>().As<IDwcaObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<ClamPortalObservationProcessor>().As<IClamPortalObservationProcessor>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<FishDataObservationProcessor>().As<IFishDataObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationProcessor>().As<IKulObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<MvmObservationProcessor>().As<IMvmObservationProcessor>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationProcessor>().As<INorsObservationProcessor>().InstancePerLifetimeScope();

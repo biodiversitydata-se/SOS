@@ -22,6 +22,7 @@ using SOS.Process.Managers;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.Processors.ClamPortal;
 using SOS.Process.Processors.DarwinCoreArchive;
+using SOS.Process.Processors.FishData;
 using SOS.Process.Processors.Kul;
 using SOS.Process.Processors.Mvm;
 using SOS.Process.Processors.Nors;
@@ -107,6 +108,13 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator, 
                 new NullLogger<ClamPortalObservationProcessor>());
+            var fishDataProcessor = new FishDataObservationProcessor(
+                new FishDataObservationVerbatimRepository(verbatimClient,
+                    new NullLogger<FishDataObservationVerbatimRepository>()),
+                areaHelper,
+                processedObservationRepository,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator,
+                new NullLogger<FishDataObservationProcessor>());
             var kulProcessor = new KulObservationProcessor(
                 new KulObservationVerbatimRepository(verbatimClient,
                     new NullLogger<KulObservationVerbatimRepository>()),
@@ -186,6 +194,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processInfoRepository,
                 harvestInfoRepository,
                 clamPortalProcessor,
+                fishDataProcessor,
                 kulProcessor,
                 mvmProcessor,
                 norsProcessor,

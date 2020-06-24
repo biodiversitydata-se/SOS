@@ -27,26 +27,28 @@ namespace SOS.Import.Jobs
         private readonly ITaxonHarvestJob _taxonHarvestJob;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="taxonHarvestJob"></param>
         /// <param name="fieldMappingImportJob"></param>
         /// <param name="artportalenHarvestJob"></param>
         /// <param name="clamPortalHarvestJob"></param>
+        /// <param name="fishDataHarvestJob"></param>
         /// <param name="kulHarvestJob"></param>
         /// <param name="mvmHarvestJob"></param>
         /// <param name="norsHarvestJob"></param>
         /// <param name="sersHarvestJob"></param>
         /// <param name="sharkHarvestJob"></param>
         /// <param name="virtualHerbariumHarvestJob"></param>
+        /// <param name="dwcArchiveHarvestJob"></param>
         /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
-        /// <param name="dwcArchiveHarvestJob"></param>
         public ObservationsHarvestJob(
             ITaxonHarvestJob taxonHarvestJob,
             IFieldMappingImportJob fieldMappingImportJob,
             IArtportalenHarvestJob artportalenHarvestJob,
             IClamPortalHarvestJob clamPortalHarvestJob,
+            IFishDataHarvestJob fishDataHarvestJob,
             IKulHarvestJob kulHarvestJob,
             IMvmHarvestJob mvmHarvestJob,
             INorsHarvestJob norsHarvestJob,
@@ -64,6 +66,7 @@ namespace SOS.Import.Jobs
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             if (artportalenHarvestJob == null) throw new ArgumentNullException(nameof(artportalenHarvestJob));
             if (clamPortalHarvestJob == null) throw new ArgumentNullException(nameof(clamPortalHarvestJob));
+            if (fishDataHarvestJob == null) throw new ArgumentNullException(nameof(fishDataHarvestJob));
             if (kulHarvestJob == null) throw new ArgumentNullException(nameof(kulHarvestJob));
             if (mvmHarvestJob == null) throw new ArgumentNullException(nameof(mvmHarvestJob));
             if (norsHarvestJob == null) throw new ArgumentNullException(nameof(norsHarvestJob));
@@ -77,6 +80,7 @@ namespace SOS.Import.Jobs
                 {DataProviderType.ClamPortalObservations, clamPortalHarvestJob},
                 {DataProviderType.SersObservations, sersHarvestJob},
                 {DataProviderType.NorsObservations, norsHarvestJob},
+                {DataProviderType.FishDataObservations, fishDataHarvestJob},
                 {DataProviderType.KULObservations, kulHarvestJob},
                 {DataProviderType.MvmObservations, mvmHarvestJob},
                 {DataProviderType.SharkObservations, sharkHarvestJob},

@@ -11,22 +11,14 @@ namespace SOS.Import.Repositories.Source.Artportalen
 {
     public class SightingRepository : BaseRepository<SightingRepository>, ISightingRepository
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="artportalenDataService"></param>
-        /// <param name="logger"></param>
-        public SightingRepository(IArtportalenDataService artportalenDataService, ILogger<SightingRepository> logger) :
-            base(artportalenDataService, logger)
+		/// <summary>
+		/// Create sighting query
+		/// </summary>
+		/// <param name="where"></param>
+		/// <returns></returns>
+        private string GetSightingQuery(string where)
         {
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<SightingEntity>> GetChunkAsync(int startId, int maxRows)
-        {
-            try
-            {
-                var query = @"
+			return $@"
                 SELECT DISTINCT
                     s.ActivityId,
                     s.DiscoveryMethodId,
@@ -79,7 +71,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.HasAnyTriggeredValidationRuleWithWarning,
 	                s.NoteOfInterest,
 	                si.DeterminationMethodId,
-	                site.ExternalId AS SiteExternalId
+	                site.ExternalId AS SiteExternalId,
                     s.SightingTypeId,
                     s.SightingTypeSearchGroupId
                 FROM
@@ -95,15 +87,33 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					LEFT JOIN SightingDescription sdb ON si.SightingBiotopeDescriptionId = sdb.Id 
 					LEFT JOIN SightingDescription sds ON si.SightingSubstrateDescriptionId = sds.Id 
 					LEFT JOIN SightingDescription sdss ON si.SightingSubstrateSpeciesDescriptionId = sdss.Id
-                    LEFT JOIN Site site on site.Id=s.SiteId 
+                    LEFT JOIN Site site on site.Id = s.SiteId 
                 WHERE
-	                s.Id BETWEEN @StartId AND @EndId
+	                { where }
 	                AND s.TaxonId IS NOT NULL	                
 	                AND s.HiddenByProvider IS NULL
 	                AND s.ValidationStatusId NOT IN(50)	                
 	                AND ss.IsActive = 1
 	                AND ss.SightingStateTypeId = 30--Published
 	                AND(ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
+		}
+
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        /// <param name="artportalenDataService"></param>
+        /// <param name="logger"></param>
+        public SightingRepository(IArtportalenDataService artportalenDataService, ILogger<SightingRepository> logger) :
+            base(artportalenDataService, logger)
+        {
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<SightingEntity>> GetChunkAsync(int startId, int maxRows)
+        {
+            try
+            {
+                var query = GetSightingQuery("s.Id BETWEEN @StartId AND @EndId");
 
                 return await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1});
             }
@@ -125,84 +135,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-                var query = @"
-                SELECT DISTINCT
-                    s.ActivityId,
-                    s.DiscoveryMethodId,
-					s.BiotopeId,
-					sdb.[Description] AS BiotopeDescription,
-                    ssci.Label AS CollectionID,
-                    ssci.Id as SightingSpeciesCollectionItemId,
-	                scp.Comment,
-	                s.EndDate,
-	                s.EndTime,
-	                s.GenderId,
-                    s.HasImages,
-	                s.HiddenByProvider,
-	                s.SightingId AS Id, 
-	                ssci.Label,
-	                s.[Length],
-                    s.MaxDepth,
-					s.MaxHeight,
-					s.MinDepth,
-					s.MinHeight,
-	                s.NotPresent,
-	                s.NotRecovered,
-                    s.OwnerOrganizationId,
-                    msi.PortalId AS MigrateSightingPortalId,
-                    msi.obsid AS MigrateSightingObsId,
-	                s.ProtectedBySystem,
-	                s.Quantity,
-					s.QuantityOfSubstrate,
-                    s.RegisterDate,
-	                CASE 
-						WHEN p.Id IS NULL THEN null
-						ELSE p.FirstName + ' ' + p.LastName 
-					END AS RightsHolder,
-	                s.SiteId,
-	                s.StageId,
-	                s.StartDate,
-	                s.StartTime,
-					s.SubstrateId,
-					sds.[Description] AS SubstrateDescription,
-					sdss.[Description] AS SubstrateSpeciesDescription,
-					s.SubstrateSpeciesId,
-	                s.TaxonId,
-	                s.UnsureDetermination,
-	                s.Unspontaneous,
-	                s.UnitId,
-	                sb.URL,
-                    s.ValidationStatusId,
-	                s.[Weight], 
-	                s.HasTriggeredValidationRules, 
-	                s.HasAnyTriggeredValidationRuleWithWarning,
-	                s.NoteOfInterest,
-	                si.DeterminationMethodId,
-	                site.ExternalId AS SiteExternalId
-                    s.SightingTypeId,
-                    s.SightingTypeSearchGroupId
-                FROM
-	                SearchableSightings s WITH(NOLOCK)
-					INNER JOIN Sighting si ON s.SightingId = si.Id
-	                INNER JOIN SightingState ss ON s.SightingId = ss.SightingId
-	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId
-	                LEFT JOIN SightingSpeciesCollectionItem ssci ON s.SightingId = ssci.SightingId
-	                LEFT JOIN SightingBarcode sb ON s.SightingId = sb.SightingId
-                    LEFT JOIN [User] u ON s.OwnerUserId = u.Id 
-	                LEFT JOIN Person p ON u.PersonId = p.Id
-                    LEFT JOIN MigrateSightingid msi ON s.SightingId = msi.Id
-					LEFT JOIN SightingDescription sdb ON si.SightingBiotopeDescriptionId = sdb.Id 
-					LEFT JOIN SightingDescription sds ON si.SightingSubstrateDescriptionId = sds.Id 
-					LEFT JOIN SightingDescription sdss ON si.SightingSubstrateSpeciesDescriptionId = sdss.Id
-                    LEFT JOIN Site site on site.Id=s.SiteId 
-                WHERE
-	                s.SightingId in @ids
-	                AND s.TaxonId IS NOT NULL	                
-	                AND s.HiddenByProvider IS NULL
-	                AND s.ValidationStatusId NOT IN(50)	                
-	                AND ss.IsActive = 1
-	                AND ss.SightingStateTypeId = 30--Published
-	                AND(ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
+                var query = GetSightingQuery("s.SightingId in @ids");
 
                 return await QueryAsync<SightingEntity>(query, new {ids = sightingIds});
             }
