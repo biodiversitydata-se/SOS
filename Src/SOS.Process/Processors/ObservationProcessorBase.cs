@@ -10,6 +10,7 @@ using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Processors
@@ -20,10 +21,12 @@ namespace SOS.Process.Processors
         protected readonly IFieldMappingResolverHelper FieldMappingResolverHelper;
         protected readonly ILogger<TEntity> Logger;
         protected readonly IProcessedObservationRepository ProcessRepository;
+        protected readonly IValidationManager ValidationManager;
 
         protected ObservationProcessorBase(IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+            IValidationManager validationManager,
             ILogger<TEntity> logger)
         {
             ProcessRepository = processedObservationRepository ??
@@ -31,6 +34,7 @@ namespace SOS.Process.Processors
             FieldMappingResolverHelper = fieldMappingResolverHelper ??
                                          throw new ArgumentNullException(nameof(fieldMappingResolverHelper));
             this.dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));
+            ValidationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

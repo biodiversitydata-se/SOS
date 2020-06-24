@@ -21,6 +21,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Database;
 using SOS.Process.Helpers;
+using SOS.Process.Managers;
 using SOS.Process.Processors.DarwinCoreArchive;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Destination.Interfaces;
@@ -130,6 +131,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new NullLogger<DwcaVerbatimRepository>());
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
+            var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
             IProcessedObservationRepository processedObservationRepository;
             if (storeProcessedObservations)
             {
@@ -152,7 +154,9 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
                 new AreaHelper(new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()),
                     processedFieldMappingRepository),
-                processConfiguration, dwcArchiveFileWriterCoordinator,
+                processConfiguration, 
+                dwcArchiveFileWriterCoordinator,
+                validationManager,
                 new NullLogger<DwcaObservationProcessor>());
         }
 

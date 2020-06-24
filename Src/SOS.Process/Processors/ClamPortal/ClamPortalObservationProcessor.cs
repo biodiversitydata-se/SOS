@@ -10,6 +10,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.ClamPortal.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -33,15 +34,16 @@ namespace SOS.Process.Processors.ClamPortal
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="validationManager"></param>
         /// <param name="logger"></param>
-        public ClamPortalObservationProcessor(
-            IClamObservationVerbatimRepository clamObservationVerbatimRepository,
+        public ClamPortalObservationProcessor(IClamObservationVerbatimRepository clamObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
-            ILogger<ClamPortalObservationProcessor> logger) : base(processedObservationRepository,
-            fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, logger)
+            IValidationManager validationManager,
+            ILogger<ClamPortalObservationProcessor> logger) : 
+                base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _clamObservationVerbatimRepository = clamObservationVerbatimRepository ??
                                                  throw new ArgumentNullException(
@@ -64,14 +66,16 @@ namespace SOS.Process.Processors.ClamPortal
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
-                var processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                ProcessedObservation processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
                 observations.Add(processedObservation);
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+                    var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+                    await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                     verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
+                    await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
                     observations.Clear();
                     Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
                 }
@@ -81,8 +85,10 @@ namespace SOS.Process.Processors.ClamPortal
             if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
+                var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+                await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                 verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
+                await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
                 Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
             }
 

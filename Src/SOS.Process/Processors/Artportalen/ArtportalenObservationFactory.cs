@@ -14,6 +14,7 @@ using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Process.Models;
 using SOS.Process.Repositories.Destination.Interfaces;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
 using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
@@ -48,10 +49,16 @@ namespace SOS.Process.Processors.Artportalen
             return new ArtportalenObservationFactory(dataProvider, taxa, fieldMappings);
         }
 
-        public IEnumerable<ProcessedObservation> CreateProcessedObservations(
+        public ICollection<ProcessedObservation> CreateProcessedObservations(
             IEnumerable<ArtportalenVerbatimObservation> verbatimObservations)
         {
-            return verbatimObservations.Select(CreateProcessedObservation);
+            return verbatimObservations.Select(CreateProcessedObservation).ToArray();
+        }
+
+        // todo - This could be a way to check for invalid observation when converting from verbatim to processed.
+        public CreateProcessedObservationResult CreateProcessedObservationResult(ArtportalenVerbatimObservation verbatimObservation)
+        {
+            return Models.CreateProcessedObservationResult.Success(CreateProcessedObservation(verbatimObservation));
         }
 
         /// <summary>

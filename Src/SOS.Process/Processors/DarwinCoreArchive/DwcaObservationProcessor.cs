@@ -13,6 +13,7 @@ using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -40,6 +41,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="areaHelper"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public DwcaObservationProcessor(IDwcaVerbatimRepository dwcaVerbatimRepository,
             IProcessedObservationRepository processedObservationRepository,
@@ -48,7 +50,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
-            ILogger<DwcaObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, logger)
+            IValidationManager validationManager,
+            ILogger<DwcaObservationProcessor> logger) : 
+                base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _dwcaVerbatimRepository =
                 dwcaVerbatimRepository ?? throw new ArgumentNullException(nameof(dwcaVerbatimRepository));
@@ -156,9 +160,11 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 if (IsBatchFilledToLimit(sightings.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+                    var invalidObservations = ValidationManager.ValidateObservations(ref sightings);
+                    await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                     verbatimCount += await CommitBatchAsync(dataProvider, sightings);
                     //var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider);
-                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider, counter++.ToString());
+                    await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider, counter++.ToString());
                     sightings.Clear();
                     Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
                 }
@@ -168,9 +174,11 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             if (sightings.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
+                var invalidObservations = ValidationManager.ValidateObservations(ref sightings);
+                await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                 verbatimCount += await CommitBatchAsync(dataProvider, sightings);
                 //var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider);
-                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider, counter.ToString());
+                await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider, counter.ToString());
                 Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
             }
 
