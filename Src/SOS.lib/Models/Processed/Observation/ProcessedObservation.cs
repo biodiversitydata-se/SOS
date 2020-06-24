@@ -319,6 +319,12 @@ namespace SOS.Lib.Models.Processed.Observation
         [Object]
         public ProcessedFieldMapValue Type { get; set; }
 
+
+        public string DeterminedBy { get; set; }
+        public int? DeterminationYear { get; set; }
+        public string ConfirmedBy { get; set; }
+        public int? ConfirmationYear { get; set; }
+
         #endregion Record level
 
         //public string VerbatimObservation { get; set; } // todo - this could be used to store the orginal verbatim observation.

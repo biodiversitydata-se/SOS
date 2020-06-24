@@ -263,6 +263,12 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public Metadata PublicCollection { get; set; }
         public string PrivateCollection { get; set; }
 
+
+        public string DeterminedBy { get; set; }
+        public int? DeterminationYear { get; set; }
+        public string ConfirmedBy { get; set; }
+        public int? ConfirmationYear { get; set; }
+
         /// <summary>
         ///     Id of sighting
         /// </summary>

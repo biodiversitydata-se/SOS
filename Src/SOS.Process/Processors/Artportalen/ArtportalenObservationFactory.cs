@@ -114,6 +114,21 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Modified = endDate ?? verbatimObservation.ReportedDate;
                 obs.SightingSpeciesCollectionItemId = verbatimObservation.SightingSpeciesCollectionItemId;
                 obs.Type = null;
+                obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
+                obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
+                obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
+                obs.ReportedBy = verbatimObservation.ReportedBy;
+                obs.ReportedByUserId = verbatimObservation.ReportedByUserId;
+                obs.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
+                obs.ReportedDate = verbatimObservation.ReportedDate;
+                obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
+                obs.PrivateCollection = verbatimObservation.PrivateCollection;
+                obs.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
+                obs.ConfirmationYear = verbatimObservation.ConfirmationYear;
+                obs.ConfirmedBy = verbatimObservation.ConfirmedBy;
+                obs.DeterminationYear = verbatimObservation.DeterminationYear;
+                obs.DeterminedBy = verbatimObservation.DeterminedBy;
+                
 
                 // Event
                 obs.Event = new ProcessedEvent();
@@ -125,6 +140,12 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Event.SubstrateSpeciesDescription = verbatimObservation.SubstrateSpeciesDescription;
                 obs.Event.SubstrateDescription = GetSubstrateDescription(verbatimObservation, _taxa);
                 obs.Event.VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate, endDate);
+                
+                if(verbatimObservation.SubstrateSpeciesId.HasValue && _taxa != null && _taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out var substratTaxon))
+                {
+                    obs.Event.SubstrateSpeciesVernacularName = substratTaxon.VernacularName;
+                    obs.Event.SubstrateSpeciesScientificName = substratTaxon.ScientificName;
+                }
                 
                 // Identification
                 obs.Identification = new ProcessedIdentification();
@@ -189,19 +210,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.SightingTypeId = verbatimObservation.SightingTypeId;
                 obs.Occurrence.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
 
-                obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
-                obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
-                obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider,
-                    verbatimObservation.ProtectedBySystem);
-                obs.ReportedBy = verbatimObservation.ReportedBy;
-                obs.ReportedByUserId = verbatimObservation.ReportedByUserId;
-                obs.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
-                obs.ReportedDate = verbatimObservation.ReportedDate;
-                obs.RightsHolder = verbatimObservation.RightsHolder ??
-                                   verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ??
-                                   "Data saknas";
-                obs.PrivateCollection = verbatimObservation.PrivateCollection;
-                obs.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
+               
                 
                 // Taxon
                 obs.Taxon = taxon;

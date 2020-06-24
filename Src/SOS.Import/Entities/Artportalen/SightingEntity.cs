@@ -271,5 +271,13 @@ namespace SOS.Import.Entities.Artportalen
         ///     Id of User to get name of Private Collector
         /// </summary>
         public int? UserCollectorId { get; set; }
+
+        public int? DeterminerUserId { get; set; }
+
+        public int? DeterminationYear { get; set; }
+
+        public int? ConfirmatorUserId { get; set; }
+
+        public int? ConfirmationYear { get; set; }
     }
 }

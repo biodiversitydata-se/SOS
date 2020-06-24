@@ -211,7 +211,11 @@ namespace SOS.Import.Extensions
                     : null,
                 PrivateCollection = entity.UserCollectorId.HasValue && personByUserId.ContainsKey(entity.UserCollectorId.Value) 
                     ? personByUserId[entity.UserCollectorId.Value].FullName
-                    : null
+                    : null,
+                DeterminedBy = entity.DeterminerUserId.HasValue && personByUserId.ContainsKey(entity.DeterminerUserId.Value) ? personByUserId[entity.DeterminerUserId.Value].FullName : null,
+                DeterminationYear = entity.DeterminationYear,
+                ConfirmedBy = entity.ConfirmatorUserId.HasValue && personByUserId.ContainsKey(entity.ConfirmatorUserId.Value) ? personByUserId[entity.ConfirmatorUserId.Value].FullName : null,
+                ConfirmationYear = entity.ConfirmationYear
             };
 
             if (observation.Site?.ParentSiteId != null)
