@@ -116,7 +116,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<FishDataObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator, validationManager,
                 new NullLogger<FishDataObservationProcessor>());
             var kulProcessor = new KulObservationProcessor(
                 new KulObservationVerbatimRepository(verbatimClient,

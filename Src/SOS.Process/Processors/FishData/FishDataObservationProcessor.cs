@@ -10,6 +10,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.FishData.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -32,6 +33,7 @@ namespace SOS.Process.Processors.FishData
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public FishDataObservationProcessor(
             IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository,
@@ -39,8 +41,9 @@ namespace SOS.Process.Processors.FishData
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
-            ILogger<FishDataObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator,
-            logger)
+            IValidationManager validationManager,
+            ILogger<FishDataObservationProcessor> logger) : 
+                base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _fishDataObservationVerbatimRepository = fishDataObservationVerbatimRepository ??
                                                 throw new ArgumentNullException(
@@ -70,8 +73,10 @@ namespace SOS.Process.Processors.FishData
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
+                    var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+                    await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                     verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
+                    await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
                     observations.Clear();
                     Logger.LogDebug($"Fish Data Sightings processed: {verbatimCount}");
                 }
@@ -81,8 +86,10 @@ namespace SOS.Process.Processors.FishData
             if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
+                var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+                await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                 verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
+                await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
                 Logger.LogDebug($"Fish Data Sightings processed: {verbatimCount}");
             }
 
