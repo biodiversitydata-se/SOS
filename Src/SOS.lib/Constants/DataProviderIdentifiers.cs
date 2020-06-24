@@ -4,6 +4,7 @@
     {
         public const string Artportalen = "Artportalen";
         public const string ClamGateway = "ClamGateway";
+        public const string FishData = "FishData";
         public const string KUL = "KUL";
         public const string NORS = "NORS";
         public const string SERS = "SERS";

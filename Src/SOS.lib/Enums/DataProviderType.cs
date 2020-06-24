@@ -17,6 +17,7 @@
         SersObservations,
         MvmObservations,
         SharkObservations,
-        VirtualHerbariumObservations
+        VirtualHerbariumObservations,
+        FishDataObservations
     }
 }

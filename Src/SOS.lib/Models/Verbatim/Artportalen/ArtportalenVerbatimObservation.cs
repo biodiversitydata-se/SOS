@@ -260,9 +260,20 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public string ReportedByUserAlias { get; set; }
         public string SpeciesCollection { get; set; }
 
+        public Metadata PublicCollection { get; set; }
+        public string PrivateCollection { get; set; }
+
+
+        public string DeterminedBy { get; set; }
+        public int? DeterminationYear { get; set; }
+        public string ConfirmedBy { get; set; }
+        public int? ConfirmationYear { get; set; }
+
         /// <summary>
         ///     Id of sighting
         /// </summary>
         public int Id { get; set; }
+        public int SightingTypeSearchGroupId { get; set; }
+        public int SightingTypeId { get; set; }
     }
 }

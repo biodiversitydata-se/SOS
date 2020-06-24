@@ -129,6 +129,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public string SubstrateSpeciesDescription { get; set; }
 
         /// <summary>
+        ///     Vernacular name of substrate species
+        /// </summary>
+        public string SubstrateSpeciesVernacularName { get; set; }
+
+        /// <summary>
+        ///     Scientific name of substrate species
+        /// </summary>
+        public string SubstrateSpeciesScientificName { get; set; }
+
+        /// <summary>
         ///     Substrate taxon id
         /// </summary>
         public int? SubstrateSpeciesId { get; set; }

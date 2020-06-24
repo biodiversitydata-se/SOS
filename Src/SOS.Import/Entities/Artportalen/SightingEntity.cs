@@ -256,5 +256,28 @@ namespace SOS.Import.Entities.Artportalen
         ///     Taxon weight
         /// </summary>
         public int? Weight { get; set; }
+        /// <summary>
+        /// Type
+        /// </summary>
+        public int SightingTypeId { get; set; }
+        public int SightingTypeSearchGroupId { get; set; }
+
+        /// <summary>
+        ///     Id of Organization to get name of Public Collection
+        /// </summary>
+        public int? OrganizationCollectorId { get; set; }
+
+        /// <summary>
+        ///     Id of User to get name of Private Collector
+        /// </summary>
+        public int? UserCollectorId { get; set; }
+
+        public int? DeterminerUserId { get; set; }
+
+        public int? DeterminationYear { get; set; }
+
+        public int? ConfirmatorUserId { get; set; }
+
+        public int? ConfirmationYear { get; set; }
     }
 }

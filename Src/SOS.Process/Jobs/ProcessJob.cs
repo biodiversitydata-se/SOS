@@ -18,6 +18,7 @@ using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Processors.ClamPortal.Interfaces;
+using SOS.Process.Processors.FishData.Interfaces;
 using SOS.Process.Processors.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
 using SOS.Process.Processors.Mvm.Interfaces;
@@ -47,12 +48,13 @@ namespace SOS.Process.Jobs
         private readonly IProcessTaxaJob _processTaxaJob;
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
         /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="harvestInfoRepository"></param>
         /// <param name="clamPortalObservationProcessor"></param>
+        /// <param name="fishDataObservationProcessor"></param>
         /// <param name="kulObservationProcessor"></param>
         /// <param name="mvmObservationProcessor"></param>
         /// <param name="norsObservationProcessor"></param>
@@ -73,6 +75,7 @@ namespace SOS.Process.Jobs
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
             IClamPortalObservationProcessor clamPortalObservationProcessor,
+            IFishDataObservationProcessor fishDataObservationProcessor,
             IKulObservationProcessor kulObservationProcessor,
             IMvmObservationProcessor mvmObservationProcessor,
             INorsObservationProcessor norsObservationProcessor,
@@ -105,6 +108,7 @@ namespace SOS.Process.Jobs
 
             if (clamPortalObservationProcessor == null)
                 throw new ArgumentNullException(nameof(clamPortalObservationProcessor));
+            if (fishDataObservationProcessor == null) throw new ArgumentNullException(nameof(fishDataObservationProcessor));
             if (kulObservationProcessor == null) throw new ArgumentNullException(nameof(kulObservationProcessor));
             if (mvmObservationProcessor == null) throw new ArgumentNullException(nameof(mvmObservationProcessor));
             if (norsObservationProcessor == null) throw new ArgumentNullException(nameof(norsObservationProcessor));
@@ -120,6 +124,7 @@ namespace SOS.Process.Jobs
             {
                 {DataProviderType.ArtportalenObservations, artportalenObservationProcessor},
                 {DataProviderType.ClamPortalObservations, clamPortalObservationProcessor},
+                {DataProviderType.FishDataObservations, fishDataObservationProcessor},
                 {DataProviderType.SersObservations, sersObservationProcessor},
                 {DataProviderType.NorsObservations, norsObservationProcessor},
                 {DataProviderType.KULObservations, kulObservationProcessor},
@@ -286,8 +291,7 @@ namespace SOS.Process.Jobs
 
                     // Get harvest info and create a provider info object that we can add processing info to later
                     var harvestInfoId = HarvestInfo.GetIdFromDataProvider(dataProvider);
-                    var harvestInfo = await GetHarvestInfoAsync(harvestInfoId);
-                    var harvestInfo2 = dataProvider.HarvestInfo; // todo - decide where we should store harvestInfo
+                    var harvestInfo = await GetHarvestInfoAsync(harvestInfoId); // todo - decide where we should store harvestInfo
                     var providerInfo = CreateProviderInfo(dataProvider, harvestInfo, processStart);
                     providerInfo.MetadataInfo = metaDataProviderInfo
                         .Where(mdp => new[] {DataProviderType.Taxa}.Contains(mdp.DataProviderType)).ToArray();
@@ -384,7 +388,7 @@ namespace SOS.Process.Jobs
                 //-------------------------------
                 // 14. Return processing result
                 //-------------------------------
-                return success ? true : throw new Exception("Process sightings job failed");
+                return success ? true : throw new Exception("Failed to process observations.");
             }
             catch (JobAbortedException)
             {
@@ -393,8 +397,8 @@ namespace SOS.Process.Jobs
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Process sightings job failed");
-                throw new Exception("Process sightings job failed");
+                _logger.LogError(e, "Process sightings job failed.");
+                throw new Exception("Process sightings job failed.");
             }
             finally
             {

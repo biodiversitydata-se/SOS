@@ -41,6 +41,20 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult RunClamPortalHarvestJob();
 
         /// <summary>
+        ///     Add daily harvest of sightings from Fish Data
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <param name="minute"></param>
+        /// <returns></returns>
+        IActionResult AddDailyFishDataHarvestJob(int hour, int minute);
+
+        /// <summary>
+        ///     Run Fish Data sightings harvest
+        /// </summary>
+        /// <returns></returns>
+        IActionResult RunFishDataHarvestJob();
+
+        /// <summary>
         ///     Add daily harvest of sightings from KUL
         /// </summary>
         /// <param name="hour"></param>

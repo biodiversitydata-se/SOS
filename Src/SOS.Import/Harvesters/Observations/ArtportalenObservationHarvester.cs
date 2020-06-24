@@ -290,7 +290,8 @@ namespace SOS.Import.Harvesters.Observations
                     units,
                     discoveryMethods,
                     determinationMethods,
-                    projectEntityDictionaries);
+                    projectEntityDictionaries,
+                    personByUserId);
                 _logger.LogDebug("Finsih casting entities to verbatim");
 
                 _logger.LogDebug("Start storing batch");

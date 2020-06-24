@@ -246,6 +246,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public string OwnerInstitutionCode { get; set; }
 
         /// <summary>
+        ///     Private Collection
+        /// </summary>
+        public string PrivateCollection { get; set; }
+
+        /// <summary>
+        ///     Public Collection
+        /// </summary>
+        public string PublicCollection { get; set; }
+
+        /// <summary>
         ///     Protection level
         /// </summary>
         public int ProtectionLevel { get; set; }
@@ -308,6 +318,12 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </remarks>
         [Object]
         public ProcessedFieldMapValue Type { get; set; }
+
+
+        public string DeterminedBy { get; set; }
+        public int? DeterminationYear { get; set; }
+        public string ConfirmedBy { get; set; }
+        public int? ConfirmationYear { get; set; }
 
         #endregion Record level
 
