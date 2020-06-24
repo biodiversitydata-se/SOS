@@ -57,6 +57,7 @@ namespace SOS.Import.Extensions
         /// <param name="discoveryMethods"></param>
         /// <param name="determinationMethods"></param>
         /// <param name="projectEntityDictionaries"></param>
+        /// <param name="personByUserId"></param>
         /// <returns></returns>
         public static IEnumerable<ArtportalenVerbatimObservation> ToVerbatims(this IEnumerable<SightingEntity> entities,
             IDictionary<int, MetadataWithCategory> activities,
@@ -71,7 +72,8 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> units,
             IDictionary<int, Metadata> discoveryMethods,
             IDictionary<int, Metadata> determinationMethods,
-            ProjectEntityDictionaries projectEntityDictionaries)
+            ProjectEntityDictionaries projectEntityDictionaries,
+            IDictionary<int, Person> personByUserId)
         {
             return entities.Select(e => e.ToVerbatim(
                 activities,
@@ -86,7 +88,8 @@ namespace SOS.Import.Extensions
                 units,
                 discoveryMethods,
                 determinationMethods,
-                projectEntityDictionaries));
+                projectEntityDictionaries,
+                personByUserId));
         }
 
         /// <summary>
@@ -106,6 +109,7 @@ namespace SOS.Import.Extensions
         /// <param name="discoveryMethods"></param>
         /// <param name="determinationMethods"></param>
         /// <param name="projectEntityDictionaries"></param>
+        /// <param name="personByUserId"></param>
         /// <returns></returns>
         public static ArtportalenVerbatimObservation ToVerbatim(this SightingEntity entity,
             IDictionary<int, MetadataWithCategory> activities,
@@ -120,7 +124,8 @@ namespace SOS.Import.Extensions
             IDictionary<int, Metadata> units,
             IDictionary<int, Metadata> discoveryMethods,
             IDictionary<int, Metadata> determinationMethods,
-            ProjectEntityDictionaries projectEntityDictionaries)
+            ProjectEntityDictionaries projectEntityDictionaries,
+            IDictionary<int, Person> personByUserId)
         {
             var observation = new ArtportalenVerbatimObservation
             {
@@ -200,7 +205,17 @@ namespace SOS.Import.Extensions
                     entity.Id,
                     projectEntityDictionaries),
                 SightingTypeId = entity.SightingTypeId,
-                SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId
+                SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId,
+                PublicCollection = entity.OrganizationCollectorId.HasValue && organizations.ContainsKey(entity.OrganizationCollectorId.Value) 
+                    ? organizations[entity.OrganizationCollectorId.Value] 
+                    : null,
+                PrivateCollection = entity.UserCollectorId.HasValue && personByUserId.ContainsKey(entity.UserCollectorId.Value) 
+                    ? personByUserId[entity.UserCollectorId.Value].FullName
+                    : null,
+                DeterminedBy = entity.DeterminerUserId.HasValue && personByUserId.ContainsKey(entity.DeterminerUserId.Value) ? personByUserId[entity.DeterminerUserId.Value].FullName : null,
+                DeterminationYear = entity.DeterminationYear,
+                ConfirmedBy = entity.ConfirmatorUserId.HasValue && personByUserId.ContainsKey(entity.ConfirmatorUserId.Value) ? personByUserId[entity.ConfirmatorUserId.Value].FullName : null,
+                ConfirmationYear = entity.ConfirmationYear
             };
 
             if (observation.Site?.ParentSiteId != null)
