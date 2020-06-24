@@ -11,14 +11,13 @@ namespace SOS.Import.Repositories.Source.Artportalen
 {
     public class SightingRepository : BaseRepository<SightingRepository>, ISightingRepository
     {
-		/// <summary>
+        /// <summary>
 		/// Create sighting query
 		/// </summary>
 		/// <param name="where"></param>
 		/// <returns></returns>
-        private string GetSightingQuery(string where)
-        {
-			return $@"
+        private string GetSightingQuery(string where) =>
+            $@"
                 SELECT DISTINCT
                     s.ActivityId,
                     s.DiscoveryMethodId,
@@ -106,7 +105,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                AND ss.IsActive = 1
 	                AND ss.SightingStateTypeId = 30--Published
 	                AND(ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
-		}
 
         /// <summary>
         ///     Constructor
