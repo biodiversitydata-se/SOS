@@ -55,14 +55,14 @@ namespace SOS.Process.Repositories.Destination
             : $"{_indexPrefix.ToLower()}-{_collectionName.ToLower()}";
 
         /// <inheritdoc />
-        public new async Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items)
+        public new async Task<IEnumerable<ProcessedObservation>> AddManyAsync(IEnumerable<ProcessedObservation> observations)
         {
             // Separate valid and invalid data
-            var invalidObservations = Validate(ref items);
+            var invalidObservations = Validate(ref observations);
 
             // Save valid processed data
-            Logger.LogDebug($"Start indexing batch for searching with {items.Count()} items");
-            var indexResult = WriteToElastic(items);
+            Logger.LogDebug($"Start indexing batch for searching with {observations.Count()} items");
+            var indexResult = WriteToElastic(observations);
             Logger.LogDebug("Finished indexing batch for searching");
 
             if ((indexResult?.TotalNumberOfFailedBuffers ?? 0) == 0)
@@ -72,10 +72,10 @@ namespace SOS.Process.Repositories.Destination
                     await _invalidObservationRepository.AddManyAsync(invalidObservations);
                 }
 
-                return items.Count();
+                return observations;
             }
 
-            return 0;
+            return null;
         }
 
         /// <inheritdoc />

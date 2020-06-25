@@ -71,7 +71,9 @@ namespace SOS.Process.Processors.Sers
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    verbatimCount += await CommitBatchAsync(dataProvider, observations);
+                    var committedObservations = await CommitBatchAsync(dataProvider, observations);
+                    verbatimCount += committedObservations?.Count() ?? 0;
+                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(committedObservations, dataProvider);
                     observations.Clear();
                     Logger.LogDebug($"SERS Sightings processed: {verbatimCount}");
                 }
@@ -81,7 +83,9 @@ namespace SOS.Process.Processors.Sers
             if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                verbatimCount += await CommitBatchAsync(dataProvider, observations);
+                var committedObservations = await CommitBatchAsync(dataProvider, observations);
+                verbatimCount += committedObservations?.Count() ?? 0;
+                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(committedObservations, dataProvider);
                 Logger.LogDebug($"SERS Sightings processed: {verbatimCount}");
             }
 

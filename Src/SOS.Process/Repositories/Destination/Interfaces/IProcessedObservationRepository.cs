@@ -17,9 +17,9 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// <summary>
         ///     Add many items
         /// </summary>
-        /// <param name="items"></param>
+        /// <param name="observations"></param>
         /// <returns></returns>
-        new Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items);
+        new Task<IEnumerable<ProcessedObservation>> AddManyAsync(IEnumerable<ProcessedObservation> observations);
 
         /// <summary>
         ///     Copy provider data from active instance to inactive instance.

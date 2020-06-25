@@ -70,8 +70,9 @@ namespace SOS.Process.Processors.ClamPortal
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
+                    var committedObservations = await CommitBatchAsync(dataProvider, observations);
+                    verbatimCount += committedObservations?.Count() ?? 0;
+                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(committedObservations, dataProvider);
                     observations.Clear();
                     Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
                 }
@@ -81,8 +82,9 @@ namespace SOS.Process.Processors.ClamPortal
             if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
+                var committedObservations = await CommitBatchAsync(dataProvider, observations);
+                verbatimCount += committedObservations?.Count() ?? 0;
+                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(committedObservations, dataProvider);
                 Logger.LogDebug($"Clam Portal Sightings processed: {verbatimCount}");
             }
 
