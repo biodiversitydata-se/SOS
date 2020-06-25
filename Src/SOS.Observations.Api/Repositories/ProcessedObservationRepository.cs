@@ -304,6 +304,15 @@ namespace SOS.Observations.Api.Repositories
                         )
                     );
                 }
+                if (internalFilter.MaxAccuracy.HasValue)
+                {
+                    queryInternal.Add(q => q
+                       .Range(r => r
+                           .Field("location.coordinateUncertaintyInMeters")
+                           .LessThanOrEquals(internalFilter.MaxAccuracy)
+                       )
+                   );
+                }
             }
 
             return queryInternal;
