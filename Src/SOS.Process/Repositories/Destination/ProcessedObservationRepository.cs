@@ -23,7 +23,6 @@ namespace SOS.Process.Repositories.Destination
         private const string ScrollTimeOut = "45s";
         private readonly IElasticClient _elasticClient;
         private readonly string _indexPrefix;
-        private readonly IInvalidObservationRepository _invalidObservationRepository;
         private readonly int _scrollBatchSize;
 
         /// <summary>
@@ -31,21 +30,16 @@ namespace SOS.Process.Repositories.Destination
         /// </summary>
         /// <param name="client"></param>
         /// <param name="elasticClient"></param>
-        /// <param name="invalidObservationRepository"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IProcessClient client,
             IElasticClient elasticClient,
-            IInvalidObservationRepository invalidObservationRepository,
             ElasticSearchConfiguration elasticConfiguration,
             ILogger<ProcessedObservationRepository> logger
         ) : base(client, true, logger)
         {
-            _invalidObservationRepository = invalidObservationRepository ??
-                                            throw new ArgumentNullException(nameof(invalidObservationRepository));
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
-
             _indexPrefix = elasticConfiguration.IndexPrefix;
             _scrollBatchSize = client.BatchSize;
         }
@@ -163,63 +157,7 @@ namespace SOS.Process.Repositories.Destination
                 await AddCollectionAsync();
             }
 
-            // Make sure invalid collection is empty 
-            await _invalidObservationRepository.DeleteCollectionAsync();
-            await _invalidObservationRepository.AddCollectionAsync();
-            await _invalidObservationRepository.CreateIndexAsync();
-
             return !response.Exists;
-        }
-
-        /// <summary>
-        ///     Validate Darwin core.
-        /// </summary>
-        /// <param name="items"></param>
-        /// <returns>Invalid items</returns>
-        private IEnumerable<InvalidObservation> Validate(
-            ref IEnumerable<ProcessedObservation> items)
-        {
-            var validItems = new List<ProcessedObservation>();
-            var invalidItems = new List<InvalidObservation>();
-
-            foreach (var item in items)
-            {
-                var invalidObservation =
-                    new InvalidObservation(item.DatasetId, item.DatasetName, item.Occurrence.OccurrenceId);
-
-                if (item.Taxon == null)
-                {
-                    invalidObservation.Defects.Add("Taxon not found");
-                }
-
-                if ((item.Location?.CoordinateUncertaintyInMeters ?? 0) > 100000)
-                {
-                    invalidObservation.Defects.Add("CoordinateUncertaintyInMeters exceeds max value 100 km");
-                }
-
-                if (!item.IsInEconomicZoneOfSweden)
-                {
-                    invalidObservation.Defects.Add("Sighting outside Swedish economic zone");
-                }
-
-                if (string.IsNullOrEmpty(item?.Occurrence.CatalogNumber))
-                {
-                    invalidObservation.Defects.Add("CatalogNumber is missing");
-                }
-
-                if (invalidObservation.Defects.Any())
-                {
-                    invalidItems.Add(invalidObservation);
-                }
-                else
-                {
-                    validItems.Add(item);
-                }
-            }
-
-            items = validItems;
-
-            return invalidItems.Any() ? invalidItems : null;
         }
 
         /// <summary>

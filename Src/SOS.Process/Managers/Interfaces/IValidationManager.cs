@@ -10,6 +10,13 @@ namespace SOS.Process.Managers.Interfaces
     public interface IValidationManager
     {
         /// <summary>
+        /// Save invalid observations.
+        /// </summary>
+        /// <param name="invalidObservations"></param>
+        /// <returns></returns>
+        Task<bool> AddInvalidObservationsToDb(ICollection<InvalidObservation> invalidObservations);
+
+        /// <summary>
         ///     Validate observations.
         /// </summary>
         /// <param name="items"></param>
@@ -17,10 +24,9 @@ namespace SOS.Process.Managers.Interfaces
         ICollection<InvalidObservation> ValidateObservations(ref ICollection<ProcessedObservation> items);
 
         /// <summary>
-        /// Save invalid observations.
+        /// Make sure we have a empty invalid items collection
         /// </summary>
-        /// <param name="invalidObservations"></param>
         /// <returns></returns>
-        Task<bool> AddInvalidObservationsToDb(ICollection<InvalidObservation> invalidObservations);
+        Task VerifyCollectionAsync();
     }
 }

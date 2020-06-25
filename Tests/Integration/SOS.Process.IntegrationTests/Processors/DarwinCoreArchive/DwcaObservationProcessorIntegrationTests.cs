@@ -136,7 +136,6 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             if (storeProcessedObservations)
             {
                 processedObservationRepository = new ProcessedObservationRepository(processClient, elasticClient,
-                    invalidObservationRepository,
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>());
             }
             else

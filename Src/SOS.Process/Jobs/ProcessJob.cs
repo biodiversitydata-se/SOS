@@ -41,6 +41,7 @@ namespace SOS.Process.Jobs
         private readonly ICopyFieldMappingsJob _copyFieldMappingsJob;
         private readonly IDataProviderManager _dataProviderManager;
         private readonly IInstanceManager _instanceManager;
+        private readonly IValidationManager _validationManager;
         private readonly ILogger<ProcessJob> _logger;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
@@ -53,6 +54,7 @@ namespace SOS.Process.Jobs
         /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
         /// <param name="harvestInfoRepository"></param>
+        /// <param name="artportalenObservationProcessor"></param>
         /// <param name="clamPortalObservationProcessor"></param>
         /// <param name="fishDataObservationProcessor"></param>
         /// <param name="kulObservationProcessor"></param>
@@ -61,11 +63,11 @@ namespace SOS.Process.Jobs
         /// <param name="sersObservationProcessor"></param>
         /// <param name="sharkObservationProcessor"></param>
         /// <param name="virtualHerbariumObservationProcessor"></param>
-        /// <param name="artportalenObservationProcessor"></param>
         /// <param name="dwcaObservationProcessor"></param>
-        /// <param name="dataProviderManager"></param>
         /// <param name="processedTaxonRepository"></param>
+        /// <param name="dataProviderManager"></param>
         /// <param name="instanceManager"></param>
+        /// <param name="validationManager"></param>
         /// <param name="copyFieldMappingsJob"></param>
         /// <param name="processTaxaJob"></param>
         /// <param name="areaHelper"></param>
@@ -74,6 +76,7 @@ namespace SOS.Process.Jobs
         public ProcessJob(IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
             IHarvestInfoRepository harvestInfoRepository,
+            IArtportalenObservationProcessor artportalenObservationProcessor,
             IClamPortalObservationProcessor clamPortalObservationProcessor,
             IFishDataObservationProcessor fishDataObservationProcessor,
             IKulObservationProcessor kulObservationProcessor,
@@ -82,11 +85,11 @@ namespace SOS.Process.Jobs
             ISersObservationProcessor sersObservationProcessor,
             ISharkObservationProcessor sharkObservationProcessor,
             IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor,
-            IArtportalenObservationProcessor artportalenObservationProcessor,
             IDwcaObservationProcessor dwcaObservationProcessor,
-            IDataProviderManager dataProviderManager,
             IProcessedTaxonRepository processedTaxonRepository,
+            IDataProviderManager dataProviderManager,
             IInstanceManager instanceManager,
+            IValidationManager validationManager,
             ICopyFieldMappingsJob copyFieldMappingsJob,
             IProcessTaxaJob processTaxaJob,
             IAreaHelper areaHelper,
@@ -102,6 +105,7 @@ namespace SOS.Process.Jobs
                 copyFieldMappingsJob ?? throw new ArgumentNullException(nameof(copyFieldMappingsJob));
             _processTaxaJob = processTaxaJob ?? throw new ArgumentNullException(nameof(processTaxaJob));
             _instanceManager = instanceManager ?? throw new ArgumentNullException(nameof(instanceManager));
+            _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));
@@ -265,11 +269,17 @@ namespace SOS.Process.Jobs
                     newCollection = await _processedObservationRepository.VerifyCollectionAsync();
                     _logger.LogInformation("Finish ensure collection exists");
                 }
-
+                
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 //--------------------------------------
-                // 6. Get ProviderInfo
+                // 6. Make sure invalid observations collection is empty
+                //------------
+                await _validationManager.VerifyCollectionAsync();
+
+                cancellationToken?.ThrowIfCancellationRequested();
+                //--------------------------------------
+                // 7. Get ProviderInfo
                 //--------------------------------------
                 var providerInfoByDataProvider = new Dictionary<DataProvider, ProviderInfo>();
                 var metaDataProviderInfo = await GetProviderInfoAsync(new Dictionary<string, DataProviderType>
@@ -279,7 +289,7 @@ namespace SOS.Process.Jobs
                 });
 
                 //------------------------------------------------------------------------
-                // 7. Create observation processing tasks, and wait for them to complete
+                // 8. Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------
                 _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
                 var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
@@ -302,13 +312,13 @@ namespace SOS.Process.Jobs
                 var success = processTaskByDataProvider.Values.All(t => t.Result.Status == RunStatus.Success);
 
                 //----------------------------------------------------------------------------
-                // 8. End create DwC CSV files and merge the files into multiple DwC-A files.
+                // 9. End create DwC CSV files and merge the files into multiple DwC-A files.
                 //----------------------------------------------------------------------------
                 await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
                 _dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
 
                 //----------------------------------------------
-                // 9. Update provider info 
+                // 10. Update provider info 
                 //----------------------------------------------
                 foreach (var task in processTaskByDataProvider)
                 {
@@ -320,7 +330,7 @@ namespace SOS.Process.Jobs
                 }
 
                 //-----------------------------------------
-                // 10. Save process info
+                // 11. Save process info
                 //-----------------------------------------
                 _logger.LogInformation("Start updating process info for observations");
                 foreach (var dataProvider in dataProvidersToProcess)
@@ -340,7 +350,7 @@ namespace SOS.Process.Jobs
                 _logger.LogInformation("Finish updating process info for observations");
 
                 //----------------------------------------------------------------------------
-                // 11. If a data provider failed to process and it was not Artportalen,
+                // 12. If a data provider failed to process and it was not Artportalen,
                 //     then try to copy that data from the active instance.
                 //----------------------------------------------------------------------------
                 var artportalenSuccededOrDidntRun = !processTaskByDataProvider.Any(pair =>
@@ -358,7 +368,7 @@ namespace SOS.Process.Jobs
                 }
 
                 //---------------------------------
-                // 12. Create ElasticSearch index
+                // 13. Create ElasticSearch index
                 //---------------------------------
                 if (success)
                 {
@@ -380,13 +390,13 @@ namespace SOS.Process.Jobs
                 _logger.LogInformation($"Processing done: {success}");
 
                 //------------------------
-                // 13. Store area cache
+                // 14. Store area cache
                 //------------------------
                 _logger.LogDebug("Persist area cache");
                 _areaHelper.PersistCache();
 
                 //-------------------------------
-                // 14. Return processing result
+                // 15. Return processing result
                 //-------------------------------
                 return success ? true : throw new Exception("Failed to process observations.");
             }

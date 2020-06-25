@@ -20,14 +20,12 @@ namespace SOS.Process.UnitTests.Repositories.Destination
         {
             _processClient = new Mock<IProcessClient>();
             _elasticClient = new Mock<IElasticClient>();
-            _invalidObservationRepositoryMock = new Mock<IInvalidObservationRepository>();
             _elasticSearchConfiguration = new ElasticSearchConfiguration();
             _loggerMock = new Mock<ILogger<ProcessedObservationRepository>>();
         }
 
         private readonly Mock<IProcessClient> _processClient;
         private readonly Mock<IElasticClient> _elasticClient;
-        private readonly Mock<IInvalidObservationRepository> _invalidObservationRepositoryMock;
         private readonly ElasticSearchConfiguration _elasticSearchConfiguration;
         private readonly Mock<ILogger<ProcessedObservationRepository>> _loggerMock;
 
@@ -40,7 +38,6 @@ namespace SOS.Process.UnitTests.Repositories.Destination
             Action create = () => new ProcessedObservationRepository(
                 null,
                 _elasticClient.Object,
-                _invalidObservationRepositoryMock.Object,
                 _elasticSearchConfiguration,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
@@ -48,23 +45,14 @@ namespace SOS.Process.UnitTests.Repositories.Destination
             create = () => new ProcessedObservationRepository(
                 _processClient.Object,
                 null,
-                _invalidObservationRepositoryMock.Object,
                 _elasticSearchConfiguration,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("elasticClient");
 
-            create = () => new ProcessedObservationRepository(
-                _processClient.Object,
-                _elasticClient.Object,
-                null,
-                _elasticSearchConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("invalidObservationRepository");
 
             create = () => new ProcessedObservationRepository(
                 _processClient.Object,
                 _elasticClient.Object,
-                _invalidObservationRepositoryMock.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("elasticConfiguration");
@@ -72,7 +60,6 @@ namespace SOS.Process.UnitTests.Repositories.Destination
             create = () => new ProcessedObservationRepository(
                 _processClient.Object,
                 _elasticClient.Object,
-                _invalidObservationRepositoryMock.Object,
                 _elasticSearchConfiguration,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");

@@ -78,7 +78,6 @@ namespace SOS.Process.IntegrationTests.Jobs
             if (storeProcessed)
             {
                 processedObservationRepository = new ProcessedObservationRepository(processClient, elasticClient,
-                    invalidObservationRepository,
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>());
             }
             else
@@ -182,7 +181,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 validationManager,
                 new NullLogger<ArtportalenObservationProcessor>());
             var instanceManager = new InstanceManager(
-                new ProcessedObservationRepository(processClient, elasticClient, invalidObservationRepository,
+                new ProcessedObservationRepository(processClient, elasticClient,
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>()),
                 processInfoRepository,
                 new NullLogger<InstanceManager>());
@@ -211,6 +210,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository,
                 processInfoRepository,
                 harvestInfoRepository,
+                artportalenProcessor,
                 clamPortalProcessor,
                 fishDataProcessor,
                 kulProcessor,
@@ -219,11 +219,11 @@ namespace SOS.Process.IntegrationTests.Jobs
                 sersProcessor,
                 sharkProcessor,
                 virtualHrbariumProcessor,
-                artportalenProcessor,
                 dwcaProcessor,
-                dataProviderManager,
                 taxonProcessedRepository,
+                dataProviderManager,
                 instanceManager,
+                validationManager,
                 copyFieldMappingsJob,
                 processTaxaJob,
                 areaHelper,
