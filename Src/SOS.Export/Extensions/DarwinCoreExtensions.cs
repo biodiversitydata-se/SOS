@@ -397,7 +397,6 @@ namespace SOS.Export.Extensions
             IEnumerable<ProcessedObservation> processedObservations)
         {
             return processedObservations
-                .Where(observation => observation.Taxon != null) // todo - remove when the validation code is moved to processor.
                 .SelectMany(observation => observation.Projects != null ? 
                     observation.Projects.SelectMany(project => ToExtendedMeasurementOrFactRows(project, observation.Occurrence.OccurrenceId)) : 
                     Enumerable.Empty<ExtendedMeasurementOrFactRow>());

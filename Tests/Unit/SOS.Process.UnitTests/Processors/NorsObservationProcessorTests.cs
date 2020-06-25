@@ -13,6 +13,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Nors;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Nors;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -35,6 +36,7 @@ namespace SOS.Process.UnitTests.Processors
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
+            _validationManagerMock = new Mock<IValidationManager>();
             _loggerMock = new Mock<ILogger<NorsObservationProcessor>>();
         }
 
@@ -43,6 +45,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
+        private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<ILogger<NorsObservationProcessor>> _loggerMock;
 
         private NorsObservationProcessor TestObject => new NorsObservationProcessor(
@@ -51,6 +54,7 @@ namespace SOS.Process.UnitTests.Processors
             _processedObservationRepositoryMock.Object,
             _fieldMappingResolverHelperMock.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
+            _validationManagerMock.Object,
             _loggerMock.Object);
 
         private DataProvider CreateDataProvider()

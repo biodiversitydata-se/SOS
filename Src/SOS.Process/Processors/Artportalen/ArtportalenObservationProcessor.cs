@@ -13,6 +13,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -39,6 +40,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="processConfiguration"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="validationManager"></param>
         /// <param name="logger"></param>
         public ArtportalenObservationProcessor(IArtportalenVerbatimRepository artportalenVerbatimRepository,
             IProcessedObservationRepository processedObservationRepository,
@@ -46,8 +48,9 @@ namespace SOS.Process.Processors.Artportalen
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             ProcessConfiguration processConfiguration,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
-            ILogger<ArtportalenObservationProcessor> logger) : base(processedObservationRepository,
-            fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, logger)
+            IValidationManager validationManager,
+            ILogger<ArtportalenObservationProcessor> logger) : 
+                base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _artportalenVerbatimRepository = artportalenVerbatimRepository ??
                                              throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
@@ -142,14 +145,17 @@ namespace SOS.Process.Processors.Artportalen
                     observationFactory.CreateProcessedObservations(verbatimObservationsBatch);
                 Logger.LogDebug($"Finish processing Artportalen batch ({startId}-{endId})");
 
-                Logger.LogDebug($"Start storing Artportalen batch ({startId}-{endId})");
+                Logger.LogDebug($"Start validating Artportalen batch ({startId}-{endId})");
+                var invalidObservations = ValidationManager.ValidateObservations(ref processedObservationsBatch);
+                await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
+                Logger.LogDebug($"End validating Artportalen batch ({startId}-{endId})");
 
-                var committedObservations = await CommitBatchAsync(dataProvider, processedObservationsBatch.ToArray());
-                var successCount = committedObservations?.Count() ?? 0;
+                Logger.LogDebug($"Start storing Artportalen batch ({startId}-{endId})");
+                var successCount = await CommitBatchAsync(dataProvider, processedObservationsBatch.ToArray());
                 Logger.LogDebug($"Finish storing Artportalen batch ({startId}-{endId})");
 
                 Logger.LogDebug($"Start writing Artportalen CSV ({startId}-{endId})");
-                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(committedObservations, dataProvider,$"{startId}-{endId}");
+                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservationsBatch, dataProvider,$"{startId}-{endId}");
                 Logger.LogDebug($"Finish writing Artportalen CSV ({startId}-{endId})");
 
                 return successCount;
@@ -179,32 +185,34 @@ namespace SOS.Process.Processors.Artportalen
             var verbatimCount = 0;
             var observationFactory =
                 await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository);
-            ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
+            ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
             using var cursor = await _artportalenVerbatimRepository.GetAllByCursorAsync();
-            var batchId = 0;
+            int batchId = 0;
 
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
-                sightings.Add(observationFactory.CreateProcessedObservation(verbatimObservation));
-                if (IsBatchFilledToLimit(sightings.Count))
+                observations.Add(observationFactory.CreateProcessedObservation(verbatimObservation));
+                if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var committedObservations = await CommitBatchAsync(dataProvider, sightings);
-                    verbatimCount += committedObservations?.Count() ?? 0;
-                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(committedObservations, dataProvider, batchId++.ToString());
-                    sightings.Clear();
+                    var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+                    await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
+                    verbatimCount += await CommitBatchAsync(dataProvider, observations);
+                    await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider, batchId++.ToString());
+                    observations.Clear();
                     Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
                 }
             });
 
             // Commit remaining batch (not filled to limit).
-            if (sightings.Any())
+            if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                var committedObservations = await CommitBatchAsync(dataProvider, sightings);
-                verbatimCount += committedObservations?.Count() ?? 0;
-                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(committedObservations, dataProvider, batchId++.ToString());
+                var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+                await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
+                verbatimCount += await CommitBatchAsync(dataProvider, observations);
+                await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider, batchId.ToString());
                 Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
             }
 

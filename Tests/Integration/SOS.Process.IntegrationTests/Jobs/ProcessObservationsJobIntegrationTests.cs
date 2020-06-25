@@ -73,6 +73,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
+            var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
             IProcessedObservationRepository processedObservationRepository;
             if (storeProcessed)
             {
@@ -106,63 +107,79 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<ClamObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator, 
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                dwcArchiveFileWriterCoordinator, 
+                validationManager,
                 new NullLogger<ClamPortalObservationProcessor>());
             var fishDataProcessor = new FishDataObservationProcessor(
                 new FishDataObservationVerbatimRepository(verbatimClient,
                     new NullLogger<FishDataObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator, validationManager,
                 new NullLogger<FishDataObservationProcessor>());
             var kulProcessor = new KulObservationProcessor(
                 new KulObservationVerbatimRepository(verbatimClient,
                     new NullLogger<KulObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                dwcArchiveFileWriterCoordinator,
+                validationManager,
                 new NullLogger<KulObservationProcessor>());
             var mvmProcessor = new MvmObservationProcessor(
                 new MvmObservationVerbatimRepository(verbatimClient,
                     new NullLogger<MvmObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                dwcArchiveFileWriterCoordinator,
+                validationManager,
                 new NullLogger<MvmObservationProcessor>());
             var norsProcessor = new NorsObservationProcessor(
                 new NorsObservationVerbatimRepository(verbatimClient,
                     new NullLogger<NorsObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                dwcArchiveFileWriterCoordinator,
+                validationManager,
                 new NullLogger<NorsObservationProcessor>());
             var sersProcessor = new SersObservationProcessor(
                 new SersObservationVerbatimRepository(verbatimClient,
                     new NullLogger<SersObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                dwcArchiveFileWriterCoordinator,
+                validationManager,
                 new NullLogger<SersObservationProcessor>());
             var sharkProcessor = new SharkObservationProcessor(
                 new SharkObservationVerbatimRepository(verbatimClient,
                     new NullLogger<SharkObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                dwcArchiveFileWriterCoordinator,
+                validationManager,
                 new NullLogger<SharkObservationProcessor>());
             var virtualHrbariumProcessor = new VirtualHerbariumObservationProcessor(
                 new VirtualHerbariumObservationVerbatimRepository(verbatimClient,
                     new NullLogger<VirtualHerbariumObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator,
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                dwcArchiveFileWriterCoordinator,
+                validationManager,
                 new NullLogger<VirtualHerbariumObservationProcessor>());
             var artportalenProcessor = new ArtportalenObservationProcessor(
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
                 processedObservationRepository,
                 processedFieldMappingRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
-                processConfiguration, dwcArchiveFileWriterCoordinator,
+                processConfiguration, 
+                dwcArchiveFileWriterCoordinator,
+                validationManager,
                 new NullLogger<ArtportalenObservationProcessor>());
             var instanceManager = new InstanceManager(
                 new ProcessedObservationRepository(processClient, elasticClient, invalidObservationRepository,
@@ -183,6 +200,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 areaHelper,
                 processConfiguration,
                 dwcArchiveFileWriterCoordinator,
+                validationManager,
                 new NullLogger<DwcaObservationProcessor>());
 
             var dataProviderManager = new DataProviderManager(

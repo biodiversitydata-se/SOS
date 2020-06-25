@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MongoDB.Bson;
 using SOS.Lib.Models.Interfaces;
 
@@ -21,6 +22,7 @@ namespace SOS.Lib.Models.Processed.Validation
             DatasetName = datasetName;
             Defects = new List<string>();
             OccurrenceID = occurrenceID;
+            ModifiedDate = DateTime.Now;
         }
 
         /// <summary>
@@ -39,6 +41,8 @@ namespace SOS.Lib.Models.Processed.Validation
         public ICollection<string> Defects { get; set; }
 
         public string OccurrenceID { get; set; }
+
+        public DateTime ModifiedDate { get; set; }
 
         /// <summary>
         ///     Object id

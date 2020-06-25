@@ -10,6 +10,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Kul.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -32,15 +33,16 @@ namespace SOS.Process.Processors.Kul
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingResolverHelper"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
+        /// <param name="validationManager"></param>
         /// <param name="logger"></param>
-        public KulObservationProcessor(
-            IKulObservationVerbatimRepository kulObservationVerbatimRepository,
+        public KulObservationProcessor(IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IAreaHelper areaHelper,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
-            ILogger<KulObservationProcessor> logger) : base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator,
-            logger)
+            IValidationManager validationManager,
+            ILogger<KulObservationProcessor> logger) : 
+                base(processedObservationRepository, fieldMappingResolverHelper, dwcArchiveFileWriterCoordinator, validationManager, logger)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository ??
                                                 throw new ArgumentNullException(
@@ -70,9 +72,10 @@ namespace SOS.Process.Processors.Kul
                 if (IsBatchFilledToLimit(observations.Count))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var committedObservations = await CommitBatchAsync(dataProvider, observations);
-                    verbatimCount += committedObservations?.Count() ?? 0;
-                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(committedObservations, dataProvider);
+                    var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+                    await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
+                    verbatimCount += await CommitBatchAsync(dataProvider, observations);
+                    await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
                     observations.Clear();
                     Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
                 }
@@ -82,9 +85,10 @@ namespace SOS.Process.Processors.Kul
             if (observations.Any())
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                var committedObservations = await CommitBatchAsync(dataProvider, observations);
-                verbatimCount += committedObservations?.Count() ?? 0;
-                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(committedObservations, dataProvider);
+                var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+                await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
+                verbatimCount += await CommitBatchAsync(dataProvider, observations);
+                await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
                 Logger.LogDebug($"KUL Sightings processed: {verbatimCount}");
             }
 

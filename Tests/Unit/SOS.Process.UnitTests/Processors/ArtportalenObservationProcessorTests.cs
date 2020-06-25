@@ -12,6 +12,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Process.Helpers.Interfaces;
+using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
@@ -35,6 +36,7 @@ namespace SOS.Process.UnitTests.Processors
             _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
             _processConfiguration = new ProcessConfiguration();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
+            _validationManagerMock = new Mock<IValidationManager>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
         }
 
@@ -44,6 +46,7 @@ namespace SOS.Process.UnitTests.Processors
         private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
+        private readonly Mock<IValidationManager> _validationManagerMock;
         private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
 
         private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
@@ -53,6 +56,7 @@ namespace SOS.Process.UnitTests.Processors
             _fieldMappingResolverHelperMock.Object,
             _processConfiguration,
             _dwcArchiveFileWriterCoordinatorMock.Object,
+            _validationManagerMock.Object,
             _loggerMock.Object);
 
         /// <summary>
