@@ -82,7 +82,7 @@ namespace SOS.Process.Processors
             IJobCancellationToken cancellationToken);
 
 
-        protected async Task<IEnumerable<ProcessedObservation>> CommitBatchAsync(
+        protected async Task<int> CommitBatchAsync(
             DataProvider dataProvider,
             ICollection<ProcessedObservation> processedObservations)
         {
