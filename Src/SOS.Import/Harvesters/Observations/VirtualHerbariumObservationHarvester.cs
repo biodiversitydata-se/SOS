@@ -5,6 +5,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
+using SOS.Import.Factories.Harvest;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.VirtualHerbarium.Interfaces;
 using SOS.Import.Services.Interfaces;
@@ -65,7 +66,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogInformation("Finish empty collection for Virtual Herbarium verbatim collection");
 
                 var localitiesXml = await _virtualHerbariumObservationService.GetLocalitiesAsync();
-                var localities = localitiesXml.ToLocalityDictionary();
+                var verbatimFactory = new VirtualHerbariumHarvestFactory(localitiesXml);
 
                 var pageIndex = 1;
                 var nrSightingsHarvested = 0;
@@ -78,7 +79,7 @@ namespace SOS.Import.Harvesters.Observations
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
 
-                    var verbatims = observations.ToVerbatims(localities)?.ToArray();
+                    var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(observations))?.ToArray();
 
                     if ((verbatims?.Length ?? 0) == 0)
                     {

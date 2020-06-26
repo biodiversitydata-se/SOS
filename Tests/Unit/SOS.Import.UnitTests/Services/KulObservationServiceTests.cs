@@ -70,7 +70,7 @@ namespace SOS.Import.UnitTests.Services
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetKulObservationsAsyncFail()
+        public void GetKulObservationsAsyncFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange

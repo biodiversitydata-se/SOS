@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -60,7 +59,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <returns></returns>
         [Fact]
         [Trait("Category", "Unit")]
-        public async Task TaxonTreeFail()
+        public void TaxonTreeFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -85,7 +84,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <returns></returns>
         [Fact]
         [Trait("Category", "Unit")]
-        public async Task TaxonTreeSuccess()
+        public void TaxonTreeSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -114,7 +113,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <returns></returns>
         [Fact]
         [Trait("Category", "Unit")]
-        public async Task TaxonTreeThrows()
+        public void TaxonTreeThrows()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange

@@ -7,14 +7,12 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
-using SOS.Import.Extensions;
-using SOS.Import.Factories;
+using SOS.Import.Factories.Harvest;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.Shared;
 
@@ -95,8 +93,7 @@ namespace SOS.Import.Harvesters.Observations
 
             try
             {
-                var activities = (await _metadataRepository.GetActivitiesAsync()).ToVerbatims()
-                    .ToDictionary(a => a.Id, a => a);
+                var activities = (await _metadataRepository.GetActivitiesAsync());
 
                 var metaDataTasks = new[]
                 {
@@ -114,26 +111,24 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogDebug("Start getting meta data");
                 await Task.WhenAll(metaDataTasks);
                 cancellationToken?.ThrowIfCancellationRequested();
-                var biotopes = metaDataTasks[0].Result.ToVerbatims().ToDictionary(b => b.Id, b => b);
-                var genders = metaDataTasks[1].Result.ToVerbatims().ToDictionary(g => g.Id, g => g);
-                var organizations = metaDataTasks[2].Result.ToVerbatims().ToDictionary(o => o.Id, o => o);
-                var stages = metaDataTasks[3].Result.ToVerbatims().ToDictionary(s => s.Id, s => s);
-                var substrates = metaDataTasks[4].Result.ToVerbatims().ToDictionary(s => s.Id, s => s);
-                var units = metaDataTasks[5].Result.ToVerbatims().ToDictionary(u => u.Id, u => u);
-                var validationStatus = metaDataTasks[6].Result.ToVerbatims().ToDictionary(v => v.Id, v => v);
-                var discoveryMethods = metaDataTasks[7].Result.ToVerbatims().ToDictionary(v => v.Id, v => v);
-                var determinationMethods = metaDataTasks[8].Result.ToVerbatims().ToDictionary(v => v.Id, v => v);
+                var biotopes = metaDataTasks[0].Result;
+                var genders = metaDataTasks[1].Result;
+                var organizations = metaDataTasks[2].Result;
+                var stages = metaDataTasks[3].Result;
+                var substrates = metaDataTasks[4].Result;
+                var units = metaDataTasks[5].Result;
+                var validationStatus = metaDataTasks[6].Result;
+                var discoveryMethods = metaDataTasks[7].Result;
+                var determinationMethods = metaDataTasks[8].Result;
                 _logger.LogDebug("Finish getting meta data");
 
                 _logger.LogDebug("Start getting persons & organizations data");
-                var personByUserId = (await _personRepository.GetAsync()).ToVerbatims()
-                    .ToDictionary(p => p.UserId, p => p);
-                var organizationById = (await _organizationRepository.GetAsync()).ToVerbatims()
-                    .ToDictionary(o => o.Id, o => o);
+                var personByUserId = await _personRepository.GetAsync();
+                var organizationById = await _organizationRepository.GetAsync();
                 _logger.LogDebug("Finish getting persons & organizations data");
 
                 _logger.LogDebug("Start getting species collection data");
-                var speciesCollections = (await _speciesCollectionRepository.GetAsync()).ToVerbatims().ToList();
+                var speciesCollections = await _speciesCollectionRepository.GetAsync();
                 _logger.LogDebug("Finish getting species collection data");
 
                 _logger.LogDebug("Start getting projects & project parameters");
@@ -144,13 +139,8 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogDebug("Finish getting projects & project parameters");
 
                 _logger.LogDebug("Start getting sites");
-                var siteEntities = (await _siteRepository.GetAsync()).ToList();
+                var sites = (await _siteRepository.GetAsync()).ToList();
                 _logger.LogDebug("Finish getting sites");
-
-                _logger.LogDebug("Start casting site entities to verbatims");
-                var siteVerbatims = siteEntities.ToVerbatimsUsingBatch();
-                var sites = siteVerbatims.ToDictionary(s => s.Id, s => s);
-                _logger.LogDebug("Finish casting site entities to verbatims");
 
                 // Make sure we have an empty collection
                 _logger.LogDebug("Empty collection");
@@ -162,6 +152,27 @@ namespace SOS.Import.Harvesters.Observations
                 var currentId = minId;
                 var harvestBatchTasks = new List<Task<int>>();
                 _hasAddedTestSightings = false;
+
+                var harvestFactory = new ArtportalenHarvestFactory(
+                    _sightingRelationRepository,
+                    activities,
+                    biotopes,
+                    determinationMethods,
+                    discoveryMethods,
+                    genders,
+                    organizations,
+                    organizationById,
+                    personByUserId,
+                    projectEntityById,
+                    projectParameterEntities,
+                    sightingProjectIds,
+                    sites,
+                    speciesCollections,
+                    stages, 
+                    substrates,
+                    validationStatus,
+                    units
+                );
 
                 _logger.LogDebug("Start getting Artportalen sightings");
                 // Loop until all sightings are fetched
@@ -177,11 +188,9 @@ namespace SOS.Import.Harvesters.Observations
                     await _semaphore.WaitAsync();
 
                     // Add batch task to list
-                    harvestBatchTasks.Add(HarvestBatchAsync(currentId, activities, biotopes, genders, organizations,
-                        sites, stages, substrates,
-                        validationStatus, units, discoveryMethods, determinationMethods,
-                        personByUserId, organizationById, speciesCollections, sightingProjectIds, projectEntityById,
-                        projectParameterEntities));
+                    harvestBatchTasks.Add(HarvestBatchAsync(
+                        currentId, 
+                        harvestFactory));
 
                     // Calculate start of next chunk
                     currentId += _artportalenConfiguration.ChunkSize;
@@ -217,23 +226,7 @@ namespace SOS.Import.Harvesters.Observations
 
         private async Task<int> HarvestBatchAsync(
             int currentId,
-            IDictionary<int, MetadataWithCategory> activities,
-            IDictionary<int, Metadata> biotopes,
-            IDictionary<int, Metadata> genders,
-            IDictionary<int, Metadata> organizations,
-            IDictionary<int, Site> sites,
-            IDictionary<int, Metadata> stages,
-            IDictionary<int, Metadata> substrates,
-            IDictionary<int, Metadata> validationStatus,
-            IDictionary<int, Metadata> units,
-            IDictionary<int, Metadata> discoveryMethods,
-            IDictionary<int, Metadata> determinationMethods,
-            IDictionary<int, Person> personByUserId,
-            IDictionary<int, Organization> organizationById,
-            IList<SpeciesCollectionItem> speciesCollections,
-            IEnumerable<(int SightingId, int ProjectId)> sightingProjectIds,
-            IDictionary<int, ProjectEntity> projectEntityById,
-            IEnumerable<ProjectParameterEntity> projectParameterEntities
+            ArtportalenHarvestFactory harvestFactory
         )
         {
             try
@@ -255,43 +248,11 @@ namespace SOS.Import.Harvesters.Observations
                     _logger.LogDebug("Finish adding test sightings");
                 }
 
-                var sightingIds = new HashSet<int>(sightings.Select(x => x.Id));
-
-                _logger.LogDebug("Start calculating person sighting directory");
-                // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
-                var sightingRelations =
-                    (await _sightingRelationRepository.GetAsync(sightingIds)).ToVerbatims().ToArray();
-                var personSightingBySightingId = PersonSightingFactory.CreatePersonSightingDictionary(
-                    sightingIds,
-                    personByUserId,
-                    organizationById,
-                    speciesCollections,
-                    sightingRelations);
-                _logger.LogDebug("Finish calculating person sighting directory");
-
-                _logger.LogDebug("Start getting projects and parameters");
-                // Get projects & project parameters
-                var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, sightingProjectIds,
-                    projectEntityById, projectParameterEntities);
-                _logger.LogDebug("Finish getting projects and parameters");
-
                 _logger.LogDebug("Start casting entities to verbatim");
+
                 // Cast sightings to verbatim observations
-                var verbatimObservations = sightings.ToVerbatims(
-                    activities,
-                    biotopes,
-                    genders,
-                    organizations,
-                    personSightingBySightingId,
-                    sites,
-                    stages,
-                    substrates,
-                    validationStatus,
-                    units,
-                    discoveryMethods,
-                    determinationMethods,
-                    projectEntityDictionaries,
-                    personByUserId);
+                var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(sightings);
+
                 _logger.LogDebug("Finsih casting entities to verbatim");
 
                 _logger.LogDebug("Start storing batch");
@@ -325,32 +286,6 @@ namespace SOS.Import.Harvesters.Observations
         {
             var extraSightings = sightingRepository.GetChunkAsync(sightingIds).Result;
             sightings = extraSightings.Union(sightings.Where(s => extraSightings.All(e => e.Id != s.Id))).ToArray();
-        }
-
-        private static ProjectEntityDictionaries GetProjectEntityDictionaries(
-            HashSet<int> sightingIds,
-            IEnumerable<(int SightingId, int ProjectId)> sightingProjectIds,
-            IDictionary<int, ProjectEntity> projectEntityById,
-            IEnumerable<ProjectParameterEntity> projectParameterEntities)
-        {
-            var projectEntitiesBySightingId = sightingProjectIds
-                .Where(p => sightingIds.Contains(p.SightingId))
-                .GroupBy(p => p.SightingId)
-                .ToDictionary(g => g.Key, g => g
-                    .Where(p => projectEntityById.ContainsKey(p.ProjectId))
-                    .Select(p => projectEntityById[p.ProjectId]));
-
-            var projectParameterEntitiesBySightingId = projectParameterEntities
-                .Where(p => sightingIds.Contains(p.SightingId))
-                .GroupBy(p => p.SightingId)
-                .ToDictionary(g => g.Key, g => g.AsEnumerable());
-
-            return new ProjectEntityDictionaries
-            {
-                ProjectEntityById = projectEntityById,
-                ProjectEntitiesBySightingId = projectEntitiesBySightingId,
-                ProjectParameterEntitiesBySightingId = projectParameterEntitiesBySightingId
-            };
         }
     }
 }

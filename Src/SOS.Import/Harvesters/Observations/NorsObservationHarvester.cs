@@ -6,7 +6,7 @@ using System.Xml.Linq;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Extensions;
+using SOS.Import.Factories.Harvest;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.Nors.Interfaces;
 using SOS.Import.Services.Interfaces;
@@ -68,6 +68,7 @@ namespace SOS.Import.Harvesters.Observations
                 var nrSightingsHarvested = 0;
                 var xmlDocument = await _norsObservationService.GetAsync(changeId);
                 var dataLastModified = DateTime.MinValue;
+                var verbatimFactory = new AquaSupportHarvestFactory<NorsObservationVerbatim>();
 
                 // Loop until all sightings are fetched.
                 while (xmlDocument != null)
@@ -78,7 +79,7 @@ namespace SOS.Import.Harvesters.Observations
                         break;
                     }
 
-                    var verbatims = xmlDocument.ToVerbatims<NorsObservationVerbatim>(ns);
+                    var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument);
 
                     // Add sightings to MongoDb
                     await _norsObservationVerbatimRepository.AddManyAsync(verbatims);

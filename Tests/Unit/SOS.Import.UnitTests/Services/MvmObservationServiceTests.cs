@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -65,7 +64,7 @@ namespace SOS.Import.UnitTests.Services
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetMvmObservationsAsyncFail()
+        public void GetMvmObservationsAsyncFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -90,7 +89,7 @@ namespace SOS.Import.UnitTests.Services
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetMvmObservationsAsyncSuccess()
+        public void GetMvmObservationsAsyncSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange

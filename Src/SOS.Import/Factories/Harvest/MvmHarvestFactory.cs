@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using MvmService;
+using SOS.Import.Extensions;
+using SOS.Import.Factories.Harvest.Interfaces;
 using SOS.Lib.Models.Verbatim.Mvm;
 
-namespace SOS.Import.Extensions
+namespace SOS.Import.Factories.Harvest
 {
-    public static class MvmObservationExtensions
+    public class MvmHarvestFactory : IHarvestFactory<IEnumerable<WebSpeciesObservation>, MvmObservationVerbatim>
     {
-        /// <summary>
-        ///     Cast multiple sightings entities to models .
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        public static IEnumerable<MvmObservationVerbatim> ToVerbatims(this IEnumerable<WebSpeciesObservation> entities)
+        /// <inheritdoc />
+        public async Task<IEnumerable<MvmObservationVerbatim>> CastEntitiesToVerbatimsAsync(IEnumerable<WebSpeciesObservation> entities)
         {
-            return entities.Select(e => e.ToVerbatim());
+            return await Task.Run(() =>
+            {
+                return
+                    from e in entities
+                    select CastEntityToVerbatim(e);
+            });
         }
 
         /// <summary>
@@ -23,7 +27,7 @@ namespace SOS.Import.Extensions
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public static MvmObservationVerbatim ToVerbatim(this WebSpeciesObservation entity)
+        private MvmObservationVerbatim CastEntityToVerbatim(WebSpeciesObservation entity)
         {
             var observation = new MvmObservationVerbatim();
             observation.ReportedBy = entity.Fields
