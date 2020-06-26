@@ -163,6 +163,7 @@ namespace SOS.Import.Factories.Harvest
             return observation;
         }
 
+        #region Metadata
         /// <summary>
         ///     Cast multiple sightings entities to models
         /// </summary>
@@ -189,7 +190,7 @@ namespace SOS.Import.Factories.Harvest
 
             return metadataItems.Values;
         }
-
+        
         /// <summary>
         ///     Cast multiple sightings entities to models
         /// </summary>
@@ -227,7 +228,9 @@ namespace SOS.Import.Factories.Harvest
 
             return metadataItems.Values;
         }
+        #endregion Metadata
 
+        #region Organization
         /// <summary>
         ///     Cast multiple projects to aggregates
         /// </summary>
@@ -243,7 +246,9 @@ namespace SOS.Import.Factories.Harvest
                 OrganizationId = o.OrganizationId
             };
         }
+        #endregion Organization
 
+        #region Person
         private IEnumerable<Person> CastPersonEntityToVerbatim(IEnumerable<PersonEntity> entities)
         {
             return from e in entities
@@ -256,7 +261,9 @@ namespace SOS.Import.Factories.Harvest
                     Alias = e.Alias
                 };
         }
+        #endregion Person
 
+        #region Project
         /// <summary>
         ///     Cast multiple projects entities to models
         /// </summary>
@@ -267,7 +274,7 @@ namespace SOS.Import.Factories.Harvest
             return from p in entities
             select CastProjectEntityToVerbatim(p);
         }
-
+        
         /// <summary>
         ///     Cast single project entity to verbatim
         /// </summary>
@@ -289,7 +296,7 @@ namespace SOS.Import.Factories.Harvest
                     SurveyMethodUrl = entity.SurveyMethodUrl
                 };
         }
-
+        
         /// <summary>
         ///     Cast project parameter itemEntity to aggregate
         /// </summary>
@@ -305,115 +312,6 @@ namespace SOS.Import.Factories.Harvest
                 Name = entity.Name,
                 Unit = entity.Unit,
                 Value = entity.Value
-            };
-        }
-
-        /// <summary>
-        ///     Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
-        ///     This saves about 500MB RAM when casting Artportalen sites (3 millions).
-        /// </summary>
-        /// <param name="siteEntities"></param>
-        /// <returns></returns>
-        private IEnumerable<Site> CastSiteEntitiesToVerbatim(List<SiteEntity> siteEntities)
-        {
-            var sites = new List<Site>();
-            var batchSize = 100000;
-            while (siteEntities.Count > 0)
-            {
-                var sitesBatch = siteEntities.Take(batchSize);
-                sites.AddRange(from s in sitesBatch 
-                    select CastSiteEntityToVerbatim(s));
-                siteEntities.RemoveRange(0, Math.Min(siteEntities.Count, batchSize));
-            }
-
-            return sites;
-        }
-
-        /// <summary>
-        /// Cast sighting relations to verbatim
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        private static IEnumerable<SightingRelation> CastSightingRelationsToVerbatim(IEnumerable<SightingRelationEntity> entities)
-        {
-            return from e in entities
-                select new SightingRelation
-            {
-                DeterminationYear = e.DeterminationYear,
-                EditDate = e.EditDate,
-                Id = e.Id,
-                IsPublic = e.IsPublic,
-                RegisterDate = e.RegisterDate,
-                SightingId = e.SightingId,
-                SightingRelationTypeId = e.SightingRelationTypeId,
-                Sort = e.Sort,
-                UserId = e.UserId
-            }; ;
-        }
-
-        private IEnumerable<SpeciesCollectionItem> CastSpeciesCollectionsToVerbatim(
-            IEnumerable<SpeciesCollectionItemEntity> entities)
-        {
-            return from s in entities
-                select new SpeciesCollectionItem
-                {
-                    SightingId = s.SightingId,
-                    CollectorId = s.CollectorId,
-                    OrganizationId = s.OrganizationId,
-                    DeterminerText = s.DeterminerText,
-                    DeterminerYear = s.DeterminerYear,
-                    Description = s.Description,
-                    ConfirmatorText = s.ConfirmatorText,
-                    ConfirmatorYear = s.ConfirmatorYear
-                };
-        }
-
-        /// <summary>
-        ///     Cast site itemEntity to aggregate
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        private Site CastSiteEntityToVerbatim(SiteEntity entity)
-        {
-            Point wgs84Point = null;
-            const int defaultAccuracy = 100;
-
-            if (entity.XCoord > 0 && entity.YCoord > 0)
-            {
-                // We process point here since site is added to observation verbatim. One site can have multiple observations and by 
-                // doing it here we only have to convert the point once
-                var webMercatorPoint = new Point(entity.XCoord, entity.YCoord);
-                wgs84Point = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
-            }
-
-            var accuracy = entity.Accuracy > 0 ? entity.Accuracy : defaultAccuracy; // If Artportalen site accuracy is <= 0, this is due to an old import. Set the accuracy to 100.
-            return new Site
-            {
-                Accuracy = accuracy,
-                County = entity.CountyId.HasValue
-                    ? new GeographicalArea { Id = entity.CountyId.Value, Name = entity.CountyName }
-                    : null,
-                CountryPart = entity.CountryPartId.HasValue
-                    ? new GeographicalArea { Id = entity.CountryPartId.Value, Name = entity.CountryPartName }
-                    : null,
-                Id = entity.Id,
-                Municipality = entity.MunicipalityId.HasValue
-                    ? new GeographicalArea { Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName }
-                    : null,
-                Province = entity.ProvinceId.HasValue
-                    ? new GeographicalArea { Id = entity.ProvinceId.Value, Name = entity.ProvinceName }
-                    : null,
-                Parish = entity.ParishId.HasValue
-                    ? new GeographicalArea { Id = entity.ParishId.Value, Name = entity.ParishName }
-                    : null,
-                PresentationNameParishRegion = entity.PresentationNameParishRegion,
-                Point = wgs84Point?.ToGeoJson(),
-                PointWithBuffer = wgs84Point?.ToCircle(accuracy)?.ToGeoJson(),
-                Name = entity.Name,
-                XCoord = entity.XCoord,
-                YCoord = entity.YCoord,
-                VerbatimCoordinateSystem = CoordinateSys.WebMercator,
-                ParentSiteId = entity.ParentSiteId
             };
         }
 
@@ -502,6 +400,122 @@ namespace SOS.Import.Factories.Harvest
 
             return projectById.Values.ToList();
         }
+        #endregion Project
+
+        #region Site
+        /// <summary>
+        ///     Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
+        ///     This saves about 500MB RAM when casting Artportalen sites (3 millions).
+        /// </summary>
+        /// <param name="siteEntities"></param>
+        /// <returns></returns>
+        private IEnumerable<Site> CastSiteEntitiesToVerbatim(List<SiteEntity> siteEntities)
+        {
+            var sites = new List<Site>();
+            var batchSize = 100000;
+            while (siteEntities.Count > 0)
+            {
+                var sitesBatch = siteEntities.Take(batchSize);
+                sites.AddRange(from s in sitesBatch 
+                    select CastSiteEntityToVerbatim(s));
+                siteEntities.RemoveRange(0, Math.Min(siteEntities.Count, batchSize));
+            }
+
+            return sites;
+        }
+
+        /// <summary>
+        ///     Cast site itemEntity to aggregate
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        private Site CastSiteEntityToVerbatim(SiteEntity entity)
+        {
+            Point wgs84Point = null;
+            const int defaultAccuracy = 100;
+
+            if (entity.XCoord > 0 && entity.YCoord > 0)
+            {
+                // We process point here since site is added to observation verbatim. One site can have multiple observations and by 
+                // doing it here we only have to convert the point once
+                var webMercatorPoint = new Point(entity.XCoord, entity.YCoord);
+                wgs84Point = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+            }
+
+            var accuracy = entity.Accuracy > 0 ? entity.Accuracy : defaultAccuracy; // If Artportalen site accuracy is <= 0, this is due to an old import. Set the accuracy to 100.
+            return new Site
+            {
+                Accuracy = accuracy,
+                County = entity.CountyId.HasValue
+                    ? new GeographicalArea { Id = entity.CountyId.Value, Name = entity.CountyName }
+                    : null,
+                CountryPart = entity.CountryPartId.HasValue
+                    ? new GeographicalArea { Id = entity.CountryPartId.Value, Name = entity.CountryPartName }
+                    : null,
+                Id = entity.Id,
+                Municipality = entity.MunicipalityId.HasValue
+                    ? new GeographicalArea { Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName }
+                    : null,
+                Province = entity.ProvinceId.HasValue
+                    ? new GeographicalArea { Id = entity.ProvinceId.Value, Name = entity.ProvinceName }
+                    : null,
+                Parish = entity.ParishId.HasValue
+                    ? new GeographicalArea { Id = entity.ParishId.Value, Name = entity.ParishName }
+                    : null,
+                PresentationNameParishRegion = entity.PresentationNameParishRegion,
+                Point = wgs84Point?.ToGeoJson(),
+                PointWithBuffer = wgs84Point?.ToCircle(accuracy)?.ToGeoJson(),
+                Name = entity.Name,
+                XCoord = entity.XCoord,
+                YCoord = entity.YCoord,
+                VerbatimCoordinateSystem = CoordinateSys.WebMercator,
+                ParentSiteId = entity.ParentSiteId
+            };
+        }
+        #endregion Site
+
+        #region SightingRelations
+        /// <summary>
+        /// Cast sighting relations to verbatim
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        private static IEnumerable<SightingRelation> CastSightingRelationsToVerbatim(IEnumerable<SightingRelationEntity> entities)
+        {
+            return from e in entities
+                select new SightingRelation
+            {
+                DeterminationYear = e.DeterminationYear,
+                EditDate = e.EditDate,
+                Id = e.Id,
+                IsPublic = e.IsPublic,
+                RegisterDate = e.RegisterDate,
+                SightingId = e.SightingId,
+                SightingRelationTypeId = e.SightingRelationTypeId,
+                Sort = e.Sort,
+                UserId = e.UserId
+            }; ;
+        }
+        #endregion SightingRelations
+
+        #region SpeciesCollections
+        private IEnumerable<SpeciesCollectionItem> CastSpeciesCollectionsToVerbatim(
+            IEnumerable<SpeciesCollectionItemEntity> entities)
+        {
+            return from s in entities
+                select new SpeciesCollectionItem
+                {
+                    SightingId = s.SightingId,
+                    CollectorId = s.CollectorId,
+                    OrganizationId = s.OrganizationId,
+                    DeterminerText = s.DeterminerText,
+                    DeterminerYear = s.DeterminerYear,
+                    Description = s.Description,
+                    ConfirmatorText = s.ConfirmatorText,
+                    ConfirmatorYear = s.ConfirmatorYear
+                };
+        }
+        #endregion SpeciesCollections
 
         /// <summary>
         /// Constructor
