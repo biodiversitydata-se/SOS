@@ -315,6 +315,17 @@ namespace SOS.Observations.Api.Repositories
                     );
                 }
 
+                if (internalFilter.Months?.Any() ?? false)
+                {
+                    queryInternal.Add(q => q
+                        .Script(s => s
+                            .Script(sc => sc
+                                .Source($@"return [{string.Join(',',internalFilter.Months.Select(m=>$"{m}"))}].contains(doc['event.startDate'].value.getMonthValue());")
+                            )
+                        )
+                    );
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
