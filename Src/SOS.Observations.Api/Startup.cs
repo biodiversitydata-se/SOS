@@ -177,7 +177,9 @@ namespace SOS.Observations.Api
             var elasticConfiguration = observationApiConfiguration.SearchDbConfiguration;
             var uris = elasticConfiguration.Hosts.Select(u => new Uri(u));
             services.AddSingleton<IElasticClient>(
-                new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))));
+                new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))
+                    //.DisableDirectStreaming().EnableDebugMode().PrettyJson() // Uncomment this line when debugging ES-query. Req and Resp is in result.DebugInformation in ProcessedObservationRepository.cs.
+                ));
 
 
             // Processed Mongo Db
