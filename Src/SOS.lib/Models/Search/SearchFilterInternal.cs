@@ -32,5 +32,6 @@ namespace SOS.Lib.Models.Search
         public DateTime? ReportedDateTo { get; set; }
         public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
         public int? MaxAccuracy { get; set; }
+        public bool UsePeriodForAllYears { get; set; }
     }
 }

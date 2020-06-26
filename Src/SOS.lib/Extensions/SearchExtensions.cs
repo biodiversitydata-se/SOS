@@ -235,18 +235,6 @@ namespace SOS.Lib.Extensions
                 }
             }
 
-            if (filter.EndDate.HasValue)
-            {
-                queryContainers.Add(q => q
-                    .DateRange(r => r
-                            .Field("event.endDate")
-                            .LessThanOrEquals(
-                                DateMath.Anchored(filter.EndDate.Value
-                                    .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                    )
-                );
-            }
-
             if (filter.GenderIds?.Any() ?? false)
             {
                 queryContainers.Add(q => q
@@ -309,16 +297,32 @@ namespace SOS.Lib.Extensions
                 );
             }
 
-            if (filter.StartDate.HasValue)
+            // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
+            if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
             {
-                queryContainers.Add(q => q
-                    .DateRange(r => r
-                            .Field("event.startDate")
-                            .GreaterThanOrEquals(
-                                DateMath.Anchored(filter.StartDate.Value
-                                    .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                    )
-                );
+                if (filter.StartDate.HasValue)
+                {
+                    queryContainers.Add(q => q
+                        .DateRange(r => r
+                                .Field("event.startDate")
+                                .GreaterThanOrEquals(
+                                    DateMath.Anchored(filter.StartDate.Value
+                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                        )
+                    );
+                }
+
+                if (filter.EndDate.HasValue)
+                {
+                    queryContainers.Add(q => q
+                        .DateRange(r => r
+                                .Field("event.endDate")
+                                .LessThanOrEquals(
+                                    DateMath.Anchored(filter.EndDate.Value
+                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                        )
+                    );
+                }
             }
 
             if (filter.TaxonIds?.Any() ?? false)

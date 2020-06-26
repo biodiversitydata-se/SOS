@@ -312,6 +312,38 @@ namespace SOS.Observations.Api.Repositories
                            .LessThanOrEquals(internalFilter.MaxAccuracy)
                        )
                    );
+
+                if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Script(s => s
+                            .Script(sc => sc
+                                .Source($@"
+                                    int startYear = doc['event.startDate'].value.getYear();
+                                    int startMonth = doc['event.startDate'].value.getMonthValue();
+                                    int startDay = doc['event.startDate'].value.getDayOfMonth();
+
+                                    int fromMonth = {internalFilter.StartDate.Value.Month};
+                                    int fromDay = {internalFilter.StartDate.Value.Day};
+                                    int toMonth = {internalFilter.EndDate.Value.Month};
+                                    int toDay = {internalFilter.EndDate.Value.Day};
+
+                                    if(
+                                        (startMonth == fromMonth && startDay >= fromDay)
+                                        || (startMonth > fromMonth && startMonth < toMonth)
+                                        || (startMonth == toMonth && startDay <= toDay)
+                                    )
+                                    {{ 
+                                        return true;
+                                    }} 
+                                    else 
+                                    {{
+                                        return false;
+                                    }}
+                                ")
+                            )
+                        )
+                    );
                 }
             }
 
