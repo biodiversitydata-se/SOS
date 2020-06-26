@@ -7,7 +7,7 @@ There should be a translation between the domain model and the data contracts. T
 </br>
 </br>
 ### Problems with serializing domain entities
-If you serialize the domain entities, then you couple the the domain model to data contracts.
+If you serialize the domain entities, then you couple the domain model to data contracts.
 >It means that you will not be capable of doing any refactoring in your domain model whatsoever, any such refactoring would lead to violating the contract between you and your clients.
 Use DTOs to decouple the domain model from the data contracts.
 
