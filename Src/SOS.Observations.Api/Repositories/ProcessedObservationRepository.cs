@@ -304,14 +304,16 @@ namespace SOS.Observations.Api.Repositories
                         )
                     );
                 }
+
                 if (internalFilter.MaxAccuracy.HasValue)
                 {
                     queryInternal.Add(q => q
-                       .Range(r => r
-                           .Field("location.coordinateUncertaintyInMeters")
-                           .LessThanOrEquals(internalFilter.MaxAccuracy)
-                       )
-                   );
+                        .Range(r => r
+                            .Field("location.coordinateUncertaintyInMeters")
+                            .LessThanOrEquals(internalFilter.MaxAccuracy)
+                        )
+                    );
+                }
 
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
