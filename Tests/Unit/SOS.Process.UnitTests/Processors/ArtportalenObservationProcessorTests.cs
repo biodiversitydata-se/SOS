@@ -180,7 +180,7 @@ namespace SOS.Process.UnitTests.Processors
             _artportalenVerbatimRepository.Setup(r => r.GetBatchAsync(0, 0))
                 .ReturnsAsync(new[]
                 {
-                    new ArtportalenVerbatimObservation
+                    new ArtportalenObservationVerbatim
                     {
                         Id = 1
                     }

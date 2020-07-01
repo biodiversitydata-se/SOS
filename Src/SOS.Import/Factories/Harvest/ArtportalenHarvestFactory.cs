@@ -13,7 +13,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Factories.Harvest
 {
-    public class ArtportalenHarvestFactory : IHarvestFactory<IEnumerable<SightingEntity>, ArtportalenVerbatimObservation>
+    public class ArtportalenHarvestFactory : IHarvestFactory<IEnumerable<SightingEntity>, ArtportalenObservationVerbatim>
     {
         private readonly ISiteRepository _siteRepository;
         private readonly ISightingRelationRepository _sightingRelationRepository;
@@ -43,11 +43,11 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="personSightings"></param>
         /// <param name="projectEntityDictionaries"></param>
         /// <returns></returns>
-        private ArtportalenVerbatimObservation CastEntityToVerbatim(SightingEntity entity,
+        private ArtportalenObservationVerbatim CastEntityToVerbatim(SightingEntity entity,
             IDictionary<int, PersonSighting> personSightings,
             ProjectEntityDictionaries projectEntityDictionaries)
         {
-            var observation = new ArtportalenVerbatimObservation
+            var observation = new ArtportalenObservationVerbatim
             {
                 Activity = entity.ActivityId.HasValue && _activities.ContainsKey(entity.ActivityId.Value)
                     ? _activities[entity.ActivityId.Value]
@@ -623,7 +623,7 @@ namespace SOS.Import.Factories.Harvest
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ArtportalenVerbatimObservation>> CastEntitiesToVerbatimsAsync(IEnumerable<SightingEntity> entities)
+        public async Task<IEnumerable<ArtportalenObservationVerbatim>> CastEntitiesToVerbatimsAsync(IEnumerable<SightingEntity> entities)
         {
             var sightingIds = new HashSet<int>(entities.Select(x => x.Id));
 

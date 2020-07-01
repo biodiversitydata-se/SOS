@@ -2,7 +2,7 @@
 
 namespace SOS.Process.Repositories.Source.Interfaces
 {
-    public interface IArtportalenVerbatimRepository : IVerbatimBaseRepository<ArtportalenVerbatimObservation, int>
+    public interface IArtportalenVerbatimRepository : IVerbatimBaseRepository<ArtportalenObservationVerbatim, int>
     {
     }
 }

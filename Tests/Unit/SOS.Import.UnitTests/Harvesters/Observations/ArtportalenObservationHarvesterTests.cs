@@ -145,7 +145,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _sightingVerbatimRepository.Setup(tr => tr.AddCollectionAsync())
                 .ReturnsAsync(true);
             _sightingVerbatimRepository
-                .Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<ArtportalenVerbatimObservation>>()))
+                .Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<ArtportalenObservationVerbatim>>()))
                 .ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act

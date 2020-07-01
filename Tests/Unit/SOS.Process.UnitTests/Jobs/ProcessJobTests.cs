@@ -543,8 +543,8 @@ namespace SOS.Process.UnitTests.Jobs
             _darwinCoreRepository.Setup(r => r.VerifyCollectionAsync());
 
 
-            _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenVerbatimObservation)))
-                .ReturnsAsync(new HarvestInfo(nameof(ArtportalenVerbatimObservation),
+            _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenObservationVerbatim)))
+                .ReturnsAsync(new HarvestInfo(nameof(ArtportalenObservationVerbatim),
                     DataProviderType.ArtportalenObservations, DateTime.Now));
             _artportalenProcessor.Setup(r =>
                     r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))

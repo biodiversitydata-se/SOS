@@ -5,7 +5,7 @@ using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source
 {
-    public class ArtportalenVerbatimRepository : VerbatimBaseRepository<ArtportalenVerbatimObservation, int>,
+    public class ArtportalenVerbatimRepository : VerbatimBaseRepository<ArtportalenObservationVerbatim, int>,
         IArtportalenVerbatimRepository
     {
         /// <summary>

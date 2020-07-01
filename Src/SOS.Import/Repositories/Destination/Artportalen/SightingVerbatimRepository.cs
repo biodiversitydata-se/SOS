@@ -11,7 +11,7 @@ namespace SOS.Import.Repositories.Destination.Artportalen
     /// <summary>
     ///     Species data service
     /// </summary>
-    public class SightingVerbatimRepository : VerbatimRepository<ArtportalenVerbatimObservation, int>,
+    public class SightingVerbatimRepository : VerbatimRepository<ArtportalenObservationVerbatim, int>,
         ISightingVerbatimRepository
     {
         /// <summary>
@@ -31,10 +31,10 @@ namespace SOS.Import.Repositories.Destination.Artportalen
             try
             {
                 var res = await MongoCollection
-                    .Find(FilterDefinition<ArtportalenVerbatimObservation>.Empty)
+                    .Find(FilterDefinition<ArtportalenObservationVerbatim>.Empty)
                     .Project(s => s.Id)
                     .Limit(1)
-                    .Sort(Builders<ArtportalenVerbatimObservation>.Sort.Descending(s => s.Id))
+                    .Sort(Builders<ArtportalenObservationVerbatim>.Sort.Descending(s => s.Id))
                     .FirstOrDefaultAsync();
 
                 return res;

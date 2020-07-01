@@ -76,7 +76,7 @@ namespace SOS.Lib.Models.Verbatim.Shared
                 case DataProviderType.DwcA:
                     return $"{nameof(DwcObservationVerbatim)}-{dataProvider.Identifier}";
                 case DataProviderType.ArtportalenObservations:
-                    return nameof(ArtportalenVerbatimObservation);
+                    return nameof(ArtportalenObservationVerbatim);
                 case DataProviderType.ClamPortalObservations:
                     return nameof(ClamObservationVerbatim);
                 case DataProviderType.SharkObservations:
