@@ -44,10 +44,16 @@ namespace SOS.Import.Jobs
         /// <inheritdoc />
         public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
+            return await RunAsync(false, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> RunAsync(bool incrementalHarvest, IJobCancellationToken cancellationToken)
+        {
             _logger.LogInformation("Start Artportalen Harvest Job");
             var dataProvider =
                 await _dataProviderManager.GetDataProviderByType(DataProviderType.ArtportalenObservations);
-            var harvestInfoResult = await _artportalenObservationHarvester.HarvestSightingsAsync(cancellationToken);
+            var harvestInfoResult = await _artportalenObservationHarvester.HarvestSightingsAsync(incrementalHarvest, cancellationToken);
             _logger.LogInformation($"End Artportalen Harvest Job. Status: {harvestInfoResult.Status}");
 
             // Save harvest info
@@ -55,7 +61,7 @@ namespace SOS.Import.Jobs
             await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult);
 
             // return result of all imports
-            return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0
+            return harvestInfoResult.Status.Equals(RunStatus.Success)
                 ? true
                 : throw new Exception("Artportalen Harvest Job failed");
         }

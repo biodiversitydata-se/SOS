@@ -81,7 +81,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.HarvestSightingsAsync(JobCancellationToken.Null);
+            var result = await TestObject.HarvestSightingsAsync(false, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
 
             _sightingRepositoryMock.Setup(sr => sr.GetIdSpanAsync())
                 .ReturnsAsync(new Tuple<int, int>(1, 1));
-            _sightingRepositoryMock.Setup(sr => sr.GetChunkAsync(It.IsAny<int>(), It.IsAny<int>()))
+            _sightingRepositoryMock.Setup(sr => sr.GetChunkAsync(It.IsAny<int>(), It.IsAny<int>(), false))
                 .ReturnsAsync(
                     new[] {new SightingEntity {Id = 1, ActivityId = 1, GenderId = 1, SiteId = 1, StageId = 1}});
             _sightingRepositoryMock.Setup(sr => sr.GetProjectIdsAsync())
@@ -150,7 +150,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.HarvestSightingsAsync(JobCancellationToken.Null);
+            var result = await TestObject.HarvestSightingsAsync(false, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

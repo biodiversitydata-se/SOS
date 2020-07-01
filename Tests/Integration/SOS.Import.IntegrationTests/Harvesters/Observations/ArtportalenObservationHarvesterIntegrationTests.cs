@@ -71,7 +71,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await observationHarvester.HarvestSightingsAsync(JobCancellationToken.Null);
+            var res = await observationHarvester.HarvestSightingsAsync(false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -125,7 +125,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await observationHarvester.HarvestSightingsAsync(JobCancellationToken.Null);
+            var res = await observationHarvester.HarvestSightingsAsync(false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

@@ -151,7 +151,7 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine(
                 $"[ArtportalenSettings].[ChunkSize]: {_importConfiguration.ArtportalenConfiguration.ChunkSize}");
             sb.AppendLine(
-                $"[ArtportalenSettings].[ConnectionString]: {_importConfiguration.ArtportalenConfiguration.ConnectionString}");
+                $"[ArtportalenSettings].[ConnectionString]: {_importConfiguration.ArtportalenConfiguration.ConnectionStringBackup}");
             sb.AppendLine($"[ClamService].[Address]: {_importConfiguration.ClamServiceConfiguration.BaseAddress}");
             sb.AppendLine(
                 $"[TaxonAttributeService].[Address]: {_importConfiguration.TaxonAttributeServiceConfiguration.BaseAddress}");

@@ -15,6 +15,7 @@ namespace SOS.Import.Factories.Harvest
 {
     public class ArtportalenHarvestFactory : IHarvestFactory<IEnumerable<SightingEntity>, ArtportalenVerbatimObservation>
     {
+        private readonly ISiteRepository _siteRepository;
         private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly IDictionary<int, MetadataWithCategory> _activities;
         private readonly IDictionary<int, Metadata> _biotopes;
@@ -190,7 +191,7 @@ namespace SOS.Import.Factories.Harvest
 
             return metadataItems.Values;
         }
-        
+
         /// <summary>
         ///     Cast multiple sightings entities to models
         /// </summary>
@@ -238,13 +239,13 @@ namespace SOS.Import.Factories.Harvest
         /// <returns></returns>
         private IEnumerable<Organization> CastOrganizationEntityToVerbatim(IEnumerable<OrganizationEntity> entities)
         {
-            return from o in entities 
-            select new Organization
-            {
-                Id = o.Id,
-                Name = o.Name,
-                OrganizationId = o.OrganizationId
-            };
+            return from o in entities
+                   select new Organization
+                   {
+                       Id = o.Id,
+                       Name = o.Name,
+                       OrganizationId = o.OrganizationId
+                   };
         }
         #endregion Organization
 
@@ -252,14 +253,14 @@ namespace SOS.Import.Factories.Harvest
         private IEnumerable<Person> CastPersonEntityToVerbatim(IEnumerable<PersonEntity> entities)
         {
             return from e in entities
-                select new Person
-                {
-                    Id = e.Id,
-                    UserId = e.UserId,
-                    FirstName = e.FirstName,
-                    LastName = e.LastName,
-                    Alias = e.Alias
-                };
+                   select new Person
+                   {
+                       Id = e.Id,
+                       UserId = e.UserId,
+                       FirstName = e.FirstName,
+                       LastName = e.LastName,
+                       Alias = e.Alias
+                   };
         }
         #endregion Person
 
@@ -272,9 +273,9 @@ namespace SOS.Import.Factories.Harvest
         private IEnumerable<Project> CastProjectEntitiesToVerbatim(IEnumerable<ProjectEntity> entities)
         {
             return from p in entities
-            select CastProjectEntityToVerbatim(p);
+                   select CastProjectEntityToVerbatim(p);
         }
-        
+
         /// <summary>
         ///     Cast single project entity to verbatim
         /// </summary>
@@ -282,21 +283,21 @@ namespace SOS.Import.Factories.Harvest
         /// <returns></returns>
         private Project CastProjectEntityToVerbatim(ProjectEntity entity)
         {
-            return  new Project
-                {
-                    Category = entity.Category,
-                    Description = entity.Description,
-                    EndDate = entity.EndDate,
-                    Id = entity.Id,
-                    IsPublic = entity.IsPublic,
-                    Name = entity.Name,
-                    Owner = entity.Owner,
-                    StartDate = entity.StartDate,
-                    SurveyMethod = entity.SurveyMethod,
-                    SurveyMethodUrl = entity.SurveyMethodUrl
-                };
+            return new Project
+            {
+                Category = entity.Category,
+                Description = entity.Description,
+                EndDate = entity.EndDate,
+                Id = entity.Id,
+                IsPublic = entity.IsPublic,
+                Name = entity.Name,
+                Owner = entity.Owner,
+                StartDate = entity.StartDate,
+                SurveyMethod = entity.SurveyMethod,
+                SurveyMethodUrl = entity.SurveyMethodUrl
+            };
         }
-        
+
         /// <summary>
         ///     Cast project parameter itemEntity to aggregate
         /// </summary>
@@ -404,6 +405,46 @@ namespace SOS.Import.Factories.Harvest
 
         #region Site
         /// <summary>
+        /// Try to add missing sites from live data
+        /// </summary>
+        /// <param name="entities"></param>
+        /// <returns></returns>
+        private async Task AddMissingSitesAsync(IEnumerable<SightingEntity> entities)
+        {
+            var newSiteIds = new HashSet<int>(entities
+                .Where(s => s.SiteId.HasValue)
+                .Select(x => x.SiteId.Value)
+                .Distinct()
+                .Except(_sites.Select(s => s.Key)));
+
+            if (!newSiteIds.Any())
+            {
+                return;
+            }
+
+            var batchSize = 1000;
+            var startIndex = 0;
+            var idBatch = newSiteIds.Take(batchSize).ToArray();
+
+            while (idBatch.Any())
+            {
+                var sites = await _siteRepository.GetByIdsLiveAsync(idBatch);
+
+                foreach (var site in sites)
+                {
+                    // Make a last check that site isn't in collection (Can have been added by parallel thread)
+                    if (!_sites.ContainsKey(site.Id))
+                    {
+                        _sites.Add(site.Id, CastSiteEntityToVerbatim(site));
+                    }
+                }
+
+                startIndex += batchSize;
+                idBatch = newSiteIds.Skip(startIndex).Take(batchSize).ToArray();
+            }
+        }
+
+        /// <summary>
         ///     Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
         ///     This saves about 500MB RAM when casting Artportalen sites (3 millions).
         /// </summary>
@@ -416,8 +457,8 @@ namespace SOS.Import.Factories.Harvest
             while (siteEntities.Count > 0)
             {
                 var sitesBatch = siteEntities.Take(batchSize);
-                sites.AddRange(from s in sitesBatch 
-                    select CastSiteEntityToVerbatim(s));
+                sites.AddRange(from s in sitesBatch
+                               select CastSiteEntityToVerbatim(s));
                 siteEntities.RemoveRange(0, Math.Min(siteEntities.Count, batchSize));
             }
 
@@ -483,18 +524,18 @@ namespace SOS.Import.Factories.Harvest
         private static IEnumerable<SightingRelation> CastSightingRelationsToVerbatim(IEnumerable<SightingRelationEntity> entities)
         {
             return from e in entities
-                select new SightingRelation
-            {
-                DeterminationYear = e.DeterminationYear,
-                EditDate = e.EditDate,
-                Id = e.Id,
-                IsPublic = e.IsPublic,
-                RegisterDate = e.RegisterDate,
-                SightingId = e.SightingId,
-                SightingRelationTypeId = e.SightingRelationTypeId,
-                Sort = e.Sort,
-                UserId = e.UserId
-            }; ;
+                   select new SightingRelation
+                   {
+                       DeterminationYear = e.DeterminationYear,
+                       EditDate = e.EditDate,
+                       Id = e.Id,
+                       IsPublic = e.IsPublic,
+                       RegisterDate = e.RegisterDate,
+                       SightingId = e.SightingId,
+                       SightingRelationTypeId = e.SightingRelationTypeId,
+                       Sort = e.Sort,
+                       UserId = e.UserId
+                   }; ;
         }
         #endregion SightingRelations
 
@@ -503,23 +544,24 @@ namespace SOS.Import.Factories.Harvest
             IEnumerable<SpeciesCollectionItemEntity> entities)
         {
             return from s in entities
-                select new SpeciesCollectionItem
-                {
-                    SightingId = s.SightingId,
-                    CollectorId = s.CollectorId,
-                    OrganizationId = s.OrganizationId,
-                    DeterminerText = s.DeterminerText,
-                    DeterminerYear = s.DeterminerYear,
-                    Description = s.Description,
-                    ConfirmatorText = s.ConfirmatorText,
-                    ConfirmatorYear = s.ConfirmatorYear
-                };
+                   select new SpeciesCollectionItem
+                   {
+                       SightingId = s.SightingId,
+                       CollectorId = s.CollectorId,
+                       OrganizationId = s.OrganizationId,
+                       DeterminerText = s.DeterminerText,
+                       DeterminerYear = s.DeterminerYear,
+                       Description = s.Description,
+                       ConfirmatorText = s.ConfirmatorText,
+                       ConfirmatorYear = s.ConfirmatorYear
+                   };
         }
         #endregion SpeciesCollections
 
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="siteRepository"></param>
         /// <param name="sightingRelationRepository"></param>
         /// <param name="activities"></param>
         /// <param name="biotopes"></param>
@@ -539,6 +581,7 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="validationStatus"></param>
         /// <param name="units"></param>
         public ArtportalenHarvestFactory(
+            ISiteRepository siteRepository,
             ISightingRelationRepository sightingRelationRepository,
             IEnumerable<MetadataWithCategoryEntity> activities,
             IEnumerable<MetadataEntity> biotopes,
@@ -558,6 +601,7 @@ namespace SOS.Import.Factories.Harvest
             IEnumerable<MetadataEntity> validationStatus,
             IEnumerable<MetadataEntity> units)
         {
+            _siteRepository = siteRepository;
             _sightingRelationRepository = sightingRelationRepository;
             _activities = CastMetdataWithCategoryEntityToVerbatim(activities).ToDictionary(a => a.Id, a => a);
             _biotopes = CastMetdataEntityToVerbatim(biotopes).ToDictionary(b => b.Id, b => b);
@@ -586,7 +630,7 @@ namespace SOS.Import.Factories.Harvest
             // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
             var sightingRelations =
                 CastSightingRelationsToVerbatim(await _sightingRelationRepository.GetAsync(sightingIds)).ToArray();
-            
+
             var personSightings = PersonSightingFactory.CreatePersonSightingDictionary(
                 sightingIds,
                 _personByUserId,
@@ -598,8 +642,10 @@ namespace SOS.Import.Factories.Harvest
             var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, _sightingProjectIds,
                 _projectEntityById, _projectParameterEntities);
 
-            return 
-                from e in entities 
+            await AddMissingSitesAsync(entities);
+
+            return
+                from e in entities
                 select CastEntityToVerbatim(e, personSightings, projectEntityDictionaries);
         }
     }

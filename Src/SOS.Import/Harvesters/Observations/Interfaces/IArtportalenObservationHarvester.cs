@@ -13,6 +13,6 @@ namespace SOS.Import.Harvesters.Observations.Interfaces
         ///     Aggregate sightings.
         /// </summary>
         /// <returns></returns>
-        Task<HarvestInfo> HarvestSightingsAsync(IJobCancellationToken cancellationToken);
+        Task<HarvestInfo> HarvestSightingsAsync(bool incrementalHarvest, IJobCancellationToken cancellationToken);
     }
 }

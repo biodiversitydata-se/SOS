@@ -14,5 +14,12 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<SiteEntity>> GetAsync();
+
+        /// <summary>
+        /// Get sites by id
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        Task<IEnumerable<SiteEntity>> GetByIdsLiveAsync(IEnumerable<int> ids);
     }
 }

@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -20,6 +23,28 @@ namespace SOS.Import.Repositories.Destination.Artportalen
             IImportClient importClient,
             ILogger<SightingVerbatimRepository> logger) : base(importClient, logger)
         {
+        }
+
+        /// <inheritdoc />
+        public async Task<int> GetMaxIdAsync()
+        {
+            try
+            {
+                var res = await MongoCollection
+                    .Find(FilterDefinition<ArtportalenVerbatimObservation>.Empty)
+                    .Project(s => s.Id)
+                    .Limit(1)
+                    .Sort(Builders<ArtportalenVerbatimObservation>.Sort.Descending(s => s.Id))
+                    .FirstOrDefaultAsync();
+
+                return res;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+
+                return default;
+            }
         }
     }
 }

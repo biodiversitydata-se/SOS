@@ -80,7 +80,7 @@ namespace SOS.Observations.Api.Repositories
                         .Filter(query)
                     )
                 )
-                .Sort(s => sortDescriptor)
+                .Sort(sort => sortDescriptor)
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);

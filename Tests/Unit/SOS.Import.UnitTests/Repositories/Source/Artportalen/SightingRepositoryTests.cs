@@ -59,13 +59,13 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         public async Task GetChunkAsyncException()
         {
             _artportalenDataServiceMock
-                .Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>()))
+                .Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>(), false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetChunkAsync(0, 10);
+            var result = await TestObject.GetChunkAsync(0, 10, false);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -87,13 +87,13 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             };
 
             _artportalenDataServiceMock
-                .Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>()))
+                .Setup(spds => spds.QueryAsync<SightingEntity>(It.IsAny<string>(), It.IsAny<object>(), false))
                 .ReturnsAsync(projects);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetChunkAsync(0, 10);
+            var result = await TestObject.GetChunkAsync(0, 10, false);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetIdSpanAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -134,7 +134,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
                 new Tuple<int, int>(1, 2)
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<Tuple<int, int>>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(span);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         public async Task GetProjectIdsAsyncException()
         {
             _artportalenDataServiceMock.Setup(spds =>
-                    spds.QueryAsync<(int SightingId, int ProjectId)>(It.IsAny<string>(), null))
+                    spds.QueryAsync<(int SightingId, int ProjectId)>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -184,7 +184,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             };
 
             _artportalenDataServiceMock.Setup(spds =>
-                    spds.QueryAsync<(int SightingId, int ProjectId)>(It.IsAny<string>(), null))
+                    spds.QueryAsync<(int SightingId, int ProjectId)>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(projectIds);
 
             //-----------------------------------------------------------------------------------------------------------

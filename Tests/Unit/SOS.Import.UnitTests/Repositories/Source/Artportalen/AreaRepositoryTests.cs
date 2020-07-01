@@ -63,7 +63,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
                 new AreaEntity {Id = 2}
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(areas);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -84,7 +84,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetAreasExceptGeometryFieldAsyncxception()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -132,7 +132,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
                 new AreaEntity {Id = 2}
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<AreaEntity>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(areas);
 
             //-----------------------------------------------------------------------------------------------------------

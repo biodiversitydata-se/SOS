@@ -187,12 +187,12 @@ namespace SOS.Administration.Api.Controllers
         [HttpPost("Artportalen/Schedule/Daily")]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailyArtportalenHarvestJob([FromQuery] int hour, [FromQuery] int minute)
+        public IActionResult AddDailyArtportalenHarvestJob([FromQuery] bool incrementalHarvest, [FromQuery] int hour, [FromQuery] int minute)
         {
             try
             {
                 RecurringJob.AddOrUpdate<IArtportalenHarvestJob>(nameof(IArtportalenHarvestJob),
-                    job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                    job => job.RunAsync(incrementalHarvest, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Artportalen harvest job added");
             }
             catch (Exception e)
@@ -206,11 +206,11 @@ namespace SOS.Administration.Api.Controllers
         [HttpPost("Artportalen/Run")]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult RunArtportalenHarvestJob()
+        public IActionResult RunArtportalenHarvestJob(bool incrementalHarvest)
         {
             try
             {
-                BackgroundJob.Enqueue<IArtportalenHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
+                BackgroundJob.Enqueue<IArtportalenHarvestJob>(job => job.RunAsync(incrementalHarvest, JobCancellationToken.Null));
                 return new OkObjectResult("Artportalen harvest job was enqueued to Hangfire.");
             }
             catch (Exception e)

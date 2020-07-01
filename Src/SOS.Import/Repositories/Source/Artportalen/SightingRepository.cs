@@ -117,13 +117,13 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<SightingEntity>> GetChunkAsync(int startId, int maxRows)
+        public async Task<IEnumerable<SightingEntity>> GetChunkAsync(int startId, int maxRows, bool liveData)
         {
             try
             {
-                var query = GetSightingQuery("s.Id BETWEEN @StartId AND @EndId");
+                var query = GetSightingQuery("s.SightingId BETWEEN @StartId AND @EndId");
 
-                return await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1});
+                return await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}, liveData);
             }
             catch (Exception e)
             {
@@ -162,8 +162,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
             {
                 const string query = @"
                 SELECT 
-                    MIN(Id) AS Item1,
-                    MAX(Id) AS Item2
+                    MIN(SightingId) AS Item1,
+                    MAX(SightingId) AS Item2
 		        FROM 
 		            SearchableSightings s";
 
@@ -174,6 +174,27 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 Logger.LogError(e, "Error getting min and max id");
 
                 return null;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<int> GetMaxIdLiveAsync()
+        {
+            try
+            {
+                const string query = @"
+                SELECT 
+                    MAX(SightingId) 
+		        FROM 
+		            SearchableSightings";
+
+                return (await QueryAsync<int>(query, null, true)).FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error live max id");
+
+                return 0;
             }
         }
 

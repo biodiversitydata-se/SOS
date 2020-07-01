@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
@@ -9,26 +10,12 @@ using SOS.Import.Services.Interfaces;
 namespace SOS.Import.Repositories.Source.Artportalen
 {
     /// <summary>
-    ///     Site repository
-    /// </summary>
-    public class SiteRepository : BaseRepository<SiteRepository>, ISiteRepository
+	///     Site repository
+	/// </summary>
+	public class SiteRepository : BaseRepository<SiteRepository>, ISiteRepository
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="artportalenDataService"></param>
-        /// <param name="logger"></param>
-        public SiteRepository(IArtportalenDataService artportalenDataService, ILogger<SiteRepository> logger) : base(
-            artportalenDataService, logger)
-        {
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<SiteEntity>> GetAsync()
-        {
-            try
-            {
-                const string query = @"
+        private string GetSiteQuery(string where = "") =>
+            $@"
                 SELECT 
 	                s.Id,
 	                ISNULL(s.PresentationName, s.Name) AS Name,
@@ -96,9 +83,25 @@ namespace SOS.Import.Repositories.Source.Artportalen
 		                GROUP BY 
 			                sa.SiteId
 	                ) AS sapa ON s.Id = sapa.SiteId  
-	                LEFT JOIN Area apa ON sapa.AreasId = apa.Id";
+	                LEFT JOIN Area apa ON sapa.AreasId = apa.Id
+                    { where }";
 
-                return await QueryAsync<SiteEntity>(query);
+		/// <summary>
+		///     Constructor
+		/// </summary>
+		/// <param name="artportalenDataService"></param>
+		/// <param name="logger"></param>
+		public SiteRepository(IArtportalenDataService artportalenDataService, ILogger<SiteRepository> logger) : base(
+            artportalenDataService, logger)
+        {
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<SiteEntity>> GetAsync()
+        {
+            try
+            {
+                return await QueryAsync<SiteEntity>(GetSiteQuery());
             }
             catch (Exception e)
             {
@@ -106,5 +109,19 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 return null;
             }
         }
-    }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<SiteEntity>> GetByIdsLiveAsync(IEnumerable<int> ids)
+        {
+            try
+            {
+                return await QueryAsync<SiteEntity>(GetSiteQuery(      $"WHERE s.Id IN ({ string.Join(',', ids) })--@siteIds"), null/*new { siteIds = ids }*/, true);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting sites by id");
+                return null;
+            }
+        }
+	}
 }
