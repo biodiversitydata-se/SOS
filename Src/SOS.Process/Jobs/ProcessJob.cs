@@ -12,7 +12,6 @@ using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Managers.Interfaces;
@@ -265,7 +264,7 @@ namespace SOS.Process.Jobs
                 else
                 {
                     _logger.LogInformation("Start ensure collection exists");
-                    // Create ES index ProcessedObservation-{0/1} if it doesn't exist. Empty MongoDB InvalidObservation-{0/1} collection.
+                    // Create ES index ProcessedObservation-{0/1} if it doesn't exist.
                     newCollection = await _processedObservationRepository.VerifyCollectionAsync();
                     _logger.LogInformation("Finish ensure collection exists");
                 }
@@ -273,8 +272,8 @@ namespace SOS.Process.Jobs
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 //--------------------------------------
-                // 6. Make sure invalid observations collection is empty
-                //------------
+                // 6.  Empty MongoDB InvalidObservation-{0/1} collection.
+                //--------------------------------------
                 await _validationManager.VerifyCollectionAsync();
 
                 cancellationToken?.ThrowIfCancellationRequested();
@@ -413,17 +412,6 @@ namespace SOS.Process.Jobs
             finally
             {
                 _dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
-            }
-        }
-
-        private string GetHarvestInfoId(DataProvider dataProvider)
-        {
-            switch (dataProvider.Type)
-            {
-                case DataProviderType.DwcA:
-                    return $"{nameof(DwcObservationVerbatim)}-{dataProvider.Identifier}";
-                default:
-                    return dataProvider.Type.ToString();
             }
         }
     }

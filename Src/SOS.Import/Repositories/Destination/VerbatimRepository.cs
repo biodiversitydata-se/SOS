@@ -67,7 +67,7 @@ namespace SOS.Import.Repositories.Destination
         ///     Get client
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(_collectionName);
+        protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(IncrementalMode ? $"{_collectionName}_incremental" : _collectionName);
 
         /// <inheritdoc />
         public async Task<bool> AddAsync(TEntity item)
@@ -288,6 +288,9 @@ namespace SOS.Import.Repositories.Destination
 
             return res;
         }
+
+        /// <inheritdoc />
+        public bool IncrementalMode { get; set; }
 
         /// <inheritdoc />
         public async Task<bool> UpdateAsync(TKey id, TEntity entity)

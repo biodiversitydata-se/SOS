@@ -149,6 +149,11 @@ namespace SOS.Import.Repositories.Destination.Interfaces
         Task<List<TEntity>> GetAllAsync(IMongoCollection<TEntity> mongoCollection);
 
         /// <summary>
+        /// Set incremental mode
+        /// </summary>
+        bool IncrementalMode { get; set; }
+
+        /// <summary>
         ///     Update entity
         /// </summary>
         /// <param name="id"></param>

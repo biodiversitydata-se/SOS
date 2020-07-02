@@ -8,6 +8,8 @@ using Autofac.Extensions.DependencyInjection;
 using Elasticsearch.Net;
 using Hangfire;
 using Hangfire.Mongo;
+using Hangfire.Mongo.Migration.Strategies;
+using Hangfire.Mongo.Migration.Strategies.Backup;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -97,8 +99,8 @@ namespace SOS.Hangfire.JobServer
                                 {
                                     MigrationOptions = new MongoMigrationOptions
                                     {
-                                        Strategy = MongoMigrationStrategy.Migrate,
-                                        BackupStrategy = MongoBackupStrategy.Collections
+                                        MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                                        BackupStrategy = new CollectionMongoBackupStrategy()
                                     }
                                 })
                     );

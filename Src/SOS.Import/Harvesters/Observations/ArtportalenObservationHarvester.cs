@@ -36,7 +36,6 @@ namespace SOS.Import.Harvesters.Observations
         private readonly ISiteRepository _siteRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private bool _hasAddedTestSightings;
-        private bool _onGoingHarvest;
         private ArtportalenHarvestFactory _harvestFactory;
 
         /// <summary>
@@ -87,7 +86,7 @@ namespace SOS.Import.Harvesters.Observations
                 var verbatimObservations = await _harvestFactory.CastEntitiesToVerbatimsAsync(sightings);
 
                 _logger.LogDebug("Finsih casting entities to verbatim");
-
+                
                 _logger.LogDebug("Start storing batch");
                 // Add sightings to mongodb
                 await _sightingVerbatimRepository.AddManyAsync(verbatimObservations);
@@ -257,17 +256,12 @@ namespace SOS.Import.Harvesters.Observations
             var harvestInfo = new HarvestInfo(nameof(ArtportalenObservationVerbatim),
                 DataProviderType.ArtportalenObservations, DateTime.Now);
 
-            if (_onGoingHarvest)
-            {
-                _logger.LogInformation("Canceling Artportalen harvest. Ongoing harvest.");
-
-                harvestInfo.Status = RunStatus.Canceled;
-                return harvestInfo;
-            }
+            
 
             try
             {
-                _onGoingHarvest = true;
+                // Set observation repository in incremental mode in order to store data in other collection
+                _sightingVerbatimRepository.IncrementalMode = incrementalHarvest;
 
                 if (_harvestFactory == null)
                 {
@@ -403,7 +397,6 @@ namespace SOS.Import.Harvesters.Observations
                 harvestInfo.Status = RunStatus.Failed;
             }
 
-            _onGoingHarvest = false;
             return harvestInfo;
         }
     }

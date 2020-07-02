@@ -9,6 +9,8 @@ using Autofac.Extensions.DependencyInjection;
 using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.Mongo;
+using Hangfire.Mongo.Migration.Strategies;
+using Hangfire.Mongo.Migration.Strategies.Backup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -64,10 +66,11 @@ namespace SOS.Administration.Api
         {
             get
             {
+                
                 var migrationOptions = new MongoMigrationOptions
                 {
-                    Strategy = MongoMigrationStrategy.Migrate,
-                    BackupStrategy = MongoBackupStrategy.Collections
+                    MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                    BackupStrategy = new CollectionMongoBackupStrategy()
                 };
 
                 var storageOptions = new MongoStorageOptions {MigrationOptions = migrationOptions};
@@ -127,8 +130,8 @@ namespace SOS.Administration.Api
                         {
                             MigrationOptions = new MongoMigrationOptions
                             {
-                                Strategy = MongoMigrationStrategy.Migrate,
-                                BackupStrategy = MongoBackupStrategy.Collections
+                                MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                                BackupStrategy = new CollectionMongoBackupStrategy()
                             }
                         })
             );
