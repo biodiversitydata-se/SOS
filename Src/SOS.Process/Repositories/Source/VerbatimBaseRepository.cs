@@ -16,8 +16,6 @@ namespace SOS.Process.Repositories.Source
     public class VerbatimBaseRepository<TEntity, TKey> : IVerbatimBaseRepository<TEntity, TKey>
         where TEntity : IEntity<TKey>
     {
-        private readonly int _batchSize;
-
         private readonly string _collectionName;
 
         protected readonly IVerbatimClient Client;
@@ -56,7 +54,6 @@ namespace SOS.Process.Repositories.Source
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Database = client.GetDatabase();
-            _batchSize = client.ReadBatchSize;
             _collectionName = typeof(TEntity).Name;
         }
 
@@ -64,7 +61,7 @@ namespace SOS.Process.Repositories.Source
         ///     Get client
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(_collectionName);
+        protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(IncrementalMode ? $"{_collectionName}_incremental" : _collectionName);
 
         /// <inheritdoc />
         public async Task<bool> CheckIfCollectionExistsAsync()
@@ -186,6 +183,9 @@ namespace SOS.Process.Repositories.Source
                 return default;
             }
         }
+
+        /// <inheritdoc />
+        public bool IncrementalMode { get; set; }
 
         /// <summary>
         ///     Dispose

@@ -36,6 +36,12 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         Task<bool> DeleteProviderDataAsync(DataProvider dataProvider);
 
         /// <summary>
+        /// Delete observations by occurence id
+        /// </summary>
+        /// <param name="occurenceIds"></param>
+        Task<bool> DeleteByOccurenceIdAsync(IEnumerable<string> occurenceIds);
+
+        /// <summary>
         ///     Create search index
         /// </summary>
         /// <returns></returns>

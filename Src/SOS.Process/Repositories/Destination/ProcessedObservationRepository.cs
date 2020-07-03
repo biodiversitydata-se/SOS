@@ -104,6 +104,31 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
+        /// <inheritdoc />
+        public async Task<bool> DeleteByOccurenceIdAsync(IEnumerable<string> occurenceIds)
+        {
+            try
+            {
+                // Create the collection
+                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q => q
+                    .Index(IndexName)
+                    .Query(q => q
+                        .Terms(t => t
+                            .Field(f => f.Occurrence.OccurrenceId)
+                            .Terms(occurenceIds)
+                        )
+                    )
+                );
+
+                return res.IsValid;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
+        }
+
         public async Task<bool> ClearCollectionAsync()
         {
             await DeleteCollectionAsync();
