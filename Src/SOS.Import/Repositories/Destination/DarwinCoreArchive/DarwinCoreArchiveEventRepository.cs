@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.DarwinCoreArchive.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
@@ -22,7 +22,7 @@ namespace SOS.Import.Repositories.Destination.DarwinCoreArchive
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
         public DarwinCoreArchiveEventRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<DarwinCoreArchiveEventRepository> logger) : base(importClient, logger)
         {
         }

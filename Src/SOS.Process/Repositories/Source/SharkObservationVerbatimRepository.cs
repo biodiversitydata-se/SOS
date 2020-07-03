@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.Shark;
-using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source

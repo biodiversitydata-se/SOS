@@ -1,8 +1,8 @@
 ﻿using Autofac;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
-using SOS.Observations.Api.Database;
-using SOS.Observations.Api.Database.Interfaces;
+using SOS.Lib.Database;
+using SOS.Lib.Database.Interfaces;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories;
@@ -26,10 +26,12 @@ namespace SOS.Observations.Api.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             // Processed Mongo Db
-            var processedDbConfiguration = ObservationApiConfiguration.ProcessedDbConfiguration;
+            var processedDbConfiguration = ObservationApiConfiguration.ProcessDbConfiguration;
             var processedSettings = processedDbConfiguration.GetMongoDbSettings();
-            var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
-                processedDbConfiguration.BatchSize);
+            var processClient = new ProcessClient(processedSettings, 
+                processedDbConfiguration.DatabaseName,
+                processedDbConfiguration.ReadBatchSize,
+                processedDbConfiguration.WriteBatchSize);
             builder.RegisterInstance(processClient).As<IProcessClient>().SingleInstance();
 
             // Add configuration

@@ -22,9 +22,9 @@ using Nest;
 using NLog.Web;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.JsonConverters;
-using SOS.Observations.Api.Database;
-using SOS.Observations.Api.Database.Interfaces;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories;
@@ -183,12 +183,11 @@ namespace SOS.Observations.Api
                     //.DisableDirectStreaming().EnableDebugMode().PrettyJson() // Uncomment this line when debugging ES-query. Req and Resp is in result.DebugInformation in ProcessedObservationRepository.cs.
                 ));
 
-
             // Processed Mongo Db
-            var processedDbConfiguration = observationApiConfiguration.ProcessedDbConfiguration;
+            var processedDbConfiguration = observationApiConfiguration.ProcessDbConfiguration;
             var processedSettings = processedDbConfiguration.GetMongoDbSettings();
             var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
-                processedDbConfiguration.BatchSize);
+                processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
             services.AddSingleton<IProcessClient>(processClient);
 
             // Add configuration

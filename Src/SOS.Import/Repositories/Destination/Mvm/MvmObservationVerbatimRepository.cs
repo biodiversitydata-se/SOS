@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.Mvm.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.Mvm;
 
 namespace SOS.Import.Repositories.Destination.Mvm
@@ -9,7 +9,7 @@ namespace SOS.Import.Repositories.Destination.Mvm
         IMvmObservationVerbatimRepository
     {
         public MvmObservationVerbatimRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<MvmObservationVerbatimRepository> logger) : base(importClient, logger)
         {
         }

@@ -5,10 +5,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Import.Harvesters.Observations;
-using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Kul;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Services;
+using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using Xunit;
 
@@ -32,11 +32,13 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 importConfiguration.KulServiceConfiguration,
                 new NullLogger<KulObservationService>());
 
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var kulObservationVerbatimRepository = new KulObservationVerbatimRepository(
-                new ImportClient(
-                    importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                    importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                    importConfiguration.VerbatimDbConfiguration.BatchSize),
+                new VerbatimClient(
+                    verbatimDbConfiguration.GetMongoDbSettings(),
+                    verbatimDbConfiguration.DatabaseName,
+                    verbatimDbConfiguration.ReadBatchSize,
+                    verbatimDbConfiguration.WriteBatchSize),
                 new Mock<ILogger<KulObservationVerbatimRepository>>().Object);
 
             var kulObservationHarvester = new KulObservationHarvester(

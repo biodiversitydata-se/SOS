@@ -19,6 +19,18 @@ namespace SOS.Process.IntegrationTests
             return processConfiguration;
         }
 
+        protected MongoDbConfiguration GetProcessDbConfiguration()
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .AddUserSecrets<TestBase>()
+                .Build();
+
+            var exportConfiguration = config.GetSection("ApplicationSettings").GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            return exportConfiguration;
+        }
+
         protected ExportConfiguration GetExportConfiguration()
         {
             var config = new ConfigurationBuilder()
@@ -31,6 +43,18 @@ namespace SOS.Process.IntegrationTests
             return exportConfiguration;
         }
 
+        protected MongoDbConfiguration GetVerbatimDbConfiguration()
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .AddUserSecrets<TestBase>()
+                .Build();
+
+            var exportConfiguration = config.GetSection("ApplicationSettings").GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+            return exportConfiguration;
+        }
+
         protected ElasticSearchConfiguration GetElasticConfiguration()
         {
             var config = new ConfigurationBuilder()
@@ -39,7 +63,7 @@ namespace SOS.Process.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var elasticConfiguration = config.GetSection("ProcessConfiguration").GetSection("SearchDbConfiguration")
+            var elasticConfiguration = config.GetSection("ApplicationSettings").GetSection("SearchDbConfiguration")
                 .Get<ElasticSearchConfiguration>();
             return elasticConfiguration;
         }

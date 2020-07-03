@@ -3,9 +3,9 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
 using SOS.Export.Extensions;
-using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database;
 using SOS.Lib.Models.Search;
 using Xunit;
 
@@ -15,12 +15,13 @@ namespace SOS.Export.IntegrationTests.Repositories
     {
         private ProcessedObservationRepository GetProcessedObservationRepository()
         {
-            var exportConfiguration = GetExportConfiguration();
+            var processDbConfiguration = GetProcessDbConfiguration();
             var elasticClient = new ElasticClient();
-            var exportClient = new ExportClient(
-                exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                exportConfiguration.ProcessedDbConfiguration.DatabaseName,
-                exportConfiguration.ProcessedDbConfiguration.BatchSize);
+            var exportClient = new ProcessClient(
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
             var processedObservationRepository =
                 new ProcessedObservationRepository(
                     elasticClient,

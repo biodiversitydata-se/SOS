@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
+using SOS.Lib.Database;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Processors.DarwinCoreArchive;
 using SOS.Process.Repositories.Destination;
@@ -30,11 +30,12 @@ namespace SOS.Process.IntegrationTests.TestHelpers
         {
             var dataProviderDummy = new DataProvider();
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
-            var processConfiguration = GetProcessConfiguration();
+            var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
-                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                processConfiguration.ProcessedDbConfiguration.BatchSize);
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
             var processedFieldMappingRepository =
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
             var areaHelper =
@@ -58,11 +59,13 @@ namespace SOS.Process.IntegrationTests.TestHelpers
 
         private ProcessedTaxonRepository CreateProcessedTaxonRepository()
         {
-            var processConfiguration = GetProcessConfiguration();
+            var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
-                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                processConfiguration.ProcessedDbConfiguration.BatchSize);
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
+
             return new ProcessedTaxonRepository(
                 processClient,
                 new NullLogger<ProcessedTaxonRepository>());

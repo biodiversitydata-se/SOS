@@ -18,16 +18,6 @@ namespace SOS.Lib.Configuration.Process
         public int NoOfThreads { get; set; }
 
         /// <summary>
-        ///     Host
-        /// </summary>
-        public MongoDbConfiguration VerbatimDbConfiguration { get; set; }
-
-        /// <summary>
-        ///     Host
-        /// </summary>
-        public MongoDbConfiguration ProcessedDbConfiguration { get; set; }
-
-        /// <summary>
         ///     Field mapping
         /// </summary>
         public FieldMappingConfiguration FieldMapping { get; set; }

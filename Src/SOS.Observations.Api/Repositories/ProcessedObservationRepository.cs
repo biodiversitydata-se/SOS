@@ -7,11 +7,11 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
-using SOS.Observations.Api.Database.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Repositories

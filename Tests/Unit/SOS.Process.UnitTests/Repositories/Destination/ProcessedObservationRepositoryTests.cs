@@ -4,9 +4,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Nest;
 using SOS.Lib.Configuration.Shared;
-using SOS.Process.Database.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Process.Repositories.Destination;
-using SOS.Process.Repositories.Destination.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Repositories.Destination

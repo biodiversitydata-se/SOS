@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Interfaces;
-using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source
@@ -56,7 +56,7 @@ namespace SOS.Process.Repositories.Source
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Database = client.GetDatabase();
-            _batchSize = client.BatchSize;
+            _batchSize = client.ReadBatchSize;
             _collectionName = typeof(TEntity).Name;
         }
 

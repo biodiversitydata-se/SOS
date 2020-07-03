@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Process.Database.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Process.Repositories.Source;
 using Xunit;
 

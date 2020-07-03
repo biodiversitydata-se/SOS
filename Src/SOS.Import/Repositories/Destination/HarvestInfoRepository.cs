@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Repositories.Destination
@@ -13,7 +13,7 @@ namespace SOS.Import.Repositories.Destination
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
         public HarvestInfoRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<HarvestInfoRepository> logger) : base(importClient, logger)
         {
         }

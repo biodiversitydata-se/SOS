@@ -23,11 +23,6 @@ namespace SOS.Lib.Configuration.Export
         public DwcaFilesCreationConfiguration DwcaFilesCreationConfiguration { get; set; }
 
         /// <summary>
-        ///     Host
-        /// </summary>
-        public MongoDbConfiguration ProcessedDbConfiguration { get; set; }
-
-        /// <summary>
         ///     Zend to config
         /// </summary>
         public ZendToConfiguration ZendToConfiguration { get; set; }

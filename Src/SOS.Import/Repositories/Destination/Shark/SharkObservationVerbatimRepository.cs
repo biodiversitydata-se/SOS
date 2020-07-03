@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.Shark.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.Shark;
 
 namespace SOS.Import.Repositories.Destination.Shark
@@ -10,7 +10,7 @@ namespace SOS.Import.Repositories.Destination.Shark
         ISharkObservationVerbatimRepository
     {
         public SharkObservationVerbatimRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<SharkObservationVerbatimRepository> logger) : base(importClient, logger)
         {
         }

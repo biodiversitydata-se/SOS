@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Repositories.Destination.Artportalen
@@ -20,7 +20,7 @@ namespace SOS.Import.Repositories.Destination.Artportalen
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
         public SightingVerbatimRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<SightingVerbatimRepository> logger) : base(importClient, logger)
         {
         }

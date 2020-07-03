@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Import.Harvesters.Interfaces;
 using SOS.Lib.Enums;
-using SOS.Process.Helpers.Interfaces;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -19,7 +18,6 @@ namespace SOS.Administration.Api.Controllers
     [Route("[controller]")]
     public class DictionaryController : ControllerBase, IFieldMappingController
     {
-        private readonly IFieldMappingDiffHelper _fieldMappingDiffHelper;
         private readonly IFieldMappingHarvester _fieldMappingHarvester;
         private readonly ILogger<DictionaryController> _logger;
 
@@ -31,13 +29,11 @@ namespace SOS.Administration.Api.Controllers
         /// <param name="logger"></param>
         public DictionaryController(
             IFieldMappingHarvester fieldMappingHarvester,
-            IFieldMappingDiffHelper fieldMappingDiffHelper,
+        
             ILogger<DictionaryController> logger)
         {
             _fieldMappingHarvester =
                 fieldMappingHarvester ?? throw new ArgumentNullException(nameof(fieldMappingHarvester));
-            _fieldMappingDiffHelper =
-                fieldMappingDiffHelper ?? throw new ArgumentNullException(nameof(fieldMappingDiffHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

@@ -3,9 +3,9 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Nest;
-using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database.Interfaces;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Repositories
@@ -18,13 +18,13 @@ namespace SOS.Export.UnitTests.Repositories
         public ProcessedObservationRepositoryTests()
         {
             _elasticClient = new Mock<IElasticClient>();
-            _exportClient = new Mock<IExportClient>();
+            _exportClient = new Mock<IProcessClient>();
             _elasticSearchConfiguration = new ElasticSearchConfiguration();
             _loggerMock = new Mock<ILogger<ProcessedObservationRepository>>();
         }
 
         private readonly Mock<IElasticClient> _elasticClient;
-        private readonly Mock<IExportClient> _exportClient;
+        private readonly Mock<IProcessClient> _exportClient;
         private readonly ElasticSearchConfiguration _elasticSearchConfiguration;
         private readonly Mock<ILogger<ProcessedObservationRepository>> _loggerMock;
 

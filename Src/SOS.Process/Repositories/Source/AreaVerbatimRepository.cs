@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.GridFS;
 using NetTopologySuite.Geometries;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source

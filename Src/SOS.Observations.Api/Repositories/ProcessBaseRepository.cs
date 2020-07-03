@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Observations.Api.Database.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Repositories
@@ -51,7 +51,7 @@ namespace SOS.Observations.Api.Repositories
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _multipleInstances = multipleInstances;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            BatchSize = _client.BatchSize;
+            BatchSize = _client.ReadBatchSize;
             Database = _client.GetDatabase();
         }
 

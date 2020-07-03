@@ -6,7 +6,7 @@ namespace SOS.Lib.Configuration.ObservationApi
     {
         public BlobStorageConfiguration BlobStorageConfiguration { get; set; }
 
-        public MongoDbConfiguration ProcessedDbConfiguration { get; set; }
+        public MongoDbConfiguration ProcessDbConfiguration { get; set; }
 
         public HangfireDbConfiguration HangfireDbConfiguration { get; set; }
 

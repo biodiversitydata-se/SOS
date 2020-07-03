@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Export.Repositories
@@ -19,7 +19,7 @@ namespace SOS.Export.Repositories
         /// <param name="mongoDbConfiguration"></param>
         /// <param name="logger"></param>
         public ProcessedTaxonRepository(
-            IExportClient exportClient,
+            IProcessClient exportClient,
             ILogger<ProcessedTaxonRepository> logger) : base(exportClient, false, logger)
         {
         }

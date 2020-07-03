@@ -11,15 +11,14 @@ using Moq;
 using Nest;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Managers;
-using SOS.Export.MongoDb;
 using SOS.Export.Services;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Managers;
 using SOS.Process.Processors.DarwinCoreArchive;
@@ -118,14 +117,19 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             }
 
             var elasticClient = new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris)));
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var verbatimClient = new VerbatimClient(
-                processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.VerbatimDbConfiguration.DatabaseName,
-                processConfiguration.VerbatimDbConfiguration.BatchSize);
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
+
+            var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
-                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                processConfiguration.ProcessedDbConfiguration.BatchSize);
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
             var dwcaVerbatimRepository = new DwcaVerbatimRepository(
                 verbatimClient,
                 new NullLogger<DwcaVerbatimRepository>());
@@ -161,11 +165,12 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
         private DwcArchiveFileWriterCoordinator CreateDwcArchiveFileWriterCoordinator()
         {
-            var processConfiguration = GetProcessConfiguration();
-            var exportClient = new ExportClient(
-                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                processConfiguration.ProcessedDbConfiguration.BatchSize);
+            var processDbConfiguration = GetProcessDbConfiguration();
+            var exportClient = new ProcessClient(
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
 
             var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
@@ -199,11 +204,13 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
         private ProcessedTaxonRepository CreateProcessedTaxonRepository()
         {
-            var processConfiguration = GetProcessConfiguration();
+            var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
-                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                processConfiguration.ProcessedDbConfiguration.BatchSize);
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
+
             return new ProcessedTaxonRepository(
                 processClient,
                 new NullLogger<ProcessedTaxonRepository>());

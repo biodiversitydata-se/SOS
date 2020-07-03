@@ -7,10 +7,10 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Import.DarwinCore;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Database;
 using SOS.Process.Helpers;
 using SOS.Process.IntegrationTests.TestHelpers;
 using SOS.Process.Repositories.Destination;
@@ -30,11 +30,13 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
         private FieldMappingResolverHelper CreateFieldMappingResolverHelper()
         {
-            var processConfiguration = GetProcessConfiguration();
+            var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
-                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                processConfiguration.ProcessedDbConfiguration.BatchSize);
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
+
             var processedFieldMappingRepository =
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
             return new FieldMappingResolverHelper(processedFieldMappingRepository,

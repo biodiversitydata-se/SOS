@@ -1,5 +1,9 @@
-﻿using System.Text;
+﻿using System;
+using System.Linq;
+using System.Text;
 using Autofac;
+using Elasticsearch.Net;
+using Nest;
 using SOS.Import.DarwinCore;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Import.Factories.FieldMapping;
@@ -10,8 +14,6 @@ using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Jobs;
 using SOS.Import.Managers;
 using SOS.Import.Managers.Interfaces;
-using SOS.Import.MongoDb;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination;
 using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
@@ -45,74 +47,67 @@ using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Jobs.Import;
 
 namespace SOS.Import.IoC.Modules
 {
     public class ImportModule : Module
     {
-        public ImportConfiguration Configuration { get; set; }
+        public (ImportConfiguration ImportConfiguration, 
+            MongoDbConfiguration VerbatimDbConfiguration, 
+            MongoDbConfiguration ProcessDbConfiguration) Configurations { get; set; }
 
         protected override void Load(ContainerBuilder builder)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
+            
             // Add configuration
-            if (Configuration.ArtportalenConfiguration != null)
-                builder.RegisterInstance(Configuration.ArtportalenConfiguration).As<ArtportalenConfiguration>()
+            if (Configurations.ImportConfiguration.ArtportalenConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.ArtportalenConfiguration).As<ArtportalenConfiguration>()
                     .SingleInstance();
-            if (Configuration.ClamServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.ClamServiceConfiguration).As<ClamServiceConfiguration>()
+            if (Configurations.ImportConfiguration.ClamServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.ClamServiceConfiguration).As<ClamServiceConfiguration>()
                     .SingleInstance();
-            if (Configuration.FishDataServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.FishDataServiceConfiguration).As<FishDataServiceConfiguration>()
+            if (Configurations.ImportConfiguration.FishDataServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.FishDataServiceConfiguration).As<FishDataServiceConfiguration>()
                     .SingleInstance();
-            if (Configuration.KulServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.KulServiceConfiguration).As<KulServiceConfiguration>()
+            if (Configurations.ImportConfiguration.KulServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.KulServiceConfiguration).As<KulServiceConfiguration>()
                     .SingleInstance();
-            if (Configuration.MvmServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.MvmServiceConfiguration).As<MvmServiceConfiguration>()
+            if (Configurations.ImportConfiguration.MvmServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.MvmServiceConfiguration).As<MvmServiceConfiguration>()
                     .SingleInstance();
-            if (Configuration.NorsServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.NorsServiceConfiguration).As<NorsServiceConfiguration>()
+            if (Configurations.ImportConfiguration.NorsServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.NorsServiceConfiguration).As<NorsServiceConfiguration>()
                     .SingleInstance();
-            if (Configuration.SersServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.SersServiceConfiguration).As<SersServiceConfiguration>()
+            if (Configurations.ImportConfiguration.SersServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.SersServiceConfiguration).As<SersServiceConfiguration>()
                     .SingleInstance();
-            if (Configuration.SharkServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.SharkServiceConfiguration).As<SharkServiceConfiguration>()
+            if (Configurations.ImportConfiguration.SharkServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.SharkServiceConfiguration).As<SharkServiceConfiguration>()
                     .SingleInstance();
-            if (Configuration.TaxonAttributeServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.TaxonAttributeServiceConfiguration)
+            if (Configurations.ImportConfiguration.TaxonAttributeServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.TaxonAttributeServiceConfiguration)
                     .As<TaxonAttributeServiceConfiguration>().SingleInstance();
-            if (Configuration.TaxonServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.TaxonServiceConfiguration).As<TaxonServiceConfiguration>()
+            if (Configurations.ImportConfiguration.TaxonServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.TaxonServiceConfiguration).As<TaxonServiceConfiguration>()
                     .SingleInstance();
-            if (Configuration.VirtualHerbariumServiceConfiguration != null)
-                builder.RegisterInstance(Configuration.VirtualHerbariumServiceConfiguration)
+            if (Configurations.ImportConfiguration.VirtualHerbariumServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.VirtualHerbariumServiceConfiguration)
                     .As<VirtualHerbariumServiceConfiguration>().SingleInstance();
 
-            // Init verbatim mongodb
-            if (Configuration.VerbatimDbConfiguration != null)
-            {
-                var importSettings = Configuration.VerbatimDbConfiguration.GetMongoDbSettings();
-                var importClient = new ImportClient(
-                    importSettings,
-                    Configuration.VerbatimDbConfiguration.DatabaseName,
-                    Configuration.VerbatimDbConfiguration.BatchSize);
-                builder.RegisterInstance(importClient).As<IImportClient>().SingleInstance();
-            }
+            // Vebatim Mongo Db
+            var verbatimSettings = Configurations.VerbatimDbConfiguration.GetMongoDbSettings();
+            builder.RegisterInstance<IVerbatimClient>(new VerbatimClient(verbatimSettings, Configurations.VerbatimDbConfiguration.DatabaseName,
+                Configurations.VerbatimDbConfiguration.ReadBatchSize, Configurations.VerbatimDbConfiguration.WriteBatchSize)).SingleInstance();
 
-            // Init resource mongodb
-            if (Configuration.ResourceDbConfiguration != null)
-            {
-                var resourceDbSettings = Configuration.ResourceDbConfiguration.GetMongoDbSettings();
-                var resourceDbClient = new ResourceDbClient(
-                    resourceDbSettings,
-                    Configuration.ResourceDbConfiguration.DatabaseName,
-                    Configuration.ResourceDbConfiguration.BatchSize);
-                builder.RegisterInstance(resourceDbClient).As<IResourceDbClient>().SingleInstance();
-            }
+            // Processed Mongo Db
+            var processedSettings = Configurations.ProcessDbConfiguration.GetMongoDbSettings();
+            builder.RegisterInstance<IProcessClient>(new ProcessClient(processedSettings, Configurations.ProcessDbConfiguration.DatabaseName,
+                Configurations.ProcessDbConfiguration.ReadBatchSize, Configurations.ProcessDbConfiguration.WriteBatchSize)).SingleInstance();
 
             // Darwin Core
             builder.RegisterType<DwcArchiveReader>().As<IDwcArchiveReader>().InstancePerLifetimeScope();
@@ -141,7 +136,6 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>().InstancePerLifetimeScope();
             builder.RegisterType<FishDataObservationVerbatimRepository>().As<IFishDataObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
@@ -162,6 +156,8 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>()
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
 
+            // Repositories resource
+            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();
 
             // Add harvesters
             builder.RegisterType<AreaHarvester>().As<IAreaHarvester>().InstancePerLifetimeScope();

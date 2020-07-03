@@ -7,8 +7,8 @@ using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
-using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Taxon;
+using SOS.Lib.Database;
 using SOS.Lib.Extensions;
 using SOS.TestHelpers.JsonConverters;
 using Xunit;
@@ -27,11 +27,12 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // 1. Remember to first remove JsonIgnore on properties in DarwinCoreTaxon class.
             const string filePath = @"c:\temp\AllBasicTaxa.msgpck";
             const int batchSize = 500000; // Get all taxa
-            var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                batchSize);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
 
             var taxonVerbatimRepository =
                 new TaxonVerbatimRepository(importClient, new NullLogger<TaxonVerbatimRepository>());
@@ -58,12 +59,12 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // 1. Remember to first remove JsonIgnore on properties in DarwinCoreTaxon class.
             const string filePath = @"c:\temp\AllTaxa.json";
-            const int batchSize = 500000; // Get all taxa
-            var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                batchSize);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
 
             var taxonVerbatimRepository =
                 new TaxonVerbatimRepository(importClient, new NullLogger<TaxonVerbatimRepository>());
@@ -91,10 +92,12 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             const string filePath = @"c:\temp\AllTaxa.msgpck";
             const int batchSize = 500000; // Get all taxa
             var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                batchSize);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
 
             var taxonVerbatimRepository =
                 new TaxonVerbatimRepository(importClient, new NullLogger<TaxonVerbatimRepository>());

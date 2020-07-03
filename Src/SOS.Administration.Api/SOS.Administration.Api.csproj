@@ -41,7 +41,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="2.8.2" />
     <PackageReference Include="HangFire" Version="1.7.11" />

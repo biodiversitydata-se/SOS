@@ -2,8 +2,8 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories;
+using SOS.Lib.Database.Interfaces;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Repositories
@@ -15,11 +15,11 @@ namespace SOS.Export.UnitTests.Repositories
         /// </summary>
         public ProcessInfoRepositoryTests()
         {
-            _exportClient = new Mock<IExportClient>();
+            _exportClient = new Mock<IProcessClient>();
             _loggerMock = new Mock<ILogger<ProcessInfoRepository>>();
         }
 
-        private readonly Mock<IExportClient> _exportClient;
+        private readonly Mock<IProcessClient> _exportClient;
         private readonly Mock<ILogger<ProcessInfoRepository>> _loggerMock;
 
         private ProcessInfoRepository TestObject => new ProcessInfoRepository(

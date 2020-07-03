@@ -10,8 +10,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using OfficeOpenXml;
 using SOS.Import.DarwinCore;
 using SOS.Import.Harvesters.Observations;
-using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.DarwinCoreArchive;
+using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Models.Verbatim.DarwinCore;
@@ -31,11 +31,12 @@ namespace SOS.Import.IntegrationTests.TestDataTools
 
         private DarwinCoreArchiveVerbatimRepository CreateArchiveVerbatimRepository()
         {
-            var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                importConfiguration.VerbatimDbConfiguration.BatchSize);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
             var repository =
                 new DarwinCoreArchiveVerbatimRepository(importClient,
                     new NullLogger<DarwinCoreArchiveVerbatimRepository>());
@@ -45,11 +46,12 @@ namespace SOS.Import.IntegrationTests.TestDataTools
 
         private DwcObservationHarvester CreateDwcObservationHarvester()
         {
-            var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                importConfiguration.VerbatimDbConfiguration.BatchSize);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
             var dwcObservationHarvester = new DwcObservationHarvester(
                 new DarwinCoreArchiveVerbatimRepository(importClient,
                     new NullLogger<DarwinCoreArchiveVerbatimRepository>()),

@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
@@ -23,7 +23,7 @@ namespace SOS.Export.Repositories
         /// <param name="exportClient"></param>
         /// <param name="logger"></param>
         public ProcessedFieldMappingRepository(
-            IExportClient exportClient,
+            IProcessClient exportClient,
             ILogger<ProcessedFieldMappingRepository> logger) : base(exportClient, false, logger)
         {
         }

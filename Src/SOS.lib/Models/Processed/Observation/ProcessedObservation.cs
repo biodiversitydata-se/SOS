@@ -325,6 +325,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public string ConfirmedBy { get; set; }
         public int? ConfirmationYear { get; set; }
 
+        /// <summary>
+        /// Verbatim numeric id if applicable
+        /// </summary>
+        public int VerbatimId { get; set; }
+
         #endregion Record level
 
         //public string VerbatimObservation { get; set; } // todo - this could be used to store the orginal verbatim observation.

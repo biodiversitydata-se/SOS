@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 
@@ -43,7 +43,7 @@ namespace SOS.Import.Repositories.Destination
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
         protected VerbatimRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<VerbatimRepository<TEntity, TKey>> logger
         )
         {
@@ -57,7 +57,7 @@ namespace SOS.Import.Repositories.Destination
 
             Database = importClient.GetDatabase();
 
-            _batchSize = importClient.BatchSize;
+            _batchSize = importClient.WriteBatchSize;
 
             // Clean name from non alfa numeric chats
             _collectionName = typeof(TEntity).Name.UntilNonAlfanumeric();

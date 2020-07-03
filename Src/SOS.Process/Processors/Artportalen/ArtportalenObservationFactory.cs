@@ -217,8 +217,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.SightingTypeId = verbatimObservation.SightingTypeId;
                 obs.Occurrence.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
 
-               
-                
                 // Taxon
                 obs.Taxon = taxon;
 

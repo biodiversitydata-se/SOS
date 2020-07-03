@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -61,7 +62,7 @@ namespace SOS.Import.Jobs
             await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult);
 
             // return result of all imports
-            return harvestInfoResult.Status.Equals(RunStatus.Success)
+            return new [] { RunStatus.Success, RunStatus.Canceled }.Contains(harvestInfoResult.Status) 
                 ? true
                 : throw new Exception("Artportalen Harvest Job failed");
         }

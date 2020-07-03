@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Repositories.Destination

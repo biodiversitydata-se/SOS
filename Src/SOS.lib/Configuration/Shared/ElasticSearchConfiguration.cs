@@ -6,9 +6,14 @@
     public class ElasticSearchConfiguration
     {
         /// <summary>
-        ///     Batch size when scrolling
+        ///     How many items to read in a time when scrolling
         /// </summary>
-        public int BatchSize { get; set; }
+        public int ReadBatchSize { get; set; }
+
+        /// <summary>
+        ///     How many items to write in a time
+        /// </summary>
+        public int WriteBatchSize { get; set; }
 
         /// <summary>
         ///     Host

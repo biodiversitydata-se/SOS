@@ -10,6 +10,7 @@ using NLog.Web;
 using SOS.Import.IoC.Modules;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Configuration.Shared;
 using SOS.Process.IoC.Modules;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
@@ -19,8 +20,9 @@ namespace SOS.Administration.Api
     /// </summary>
     public class Program
     {
+        private static MongoDbConfiguration _verbatimDbConfiguration;
         private static ImportConfiguration _importConfiguration;
-        private static ProcessConfiguration _processConfiguration;
+        private static MongoDbConfiguration _processDbConfiguration;
 
         /// <summary>
         ///     Main
@@ -67,15 +69,17 @@ namespace SOS.Administration.Api
                 })
                 .UseServiceProviderFactory(hostContext =>
                     {
-                        _importConfiguration = hostContext.Configuration.GetSection(typeof(ImportConfiguration).Name)
-                            .Get<ImportConfiguration>();
-                        _processConfiguration = hostContext.Configuration.GetSection(typeof(ProcessConfiguration).Name)
-                            .Get<ProcessConfiguration>();
+                        _verbatimDbConfiguration = hostContext.Configuration.GetSection("ApplicationSettings")
+                            .GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+                        _processDbConfiguration = hostContext.Configuration.GetSection("ApplicationSettings")
+                            .GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+                        _importConfiguration = hostContext.Configuration.GetSection("ApplicationSettings")
+                            .GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
 
                         return new AutofacServiceProviderFactory(builder =>
                             builder
-                                .RegisterModule(new ImportModule {Configuration = _importConfiguration})
-                                .RegisterModule(new ProcessModule {Configuration = _processConfiguration})
+                                .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
+                                .RegisterModule(new ProcessModule { Configurations = (new ProcessConfiguration(), _verbatimDbConfiguration, _processDbConfiguration) })
                         );
                     }
                 )

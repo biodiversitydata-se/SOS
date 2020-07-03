@@ -2,7 +2,7 @@ using System;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.MongoDb.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Import.Repositories.Destination.FieldMappings;
 using Xunit;
 
@@ -18,11 +18,11 @@ namespace SOS.Import.UnitTests.Repositories.Destination.FieldMappings
         /// </summary>
         public FieldMappingRepositoryTests()
         {
-            _importClient = new Mock<IImportClient>();
+            _importClient = new Mock<IVerbatimClient>();
             _loggerMock = new Mock<ILogger<FieldMappingRepository>>();
         }
 
-        private readonly Mock<IImportClient> _importClient;
+        private readonly Mock<IVerbatimClient> _importClient;
         private readonly Mock<ILogger<FieldMappingRepository>> _loggerMock;
 
         private FieldMappingRepository TestObject => new FieldMappingRepository(

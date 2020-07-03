@@ -13,7 +13,7 @@ namespace SOS.Observations.Api.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var mongoDbConfiguration = config.GetSection("ProcessedDbConfiguration").Get<MongoDbConfiguration>();
+            var mongoDbConfiguration = config.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
             return mongoDbConfiguration;
         }
     }

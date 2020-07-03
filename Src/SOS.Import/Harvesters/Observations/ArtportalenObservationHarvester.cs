@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 
 namespace SOS.Import.Harvesters.Observations
 {
@@ -256,13 +257,9 @@ namespace SOS.Import.Harvesters.Observations
             var harvestInfo = new HarvestInfo(nameof(ArtportalenObservationVerbatim),
                 DataProviderType.ArtportalenObservations, DateTime.Now);
 
-            
-
             try
             {
-                // Set observation repository in incremental mode in order to store data in other collection
-                _sightingVerbatimRepository.IncrementalMode = incrementalHarvest;
-
+                
                 if (_harvestFactory == null)
                 {
                     var activities = await GetActivitiesAsync();
@@ -316,12 +313,17 @@ namespace SOS.Import.Harvesters.Observations
 
                 // Get source min and max id
                 int minId, maxId;
-  
+
+               
                 if (incrementalHarvest)
                 {
+                    // Make sure incremental mode is false to get max id from last full harvest
+                    _sightingVerbatimRepository.IncrementalMode = false;
+
                     // We start from last harvested sighting and end at latest added sighting (live data)
                     minId = await _sightingVerbatimRepository.GetMaxIdAsync() + 1;
                     maxId = await _sightingRepository.GetMaxIdLiveAsync();
+            
                     // Check if number of sightings to harvest exceeds live harvest limit
                     if (maxId - minId > _artportalenConfiguration.CatchUpLimit)
                     {
@@ -334,6 +336,9 @@ namespace SOS.Import.Harvesters.Observations
                 {
                     (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
                 }
+
+                // Set observation repository in incremental mode in order to store data in other collection
+                _sightingVerbatimRepository.IncrementalMode = incrementalHarvest;
 
                 var nrSightingsHarvested = 0;
 

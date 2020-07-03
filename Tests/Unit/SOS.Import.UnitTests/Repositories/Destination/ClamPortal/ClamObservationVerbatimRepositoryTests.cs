@@ -2,8 +2,8 @@ using System;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.ClamPortal;
+using SOS.Lib.Database.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Destination.ClamPortal
@@ -18,11 +18,11 @@ namespace SOS.Import.UnitTests.Repositories.Destination.ClamPortal
         /// </summary>
         public ClamObservationVerbatimRepositoryTests()
         {
-            _importClient = new Mock<IImportClient>();
+            _importClient = new Mock<IVerbatimClient>();
             _loggerMock = new Mock<ILogger<ClamObservationVerbatimRepository>>();
         }
 
-        private readonly Mock<IImportClient> _importClient;
+        private readonly Mock<IVerbatimClient> _importClient;
         private readonly Mock<ILogger<ClamObservationVerbatimRepository>> _loggerMock;
 
         private ClamObservationVerbatimRepository TestObject => new ClamObservationVerbatimRepository(

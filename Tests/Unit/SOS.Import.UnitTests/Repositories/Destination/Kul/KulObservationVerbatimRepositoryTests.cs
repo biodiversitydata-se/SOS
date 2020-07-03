@@ -2,7 +2,7 @@ using System;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.MongoDb.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Import.Repositories.Destination.Kul;
 using Xunit;
 
@@ -18,11 +18,11 @@ namespace SOS.Import.UnitTests.Repositories.Destination.Kul
         /// </summary>
         public KulObservationVerbatimRepositoryTests()
         {
-            _importClient = new Mock<IImportClient>();
+            _importClient = new Mock<IVerbatimClient>();
             _loggerMock = new Mock<ILogger<KulObservationVerbatimRepository>>();
         }
 
-        private readonly Mock<IImportClient> _importClient;
+        private readonly Mock<IVerbatimClient> _importClient;
         private readonly Mock<ILogger<KulObservationVerbatimRepository>> _loggerMock;
 
         private KulObservationVerbatimRepository TestObject => new KulObservationVerbatimRepository(
