@@ -336,6 +336,16 @@ namespace SOS.Observations.Api.Repositories
                     );
                 }
 
+                if (internalFilter.LifeStageIds?.Any() ?? false)
+                {
+                    queryInternal.Add(q => q
+                        .Terms(t => t
+                            .Field("occurrence.lifeStage.id")
+                            .Terms(internalFilter.LifeStageIds)
+                        )
+                    );
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q

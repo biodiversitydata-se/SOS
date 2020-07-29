@@ -36,5 +36,7 @@ namespace SOS.Lib.Models.Search
         public List<int> Months { get; set; }
 
         public List<int> DiscoveryMethodIds { get; set; }
+
+        public List<int> LifeStageIds { get; set; }
     }
 }
