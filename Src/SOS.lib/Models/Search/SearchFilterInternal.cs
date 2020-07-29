@@ -34,5 +34,7 @@ namespace SOS.Lib.Models.Search
         public int? MaxAccuracy { get; set; }
         public bool UsePeriodForAllYears { get; set; }
         public List<int> Months { get; set; }
+
+        public List<int> DiscoveryMethodIds { get; set; }
     }
 }

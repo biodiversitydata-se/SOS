@@ -326,6 +326,16 @@ namespace SOS.Observations.Api.Repositories
                     );
                 }
 
+                if (internalFilter.DiscoveryMethodIds?.Any() ?? false)
+                {
+                    queryInternal.Add(q => q
+                        .Terms(t => t
+                            .Field("occurrence.discoveryMethod.id")
+                            .Terms(internalFilter.DiscoveryMethodIds)
+                        )
+                    );
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
