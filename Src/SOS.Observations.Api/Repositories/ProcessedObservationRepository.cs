@@ -356,6 +356,22 @@ namespace SOS.Observations.Api.Repositories
                     );
                 }
 
+                if (internalFilter.HasTriggerdValidationRule)
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("hasTriggeredValidationRules")
+                            .Value(true)));
+                }
+
+                if (internalFilter.HasTriggerdValidationRuleWithWarning)
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("hasAnyTriggeredValidationRuleWithWarning")
+                            .Value(true)));
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q

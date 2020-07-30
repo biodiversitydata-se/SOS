@@ -40,5 +40,8 @@ namespace SOS.Lib.Models.Search
         public List<int> LifeStageIds { get; set; }
 
         public List<int> ActivityIds { get; set; }
+
+        public bool HasTriggerdValidationRule { get; set; }
+        public bool HasTriggerdValidationRuleWithWarning { get; set; }
     }
 }
