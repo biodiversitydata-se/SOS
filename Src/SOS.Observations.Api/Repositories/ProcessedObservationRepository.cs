@@ -346,6 +346,16 @@ namespace SOS.Observations.Api.Repositories
                     );
                 }
 
+                if (internalFilter.ActivityIds?.Any() ?? false)
+                {
+                    queryInternal.Add(q=>q
+                        .Terms(t=>t
+                            .Field("occurrence.activity.id")
+                            .Terms(internalFilter.ActivityIds)
+                        )
+                    );
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q

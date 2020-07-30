@@ -38,5 +38,7 @@ namespace SOS.Lib.Models.Search
         public List<int> DiscoveryMethodIds { get; set; }
 
         public List<int> LifeStageIds { get; set; }
+
+        public List<int> ActivityIds { get; set; }
     }
 }
