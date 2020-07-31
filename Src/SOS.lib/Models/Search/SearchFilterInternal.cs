@@ -43,5 +43,10 @@ namespace SOS.Lib.Models.Search
 
         public bool HasTriggerdValidationRule { get; set; }
         public bool HasTriggerdValidationRuleWithWarning { get; set; }
+
+        public int? Length { get; set; }
+        public string LengthOperator { get; set; }
+        public int? Weight { get; set; }
+        public string WeightOperator { get; set; }
     }
 }

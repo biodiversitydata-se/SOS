@@ -372,6 +372,68 @@ namespace SOS.Observations.Api.Repositories
                             .Value(true)));
                 }
 
+                if (internalFilter.Length.HasValue && !string.IsNullOrWhiteSpace(internalFilter.LengthOperator))
+                {
+                    switch (internalFilter.LengthOperator.ToLower())
+                    {
+                        case "eq":
+                            queryInternal.Add(q => q
+                                .Term(r => r
+                                    .Field("occurrence.length")
+                                    .Value(internalFilter.Length.Value)
+                                )
+                            );
+                            break;
+                        case "gte":
+                            queryInternal.Add(q => q
+                                .Range(r => r
+                                    .Field("occurrence.length")
+                                    .GreaterThanOrEquals(internalFilter.Length.Value)
+                                )
+                            );
+                            break;
+                        case "lte":
+                            queryInternal.Add(q => q
+                                .Range(r => r
+                                    .Field("occurrence.length")
+                                    .LessThanOrEquals(internalFilter.Length.Value)
+                                )
+                            );
+                            break;
+                    }
+                }
+
+                if (internalFilter.Weight.HasValue && !string.IsNullOrWhiteSpace(internalFilter.WeightOperator))
+                {
+                    switch (internalFilter.WeightOperator.ToLower())
+                    {
+                        case "eq":
+                            queryInternal.Add(q => q
+                                .Term(r => r
+                                    .Field("occurrence.weight")
+                                    .Value(internalFilter.Weight.Value)
+                                )
+                            );
+                            break;
+                        case "gte":
+                            queryInternal.Add(q => q
+                                .Range(r => r
+                                    .Field("occurrence.weight")
+                                    .GreaterThanOrEquals(internalFilter.Weight.Value)
+                                )
+                            );
+                            break;
+                        case "lte":
+                            queryInternal.Add(q => q
+                                .Range(r => r
+                                    .Field("occurrence.weight")
+                                    .LessThanOrEquals(internalFilter.Weight.Value)
+                                )
+                            );
+                            break;
+                    }
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
