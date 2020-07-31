@@ -233,6 +233,37 @@ namespace SOS.Observations.Api.Repositories
                     }
                 }
 
+                if (internalFilter.Quantity.HasValue && !string.IsNullOrWhiteSpace(internalFilter.QuantityOperator))
+                {
+                    switch (internalFilter.QuantityOperator.ToLower())
+                    {
+                        case "eq":
+                            queryInternal.Add(q => q
+                                .Term(r => r
+                                    .Field("occurrence.organismQuantityInt")
+                                    .Value(internalFilter.Quantity.Value)
+                                )
+                            );
+                            break;
+                        case "gte":
+                            queryInternal.Add(q => q
+                                .Range(r => r
+                                    .Field("occurrence.organismQuantityInt")
+                                    .GreaterThanOrEquals(internalFilter.Quantity.Value)
+                                )
+                            );
+                            break;
+                        case "lte":
+                            queryInternal.Add(q => q
+                                .Range(r => r
+                                    .Field("occurrence.organismQuantityInt")
+                                    .LessThanOrEquals(internalFilter.Quantity.Value)
+                                )
+                            );
+                            break;
+                    }
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q

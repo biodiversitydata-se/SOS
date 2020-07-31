@@ -48,5 +48,8 @@ namespace SOS.Lib.Models.Search
         public string LengthOperator { get; set; }
         public int? Weight { get; set; }
         public string WeightOperator { get; set; }
+
+        public int? Quantity { get; set; }
+        public string QuantityOperator { get; set; }
     }
 }
