@@ -173,97 +173,19 @@ namespace SOS.Observations.Api.Repositories
 
                 if (internalFilter.Length.HasValue && !string.IsNullOrWhiteSpace(internalFilter.LengthOperator))
                 {
-                    switch (internalFilter.LengthOperator.ToLower())
-                    {
-                        case "eq":
-                            queryInternal.Add(q => q
-                                .Term(r => r
-                                    .Field("occurrence.length")
-                                    .Value(internalFilter.Length.Value)
-                                )
-                            );
-                            break;
-                        case "gte":
-                            queryInternal.Add(q => q
-                                .Range(r => r
-                                    .Field("occurrence.length")
-                                    .GreaterThanOrEquals(internalFilter.Length.Value)
-                                )
-                            );
-                            break;
-                        case "lte":
-                            queryInternal.Add(q => q
-                                .Range(r => r
-                                    .Field("occurrence.length")
-                                    .LessThanOrEquals(internalFilter.Length.Value)
-                                )
-                            );
-                            break;
-                    }
+                    AddNumericFilterWithRelationalOperator(queryInternal, "occurrence.length", internalFilter.Length.Value, internalFilter.LengthOperator);
                 }
 
                 if (internalFilter.Weight.HasValue && !string.IsNullOrWhiteSpace(internalFilter.WeightOperator))
                 {
-                    switch (internalFilter.WeightOperator.ToLower())
-                    {
-                        case "eq":
-                            queryInternal.Add(q => q
-                                .Term(r => r
-                                    .Field("occurrence.weight")
-                                    .Value(internalFilter.Weight.Value)
-                                )
-                            );
-                            break;
-                        case "gte":
-                            queryInternal.Add(q => q
-                                .Range(r => r
-                                    .Field("occurrence.weight")
-                                    .GreaterThanOrEquals(internalFilter.Weight.Value)
-                                )
-                            );
-                            break;
-                        case "lte":
-                            queryInternal.Add(q => q
-                                .Range(r => r
-                                    .Field("occurrence.weight")
-                                    .LessThanOrEquals(internalFilter.Weight.Value)
-                                )
-                            );
-                            break;
-                    }
+                    AddNumericFilterWithRelationalOperator(queryInternal, "occurrence.weight", internalFilter.Weight.Value, internalFilter.WeightOperator);
                 }
 
                 if (internalFilter.Quantity.HasValue && !string.IsNullOrWhiteSpace(internalFilter.QuantityOperator))
                 {
-                    switch (internalFilter.QuantityOperator.ToLower())
-                    {
-                        case "eq":
-                            queryInternal.Add(q => q
-                                .Term(r => r
-                                    .Field("occurrence.organismQuantityInt")
-                                    .Value(internalFilter.Quantity.Value)
-                                )
-                            );
-                            break;
-                        case "gte":
-                            queryInternal.Add(q => q
-                                .Range(r => r
-                                    .Field("occurrence.organismQuantityInt")
-                                    .GreaterThanOrEquals(internalFilter.Quantity.Value)
-                                )
-                            );
-                            break;
-                        case "lte":
-                            queryInternal.Add(q => q
-                                .Range(r => r
-                                    .Field("occurrence.organismQuantityInt")
-                                    .LessThanOrEquals(internalFilter.Quantity.Value)
-                                )
-                            );
-                            break;
-                    }
+                    AddNumericFilterWithRelationalOperator(queryInternal, "occurrence.organismQuantityInt", internalFilter.Quantity.Value, internalFilter.QuantityOperator);
                 }
-
+                
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
@@ -299,6 +221,39 @@ namespace SOS.Observations.Api.Repositories
             }
 
             return queryInternal;
+        }
+
+        private static void AddNumericFilterWithRelationalOperator(
+            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> queryInternal, string fieldName,
+            int value, string relationalOperator)
+        {
+            switch (relationalOperator.ToLower())
+            {
+                case "eq":
+                    queryInternal.Add(q => q
+                        .Term(r => r
+                            .Field(fieldName)
+                            .Value(value)
+                        )
+                    );
+                    break;
+                case "gte":
+                    queryInternal.Add(q => q
+                        .Range(r => r
+                            .Field(fieldName)
+                            .GreaterThanOrEquals(value)
+                        )
+                    );
+                    break;
+                case "lte":
+                    queryInternal.Add(q => q
+                        .Range(r => r
+                            .Field(fieldName)
+                            .LessThanOrEquals(value)
+                        )
+                    );
+                    break;
+            }
         }
     }
 }
