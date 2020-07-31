@@ -51,5 +51,7 @@ namespace SOS.Lib.Models.Search
 
         public int? Quantity { get; set; }
         public string QuantityOperator { get; set; }
+
+        public List<int> ValidationStatusIds { get; set; }
     }
 }

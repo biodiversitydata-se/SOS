@@ -185,7 +185,17 @@ namespace SOS.Observations.Api.Repositories
                 {
                     AddNumericFilterWithRelationalOperator(queryInternal, "occurrence.organismQuantityInt", internalFilter.Quantity.Value, internalFilter.QuantityOperator);
                 }
-                
+
+                if (internalFilter.ValidationStatusIds?.Any() ?? false)
+                {
+                    queryInternal.Add(q => q
+                        .Terms(t => t
+                            .Field("identification.validationStatus.id")
+                            .Terms(internalFilter.ValidationStatusIds)
+                        )
+                    );
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
