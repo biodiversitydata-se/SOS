@@ -167,7 +167,7 @@ namespace SOS.Process.UnitTests.Jobs
         // todo - delete test?
         // This test doesn't add any value to the unit test suite due to the following reasons:
         // 1) The constructor is always invoked by dependency injection, which means that this test adds no protection against regressions (bugs).
-        // 2) This test tests the code implementation details and not the behavior of the system.
+        // 2) This test, tests the code implementation details and not the behavior of the system.
         //
         ///// <summary>
         ///// Test constructor
