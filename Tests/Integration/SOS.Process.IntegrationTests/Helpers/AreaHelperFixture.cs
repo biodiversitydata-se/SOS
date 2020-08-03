@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Process.Database;
+using SOS.Lib.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Repositories.Destination;
 
@@ -24,11 +24,12 @@ namespace SOS.Process.IntegrationTests.Helpers
 
         private AreaHelper CreateAreaHelper()
         {
-            var processConfiguration = GetProcessConfiguration();
+            var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
-                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                processConfiguration.ProcessedDbConfiguration.BatchSize);
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
             var processedAreaRepository = new ProcessedAreaRepository(
                 processClient,
                 new Mock<ILogger<ProcessedAreaRepository>>().Object);

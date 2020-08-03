@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
+using SOS.Lib.Database;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Observations.Api.Database;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Repositories;
 using Xunit;
@@ -16,7 +16,8 @@ namespace SOS.Observations.Api.IntegrationTests.Managers
             var processClient = new ProcessClient(
                 mongoDbConfiguration.GetMongoDbSettings(),
                 mongoDbConfiguration.DatabaseName,
-                mongoDbConfiguration.BatchSize);
+                mongoDbConfiguration.ReadBatchSize,
+                mongoDbConfiguration.WriteBatchSize);
 
             var processedTaxonRepository = new ProcessedTaxonRepository(
                 processClient,

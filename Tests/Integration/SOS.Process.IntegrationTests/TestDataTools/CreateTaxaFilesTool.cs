@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.Extensions.Logging.Abstractions;
+using SOS.Lib.Database;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Process.Database;
 using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Source;
 using Xunit;
@@ -19,11 +19,12 @@ namespace SOS.Process.IntegrationTests.TestDataTools
     {
         private ProcessedTaxonRepository CreateTaxonProcessedRepository()
         {
-            var processConfiguration = GetProcessConfiguration();
+            var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
-                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                processConfiguration.ProcessedDbConfiguration.BatchSize);
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
             var processedTaxonRepository =
                 new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
             return processedTaxonRepository;
@@ -31,11 +32,12 @@ namespace SOS.Process.IntegrationTests.TestDataTools
 
         private TaxonVerbatimRepository CreateTaxonVerbatimRepository(int batchSize)
         {
-            var processConfiguration = GetProcessConfiguration();
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var verbatimClient = new VerbatimClient(
-                processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.VerbatimDbConfiguration.DatabaseName,
-                batchSize);
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
             var taxonVerbatimRepository =
                 new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
             return taxonVerbatimRepository;

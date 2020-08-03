@@ -19,7 +19,7 @@
                 Destination file settings
             </summary>
         </member>
-        <member name="P:SOS.Lib.Configuration.Export.ExportConfiguration.ProcessedDbConfiguration">
+        <member name="P:SOS.Lib.Configuration.Export.ExportConfiguration.ProcessDbConfiguration">
             <summary>
                 Host
             </summary>
@@ -239,7 +239,7 @@
                 Host
             </summary>
         </member>
-        <member name="P:SOS.Lib.Configuration.Process.ProcessConfiguration.ProcessedDbConfiguration">
+        <member name="P:SOS.Lib.Configuration.Process.ProcessConfiguration.ProcessDbConfiguration">
             <summary>
                 Host
             </summary>

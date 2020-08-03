@@ -4,8 +4,8 @@ using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Import.DarwinCore;
 using SOS.Import.Harvesters.Observations;
-using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.DarwinCoreArchive;
+using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using Xunit;
@@ -20,11 +20,12 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
 
         private DwcObservationHarvester CreateDwcObservationHarvester()
         {
-            var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                importConfiguration.VerbatimDbConfiguration.BatchSize);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
             var dwcObservationHarvester = new DwcObservationHarvester(
                 new DarwinCoreArchiveVerbatimRepository(importClient,
                     new NullLogger<DarwinCoreArchiveVerbatimRepository>()),

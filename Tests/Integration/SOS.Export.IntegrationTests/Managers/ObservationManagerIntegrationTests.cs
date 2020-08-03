@@ -7,12 +7,12 @@ using Moq;
 using Nest;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Managers;
-using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.Managers
@@ -23,10 +23,13 @@ namespace SOS.Export.IntegrationTests.Managers
         {
             var exportConfiguration = GetExportConfiguration();
             var elasticClient = new ElasticClient();
-            var exportClient = new ExportClient(
-                exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                exportConfiguration.ProcessedDbConfiguration.DatabaseName,
-                exportConfiguration.ProcessedDbConfiguration.BatchSize);
+
+            var processDbConfiguration = GetProcessDbConfiguration();
+            var exportClient = new ProcessClient(
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     new ProcessedFieldMappingRepository(exportClient,

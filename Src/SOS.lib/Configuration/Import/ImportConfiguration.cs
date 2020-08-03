@@ -38,11 +38,6 @@ namespace SOS.Lib.Configuration.Import
         public NorsServiceConfiguration NorsServiceConfiguration { get; set; }
 
         /// <summary>
-        ///     Resource db
-        /// </summary>
-        public MongoDbConfiguration ResourceDbConfiguration { get; set; }
-
-        /// <summary>
         ///     SERS configuration
         /// </summary>
         public SersServiceConfiguration SersServiceConfiguration { get; set; }
@@ -61,11 +56,6 @@ namespace SOS.Lib.Configuration.Import
         ///     Taxon service configuration
         /// </summary>
         public TaxonServiceConfiguration TaxonServiceConfiguration { get; set; }
-
-        /// <summary>
-        ///     Host
-        /// </summary>
-        public MongoDbConfiguration VerbatimDbConfiguration { get; set; }
 
         /// <summary>
         ///     Virtual Herbarium service configuration

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
@@ -17,7 +17,7 @@ namespace SOS.Import.Repositories.Destination.FieldMappings
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
         public FieldMappingRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<FieldMappingRepository> logger) : base(importClient, logger)
         {
         }

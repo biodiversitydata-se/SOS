@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source

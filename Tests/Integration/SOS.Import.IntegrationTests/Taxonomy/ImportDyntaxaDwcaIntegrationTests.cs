@@ -3,10 +3,10 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Import.Harvesters;
 using SOS.Import.IntegrationTests.TestHelpers.Factories;
-using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Taxon;
 using SOS.Import.Services;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using Xunit;
 
@@ -17,10 +17,12 @@ namespace SOS.Import.IntegrationTests.Taxonomy
         private TaxonHarvester CreateTaxonHarvester(string filename)
         {
             var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                importConfiguration.VerbatimDbConfiguration.BatchSize);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
             var taxonService = new TaxonService(
                 TaxonServiceProxyStubFactory.Create(filename).Object,
                 new TaxonServiceConfiguration {BaseAddress = "..."},

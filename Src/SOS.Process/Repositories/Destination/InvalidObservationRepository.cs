@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Validation;
-using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Repositories.Destination

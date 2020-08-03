@@ -1,8 +1,9 @@
 ﻿using Autofac;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Jobs.Process;
-using SOS.Process.Database;
-using SOS.Process.Database.Interfaces;
 using SOS.Process.Helpers;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
@@ -39,31 +40,27 @@ namespace SOS.Process.IoC.Modules
 {
     public class ProcessModule : Module
     {
-        public ProcessConfiguration Configuration { get; set; }
+        public (ProcessConfiguration ProcessConfiguration, MongoDbConfiguration VerbatimDbConfiguration, MongoDbConfiguration ProcessDbConfiguration) Configurations { get; set; }
 
         protected override void Load(ContainerBuilder builder)
         {
-            // Vebatim Mongo Db
-            var verbatimDbConfiguration = Configuration.VerbatimDbConfiguration;
-            var verbatimSettings = verbatimDbConfiguration.GetMongoDbSettings();
-            var verbatimClient = new VerbatimClient(verbatimSettings, verbatimDbConfiguration.DatabaseName,
-                verbatimDbConfiguration.BatchSize);
-            builder.RegisterInstance(verbatimClient).As<IVerbatimClient>().SingleInstance();
-
-            // Processed Mongo Db
-            var processedDbConfiguration = Configuration.ProcessedDbConfiguration;
-            var processedSettings = processedDbConfiguration.GetMongoDbSettings();
-            var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
-                processedDbConfiguration.BatchSize);
-            builder.RegisterInstance(processClient).As<IProcessClient>().SingleInstance();
-
             // Field mapping processing configuration
-            if (Configuration.FieldMapping != null)
+            if (Configurations.ProcessConfiguration.FieldMapping != null)
             {
-                builder.RegisterInstance(Configuration.FieldMapping).As<FieldMappingConfiguration>().SingleInstance();
+                builder.RegisterInstance(Configurations.ProcessConfiguration.FieldMapping).As<FieldMappingConfiguration>().SingleInstance();
             }
 
-            builder.RegisterInstance(Configuration).As<ProcessConfiguration>().SingleInstance();
+            builder.RegisterInstance(Configurations.ProcessConfiguration).As<ProcessConfiguration>().SingleInstance();
+
+            // Vebatim Mongo Db
+            var verbatimSettings = Configurations.VerbatimDbConfiguration.GetMongoDbSettings();
+            builder.RegisterInstance<IVerbatimClient>(new VerbatimClient(verbatimSettings, Configurations.VerbatimDbConfiguration.DatabaseName,
+                Configurations.VerbatimDbConfiguration.ReadBatchSize, Configurations.VerbatimDbConfiguration.WriteBatchSize)).SingleInstance();
+
+            // Processed Mongo Db
+            var processedSettings = Configurations.ProcessDbConfiguration.GetMongoDbSettings();
+            builder.RegisterInstance<IProcessClient>(new ProcessClient(processedSettings, Configurations.ProcessDbConfiguration.DatabaseName,
+                Configurations.ProcessDbConfiguration.ReadBatchSize, Configurations.ProcessDbConfiguration.WriteBatchSize)).SingleInstance();
 
             // Helpers
             builder.RegisterType<AreaNameMapper>().As<IAreaNameMapper>().SingleInstance();

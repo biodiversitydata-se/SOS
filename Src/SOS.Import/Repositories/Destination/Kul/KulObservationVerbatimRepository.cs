@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.Kul.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.Kul;
 
 namespace SOS.Import.Repositories.Destination.Kul
@@ -9,7 +9,7 @@ namespace SOS.Import.Repositories.Destination.Kul
         IKulObservationVerbatimRepository
     {
         public KulObservationVerbatimRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<KulObservationVerbatimRepository> logger) : base(importClient, logger)
         {
         }

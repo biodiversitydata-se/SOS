@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.Sers.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.Sers;
 
 namespace SOS.Import.Repositories.Destination.Sers
@@ -9,7 +9,7 @@ namespace SOS.Import.Repositories.Destination.Sers
         ISersObservationVerbatimRepository
     {
         public SersObservationVerbatimRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<SersObservationVerbatimRepository> logger) : base(importClient, logger)
         {
         }

@@ -3,10 +3,10 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Harvesters;
-using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services;
+using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using Xunit;
 
@@ -23,11 +23,14 @@ namespace SOS.Import.IntegrationTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
             var importConfiguration = GetImportConfiguration();
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
+
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var areaVerbatimRepository = new AreaVerbatimRepository(
-                new ImportClient(
-                    importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                    importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                    importConfiguration.VerbatimDbConfiguration.BatchSize),
+                new VerbatimClient(
+                    verbatimDbConfiguration.GetMongoDbSettings(),
+                    verbatimDbConfiguration.DatabaseName,
+                    verbatimDbConfiguration.ReadBatchSize,
+                    verbatimDbConfiguration.WriteBatchSize),
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
 
             var areaHarvester = new AreaHarvester(
@@ -55,11 +58,13 @@ namespace SOS.Import.IntegrationTests.Harvesters
             //-----------------------------------------------------------------------------------------------------------
             var importConfiguration = GetImportConfiguration();
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var areaVerbatimRepository = new AreaVerbatimRepository(
-                new ImportClient(
-                    importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                    importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                    importConfiguration.VerbatimDbConfiguration.BatchSize),
+                new VerbatimClient(
+                    verbatimDbConfiguration.GetMongoDbSettings(),
+                    verbatimDbConfiguration.DatabaseName,
+                    verbatimDbConfiguration.ReadBatchSize,
+                    verbatimDbConfiguration.WriteBatchSize),
                 new Mock<ILogger<AreaVerbatimRepository>>().Object);
 
             var areaHarvester = new AreaHarvester(

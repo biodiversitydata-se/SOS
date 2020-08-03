@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Extensions;
+using SOS.Import.Factories.Harvest;
 using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
@@ -22,6 +22,7 @@ namespace SOS.Import.Harvesters
         private readonly IAreaRepository _areaRepository;
         private readonly IAreaVerbatimRepository _areaVerbatimRepository;
         private readonly ILogger<AreaHarvester> _logger;
+        private readonly AreaHarvestFactory _harvestFactory;
 
         /// <summary>
         ///     Constructor
@@ -38,6 +39,8 @@ namespace SOS.Import.Harvesters
             _areaVerbatimRepository =
                 areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _harvestFactory = new AreaHarvestFactory();
         }
 
         /// <inheritdoc />
@@ -62,7 +65,8 @@ namespace SOS.Import.Harvesters
                     {
                         _logger.LogDebug("Finish preparing area collection");
                         _logger.LogDebug("Start adding areas");
-                        if (await _areaVerbatimRepository.AddManyAsync(areas.ToVerbatims()))
+
+                        if (await _areaVerbatimRepository.AddManyAsync(await _harvestFactory.CastEntitiesToVerbatimsAsync(areas)))
                         {
                             _logger.LogDebug("Finish adding areas");
 
@@ -102,7 +106,7 @@ namespace SOS.Import.Harvesters
         /// <inheritdoc />
         public async Task<IEnumerable<Area>> GetAreasAsync()
         {
-            return (await _areaRepository.GetAsync()).ToVerbatims();
+            return await _harvestFactory.CastEntitiesToVerbatimsAsync(await _areaRepository.GetAsync());
         }
     }
 }

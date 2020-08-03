@@ -7,11 +7,11 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using Nest;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
-using SOS.Observations.Api.Database.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Repositories
@@ -80,7 +80,7 @@ namespace SOS.Observations.Api.Repositories
                         .Filter(query)
                     )
                 )
-                .Sort(s => sortDescriptor)
+                .Sort(sort => sortDescriptor)
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -300,6 +300,70 @@ namespace SOS.Observations.Api.Repositories
                                 DateMath.Anchored(
                                     internalFilter.ReportedDateTo.Value.ToUniversalTime()
                                 )
+                            )
+                        )
+                    );
+                }
+
+                if (internalFilter.MaxAccuracy.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Range(r => r
+                            .Field("location.coordinateUncertaintyInMeters")
+                            .LessThanOrEquals(internalFilter.MaxAccuracy)
+                        )
+                    );
+                }
+
+                if (internalFilter.Months?.Any() ?? false)
+                {
+                    queryInternal.Add(q => q
+                        .Script(s => s
+                            .Script(sc => sc
+                                .Source($@"return [{string.Join(',',internalFilter.Months.Select(m=>$"{m}"))}].contains(doc['event.startDate'].value.getMonthValue());")
+                            )
+                        )
+                    );
+                }
+
+                if (internalFilter.DiscoveryMethodIds?.Any() ?? false)
+                {
+                    queryInternal.Add(q => q
+                        .Terms(t => t
+                            .Field("occurrence.discoveryMethod.id")
+                            .Terms(internalFilter.DiscoveryMethodIds)
+                        )
+                    );
+                }
+
+                if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Script(s => s
+                            .Script(sc => sc
+                                .Source($@"
+                                    int startYear = doc['event.startDate'].value.getYear();
+                                    int startMonth = doc['event.startDate'].value.getMonthValue();
+                                    int startDay = doc['event.startDate'].value.getDayOfMonth();
+
+                                    int fromMonth = {internalFilter.StartDate.Value.Month};
+                                    int fromDay = {internalFilter.StartDate.Value.Day};
+                                    int toMonth = {internalFilter.EndDate.Value.Month};
+                                    int toDay = {internalFilter.EndDate.Value.Day};
+
+                                    if(
+                                        (startMonth == fromMonth && startDay >= fromDay)
+                                        || (startMonth > fromMonth && startMonth < toMonth)
+                                        || (startMonth == toMonth && startDay <= toDay)
+                                    )
+                                    {{ 
+                                        return true;
+                                    }} 
+                                    else 
+                                    {{
+                                        return false;
+                                    }}
+                                ")
                             )
                         )
                     );

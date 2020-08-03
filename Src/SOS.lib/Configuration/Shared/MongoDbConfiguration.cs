@@ -40,9 +40,14 @@ namespace SOS.Lib.Configuration.Shared
         public bool UseTls { get; set; }
 
         /// <summary>
-        ///     How many items to add in a time
+        ///     How many items to read in a time
         /// </summary>
-        public int BatchSize { get; set; }
+        public int ReadBatchSize { get; set; }
+
+        /// <summary>
+        ///     How many items to write in a time
+        /// </summary>
+        public int WriteBatchSize { get; set; }
 
         /// <summary>
         ///     Get mongo db settings object.

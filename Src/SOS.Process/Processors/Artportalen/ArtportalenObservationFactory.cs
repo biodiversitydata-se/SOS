@@ -50,13 +50,13 @@ namespace SOS.Process.Processors.Artportalen
         }
 
         public ICollection<ProcessedObservation> CreateProcessedObservations(
-            IEnumerable<ArtportalenVerbatimObservation> verbatimObservations)
+            IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
         {
             return verbatimObservations.Select(CreateProcessedObservation).ToArray();
         }
 
         // todo - This could be a way to check for invalid observation when converting from verbatim to processed.
-        public CreateProcessedObservationResult CreateProcessedObservationResult(ArtportalenVerbatimObservation verbatimObservation)
+        public CreateProcessedObservationResult CreateProcessedObservationResult(ArtportalenObservationVerbatim verbatimObservation)
         {
             return Models.CreateProcessedObservationResult.Success(CreateProcessedObservation(verbatimObservation));
         }
@@ -66,7 +66,7 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public ProcessedObservation CreateProcessedObservation(ArtportalenVerbatimObservation verbatimObservation)
+        public ProcessedObservation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation)
         {
             try
             {
@@ -217,8 +217,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.SightingTypeId = verbatimObservation.SightingTypeId;
                 obs.Occurrence.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
 
-               
-                
                 // Taxon
                 obs.Taxon = taxon;
 
@@ -397,7 +395,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="verbatimObservation"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        private string GetSubstrateDescription(ArtportalenVerbatimObservation verbatimObservation,
+        private string GetSubstrateDescription(ArtportalenObservationVerbatim verbatimObservation,
             IDictionary<int, ProcessedTaxon> taxa)
         {
             if (verbatimObservation == null)
@@ -447,7 +445,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="verbatimObservation"></param>
         /// <param name="taxon"></param>
         /// <returns></returns>
-        public int? GetBirdNestActivityId(ArtportalenVerbatimObservation verbatimObservation, ProcessedTaxon taxon)
+        public int? GetBirdNestActivityId(ArtportalenObservationVerbatim verbatimObservation, ProcessedTaxon taxon)
         {
             if (verbatimObservation == null || taxon == null)
             {
@@ -467,7 +465,7 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        private string GetAssociatedReferences(ArtportalenVerbatimObservation verbatimObservation)
+        private string GetAssociatedReferences(ArtportalenObservationVerbatim verbatimObservation)
         {
             if (!verbatimObservation?.MigrateSightingObsId.HasValue ?? true)
             {

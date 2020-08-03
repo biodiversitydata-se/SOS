@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
-using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
@@ -42,7 +42,7 @@ namespace SOS.Export.Repositories
         /// <param name="toggleable"></param>
         /// <param name="logger"></param>
         protected BaseRepository(
-            IExportClient exportClient,
+            IProcessClient exportClient,
             bool toggleable,
             ILogger<BaseRepository<TEntity, TKey>> logger
         )

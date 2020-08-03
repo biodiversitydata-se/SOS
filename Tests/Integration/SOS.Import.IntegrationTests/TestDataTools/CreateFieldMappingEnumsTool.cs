@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
-using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.FieldMappings;
 using SOS.Lib.Constants;
+using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using Xunit;
@@ -125,12 +125,12 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\FieldMappingEnums.cs";
-            const int batchSize = 50000;
-            var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                batchSize);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
 
             var fieldMappingRepository =
                 new FieldMappingRepository(importClient, new NullLogger<FieldMappingRepository>());

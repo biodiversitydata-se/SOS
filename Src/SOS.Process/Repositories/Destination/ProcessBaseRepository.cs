@@ -5,10 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Process.Database.Interfaces;
+
 using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Repositories.Destination
@@ -58,7 +59,7 @@ namespace SOS.Process.Repositories.Destination
             _toggleable = toggleable;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            BatchSize = _client.BatchSize;
+            BatchSize = _client.WriteBatchSize;
             Database = _client.GetDatabase();
 
             _collectionName = GetInstanceName(InActiveInstance);

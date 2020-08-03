@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.ProcessInfo;
 
 namespace SOS.Export.Repositories
@@ -16,7 +16,7 @@ namespace SOS.Export.Repositories
         /// <param name="client"></param>
         /// <param name="logger"></param>
         public ProcessInfoRepository(
-            IExportClient client,
+            IProcessClient client,
             ILogger<ProcessInfoRepository> logger
         ) : base(client, false, logger)
         {

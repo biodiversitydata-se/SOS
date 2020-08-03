@@ -17,9 +17,9 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// <summary>
         ///     Add many items
         /// </summary>
-        /// <param name="items"></param>
+        /// <param name="observations"></param>
         /// <returns></returns>
-        new Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items);
+        new Task<int> AddManyAsync(IEnumerable<ProcessedObservation> observations);
 
         /// <summary>
         ///     Copy provider data from active instance to inactive instance.
@@ -34,6 +34,12 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// <param name="dataProvider"></param>
         /// <returns></returns>
         Task<bool> DeleteProviderDataAsync(DataProvider dataProvider);
+
+        /// <summary>
+        /// Delete observations by occurence id
+        /// </summary>
+        /// <param name="occurenceIds"></param>
+        Task<bool> DeleteByOccurenceIdAsync(IEnumerable<string> occurenceIds);
 
         /// <summary>
         ///     Create search index

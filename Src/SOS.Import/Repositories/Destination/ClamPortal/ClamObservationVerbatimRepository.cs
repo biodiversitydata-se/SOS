@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.ClamPortal.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 
 namespace SOS.Import.Repositories.Destination.ClamPortal
@@ -18,7 +18,7 @@ namespace SOS.Import.Repositories.Destination.ClamPortal
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
         public ClamObservationVerbatimRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<ClamObservationVerbatimRepository> logger) : base(importClient, logger)
         {
         }

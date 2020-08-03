@@ -4,14 +4,14 @@ using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Jobs;
 using SOS.Export.Managers;
 using SOS.Export.Managers.Interfaces;
-using SOS.Export.MongoDb;
-using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Jobs.Export;
 
 namespace SOS.Export.IoC.Modules
@@ -24,7 +24,7 @@ namespace SOS.Export.IoC.Modules
         /// <summary>
         ///     Module configuration
         /// </summary>
-        public ExportConfiguration Configuration { get; set; }
+        public (ExportConfiguration ExportConfiguration, MongoDbConfiguration ProcessDbConfiguration) Configurations { get; set; }
 
         /// <summary>
         ///     Load event
@@ -33,17 +33,16 @@ namespace SOS.Export.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             // Add configuration
-            builder.RegisterInstance(Configuration.BlobStorageConfiguration).As<BlobStorageConfiguration>()
+            builder.RegisterInstance(Configurations.ExportConfiguration.BlobStorageConfiguration).As<BlobStorageConfiguration>()
                 .SingleInstance();
-            builder.RegisterInstance(Configuration.DwcaFilesCreationConfiguration).As<DwcaFilesCreationConfiguration>().SingleInstance();
-            builder.RegisterInstance(Configuration.FileDestination).As<FileDestination>().SingleInstance();
-            builder.RegisterInstance(Configuration.ZendToConfiguration).As<ZendToConfiguration>().SingleInstance();
+            builder.RegisterInstance(Configurations.ExportConfiguration.DwcaFilesCreationConfiguration).As<DwcaFilesCreationConfiguration>().SingleInstance();
+            builder.RegisterInstance(Configurations.ExportConfiguration.FileDestination).As<FileDestination>().SingleInstance();
+            builder.RegisterInstance(Configurations.ExportConfiguration.ZendToConfiguration).As<ZendToConfiguration>().SingleInstance();
 
-            // Init mongodb
-            var exportSettings = Configuration.ProcessedDbConfiguration.GetMongoDbSettings();
-            var exportClient = new ExportClient(exportSettings, Configuration.ProcessedDbConfiguration.DatabaseName,
-                Configuration.ProcessedDbConfiguration.BatchSize);
-            builder.RegisterInstance(exportClient).As<IExportClient>().SingleInstance();
+            // Processed Mongo Db
+            var processedSettings = Configurations.ProcessDbConfiguration.GetMongoDbSettings();
+            builder.RegisterInstance<IProcessClient>(new ProcessClient(processedSettings, Configurations.ProcessDbConfiguration.DatabaseName,
+                Configurations.ProcessDbConfiguration.ReadBatchSize, Configurations.ProcessDbConfiguration.WriteBatchSize)).SingleInstance();
 
             // Add factories
             builder.RegisterType<ObservationManager>().As<IObservationManager>().InstancePerLifetimeScope();

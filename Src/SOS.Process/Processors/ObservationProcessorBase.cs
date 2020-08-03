@@ -89,8 +89,7 @@ namespace SOS.Process.Processors
             FieldMappingResolverHelper
                 .ResolveFieldMappedValues(
                     processedObservations); // used for testing purpose. A setting decides whether values should be resolved for easier debugging of field mapped data.
-            var successCount = await ProcessRepository.AddManyAsync(processedObservations);
-            return successCount;
+            return await ProcessRepository.AddManyAsync(processedObservations);
         }
 
         protected bool IsBatchFilledToLimit(int count)

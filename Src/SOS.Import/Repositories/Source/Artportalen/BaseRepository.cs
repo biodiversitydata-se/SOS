@@ -31,16 +31,10 @@ namespace SOS.Import.Repositories.Source.Artportalen
         /// </summary>
         protected ILogger<T> Logger { get; }
 
-        /// <summary>
-        ///     Query data base
-        /// </summary>
-        /// <typeparam name="E"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
-        public async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters = null)
+        /// <inheritdoc />
+        public async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters = null, bool live = false)
         {
-            return await _artportalenDataService.QueryAsync<E>(query, parameters);
+            return await _artportalenDataService.QueryAsync<E>(query, parameters, live);
         }
     }
 }

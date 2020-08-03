@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.Nors.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.Nors;
 
 namespace SOS.Import.Repositories.Destination.Nors
@@ -9,7 +9,7 @@ namespace SOS.Import.Repositories.Destination.Nors
         INorsObservationVerbatimRepository
     {
         public NorsObservationVerbatimRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<NorsObservationVerbatimRepository> logger) : base(importClient, logger)
         {
         }

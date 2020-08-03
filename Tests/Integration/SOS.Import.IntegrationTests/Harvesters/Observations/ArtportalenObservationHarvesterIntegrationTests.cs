@@ -6,12 +6,13 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters.Observations;
-using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
+using SOS.Import.Repositories.Resource;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services;
+using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using Xunit;
 
@@ -31,10 +32,13 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.ArtportalenConfiguration.MaxNumberOfSightingsHarvested = 100000;
 
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                importConfiguration.VerbatimDbConfiguration.BatchSize);
+
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
             var sightingVerbatimRepository =
                 new SightingVerbatimRepository(importClient, new Mock<ILogger<SightingVerbatimRepository>>().Object);
             var metadataRepository =
@@ -71,7 +75,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await observationHarvester.HarvestSightingsAsync(JobCancellationToken.Null);
+            var res = await observationHarvester.HarvestSightingsAsync(false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -125,7 +129,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await observationHarvester.HarvestSightingsAsync(JobCancellationToken.Null);
+            var res = await observationHarvester.HarvestSightingsAsync(false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

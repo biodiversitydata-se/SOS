@@ -6,8 +6,8 @@ using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
-using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.FieldMappings;
+using SOS.Lib.Database;
 using SOS.TestHelpers.JsonConverters;
 using Xunit;
 
@@ -26,12 +26,12 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\FieldMappings.json";
-            const int batchSize = 50000;
-            var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                batchSize);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
 
             var fieldMappingRepository =
                 new FieldMappingRepository(importClient, new NullLogger<FieldMappingRepository>());
@@ -58,11 +58,12 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             const string filePath = @"c:\temp\FieldMappings.msgpck";
             const int batchSize = 50000;
             var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                batchSize);
-
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
             var fieldMappingRepository =
                 new FieldMappingRepository(importClient, new NullLogger<FieldMappingRepository>());
 

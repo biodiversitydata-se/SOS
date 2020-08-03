@@ -9,6 +9,8 @@ using Elasticsearch.Net;
 using Hangfire;
 using Hangfire.Dashboard;
 using Hangfire.Mongo;
+using Hangfire.Mongo.Migration.Strategies;
+using Hangfire.Mongo.Migration.Strategies.Backup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -20,9 +22,9 @@ using Nest;
 using NLog.Web;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.JsonConverters;
-using SOS.Observations.Api.Database;
-using SOS.Observations.Api.Database.Interfaces;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories;
@@ -167,8 +169,8 @@ namespace SOS.Observations.Api
                         {
                             MigrationOptions = new MongoMigrationOptions
                             {
-                                Strategy = MongoMigrationStrategy.Migrate,
-                                BackupStrategy = MongoBackupStrategy.Collections
+                                MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                                BackupStrategy = new CollectionMongoBackupStrategy()
                             }
                         })
             );
@@ -177,14 +179,15 @@ namespace SOS.Observations.Api
             var elasticConfiguration = observationApiConfiguration.SearchDbConfiguration;
             var uris = elasticConfiguration.Hosts.Select(u => new Uri(u));
             services.AddSingleton<IElasticClient>(
-                new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))));
-
+                new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))
+                    //.DisableDirectStreaming().EnableDebugMode().PrettyJson() // Uncomment this line when debugging ES-query. Req and Resp is in result.DebugInformation in ProcessedObservationRepository.cs.
+                ));
 
             // Processed Mongo Db
-            var processedDbConfiguration = observationApiConfiguration.ProcessedDbConfiguration;
+            var processedDbConfiguration = observationApiConfiguration.ProcessDbConfiguration;
             var processedSettings = processedDbConfiguration.GetMongoDbSettings();
             var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
-                processedDbConfiguration.BatchSize);
+                processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
             services.AddSingleton<IProcessClient>(processClient);
 
             // Add configuration

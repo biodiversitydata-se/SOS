@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.Nors;
-using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source

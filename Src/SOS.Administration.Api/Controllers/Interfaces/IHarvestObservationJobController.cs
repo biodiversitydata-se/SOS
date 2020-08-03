@@ -125,18 +125,20 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult RunSharkHarvestJob();
 
         /// <summary>
-        ///     Add daily harvest of sightings from species data portal
+        /// Add daily harvest of sightings from species data portal
         /// </summary>
+        /// <param name="incrementalHarvest"></param>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult AddDailyArtportalenHarvestJob(int hour, int minute);
+        IActionResult AddDailyArtportalenHarvestJob(bool incrementalHarvest, int hour, int minute);
 
         /// <summary>
-        ///     Run Artportalen sightings harvest
+        /// Run Artportalen sightings harvest
         /// </summary>
+        /// <param name="incrementalHarvest"></param>
         /// <returns></returns>
-        IActionResult RunArtportalenHarvestJob();
+        IActionResult RunArtportalenHarvestJob(bool incrementalHarvest);
 
         /// <summary>
         ///     Add daily harvest of sightings from Virtual Herbarium

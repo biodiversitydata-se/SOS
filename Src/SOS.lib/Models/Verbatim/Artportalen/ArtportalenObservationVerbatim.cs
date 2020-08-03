@@ -8,7 +8,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
     /// <summary>
     ///     Sighting object
     /// </summary>
-    public class ArtportalenVerbatimObservation : IEntity<int>
+    public class ArtportalenObservationVerbatim : IEntity<int>
     {
         /// <summary>
         ///     Id of activity

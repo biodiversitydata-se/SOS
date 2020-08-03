@@ -13,10 +13,10 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Managers;
-using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories;
 using SOS.Export.UnitTests.TestHelpers.Builders;
 using SOS.Export.UnitTests.TestHelpers.Factories;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search;
@@ -50,7 +50,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             var writer = new DwcArchiveOccurrenceCsvWriter(
                 ProcessedFieldMappingRepositoryStubFactory.Create().Object,
                 new TaxonManager(
-                    new ProcessedTaxonRepository(new Mock<IExportClient>().Object,
+                    new ProcessedTaxonRepository(new Mock<IProcessClient>().Object,
                         new Mock<ILogger<ProcessedTaxonRepository>>().Object),
                     new Mock<ILogger<TaxonManager>>().Object),
                 new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object);

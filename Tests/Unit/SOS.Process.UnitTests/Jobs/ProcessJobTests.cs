@@ -72,7 +72,6 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IProcessedObservationRepository> _darwinCoreRepository;
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
-        private readonly Mock<IInstanceManager> _instanceManager;
         private readonly Mock<ICopyFieldMappingsJob> _copyFieldMappingsJob;
         private readonly Mock<IProcessTaxaJob> _processTaxaJob;
         private readonly Mock<IClamPortalObservationProcessor> _clamPortalProcessor;
@@ -85,6 +84,8 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IVirtualHerbariumObservationProcessor> _virtualHerbariumProcessor;
         private readonly Mock<IArtportalenObservationProcessor> _artportalenProcessor;
         private readonly Mock<IProcessedTaxonRepository> _taxonProcessedRepository;
+        private readonly Mock<IValidationManager> _validationManager;
+        private readonly Mock<IInstanceManager> _instanceManager;
         private readonly Mock<IDataProviderManager> _dataProviderManager;
         private readonly Mock<IDwcaObservationProcessor> _dwcaObservationProcessor;
         private readonly Mock<IAreaHelper> _areaHelper;
@@ -95,6 +96,7 @@ namespace SOS.Process.UnitTests.Jobs
             _darwinCoreRepository.Object,
             _processInfoRepository.Object,
             _harvestInfoRepository.Object,
+            _artportalenProcessor.Object,
             _clamPortalProcessor.Object,
             _fishDataProcessor.Object,
             _kulProcessor.Object,
@@ -103,11 +105,11 @@ namespace SOS.Process.UnitTests.Jobs
             _sersProcessor.Object,
             _sharkProcessor.Object,
             _virtualHerbariumProcessor.Object,
-            _artportalenProcessor.Object,
             _dwcaObservationProcessor.Object,
-            _dataProviderManager.Object,
             _taxonProcessedRepository.Object,
+            _dataProviderManager.Object,
             _instanceManager.Object,
+            _validationManager.Object,
             _copyFieldMappingsJob.Object,
             _processTaxaJob.Object,
             _areaHelper.Object,
@@ -541,8 +543,8 @@ namespace SOS.Process.UnitTests.Jobs
             _darwinCoreRepository.Setup(r => r.VerifyCollectionAsync());
 
 
-            _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenVerbatimObservation)))
-                .ReturnsAsync(new HarvestInfo(nameof(ArtportalenVerbatimObservation),
+            _harvestInfoRepository.Setup(r => r.GetAsync(nameof(ArtportalenObservationVerbatim)))
+                .ReturnsAsync(new HarvestInfo(nameof(ArtportalenObservationVerbatim),
                     DataProviderType.ArtportalenObservations, DateTime.Now));
             _artportalenProcessor.Setup(r =>
                     r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))

@@ -58,7 +58,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         public async Task GetAsyncException()
         {
             _artportalenDataServiceMock
-                .Setup(spds => spds.QueryAsync<SpeciesCollectionItemEntity>(It.IsAny<string>(), null))
+                .Setup(spds => spds.QueryAsync<SpeciesCollectionItemEntity>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             };
 
             _artportalenDataServiceMock
-                .Setup(spds => spds.QueryAsync<SpeciesCollectionItemEntity>(It.IsAny<string>(), null))
+                .Setup(spds => spds.QueryAsync<SpeciesCollectionItemEntity>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(speciesCollectionItemEntities);
 
             //-----------------------------------------------------------------------------------------------------------

@@ -8,10 +8,10 @@ using Moq;
 using SOS.Export.IntegrationTests.TestHelpers.Factories;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Managers;
-using SOS.Export.MongoDb;
 using SOS.Export.Repositories;
 using SOS.Export.Services;
-using SOS.Lib.Configuration.Export;
+using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database;
 using SOS.Lib.Models.Search;
 using SOS.TestHelpers.IO;
 using Xunit;
@@ -20,16 +20,17 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
 {
     public class DwcArchiveFileWriterIntegrationTests : TestBase
     {
-        private static ExportClient CreateExportClient(ExportConfiguration exportConfiguration)
+        private static ProcessClient CreateExportClient(MongoDbConfiguration exportConfiguration)
         {
-            var exportClient = new ExportClient(
-                exportConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                exportConfiguration.ProcessedDbConfiguration.DatabaseName,
-                exportConfiguration.ProcessedDbConfiguration.BatchSize);
+            var exportClient = new ProcessClient(
+                exportConfiguration.GetMongoDbSettings(),
+                exportConfiguration.DatabaseName,
+                exportConfiguration.ReadBatchSize,
+                exportConfiguration.WriteBatchSize);
             return exportClient;
         }
 
-        private static DwcArchiveFileWriter CreateDwcArchiveFileWriter(ExportClient exportClient)
+        private static DwcArchiveFileWriter CreateDwcArchiveFileWriter(ProcessClient exportClient)
         {
             var processedFieldMappingRepository = new ProcessedFieldMappingRepository(
                 exportClient,
@@ -48,7 +49,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             return dwcArchiveFileWriter;
         }
 
-        private static ProcessedObservationRepository CreateProcessedObservationRepository(ExportClient exportClient)
+        private static ProcessedObservationRepository CreateProcessedObservationRepository(ProcessClient exportClient)
         {
             /*  var processedObservationRepository = new ProcessedObservationRepository(
                   exportClient,
@@ -74,7 +75,8 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             var exportConfiguration = GetExportConfiguration();
             var exportFolderPath = exportConfiguration.FileDestination.Path;
-            var exportClient = CreateExportClient(exportConfiguration);
+            var processDbConfiguration = GetProcessDbConfiguration();
+            var exportClient = CreateExportClient(processDbConfiguration);
             var processedObservationRepository = CreateProcessedObservationRepository(exportClient);
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository =
@@ -110,8 +112,9 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
+            var processDbConfiguration = GetProcessDbConfiguration();
+            var exportClient = CreateExportClient(processDbConfiguration);
             var exportConfiguration = GetExportConfiguration();
-            var exportClient = CreateExportClient(exportConfiguration);
             var exportFolderPath = exportConfiguration.FileDestination.Path;
             var processedDarwinCoreRepositoryStub =
                 ProcessedDarwinCoreRepositoryStubFactory.Create(@"Resources\TenProcessedTestObservations.json");

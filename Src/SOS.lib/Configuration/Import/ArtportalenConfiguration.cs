@@ -5,9 +5,19 @@ namespace SOS.Lib.Configuration.Import
     public class ArtportalenConfiguration
     {
         /// <summary>
-        ///     Artportalen connection settings.
+        /// Max number of new observations to perform live catch up
         /// </summary>
-        public string ConnectionString { get; set; }
+        public int CatchUpLimit { get; set; }
+
+        /// <summary>
+        ///     Artportalen connection settings backup database.
+        /// </summary>
+        public string ConnectionStringBackup { get; set; }
+
+        /// <summary>
+        ///     Artportalen connection settings live database.
+        /// </summary>
+        public string ConnectionStringLive { get; set; }
 
         /// <summary>
         ///     The number of observations that will be fetched in each loop.

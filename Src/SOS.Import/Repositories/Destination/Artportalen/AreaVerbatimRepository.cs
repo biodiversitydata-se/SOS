@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.GridFS;
 using NetTopologySuite.Geometries;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 
@@ -26,7 +26,7 @@ namespace SOS.Import.Repositories.Destination.Artportalen
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
         public AreaVerbatimRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<AreaVerbatimRepository> logger) : base(importClient, logger)
         {
             _jsonSerializerOptions = new JsonSerializerOptions();

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using DnsClient.Internal;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
@@ -17,17 +15,25 @@ namespace SOS.Process.Managers
         private readonly IInvalidObservationRepository _invalidObservationRepository;
         private readonly ILogger<ValidationManager> _logger;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="invalidObservationRepository"></param>
+        /// <param name="logger"></param>
         public ValidationManager(IInvalidObservationRepository invalidObservationRepository, ILogger<ValidationManager> logger)
         {
-            _invalidObservationRepository = invalidObservationRepository;
-            _logger = logger;
+            _invalidObservationRepository = invalidObservationRepository ??
+                                            throw new ArgumentNullException(nameof(invalidObservationRepository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <inheritdoc />
         public async Task<bool> AddInvalidObservationsToDb(ICollection<InvalidObservation> invalidObservations)
         {
             try
             {
                 if (invalidObservations == null || invalidObservations.Count == 0) return false;
+
                 await _invalidObservationRepository.AddManyAsync(invalidObservations);
                 return true;
             }
@@ -38,11 +44,7 @@ namespace SOS.Process.Managers
             }
         }
 
-        /// <summary>
-        ///     Validate observations.
-        /// </summary>
-        /// <param name="items"></param>
-        /// <returns>Invalid items</returns>
+        /// <inheritdoc />
         public ICollection<InvalidObservation> ValidateObservations(ref ICollection<ProcessedObservation> items)
         {
             var validItems = new List<ProcessedObservation>();
@@ -88,5 +90,13 @@ namespace SOS.Process.Managers
             return invalidItems.Any() ? invalidItems : null;
         }
 
+        /// <inheritdoc />
+        public async Task VerifyCollectionAsync()
+        {
+            // Make sure invalid collection is empty 
+            await _invalidObservationRepository.DeleteCollectionAsync();
+            await _invalidObservationRepository.AddCollectionAsync();
+            await _invalidObservationRepository.CreateIndexAsync();
+        }
     }
 }

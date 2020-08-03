@@ -10,7 +10,7 @@
         <PackageReference Include="DotNetZip" Version="1.13.8" />
         <PackageReference Include="Hangfire.Core" Version="1.7.11" />
         <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.1.7" />
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.4" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.5" />
         <PackageReference Include="MongoDB.Driver" Version="2.10.4" />
         <PackageReference Include="MongoDB.Driver.GridFS" Version="2.10.4" />
         <PackageReference Include="NReco.Csv" Version="1.0.0" />

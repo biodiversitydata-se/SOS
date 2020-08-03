@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Resource.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
@@ -19,9 +19,7 @@ namespace SOS.Import.Repositories.Resource
     public class ResourceRepositoryBase<TEntity, TKey> : IResourceRepositoryBase<TEntity, TKey>
         where TEntity : IEntity<TKey>
     {
-        private readonly IResourceDbClient _client;
-
-
+        private readonly IProcessClient _client;
         private readonly string _collectionNameConfiguration = nameof(ProcessedConfiguration);
         private readonly bool _toggleable;
 
@@ -49,7 +47,7 @@ namespace SOS.Import.Repositories.Resource
         /// <param name="toggleable"></param>
         /// <param name="logger"></param>
         public ResourceRepositoryBase(
-            IResourceDbClient client,
+            IProcessClient client,
             bool toggleable,
             ILogger<ResourceRepositoryBase<TEntity, TKey>> logger
         )
@@ -58,7 +56,7 @@ namespace SOS.Import.Repositories.Resource
             _toggleable = toggleable;
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            BatchSize = _client.BatchSize;
+            BatchSize = _client.ReadBatchSize;
             Database = _client.GetDatabase();
 
             _collectionName = GetInstanceName(InActiveInstance);

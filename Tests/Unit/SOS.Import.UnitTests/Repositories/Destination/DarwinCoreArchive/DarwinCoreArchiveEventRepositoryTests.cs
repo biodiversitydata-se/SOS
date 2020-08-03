@@ -2,8 +2,8 @@ using System;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.DarwinCoreArchive;
+using SOS.Lib.Database.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Destination.DarwinCoreArchive
@@ -18,11 +18,11 @@ namespace SOS.Import.UnitTests.Repositories.Destination.DarwinCoreArchive
         /// </summary>
         public DarwinCoreArchiveEventRepositoryTests()
         {
-            _importClient = new Mock<IImportClient>();
+            _importClient = new Mock<IVerbatimClient>();
             _loggerMock = new Mock<ILogger<DarwinCoreArchiveEventRepository>>();
         }
 
-        private readonly Mock<IImportClient> _importClient;
+        private readonly Mock<IVerbatimClient> _importClient;
         private readonly Mock<ILogger<DarwinCoreArchiveEventRepository>> _loggerMock;
 
         private DarwinCoreArchiveEventRepository TestObject => new DarwinCoreArchiveEventRepository(

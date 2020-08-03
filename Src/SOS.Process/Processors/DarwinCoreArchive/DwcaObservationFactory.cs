@@ -751,7 +751,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="verbatimObservation"></param>
         /// <param name="taxa"></param>
         /// <returns></returns>
-        private string GetSubstrateDescription(ArtportalenVerbatimObservation verbatimObservation,
+        private string GetSubstrateDescription(ArtportalenObservationVerbatim verbatimObservation,
             IDictionary<int, ProcessedTaxon> taxa)
         {
             if (verbatimObservation == null)
@@ -801,7 +801,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="verbatimObservation"></param>
         /// <param name="taxon"></param>
         /// <returns></returns>
-        public int? GetBirdNestActivityId(ArtportalenVerbatimObservation verbatimObservation, ProcessedTaxon taxon)
+        public int? GetBirdNestActivityId(ArtportalenObservationVerbatim verbatimObservation, ProcessedTaxon taxon)
         {
             if (verbatimObservation == null || taxon == null)
             {
@@ -821,7 +821,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        private string GetAssociatedReferences(ArtportalenVerbatimObservation verbatimObservation)
+        private string GetAssociatedReferences(ArtportalenObservationVerbatim verbatimObservation)
         {
             if (!verbatimObservation?.MigrateSightingObsId.HasValue ?? true)
             {

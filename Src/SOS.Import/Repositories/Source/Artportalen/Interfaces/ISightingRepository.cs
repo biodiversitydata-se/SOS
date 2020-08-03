@@ -11,12 +11,13 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
     public interface ISightingRepository
     {
         /// <summary>
-        ///     Get chunk of sightings from Artportalen
+        /// Get chunk of sightings from Artportalen
         /// </summary>
         /// <param name="startId"></param>
         /// <param name="maxRows"></param>
+        /// <param name="liveData"></param>
         /// <returns></returns>
-        Task<IEnumerable<SightingEntity>> GetChunkAsync(int startId, int maxRows);
+        Task<IEnumerable<SightingEntity>> GetChunkAsync(int startId, int maxRows, bool liveData);
 
         /// <summary>
         ///     Get sightings for specified sighting ids.
@@ -28,6 +29,12 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<Tuple<int, int>> GetIdSpanAsync();
+
+        /// <summary>
+        /// Get highest id from live database
+        /// </summary>
+        /// <returns></returns>
+        Task<int> GetMaxIdLiveAsync();
 
         /// <summary>
         ///     Get last modified date for sightings

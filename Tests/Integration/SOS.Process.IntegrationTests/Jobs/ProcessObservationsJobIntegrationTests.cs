@@ -9,13 +9,12 @@ using Moq;
 using Nest;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Managers;
-using SOS.Export.MongoDb;
 using SOS.Export.Services;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Constants;
-using SOS.Process.Database;
+using SOS.Lib.Database;
 using SOS.Process.Helpers;
 using SOS.Process.Jobs;
 using SOS.Process.Managers;
@@ -50,18 +49,20 @@ namespace SOS.Process.IntegrationTests.Jobs
 
             var elasticClient = new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris)));
 
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
             var verbatimClient = new VerbatimClient(
-                processConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.VerbatimDbConfiguration.DatabaseName,
-                processConfiguration.VerbatimDbConfiguration.BatchSize);
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
+
+            var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
-                processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                processConfiguration.ProcessedDbConfiguration.BatchSize);
-            var exportClient = new ExportClient(
-                    processConfiguration.ProcessedDbConfiguration.GetMongoDbSettings(),
-                    processConfiguration.ProcessedDbConfiguration.DatabaseName,
-                    processConfiguration.ProcessedDbConfiguration.BatchSize);
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
+            
             var areaHelper = new AreaHelper(
                 new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()),
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>()));
@@ -78,7 +79,6 @@ namespace SOS.Process.IntegrationTests.Jobs
             if (storeProcessed)
             {
                 processedObservationRepository = new ProcessedObservationRepository(processClient, elasticClient,
-                    invalidObservationRepository,
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>());
             }
             else
@@ -88,9 +88,9 @@ namespace SOS.Process.IntegrationTests.Jobs
 
             var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
-                    new Export.Repositories.ProcessedFieldMappingRepository(exportClient, new NullLogger<Export.Repositories.ProcessedFieldMappingRepository>()), 
+                    new Export.Repositories.ProcessedFieldMappingRepository(processClient, new NullLogger<Export.Repositories.ProcessedFieldMappingRepository>()), 
                     new TaxonManager(
-                        new Export.Repositories.ProcessedTaxonRepository(exportClient, new NullLogger<Export.Repositories.ProcessedTaxonRepository>()), 
+                        new Export.Repositories.ProcessedTaxonRepository(processClient, new NullLogger<Export.Repositories.ProcessedTaxonRepository>()), 
                         new NullLogger<Export.Managers.TaxonManager>() ), new NullLogger<DwcArchiveOccurrenceCsvWriter>()), 
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()), 
                 new FileService(), 
@@ -182,7 +182,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 validationManager,
                 new NullLogger<ArtportalenObservationProcessor>());
             var instanceManager = new InstanceManager(
-                new ProcessedObservationRepository(processClient, elasticClient, invalidObservationRepository,
+                new ProcessedObservationRepository(processClient, elasticClient,
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>()),
                 processInfoRepository,
                 new NullLogger<InstanceManager>());
@@ -211,6 +211,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processedObservationRepository,
                 processInfoRepository,
                 harvestInfoRepository,
+                artportalenProcessor,
                 clamPortalProcessor,
                 fishDataProcessor,
                 kulProcessor,
@@ -219,11 +220,11 @@ namespace SOS.Process.IntegrationTests.Jobs
                 sersProcessor,
                 sharkProcessor,
                 virtualHrbariumProcessor,
-                artportalenProcessor,
                 dwcaProcessor,
-                dataProviderManager,
                 taxonProcessedRepository,
+                dataProviderManager,
                 instanceManager,
+                validationManager,
                 copyFieldMappingsJob,
                 processTaxaJob,
                 areaHelper,

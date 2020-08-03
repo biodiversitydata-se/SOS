@@ -9,12 +9,13 @@ namespace SOS.Import.Services.Interfaces
     public interface IArtportalenDataService
     {
         /// <summary>
-        ///     Query data base
+        /// Query data base
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="query"></param>
         /// <param name="parameters"></param>
+        /// <param name="live"></param>
         /// <returns></returns>
-        Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null);
+        Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic parameters = null, bool live = false);
     }
 }

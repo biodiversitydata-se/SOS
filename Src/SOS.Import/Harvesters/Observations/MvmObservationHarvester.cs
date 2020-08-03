@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Extensions;
+using SOS.Import.Factories.Harvest;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.Mvm.Interfaces;
 using SOS.Import.Services.Interfaces;
@@ -67,6 +67,7 @@ namespace SOS.Import.Harvesters.Observations
                 var result = await _mvmObservationService.GetAsync(0);
                 var maxId = result?.Item1 ?? 0;
                 var dataLastModified = DateTime.MinValue;
+                var verbatimFactory = new MvmHarvestFactory();
 
                 // Loop until all sightings are fetched.
                 while (maxId != 0)
@@ -74,13 +75,13 @@ namespace SOS.Import.Harvesters.Observations
                     var sightings = result?.Item2;
                     cancellationToken?.ThrowIfCancellationRequested();
 
-                    var aggregates = sightings.ToVerbatims().ToArray();
-                    nrSightingsHarvested += aggregates.Length;
+                    var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(sightings))?.ToArray();
+                    nrSightingsHarvested += verbatims.Length;
 
                     // Add sightings to MongoDb
-                    await _mvmObservationVerbatimRepository.AddManyAsync(aggregates);
+                    await _mvmObservationVerbatimRepository.AddManyAsync(verbatims);
 
-                    var batchDataLastModified = aggregates.Select(a => a.Modified).Max();
+                    var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
 
                     if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
                     {

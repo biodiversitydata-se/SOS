@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
 using Newtonsoft.Json;
-using SOS.Export.MongoDb.Interfaces;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
@@ -35,12 +33,12 @@ namespace SOS.Export.Repositories
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IElasticClient elasticClient,
-            IExportClient exportClient,
+            IProcessClient exportClient,
             ElasticSearchConfiguration elasticConfiguration,
             ILogger<ProcessedObservationRepository> logger) : base(exportClient, true, logger)
         {
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
-            _batchSize = elasticConfiguration.BatchSize;
+            _batchSize = elasticConfiguration.ReadBatchSize;
             _indexName = string.IsNullOrEmpty(elasticConfiguration.IndexPrefix)
                 ? $"{CollectionName.ToLower()}"
                 : $"{elasticConfiguration.IndexPrefix.ToLower()}-{CollectionName.ToLower()}";

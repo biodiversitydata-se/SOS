@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using SOS.Import.MongoDb.Interfaces;
 using SOS.Import.Repositories.Destination.FishData.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.FishData;
 
 namespace SOS.Import.Repositories.Destination.FishData
@@ -9,7 +9,7 @@ namespace SOS.Import.Repositories.Destination.FishData
         IFishDataObservationVerbatimRepository
     {
         public FishDataObservationVerbatimRepository(
-            IImportClient importClient,
+            IVerbatimClient importClient,
             ILogger<FishDataObservationVerbatimRepository> logger) : base(importClient, logger)
         {
         }

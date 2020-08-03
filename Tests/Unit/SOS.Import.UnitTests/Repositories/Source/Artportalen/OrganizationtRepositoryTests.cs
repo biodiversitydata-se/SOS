@@ -58,7 +58,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
         [Fact]
         public async Task GetAsyncException()
         {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<OrganizationEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<OrganizationEntity>(It.IsAny<string>(), null, false))
                 .Throws<Exception>();
 
             //-----------------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
                 new OrganizationEntity {Id = 2, Name = "Org 2"}
             };
 
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<OrganizationEntity>(It.IsAny<string>(), null))
+            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<OrganizationEntity>(It.IsAny<string>(), null, false))
                 .ReturnsAsync(projects);
 
             //-----------------------------------------------------------------------------------------------------------

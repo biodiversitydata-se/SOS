@@ -69,7 +69,7 @@ namespace SOS.Import.UnitTests.Services
         /// </summary>
         /// <returns></returns>
         [Fact]
-        public async Task GetNorsObservationsAsyncFail()
+        public void GetNorsObservationsAsyncFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange

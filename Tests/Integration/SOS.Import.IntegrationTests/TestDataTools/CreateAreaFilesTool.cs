@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using NetTopologySuite.Features;
 using NetTopologySuite.IO;
-using SOS.Import.MongoDb;
 using SOS.Import.Repositories.Destination.Artportalen;
+using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using Xunit;
@@ -38,12 +38,12 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 (AreaType: AreaType.Province, Filename: "Provinces.geojson")
             };
             const string filePathBase = @"c:\temp\";
-            const int batchSize = 50000;
-            var importConfiguration = GetImportConfiguration();
-            var importClient = new ImportClient(
-                importConfiguration.VerbatimDbConfiguration.GetMongoDbSettings(),
-                importConfiguration.VerbatimDbConfiguration.DatabaseName,
-                batchSize);
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
 
             var areaVerbatimRepository =
                 new AreaVerbatimRepository(importClient, new NullLogger<AreaVerbatimRepository>());

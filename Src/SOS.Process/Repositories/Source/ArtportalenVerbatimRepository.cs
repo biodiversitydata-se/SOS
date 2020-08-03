@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Process.Database.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Repositories.Source
 {
-    public class ArtportalenVerbatimRepository : VerbatimBaseRepository<ArtportalenVerbatimObservation, int>,
+    public class ArtportalenVerbatimRepository : VerbatimBaseRepository<ArtportalenObservationVerbatim, int>,
         IArtportalenVerbatimRepository
     {
         /// <summary>

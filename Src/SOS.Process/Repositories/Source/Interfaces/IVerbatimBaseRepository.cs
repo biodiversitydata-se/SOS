@@ -78,5 +78,10 @@ namespace SOS.Process.Repositories.Source.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<Tuple<TKey, TKey>> GetIdSpanAsync(IMongoCollection<TEntity> mongoCollection);
+
+        /// <summary>
+        /// Set repository mode
+        /// </summary>
+        bool IncrementalMode { get; set; }
     }
 }

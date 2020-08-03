@@ -5,6 +5,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Extensions;
+using SOS.Import.Factories.Harvest;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.Shark.Interfaces;
 using SOS.Import.Services.Interfaces;
@@ -88,6 +89,8 @@ namespace SOS.Import.Harvesters.Observations
                     return harvestInfo;
                 }
 
+                var verbatimFactory = new SharkHarvestFactory();
+
                 foreach (var row in dataSetsInfo.Rows.Where(r => r != null).Select(r => r.ToArray()))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
@@ -110,7 +113,7 @@ namespace SOS.Import.Harvesters.Observations
                         continue;
                     }
 
-                    var verbatims = data.ToVerbatims()?.ToArray();
+                    var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(data))?.ToArray();
                     nrSightingsHarvested += verbatims?.Count() ?? 0;
 
                     // Add sightings to MongoDb

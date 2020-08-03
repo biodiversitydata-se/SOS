@@ -2,7 +2,7 @@ using System;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.MongoDb.Interfaces;
+using SOS.Lib.Database.Interfaces;
 using SOS.Import.Repositories.Destination.Shark;
 using Xunit;
 
@@ -18,11 +18,11 @@ namespace SOS.Import.UnitTests.Repositories.Destination.Shark
         /// </summary>
         public SharkObservationVerbatimRepositoryTests()
         {
-            _importClient = new Mock<IImportClient>();
+            _importClient = new Mock<IVerbatimClient>();
             _loggerMock = new Mock<ILogger<SharkObservationVerbatimRepository>>();
         }
 
-        private readonly Mock<IImportClient> _importClient;
+        private readonly Mock<IVerbatimClient> _importClient;
         private readonly Mock<ILogger<SharkObservationVerbatimRepository>> _loggerMock;
 
         private SharkObservationVerbatimRepository TestObject => new SharkObservationVerbatimRepository(
