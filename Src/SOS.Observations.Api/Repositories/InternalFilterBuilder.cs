@@ -196,6 +196,16 @@ namespace SOS.Observations.Api.Repositories
                     );
                 }
 
+                if (internalFilter.OnlyWithBarcode)
+                {
+                    queryInternal.Add(q => q
+                        .Wildcard(w => w
+                            .Field("taxon.individualId")
+                            .Value("?*")
+                        )
+                    );
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
