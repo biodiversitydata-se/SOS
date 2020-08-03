@@ -5,8 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CsvHelper;
-using CsvHelper.Configuration;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
@@ -18,6 +16,7 @@ using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive
@@ -25,14 +24,12 @@ namespace SOS.Export.IO.DwcArchive
     public class ExtendedMeasurementOrFactCsvWriter : IExtendedMeasurementOrFactCsvWriter
     {
         private readonly ILogger<ExtendedMeasurementOrFactCsvWriter> _logger;
-        private readonly LineBreakTabStringConverter<string> _lineBreakTabStringConverter = new LineBreakTabStringConverter<string>();
 
         public ExtendedMeasurementOrFactCsvWriter(ILogger<ExtendedMeasurementOrFactCsvWriter> logger)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
         public async Task<bool> CreateCsvFileAsync(
             FilterBase filter,
             Stream stream,
@@ -42,16 +39,33 @@ namespace SOS.Export.IO.DwcArchive
         {
             try
             {
-                var map = new ExtendedMeasurementOrFactRowMap();
-                var results = await processedObservationRepository.TypedScrollProjectParametersAsync(filter, null);
-                bool writeHeader = true;
-                while (results?.Records?.Any() ?? false)
+                var scrollResult = await processedObservationRepository.TypedScrollProjectParametersAsync(filter, null);
+                await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
+                var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
+
+                // Write header row
+                WriteHeaderRow(csvWriter);
+
+                while (scrollResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var records = results?.Records.ToExtendedMeasurementOrFactRows(null); // bug? - results doesn't contain occurrenceId?
-                    await WriteEmofCsvAsync(stream, records, map, writeHeader);
-                    results = await processedObservationRepository.TypedScrollProjectParametersAsync(filter, results.ScrollId);
-                    writeHeader = false;
+
+                    // Fetch observations from ElasticSearch.
+                    var processedProjects = scrollResult.Records.ToArray();
+
+                    // Convert observations to DwC format.
+                    var emofRows = processedProjects.ToExtendedMeasurementOrFactRows(null);
+                    //var dwcObservations = processedObservations.ToDarwinCore().ToArray();
+
+                    // Write occurrence rows to CSV file.
+                    foreach (var emofRow in emofRows)
+                    {
+                        WriteEmofRow(csvWriter, emofRow);
+                    }
+                    await streamWriter.FlushAsync();
+
+                    // Get next batch of observations.
+                    scrollResult = await processedObservationRepository.TypedScrollProjectParametersAsync(filter, scrollResult.ScrollId);
                 }
 
                 return true;
@@ -63,8 +77,8 @@ namespace SOS.Export.IO.DwcArchive
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to create ExtendedMeasurementOrFact CSV file.");
-                return false;
+                _logger.LogError(e, "Failed to create EMOF CSV file.");
+                throw;
             }
         }
 
@@ -128,30 +142,6 @@ namespace SOS.Export.IO.DwcArchive
             csvWriter.WriteField(DwcFormatter.RemoveNewLineTabs(emofRow.MeasurementMethod));
 
             csvWriter.NextRecord();
-        }
-
-        private async Task WriteEmofCsvAsync<T>(
-            Stream stream, 
-            IEnumerable<ExtendedMeasurementOrFactRow> records,
-            ClassMap<T> map,
-            bool writeHeader)
-        {
-            if (!records?.Any() ?? true)
-            {
-                return;
-            }
-
-            await using var streamWriter = new StreamWriter(stream, null, -1, false);
-            var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                HasHeaderRecord = true,
-                Delimiter = "\t", // tab
-                Encoding = Encoding.UTF8
-            };
-            await using var csv = new CsvWriter(streamWriter, csvConfig);
-            csv.Configuration.HasHeaderRecord = writeHeader;
-            csv.Configuration.RegisterClassMap(map);
-            await csv.WriteRecordsAsync(records);
         }
     }
 }
