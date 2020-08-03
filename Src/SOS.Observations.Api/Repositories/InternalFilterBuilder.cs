@@ -222,6 +222,21 @@ namespace SOS.Observations.Api.Repositories
                         break;
                 }
 
+                switch (internalFilter.UnspontaneousFilter)
+                {
+                    case SearchFilterInternal.SightingUnspontaneousFilter.NotUnspontaneous:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("occurrence.isNaturalOccurrence")
+                                .Value(true)));
+                        break;
+                    case SearchFilterInternal.SightingUnspontaneousFilter.Unspontaneous:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("occurrence.isNaturalOccurrence")
+                                .Value(false)));
+                        break;
+                }
 
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {

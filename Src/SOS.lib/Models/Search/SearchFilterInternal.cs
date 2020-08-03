@@ -23,6 +23,13 @@ namespace SOS.Lib.Models.Search
             OnlyUnsureDetermination
         }
 
+        public enum SightingUnspontaneousFilter
+        {
+            NoFilter,
+            NotUnspontaneous,
+            Unspontaneous
+        }
+
         public int? UserId { get; set; }
         public int? ProjectId { get; set; }
         public bool IncludeRealCount { get; set; }
@@ -65,5 +72,7 @@ namespace SOS.Lib.Models.Search
         public List<int> ValidationStatusIds { get; set; }
 
         public SightingDeterminationFilter DeterminationFilter { get; set; }
+
+        public SightingUnspontaneousFilter UnspontaneousFilter { get; set; }
     }
 }
