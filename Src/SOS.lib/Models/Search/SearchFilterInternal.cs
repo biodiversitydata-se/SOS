@@ -15,6 +15,14 @@ namespace SOS.Lib.Models.Search
             ShowBoth,
             DoNotShowSightingsInMerged
         }
+
+        public enum SightingDeterminationFilter
+        {
+            NoFilter,
+            NotUnsureDetermination,
+            OnlyUnsureDetermination
+        }
+
         public int? UserId { get; set; }
         public int? ProjectId { get; set; }
         public bool IncludeRealCount { get; set; }
@@ -55,5 +63,7 @@ namespace SOS.Lib.Models.Search
         public string QuantityOperator { get; set; }
 
         public List<int> ValidationStatusIds { get; set; }
+
+        public SightingDeterminationFilter DeterminationFilter { get; set; }
     }
 }

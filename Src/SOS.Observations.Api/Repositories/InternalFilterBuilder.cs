@@ -206,6 +206,23 @@ namespace SOS.Observations.Api.Repositories
                     );
                 }
 
+                switch (internalFilter.DeterminationFilter)
+                {
+                    case SearchFilterInternal.SightingDeterminationFilter.NotUnsureDetermination:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("identification.uncertainDetermination")
+                                .Value(false)));
+                        break;
+                    case SearchFilterInternal.SightingDeterminationFilter.OnlyUnsureDetermination:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("identification.uncertainDetermination")
+                                .Value(true)));
+                        break;
+                }
+
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
