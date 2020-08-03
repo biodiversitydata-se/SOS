@@ -7,7 +7,7 @@ namespace SOS.Administration.Api.Controllers.Interfaces
     /// <summary>
     ///     Interface for field mapping controller
     /// </summary>
-    public interface IFieldMappingController
+    public interface ITermDictionaryController
     {
         /// <summary>
         /// </summary>
