@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
@@ -42,7 +43,7 @@ namespace SOS.Export.Repositories.Interfaces
         /// <param name="scrollId"></param>
         /// <remarks>To improve performance this method doesn't use the dynamic type.</remarks>
         /// <returns></returns>
-        Task<ScrollResult<ProcessedProject>> TypedScrollProjectParametersAsync(
+        Task<ScrollResult<ExtendedMeasurementOrFactRow>> TypedScrollProjectParametersAsync(
             FilterBase filter,
             string scrollId);
     }

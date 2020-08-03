@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
 using Newtonsoft.Json;
+using SOS.Export.Extensions;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
@@ -86,7 +89,7 @@ namespace SOS.Export.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<ScrollResult<ProcessedProject>> TypedScrollProjectParametersAsync(
+        public async Task<ScrollResult<ExtendedMeasurementOrFactRow>> TypedScrollProjectParametersAsync(
             FilterBase filter,
             string scrollId)
         {
@@ -115,14 +118,13 @@ namespace SOS.Export.Repositories
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
-            return new ScrollResult<ProcessedProject>
+            return new ScrollResult<ExtendedMeasurementOrFactRow>
             {
-                Records = searchResponse.Documents.SelectMany(p => p.Projects),
+                Records = searchResponse.Documents.ToExtendedMeasurementOrFactRows(),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };
         }
-
 
         /// <inheritdoc />
         public async Task<ScrollResult<ProcessedObservation>> TypedScrollObservationsAsync(

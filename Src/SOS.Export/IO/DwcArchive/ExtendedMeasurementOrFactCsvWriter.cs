@@ -51,11 +51,7 @@ namespace SOS.Export.IO.DwcArchive
                     cancellationToken?.ThrowIfCancellationRequested();
 
                     // Fetch observations from ElasticSearch.
-                    var processedProjects = scrollResult.Records.ToArray();
-
-                    // Convert observations to DwC format.
-                    var emofRows = processedProjects.ToExtendedMeasurementOrFactRows(null);
-                    //var dwcObservations = processedObservations.ToDarwinCore().ToArray();
+                    var emofRows = scrollResult.Records.ToArray();
 
                     // Write occurrence rows to CSV file.
                     foreach (var emofRow in emofRows)
