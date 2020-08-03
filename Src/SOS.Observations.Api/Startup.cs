@@ -203,6 +203,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IObservationManager, ObservationManager>();
             services.AddSingleton<IProcessInfoManager, ProcessInfoManager>();
             services.AddSingleton<ITaxonManager, TaxonManager>();
+            services.AddSingleton<IFilterManager, FilterManager>();
 
             // Add repositories
             services.AddSingleton<IAreaRepository, AreaRepository>();

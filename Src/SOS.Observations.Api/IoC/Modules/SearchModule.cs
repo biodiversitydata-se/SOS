@@ -48,6 +48,7 @@ namespace SOS.Observations.Api.IoC.Modules
             builder.RegisterType<ProcessInfoManager>().As<IProcessInfoManager>()
                 .SingleInstance(); // InstancePerLifetimeScope
             builder.RegisterType<TaxonManager>().As<ITaxonManager>().SingleInstance();
+            builder.RegisterType<FilterManager>().As<IFilterManager>().SingleInstance();
 
             // Add repositories
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().SingleInstance();
