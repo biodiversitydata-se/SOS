@@ -30,14 +30,15 @@ namespace SOS.Export.IntegrationTests.Managers
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
+            var taxonManager = new TaxonManager(
+                new ProcessedTaxonRepository(exportClient,
+                    new Mock<ILogger<ProcessedTaxonRepository>>().Object),
+                new Mock<ILogger<TaxonManager>>().Object);
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
                     new ProcessedFieldMappingRepository(exportClient,
                         new NullLogger<ProcessedFieldMappingRepository>()),
-                    new TaxonManager(
-                        new ProcessedTaxonRepository(exportClient,
-                            new Mock<ILogger<ProcessedTaxonRepository>>().Object),
-                        new Mock<ILogger<TaxonManager>>().Object),
+                    taxonManager,
                     new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new FileService(),
@@ -54,7 +55,8 @@ namespace SOS.Export.IntegrationTests.Managers
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,
                 new Mock<IZendToService>().Object,
-                new FileDestination {Path = exportConfiguration.FileDestination.Path},
+                new FileDestination {Path = exportConfiguration.FileDestination.Path}, 
+                new FilterManager(taxonManager, new AreaRepository(exportClient, new NullLogger<AreaRepository>())), 
                 new Mock<ILogger<ObservationManager>>().Object);
 
             return observationManager;

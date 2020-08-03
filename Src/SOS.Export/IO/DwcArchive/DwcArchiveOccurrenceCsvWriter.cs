@@ -52,7 +52,6 @@ namespace SOS.Export.IO.DwcArchive
                 var elasticRetrievalStopwatch = new Stopwatch();
                 var csvWritingStopwatch = new Stopwatch();
                 bool[] fieldsToWriteArray = FieldDescriptionHelper.CreateWriteFieldsArray(fieldDescriptions);
-                filter = PrepareFilter(filter);
                 var fieldMappings = await _processedFieldMappingRepository.GetFieldMappingsAsync();
                 var valueMappingDictionaries = fieldMappings.ToDictionary(m => m.Id, m => m.CreateValueDictionary());
                 elasticRetrievalStopwatch.Start();
@@ -332,24 +331,6 @@ namespace SOS.Export.IO.DwcArchive
             }
 
             csvWriter.NextRecord();
-        }
-
-
-        private FilterBase PrepareFilter(FilterBase filter)
-        {
-            if (filter.IncludeUnderlyingTaxa && filter.TaxonIds != null && filter.TaxonIds.Any())
-            {
-                if (filter.TaxonIds.Contains(0)) // If Biota, then clear taxon filter
-                {
-                    filter.TaxonIds = new List<int>();
-                }
-                else
-                {
-                    filter.TaxonIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(filter.TaxonIds, true);
-                }
-            }
-
-            return filter;
         }
 
         private void ResolveFieldMappedValues(
