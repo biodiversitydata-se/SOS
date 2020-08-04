@@ -132,7 +132,7 @@ namespace SOS.Process.UnitTests.Jobs
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var result =
-                await TestObject.RunAsync(It.IsAny<List<string>>(), false, false, true, JobCancellationToken.Null);
+                await TestObject.RunAsync(It.IsAny<List<string>>(), false, false, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -156,7 +156,7 @@ namespace SOS.Process.UnitTests.Jobs
             // Act
             //----------------------------------------------------------------------------------------------------------
             var result =
-                await TestObject.RunAsync(It.IsAny<List<string>>(), false, false, true, JobCancellationToken.Null);
+                await TestObject.RunAsync(It.IsAny<List<string>>(), false, false, false, true, JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -547,7 +547,7 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(new HarvestInfo(nameof(ArtportalenObservationVerbatim),
                     DataProviderType.ArtportalenObservations, DateTime.Now));
             _artportalenProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+                    r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), false, JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.Artportalen,
                     DataProviderType.ArtportalenObservations, DateTime.Now, DateTime.Now, 1));
 
@@ -555,7 +555,7 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(new HarvestInfo(nameof(ClamObservationVerbatim), DataProviderType.ClamPortalObservations,
                     DateTime.Now));
             _clamPortalProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+                    r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), false, JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.ClamGateway,
                     DataProviderType.ClamPortalObservations, DateTime.Now, DateTime.Now, 1));
 
@@ -563,7 +563,7 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(new HarvestInfo(nameof(KulObservationVerbatim), DataProviderType.KULObservations,
                     DateTime.Now));
             _kulProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobCancellationToken.Null))
+                    r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), false, JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.KUL, DataProviderType.KULObservations,
                     DateTime.Now, DateTime.Now, 1));
 
@@ -587,6 +587,7 @@ namespace SOS.Process.UnitTests.Jobs
                     DataProviderIdentifiers.Artportalen, DataProviderIdentifiers.ClamGateway,
                     DataProviderIdentifiers.KUL
                 },
+                false,
                 false,
                 false,
                 true,

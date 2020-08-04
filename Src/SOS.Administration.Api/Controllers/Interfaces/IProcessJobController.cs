@@ -37,15 +37,16 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         Task<IActionResult> RunProcessJob(bool cleanStart, bool copyFromActiveOnFail, bool toggleInstanceOnSuccess);
 
         /// <summary>
-        ///     Run process job for selected data providers
+        /// Run process job for selected data providers
         /// </summary>
         /// <param name="dataProviderIdOrIdentifiers"></param>
         /// <param name="cleanStart"></param>
+        /// <param name="incrementalMode"></param>
         /// <param name="copyFromActiveOnFail"></param>
         /// <param name="toggleInstanceOnSuccess"></param>
         /// <returns></returns>
         Task<IActionResult> RunProcessJob(List<string> dataProviderIdOrIdentifiers, bool cleanStart = true,
-            bool copyFromActiveOnFail = false, bool toggleInstanceOnSuccess = true);
+            bool incrementalMode = false, bool copyFromActiveOnFail = false, bool toggleInstanceOnSuccess = true);
 
         /// <summary>
         ///     Add daily process taxa job.

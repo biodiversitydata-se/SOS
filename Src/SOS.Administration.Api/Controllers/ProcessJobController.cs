@@ -123,6 +123,7 @@ namespace SOS.Administration.Api.Controllers
         public async Task<IActionResult> RunProcessJob(
             [FromQuery] List<string> dataProviderIdOrIdentifiers,
             [FromQuery] bool cleanStart = false,
+            [FromQuery] bool incrementalMode = false,
             [FromQuery] bool copyFromActiveOnFail = false,
             [FromQuery] bool toggleInstanceOnSuccess = false)
         {
@@ -141,7 +142,7 @@ namespace SOS.Administration.Api.Controllers
                     return new BadRequestObjectResult(result.Error);
                 }
 
-                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(dataProviderIdOrIdentifiers, cleanStart,
+                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(dataProviderIdOrIdentifiers, cleanStart, incrementalMode,
                     copyFromActiveOnFail, toggleInstanceOnSuccess, JobCancellationToken.Null));
                 return new OkObjectResult(
                     $"Process job was enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, dataProvidersToProcess.Select(res => " - " + res.Value))}");

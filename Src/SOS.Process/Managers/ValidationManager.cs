@@ -91,12 +91,24 @@ namespace SOS.Process.Managers
         }
 
         /// <inheritdoc />
-        public async Task VerifyCollectionAsync()
+        public async Task VerifyCollectionAsync(bool incrementalMode)
         {
-            // Make sure invalid collection is empty 
-            await _invalidObservationRepository.DeleteCollectionAsync();
-            await _invalidObservationRepository.AddCollectionAsync();
-            await _invalidObservationRepository.CreateIndexAsync();
+            var collectionCreated = true;
+            if (incrementalMode)
+            {
+                collectionCreated = await _invalidObservationRepository.VerifyCollectionAsync();
+            }
+            else
+            {
+                // Make sure invalid collection is empty 
+                await _invalidObservationRepository.DeleteCollectionAsync();
+                await _invalidObservationRepository.AddCollectionAsync();
+            }
+
+            if (collectionCreated)
+            {
+                await _invalidObservationRepository.CreateIndexAsync();
+            }
         }
     }
 }

@@ -17,6 +17,7 @@ namespace SOS.Process.Processors.Interfaces
         Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
+            bool incrementalMode,
             IJobCancellationToken cancellationToken);
     }
 }

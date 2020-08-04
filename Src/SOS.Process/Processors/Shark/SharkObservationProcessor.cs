@@ -57,6 +57,7 @@ namespace SOS.Process.Processors.Shark
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
+            bool incrementalMode,
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;

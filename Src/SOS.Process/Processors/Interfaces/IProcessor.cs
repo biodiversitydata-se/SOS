@@ -13,15 +13,17 @@ namespace SOS.Process.Processors.Interfaces
     public interface IProcessor
     {
         /// <summary>
-        ///     Process sightings
+        /// Process sightings
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
+        /// <param name="incrementalMode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
+            bool incrementalMode,
             IJobCancellationToken cancellationToken);
     }
 }

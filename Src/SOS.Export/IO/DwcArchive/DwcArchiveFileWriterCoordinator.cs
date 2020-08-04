@@ -2,18 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using DnsClient.Internal;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Enums;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
-using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 

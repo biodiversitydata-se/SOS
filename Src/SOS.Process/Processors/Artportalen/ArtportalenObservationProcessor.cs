@@ -70,34 +70,39 @@ namespace SOS.Process.Processors.Artportalen
         public override DataProviderType Type => DataProviderType.ArtportalenObservations;
 
         /// <summary>
-        ///     Process all observations
+        ///  Process all observations
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
+        /// <param name="incrementalMode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
+            bool incrementalMode,
             IJobCancellationToken cancellationToken)
         {
             if (_processConfiguration.ParallelProcessing)
             {
-                return await ProcessObservationsParallel(dataProvider, taxa, cancellationToken);
+                return await ProcessObservationsParallel(dataProvider, taxa, incrementalMode, cancellationToken);
             }
 
             // Sequential processing is used for easier debugging.
-            return await ProcessObservationsSequential(dataProvider, taxa, cancellationToken);
+            return await ProcessObservationsSequential(dataProvider, taxa, incrementalMode, cancellationToken);
         }
 
         private async Task<int> ProcessObservationsParallel(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
+            bool incrementalMode,
             IJobCancellationToken cancellationToken)
         {
             var observationFactory =
                 await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository);
             // Get min and max id from db
+
+            _artportalenVerbatimRepository.IncrementalMode = incrementalMode;
             (await _artportalenVerbatimRepository.GetIdSpanAsync())
                 .Deconstruct(out var batchStartId, out var maxId);
             var processBatchTasks = new List<Task<int>>();
@@ -107,7 +112,7 @@ namespace SOS.Process.Processors.Artportalen
                 await _semaphore.WaitAsync();
 
                 var batchEndId = batchStartId + _processedFieldMappingRepository.BatchSize - 1;
-                processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, observationFactory,
+                processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, incrementalMode, observationFactory,
                     cancellationToken));
                 batchStartId = batchEndId + 1;
             }
@@ -118,11 +123,12 @@ namespace SOS.Process.Processors.Artportalen
         }
 
         /// <summary>
-        ///     Process a batch of data
+        /// Process a batch of data
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="startId"></param>
         /// <param name="endId"></param>
+        /// <param name="incrementalMode"></param>
         /// <param name="observationFactory"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -130,6 +136,7 @@ namespace SOS.Process.Processors.Artportalen
             DataProvider dataProvider,
             int startId,
             int endId,
+            bool incrementalMode,
             ArtportalenObservationFactory observationFactory,
             IJobCancellationToken cancellationToken)
         {
@@ -154,10 +161,13 @@ namespace SOS.Process.Processors.Artportalen
                 var successCount = await CommitBatchAsync(dataProvider, processedObservationsBatch.ToArray());
                 Logger.LogDebug($"Finish storing Artportalen batch ({startId}-{endId})");
 
-                Logger.LogDebug($"Start writing Artportalen CSV ({startId}-{endId})");
-                var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservationsBatch, dataProvider,$"{startId}-{endId}");
-                Logger.LogDebug($"Finish writing Artportalen CSV ({startId}-{endId})");
-
+                if (!incrementalMode)
+                {
+                    Logger.LogDebug($"Start writing Artportalen CSV ({startId}-{endId})");
+                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservationsBatch, dataProvider, $"{startId}-{endId}");
+                    Logger.LogDebug($"Finish writing Artportalen CSV ({startId}-{endId})");
+                }
+                   
                 return successCount;
             }
             catch (JobAbortedException e)
@@ -180,12 +190,14 @@ namespace SOS.Process.Processors.Artportalen
         private async Task<int> ProcessObservationsSequential(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
+            bool incrementalMode,
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
             var observationFactory =
                 await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository);
             ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
+            _artportalenVerbatimRepository.IncrementalMode = incrementalMode;
             using var cursor = await _artportalenVerbatimRepository.GetAllByCursorAsync();
             int batchId = 0;
 
@@ -199,7 +211,12 @@ namespace SOS.Process.Processors.Artportalen
                     var invalidObservations = ValidationManager.ValidateObservations(ref observations);
                     await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                     verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                    await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider, batchId++.ToString());
+
+                    if (!incrementalMode)
+                    {
+                        await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider, batchId++.ToString());
+                    }
+
                     observations.Clear();
                     Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
                 }
@@ -212,7 +229,12 @@ namespace SOS.Process.Processors.Artportalen
                 var invalidObservations = ValidationManager.ValidateObservations(ref observations);
                 await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                 verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider, batchId.ToString());
+                
+                if (!incrementalMode)
+                {
+                    await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider, batchId.ToString());
+                }
+                    
                 Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
             }
 

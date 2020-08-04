@@ -31,8 +31,6 @@ namespace SOS.Process.Repositories.Destination
         /// </summary>
         protected readonly ILogger<ProcessBaseRepository<TEntity, TKey>> Logger;
 
-        protected string _collectionName;
-
         /// <summary>
         ///     Disposed
         /// </summary>
@@ -62,8 +60,6 @@ namespace SOS.Process.Repositories.Destination
             BatchSize = _client.WriteBatchSize;
             Database = _client.GetDatabase();
 
-            _collectionName = GetInstanceName(InActiveInstance);
-
             // Init config
             InitializeConfiguration();
         }
@@ -72,7 +68,7 @@ namespace SOS.Process.Repositories.Destination
         ///     Get collection
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(_collectionName);
+        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(CurrentCollectionName);
 
         /// <summary>
         ///     Configuration collection
@@ -108,6 +104,8 @@ namespace SOS.Process.Repositories.Destination
         public byte ActiveInstance => GetConfiguration()?.ActiveInstance ?? 1;
         public byte InActiveInstance => (byte) (ActiveInstance == 0 ? 1 : 0);
 
+        public bool IncrementalMode { get; set; }
+
         /// <inheritdoc />
         public virtual async Task<List<TEntity>> GetAllAsync()
         {
@@ -130,6 +128,8 @@ namespace SOS.Process.Repositories.Destination
         public string ActiveCollectionName => GetInstanceName(ActiveInstance);
 
         public string InactiveCollectionName => GetInstanceName(InActiveInstance);
+
+        public string CurrentCollectionName => IncrementalMode ? ActiveCollectionName : InactiveCollectionName;
 
         /// <inheritdoc />
         public async Task<bool> AddAsync(TEntity item)
@@ -164,7 +164,7 @@ namespace SOS.Process.Repositories.Destination
             try
             {
                 // Create the collection
-                await Database.CreateCollectionAsync(_collectionName);
+                await Database.CreateCollectionAsync(CurrentCollectionName);
 
                 return true;
             }
@@ -223,7 +223,7 @@ namespace SOS.Process.Repositories.Destination
             try
             {
                 // Create the collection
-                await Database.DropCollectionAsync(_collectionName);
+                await Database.DropCollectionAsync(CurrentCollectionName);
 
                 return true;
             }
@@ -282,7 +282,7 @@ namespace SOS.Process.Repositories.Destination
             var exists = (await Database
                     .ListCollectionNamesAsync(new ListCollectionNamesOptions
                     {
-                        Filter = new BsonDocument("name", _collectionName)
+                        Filter = new BsonDocument("name", CurrentCollectionName)
                     }))
                 .Any();
 
@@ -290,7 +290,7 @@ namespace SOS.Process.Repositories.Destination
             if (!exists)
             {
                 // Create the collection
-                await Database.CreateCollectionAsync(_collectionName);
+                await Database.CreateCollectionAsync(CurrentCollectionName);
 
                 return true;
             }
@@ -350,15 +350,6 @@ namespace SOS.Process.Repositories.Destination
             return _toggleable
                 ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{instance}"
                 : $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="instance"></param>
-        /// <returns></returns>
-        protected void SetCollectionName(byte instance)
-        {
-            _collectionName = GetInstanceName(instance);
         }
 
         /// <summary>

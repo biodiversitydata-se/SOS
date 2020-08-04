@@ -141,6 +141,7 @@ namespace SOS.Process.Jobs
         public async Task<bool> RunAsync(
             List<string> dataProviderIdOrIdentifiers,
             bool cleanStart,
+            bool incrementalMode,
             bool copyFromActiveOnFail,
             bool toggleInstanceOnSuccess,
             IJobCancellationToken cancellationToken)
@@ -159,6 +160,7 @@ namespace SOS.Process.Jobs
             return await RunAsync(
                 dataProvidersToProcess,
                 cleanStart,
+                incrementalMode,
                 copyFromActiveOnFail,
                 toggleInstanceOnSuccess,
                 cancellationToken);
@@ -175,6 +177,7 @@ namespace SOS.Process.Jobs
             return await RunAsync(
                 dataProvidersToProcess,
                 cleanStart,
+                false,
                 copyFromActiveOnFail,
                 toggleInstanceOnSuccess,
                 cancellationToken);
@@ -191,6 +194,7 @@ namespace SOS.Process.Jobs
         public async Task<bool> RunAsync(
             List<DataProvider> dataProvidersToProcess,
             bool cleanStart,
+            bool incrementalMode,
             bool copyFromActiveOnFail,
             bool toggleInstanceOnSuccess,
             IJobCancellationToken cancellationToken)
@@ -200,7 +204,9 @@ namespace SOS.Process.Jobs
                 //-----------------
                 // 1. Arrange
                 //-----------------
+                
                 var processStart = DateTime.Now;
+                _processedObservationRepository.IncrementalMode = incrementalMode;
 
                 //-----------------
                 // 2. Validation
@@ -210,25 +216,28 @@ namespace SOS.Process.Jobs
                     return false;
                 }
 
-                //----------------------------------------------------------------------
-                // 3. Copy field mappings and taxa from sos-verbatim to sos-processed
-                //----------------------------------------------------------------------
-                _logger.LogInformation("Start copying taxonomy and fieldmapping from verbatim to processed db");
-                var metadataTasks = new[]
+                // Use current taxa and field mappings if we are in incremental mode, to speed things up
+                if (!incrementalMode)
                 {
-                    _copyFieldMappingsJob.RunAsync(),
-                    _processTaxaJob.RunAsync()
-                };
-                await Task.WhenAll(metadataTasks);
-                if (!metadataTasks.All(t => t.Result))
-                {
-                    _logger.LogError("Failed to copy taxonomy and fieldmapping from verbatim to processed db");
-                    return false;
+                    //----------------------------------------------------------------------
+                    // 3. Copy field mappings and taxa from sos-verbatim to sos-processed
+                    //----------------------------------------------------------------------
+                    _logger.LogInformation("Start copying taxonomy and fieldmapping from verbatim to processed db");
+                    var metadataTasks = new[]
+                    {
+                        _copyFieldMappingsJob.RunAsync(),
+                        _processTaxaJob.RunAsync()
+                    };
+                    await Task.WhenAll(metadataTasks);
+                    if (!metadataTasks.All(t => t.Result))
+                    {
+                        _logger.LogError("Failed to copy taxonomy and fieldmapping from verbatim to processed db");
+                        return false;
+                    }
+
+                    _logger.LogInformation("Finish copying taxonomy and fieldmapping from verbatim to processed db");
                 }
-
-                _logger.LogInformation("Finish copying taxonomy and fieldmapping from verbatim to processed db");
-
-
+                
                 //--------------------------------------
                 // 4. Get taxonomy
                 //--------------------------------------
@@ -252,7 +261,7 @@ namespace SOS.Process.Jobs
                 // If cleanStart == false => Keep existing data. Just create ES index if it doesn't exist.
                 //------------------------------------------------------------------------
                 bool newCollection;
-                if (cleanStart)
+                if (cleanStart && !incrementalMode)
                 {
                     _logger.LogInformation(
                         $"Start clear ElasticSearch index: {_processedObservationRepository.IndexName}");
@@ -272,9 +281,9 @@ namespace SOS.Process.Jobs
                 cancellationToken?.ThrowIfCancellationRequested();
 
                 //--------------------------------------
-                // 6.  Empty MongoDB InvalidObservation-{0/1} collection.
+                // 6.  Verify MongoDB InvalidObservation-{0/1} collection.
                 //--------------------------------------
-                await _validationManager.VerifyCollectionAsync();
+                await _validationManager.VerifyCollectionAsync(incrementalMode);
 
                 cancellationToken?.ThrowIfCancellationRequested();
                 //--------------------------------------
@@ -290,13 +299,17 @@ namespace SOS.Process.Jobs
                 //------------------------------------------------------------------------
                 // 8. Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------
-                _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
+                if (!incrementalMode)
+                {
+                    _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
+                }
+
                 var processTaskByDataProvider = new Dictionary<DataProvider, Task<ProcessingStatus>>();
                 foreach (var dataProvider in dataProvidersToProcess)
                 {
                     var processor = _processorByType[dataProvider.Type];
                     processTaskByDataProvider.Add(dataProvider,
-                        processor.ProcessAsync(dataProvider, taxonById, cancellationToken));
+                        processor.ProcessAsync(dataProvider, taxonById, incrementalMode, cancellationToken));
 
                     // Get harvest info and create a provider info object that we can add processing info to later
                     var harvestInfoId = HarvestInfo.GetIdFromDataProvider(dataProvider);
@@ -310,11 +323,15 @@ namespace SOS.Process.Jobs
                 var processingResult = await Task.WhenAll(processTaskByDataProvider.Values);
                 var success = processTaskByDataProvider.Values.All(t => t.Result.Status == RunStatus.Success);
 
-                //----------------------------------------------------------------------------
-                // 9. End create DwC CSV files and merge the files into multiple DwC-A files.
-                //----------------------------------------------------------------------------
-                await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
-                _dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
+                // Don't create a dwc file in incremental mode
+                if (!incrementalMode)
+                {
+                    //----------------------------------------------------------------------------
+                    // 9. End create DwC CSV files and merge the files into multiple DwC-A files.
+                    //----------------------------------------------------------------------------
+                    await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
+                    _dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
+                }
 
                 //----------------------------------------------
                 // 10. Update provider info 
@@ -322,7 +339,7 @@ namespace SOS.Process.Jobs
                 foreach (var task in processTaskByDataProvider)
                 {
                     var vi = providerInfoByDataProvider[task.Key];
-                    vi.ProcessCount = task.Value.Result.Count;
+                    vi.ProcessCount = incrementalMode ? vi.ProcessCount + task.Value.Result.Count : task.Value.Result.Count;
                     vi.ProcessEnd = task.Value.Result.End;
                     vi.ProcessStart = task.Value.Result.Start;
                     vi.ProcessStatus = task.Value.Result.Status;
@@ -352,18 +369,21 @@ namespace SOS.Process.Jobs
                 // 12. If a data provider failed to process and it was not Artportalen,
                 //     then try to copy that data from the active instance.
                 //----------------------------------------------------------------------------
-                var artportalenSuccededOrDidntRun = !processTaskByDataProvider.Any(pair =>
-                    pair.Key.Type == DataProviderType.ArtportalenObservations &&
-                    pair.Value.Result.Status == RunStatus.Failed);
-
-                if (!success && copyFromActiveOnFail && artportalenSuccededOrDidntRun)
+                if (!incrementalMode)
                 {
-                    var copyTasks = processTaskByDataProvider
-                        .Where(t => t.Value.Result.Status == RunStatus.Failed)
-                        .Select(t => _instanceManager.CopyProviderDataAsync(t.Key)).ToArray();
+                    var artportalenSuccededOrDidntRun = !processTaskByDataProvider.Any(pair =>
+                        pair.Key.Type == DataProviderType.ArtportalenObservations &&
+                        pair.Value.Result.Status == RunStatus.Failed);
 
-                    await Task.WhenAll(copyTasks);
-                    success = copyTasks.All(t => t.Result);
+                    if (!success && copyFromActiveOnFail && artportalenSuccededOrDidntRun)
+                    {
+                        var copyTasks = processTaskByDataProvider
+                            .Where(t => t.Value.Result.Status == RunStatus.Failed)
+                            .Select(t => _instanceManager.CopyProviderDataAsync(t.Key)).ToArray();
+
+                        await Task.WhenAll(copyTasks);
+                        success = copyTasks.All(t => t.Result);
+                    }
                 }
 
                 //---------------------------------
@@ -378,7 +398,7 @@ namespace SOS.Process.Jobs
                         _logger.LogInformation("Finish creating indexes");
                     }
 
-                    if (toggleInstanceOnSuccess)
+                    if (toggleInstanceOnSuccess && !incrementalMode)
                     {
                         _logger.LogInformation("Toggle instance");
                         await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository

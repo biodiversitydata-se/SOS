@@ -44,8 +44,8 @@ namespace SOS.Process.Repositories.Destination
         }
 
         public string IndexName => string.IsNullOrEmpty(_indexPrefix)
-            ? $"{_collectionName.ToLower()}"
-            : $"{_indexPrefix.ToLower()}-{_collectionName.ToLower()}";
+            ? $"{CurrentCollectionName.ToLower()}"
+            : $"{_indexPrefix.ToLower()}-{CurrentCollectionName.ToLower()}";
 
         /// <inheritdoc />
         public new async Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items)

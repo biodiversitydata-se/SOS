@@ -9,6 +9,7 @@ namespace SOS.Lib.Jobs.Process
         Task<bool> RunAsync(
             List<string> dataProviderIdOrIdentifiers,
             bool cleanStart,
+            bool incrementalMode,
             bool copyFromActiveOnFail,
             bool toggleInstanceOnSuccess,
             IJobCancellationToken cancellationToken);

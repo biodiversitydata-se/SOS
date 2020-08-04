@@ -251,6 +251,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 false,
                 false,
                 false,
+                false,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -272,6 +273,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             var result = await processJob.RunAsync(
                 new List<string> {DataProviderIdentifiers.Artportalen},
+                false,
                 false,
                 false,
                 false,

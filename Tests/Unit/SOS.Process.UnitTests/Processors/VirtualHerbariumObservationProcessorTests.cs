@@ -84,7 +84,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataprovider, null, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataprovider, null, false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -157,7 +157,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataprovider, null, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataprovider, null, false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -207,7 +207,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, taxa, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, taxa, false, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
