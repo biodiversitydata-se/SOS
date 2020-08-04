@@ -15,7 +15,7 @@ namespace SOS.Process.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var processConfiguration = config.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
+            var processConfiguration = config.GetSection(nameof(ProcessConfiguration)).Get<ProcessConfiguration>();
             return processConfiguration;
         }
 
@@ -39,7 +39,7 @@ namespace SOS.Process.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var exportConfiguration = config.GetSection(typeof(ExportConfiguration).Name).Get<ExportConfiguration>();
+            var exportConfiguration = config.GetSection(nameof(ExportConfiguration)).Get<ExportConfiguration>();
             return exportConfiguration;
         }
 

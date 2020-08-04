@@ -15,7 +15,7 @@ namespace SOS.Import.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var importConfiguration = config.GetSection(typeof(ImportConfiguration).Name).Get<ImportConfiguration>();
+            var importConfiguration = config.GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
             return importConfiguration;
         }
 
@@ -31,31 +31,5 @@ namespace SOS.Import.IntegrationTests
                 .GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
             return verbatimDbConfiguration;
         }
-
-        protected ProcessConfiguration GetProcessConfiguration()
-        {
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .AddUserSecrets<TestBase>()
-                .Build();
-
-            var processConfiguration = config.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
-            return processConfiguration;
-        }
-
-        protected MongoDbConfiguration GetProcessDbConfiguration()
-        {
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
-                .AddUserSecrets<TestBase>()
-                .Build();
-
-            var verbatimDbConfiguration = config.GetSection("ApplicationSettings")
-                .GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
-            return verbatimDbConfiguration;
-        }
-
     }
 }

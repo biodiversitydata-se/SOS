@@ -17,36 +17,28 @@ namespace SOS.Observations.Api.Managers
     /// </summary>
     public class ObservationManager : IObservationManager
     {
-        private const int BiotaTaxonId = 0;
-        private readonly IAreaRepository _areaRepository;
         private readonly IFieldMappingManager _fieldMappingManager;
         private readonly ILogger<ObservationManager> _logger;
         private readonly IProcessedObservationRepository _processedObservationRepository;
-        private readonly ITaxonManager _taxonManager;
+        private readonly IFilterManager _filterManager;
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="areaRepository"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="fieldMappingManager"></param>
-        /// <param name="areaManager"></param>
-        /// <param name="taxonManager"></param>
+        /// <param name="filterManager"></param>
         /// <param name="logger"></param>
         public ObservationManager(
-            IAreaRepository areaRepository,
             IProcessedObservationRepository processedObservationRepository,
             IFieldMappingManager fieldMappingManager,
-            IAreaManager areaManager,
-            ITaxonManager taxonManager,
+            IFilterManager filterManager,
             ILogger<ObservationManager> logger)
         {
-            _areaRepository = areaRepository ?? throw new ArgumentNullException(nameof(areaRepository));
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _fieldMappingManager = fieldMappingManager ?? throw new ArgumentNullException(nameof(fieldMappingManager));
-            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
-
+            _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -56,8 +48,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                filter = await PrepareFilter(filter);
-
+                filter = await _filterManager.PrepareFilter(filter);
                 var processedObservations =
                     await _processedObservationRepository.GetChunkAsync(filter, skip, take, sortBy, sortOrder);
                 ProcessLocalizedFieldMappings(filter, processedObservations.Records);
@@ -69,91 +60,6 @@ namespace SOS.Observations.Api.Managers
                 _logger.LogError(e, "Failed to get chunk of observations");
                 return null;
             }
-        }
-
-        private async Task<SearchFilter> PrepareFilter(SearchFilter filter)
-        {
-            var preparedFilter = filter.Clone();
-
-            if (preparedFilter.IncludeUnderlyingTaxa && preparedFilter.TaxonIds != null &&
-                preparedFilter.TaxonIds.Any())
-            {
-                if (preparedFilter.TaxonIds.Contains(BiotaTaxonId)) // If Biota, then clear taxon filter
-                {
-                    preparedFilter.TaxonIds = new List<int>();
-                }
-                else
-                {
-                    preparedFilter.TaxonIds =
-                        _taxonManager.TaxonTree.GetUnderlyingTaxonIds(preparedFilter.TaxonIds, true);
-                }
-            }
-
-            // handle the area ids search
-            if (preparedFilter.AreaIds != null && preparedFilter.AreaIds.Any())
-            {
-                foreach (var areaId in preparedFilter.AreaIds)
-                {
-                    var area = await _areaRepository.GetAreaAsync(areaId);
-
-                    if (area != null)
-                    {
-                        //if we already have the info needed for the search we skip polygon searches
-                        if (area.AreaType == AreaType.County ||
-                            area.AreaType == AreaType.Municipality ||
-                            area.AreaType == AreaType.Province)
-                        {
-                            if (area.AreaType == AreaType.County)
-                            {
-                                if (preparedFilter.CountyIds == null)
-                                {
-                                    preparedFilter.CountyIds = new List<int>();
-                                }
-
-                                var list = preparedFilter.CountyIds.ToList();
-                                list.Add(area.Id);
-                                preparedFilter.CountyIds = list;
-                            }
-                            else if (area.AreaType == AreaType.Municipality)
-                            {
-                                if (preparedFilter.MunicipalityIds == null)
-                                {
-                                    preparedFilter.MunicipalityIds = new List<int>();
-                                }
-
-                                var list = preparedFilter.MunicipalityIds.ToList();
-                                list.Add(area.Id);
-                                preparedFilter.MunicipalityIds = list;
-                            }
-                            else if (area.AreaType == AreaType.Province)
-                            {
-                                if (preparedFilter.ProvinceIds == null)
-                                {
-                                    preparedFilter.ProvinceIds = new List<int>();
-                                }
-
-                                var list = preparedFilter.ProvinceIds.ToList();
-                                list.Add(area.Id);
-                                preparedFilter.ProvinceIds = list;
-                            }
-                        }
-                        else // we need to use the geometry filter
-                        {
-                            var geometry = await _areaRepository.GetGeometryAsync(areaId);
-
-                            if (preparedFilter.GeometryFilter == null)
-                            {
-                                preparedFilter.GeometryFilter = new GeometryFilter();
-                                preparedFilter.GeometryFilter.MaxDistanceFromPoint = 0;
-                            }
-
-                            preparedFilter.GeometryFilter.Geometries.Add(geometry);
-                        }
-                    }
-                }
-            }
-
-            return preparedFilter;
         }
 
         private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)

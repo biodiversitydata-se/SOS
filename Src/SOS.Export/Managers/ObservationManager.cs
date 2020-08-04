@@ -20,6 +20,7 @@ namespace SOS.Export.Managers
     /// </summary>
     public class ObservationManager : IObservationManager
     {
+        private readonly IFilterManager _filterManager;
         private readonly IBlobStorageService _blobStorageService;
         private readonly IDOIRepository _doiRepository;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
@@ -41,9 +42,9 @@ namespace SOS.Export.Managers
         /// <param name="blobStorageService"></param>
         /// <param name="zendToService"></param>
         /// <param name="fileDestination"></param>
+        /// <param name="filterManager"></param>
         /// <param name="logger"></param>
-        public ObservationManager(
-            IDOIRepository doiRepository,
+        public ObservationManager(IDOIRepository doiRepository,
             IDwcArchiveFileWriter dwcArchiveFileWriter,
             IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
@@ -51,6 +52,7 @@ namespace SOS.Export.Managers
             IBlobStorageService blobStorageService,
             IZendToService zendToService,
             FileDestination fileDestination,
+            IFilterManager filterManager,
             ILogger<ObservationManager> logger)
         {
             _doiRepository = doiRepository ?? throw new ArgumentNullException(nameof(doiRepository));
@@ -61,6 +63,7 @@ namespace SOS.Export.Managers
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
             _zendToService = zendToService ?? throw new ArgumentNullException(nameof(zendToService));
+            _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _exportPath = fileDestination?.Path ?? throw new ArgumentNullException(nameof(fileDestination));
             _dwcArchiveFileWriter =
                 dwcArchiveFileWriter ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriter));
@@ -73,7 +76,8 @@ namespace SOS.Export.Managers
             var zipFilePath = "";
             try
             {
-                zipFilePath = await CreateDWCExportAsync(filter, Guid.NewGuid().ToString(), cancellationToken);
+                var preparedFilter = await _filterManager.PrepareFilter(filter);
+                zipFilePath = await CreateDWCExportAsync(preparedFilter, Guid.NewGuid().ToString(), cancellationToken);
 
                 // zend file to user
                 return await _zendToService.SendFile(emailAddress, JsonConvert.SerializeObject(filter), zipFilePath);
@@ -96,7 +100,8 @@ namespace SOS.Export.Managers
             var zipFilePath = "";
             try
             {
-                zipFilePath = await CreateDWCExportAsync(filter, fileName, cancellationToken);
+                var preparedFilter = await _filterManager.PrepareFilter(filter);
+                zipFilePath = await CreateDWCExportAsync(preparedFilter, fileName, cancellationToken);
 
                 // Blob Storage Containers must be in lower case
                 blobStorageContainer = blobStorageContainer.ToLower();
@@ -121,8 +126,6 @@ namespace SOS.Export.Managers
 
                     return await _doiRepository.AddAsync(doi);
                 }
-
-                ;
 
                 return success;
             }

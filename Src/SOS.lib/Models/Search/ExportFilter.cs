@@ -5,5 +5,10 @@
     /// </summary>
     public class ExportFilter : FilterBase
     {
+        public new ExportFilter Clone()
+        {
+            var exportFilter = (ExportFilter)MemberwiseClone();
+            return exportFilter;
+        }
     }
 }

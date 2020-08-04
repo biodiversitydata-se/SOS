@@ -44,9 +44,10 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterInstance<IProcessClient>(new ProcessClient(processedSettings, Configurations.ProcessDbConfiguration.DatabaseName,
                 Configurations.ProcessDbConfiguration.ReadBatchSize, Configurations.ProcessDbConfiguration.WriteBatchSize)).SingleInstance();
 
-            // Add factories
+            // Add managers
             builder.RegisterType<ObservationManager>().As<IObservationManager>().InstancePerLifetimeScope();
             builder.RegisterType<TaxonManager>().As<ITaxonManager>().InstancePerLifetimeScope();
+            builder.RegisterType<FilterManager>().As<IFilterManager>().InstancePerLifetimeScope();
 
             // Repositories mongo
             builder.RegisterType<DOIRepository>().As<IDOIRepository>().InstancePerLifetimeScope();
@@ -56,6 +57,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<AreaRepository>().As<IAreaRepository>().SingleInstance();
 
             // Services
             builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().InstancePerLifetimeScope();

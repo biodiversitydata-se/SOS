@@ -35,12 +35,10 @@ namespace SOS.Observations.Api.Controllers.Interfaces
             SearchSortOrder sortOrder);
 
         /// <summary>
-        ///     Field Mappings are used for properties with multiple acceptable fixed values but limited by other contraints then
-        ///     permitted by
-        ///     the underlying data type. E.g gender can have the values: male, female...
-        ///     Field Mappings also describe the different possible query parameters available in searches.
+        ///     Term dictionary are used for properties with multiple acceptable fixed values. E.g gender can have the values: male, female...
+        ///     Term dictionary also describe the different possible query parameters available in searches.
         /// </summary>
-        /// <returns>List of Field Mappings</returns>
+        /// <returns>List of term dicionaries.</returns>
         Task<IActionResult> GetFieldMappingAsync();
     }
 }

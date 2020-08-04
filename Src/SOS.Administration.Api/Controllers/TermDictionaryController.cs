@@ -12,25 +12,23 @@ using SOS.Lib.Enums;
 namespace SOS.Administration.Api.Controllers
 {
     /// <summary>
-    ///     Field mapping controller.
+    ///     Term dictionary controller.
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class DictionaryController : ControllerBase, IFieldMappingController
+    public class TermDictionaryController : ControllerBase, ITermDictionaryController
     {
         private readonly IFieldMappingHarvester _fieldMappingHarvester;
-        private readonly ILogger<DictionaryController> _logger;
+        private readonly ILogger<TermDictionaryController> _logger;
 
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="fieldMappingHarvester"></param>
-        /// <param name="fieldMappingDiffHelper"></param>
         /// <param name="logger"></param>
-        public DictionaryController(
+        public TermDictionaryController(
             IFieldMappingHarvester fieldMappingHarvester,
-        
-            ILogger<DictionaryController> logger)
+            ILogger<TermDictionaryController> logger)
         {
             _fieldMappingHarvester =
                 fieldMappingHarvester ?? throw new ArgumentNullException(nameof(fieldMappingHarvester));
@@ -51,7 +49,7 @@ namespace SOS.Administration.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{MethodBase.GetCurrentMethod().Name}() failed");
+                _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
@@ -70,7 +68,7 @@ namespace SOS.Administration.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{MethodBase.GetCurrentMethod().Name}() failed");
+                _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
