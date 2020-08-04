@@ -15,7 +15,7 @@ namespace SOS.Process.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var processConfiguration = config.GetSection(typeof(ProcessConfiguration).Name).Get<ProcessConfiguration>();
+            var processConfiguration = config.GetSection(nameof(ProcessConfiguration)).Get<ProcessConfiguration>();
             return processConfiguration;
         }
 
@@ -27,7 +27,7 @@ namespace SOS.Process.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var exportConfiguration = config.GetSection("ApplicationSettings").GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            var exportConfiguration = config.GetSection(nameof(ProcessConfiguration)).GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
             return exportConfiguration;
         }
 
@@ -39,7 +39,7 @@ namespace SOS.Process.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var exportConfiguration = config.GetSection(typeof(ExportConfiguration).Name).Get<ExportConfiguration>();
+            var exportConfiguration = config.GetSection(nameof(ExportConfiguration)).Get<ExportConfiguration>();
             return exportConfiguration;
         }
 
@@ -51,7 +51,7 @@ namespace SOS.Process.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var exportConfiguration = config.GetSection("ApplicationSettings").GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+            var exportConfiguration = config.GetSection(nameof(ProcessConfiguration)).GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
             return exportConfiguration;
         }
 
@@ -63,7 +63,7 @@ namespace SOS.Process.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var elasticConfiguration = config.GetSection("ApplicationSettings").GetSection("SearchDbConfiguration")
+            var elasticConfiguration = config.GetSection(nameof(ProcessConfiguration)).GetSection("SearchDbConfiguration")
                 .Get<ElasticSearchConfiguration>();
             return elasticConfiguration;
         }

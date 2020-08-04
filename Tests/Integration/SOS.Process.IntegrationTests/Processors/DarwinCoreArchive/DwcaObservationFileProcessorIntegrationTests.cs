@@ -43,6 +43,68 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
         private readonly ITestOutputHelper _testOutputHelper;
 
+        [Fact]
+        public async Task Process_Dwca_observations()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
+            var dataProvider = new DataProvider
+            {
+                Id = 102,
+                Identifier = "TestButterflyMonitoring",
+                Type = DataProviderType.DwcA
+            };
+
+            var dwcaReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            using var archiveReader = new ArchiveReader(archivePath);
+            var observations = await dwcaReader.ReadArchiveAsync(archiveReader, dataProvider);
+            var dwcaProcessor = CreateDwcaObservationProcessor(false, observations);
+            var taxonByTaxonId = await GetTaxonDictionaryAsync();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var processingStatus = await dwcaProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            processingStatus.Status.Should().Be(RunStatus.Success);
+        }
+
+        [Fact]
+        public async Task Process_SHARK_observations()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/SHARK_Zooplankton_NAT_DwC-A.zip";
+            var dataProvider = new DataProvider
+            {
+                Id = 101,
+                Identifier = "TestSHARK",
+                Type = DataProviderType.DwcA
+            };
+
+            var dwcaReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
+            using var archiveReader = new ArchiveReader(archivePath);
+            var observations = await dwcaReader.ReadArchiveAsync(archiveReader, dataProvider);
+            var dwcaProcessor = CreateDwcaObservationProcessor(false, observations);
+            var taxonByTaxonId = await GetTaxonDictionaryAsync();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var processingStatus = await dwcaProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            processingStatus.Status.Should().Be(RunStatus.Success);
+        }
+
 
         private DwcaObservationProcessor CreateDwcaObservationProcessor(
             bool storeProcessedObservations,
@@ -83,6 +145,8 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             var dwcaVerbatimRepository = new Mock<IDwcaVerbatimRepository>();
             dwcaVerbatimRepository.Setup(m => m.GetAllByCursorAsync(It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(mockCursor.Object);
+            dwcaVerbatimRepository.Setup(m => m.CheckIfCollectionExistsAsync(It.IsAny<int>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());
@@ -108,7 +172,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
+            ), new FileService(), new DwcaFilesCreationConfiguration { IsEnabled = false, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
             return new DwcaObservationProcessor(
                 dwcaVerbatimRepository.Object,
                 processedObservationRepository,
@@ -149,64 +213,6 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             return new ProcessedTaxonRepository(
                 processClient,
                 new NullLogger<ProcessedTaxonRepository>());
-        }
-
-        [Fact]
-        public async Task Process_Dwca_observations()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            const string archivePath = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
-            var dataProviderIdIdentifierTuple = new IdIdentifierTuple
-            {
-                Id = 100,
-                Identifier = "TestButterflyMonitoring"
-            };
-            var dwcaReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
-            using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcaReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
-            var dwcaProcessor = CreateDwcaObservationProcessor(false, observations);
-            var taxonByTaxonId = await GetTaxonDictionaryAsync();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var processingStatus = await dwcaProcessor.ProcessAsync(null, taxonByTaxonId, JobCancellationToken.Null);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            processingStatus.Status.Should().Be(RunStatus.Success);
-        }
-
-        [Fact]
-        public async Task Process_SHARK_observations()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            const string archivePath = "./resources/dwca/SHARK_Zooplankton_NAT_DwC-A.zip";
-            var dataProviderIdIdentifierTuple = new IdIdentifierTuple
-            {
-                Id = 101,
-                Identifier = "TestSHARK"
-            };
-            var dwcaReader = new DwcArchiveReader(new NullLogger<DwcArchiveReader>());
-            using var archiveReader = new ArchiveReader(archivePath);
-            var observations = await dwcaReader.ReadArchiveAsync(archiveReader, dataProviderIdIdentifierTuple);
-            var dwcaProcessor = CreateDwcaObservationProcessor(false, observations);
-            var taxonByTaxonId = await GetTaxonDictionaryAsync();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var processingStatus = await dwcaProcessor.ProcessAsync(null, taxonByTaxonId, JobCancellationToken.Null);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            processingStatus.Status.Should().Be(RunStatus.Success);
         }
     }
 }
