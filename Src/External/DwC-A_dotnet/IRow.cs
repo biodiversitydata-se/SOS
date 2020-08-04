@@ -19,6 +19,16 @@ namespace DwC_A
         IEnumerable<string> Fields { get; }
 
         /// <summary>
+        ///     Dictionary of field values.
+        /// </summary>
+        IDictionary<int, string> FieldValueById { get; }
+
+        /// <summary>
+        ///     Checks whether the number of values is correct.
+        /// </summary>
+        bool IsValid { get; }
+
+        /// <summary>
         ///     Returns field value for a specified term
         /// </summary>
         /// <param name="term">Darwin Core Term</param>

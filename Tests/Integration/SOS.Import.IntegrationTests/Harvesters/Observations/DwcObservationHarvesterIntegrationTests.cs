@@ -134,6 +134,36 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             harvestInfo.Status.Should().Be(RunStatus.Success);
         }
 
+        [Fact]
+        public async Task Harvest_Riksskogstaxeringen()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = @"C:\DwC-A\Riksskogstaxeringen\Riksskogstaxeringen-RTFulldataset20200626.zip";
+            var dataProvider = new DataProvider
+            {
+                Id = 104,
+                Identifier = "Riksskogstaxeringen",
+                Type = DataProviderType.DwcA
+            };
+            var dwcObservationHarvester = CreateDwcObservationHarvester();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
+                archivePath,
+                dataProvider,
+                JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            harvestInfo.Status.Should().Be(RunStatus.Success);
+        }
+
+
         private DwcObservationHarvester CreateDwcObservationHarvester()
         {
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
