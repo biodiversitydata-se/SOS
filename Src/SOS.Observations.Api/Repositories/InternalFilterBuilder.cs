@@ -262,6 +262,14 @@ namespace SOS.Observations.Api.Repositories
                             .Value(internalFilter.SpeciesCollectionLabel)));
                 }
 
+                if (!string.IsNullOrEmpty(internalFilter.PublicCollection))
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("publicCollection.keyword")
+                            .Value(internalFilter.PublicCollection)));
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q

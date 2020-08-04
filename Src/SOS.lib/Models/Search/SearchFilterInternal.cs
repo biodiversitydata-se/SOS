@@ -86,5 +86,7 @@ namespace SOS.Lib.Models.Search
         public SightingNotRecoveredFilter NotRecoveredFilter { get; set; }
 
         public string SpeciesCollectionLabel { get; set; }
+
+        public string PublicCollection { get; set; }
     }
 }
