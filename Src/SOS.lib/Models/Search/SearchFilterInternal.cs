@@ -88,5 +88,7 @@ namespace SOS.Lib.Models.Search
         public string SpeciesCollectionLabel { get; set; }
 
         public string PublicCollection { get; set; }
+
+        public string PrivateCollection { get; set; }
     }
 }

@@ -270,6 +270,14 @@ namespace SOS.Observations.Api.Repositories
                             .Value(internalFilter.PublicCollection)));
                 }
 
+                if (!string.IsNullOrEmpty(internalFilter.PrivateCollection))
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("privateCollection.keyword")
+                            .Value(internalFilter.PrivateCollection)));
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
