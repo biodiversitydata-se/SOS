@@ -70,6 +70,7 @@ namespace SOS.Lib.Models.Search
         public string QuantityOperator { get; set; }
 
         public List<int> ValidationStatusIds { get; set; }
+        public List<int> ExcludeValidationStatusIds { get; set; }
 
         public SightingDeterminationFilter DeterminationFilter { get; set; }
 

@@ -307,5 +307,27 @@ namespace SOS.Observations.Api.Repositories
                     break;
             }
         }
+
+        public static List<Func<QueryContainerDescriptor<object>, QueryContainer>> AddExcludeFilters(
+            SearchFilter filter, List<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery)
+        {
+            var excludeQueryInternal = excludeQuery.ToList();
+            if (filter is SearchFilterInternal)
+            {
+                var internalFilter = filter as SearchFilterInternal;
+
+                if (internalFilter.ExcludeValidationStatusIds?.Any() ?? false)
+                {
+                    excludeQueryInternal.Add(q => q
+                        .Terms(t => t
+                            .Field("identification.validationStatus.id")
+                            .Terms(internalFilter.ExcludeValidationStatusIds)
+                        )
+                    );
+                }
+            }
+
+            return excludeQueryInternal;
+        }
     }
 }

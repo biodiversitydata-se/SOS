@@ -63,6 +63,8 @@ namespace SOS.Observations.Api.Repositories
             query = InternalFilterBuilder.AddFilters(filter, query);
 
             var excludeQuery = CreateExcludeQuery(filter);
+            excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
+
             var sortDescriptor = sortBy.ToSortDescriptor<ProcessedObservation>(sortOrder);
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
