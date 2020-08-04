@@ -30,6 +30,13 @@ namespace SOS.Lib.Models.Search
             Unspontaneous
         }
 
+        public enum SightingNotRecoveredFilter
+        {
+            NoFilter,
+            OnlyNotRecovered,
+            DontIncludeNotRecovered
+        }
+
         public int? UserId { get; set; }
         public int? ProjectId { get; set; }
         public bool IncludeRealCount { get; set; }
@@ -75,5 +82,9 @@ namespace SOS.Lib.Models.Search
         public SightingDeterminationFilter DeterminationFilter { get; set; }
 
         public SightingUnspontaneousFilter UnspontaneousFilter { get; set; }
+
+        public SightingNotRecoveredFilter NotRecoveredFilter { get; set; }
+
+        public string SpeciesCollectionLabel { get; set; }
     }
 }

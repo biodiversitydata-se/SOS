@@ -238,6 +238,30 @@ namespace SOS.Observations.Api.Repositories
                         break;
                 }
 
+                switch (internalFilter.NotRecoveredFilter)
+                {
+                    case SearchFilterInternal.SightingNotRecoveredFilter.DontIncludeNotRecovered:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("occurrence.isNotRediscoveredObservation")
+                                .Value(false)));
+                        break;
+                    case SearchFilterInternal.SightingNotRecoveredFilter.OnlyNotRecovered:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("occurrence.isNotRediscoveredObservation")
+                                .Value(true)));
+                        break;
+                }
+
+                if (!string.IsNullOrEmpty(internalFilter.SpeciesCollectionLabel))
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("collectionId.keyword")
+                            .Value(internalFilter.SpeciesCollectionLabel)));
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
