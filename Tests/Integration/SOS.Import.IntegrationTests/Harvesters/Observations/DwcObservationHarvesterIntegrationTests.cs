@@ -14,27 +14,6 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
 {
     public class DwcObservationHarvesterIntegrationTests : TestBase
     {
-        private const string SamplingEventDwcArchiveWithMofExtension =
-            "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
-
-
-        private DwcObservationHarvester CreateDwcObservationHarvester()
-        {
-            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var importClient = new VerbatimClient(
-                verbatimDbConfiguration.GetMongoDbSettings(),
-                verbatimDbConfiguration.DatabaseName,
-                verbatimDbConfiguration.ReadBatchSize,
-                verbatimDbConfiguration.WriteBatchSize);
-            var dwcObservationHarvester = new DwcObservationHarvester(
-                new DarwinCoreArchiveVerbatimRepository(importClient,
-                    new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
-                new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
-                new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
-                new NullLogger<DwcObservationHarvester>());
-            return dwcObservationHarvester;
-        }
-
         [Fact]
         public async Task Harvest_occurrence_dwc_archive_with_emof_extension()
         {
@@ -153,6 +132,23 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             harvestInfo.Status.Should().Be(RunStatus.Success);
+        }
+
+        private DwcObservationHarvester CreateDwcObservationHarvester()
+        {
+            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+            var importClient = new VerbatimClient(
+                verbatimDbConfiguration.GetMongoDbSettings(),
+                verbatimDbConfiguration.DatabaseName,
+                verbatimDbConfiguration.ReadBatchSize,
+                verbatimDbConfiguration.WriteBatchSize);
+            var dwcObservationHarvester = new DwcObservationHarvester(
+                new DarwinCoreArchiveVerbatimRepository(importClient,
+                    new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
+                new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
+                new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
+                new NullLogger<DwcObservationHarvester>());
+            return dwcObservationHarvester;
         }
     }
 }

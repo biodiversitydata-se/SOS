@@ -27,7 +27,7 @@ namespace SOS.Process.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var exportConfiguration = config.GetSection(nameof(ProcessConfiguration)).GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            var exportConfiguration = config.GetSection("ApplicationSettings").GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
             return exportConfiguration;
         }
 
@@ -51,7 +51,7 @@ namespace SOS.Process.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var exportConfiguration = config.GetSection(nameof(ProcessConfiguration)).GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+            var exportConfiguration = config.GetSection("ApplicationSettings").GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
             return exportConfiguration;
         }
 
@@ -63,7 +63,7 @@ namespace SOS.Process.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var elasticConfiguration = config.GetSection(nameof(ProcessConfiguration)).GetSection("SearchDbConfiguration")
+            var elasticConfiguration = config.GetSection("ApplicationSettings").GetSection("SearchDbConfiguration")
                 .Get<ElasticSearchConfiguration>();
             return elasticConfiguration;
         }
