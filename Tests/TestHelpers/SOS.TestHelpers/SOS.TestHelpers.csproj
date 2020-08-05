@@ -14,4 +14,8 @@
     <ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="IO\" />
+  </ItemGroup>
+
 </Project>

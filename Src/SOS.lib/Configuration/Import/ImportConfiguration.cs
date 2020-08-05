@@ -13,6 +13,11 @@ namespace SOS.Lib.Configuration.Import
         public ArtportalenConfiguration ArtportalenConfiguration { get; set; }
 
         /// <summary>
+        ///     Configuration for DwC-A
+        /// </summary>
+        public DwcaConfiguration DwcaConfiguration { get; set; }
+        
+        /// <summary>
         ///     Configuration for clam tree service
         /// </summary>
         public ClamServiceConfiguration ClamServiceConfiguration { get; set; }

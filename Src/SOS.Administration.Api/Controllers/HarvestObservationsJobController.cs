@@ -11,7 +11,9 @@ using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Administration.Api.Models;
 using SOS.Import.Managers.Interfaces;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 
 namespace SOS.Administration.Api.Controllers
@@ -24,18 +26,21 @@ namespace SOS.Administration.Api.Controllers
     public class HarvestObservationsJobController : ControllerBase, IHarvestObservationJobController
     {
         private readonly IDataProviderManager _dataProviderManager;
+        private readonly DwcaConfiguration _dwcaConfiguration;
         private readonly ILogger<HarvestObservationsJobController> _logger;
 
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="dataProviderManager"></param>
+        /// <param name="dwcaConfiguration"></param>
         /// <param name="logger"></param>
-        public HarvestObservationsJobController(
-            IDataProviderManager dataProviderManager,
+        public HarvestObservationsJobController(IDataProviderManager dataProviderManager,
+            DwcaConfiguration dwcaConfiguration,
             ILogger<HarvestObservationsJobController> logger)
         {
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
+            _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -160,8 +165,8 @@ namespace SOS.Administration.Api.Controllers
                     return new BadRequestObjectResult("No file content");
                 }
 
-                //var filePath = Path.GetTempFileName();
-                var filePath = Path.Combine(Path.GetTempPath(), model.DwcaFile.FileName);
+                string filename = FilenameHelper.CreateFilenameWithDate(model.DwcaFile.FileName, true);
+                var filePath = Path.Combine(_dwcaConfiguration.ImportPath, filename);
                 if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
                 await using var stream = new FileStream(filePath, FileMode.Create);
                 await model.DwcaFile.CopyToAsync(stream).ConfigureAwait(false);

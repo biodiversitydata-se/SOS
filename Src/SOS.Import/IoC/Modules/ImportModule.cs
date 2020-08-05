@@ -68,6 +68,9 @@ namespace SOS.Import.IoC.Modules
             if (Configurations.ImportConfiguration.ArtportalenConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.ArtportalenConfiguration).As<ArtportalenConfiguration>()
                     .SingleInstance();
+            if (Configurations.ImportConfiguration.DwcaConfiguration != null)
+                builder.RegisterInstance(Configurations.ImportConfiguration.DwcaConfiguration).As<DwcaConfiguration>()
+                    .SingleInstance();
             if (Configurations.ImportConfiguration.ClamServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.ClamServiceConfiguration).As<ClamServiceConfiguration>()
                     .SingleInstance();
