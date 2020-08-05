@@ -286,6 +286,14 @@ namespace SOS.Observations.Api.Repositories
                             .Value(internalFilter.SubstrateSpeciesId.Value)));
                 }
 
+                if (internalFilter.SubstrateId.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("event.substrate.id")
+                            .Value(internalFilter.SubstrateId.Value)));
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
