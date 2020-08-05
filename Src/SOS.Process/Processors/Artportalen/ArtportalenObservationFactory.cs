@@ -150,6 +150,7 @@ namespace SOS.Process.Processors.Artportalen
                 
                 if(verbatimObservation.SubstrateSpeciesId.HasValue && _taxa != null && _taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out var substratTaxon))
                 {
+                    obs.Event.SubstrateSpeciesId = verbatimObservation.SubstrateSpeciesId.Value;
                     obs.Event.SubstrateSpeciesVernacularName = substratTaxon.VernacularName;
                     obs.Event.SubstrateSpeciesScientificName = substratTaxon.ScientificName;
                 }
