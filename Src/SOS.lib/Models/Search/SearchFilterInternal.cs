@@ -93,5 +93,7 @@ namespace SOS.Lib.Models.Search
         
         public int? SubstrateSpeciesId { get; set; }
         public int? SubstrateId { get; set; }
+
+        public int?  BiotopeId { get; set; }
     }
 }

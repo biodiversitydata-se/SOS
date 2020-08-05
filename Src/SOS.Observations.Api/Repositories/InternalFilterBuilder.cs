@@ -294,6 +294,14 @@ namespace SOS.Observations.Api.Repositories
                             .Value(internalFilter.SubstrateId.Value)));
                 }
 
+                if (internalFilter.BiotopeId.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("event.biotope.id")
+                            .Value(internalFilter.BiotopeId.Value)));
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
