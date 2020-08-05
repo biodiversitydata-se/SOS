@@ -31,12 +31,18 @@ namespace DwC_A
         {
         }
 
+        public ArchiveReader(string archivePath, string outputPath) :
+            this(archivePath, new DefaultFactory(), Path.Combine(outputPath, $"dwca-{Guid.NewGuid()}"))
+        {
+        }
+
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="archivePath">Fully qualified file name for archive file</param>
         /// <param name="abstractFactory">Factory to create tokenizers, readers etc.</param>
-        public ArchiveReader(string archivePath, IAbstractFactory abstractFactory)
+        /// <param name="outputPath">Output path where the zip file should be extracted. If null then the OS temp path is used.</param>
+        public ArchiveReader(string archivePath, IAbstractFactory abstractFactory, string outputPath = null)
         {
             this.abstractFactory = abstractFactory ??
                                    throw new ArgumentNullException(nameof(abstractFactory));
@@ -51,7 +57,7 @@ namespace DwC_A
             else
             {
                 //File is an archive file.  Extract to temp directory
-                archiveFolder = abstractFactory.CreateArchiveFolder(archivePath, null);
+                archiveFolder = abstractFactory.CreateArchiveFolder(archivePath, outputPath);
                 OutputPath = archiveFolder.Extract();
             }
 

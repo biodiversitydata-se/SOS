@@ -13,9 +13,10 @@ namespace DwC_A
         ///     Extracts archive to a folder
         /// </summary>
         /// <param name="fileName">Zip archive file name</param>
-        /// <param name="folderPath">Path to extract to.  Leave null for a temp folder</param>
+        /// <param name="folderPath">Path to extract to. Leave null for a temp folder</param>
         public ArchiveFolder(string fileName, string folderPath = null)
         {
+            ShouldCleanup = true;
             this.fileName = fileName;
             this.folderPath = string.IsNullOrEmpty(folderPath) ? GetTempPath() : folderPath;
         }

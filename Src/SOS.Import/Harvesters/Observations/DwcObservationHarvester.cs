@@ -9,6 +9,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Repositories.Destination.DarwinCoreArchive.Interfaces;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
@@ -26,6 +27,7 @@ namespace SOS.Import.Harvesters.Observations
         private readonly IDarwinCoreArchiveEventRepository _dwcArchiveEventRepository;
         private readonly IDwcArchiveReader _dwcArchiveReader;
         private readonly IDarwinCoreArchiveVerbatimRepository _dwcArchiveVerbatimRepository;
+        private readonly DwcaConfiguration _dwcaConfiguration;
         private readonly ILogger<DwcObservationHarvester> _logger;
 
         /// <summary>
@@ -34,11 +36,13 @@ namespace SOS.Import.Harvesters.Observations
         /// <param name="dwcArchiveVerbatimRepository"></param>
         /// <param name="dwcArchiveEventRepository"></param>
         /// <param name="dwcArchiveReader"></param>
+        /// <param name="dwcaConfiguration"></param>
         /// <param name="logger"></param>
         public DwcObservationHarvester(
             IDarwinCoreArchiveVerbatimRepository dwcArchiveVerbatimRepository,
             IDarwinCoreArchiveEventRepository dwcArchiveEventRepository,
             IDwcArchiveReader dwcArchiveReader,
+            DwcaConfiguration dwcaConfiguration,
             ILogger<DwcObservationHarvester> logger)
         {
             _dwcArchiveVerbatimRepository = dwcArchiveVerbatimRepository ??
@@ -46,6 +50,7 @@ namespace SOS.Import.Harvesters.Observations
             _dwcArchiveEventRepository = dwcArchiveEventRepository ??
                                          throw new ArgumentNullException(nameof(dwcArchiveEventRepository));
             _dwcArchiveReader = dwcArchiveReader ?? throw new ArgumentNullException(nameof(dwcArchiveReader));
+            _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -70,7 +75,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogDebug("Start storing DwC-A observations");
                 await _dwcArchiveVerbatimRepository.ClearTempHarvestCollection(dataProvider);
                 var observationCount = 0;
-                using var archiveReader = new ArchiveReader(archivePath);
+                using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
                 var observationBatches =
                     _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, dataProvider, BatchSize);
                 await foreach (var verbatimObservationsBatch in observationBatches)
@@ -151,7 +156,7 @@ namespace SOS.Import.Harvesters.Observations
                         Id = -1 // Unknown
                     };
 
-                    using var archiveReader = new ArchiveReader(filePath);
+                    using var archiveReader = new ArchiveReader(filePath, _dwcaConfiguration.ImportPath);
                     var observationBatches =
                         _dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader, datasetInfo, BatchSize);
                     await foreach (var verbatimObservationsBatch in observationBatches)
