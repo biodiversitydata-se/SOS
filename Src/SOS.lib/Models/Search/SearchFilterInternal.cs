@@ -23,6 +23,20 @@ namespace SOS.Lib.Models.Search
             OnlyUnsureDetermination
         }
 
+        public enum SightingUnspontaneousFilter
+        {
+            NoFilter,
+            NotUnspontaneous,
+            Unspontaneous
+        }
+
+        public enum SightingNotRecoveredFilter
+        {
+            NoFilter,
+            OnlyNotRecovered,
+            DontIncludeNotRecovered
+        }
+
         public int? UserId { get; set; }
         public int? ProjectId { get; set; }
         public bool IncludeRealCount { get; set; }
@@ -63,7 +77,18 @@ namespace SOS.Lib.Models.Search
         public string QuantityOperator { get; set; }
 
         public List<int> ValidationStatusIds { get; set; }
+        public List<int> ExcludeValidationStatusIds { get; set; }
 
         public SightingDeterminationFilter DeterminationFilter { get; set; }
+
+        public SightingUnspontaneousFilter UnspontaneousFilter { get; set; }
+
+        public SightingNotRecoveredFilter NotRecoveredFilter { get; set; }
+
+        public string SpeciesCollectionLabel { get; set; }
+
+        public string PublicCollection { get; set; }
+
+        public string PrivateCollection { get; set; }
     }
 }

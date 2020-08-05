@@ -222,6 +222,61 @@ namespace SOS.Observations.Api.Repositories
                         break;
                 }
 
+                switch (internalFilter.UnspontaneousFilter)
+                {
+                    case SearchFilterInternal.SightingUnspontaneousFilter.NotUnspontaneous:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("occurrence.isNaturalOccurrence")
+                                .Value(true)));
+                        break;
+                    case SearchFilterInternal.SightingUnspontaneousFilter.Unspontaneous:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("occurrence.isNaturalOccurrence")
+                                .Value(false)));
+                        break;
+                }
+
+                switch (internalFilter.NotRecoveredFilter)
+                {
+                    case SearchFilterInternal.SightingNotRecoveredFilter.DontIncludeNotRecovered:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("occurrence.isNotRediscoveredObservation")
+                                .Value(false)));
+                        break;
+                    case SearchFilterInternal.SightingNotRecoveredFilter.OnlyNotRecovered:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("occurrence.isNotRediscoveredObservation")
+                                .Value(true)));
+                        break;
+                }
+
+                if (!string.IsNullOrEmpty(internalFilter.SpeciesCollectionLabel))
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("collectionId.keyword")
+                            .Value(internalFilter.SpeciesCollectionLabel)));
+                }
+
+                if (!string.IsNullOrEmpty(internalFilter.PublicCollection))
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("publicCollection.keyword")
+                            .Value(internalFilter.PublicCollection)));
+                }
+
+                if (!string.IsNullOrEmpty(internalFilter.PrivateCollection))
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("privateCollection.keyword")
+                            .Value(internalFilter.PrivateCollection)));
+                }
 
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
@@ -291,6 +346,28 @@ namespace SOS.Observations.Api.Repositories
                     );
                     break;
             }
+        }
+
+        public static List<Func<QueryContainerDescriptor<object>, QueryContainer>> AddExcludeFilters(
+            SearchFilter filter, List<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery)
+        {
+            var excludeQueryInternal = excludeQuery.ToList();
+            if (filter is SearchFilterInternal)
+            {
+                var internalFilter = filter as SearchFilterInternal;
+
+                if (internalFilter.ExcludeValidationStatusIds?.Any() ?? false)
+                {
+                    excludeQueryInternal.Add(q => q
+                        .Terms(t => t
+                            .Field("identification.validationStatus.id")
+                            .Terms(internalFilter.ExcludeValidationStatusIds)
+                        )
+                    );
+                }
+            }
+
+            return excludeQueryInternal;
         }
     }
 }

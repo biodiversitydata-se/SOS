@@ -507,7 +507,13 @@ namespace SOS.Lib.Extensions
                 // If it's a string, add keyword in order to make the sorting work
                 if (propertyType == typeof(string))
                 {
-                    sortBy = $"{sortBy}.keyword";
+                    //check if the string property already has the keyword attribute, if it does, we do not need the .keyword
+                    KeywordAttribute isKeywordAttribute =
+                        (KeywordAttribute)Attribute.GetCustomAttribute(targetProperty, typeof(KeywordAttribute));
+                    if (isKeywordAttribute == null)
+                    {
+                        sortBy = $"{sortBy}.keyword";
+                    }
                 }
 
                 sortDescriptor.Field(sortBy,
