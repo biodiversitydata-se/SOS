@@ -90,5 +90,7 @@ namespace SOS.Lib.Models.Search
         public string PublicCollection { get; set; }
 
         public string PrivateCollection { get; set; }
+        
+        public int? SubstrateSpeciesId { get; set; }
     }
 }

@@ -278,6 +278,14 @@ namespace SOS.Observations.Api.Repositories
                             .Value(internalFilter.PrivateCollection)));
                 }
 
+                if (internalFilter.SubstrateSpeciesId.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("event.substrateSpeciesId")
+                            .Value(internalFilter.SubstrateSpeciesId.Value)));
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
