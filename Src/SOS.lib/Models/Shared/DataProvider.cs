@@ -84,6 +84,11 @@ namespace SOS.Lib.Models.Shared
         public bool IncludeInScheduledHarvest { get; set; }
 
         /// <summary>
+        /// True if provider support incremental harvest
+        /// </summary>
+        public bool SupportIncrementalHarvest { get; set; }
+
+        /// <summary>
         ///     Decides whether the data quality is approved.
         /// </summary>
         public bool DataQualityIsApproved { get; set; }

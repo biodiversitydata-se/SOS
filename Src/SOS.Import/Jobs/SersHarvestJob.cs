@@ -54,5 +54,11 @@ namespace SOS.Import.Jobs
                 ? true
                 : throw new Exception("SERS Harvest Job failed");
         }
+
+        /// <inheritdoc />
+        public async Task<bool> RunAsync(bool incrementalHarvest, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException("Method not implemented for SERS");
+        }
     }
 }
