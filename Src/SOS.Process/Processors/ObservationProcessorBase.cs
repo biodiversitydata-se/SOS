@@ -40,26 +40,38 @@ namespace SOS.Process.Processors
 
         public abstract DataProviderType Type { get; }
 
+        /// <summary>
+        /// Process observations
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="taxa"></param>
+        /// <param name="incrementalMode"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public virtual async Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
+            bool incrementalMode,
             IJobCancellationToken cancellationToken)
         {
             Logger.LogInformation($"Start Processing {dataProvider} verbatim observations");
             var startTime = DateTime.Now;
             try
             {
-                Logger.LogDebug($"Start deleting {dataProvider} data");
-                if (!await ProcessRepository.DeleteProviderDataAsync(dataProvider))
+                if (!incrementalMode)
                 {
-                    Logger.LogError($"Failed to delete {dataProvider} data");
-                    return ProcessingStatus.Failed(dataProvider.Identifier, Type, startTime, DateTime.Now);
+                    Logger.LogDebug($"Start deleting {dataProvider} data");
+                    if (!await ProcessRepository.DeleteProviderDataAsync(dataProvider))
+                    {
+                        Logger.LogError($"Failed to delete {dataProvider} data");
+                        return ProcessingStatus.Failed(dataProvider.Identifier, Type, startTime, DateTime.Now);
+                    }
+
+                    Logger.LogDebug($"Finish deleting {dataProvider} data");
                 }
-
-                Logger.LogDebug($"Finish deleting {dataProvider} data");
-
+                
                 Logger.LogDebug($"Start processing {dataProvider} data");
-                var verbatimCount = await ProcessObservations(dataProvider, taxa, cancellationToken);
+                var verbatimCount = await ProcessObservations(dataProvider, taxa, incrementalMode, cancellationToken);
                 Logger.LogInformation($"Finish processing {dataProvider} data.");
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, verbatimCount);
@@ -79,6 +91,7 @@ namespace SOS.Process.Processors
         protected abstract Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
+            bool incrementalMode,
             IJobCancellationToken cancellationToken);
 
 

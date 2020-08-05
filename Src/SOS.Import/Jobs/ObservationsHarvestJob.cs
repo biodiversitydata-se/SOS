@@ -240,6 +240,7 @@ namespace SOS.Import.Jobs
                     var jobId = BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(
                         processDataProviders.Select(dataProvider => dataProvider.Identifier).ToList(),
                         true,
+                        false,
                         true,
                         true,
                         cancellationToken));

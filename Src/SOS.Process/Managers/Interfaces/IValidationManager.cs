@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
@@ -24,9 +22,10 @@ namespace SOS.Process.Managers.Interfaces
         ICollection<InvalidObservation> ValidateObservations(ref ICollection<ProcessedObservation> items);
 
         /// <summary>
-        /// Make sure we have a empty invalid items collection
+        /// Make sure we have a invalid items collection
         /// </summary>
+        /// <param name="incrementalMode"></param>
         /// <returns></returns>
-        Task VerifyCollectionAsync();
+        Task VerifyCollectionAsync(bool incrementalMode);
     }
 }

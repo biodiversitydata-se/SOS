@@ -26,6 +26,8 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// </summary>
         string InactiveCollectionName { get; }
 
+        bool IncrementalMode { get; set; }
+
         int BatchSize { get; }
 
         /// <summary>

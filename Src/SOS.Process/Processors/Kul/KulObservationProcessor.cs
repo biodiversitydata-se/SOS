@@ -55,6 +55,7 @@ namespace SOS.Process.Processors.Kul
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
+            bool incrementalMode,
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;

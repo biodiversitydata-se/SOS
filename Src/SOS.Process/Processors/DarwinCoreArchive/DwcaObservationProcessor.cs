@@ -79,6 +79,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         public override async Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
+            bool incrementalMode,
             IJobCancellationToken cancellationToken)
         {
             Logger.LogInformation($"Start Processing {dataProvider} verbatim observations");
@@ -132,6 +133,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
+            bool incrementalMode,
             IJobCancellationToken cancellationToken)
         {
             throw new NotImplementedException();
