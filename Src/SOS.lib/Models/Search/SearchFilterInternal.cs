@@ -37,6 +37,13 @@ namespace SOS.Lib.Models.Search
             DontIncludeNotRecovered
         }
 
+        public enum SightingNotPresentFilter
+        {
+            DontIncludeNotPresent,
+            OnlyNotPresent,
+            IncludeNotPresent
+        }
+
         public int? UserId { get; set; }
         public int? ProjectId { get; set; }
         public bool IncludeRealCount { get; set; }
@@ -95,5 +102,7 @@ namespace SOS.Lib.Models.Search
         public int? SubstrateId { get; set; }
 
         public int?  BiotopeId { get; set; }
+
+        public SightingNotPresentFilter NotPresentFilter { get; set; }
     }
 }

@@ -302,6 +302,22 @@ namespace SOS.Observations.Api.Repositories
                             .Value(internalFilter.BiotopeId.Value)));
                 }
 
+                switch (internalFilter.NotPresentFilter)
+                {
+                    case SearchFilterInternal.SightingNotPresentFilter.DontIncludeNotPresent:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("occurrence.isNeverFoundObservation")
+                                .Value(false)));
+                        break;
+                    case SearchFilterInternal.SightingNotPresentFilter.OnlyNotPresent:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("occurrence.isNeverFoundObservation")
+                                .Value(true)));
+                        break;
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
