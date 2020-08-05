@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Import.DarwinCore;
 using SOS.Import.Harvesters.Observations;
 using SOS.Import.Repositories.Destination.DarwinCoreArchive;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
@@ -134,6 +135,36 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             harvestInfo.Status.Should().Be(RunStatus.Success);
         }
 
+        [Fact]
+        public async Task Harvest_Riksskogstaxeringen()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = @"C:\DwC-A\Riksskogstaxeringen\Riksskogstaxeringen-RTFulldataset20200626.zip";
+            var dataProvider = new DataProvider
+            {
+                Id = 104,
+                Identifier = "Riksskogstaxeringen",
+                Type = DataProviderType.DwcA
+            };
+            var dwcObservationHarvester = CreateDwcObservationHarvester();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var harvestInfo = await dwcObservationHarvester.HarvestObservationsAsync(
+                archivePath,
+                dataProvider,
+                JobCancellationToken.Null);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            harvestInfo.Status.Should().Be(RunStatus.Success);
+        }
+
+
         private DwcObservationHarvester CreateDwcObservationHarvester()
         {
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
@@ -146,7 +177,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new DarwinCoreArchiveVerbatimRepository(importClient,
                     new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
                 new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
-                new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
+                new DwcArchiveReader(new NullLogger<DwcArchiveReader>()), 
+                new DwcaConfiguration {ImportPath = @"C:\Temp"},
                 new NullLogger<DwcObservationHarvester>());
             return dwcObservationHarvester;
         }

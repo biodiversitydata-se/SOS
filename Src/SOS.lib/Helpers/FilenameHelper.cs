@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace SOS.TestHelpers.IO
+namespace SOS.Lib.Helpers
 {
     /// <summary>
     ///     Contains functions for generating file names that contain today's date and time.
     /// </summary>
-    public static class FilenameGenerator
+    public static class FilenameHelper
     {
         /// <summary>
         ///     Creates a filename by joining: name, file extension and current date & time.
@@ -13,20 +13,32 @@ namespace SOS.TestHelpers.IO
         /// <param name="name">The name part of the filename.</param>
         /// <param name="fileExtension">The file extension.</param>
         /// <returns>A valid filename.</returns>
-        public static string CreateFilename(string name, string fileExtension)
+        public static string CreateFilenameWithDate(string name, string fileExtension)
         {
-            return CreateFilename(name, fileExtension, DateTime.Now);
+            return CreateFilenameWithDate(name, fileExtension, DateTime.Now);
         }
 
         /// <summary>
         ///     Creates a filename by joining: name and current date & time. File extension is excluded.
         /// </summary>
         /// <param name="name">The name part of the filename.</param>
+        /// <param name="preserveFileExtension">If true, the file extension will be preserved.</param>
         /// <returns>A valid filename.</returns>
-        public static string CreateFilename(string name)
+        public static string CreateFilenameWithDate(string name, bool preserveFileExtension = false)
         {
-            var dateFilenamePart = GenerateDateFilenamePart(DateTime.Now);
-            return $"{name}-{dateFilenamePart}";
+            string fileExtension = System.IO.Path.GetExtension(name);
+            if (preserveFileExtension && !string.IsNullOrEmpty(fileExtension))
+            {
+                var dateFilenamePart = GenerateDateFilenamePart(DateTime.Now);
+                var nameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(name);
+                return $"{nameWithoutExtension}-{dateFilenamePart}{fileExtension}";
+                //return System.IO.Path.Combine($"{nameWithoutExtension}-{dateFilenamePart}", fileExtension.Replace(".",""));
+            }
+            else
+            {
+                var dateFilenamePart = GenerateDateFilenamePart(DateTime.Now);
+                return $"{name}-{dateFilenamePart}";
+            }
         }
 
         /// <summary>
@@ -36,7 +48,7 @@ namespace SOS.TestHelpers.IO
         /// <param name="fileExtension">The file extension.</param>
         /// <param name="date">The date that will be used to generate the date part of the filename.</param>
         /// <returns>A valid filename.</returns>
-        public static string CreateFilename(string name, string fileExtension, DateTime date)
+        public static string CreateFilenameWithDate(string name, string fileExtension, DateTime date)
         {
             var dateFilenamePart = GenerateDateFilenamePart(date);
             return $"{name}-{dateFilenamePart}.{fileExtension}";

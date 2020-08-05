@@ -11,6 +11,7 @@ using OfficeOpenXml;
 using SOS.Import.DarwinCore;
 using SOS.Import.Harvesters.Observations;
 using SOS.Import.Repositories.Destination.DarwinCoreArchive;
+using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Statistics;
@@ -57,6 +58,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                     new NullLogger<DarwinCoreArchiveVerbatimRepository>()),
                 new DarwinCoreArchiveEventRepository(importClient, new NullLogger<DarwinCoreArchiveEventRepository>()),
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
+                new DwcaConfiguration { ImportPath = @"C:\Temp" },
                 new NullLogger<DwcObservationHarvester>());
             return dwcObservationHarvester;
         }

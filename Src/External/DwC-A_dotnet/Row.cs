@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DwC_A.Meta;
 
 namespace DwC_A
@@ -31,6 +32,8 @@ namespace DwC_A
                 return this[index];
             }
         }
+
+        public bool IsValid => FieldMetaData.Count() == FieldValueById.Count;
 
         public string this[int index] =>
             // todo - improve performance by introducing Dictionary

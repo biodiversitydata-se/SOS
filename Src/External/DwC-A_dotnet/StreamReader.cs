@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using DwC_A.Factories;
 using DwC_A.Meta;
@@ -23,25 +24,23 @@ namespace DwC_A
 
         public IEnumerable<IRow> ReadRows(Stream stream)
         {
-            using (var reader = new System.IO.StreamReader(stream, fileMetaData.Encoding))
+            using var reader = new System.IO.StreamReader(stream, fileMetaData.Encoding);
+            string line;
+            while ((line = reader.ReadLine()) != null)
             {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    yield return rowFactory.CreateRow(tokenizer.Split(line), fileMetaData.Fields);
-                }
+                var row = rowFactory.CreateRow(tokenizer.Split(line), fileMetaData.Fields);
+                if (row.IsValid) yield return row;
             }
         }
 
         public async IAsyncEnumerable<IRow> ReadRowsAsync(Stream stream)
         {
-            using (var reader = new System.IO.StreamReader(stream, fileMetaData.Encoding))
+            using var reader = new System.IO.StreamReader(stream, fileMetaData.Encoding);
+            string line;
+            while ((line = await reader.ReadLineAsync()) != null)
             {
-                string line;
-                while ((line = await reader.ReadLineAsync()) != null)
-                {
-                    yield return rowFactory.CreateRow(tokenizer.Split(line), fileMetaData.Fields);
-                }
+                var row = rowFactory.CreateRow(tokenizer.Split(line), fileMetaData.Fields);
+                if (row.IsValid) yield return row;
             }
         }
     }

@@ -43,13 +43,10 @@ namespace DwC_A
 
         public async IAsyncEnumerable<IRow> GetRowsAsync()
         {
-            using (var stream = new FileStream(FileName,
-                FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, true))
+            await using var stream = new FileStream(FileName, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, true);
+            await foreach (var row in streamReader.ReadRowsAsync(stream))
             {
-                await foreach (var row in streamReader.ReadRowsAsync(stream))
-                {
-                    yield return row;
-                }
+                yield return row;
             }
         }
 
