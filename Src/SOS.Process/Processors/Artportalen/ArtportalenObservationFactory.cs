@@ -139,6 +139,7 @@ namespace SOS.Process.Processors.Artportalen
 
                 // Event
                 obs.Event = new ProcessedEvent();
+                obs.Event.Biotope = GetSosId(verbatimObservation?.Biotope?.Id, _fieldMappings[FieldMappingFieldId.Biotope]);
                 obs.Event.BiotopeDescription = verbatimObservation.BiotopeDescription;
                 obs.Event.EndDate = endDate?.ToUniversalTime();
                 obs.Event.QuantityOfSubstrate = verbatimObservation.QuantityOfSubstrate;
@@ -147,14 +148,16 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Event.SubstrateSpeciesDescription = verbatimObservation.SubstrateSpeciesDescription;
                 obs.Event.SubstrateDescription = GetSubstrateDescription(verbatimObservation, _taxa);
                 obs.Event.VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate, endDate);
-                
-                if(verbatimObservation.SubstrateSpeciesId.HasValue && _taxa != null && _taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out var substratTaxon))
+
+                if (verbatimObservation.SubstrateSpeciesId.HasValue && _taxa != null && _taxa.TryGetValue(verbatimObservation.SubstrateSpeciesId.Value, out var substratTaxon))
                 {
                     obs.Event.SubstrateSpeciesId = verbatimObservation.SubstrateSpeciesId.Value;
                     obs.Event.SubstrateSpeciesVernacularName = substratTaxon.VernacularName;
                     obs.Event.SubstrateSpeciesScientificName = substratTaxon.ScientificName;
                 }
-                
+
+                obs.Event.Substrate = GetSosId(verbatimObservation?.Substrate?.Id, _fieldMappings[FieldMappingFieldId.Substrate]);
+
                 // Identification
                 obs.Identification = new ProcessedIdentification();
                 obs.Identification.IdentifiedBy = verbatimObservation.VerifiedBy;
@@ -168,8 +171,10 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.CoordinateUncertaintyInMeters = verbatimObservation.Site?.Accuracy;
                 obs.Location.Country = new ProcessedFieldMapValue {Id = (int) CountryId.Sweden};
                 obs.Location.CountryCode = CountryCode.Sweden;
+                obs.Location.County = GetSosId(verbatimObservation.Site?.County?.Id, _fieldMappings[FieldMappingFieldId.County]);
                 obs.Location.DecimalLatitude = point?.Coordinates?.Latitude ?? 0;
                 obs.Location.DecimalLongitude = point?.Coordinates?.Longitude ?? 0;
+                obs.Location.ExternalId = verbatimObservation.Site?.ExternalId;
                 obs.Location.GeodeticDatum = GeodeticDatum.Wgs84;
                 obs.Location.Locality = verbatimObservation.Site?.Name.Trim();
                 obs.Location.LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}";
@@ -177,17 +182,19 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
                 obs.Location.MinimumDepthInMeters = verbatimObservation.MinDepth;
                 obs.Location.MinimumElevationInMeters = verbatimObservation.MinHeight;
+                obs.Location.Municipality = GetSosId(verbatimObservation.Site?.Municipality?.Id, _fieldMappings[FieldMappingFieldId.Municipality]);
+                obs.Location.ParentLocationId = verbatimObservation.Site?.ParentSiteId;
+                obs.Location.ParentLocality = verbatimObservation.Site?.ParentSiteName?.Trim();
+                obs.Location.Parish = GetSosId(verbatimObservation.Site?.Parish?.Id, _fieldMappings[FieldMappingFieldId.Parish]);
                 obs.Location.Point = point;
                 obs.Location.PointLocation = verbatimObservation.Site?.Point?.ToGeoLocation();
                 obs.Location.PointWithBuffer = (PolygonGeoShape) verbatimObservation.Site?.PointWithBuffer.ToGeoShape();
+                obs.Location.PresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
+                obs.Location.Province = GetSosId(verbatimObservation.Site?.Province?.Id, _fieldMappings[FieldMappingFieldId.Province]);
                 obs.Location.VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord : 0;
                 obs.Location.VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0;
                 obs.Location.VerbatimCoordinateSystem = "EPSG:3857";
-                obs.Location.ParentLocationId = verbatimObservation.Site?.ParentSiteId;
-                obs.Location.ParentLocality = verbatimObservation.Site?.ParentSiteName?.Trim();
-                obs.Location.PresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
-                obs.Location.ExternalId = verbatimObservation.Site?.ExternalId;
-                
+
                 // Occurrence
                 obs.Occurrence = new ProcessedOccurrence();
                 obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages
@@ -228,36 +235,18 @@ namespace SOS.Process.Processors.Artportalen
                     : obs.Event.BiotopeDescription).WithMaxLength(255);
 
                 // Get field mapping values
-                obs.Occurrence.Gender =
-                    GetSosId(verbatimObservation.Gender?.Id, _fieldMappings[FieldMappingFieldId.Gender]);
-                obs.Occurrence.Activity =
-                    GetSosId(verbatimObservation.Activity?.Id, _fieldMappings[FieldMappingFieldId.Activity]);
-                obs.Location.County = GetSosId(verbatimObservation.Site?.County?.Id,
-                    _fieldMappings[FieldMappingFieldId.County]);
-                obs.Location.Municipality = GetSosId(verbatimObservation.Site?.Municipality?.Id,
-                    _fieldMappings[FieldMappingFieldId.Municipality]);
-                obs.Location.Province = GetSosId(verbatimObservation.Site?.Province?.Id,
-                    _fieldMappings[FieldMappingFieldId.Province]);
-                obs.Location.Parish = GetSosId(verbatimObservation.Site?.Parish?.Id,
-                    _fieldMappings[FieldMappingFieldId.Parish]);
-                obs.Event.Biotope =
-                    GetSosId(verbatimObservation?.Biotope?.Id, _fieldMappings[FieldMappingFieldId.Biotope]);
-                obs.Event.Substrate = GetSosId(verbatimObservation?.Biotope?.Id,
-                    _fieldMappings[FieldMappingFieldId.Substrate]);
-                obs.Identification.ValidationStatus = GetSosId(verbatimObservation?.ValidationStatus?.Id,
-                    _fieldMappings[FieldMappingFieldId.ValidationStatus]);
-                obs.Occurrence.LifeStage =
-                    GetSosId(verbatimObservation?.Stage?.Id, _fieldMappings[FieldMappingFieldId.LifeStage]);
-                obs.InstitutionId = GetSosId(verbatimObservation?.OwnerOrganization?.Id,
-                    _fieldMappings[FieldMappingFieldId.Institution]);
-                obs.Occurrence.OrganismQuantityUnit = GetSosId(verbatimObservation?.Unit?.Id,
+                obs.Occurrence.Gender = GetSosId(verbatimObservation.Gender?.Id, _fieldMappings[FieldMappingFieldId.Gender]);
+                obs.Occurrence.Activity = GetSosId(verbatimObservation.Activity?.Id, _fieldMappings[FieldMappingFieldId.Activity]);
+                
+                obs.Identification.ValidationStatus = GetSosId(verbatimObservation?.ValidationStatus?.Id, _fieldMappings[FieldMappingFieldId.ValidationStatus]);
+                obs.Occurrence.LifeStage = GetSosId(verbatimObservation?.Stage?.Id, _fieldMappings[FieldMappingFieldId.LifeStage]);
+                obs.InstitutionId = GetSosId(verbatimObservation?.OwnerOrganization?.Id, _fieldMappings[FieldMappingFieldId.Institution]);
+                obs.Occurrence.OrganismQuantityUnit = GetSosId(
+                    verbatimObservation?.Unit?.Id, 
                     _fieldMappings[FieldMappingFieldId.Unit],
-                    (int) UnitId
-                        .Individuals); // todo - if verbatimObservation.Unit is null, should the value be set to "Individuals"? This is how it works in SSOS.
-                obs.Occurrence.DiscoveryMethod = GetSosId(verbatimObservation?.DiscoveryMethod?.Id,
-                    _fieldMappings[FieldMappingFieldId.DiscoveryMethod]);
-                obs.Identification.DeterminationMethod = GetSosId(verbatimObservation?.DeterminationMethod?.Id,
-                    _fieldMappings[FieldMappingFieldId.DeterminationMethod]);
+                    (int) UnitId.Individuals); // todo - if verbatimObservation.Unit is null, should the value be set to "Individuals"? This is how it works in SSOS.
+                obs.Occurrence.DiscoveryMethod = GetSosId(verbatimObservation?.DiscoveryMethod?.Id, _fieldMappings[FieldMappingFieldId.DiscoveryMethod]);
+                obs.Identification.DeterminationMethod = GetSosId(verbatimObservation?.DeterminationMethod?.Id, _fieldMappings[FieldMappingFieldId.DeterminationMethod]);
 
                 return obs;
             }
