@@ -40,7 +40,8 @@ namespace SOS.Import.DarwinCore
         /// <inheritdoc />
         public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
             ArchiveReader archiveReader,
-            IIdIdentifierTuple idIdentifierTuple)
+            IIdIdentifierTuple idIdentifierTuple,
+            int maxNrObservationsToReturn = int.MaxValue)
         {
             const int batchSize = 100000;
             var observationsBatches = ReadArchiveInBatchesAsync(
@@ -51,6 +52,10 @@ namespace SOS.Import.DarwinCore
             await foreach (var observationsBatch in observationsBatches)
             {
                 observations.AddRange(observationsBatch);
+                if (observations.Count >= maxNrObservationsToReturn)
+                {
+                    return observations.Take(maxNrObservationsToReturn).ToList();
+                }
             }
 
             return observations;

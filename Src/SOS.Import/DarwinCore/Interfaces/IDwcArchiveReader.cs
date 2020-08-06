@@ -25,10 +25,12 @@ namespace SOS.Import.DarwinCore.Interfaces
         /// </summary>
         /// <param name="archiveReader"></param>
         /// <param name="idIdentifierTuple"></param>
+        /// <param name="maxNrObservationsToReturn">Max number of observations to return.</param>
         /// <returns></returns>
         public Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
             ArchiveReader archiveReader,
-            IIdIdentifierTuple idIdentifierTuple);
+            IIdIdentifierTuple idIdentifierTuple,
+            int maxNrObservationsToReturn = int.MaxValue);
 
         /// <summary>
         ///     Reads a Sampling Event DwC-A and returns the events in batches.
