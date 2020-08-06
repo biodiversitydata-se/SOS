@@ -104,5 +104,7 @@ namespace SOS.Lib.Models.Search
         public int?  BiotopeId { get; set; }
 
         public SightingNotPresentFilter NotPresentFilter { get; set; }
+
+        public bool OnlySecondHandInformation { get; set; }
     }
 }

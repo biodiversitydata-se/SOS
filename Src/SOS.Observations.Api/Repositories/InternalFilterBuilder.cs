@@ -318,6 +318,22 @@ namespace SOS.Observations.Api.Repositories
                         break;
                 }
 
+                if (internalFilter.OnlySecondHandInformation)
+                {
+                    queryInternal.Add(q=>q
+                        .Wildcard(w=>w
+                            .Field("occurrence.recordedBy")
+                            .Value("Via*")));
+
+                    queryInternal.Add(q=>q
+                        .Script(s=>s
+                            .Script(sc=>sc
+                                .Source("doc['reportedByUserId'].value ==  doc['occurrence.recordedByInternal.id'].value")
+                            )
+                        )
+                    );
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
