@@ -154,7 +154,6 @@ namespace SOS.Administration.Api.Controllers
             }
         }
 
-
         ///// <inheritdoc />
         //[HttpPost("Daily")]
         //[ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]

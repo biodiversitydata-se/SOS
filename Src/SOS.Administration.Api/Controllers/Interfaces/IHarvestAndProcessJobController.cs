@@ -32,5 +32,12 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         Task<IActionResult> RunObservationHarvestAndProcessJob(
             List<string> harvestDataProviderIdOrIdentifiers,
             List<string> processDataProviderIdOrIdentifiers);
+
+        /// <summary>
+        ///  Incremental harvest and processing
+        /// </summary>
+        /// <param name="runIntervalInMinutes"></param>
+        /// <returns></returns>
+        IActionResult ScheduleIncrementalObservationHarvestAndProcessJob(byte runIntervalInMinutes);
     }
 }

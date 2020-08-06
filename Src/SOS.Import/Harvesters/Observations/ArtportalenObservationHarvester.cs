@@ -314,7 +314,6 @@ namespace SOS.Import.Harvesters.Observations
                 // Get source min and max id
                 int minId, maxId;
 
-               
                 if (incrementalHarvest)
                 {
                     // Make sure incremental mode is false to get max id from last full harvest

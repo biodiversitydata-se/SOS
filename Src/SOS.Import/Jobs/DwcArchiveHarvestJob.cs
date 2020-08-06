@@ -82,5 +82,11 @@ namespace SOS.Import.Jobs
             // todo - implement DwC-A harvest from DataProvider.DownloadUrl
             return false;
         }
+
+        /// <inheritdoc />
+        public async Task<bool> RunAsync(bool incrementalHarvest, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException("Method not implemented for Darwin core");
+        }
     }
 }

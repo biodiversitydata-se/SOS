@@ -16,7 +16,8 @@
         "DownloadUrl": null,
         "IncludeInScheduledHarvest": true,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest":  true 
     },
     {
         "Id": 2,
@@ -35,7 +36,8 @@
         "DownloadUrl": null,
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 3,
@@ -54,7 +56,8 @@
         "DownloadUrl": null,
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 4,
@@ -73,7 +76,8 @@
         "DownloadUrl": null,
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 5,
@@ -92,7 +96,8 @@
         "DownloadUrl": null,
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 6,
@@ -111,7 +116,8 @@
         "DownloadUrl": null,
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 7,
@@ -130,7 +136,8 @@
         "DownloadUrl": null,
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 8,
@@ -149,7 +156,8 @@
         "DownloadUrl": null,
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 9,
@@ -168,7 +176,8 @@
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nrm-ringedbirds",
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 10,
@@ -187,7 +196,8 @@
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nhrs-nrm",
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 11,
@@ -206,7 +216,8 @@
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=smtp-nrm",
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 12,
@@ -225,7 +236,8 @@
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=nrm-porpoises",
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 13,
@@ -244,7 +256,8 @@
         "DownloadUrl": "http://www.gbif.se/ipt/archive.do?r=lu_sebms",
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 14,
@@ -263,7 +276,8 @@
         "DownloadUrl": "",
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     },
     {
         "Id": 15,
@@ -282,6 +296,7 @@
         "DownloadUrl": null,
         "IncludeInScheduledHarvest": false,
         "DataQualityIsApproved": true,
-        "HarvestInfo": null
+        "HarvestInfo": null,
+        "SupportIncrementalHarvest": false
     }
 ]

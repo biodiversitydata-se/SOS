@@ -122,5 +122,27 @@ namespace SOS.Administration.Api.Controllers
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <inheritdoc />
+        [HttpPost("Observations/Schedule/Incremental")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult ScheduleIncrementalObservationHarvestAndProcessJob([FromQuery]byte runIntervalInMinutes)
+        {
+            try
+            {
+                RecurringJob.AddOrUpdate<IObservationsHarvestIncrementalJob>(
+                    nameof(IObservationsHarvestIncrementalJob), job => job.RunAsync(
+                        JobCancellationToken.Null),
+                    $"*/{runIntervalInMinutes} * * * *", TimeZoneInfo.Local);
+
+                return new OkObjectResult("Incremental observation Harvest and process job scheduled");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Scheduling incremental observation Harvest and process job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
