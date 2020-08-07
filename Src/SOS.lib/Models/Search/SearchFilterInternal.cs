@@ -45,7 +45,7 @@ namespace SOS.Lib.Models.Search
         }
 
         public int? UserId { get; set; }
-        public int? ProjectId { get; set; }
+        public List<int> ProjectIds { get; set; }
         public bool IncludeRealCount { get; set; }
         public List<double> BoundingBox { get; set; }
         /// <summary>
