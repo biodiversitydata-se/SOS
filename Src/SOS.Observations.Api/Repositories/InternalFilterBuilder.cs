@@ -19,15 +19,15 @@ namespace SOS.Observations.Api.Repositories
             {
                 var internalFilter = filter as SearchFilterInternal;
 
-                if (internalFilter.ProjectId.HasValue)
+                if (internalFilter.ProjectIds?.Any() ?? false)
                 {
                     queryInternal.Add(q => q
                         .Nested(n => n
                             .Path("projects")
                             .Query(q => q
-                                .Match(m => m
-                                    .Field(new Field("projects.id"))
-                                    .Query(internalFilter.ProjectId.ToString())
+                                .Terms(t => t
+                                    .Field("projects.id")
+                                    .Terms(internalFilter.ProjectIds)
                                 )
                             )));
                 }
@@ -278,6 +278,62 @@ namespace SOS.Observations.Api.Repositories
                             .Value(internalFilter.PrivateCollection)));
                 }
 
+                if (internalFilter.SubstrateSpeciesId.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("event.substrateSpeciesId")
+                            .Value(internalFilter.SubstrateSpeciesId.Value)));
+                }
+
+                if (internalFilter.SubstrateId.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("event.substrate.id")
+                            .Value(internalFilter.SubstrateId.Value)));
+                }
+
+                if (internalFilter.BiotopeId.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Term(m => m
+                            .Field("event.biotope.id")
+                            .Value(internalFilter.BiotopeId.Value)));
+                }
+
+                switch (internalFilter.NotPresentFilter)
+                {
+                    case SearchFilterInternal.SightingNotPresentFilter.DontIncludeNotPresent:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("occurrence.isNeverFoundObservation")
+                                .Value(false)));
+                        break;
+                    case SearchFilterInternal.SightingNotPresentFilter.OnlyNotPresent:
+                        queryInternal.Add(q => q
+                            .Term(m => m
+                                .Field("occurrence.isNeverFoundObservation")
+                                .Value(true)));
+                        break;
+                }
+
+                if (internalFilter.OnlySecondHandInformation)
+                {
+                    queryInternal.Add(q=>q
+                        .Wildcard(w=>w
+                            .Field("occurrence.recordedBy")
+                            .Value("Via*")));
+
+                    queryInternal.Add(q=>q
+                        .Script(s=>s
+                            .Script(sc=>sc
+                                .Source("doc['reportedByUserId'].value ==  doc['occurrence.recordedByInternal.id'].value")
+                            )
+                        )
+                    );
+                }
+                
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q

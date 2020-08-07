@@ -37,8 +37,15 @@ namespace SOS.Lib.Models.Search
             DontIncludeNotRecovered
         }
 
+        public enum SightingNotPresentFilter
+        {
+            DontIncludeNotPresent,
+            OnlyNotPresent,
+            IncludeNotPresent
+        }
+
         public int? UserId { get; set; }
-        public int? ProjectId { get; set; }
+        public List<int> ProjectIds { get; set; }
         public bool IncludeRealCount { get; set; }
         public List<double> BoundingBox { get; set; }
         /// <summary>
@@ -90,5 +97,14 @@ namespace SOS.Lib.Models.Search
         public string PublicCollection { get; set; }
 
         public string PrivateCollection { get; set; }
+        
+        public int? SubstrateSpeciesId { get; set; }
+        public int? SubstrateId { get; set; }
+
+        public int?  BiotopeId { get; set; }
+
+        public SightingNotPresentFilter NotPresentFilter { get; set; }
+
+        public bool OnlySecondHandInformation { get; set; }
     }
 }
