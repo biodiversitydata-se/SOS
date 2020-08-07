@@ -1,6 +1,6 @@
 ﻿using Moq;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.TestHelpers.Helpers;
 
 namespace SOS.Process.UnitTests.TestHelpers.Factories

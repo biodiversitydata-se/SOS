@@ -127,10 +127,17 @@ namespace SOS.Administration.Api.Controllers
         [HttpPost("Observations/Schedule/Incremental")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public IActionResult ScheduleIncrementalObservationHarvestAndProcessJob([FromQuery]byte runIntervalInMinutes)
         {
             try
             {
+                if (runIntervalInMinutes <= 0 || runIntervalInMinutes > 59)
+                {
+
+                    return new BadRequestObjectResult("Run interval must be between 1 and 59");
+                }
+
                 RecurringJob.AddOrUpdate<IObservationsHarvestIncrementalJob>(
                     nameof(IObservationsHarvestIncrementalJob), job => job.RunAsync(
                         JobCancellationToken.Null),

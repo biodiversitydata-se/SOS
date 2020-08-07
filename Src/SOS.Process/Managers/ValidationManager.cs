@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Managers.Interfaces;
-using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Managers
 {

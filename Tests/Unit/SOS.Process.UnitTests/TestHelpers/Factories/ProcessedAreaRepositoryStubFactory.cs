@@ -3,7 +3,7 @@ using System.Linq;
 using Moq;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Process.UnitTests.TestHelpers.Factories
 {

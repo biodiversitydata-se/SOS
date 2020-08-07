@@ -9,9 +9,9 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Managers.Interfaces;
-using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Processors
 {

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Lib.Database;
 using SOS.Process.Helpers;
-using SOS.Process.Repositories.Destination;
+using SOS.Lib.Repositories.Processed;
 
 namespace SOS.Process.IntegrationTests.Helpers
 {

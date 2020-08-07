@@ -11,9 +11,9 @@ using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed;
 using SOS.Process.Helpers;
 using SOS.Process.IntegrationTests.TestHelpers;
-using SOS.Process.Repositories.Destination;
 using Xunit;
 
 namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive

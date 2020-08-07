@@ -16,8 +16,8 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Helpers.Interfaces;
-using SOS.Process.Repositories.Destination.Interfaces;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
 
 namespace SOS.Process.Processors.DarwinCoreArchive

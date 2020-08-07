@@ -15,9 +15,9 @@ using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Models.Cache;
-using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Helpers
 {

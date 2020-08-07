@@ -2,14 +2,14 @@
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
-namespace SOS.Process.Repositories.Destination
+namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
     ///     Repository for retrieving field mappings.
     /// </summary>
-    public class ProcessedFieldMappingRepository : ProcessBaseRepository<FieldMapping, FieldMappingFieldId>,
+    public class ProcessedFieldMappingRepository : MongoDbProcessedRepositoryBase<FieldMapping, FieldMappingFieldId>,
         IProcessedFieldMappingRepository
     {
         /// <summary>

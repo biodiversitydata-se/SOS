@@ -2,8 +2,8 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
+using SOS.Lib.Repositories.Processed;
 using SOS.Process.Jobs;
-using SOS.Process.Repositories.Destination;
 using SOS.Process.Repositories.Source;
 using Xunit;
 

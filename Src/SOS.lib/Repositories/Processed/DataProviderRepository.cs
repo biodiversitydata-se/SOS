@@ -7,14 +7,14 @@ using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
-namespace SOS.Process.Repositories.Destination
+namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
     ///     Repository for data providers.
     /// </summary>
-    public class DataProviderRepository : ProcessBaseRepository<DataProvider, int>, IDataProviderRepository
+    public class DataProviderRepository : MongoDbProcessedRepositoryBase<DataProvider, int>, IDataProviderRepository
     {
         /// <summary>
         ///     Constructor.

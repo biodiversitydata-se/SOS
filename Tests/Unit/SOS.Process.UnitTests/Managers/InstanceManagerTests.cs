@@ -5,8 +5,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Constants;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Managers;
-using SOS.Process.Repositories.Destination.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Managers

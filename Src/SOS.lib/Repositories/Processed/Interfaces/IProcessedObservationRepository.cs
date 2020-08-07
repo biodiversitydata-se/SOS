@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Process.Repositories.Destination.Interfaces
+namespace SOS.Lib.Repositories.Processed.Interfaces
 {
     /// <summary>
     ///     Processed data class
     /// </summary>
-    public interface IProcessedObservationRepository : IProcessBaseRepository<ProcessedObservation, string>
+    public interface IProcessedObservationRepository : IProcessRepositoryBase<ProcessedObservation>
     {
         public string IndexName { get; }
 
@@ -46,5 +46,18 @@ namespace SOS.Process.Repositories.Destination.Interfaces
         /// </summary>
         /// <returns></returns>
         Task CreateIndexAsync();
+
+        /// <summary>
+        /// Get max id for specified provider
+        /// </summary>
+        /// <param name="providerId"></param>
+        /// <returns></returns>
+        Task<int> GetMaxIdForProviderAsync(int providerId);
+
+        /// <summary>
+        /// Verify that collection exists
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> VerifyCollectionAsync();
     }
 }

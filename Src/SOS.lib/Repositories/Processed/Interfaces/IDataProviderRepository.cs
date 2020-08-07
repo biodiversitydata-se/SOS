@@ -2,9 +2,9 @@
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Process.Repositories.Destination.Interfaces
+namespace SOS.Lib.Repositories.Processed.Interfaces
 {
-    public interface IDataProviderRepository : IProcessBaseRepository<DataProvider, int>
+    public interface IDataProviderRepository : IMongoDbProcessedRepositoryBase<DataProvider, int>
     {
         Task<bool> UpdateProcessInfo(int dataProviderId, string collectionName, ProviderInfo providerInfo);
     }

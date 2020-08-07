@@ -1,40 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Process.Repositories.Destination.Interfaces
+namespace SOS.Lib.Repositories.Processed.Interfaces
 {
     /// <summary>
     ///     Processed data class
     /// </summary>
-    public interface IProcessBaseRepository<TEntity, in TKey> : IDisposable where TEntity : IEntity<TKey>
+    public interface IMongoDbProcessedRepositoryBase<TEntity, in TKey> : IProcessRepositoryBase<TEntity> where TEntity : IEntity<TKey>
     {
-        /// <summary>
-        ///     Get 0 or 1 depending of witch instance to update
-        /// </summary>
-        byte ActiveInstance { get; }
-
-        /// <summary>
-        ///     Name of active collection
-        /// </summary>
-        string ActiveCollectionName { get; }
-
-        /// <summary>
-        ///     Name of inactive collection
-        /// </summary>
-        string InactiveCollectionName { get; }
-
-        bool IncrementalMode { get; set; }
-
-        int BatchSize { get; }
-
-        /// <summary>
-        ///     Get 0 or 1 depending of witch instance to update
-        /// </summary>
-        byte InActiveInstance { get; }
-
         /// <summary>
         ///     Add one item
         /// </summary>

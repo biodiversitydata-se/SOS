@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
-namespace SOS.Process.Repositories.Destination
+namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
     ///     Repository for retrieving processd taxa.
     /// </summary>
-    public class ProcessedTaxonRepository : ProcessBaseRepository<ProcessedTaxon, int>, IProcessedTaxonRepository
+    public class ProcessedTaxonRepository : MongoDbProcessedRepositoryBase<ProcessedTaxon, int>, IProcessedTaxonRepository
     {
         /// <summary>
         ///     Constructor.

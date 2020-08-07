@@ -62,9 +62,9 @@ namespace SOS.Import.Jobs
             await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult);
 
             // return result of all imports
-            return new [] { RunStatus.Success, RunStatus.Canceled }.Contains(harvestInfoResult.Status) 
-                ? true
-                : throw new Exception("Artportalen Harvest Job failed");
+            return harvestInfoResult.Status.Equals(RunStatus.Success) ? true :
+                 harvestInfoResult.Status.Equals(RunStatus.Canceled) ? false : 
+                throw new Exception("Artportalen Harvest Job failed");
         }
     }
 }

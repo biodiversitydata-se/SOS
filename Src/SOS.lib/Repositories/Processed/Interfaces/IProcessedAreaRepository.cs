@@ -4,12 +4,12 @@ using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Process.Repositories.Destination.Interfaces
+namespace SOS.Lib.Repositories.Processed.Interfaces
 {
     /// <summary>
     ///     Repository for retrieving processed areas.
     /// </summary>
-    public interface IProcessedAreaRepository : IProcessBaseRepository<Area, int>
+    public interface IProcessedAreaRepository : IMongoDbProcessedRepositoryBase<Area, int>
     {
         /// <summary>
         ///     Create indexes

@@ -9,20 +9,50 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
-namespace SOS.Process.Repositories.Destination
+namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, string>,
+    public class ProcessedObservationRepository : ProcessRepositoryBase<ProcessedObservation>,
         IProcessedObservationRepository
     {
         private const string ScrollTimeOut = "45s";
         private readonly IElasticClient _elasticClient;
         private readonly string _indexPrefix;
         private readonly int _scrollBatchSize;
+
+        private async Task<bool> AddCollectionAsync()
+        {
+            var createIndexResponse = await _elasticClient.Indices.CreateAsync(IndexName, s => s
+                .IncludeTypeName(false)
+                .Settings(s => s
+                    .NumberOfShards(6)
+                    .NumberOfReplicas(0)
+                )
+                .Map<ProcessedObservation>(p => p
+                    .AutoMap()
+                    .Properties(ps => ps
+                        .GeoShape(gs => gs
+                            .Name(nn => nn.Location.Point))
+                        .GeoPoint(gp => gp
+                            .Name(nn => nn.Location.PointLocation))
+                        .GeoShape(gs => gs
+                            .Name(nn => nn.Location.PointWithBuffer)))));
+
+            if (createIndexResponse.Acknowledged && createIndexResponse.IsValid)
+            {
+                var updateSettingsResponse =
+                    await _elasticClient.Indices.UpdateSettingsAsync(IndexName,
+                        p => p.IndexSettings(g => g.RefreshInterval(-1)));
+
+                return updateSettingsResponse.Acknowledged && updateSettingsResponse.IsValid;
+            }
+
+            return false;
+        }
 
         /// <summary>
         ///     Constructor
@@ -40,13 +70,14 @@ namespace SOS.Process.Repositories.Destination
         {
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
             _indexPrefix = elasticConfiguration.IndexPrefix;
-            _scrollBatchSize = client.ReadBatchSize;
+            _scrollBatchSize = client.ReadBatchSize; 
         }
 
         public string IndexName => string.IsNullOrEmpty(_indexPrefix)
-            ? $"{CurrentCollectionName.ToLower()}"
-            : $"{_indexPrefix.ToLower()}-{CurrentCollectionName.ToLower()}";
+            ? $"{CurrentInstanceName.ToLower()}"
+            : $"{_indexPrefix.ToLower()}-{CurrentInstanceName.ToLower()}";
 
+        
         /// <inheritdoc />
         public new async Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items)
         {
@@ -82,26 +113,16 @@ namespace SOS.Process.Repositories.Destination
             return success;
         }
 
-        /// <inheritdoc />
-        public async Task<bool> DeleteProviderDataAsync(DataProvider dataProvider)
+        public async Task<bool> ClearCollectionAsync()
         {
-            try
-            {
-                // Create the collection
-                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q => q
-                    .Index(IndexName)
-                    .Query(q => q
-                        .Term(t => t
-                            .Field(f => f.DataProviderId)
-                            .Value(dataProvider.Id))));
+            await DeleteCollectionAsync();
+            return await AddCollectionAsync();
+        }
 
-                return res.IsValid;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
-            }
+        public async Task<bool> DeleteCollectionAsync()
+        {
+            var res = await _elasticClient.Indices.DeleteAsync(IndexName);
+            return res.IsValid;
         }
 
         /// <inheritdoc />
@@ -129,50 +150,58 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
-        public async Task<bool> ClearCollectionAsync()
+        /// <inheritdoc />
+        public async Task<bool> DeleteProviderDataAsync(DataProvider dataProvider)
         {
-            await DeleteCollectionAsync();
-            return await AddCollectionAsync();
-        }
-
-        public override async Task<bool> DeleteCollectionAsync()
-        {
-            var res = await _elasticClient.Indices.DeleteAsync(IndexName);
-            return res.IsValid;
-        }
-
-        public override async Task<bool> AddCollectionAsync()
-        {
-            var createIndexResponse = await _elasticClient.Indices.CreateAsync(IndexName, s => s
-                .IncludeTypeName(false)
-                .Settings(s => s
-                    .NumberOfShards(6)
-                    .NumberOfReplicas(0)
-                )
-                .Map<ProcessedObservation>(p => p
-                    .AutoMap()
-                    .Properties(ps => ps
-                        .GeoShape(gs => gs
-                            .Name(nn => nn.Location.Point))
-                        .GeoPoint(gp => gp
-                            .Name(nn => nn.Location.PointLocation))
-                        .GeoShape(gs => gs
-                            .Name(nn => nn.Location.PointWithBuffer)))));
-
-            if (createIndexResponse.Acknowledged && createIndexResponse.IsValid)
+            try
             {
-                var updateSettingsResponse =
-                    await _elasticClient.Indices.UpdateSettingsAsync(IndexName,
-                        p => p.IndexSettings(g => g.RefreshInterval(-1)));
+                // Create the collection
+                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q => q
+                    .Index(IndexName)
+                    .Query(q => q
+                        .Term(t => t
+                            .Field(f => f.DataProviderId)
+                            .Value(dataProvider.Id))));
 
-                return updateSettingsResponse.Acknowledged && updateSettingsResponse.IsValid;
+                return res.IsValid;
             }
-
-            return false;
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
         }
 
         /// <inheritdoc />
-        public override async Task<bool> VerifyCollectionAsync()
+        public async Task<int> GetMaxIdForProviderAsync(int providerId)
+        {
+            try
+            {
+                // Create the collection
+                var res = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                    .Index(IndexName)
+                    .Query(q => q
+                        .Term(t => t
+                            .Field(f => f.DataProviderId)
+                            .Value(providerId)))
+                    .Aggregations(a => a
+                        .Max("maxId", m => m
+                        .Field(f => f.VerbatimId)
+                        )
+                     )
+                );
+
+                return (int)res.Aggregations.Max("maxId").Value;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return 0;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> VerifyCollectionAsync()
         {
             var response = await _elasticClient.Indices.ExistsAsync(IndexName);
 

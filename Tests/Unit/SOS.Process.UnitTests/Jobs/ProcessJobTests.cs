@@ -16,6 +16,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
 using SOS.Process.Managers.Interfaces;
@@ -29,7 +30,6 @@ using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark.Interfaces;
 using SOS.Process.Processors.VirtualHerbarium.Interfaces;
-using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
 

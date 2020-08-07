@@ -5,14 +5,14 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Validation;
-using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
-namespace SOS.Process.Repositories.Destination
+namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
     ///     Invalid observation repository
     /// </summary>
-    public class InvalidObservationRepository : ProcessBaseRepository<InvalidObservation, ObjectId>,
+    public class InvalidObservationRepository : MongoDbProcessedRepositoryBase<InvalidObservation, ObjectId>,
         IInvalidObservationRepository
     {
         /// <summary>

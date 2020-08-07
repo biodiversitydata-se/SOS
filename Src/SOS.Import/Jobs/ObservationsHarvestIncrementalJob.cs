@@ -92,7 +92,6 @@ namespace SOS.Import.Jobs
                 //---------------------------------------------------------------------------------------------------------
                 if (harvestTaskByDataProvider.All(p => p.Value.Result))
                 {
-
                     // Enqueue process job to Hangfire
                     var jobId = BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(
                         dataProviders.Select(dataProvider => dataProvider.Identifier).ToList(),

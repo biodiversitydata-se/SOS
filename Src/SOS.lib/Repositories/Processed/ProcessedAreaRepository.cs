@@ -10,14 +10,14 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
-namespace SOS.Process.Repositories.Destination
+namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
     ///     Repository for retrieving processed areas.
     /// </summary>
-    public class ProcessedAreaRepository : ProcessBaseRepository<Area, int>, IProcessedAreaRepository
+    public class ProcessedAreaRepository : MongoDbProcessedRepositoryBase<Area, int>, IProcessedAreaRepository
     {
         private readonly GridFSBucket _gridFSBucket;
         private readonly JsonSerializerOptions _jsonSerializerOptions;

@@ -13,6 +13,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
@@ -25,7 +26,6 @@ using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark.Interfaces;
 using SOS.Process.Processors.VirtualHerbarium.Interfaces;
-using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Jobs
@@ -353,12 +353,12 @@ namespace SOS.Process.Jobs
                 {
                     await _dataProviderManager.UpdateProcessInfo(
                         dataProvider.Id,
-                        _processedObservationRepository.InactiveCollectionName,
+                        _processedObservationRepository.InactiveInstanceName,
                         providerInfoByDataProvider[dataProvider]);
                 }
 
                 await SaveProcessInfo(
-                    _processedObservationRepository.InactiveCollectionName,
+                    _processedObservationRepository.InactiveInstanceName,
                     processStart,
                     providerInfoByDataProvider.Sum(pi => pi.Value.ProcessCount ?? 0),
                     success ? RunStatus.Success : RunStatus.Failed,

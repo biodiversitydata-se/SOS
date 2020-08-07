@@ -14,8 +14,8 @@ using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Models;
-using SOS.Process.Repositories.Destination.Interfaces;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
 using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
 
@@ -99,6 +99,7 @@ namespace SOS.Process.Processors.Artportalen
                 var obs = new ProcessedObservation();
 
                 // Record level
+                obs.VerbatimId = verbatimObservation.Id;
                 obs.DataProviderId = _dataProvider.Id;
                 obs.AccessRights = !verbatimObservation.ProtectedBySystem && verbatimObservation.HiddenByProvider.HasValue &&
                                    verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now

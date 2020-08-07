@@ -6,8 +6,8 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Helpers.Interfaces;
-using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.Helpers
 {

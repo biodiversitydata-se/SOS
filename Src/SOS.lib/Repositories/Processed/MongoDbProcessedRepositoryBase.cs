@@ -6,36 +6,20 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
-using SOS.Process.Repositories.Destination.Interfaces;
-
-namespace SOS.Process.Repositories.Destination
+namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public class ProcessBaseRepository<TEntity, TKey> : IProcessBaseRepository<TEntity, TKey>
+    public class MongoDbProcessedRepositoryBase<TEntity, TKey> : ProcessRepositoryBase<TEntity>, IMongoDbProcessedRepositoryBase<TEntity, TKey>
         where TEntity : IEntity<TKey>
     {
         private readonly IProcessClient _client;
 
-
-        private readonly string _collectionNameConfiguration = typeof(ProcessedConfiguration).Name;
-        private readonly bool _toggleable;
-
-        /// <summary>
-        ///     Logger
-        /// </summary>
-        protected readonly ILogger<ProcessBaseRepository<TEntity, TKey>> Logger;
-
-        /// <summary>
-        ///     Disposed
-        /// </summary>
-        private bool _disposed;
-
+       
         /// <summary>
         ///     Mongo db
         /// </summary>
@@ -47,36 +31,24 @@ namespace SOS.Process.Repositories.Destination
         /// <param name="client"></param>
         /// <param name="toggleable"></param>
         /// <param name="logger"></param>
-        public ProcessBaseRepository(
+        public MongoDbProcessedRepositoryBase(
             IProcessClient client,
             bool toggleable,
-            ILogger<ProcessBaseRepository<TEntity, TKey>> logger
-        )
+            ILogger<ProcessRepositoryBase<TEntity>> logger
+        ) : base (client, toggleable, logger)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
-            _toggleable = toggleable;
-            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            BatchSize = _client.WriteBatchSize;
+            
             Database = _client.GetDatabase();
-
-            // Init config
-            InitializeConfiguration();
         }
 
         /// <summary>
         ///     Get collection
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(CurrentCollectionName);
+        protected IMongoCollection<TEntity> MongoCollection => Database.GetCollection<TEntity>(CurrentInstanceName);
 
-        /// <summary>
-        ///     Configuration collection
-        /// </summary>
-        private IMongoCollection<ProcessedConfiguration> MongoCollectionConfiguration => Database
-            .GetCollection<ProcessedConfiguration>(_collectionNameConfiguration)
-            .WithWriteConcern(new WriteConcern(1, journal: true));
-
+       
         /// <inheritdoc />
         public async Task<bool> UpdateAsync(TKey id, TEntity entity)
         {
@@ -101,10 +73,6 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
-        public byte ActiveInstance => GetConfiguration()?.ActiveInstance ?? 1;
-        public byte InActiveInstance => (byte) (ActiveInstance == 0 ? 1 : 0);
-
-        public bool IncrementalMode { get; set; }
 
         /// <inheritdoc />
         public virtual async Task<List<TEntity>> GetAllAsync()
@@ -113,23 +81,6 @@ namespace SOS.Process.Repositories.Destination
 
             return res;
         }
-
-        public int BatchSize { get; }
-
-        /// <summary>
-        ///     Dispose
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        public string ActiveCollectionName => GetInstanceName(ActiveInstance);
-
-        public string InactiveCollectionName => GetInstanceName(InActiveInstance);
-
-        public string CurrentCollectionName => IncrementalMode ? ActiveCollectionName : InactiveCollectionName;
 
         /// <inheritdoc />
         public async Task<bool> AddAsync(TEntity item)
@@ -164,7 +115,7 @@ namespace SOS.Process.Repositories.Destination
             try
             {
                 // Create the collection
-                await Database.CreateCollectionAsync(CurrentCollectionName);
+                await Database.CreateCollectionAsync(CurrentInstanceName);
 
                 return true;
             }
@@ -223,7 +174,7 @@ namespace SOS.Process.Repositories.Destination
             try
             {
                 // Create the collection
-                await Database.DropCollectionAsync(CurrentCollectionName);
+                await Database.DropCollectionAsync(CurrentInstanceName);
 
                 return true;
             }
@@ -251,30 +202,7 @@ namespace SOS.Process.Repositories.Destination
             }
         }
 
-        /// <inheritdoc />
-        public async Task<bool> SetActiveInstanceAsync(byte instance)
-        {
-            try
-            {
-                var config = GetConfiguration();
-
-                config.ActiveInstance = instance;
-
-                var updateResult = await MongoCollectionConfiguration.ReplaceOneAsync(
-                    x => x.Id.Equals(config.Id),
-                    config,
-                    new ReplaceOptions {IsUpsert = true});
-
-                return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-
-                return default;
-            }
-        }
-
+     
         /// <inheritdoc />
         public virtual async Task<bool> VerifyCollectionAsync()
         {
@@ -282,7 +210,7 @@ namespace SOS.Process.Repositories.Destination
             var exists = (await Database
                     .ListCollectionNamesAsync(new ListCollectionNamesOptions
                     {
-                        Filter = new BsonDocument("name", CurrentCollectionName)
+                        Filter = new BsonDocument("name", CurrentInstanceName)
                     }))
                 .Any();
 
@@ -290,66 +218,12 @@ namespace SOS.Process.Repositories.Destination
             if (!exists)
             {
                 // Create the collection
-                await Database.CreateCollectionAsync(CurrentCollectionName);
+                await Database.CreateCollectionAsync(CurrentInstanceName);
 
                 return true;
             }
 
             return false;
-        }
-
-
-        /// <summary>
-        ///     Make sure configuration collection exists
-        /// </summary>
-        private void InitializeConfiguration()
-        {
-            //filter by collection name
-            var exists = Database
-                .ListCollectionNames(new ListCollectionNamesOptions
-                {
-                    Filter = new BsonDocument("name", _collectionNameConfiguration)
-                })
-                .Any();
-
-            //check for existence
-            if (!exists)
-            {
-                // Create the collection
-                Database.CreateCollection(_collectionNameConfiguration);
-
-                MongoCollectionConfiguration.InsertOne(new ProcessedConfiguration
-                {
-                    ActiveInstance = 1
-                });
-            }
-        }
-
-        /// <summary>
-        ///     Get configuration object
-        /// </summary>
-        /// <returns></returns>
-        protected ProcessedConfiguration GetConfiguration()
-        {
-            try
-            {
-                return MongoCollectionConfiguration
-                    .Find(Builders<ProcessedConfiguration>.Filter.Empty)
-                    .FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-
-                return default;
-            }
-        }
-
-        protected string GetInstanceName(byte instance)
-        {
-            return _toggleable
-                ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{instance}"
-                : $"{typeof(TEntity).Name.UntilNonAlfanumeric()}";
         }
 
         /// <summary>
@@ -404,24 +278,6 @@ namespace SOS.Process.Repositories.Destination
                 Logger.LogError(e.ToString());
                 return false;
             }
-        }
-
-        /// <summary>
-        ///     Dispose
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-            }
-
-            _disposed = true;
         }
     }
 }

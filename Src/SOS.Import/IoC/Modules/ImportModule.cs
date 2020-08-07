@@ -1,9 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using Autofac;
-using Elasticsearch.Net;
-using Nest;
 using SOS.Import.DarwinCore;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Import.Factories.FieldMapping;
@@ -40,8 +36,6 @@ using SOS.Import.Repositories.Destination.Taxon;
 using SOS.Import.Repositories.Destination.Taxon.Interfaces;
 using SOS.Import.Repositories.Destination.VirtualHerbarium;
 using SOS.Import.Repositories.Destination.VirtualHerbarium.Interfaces;
-using SOS.Import.Repositories.Resource;
-using SOS.Import.Repositories.Resource.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services;
@@ -51,6 +45,8 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Jobs.Import;
+using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Import.IoC.Modules
 {
@@ -159,8 +155,11 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>()
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
 
+            builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
+               .InstancePerLifetimeScope();
+
             // Repositories resource
-            builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<Repositories.Resource.DataProviderRepository>().As<Repositories.Resource.Interfaces.IDataProviderRepository>().InstancePerLifetimeScope();
 
             // Add harvesters
             builder.RegisterType<AreaHarvester>().As<IAreaHarvester>().InstancePerLifetimeScope();

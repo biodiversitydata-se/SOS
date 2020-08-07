@@ -19,11 +19,11 @@ using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Helpers;
 using SOS.Process.Managers;
 using SOS.Process.Processors.Artportalen;
-using SOS.Process.Repositories.Destination;
-using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
 using Xunit;
 

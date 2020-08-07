@@ -11,6 +11,7 @@
   <ItemGroup>
     <PackageReference Include="Hangfire.Core" Version="1.7.11" />
     <PackageReference Include="MailKit" Version="2.7.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.5" />
     <PackageReference Include="Microsoft.SqlServer.Types" Version="14.0.1016.290" />
     <PackageReference Include="MongoDB.Driver" Version="2.10.4" />
     <PackageReference Include="MongoDB.Driver.GridFS" Version="2.10.4" />
@@ -25,10 +26,6 @@
     <None Update="Resources\FieldDescriptions.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Repositories\" />
   </ItemGroup>
 
 </Project>

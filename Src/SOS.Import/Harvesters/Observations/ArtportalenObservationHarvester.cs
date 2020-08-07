@@ -10,12 +10,12 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MongoDB.Bson;
 
 namespace SOS.Import.Harvesters.Observations
 {
@@ -36,6 +36,7 @@ namespace SOS.Import.Harvesters.Observations
         private readonly ISightingVerbatimRepository _sightingVerbatimRepository;
         private readonly ISiteRepository _siteRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
+        private readonly IProcessedObservationRepository _processedObservationRepository;
         private bool _hasAddedTestSightings;
         private ArtportalenHarvestFactory _harvestFactory;
 
@@ -204,9 +205,8 @@ namespace SOS.Import.Harvesters.Observations
         }
 
         /// <summary>
-        ///     Constructor
+        /// Constructor
         /// </summary>
-        /// ///
         /// <param name="artportalenConfiguration"></param>
         /// <param name="metadataRepository"></param>
         /// <param name="projectRepository"></param>
@@ -217,6 +217,7 @@ namespace SOS.Import.Harvesters.Observations
         /// <param name="organizationRepository"></param>
         /// <param name="sightingRelationRepository"></param>
         /// <param name="speciesCollectionItemRepository"></param>
+        /// <param name="processedObservationRepository"></param>
         /// <param name="logger"></param>
         public ArtportalenObservationHarvester(
             ArtportalenConfiguration artportalenConfiguration,
@@ -229,6 +230,7 @@ namespace SOS.Import.Harvesters.Observations
             IOrganizationRepository organizationRepository,
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionItemRepository,
+            IProcessedObservationRepository processedObservationRepository,
             ILogger<ArtportalenObservationHarvester> logger)
         {
             _artportalenConfiguration = artportalenConfiguration ??
@@ -246,6 +248,7 @@ namespace SOS.Import.Harvesters.Observations
                                           throw new ArgumentNullException(nameof(sightingRelationRepository));
             _speciesCollectionRepository = speciesCollectionItemRepository ??
                                            throw new ArgumentNullException(nameof(speciesCollectionItemRepository));
+            _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads);
@@ -317,10 +320,10 @@ namespace SOS.Import.Harvesters.Observations
                 if (incrementalHarvest)
                 {
                     // Make sure incremental mode is false to get max id from last full harvest
-                    _sightingVerbatimRepository.IncrementalMode = false;
+                    _processedObservationRepository.IncrementalMode = false;
 
                     // We start from last harvested sighting and end at latest added sighting (live data)
-                    minId = await _sightingVerbatimRepository.GetMaxIdAsync() + 1;
+                    minId = await _processedObservationRepository.GetMaxIdForProviderAsync(1) + 1;
                     maxId = await _sightingRepository.GetMaxIdLiveAsync();
             
                     // Check if number of sightings to harvest exceeds live harvest limit
@@ -334,6 +337,13 @@ namespace SOS.Import.Harvesters.Observations
                 else
                 {
                     (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
+
+                    // MaxNumberOfSightingsHarvested is a debug feature. If it's set calculate minid to get last sightings.
+                    // This make it easier to test incremental harvest since it has a max limit from last created 
+                    if (_artportalenConfiguration.MaxNumberOfSightingsHarvested.HasValue && _artportalenConfiguration.MaxNumberOfSightingsHarvested > 0)
+                    {
+                        minId = maxId - _artportalenConfiguration.MaxNumberOfSightingsHarvested.Value;
+                    }
                 }
 
                 // Set observation repository in incremental mode in order to store data in other collection
@@ -383,7 +393,6 @@ namespace SOS.Import.Harvesters.Observations
                     _logger.LogDebug($"Finish getting Artportalen sightings ({ nrSightingsHarvested })");
                 }
                 
-
                 // Update harvest info
                 harvestInfo.DataLastModified = await _sightingRepository.GetLastModifiedDateAsyc();
                 harvestInfo.End = DateTime.Now;

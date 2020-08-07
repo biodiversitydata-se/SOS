@@ -9,7 +9,7 @@ using SOS.Lib.Database;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Process.Repositories.Destination;
+using SOS.Lib.Repositories.Processed;
 using SOS.Process.Repositories.Source;
 using Xunit;
 

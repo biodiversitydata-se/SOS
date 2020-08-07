@@ -15,6 +15,8 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Constants;
 using SOS.Lib.Database;
+using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Helpers;
 using SOS.Process.Jobs;
 using SOS.Process.Managers;
@@ -28,8 +30,6 @@ using SOS.Process.Processors.Nors;
 using SOS.Process.Processors.Sers;
 using SOS.Process.Processors.Shark;
 using SOS.Process.Processors.VirtualHerbarium;
-using SOS.Process.Repositories.Destination;
-using SOS.Process.Repositories.Destination.Interfaces;
 using SOS.Process.Repositories.Source;
 using Xunit;
 

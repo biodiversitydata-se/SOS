@@ -6,9 +6,9 @@ using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed;
 using SOS.Process.Helpers;
 using SOS.Process.Processors.DarwinCoreArchive;
-using SOS.Process.Repositories.Destination;
 
 namespace SOS.Process.IntegrationTests.TestHelpers
 {

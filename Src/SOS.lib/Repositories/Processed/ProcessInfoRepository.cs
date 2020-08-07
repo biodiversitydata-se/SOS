@@ -6,14 +6,14 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Repositories.Destination.Interfaces;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
-namespace SOS.Process.Repositories.Destination
+namespace SOS.Lib.Repositories.Processed
 {
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public class ProcessInfoRepository : ProcessBaseRepository<ProcessInfo, string>, IProcessInfoRepository
+    public class ProcessInfoRepository : MongoDbProcessedRepositoryBase<ProcessInfo, string>, IProcessInfoRepository
     {
         /// <summary>
         ///     Constructor
@@ -44,7 +44,7 @@ namespace SOS.Process.Repositories.Destination
             }
 
             var target = await GetAsync(inactiveProcessedInfoId) ??
-                         new ProcessInfo(InactiveCollectionName, DateTime.Now);
+                         new ProcessInfo(InactiveInstanceName, DateTime.Now);
 
             // make a list of providers
             var targetProviders = target.ProvidersInfo.ToList();

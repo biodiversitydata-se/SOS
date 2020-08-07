@@ -5,7 +5,7 @@ using Moq;
 using Nest;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
-using SOS.Process.Repositories.Destination;
+using SOS.Lib.Repositories.Processed;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Repositories.Destination
