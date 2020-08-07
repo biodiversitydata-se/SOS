@@ -19,15 +19,15 @@ namespace SOS.Observations.Api.Repositories
             {
                 var internalFilter = filter as SearchFilterInternal;
 
-                if (internalFilter.ProjectId.HasValue)
+                if (internalFilter.ProjectIds?.Any() ?? false)
                 {
                     queryInternal.Add(q => q
                         .Nested(n => n
                             .Path("projects")
                             .Query(q => q
-                                .Match(m => m
-                                    .Field(new Field("projects.id"))
-                                    .Query(internalFilter.ProjectId.ToString())
+                                .Terms(t => t
+                                    .Field("projects.id")
+                                    .Terms(internalFilter.ProjectIds)
                                 )
                             )));
                 }
@@ -333,7 +333,7 @@ namespace SOS.Observations.Api.Repositories
                         )
                     );
                 }
-
+                
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q
