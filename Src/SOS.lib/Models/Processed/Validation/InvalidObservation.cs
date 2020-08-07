@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Lib.Models.Processed.Validation
@@ -24,6 +26,18 @@ namespace SOS.Lib.Models.Processed.Validation
             OccurrenceID = occurrenceID;
             ModifiedDate = DateTime.Now;
         }
+
+        /// <summary>
+        /// Is the observation valid.
+        /// </summary>
+        [BsonIgnore]
+        public bool IsValid => !Defects.Any();
+
+        /// <summary>
+        /// Is the observation invalid.
+        /// </summary>
+        [BsonIgnore]
+        public bool IsInvalid => Defects.Any();
 
         /// <summary>
         ///     Id of data set

@@ -28,7 +28,7 @@ namespace SOS.Lib.Helpers
             {
                 foreach (var deleteProperty in deleteProperties)
                 {
-                    jToken.SelectTokens($"[*].{deleteProperty}").ToList().ForEach(attr => attr.Parent.Remove());
+                    jToken.SelectTokens($"{deleteProperty}").ToList().ForEach(attr => attr.Parent.Remove());
                 }
             }
 

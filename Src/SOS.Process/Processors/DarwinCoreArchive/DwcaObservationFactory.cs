@@ -474,10 +474,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
         private ProcessedTaxon CreateProcessedTaxon(DwcObservationVerbatim verbatimObservation)
         {
-            var processedTaxon = new ProcessedTaxon();
             // Get all taxon values from Dyntaxa instead of the provided DarwinCore data.
-            TryGetTaxonInformation(
-                processedTaxon,
+            var processedTaxon = TryGetTaxonInformation(
                 verbatimObservation.TaxonID,
                 verbatimObservation.ScientificName,
                 verbatimObservation.ScientificNameAuthorship,
@@ -522,8 +520,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             //processedTaxon.VernacularName = verbatimObservation.VernacularName;
         }
 
-        private void TryGetTaxonInformation(
-            ProcessedTaxon processedTaxon,
+        private ProcessedTaxon TryGetTaxonInformation(
             string taxonId,
             string scientificName,
             string scientificNameAuthorship,
@@ -539,44 +536,50 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                     taxon = result.First();
                 }
             }
-
-            if (taxon != null)
+            if (taxon == null)
             {
-                processedTaxon.DyntaxaTaxonId = taxon.DyntaxaTaxonId;
-                processedTaxon.AcceptedNameUsage = taxon.AcceptedNameUsage;
-                processedTaxon.AcceptedNameUsageID = taxon.AcceptedNameUsageID;
-                processedTaxon.Class = taxon.Class;
-                processedTaxon.Family = taxon.Family;
-                processedTaxon.Genus = taxon.Genus;
-                processedTaxon.HigherClassification = taxon.HigherClassification;
-                processedTaxon.InfraspecificEpithet = taxon.InfraspecificEpithet;
-                processedTaxon.Kingdom = taxon.Kingdom;
-                processedTaxon.NameAccordingTo = taxon.NameAccordingTo;
-                processedTaxon.NameAccordingToID = taxon.NameAccordingToID;
-                processedTaxon.NamePublishedIn = taxon.NamePublishedIn;
-                processedTaxon.NamePublishedInId = taxon.NamePublishedInId;
-                processedTaxon.NamePublishedInYear = taxon.NamePublishedInYear;
-                processedTaxon.NomenclaturalCode = taxon.NomenclaturalCode;
-                processedTaxon.NomenclaturalStatus = taxon.NomenclaturalStatus;
-                processedTaxon.Order = taxon.Order;
-                processedTaxon.OriginalNameUsage = taxon.OriginalNameUsage;
-                processedTaxon.OriginalNameUsageId = taxon.OriginalNameUsageId;
-                processedTaxon.ParentNameUsage = taxon.ParentNameUsage;
-                processedTaxon.ParentNameUsageId = taxon.ParentNameUsageId;
-                processedTaxon.Phylum = taxon.Phylum;
-                processedTaxon.ScientificName = taxon.ScientificName;
-                processedTaxon.ScientificNameAuthorship = taxon.ScientificNameAuthorship;
-                processedTaxon.ScientificNameId = taxon.ScientificNameId;
-                processedTaxon.SpecificEpithet = taxon.SpecificEpithet;
-                processedTaxon.Subgenus = taxon.Subgenus;
-                processedTaxon.TaxonConceptId = taxon.TaxonConceptId;
-                processedTaxon.TaxonId = taxon.TaxonId;
-                processedTaxon.TaxonomicStatus = taxon.TaxonomicStatus;
-                processedTaxon.TaxonRank = taxon.TaxonRank;
-                processedTaxon.TaxonRemarks = taxon.TaxonRemarks;
-                processedTaxon.VerbatimTaxonRank = taxon.VerbatimTaxonRank;
-                processedTaxon.VernacularName = taxon.VernacularName;
+                return null;
             }
+
+            var processedTaxon = new ProcessedTaxon
+            {
+                DyntaxaTaxonId = taxon.DyntaxaTaxonId,
+                AcceptedNameUsage = taxon.AcceptedNameUsage,
+                AcceptedNameUsageID = taxon.AcceptedNameUsageID,
+                Class = taxon.Class,
+                Family = taxon.Family,
+                Genus = taxon.Genus,
+                HigherClassification = taxon.HigherClassification,
+                InfraspecificEpithet = taxon.InfraspecificEpithet,
+                Kingdom = taxon.Kingdom,
+                NameAccordingTo = taxon.NameAccordingTo,
+                NameAccordingToID = taxon.NameAccordingToID,
+                NamePublishedIn = taxon.NamePublishedIn,
+                NamePublishedInId = taxon.NamePublishedInId,
+                NamePublishedInYear = taxon.NamePublishedInYear,
+                NomenclaturalCode = taxon.NomenclaturalCode,
+                NomenclaturalStatus = taxon.NomenclaturalStatus,
+                Order = taxon.Order,
+                OriginalNameUsage = taxon.OriginalNameUsage,
+                OriginalNameUsageId = taxon.OriginalNameUsageId,
+                ParentNameUsage = taxon.ParentNameUsage,
+                ParentNameUsageId = taxon.ParentNameUsageId,
+                Phylum = taxon.Phylum,
+                ScientificName = taxon.ScientificName,
+                ScientificNameAuthorship = taxon.ScientificNameAuthorship,
+                ScientificNameId = taxon.ScientificNameId,
+                SpecificEpithet = taxon.SpecificEpithet,
+                Subgenus = taxon.Subgenus,
+                TaxonConceptId = taxon.TaxonConceptId,
+                TaxonId = taxon.TaxonId,
+                TaxonomicStatus = taxon.TaxonomicStatus,
+                TaxonRank = taxon.TaxonRank,
+                TaxonRemarks = taxon.TaxonRemarks,
+                VerbatimTaxonRank = taxon.VerbatimTaxonRank,
+                VernacularName = taxon.VernacularName
+            };
+
+            return processedTaxon;
         }
 
         //private ProcessedFieldMapValue GetSosId(string val,
