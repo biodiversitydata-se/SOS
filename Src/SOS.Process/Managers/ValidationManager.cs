@@ -45,49 +45,59 @@ namespace SOS.Process.Managers
         }
 
         /// <inheritdoc />
-        public ICollection<InvalidObservation> ValidateObservations(ref ICollection<ProcessedObservation> items)
+        public ICollection<InvalidObservation> ValidateObservations(ref ICollection<ProcessedObservation> observations)
         {
             var validItems = new List<ProcessedObservation>();
             var invalidItems = new List<InvalidObservation>();
 
-            foreach (var item in items)
+            foreach (var observation in observations)
             {
-                var invalidObservation =
-                    new InvalidObservation(item.DatasetId, item.DatasetName, item.Occurrence.OccurrenceId);
+                var observationValidation = ValidateObservation(observation);
 
-                if (item.Taxon == null)
+                if (observationValidation.IsInvalid)
                 {
-                    invalidObservation.Defects.Add("Taxon not found");
-                }
-
-                if ((item.Location?.CoordinateUncertaintyInMeters ?? 0) > 100000)
-                {
-                    invalidObservation.Defects.Add("CoordinateUncertaintyInMeters exceeds max value 100 km");
-                }
-
-                if (!item.IsInEconomicZoneOfSweden)
-                {
-                    invalidObservation.Defects.Add("Sighting outside Swedish economic zone");
-                }
-
-                if (string.IsNullOrEmpty(item?.Occurrence.CatalogNumber))
-                {
-                    invalidObservation.Defects.Add("CatalogNumber is missing");
-                }
-
-                if (invalidObservation.Defects.Any())
-                {
-                    invalidItems.Add(invalidObservation);
+                    invalidItems.Add(observationValidation);
                 }
                 else
                 {
-                    validItems.Add(item);
+                    validItems.Add(observation);
                 }
             }
 
-            items = validItems;
-
+            observations = validItems;
             return invalidItems.Any() ? invalidItems : null;
+        }
+
+        /// <summary>
+        /// Checks if an observation is valid or not.
+        /// </summary>
+        /// <param name="observation"></param>
+        /// <returns></returns>
+        public InvalidObservation ValidateObservation(ProcessedObservation observation)
+        {
+            var observationValidation = new InvalidObservation(observation.DatasetId, observation.DatasetName, observation.Occurrence.OccurrenceId);
+
+            if (observation.Taxon == null)
+            {
+                observationValidation.Defects.Add("Taxon not found");
+            }
+
+            if ((observation.Location?.CoordinateUncertaintyInMeters ?? 0) > 100000)
+            {
+                observationValidation.Defects.Add("CoordinateUncertaintyInMeters exceeds max value 100 km");
+            }
+
+            if (!observation.IsInEconomicZoneOfSweden)
+            {
+                observationValidation.Defects.Add("Sighting outside Swedish economic zone");
+            }
+
+            if (string.IsNullOrEmpty(observation?.Occurrence.CatalogNumber))
+            {
+                observationValidation.Defects.Add("CatalogNumber is missing");
+            }
+
+            return observationValidation;
         }
 
         /// <inheritdoc />

@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using SOS.Lib.Database;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Processed;
 using SOS.Process.Helpers;
+using SOS.Process.Managers;
 using SOS.Process.Processors.DarwinCoreArchive;
+using SOS.Process.Repositories.Destination;
+using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.IntegrationTests.TestHelpers
 {
@@ -17,13 +20,22 @@ namespace SOS.Process.IntegrationTests.TestHelpers
         public DwcaObservationFactoryIntegrationFixture()
         {
             DwcaObservationFactory = CreateDwcaObservationFactoryAsync().Result;
+            ValidationManager = CreateValidationManager();
         }
 
         public DwcaObservationFactory DwcaObservationFactory { get; private set; }
+        public ValidationManager ValidationManager { get; private set; }
 
         public void Dispose()
         {
             DwcaObservationFactory = null;
+        }
+
+        private ValidationManager CreateValidationManager()
+        {
+            var invalidObservationRepositoryMock = new Mock<IInvalidObservationRepository>();
+            ValidationManager validationManager = new ValidationManager(invalidObservationRepositoryMock.Object, new NullLogger<ValidationManager>());
+            return validationManager;
         }
 
         private async Task<DwcaObservationFactory> CreateDwcaObservationFactoryAsync()
