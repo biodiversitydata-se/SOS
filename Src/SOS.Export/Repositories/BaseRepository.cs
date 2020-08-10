@@ -75,7 +75,7 @@ namespace SOS.Export.Repositories
         ///     Get active instance
         /// </summary>
         /// <returns></returns>
-        public byte ActiveInstance => GetConfiguration().ActiveInstance;
+        public byte ActiveInstance => GetConfiguration()?.ActiveInstance ?? 0;
 
         public string CollectionName => _toggleable
             ? $"{typeof(TEntity).Name.UntilNonAlfanumeric()}-{ActiveInstance}"

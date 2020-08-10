@@ -7,13 +7,13 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters.Observations;
-using SOS.Import.Repositories.Destination.Artportalen;
-using SOS.Import.Repositories.Source.Artportalen;
+using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Harvesters.Observations
@@ -33,11 +33,12 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _projectRepositoryMock = new Mock<IProjectRepository>();
             _sightingRepositoryMock = new Mock<ISightingRepository>();
             _siteRepositoryMockMock = new Mock<ISiteRepository>();
-            _sightingVerbatimRepository = new Mock<SightingVerbatimRepository>();
-            _personRepository = new Mock<PersonRepository>();
-            _organizationRepository = new Mock<OrganizationRepository>();
-            _sightingRelationRepository = new Mock<SightingRelationRepository>();
-            _speciesCollectionItemRepository = new Mock<SpeciesCollectionItemRepository>();
+            _sightingVerbatimRepository = new Mock<ISightingVerbatimRepository>();
+            _personRepository = new Mock<IPersonRepository>();
+            _organizationRepository = new Mock<IOrganizationRepository>();
+            _sightingRelationRepository = new Mock<ISightingRelationRepository>();
+            _speciesCollectionItemRepository = new Mock<ISpeciesCollectionItemRepository>();
+            _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _loggerMock = new Mock<ILogger<ArtportalenObservationHarvester>>();
         }
 
@@ -46,11 +47,12 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         private readonly Mock<IProjectRepository> _projectRepositoryMock;
         private readonly Mock<ISightingRepository> _sightingRepositoryMock;
         private readonly Mock<ISiteRepository> _siteRepositoryMockMock;
-        private readonly Mock<SightingVerbatimRepository> _sightingVerbatimRepository;
-        private readonly Mock<PersonRepository> _personRepository;
-        private readonly Mock<OrganizationRepository> _organizationRepository;
-        private readonly Mock<SightingRelationRepository> _sightingRelationRepository;
-        private readonly Mock<SpeciesCollectionItemRepository> _speciesCollectionItemRepository;
+        private readonly Mock<ISightingVerbatimRepository> _sightingVerbatimRepository;
+        private readonly Mock<IPersonRepository> _personRepository;
+        private readonly Mock<IOrganizationRepository> _organizationRepository;
+        private readonly Mock<ISightingRelationRepository> _sightingRelationRepository;
+        private readonly Mock<ISpeciesCollectionItemRepository> _speciesCollectionItemRepository;
+        private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<ILogger<ArtportalenObservationHarvester>> _loggerMock;
 
         private ArtportalenObservationHarvester TestObject => new ArtportalenObservationHarvester(
@@ -64,6 +66,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _organizationRepository.Object,
             _sightingRelationRepository.Object,
             _speciesCollectionItemRepository.Object,
+            _processedObservationRepositoryMock.Object,
             _loggerMock.Object);
 
         /// <summary>
@@ -177,6 +180,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("artportalenConfiguration");
 
@@ -191,6 +195,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("projectRepository");
 
@@ -205,6 +210,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sightingRepository");
 
@@ -219,6 +225,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("siteRepository");
 
@@ -233,6 +240,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("sightingVerbatimRepository");
 
@@ -247,6 +255,22 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
                 _speciesCollectionItemRepository.Object,
+                null,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
+
+            create = () => new ArtportalenObservationHarvester(
+                _artportalenConfiguration,
+                _metadataRepositoryMock.Object,
+                _projectRepositoryMock.Object,
+                _sightingRepositoryMock.Object,
+                _siteRepositoryMockMock.Object,
+                _sightingVerbatimRepository.Object,
+                _personRepository.Object,
+                _organizationRepository.Object,
+                _sightingRelationRepository.Object,
+                _speciesCollectionItemRepository.Object,
+                _processedObservationRepositoryMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }

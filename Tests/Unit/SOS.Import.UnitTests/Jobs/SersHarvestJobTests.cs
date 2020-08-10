@@ -129,7 +129,7 @@ namespace SOS.Import.UnitTests.Managers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _sersObservationHarvesterMock.Setup(ts => ts.HarvestObservationsAsync(JobCancellationToken.Null))
-                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success});
+                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success, Count = 1 });
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
             //-----------------------------------------------------------------------------------------------------------

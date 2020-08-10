@@ -101,7 +101,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             // Assert
             //-----------------------------------------------------------------------------------------------------------
 
-            result.Status.Should().Be(RunStatus.Failed);
+            result.Count.Should().Be(0);
         }
 
         /// <summary>

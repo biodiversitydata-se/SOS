@@ -55,6 +55,11 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         private void InitializeConfiguration()
         {
+            if (_database == null)
+            {
+                return;
+            }
+
             //filter by collection name
             var exists = _database
                 .ListCollectionNames(new ListCollectionNamesOptions

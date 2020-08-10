@@ -32,7 +32,10 @@ namespace SOS.Import.Repositories.Destination.Artportalen
             _jsonSerializerOptions = new JsonSerializerOptions();
             _jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
 
-            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions {BucketName = nameof(Area)});
+            if (Database != null)
+            {
+                _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = nameof(Area) });
+            }
         }
 
         /// <inheritdoc />

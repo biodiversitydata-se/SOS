@@ -21,10 +21,12 @@ namespace SOS.Process.UnitTests.Jobs
         public CopyProviderDataJobTests()
         {
             _instanceManagerMock = new Mock<IInstanceManager>();
+            _dataProviderManagerMock = new Mock<IDataProviderManager>();
             _loggerMock = new Mock<ILogger<CopyProviderDataJob>>();
         }
 
         private readonly Mock<IInstanceManager> _instanceManagerMock;
+        private readonly Mock<IDataProviderManager> _dataProviderManagerMock;
         private readonly Mock<ILogger<CopyProviderDataJob>> _loggerMock;
 
         /// <summary>
@@ -44,15 +46,15 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             var job = new CopyProviderDataJob(
                 _instanceManagerMock.Object,
-                null,
+                _dataProviderManagerMock.Object,
                 _loggerMock.Object);
 
-            var result = await job.RunAsync(It.IsAny<int>());
+            Func<Task> act = async () => { await job.RunAsync(It.IsAny<int>()); };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeFalse();
+            act.Should().Throw<Exception>();
         }
 
         /// <summary>
@@ -72,15 +74,15 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             var job = new CopyProviderDataJob(
                 _instanceManagerMock.Object,
-                null,
+                _dataProviderManagerMock.Object,
                 _loggerMock.Object);
 
-            var result = await job.RunAsync(It.IsAny<int>());
+            Func<Task> act = async () => { await job.RunAsync(It.IsAny<int>()); };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeFalse();
+            act.Should().Throw<Exception>();
         }
 
         // todo - delete test?
@@ -125,12 +127,15 @@ namespace SOS.Process.UnitTests.Jobs
             _instanceManagerMock.Setup(r => r.CopyProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
 
+            _dataProviderManagerMock.Setup(dpm => dpm.GetDataProviderByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(new DataProvider());
+
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var job = new CopyProviderDataJob(
                 _instanceManagerMock.Object,
-                null,
+                _dataProviderManagerMock.Object,
                 _loggerMock.Object);
 
             var result = await job.RunAsync(It.IsAny<int>());

@@ -27,7 +27,10 @@ namespace SOS.Process.Repositories.Source
             _jsonSerializerOptions = new JsonSerializerOptions();
             _jsonSerializerOptions.Converters.Add(new GeometryConverter());
 
-            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions {BucketName = nameof(Area)});
+            if (Database != null)
+            {
+                _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = nameof(Area) });
+            }
         }
 
         /// <inheritdoc />

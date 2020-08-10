@@ -66,7 +66,10 @@ namespace SOS.Import.Jobs
                 await _harvestInfoRepository
                     .AddOrUpdateAsync(
                         harvestInfoResult); // todo - decide whether we should store harvestInfo in two places or not.
-                await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult);
+                if (dataProvider != null)
+                {
+                    await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult);
+                }
                 return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0
                     ? true
                     : throw new Exception("DwC-A Harvest Job failed");

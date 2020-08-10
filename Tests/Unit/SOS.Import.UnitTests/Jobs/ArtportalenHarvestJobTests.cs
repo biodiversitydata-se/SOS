@@ -129,9 +129,11 @@ namespace SOS.Import.UnitTests.Managers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _artportalenObservationHarvesterMock.Setup(ts => ts.HarvestSightingsAsync(false, JobCancellationToken.Null))
-                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success});
+                .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success, Count = 1 });
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
+            _dataProviderManagerMock.Setup(dpm => dpm.UpdateHarvestInfo(It.IsAny<int>(), It.IsAny<HarvestInfo>()))
+                .ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------

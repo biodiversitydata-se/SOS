@@ -14,6 +14,7 @@ using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Harvesters.Observations
@@ -56,6 +57,8 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             var speciesCollectionItemRepository = new SpeciesCollectionItemRepository(artportalenDataService,
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
+
+            var _processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
             siteRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<SiteEntity>());
 
             var observationHarvester = new ArtportalenObservationHarvester(
@@ -70,6 +73,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
+                _processedObservationRepository,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -111,6 +115,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
             var siteRepositoryMock = new Mock<ISiteRepository>();
             siteRepositoryMock.Setup(foo => foo.GetAsync()).ReturnsAsync(new List<SiteEntity>());
+            var _processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
 
             var observationHarvester = new ArtportalenObservationHarvester(
                 importConfiguration.ArtportalenConfiguration,
@@ -124,6 +129,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
+                _processedObservationRepository,
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

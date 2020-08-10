@@ -4,9 +4,10 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NetTopologySuite.Geometries;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters;
-using SOS.Import.Repositories.Destination.Artportalen;
+using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
@@ -25,12 +26,12 @@ namespace SOS.Import.UnitTests.Harvesters
         public AreaHarvesterTests()
         {
             _areaRepositoryMock = new Mock<IAreaRepository>();
-            _areaVerbatimRepository = new Mock<AreaVerbatimRepository>();
+            _areaVerbatimRepository = new Mock<IAreaVerbatimRepository>();
             _loggerMock = new Mock<ILogger<AreaHarvester>>();
         }
 
         private readonly Mock<IAreaRepository> _areaRepositoryMock;
-        private readonly Mock<AreaVerbatimRepository> _areaVerbatimRepository;
+        private readonly Mock<IAreaVerbatimRepository> _areaVerbatimRepository;
         private readonly Mock<ILogger<AreaHarvester>> _loggerMock;
 
         private AreaHarvester TestObject => new AreaHarvester(
@@ -106,6 +107,8 @@ namespace SOS.Import.UnitTests.Harvesters
             _areaVerbatimRepository.Setup(tr => tr.AddCollectionAsync())
                 .ReturnsAsync(true);
             _areaVerbatimRepository.Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<Area>>()))
+                .ReturnsAsync(true);
+            _areaVerbatimRepository.Setup(tr => tr.StoreGeometriesAsync(It.IsAny<IDictionary<int, Geometry>>()))
                 .ReturnsAsync(true);
 
             //-----------------------------------------------------------------------------------------------------------

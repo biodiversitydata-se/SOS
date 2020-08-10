@@ -69,7 +69,7 @@ namespace SOS.Lib.Repositories.Processed
         ) : base(client, true, logger)
         {
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
-            _indexPrefix = elasticConfiguration.IndexPrefix;
+            _indexPrefix = elasticConfiguration?.IndexPrefix ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _scrollBatchSize = client.ReadBatchSize; 
         }
 

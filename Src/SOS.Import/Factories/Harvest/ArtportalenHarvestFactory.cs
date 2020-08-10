@@ -603,23 +603,23 @@ namespace SOS.Import.Factories.Harvest
         {
             _siteRepository = siteRepository;
             _sightingRelationRepository = sightingRelationRepository;
-            _activities = CastMetdataWithCategoryEntityToVerbatim(activities).ToDictionary(a => a.Id, a => a);
-            _biotopes = CastMetdataEntityToVerbatim(biotopes).ToDictionary(b => b.Id, b => b);
-            _determinationMethods = CastMetdataEntityToVerbatim(determinationMethods).ToDictionary(dm => dm.Id, dm => dm);
-            _discoveryMethods = CastMetdataEntityToVerbatim(discoveryMethods).ToDictionary(dm => dm.Id, dm => dm);
-            _genders = CastMetdataEntityToVerbatim(genders).ToDictionary(g => g.Id, g => g);
-            _organizations = CastMetdataEntityToVerbatim(organizations).ToDictionary(o => o.Id, o => o);
-            _organizationById = CastOrganizationEntityToVerbatim(organizationById).ToDictionary(o => o.Id, o => o);
-            _personByUserId = CastPersonEntityToVerbatim(personByUserId).ToDictionary(p => p.Id, p => p);
+            _activities = CastMetdataWithCategoryEntityToVerbatim(activities)?.ToDictionary(a => a.Id, a => a);
+            _biotopes = CastMetdataEntityToVerbatim(biotopes)?.ToDictionary(b => b.Id, b => b);
+            _determinationMethods = CastMetdataEntityToVerbatim(determinationMethods)?.ToDictionary(dm => dm.Id, dm => dm);
+            _discoveryMethods = CastMetdataEntityToVerbatim(discoveryMethods)?.ToDictionary(dm => dm.Id, dm => dm);
+            _genders = CastMetdataEntityToVerbatim(genders)?.ToDictionary(g => g.Id, g => g);
+            _organizations = CastMetdataEntityToVerbatim(organizations)?.ToDictionary(o => o.Id, o => o);
+            _organizationById = CastOrganizationEntityToVerbatim(organizationById)?.ToDictionary(o => o.Id, o => o);
+            _personByUserId = CastPersonEntityToVerbatim(personByUserId)?.ToDictionary(p => p.Id, p => p);
             _projectEntityById = projectEntityById;
             _projectParameterEntities = projectParameterEntities;
             _sightingProjectIds = sightingProjectIds;
-            _sites = CastSiteEntitiesToVerbatim(sites).ToDictionary(s => s.Id, s => s);
+            _sites = CastSiteEntitiesToVerbatim(sites)?.ToDictionary(s => s.Id, s => s);
             _speciesCollections = CastSpeciesCollectionsToVerbatim(speciesCollections).ToList();
-            _stages = CastMetdataEntityToVerbatim(stages).ToDictionary(s => s.Id, s => s);
-            _substrates = CastMetdataEntityToVerbatim(substrates).ToDictionary(s => s.Id, s => s);
-            _validationStatus = CastMetdataEntityToVerbatim(validationStatus).ToDictionary(vs => vs.Id, vs => vs);
-            _units = CastMetdataEntityToVerbatim(units).ToDictionary(u => u.Id, u => u);
+            _stages = CastMetdataEntityToVerbatim(stages)?.ToDictionary(s => s.Id, s => s);
+            _substrates = CastMetdataEntityToVerbatim(substrates)?.ToDictionary(s => s.Id, s => s);
+            _validationStatus = CastMetdataEntityToVerbatim(validationStatus)?.ToDictionary(vs => vs.Id, vs => vs);
+            _units = CastMetdataEntityToVerbatim(units)?.ToDictionary(u => u.Id, u => u);
         }
 
         /// <inheritdoc />

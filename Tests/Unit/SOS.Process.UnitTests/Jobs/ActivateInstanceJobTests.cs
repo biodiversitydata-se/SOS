@@ -67,12 +67,12 @@ namespace SOS.Process.UnitTests.Jobs
                 _instanceManagerMock.Object,
                 _loggerMock.Object);
 
-            var result = await job.RunAsync(It.IsAny<byte>());
+            Func<Task> act = async () => { await job.RunAsync(It.IsAny<byte>()); };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeFalse();
+            act.Should().Throw<Exception>();
         }
 
         /// <summary>
@@ -94,12 +94,12 @@ namespace SOS.Process.UnitTests.Jobs
                 _instanceManagerMock.Object,
                 _loggerMock.Object);
 
-            var result = await job.RunAsync(It.IsAny<byte>());
+            Func<Task> act = async () => { await job.RunAsync(It.IsAny<byte>()); };
+
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-
-            result.Should().BeFalse();
+            act.Should().Throw<Exception>();
         }
 
         /// <summary>

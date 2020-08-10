@@ -104,7 +104,7 @@ namespace SOS.Export.Managers
                 zipFilePath = await CreateDWCExportAsync(preparedFilter, fileName, cancellationToken);
 
                 // Blob Storage Containers must be in lower case
-                blobStorageContainer = blobStorageContainer.ToLower();
+                blobStorageContainer = blobStorageContainer?.ToLower();
 
                 // Make sure container exists
                 await _blobStorageService.CreateContainerAsync(blobStorageContainer);

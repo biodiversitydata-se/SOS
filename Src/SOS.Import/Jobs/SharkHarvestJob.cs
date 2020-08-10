@@ -48,7 +48,10 @@ namespace SOS.Import.Jobs
 
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(harvestInfoResult);
-            await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult);
+            if (dataProvider != null)
+            {
+                await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult);
+            }
 
             return harvestInfoResult.Status.Equals(RunStatus.Success) && harvestInfoResult.Count > 0
                 ? true

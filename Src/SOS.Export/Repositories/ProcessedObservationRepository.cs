@@ -41,7 +41,7 @@ namespace SOS.Export.Repositories
             ILogger<ProcessedObservationRepository> logger) : base(exportClient, true, logger)
         {
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
-            _batchSize = elasticConfiguration.ReadBatchSize;
+            _batchSize = elasticConfiguration?.ReadBatchSize ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _indexName = string.IsNullOrEmpty(elasticConfiguration.IndexPrefix)
                 ? $"{CollectionName.ToLower()}"
                 : $"{elasticConfiguration.IndexPrefix.ToLower()}-{CollectionName.ToLower()}";

@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Nest;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
@@ -181,6 +183,8 @@ namespace SOS.Process.UnitTests.Jobs
 
             _processInfoRepository.Setup(r => r.AddOrUpdateAsync(It.IsAny<ProcessInfo>()));
 
+            _areaVerbatimRepositoryMock.Setup(avr => avr.GetGeometryAsync(It.IsAny<int>())).ReturnsAsync(new Point(1,1));
+            _processedAreaRepositoryMock.Setup(par => par.StoreGeometryAsync(It.IsAny<int>(), It.IsAny<IGeoShape>())).ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------

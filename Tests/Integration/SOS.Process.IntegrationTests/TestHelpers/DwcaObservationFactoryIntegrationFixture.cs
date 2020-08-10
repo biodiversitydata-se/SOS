@@ -7,11 +7,11 @@ using Moq;
 using SOS.Lib.Database;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Helpers;
 using SOS.Process.Managers;
 using SOS.Process.Processors.DarwinCoreArchive;
-using SOS.Process.Repositories.Destination;
-using SOS.Process.Repositories.Destination.Interfaces;
 
 namespace SOS.Process.IntegrationTests.TestHelpers
 {

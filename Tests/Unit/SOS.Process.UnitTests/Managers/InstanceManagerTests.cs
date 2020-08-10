@@ -45,7 +45,7 @@ namespace SOS.Process.UnitTests.Managers
                 null,
                 _processInfoRepositoryMock.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("darwinCoreRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedObservationRepository");
 
 
             create = () => new InstanceManager(

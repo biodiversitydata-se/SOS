@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using DwC_A;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using Nest;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using SOS.Import.DarwinCore;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database;
@@ -17,13 +12,10 @@ using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.Lib.Repositories.Processed;
 using SOS.Process.Helpers;
 using SOS.Process.IntegrationTests.TestHelpers;
-using SOS.Process.Models;
-using SOS.Process.Repositories.Destination;
 using Xunit;
 
 namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
@@ -105,7 +97,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             strJsonObservationCompare.Should().NotBeEmpty();
         }
 
-        [Fact]
+        [Fact(Skip = "Disabled")]
         public async Task Compare_Riksskogstaxeringen_verbatim_and_processed_data()
         {
             //-----------------------------------------------------------------------------------------------------------

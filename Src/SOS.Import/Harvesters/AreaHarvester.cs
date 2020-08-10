@@ -71,7 +71,7 @@ namespace SOS.Import.Harvesters
                             _logger.LogDebug("Finish adding areas");
 
                             _logger.LogDebug("Start casting geometries");
-                            var geometries = areas.ToDictionary(a => a.Id, a => a.Polygon.ToGeometry());
+                            var geometries = areas.ToDictionary(a => a.Id, a => a.Polygon?.ToGeometry());
                             _logger.LogDebug("Finsih casting geometries");
 
                             _logger.LogDebug("Start storing geometries");
