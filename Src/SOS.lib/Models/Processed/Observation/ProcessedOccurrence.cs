@@ -304,5 +304,15 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Sighting type search group id
         /// </summary>
         public int SightingTypeSearchGroupId { get; set; }
+        
+        /// <summary>
+        /// Id of sightings RegionalSightingState
+        /// </summary>
+        public int? RegionalSightingStateId { get; set; }
+        
+        /// <summary>
+        /// Id of publishing types.
+        /// </summary>
+        public IEnumerable<int> SightingPublishTypeIds { get; set; }
     }
 }

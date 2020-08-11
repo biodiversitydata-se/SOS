@@ -333,7 +333,27 @@ namespace SOS.Observations.Api.Repositories
                         )
                     );
                 }
-                
+
+                if (internalFilter.RegionalSightingStateIdsFilter?.Any() ?? false)
+                {
+                    queryInternal.Add(q => q
+                        .Terms(t => t
+                            .Field("occurrence.regionalSightingStateId")
+                            .Terms(internalFilter.RegionalSightingStateIdsFilter)
+                        )
+                    );
+                }
+
+                if (internalFilter.PublishTypeIdsFilter?.Any() ?? false)
+                {
+                    queryInternal.Add(q => q
+                        .Terms(t => t
+                            .Field("occurrence.sightingPublishTypeIds")
+                            .Terms(internalFilter.PublishTypeIdsFilter)
+                        )
+                    );
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q

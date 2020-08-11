@@ -80,7 +80,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                srConfirmator.UserId AS ConfirmatorUserId,
 	                srConfirmator.DeterminationYear AS ConfirmationYear,
 	                svr.RegionalSightingStateId as RegionalSightingStateId,
-	                sp.SightingPublishTypeId as SightingPublishTypeId
+                    (select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = s.SightingId group by SightingId) SightingPublishTypeIds
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id
@@ -98,8 +98,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     LEFT JOIN SightingRelation srDeterminer ON srDeterminer.SightingId = s.SightingId AND srDeterminer.IsPublic = 1 AND srDeterminer.SightingRelationTypeId = 3
                     LEFT JOIN SightingRelation srConfirmator ON srConfirmator.SightingId = s.SightingId AND srConfirmator.IsPublic = 1 AND srConfirmator.SightingRelationTypeId = 5
                     LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = ss.SightingId
-                    LEFT JOIN StatusValidationRule svr on svr.Id = tvr.StatusValidationRuleId
-                    LEFT JOIN SightingPublish sp ON sp.SightingId = ss.SightingId 
+                    LEFT JOIN StatusValidationRule svr on svr.Id = tvr.StatusValidationRuleId                    
                 WHERE
 	                { where }
 	                AND s.TaxonId IS NOT NULL	 

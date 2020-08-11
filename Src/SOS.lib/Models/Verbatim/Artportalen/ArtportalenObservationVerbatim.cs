@@ -275,5 +275,8 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public int Id { get; set; }
         public int SightingTypeSearchGroupId { get; set; }
         public int SightingTypeId { get; set; }
+
+        public int? RegionalSightingStateId { get; set; }
+        public IEnumerable<int> SightingPublishTypeIds { get; set; }
     }
 }
