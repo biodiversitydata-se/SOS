@@ -78,7 +78,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                srDeterminer.UserId AS DeterminerUserId,
 	                srDeterminer.DeterminationYear AS DeterminationYear,
 	                srConfirmator.UserId AS ConfirmatorUserId,
-	                srConfirmator.DeterminationYear AS ConfirmationYear
+	                srConfirmator.DeterminationYear AS ConfirmationYear,
+	                svr.RegionalSightingStateId as RegionalSightingStateId,
+                    (select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = s.SightingId group by SightingId) SightingPublishTypeIds
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id
@@ -95,6 +97,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     LEFT JOIN Site site on site.Id = s.SiteId 
                     LEFT JOIN SightingRelation srDeterminer ON srDeterminer.SightingId = s.SightingId AND srDeterminer.IsPublic = 1 AND srDeterminer.SightingRelationTypeId = 3
                     LEFT JOIN SightingRelation srConfirmator ON srConfirmator.SightingId = s.SightingId AND srConfirmator.IsPublic = 1 AND srConfirmator.SightingRelationTypeId = 5
+                    LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = ss.SightingId
+                    LEFT JOIN StatusValidationRule svr on svr.Id = tvr.StatusValidationRuleId                    
                 WHERE
 	                { where }
 	                AND s.TaxonId IS NOT NULL	 
@@ -103,8 +107,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                AND s.ValidationStatusId NOT IN(50)	   
                     AND s.SightingTypeSearchGroupId & 33 > 0
 	                AND ss.IsActive = 1
-	                AND ss.SightingStateTypeId = 30--Published
-	                AND(ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
+	                AND ss.SightingStateTypeId = 30 --Published
+	                AND (ss.EndDate IS NULL OR ss.EndDate > GETDATE()) ";
 
         /// <summary>
         ///     Constructor

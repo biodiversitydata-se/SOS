@@ -138,6 +138,24 @@ namespace SOS.Import.Factories.Harvest
                 ConfirmationYear = entity.ConfirmationYear
             };
 
+            observation.RegionalSightingStateId = entity.RegionalSightingStateId;
+
+            if (!string.IsNullOrEmpty(entity.SightingPublishTypeIds))
+            {
+                var stringIds = entity.SightingPublishTypeIds.Split(",");
+                var ids = new List<int>();
+
+                foreach (var stringId in stringIds)
+                {
+                    if (int.TryParse(stringId, out var id))
+                    {
+                        ids.Add(id);
+                    }
+                }
+
+                observation.SightingPublishTypeIds = ids.Any() ? ids : null;
+            }
+
             if (observation.Site?.ParentSiteId != null)
             {
                 if (_sites.ContainsKey(observation.Site.ParentSiteId.Value))

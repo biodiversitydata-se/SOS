@@ -279,5 +279,9 @@ namespace SOS.Import.Entities.Artportalen
         public int? ConfirmatorUserId { get; set; }
 
         public int? ConfirmationYear { get; set; }
+        
+        public int? RegionalSightingStateId { get; set; }
+
+        public string SightingPublishTypeIds { get; set; }
     }
 }

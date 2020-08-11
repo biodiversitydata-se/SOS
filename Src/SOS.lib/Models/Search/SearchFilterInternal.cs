@@ -106,5 +106,9 @@ namespace SOS.Lib.Models.Search
         public SightingNotPresentFilter NotPresentFilter { get; set; }
 
         public bool OnlySecondHandInformation { get; set; }
+
+        public List<int> PublishTypeIdsFilter { get; set; }
+
+        public List<int> RegionalSightingStateIdsFilter { get; set; }
     }
 }

@@ -225,6 +225,8 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.Weight = verbatimObservation.Weight;
                 obs.Occurrence.SightingTypeId = verbatimObservation.SightingTypeId;
                 obs.Occurrence.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
+                obs.Occurrence.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;
+                obs.Occurrence.SightingPublishTypeIds = verbatimObservation.SightingPublishTypeIds;
 
                 // Taxon
                 obs.Taxon = taxon;
