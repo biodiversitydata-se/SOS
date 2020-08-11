@@ -10,7 +10,7 @@ namespace SOS.Import.Factories.Harvest
     public class AquaSupportHarvestFactory<T> : IHarvestFactory<XDocument, T>
     {
         /// <inheritdoc />
-        public async Task<IEnumerable<T>> CastEntitiesToVerbatimsAsync(XDocument xmlDocument)
+        public async Task<IEnumerable<T>> CastEntitiesToVerbatimsAsync(XDocument xmlDocument, bool incrementalHarvest = false)
         {
             return await Task.Run(() =>
             {

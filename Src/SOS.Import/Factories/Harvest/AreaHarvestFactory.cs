@@ -11,7 +11,7 @@ namespace SOS.Import.Factories.Harvest
     public class AreaHarvestFactory : IHarvestFactory<IEnumerable<AreaEntity>, Area>
     {
         /// <inheritdoc />
-        public async Task<IEnumerable<Area>> CastEntitiesToVerbatimsAsync(IEnumerable<AreaEntity> entities)
+        public async Task<IEnumerable<Area>> CastEntitiesToVerbatimsAsync(IEnumerable<AreaEntity> entities, bool incrementalHarvest = false)
         {
             return await Task.Run(() =>
             {

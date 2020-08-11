@@ -12,6 +12,6 @@ namespace SOS.Import.Factories.Harvest.Interfaces
         /// Cast entities to verbatim
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<TV>> CastEntitiesToVerbatimsAsync(TE entities);
+        Task<IEnumerable<TV>> CastEntitiesToVerbatimsAsync(TE entities, bool incrementalHarvest = false);
     }
 }

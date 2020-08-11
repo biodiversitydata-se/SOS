@@ -12,7 +12,7 @@ namespace SOS.Import.Factories.Harvest
     public class MvmHarvestFactory : IHarvestFactory<IEnumerable<WebSpeciesObservation>, MvmObservationVerbatim>
     {
         /// <inheritdoc />
-        public async Task<IEnumerable<MvmObservationVerbatim>> CastEntitiesToVerbatimsAsync(IEnumerable<WebSpeciesObservation> entities)
+        public async Task<IEnumerable<MvmObservationVerbatim>> CastEntitiesToVerbatimsAsync(IEnumerable<WebSpeciesObservation> entities, bool incrementalHarvest = false)
         {
             return await Task.Run(() =>
             {

@@ -623,7 +623,7 @@ namespace SOS.Import.Factories.Harvest
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ArtportalenObservationVerbatim>> CastEntitiesToVerbatimsAsync(IEnumerable<SightingEntity> entities)
+        public async Task<IEnumerable<ArtportalenObservationVerbatim>> CastEntitiesToVerbatimsAsync(IEnumerable<SightingEntity> entities, bool incrementalHarvest = false)
         {
             var sightingIds = new HashSet<int>(entities.Select(x => x.Id));
 
@@ -642,8 +642,12 @@ namespace SOS.Import.Factories.Harvest
             var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, _sightingProjectIds,
                 _projectEntityById, _projectParameterEntities);
 
-            await AddMissingSitesAsync(entities);
-
+            // If it's a incremental harvest we can have new sites
+            if (incrementalHarvest)
+            {
+                await AddMissingSitesAsync(entities);
+            }
+            
             return
                 from e in entities
                 select CastEntityToVerbatim(e, personSightings, projectEntityDictionaries);

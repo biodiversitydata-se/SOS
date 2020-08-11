@@ -85,7 +85,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogDebug("Start casting entities to verbatim");
 
                 // Cast sightings to verbatim observations
-                var verbatimObservations = await _harvestFactory.CastEntitiesToVerbatimsAsync(sightings);
+                var verbatimObservations = await _harvestFactory.CastEntitiesToVerbatimsAsync(sightings, incrementalHarvest);
 
                 _logger.LogDebug("Finsih casting entities to verbatim");
                 
