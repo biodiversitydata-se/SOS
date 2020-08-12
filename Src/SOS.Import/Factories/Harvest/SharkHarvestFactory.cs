@@ -10,7 +10,7 @@ namespace SOS.Import.Factories.Harvest
     public class SharkHarvestFactory : IHarvestFactory<SharkJsonFile, SharkObservationVerbatim>
     {
         /// <inheritdoc />
-        public async Task<IEnumerable<SharkObservationVerbatim>> CastEntitiesToVerbatimsAsync(SharkJsonFile fileData, bool incrementalHarvest = false)
+        public async Task<IEnumerable<SharkObservationVerbatim>> CastEntitiesToVerbatimsAsync(SharkJsonFile fileData)
         {
             return await Task.Run(() =>
             {

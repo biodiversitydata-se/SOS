@@ -86,7 +86,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogDebug($"Start casting entities to verbatim from id: {currentId} to id: {lastId}");
 
                 // Cast sightings to verbatim observations
-                var verbatimObservations = await _harvestFactory.CastEntitiesToVerbatimsAsync(sightings, incrementalHarvest);
+                var verbatimObservations = await _harvestFactory.CastEntitiesToVerbatimsAsync(sightings);
                 
                 // We don't need entities in memory any more
                 sightings = null;

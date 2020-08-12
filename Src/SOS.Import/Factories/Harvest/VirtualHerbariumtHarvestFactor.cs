@@ -139,7 +139,7 @@ namespace SOS.Import.Factories.Harvest
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<VirtualHerbariumObservationVerbatim>> CastEntitiesToVerbatimsAsync(XDocument xDocument, bool incrementalHarvest = false)
+        public async Task<IEnumerable<VirtualHerbariumObservationVerbatim>> CastEntitiesToVerbatimsAsync(XDocument xDocument)
         {
             return await Task.Run(() =>
             {

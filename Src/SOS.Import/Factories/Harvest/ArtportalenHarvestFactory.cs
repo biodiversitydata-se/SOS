@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
@@ -13,7 +12,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Factories.Harvest
 {
-    public class ArtportalenHarvestFactory : IHarvestFactory<IEnumerable<SightingEntity>, ArtportalenObservationVerbatim>
+    public class ArtportalenHarvestFactory : IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
     {
         private readonly ISiteRepository _siteRepository;
         private readonly ISightingRelationRepository _sightingRelationRepository;
@@ -425,20 +424,22 @@ namespace SOS.Import.Factories.Harvest
         /// <summary>
         /// Try to add missing sites from live data
         /// </summary>
-        /// <param name="entities"></param>
+        /// <param name="siteIds"></param>
         /// <returns></returns>
-        private async Task AddMissingSitesAsync(IEnumerable<SightingEntity> entities)
+        private async Task AddMissingSitesAsync(HashSet<int> siteIds)
         {
-            if (!entities?.Any() ?? true)
+            if (!siteIds?.Any() ?? true)
             {
                 return;
             }
-
-            var newSiteIds = new HashSet<int>(entities
-                .Where(s => s.SiteId.HasValue)
-                .Select(x => x.SiteId.Value)?
-                .Distinct()?
-                .Except(_sites?.Select(s => s.Key)));
+            var newSiteIds = new HashSet<int>();
+            foreach (var siteId in siteIds)
+            {
+                if (!_sites.ContainsKey(siteId))
+                {
+                    newSiteIds.Add(siteId);
+                }
+            }
 
             if (!newSiteIds.Any())
             {
@@ -654,9 +655,25 @@ namespace SOS.Import.Factories.Harvest
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ArtportalenObservationVerbatim>> CastEntitiesToVerbatimsAsync(IEnumerable<SightingEntity> entities, bool incrementalHarvest = false)
+        public async Task<IEnumerable<ArtportalenObservationVerbatim>> CastEntitiesToVerbatimsAsync(SightingEntity[] entities)
         {
-            var sightingIds = new HashSet<int>(entities.Select(x => x.Id));
+            if (!entities?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var sightingIds = new HashSet<int>();
+            var siteIds = new HashSet<int>();
+
+            for (var i = 0; i < entities.Length; i++)
+            {
+                var entity = entities[i];
+                sightingIds.Add(entity.Id);
+                if (entity.SiteId.HasValue && !siteIds.Contains(entity.SiteId.Value))
+                {
+                    siteIds.Add(entity.SiteId.Value);
+                }
+            }
 
             // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
             var sightingRelations =
@@ -673,12 +690,8 @@ namespace SOS.Import.Factories.Harvest
             var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, _sightingProjectIds,
                 _projectEntityById, _projectParameterEntities);
 
-            // If it's a incremental harvest we can have new sites
-            if (incrementalHarvest)
-            {
-                await AddMissingSitesAsync(entities);
-            }
-
+            await AddMissingSitesAsync(siteIds);
+            
             return  from e in entities
                 select CastEntityToVerbatim(e, personSightings, projectEntityDictionaries);
         }
