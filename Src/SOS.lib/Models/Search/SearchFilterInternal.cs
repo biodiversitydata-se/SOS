@@ -110,5 +110,7 @@ namespace SOS.Lib.Models.Search
         public List<int> PublishTypeIdsFilter { get; set; }
 
         public List<int> RegionalSightingStateIdsFilter { get; set; }
+
+        public List<int> SiteIds { get; set; }
     }
 }
