@@ -111,6 +111,11 @@ namespace SOS.Lib.Models.Search
 
         public IEnumerable<int> AreaIds { get; set; }
 
+        /// <summary>
+        ///     If true the whole event timespan must be between StartDate and EndDate
+        /// </summary>
+        public bool SearchOnlyBetweenDates { get; set; }
+
         public FilterBase Clone()
         {
             var searchFilter = (FilterBase) MemberwiseClone();
