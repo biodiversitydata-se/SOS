@@ -63,7 +63,7 @@ namespace SOS.Import.Harvesters.Observations
             bool incrementalHarvest
         )
         {
-            var lastId = _artportalenConfiguration.ChunkSize - 1;
+            var lastId = currentId + _artportalenConfiguration.ChunkSize - 1;
             try
             {
                 _logger.LogDebug(
@@ -93,7 +93,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogDebug($"Start storing batch from id: {currentId} to id: {lastId}");
                 // Add sightings to mongodb
                 await _sightingVerbatimRepository.AddManyAsync(verbatimObservations);
-                _logger.LogDebug("Finish storing batch from id: {currentId} to id: {lastId}");
+                _logger.LogDebug($"Finish storing batch from id: {currentId} to id: {lastId}");
 
                 return sightings.Length;
             }
