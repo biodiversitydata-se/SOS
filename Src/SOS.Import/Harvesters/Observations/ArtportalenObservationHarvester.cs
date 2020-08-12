@@ -87,7 +87,10 @@ namespace SOS.Import.Harvesters.Observations
 
                 // Cast sightings to verbatim observations
                 var verbatimObservations = await _harvestFactory.CastEntitiesToVerbatimsAsync(sightings, incrementalHarvest);
-
+                
+                // We don't need entities in memory any more
+                sightings = null;
+                
                 _logger.LogDebug($"Finsih casting entities to verbatim from id: {currentId} to id: {lastId}");
                 
                 _logger.LogDebug($"Start storing batch from id: {currentId} to id: {lastId}");
@@ -95,7 +98,7 @@ namespace SOS.Import.Harvesters.Observations
                 await _sightingVerbatimRepository.AddManyAsync(verbatimObservations);
                 _logger.LogDebug($"Finish storing batch from id: {currentId} to id: {lastId}");
 
-                return sightings.Length;
+                return verbatimObservations.Count();
             }
             catch (Exception e)
             {
@@ -311,6 +314,22 @@ namespace SOS.Import.Harvesters.Observations
                         validationStatus,
                         units
                     );
+
+                    // Clean up to release memory
+                    activities = null;
+                    biotopes = null;
+                    determinationMethods = null;
+                    discoveryMethods = null;
+                    genders = null;
+                    organizations = null;
+                    organizationById = null;
+                    personByUserId = null;
+                    sites = null;
+                    speciesCollections = null;
+                    stages = null;
+                    substrates = null;
+                    validationStatus = null;
+                    units = null;
 
                     _logger.LogDebug("Finsih creating factory");
                 }

@@ -487,10 +487,10 @@ namespace SOS.Import.Factories.Harvest
             var batchSize = 100000;
             while (siteEntities.Count > 0)
             {
-                var sitesBatch = siteEntities.Take(batchSize);
+                var sitesBatch = siteEntities.Take(batchSize).ToArray();
                 sites.AddRange(from s in sitesBatch
                                select CastSiteEntityToVerbatim(s));
-                siteEntities.RemoveRange(0, Math.Min(siteEntities.Count, batchSize));
+                siteEntities.RemoveRange(0, sitesBatch?.Count() ?? 0);
             }
 
             return sites;
@@ -678,9 +678,8 @@ namespace SOS.Import.Factories.Harvest
             {
                 await AddMissingSitesAsync(entities);
             }
-            
-            return
-                from e in entities
+
+            return  from e in entities
                 select CastEntityToVerbatim(e, personSightings, projectEntityDictionaries);
         }
     }
