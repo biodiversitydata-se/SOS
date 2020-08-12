@@ -63,16 +63,17 @@ namespace SOS.Import.Harvesters.Observations
             bool incrementalHarvest
         )
         {
+            var lastId = _artportalenConfiguration.ChunkSize - 1;
             try
             {
                 _logger.LogDebug(
-                    $"Start getting Artportalen sightings from id: {currentId} to id: {currentId + _artportalenConfiguration.ChunkSize - 1}");
+                    $"Start getting Artportalen sightings from id: {currentId} to id: {lastId}");
                 // Get chunk of sightings
                 var sightings =
                     (await _sightingRepository.GetChunkAsync(currentId, _artportalenConfiguration.ChunkSize, incrementalHarvest))
                     .ToArray();
                 _logger.LogDebug(
-                    $"Finish getting Artportalen sightings from id: {currentId} to id: {currentId + _artportalenConfiguration.ChunkSize - 1}");
+                    $"Finish getting Artportalen sightings from id: {currentId} to id: {lastId}");
 
                 if (_artportalenConfiguration.AddTestSightings && !_hasAddedTestSightings)
                 {
@@ -82,24 +83,24 @@ namespace SOS.Import.Harvesters.Observations
                     _logger.LogDebug("Finish adding test sightings");
                 }
 
-                _logger.LogDebug("Start casting entities to verbatim");
+                _logger.LogDebug($"Start casting entities to verbatim from id: {currentId} to id: {lastId}");
 
                 // Cast sightings to verbatim observations
                 var verbatimObservations = await _harvestFactory.CastEntitiesToVerbatimsAsync(sightings, incrementalHarvest);
 
-                _logger.LogDebug("Finsih casting entities to verbatim");
+                _logger.LogDebug($"Finsih casting entities to verbatim from id: {currentId} to id: {lastId}");
                 
-                _logger.LogDebug("Start storing batch");
+                _logger.LogDebug($"Start storing batch from id: {currentId} to id: {lastId}");
                 // Add sightings to mongodb
                 await _sightingVerbatimRepository.AddManyAsync(verbatimObservations);
-                _logger.LogDebug("Finish storing batch");
+                _logger.LogDebug("Finish storing batch from id: {currentId} to id: {lastId}");
 
                 return sightings.Length;
             }
             catch (Exception e)
             {
                 _logger.LogError(e,
-                    $"Harvest Artportalen sightings from id: {currentId} to id: {currentId + _artportalenConfiguration.ChunkSize - 1} failed.");
+                    $"Harvest Artportalen sightings from id: {currentId} to id: {lastId} failed.");
             }
             finally
             {

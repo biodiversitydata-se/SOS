@@ -429,11 +429,16 @@ namespace SOS.Import.Factories.Harvest
         /// <returns></returns>
         private async Task AddMissingSitesAsync(IEnumerable<SightingEntity> entities)
         {
+            if (!entities?.Any() ?? true)
+            {
+                return;
+            }
+
             var newSiteIds = new HashSet<int>(entities
                 .Where(s => s.SiteId.HasValue)
-                .Select(x => x.SiteId.Value)
-                .Distinct()
-                .Except(_sites.Select(s => s.Key)));
+                .Select(x => x.SiteId.Value)?
+                .Distinct()?
+                .Except(_sites?.Select(s => s.Key)));
 
             if (!newSiteIds.Any())
             {
@@ -446,19 +451,22 @@ namespace SOS.Import.Factories.Harvest
 
             while (idBatch.Any())
             {
-                var sites = await _siteRepository.GetByIdsLiveAsync(idBatch);
+                var sites = CastSiteEntitiesToVerbatim((await _siteRepository.GetByIdsLiveAsync(idBatch)).ToList());
 
-                foreach (var site in sites)
+                if (sites?.Any() ?? false)
                 {
-                    // Make a last check that site isn't in collection (Can have been added by parallel thread)
-                    if (!_sites.ContainsKey(site.Id))
+                    foreach (var site in sites)
                     {
-                        _sites.Add(site.Id, CastSiteEntityToVerbatim(site));
+                        // Make a last check that site isn't in collection (Can have been added by parallel thread)
+                        if (!_sites.ContainsKey(site.Id))
+                        {
+                            _sites.Add(site.Id, site);
+                        }
                     }
-                }
 
-                startIndex += batchSize;
-                idBatch = newSiteIds.Skip(startIndex).Take(batchSize).ToArray();
+                    startIndex += batchSize;
+                    idBatch = newSiteIds.Skip(startIndex).Take(batchSize).ToArray();
+                }
             }
         }
 
@@ -470,6 +478,11 @@ namespace SOS.Import.Factories.Harvest
         /// <returns></returns>
         private IEnumerable<Site> CastSiteEntitiesToVerbatim(List<SiteEntity> siteEntities)
         {
+            if (!siteEntities?.Any() ?? true)
+            {
+                return null;
+            }
+
             var sites = new List<Site>();
             var batchSize = 100000;
             while (siteEntities.Count > 0)
