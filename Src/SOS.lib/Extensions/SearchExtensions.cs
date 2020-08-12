@@ -300,28 +300,57 @@ namespace SOS.Lib.Extensions
             // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
             if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
             {
-                if (filter.StartDate.HasValue)
+                if (filter.SearchOnlyBetweenDates)
                 {
-                    queryContainers.Add(q => q
-                        .DateRange(r => r
-                                .Field("event.startDate")
-                                .GreaterThanOrEquals(
-                                    DateMath.Anchored(filter.StartDate.Value
-                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                        )
-                    );
-                }
+                    if (filter.StartDate.HasValue)
+                    {
+                        queryContainers.Add(q => q
+                            .DateRange(r => r
+                                    .Field("event.startDate")
+                                    .GreaterThanOrEquals(
+                                        DateMath.Anchored(filter.StartDate.Value
+                                            .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                            )
+                        );
+                    }
 
-                if (filter.EndDate.HasValue)
+                    if (filter.EndDate.HasValue)
+                    {
+                        queryContainers.Add(q => q
+                            .DateRange(r => r
+                                    .Field("event.endDate")
+                                    .LessThanOrEquals(
+                                        DateMath.Anchored(filter.EndDate.Value
+                                            .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                            )
+                        );
+                    }
+                }
+                else
                 {
-                    queryContainers.Add(q => q
-                        .DateRange(r => r
-                                .Field("event.endDate")
-                                .LessThanOrEquals(
-                                    DateMath.Anchored(filter.EndDate.Value
-                                        .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
-                        )
-                    );
+                    if (filter.StartDate.HasValue)
+                    {
+                        queryContainers.Add(q => q
+                            .DateRange(r => r
+                                    .Field("event.startDate")
+                                    .LessThanOrEquals(
+                                        DateMath.Anchored(filter.EndDate.Value
+                                            .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                            )
+                        );
+                    }
+
+                    if (filter.EndDate.HasValue)
+                    {
+                        queryContainers.Add(q => q
+                            .DateRange(r => r
+                                    .Field("event.endDate")
+                                    .GreaterThanOrEquals(
+                                        DateMath.Anchored(filter.StartDate.Value
+                                            .ToUniversalTime())) //.RoundTo(DateMathTimeUnit.Day))
+                            )
+                        );
+                    }
                 }
             }
 
