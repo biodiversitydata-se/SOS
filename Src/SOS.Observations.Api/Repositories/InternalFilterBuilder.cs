@@ -364,6 +364,19 @@ namespace SOS.Observations.Api.Repositories
                     );
                 }
 
+                if (internalFilter.SpeciesFactsIds?.Any() ?? false)
+                {
+                    foreach (var factsId in internalFilter.SpeciesFactsIds)
+                    {
+                        queryInternal.Add(q => q
+                            .Term(t => t
+                                .Field("speciesFactsIds")
+                                .Value(factsId)
+                            )
+                        );
+                    }
+                }
+
                 if (internalFilter.UsePeriodForAllYears && internalFilter.StartDate.HasValue && internalFilter.EndDate.HasValue)
                 {
                     queryInternal.Add(q => q

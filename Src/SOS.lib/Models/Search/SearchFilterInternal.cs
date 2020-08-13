@@ -112,5 +112,7 @@ namespace SOS.Lib.Models.Search
         public List<int> RegionalSightingStateIdsFilter { get; set; }
 
         public List<int> SiteIds { get; set; }
+
+        public List<int> SpeciesFactsIds { get; set; }
     }
 }
