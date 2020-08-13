@@ -426,26 +426,13 @@ namespace SOS.Import.Factories.Harvest
         /// </summary>
         /// <param name="siteIds"></param>
         /// <returns></returns>
-        private async Task AddMissingSitesAsync(HashSet<int> siteIds)
+        private async Task AddMissingSitesAsync(HashSet<int> newSiteIds)
         {
-            if (!siteIds?.Any() ?? true)
+            if (!newSiteIds?.Any() ?? true)
             {
                 return;
             }
-            var newSiteIds = new HashSet<int>();
-            foreach (var siteId in siteIds)
-            {
-                if (!_sites.ContainsKey(siteId))
-                {
-                    newSiteIds.Add(siteId);
-                }
-            }
-
-            if (!newSiteIds.Any())
-            {
-                return;
-            }
-
+            
             var batchSize = 1000;
             var startIndex = 0;
             var idBatch = newSiteIds.Take(batchSize).ToArray();
@@ -663,17 +650,24 @@ namespace SOS.Import.Factories.Harvest
             }
 
             var sightingIds = new HashSet<int>();
-            var siteIds = new HashSet<int>();
+            var newSiteIds = new HashSet<int>();
 
             for (var i = 0; i < entities.Length; i++)
             {
                 var entity = entities[i];
                 sightingIds.Add(entity.Id);
-                if (entity.SiteId.HasValue && !siteIds.Contains(entity.SiteId.Value))
+                var siteId = entity.SiteId ?? 0;
+
+                // Check for new sites since we already lopping the array 
+                if (siteId == 0 || newSiteIds.Contains(siteId) || _sites.ContainsKey(siteId))
                 {
-                    siteIds.Add(entity.SiteId.Value);
+                    continue;
                 }
+
+                newSiteIds.Add(siteId);
             }
+            
+            await AddMissingSitesAsync(newSiteIds);
 
             // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
             var sightingRelations =
@@ -690,8 +684,6 @@ namespace SOS.Import.Factories.Harvest
             var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, _sightingProjectIds,
                 _projectEntityById, _projectParameterEntities);
 
-            await AddMissingSitesAsync(siteIds);
-            
             return  from e in entities
                 select CastEntityToVerbatim(e, personSightings, projectEntityDictionaries);
         }
