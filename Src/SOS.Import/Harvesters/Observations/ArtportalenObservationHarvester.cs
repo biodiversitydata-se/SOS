@@ -184,10 +184,10 @@ namespace SOS.Import.Harvesters.Observations
         /// Initialize project related data
         /// </summary>
         /// <returns></returns>
-        private async Task<(IDictionary<int, ProjectEntity>, IEnumerable<ProjectParameterEntity>, IEnumerable<(int, int)>)> GetProjectRelatedAsync()
+        private async Task<(IEnumerable<ProjectEntity>, IEnumerable<ProjectParameterEntity>, IEnumerable<(int, int)>)> GetProjectRelatedAsync()
         {
             _logger.LogDebug("Start getting projects & project parameters");
-            var projectEntityById = (await _projectRepository.GetProjectsAsync()).ToDictionary(p => p.Id, p => p);
+            var projectEntityById = (await _projectRepository.GetProjectsAsync());
             var projectParameterEntities = await _projectRepository.GetProjectParametersAsync();
             var sightingProjectIds = await _sightingRepository.GetProjectIdsAsync();
             _logger.LogDebug("Finish getting projects & project parameters");
@@ -266,7 +266,6 @@ namespace SOS.Import.Harvesters.Observations
 
             try
             {
-                
                 if (_harvestFactory == null)
                 {
                     var activities = await GetActivitiesAsync();
@@ -324,6 +323,9 @@ namespace SOS.Import.Harvesters.Observations
                     organizations = null;
                     organizationById = null;
                     personByUserId = null;
+                    projectEntityById = null;
+                    projectParameterEntities = null;
+                    sightingProjectIds = null;
                     sites = null;
                     speciesCollections = null;
                     stages = null;

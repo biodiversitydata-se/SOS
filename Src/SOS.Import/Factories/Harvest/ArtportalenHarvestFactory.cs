@@ -22,7 +22,6 @@ namespace SOS.Import.Factories.Harvest
         private readonly IDictionary<int, Metadata> _organizations;
         private readonly IDictionary<int, Organization> _organizationById;
         private readonly IDictionary<int, Site> _sites;
-        private readonly IEnumerable<(int SightingId, int ProjectId)> _sightingProjectIds;
         private readonly IList<SpeciesCollectionItem> _speciesCollections;
         private readonly IDictionary<int, Metadata> _stages;
         private readonly IDictionary<int, Metadata> _substrates;
@@ -31,8 +30,11 @@ namespace SOS.Import.Factories.Harvest
         private readonly IDictionary<int, Metadata> _discoveryMethods;
         private readonly IDictionary<int, Metadata> _determinationMethods;
         private readonly IDictionary<int, Person> _personByUserId;
-        private readonly IDictionary<int, ProjectEntity> _projectEntityById;
-        private readonly IEnumerable<ProjectParameterEntity> _projectParameterEntities;
+        private readonly IDictionary<int, Project[]> _sightingsProjects;
+
+        //private readonly IDictionary<int, int[]> _sightingProjectIds;
+        // private readonly IDictionary<int, Project> _projects;
+        // private readonly IEnumerable<ProjectParameterEntity> _projectParameterEntities;
 
 
         /// <summary>
@@ -43,8 +45,7 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="projectEntityDictionaries"></param>
         /// <returns></returns>
         private ArtportalenObservationVerbatim CastEntityToVerbatim(SightingEntity entity,
-            IDictionary<int, PersonSighting> personSightings,
-            ProjectEntityDictionaries projectEntityDictionaries)
+            IDictionary<int, PersonSighting> personSightings)
         {
             var observation = new ArtportalenObservationVerbatim
             {
@@ -120,9 +121,7 @@ namespace SOS.Import.Factories.Harvest
                     ? _validationStatus[entity.ValidationStatusId]
                     : null,
                 Weight = entity.Weight,
-                Projects = GetProjects(
-                    entity.Id,
-                    projectEntityDictionaries),
+                Projects = _sightingsProjects.ContainsKey(entity.Id) ? _sightingsProjects[entity.Id] : null,
                 SightingTypeId = entity.SightingTypeId,
                 SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId,
                 PublicCollection = entity.OrganizationCollectorId.HasValue && _organizations.ContainsKey(entity.OrganizationCollectorId.Value)
@@ -333,46 +332,13 @@ namespace SOS.Import.Factories.Harvest
             };
         }
 
-        /// <summary>
-        /// Create project entity dictionaries
-        /// </summary>
-        /// <param name="sightingIds"></param>
-        /// <param name="sightingProjectIds"></param>
-        /// <param name="projectEntityById"></param>
-        /// <param name="projectParameterEntities"></param>
-        /// <returns></returns>
-        private static ProjectEntityDictionaries GetProjectEntityDictionaries(
-            HashSet<int> sightingIds,
-            IEnumerable<(int SightingId, int ProjectId)> sightingProjectIds,
-            IDictionary<int, ProjectEntity> projectEntityById,
-            IEnumerable<ProjectParameterEntity> projectParameterEntities)
-        {
-            var projectEntitiesBySightingId = sightingProjectIds
-                .Where(p => sightingIds.Contains(p.SightingId))
-                .GroupBy(p => p.SightingId)
-                .ToDictionary(g => g.Key, g => g
-                    .Where(p => projectEntityById.ContainsKey(p.ProjectId))
-                    .Select(p => projectEntityById[p.ProjectId]));
-
-            var projectParameterEntitiesBySightingId = projectParameterEntities
-                .Where(p => sightingIds.Contains(p.SightingId))
-                .GroupBy(p => p.SightingId)
-                .ToDictionary(g => g.Key, g => g.AsEnumerable());
-
-            return new ProjectEntityDictionaries
-            {
-                ProjectEntityById = projectEntityById,
-                ProjectEntitiesBySightingId = projectEntitiesBySightingId,
-                ProjectParameterEntitiesBySightingId = projectParameterEntitiesBySightingId
-            };
-        }
 
         /// <summary>
         ///     Get project and project parameters for the specified sightingId.
         /// </summary>
-        private List<Project> GetProjects(int sightingId, ProjectEntityDictionaries projectEntityDictionaries)
+        private IEnumerable<Project> GetProjects(int sightingId, ProjectEntityDictionaries projectEntityDictionaries)
         {
-            Dictionary<int, Project> projectById = null;
+            var projectById = new Dictionary<int, Project>();
             if (projectEntityDictionaries.ProjectEntitiesBySightingId.TryGetValue(sightingId, out var projectEntities))
             {
                 projectById = CastProjectEntitiesToVerbatim(projectEntities).ToDictionary(p => p.Id, p => p);
@@ -381,42 +347,34 @@ namespace SOS.Import.Factories.Harvest
             if (projectEntityDictionaries.ProjectParameterEntitiesBySightingId.TryGetValue(sightingId,
                 out var projectParameterEntities))
             {
-                if (projectById == null)
-                {
-                    projectById = new Dictionary<int, Project>();
-                }
-
+                Project project = null;
                 foreach (var projectParameterEntity in projectParameterEntities)
                 {
-                    if (projectById.TryGetValue(projectParameterEntity.ProjectId, out var project))
-                    {
-                        if (project.ProjectParameters == null)
-                        {
-                            project.ProjectParameters = new List<ProjectParameter>();
-                        }
-
-                        project.ProjectParameters.Add(CastProjectParameterEntityToVerbatim(projectParameterEntity));
-                    }
-                    else
+                    if (!projectById.TryGetValue(projectParameterEntity.ProjectId, out project))
                     {
                         if (projectEntityDictionaries.ProjectEntityById.TryGetValue(projectParameterEntity.ProjectId,
                             out var projectEntity))
                         {
-                            var newProject = CastProjectEntityToVerbatim(projectEntity);
-                            newProject.ProjectParameters = new List<ProjectParameter>();
-                            newProject.ProjectParameters.Add(CastProjectParameterEntityToVerbatim(projectParameterEntity));
-                            projectById.Add(projectParameterEntity.ProjectId, newProject);
+                            project = CastProjectEntityToVerbatim(projectEntity);
+                            projectById.Add(projectParameterEntity.ProjectId, project);
                         }
                     }
+
+                    if (project == null)
+                    {
+                        continue;
+                    }
+
+                    if (project.ProjectParameters == null)
+                    {
+                        project.ProjectParameters = new List<ProjectParameter>();
+                    }
+
+                    project.ProjectParameters.Add(CastProjectParameterEntityToVerbatim(projectParameterEntity));
                 }
             }
 
-            if (projectById == null || projectById.Keys.Count == 0)
-            {
-                return null;
-            }
-
-            return projectById.Values.ToList();
+            return projectById.Any() ? projectById.Values : null;
         }
         #endregion Project
 
@@ -554,7 +512,7 @@ namespace SOS.Import.Factories.Harvest
                        SightingRelationTypeId = e.SightingRelationTypeId,
                        Sort = e.Sort,
                        UserId = e.UserId
-                   }; ;
+                   }; 
         }
         #endregion SightingRelations
 
@@ -590,7 +548,7 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="organizations"></param>
         /// <param name="organizationById"></param>
         /// <param name="personByUserId"></param>
-        /// <param name="projectEntityById"></param>
+        /// <param name="projectEntities"></param>
         /// <param name="projectParameterEntities"></param>
         /// <param name="sightingProjectIds"></param>
         /// <param name="sites"></param>
@@ -610,7 +568,7 @@ namespace SOS.Import.Factories.Harvest
             IEnumerable<MetadataEntity> organizations,
             IEnumerable<OrganizationEntity> organizationById,
             IEnumerable<PersonEntity> personByUserId,
-            IDictionary<int, ProjectEntity> projectEntityById,
+            IEnumerable<ProjectEntity> projectEntities,
             IEnumerable<ProjectParameterEntity> projectParameterEntities,
             IEnumerable<(int SightingId, int ProjectId)> sightingProjectIds,
             List<SiteEntity> sites,
@@ -630,15 +588,79 @@ namespace SOS.Import.Factories.Harvest
             _organizations = CastMetdataEntityToVerbatim(organizations)?.ToDictionary(o => o.Id, o => o);
             _organizationById = CastOrganizationEntityToVerbatim(organizationById)?.ToDictionary(o => o.Id, o => o);
             _personByUserId = CastPersonEntityToVerbatim(personByUserId)?.ToDictionary(p => p.Id, p => p);
-            _projectEntityById = projectEntityById;
-            _projectParameterEntities = projectParameterEntities;
-            _sightingProjectIds = sightingProjectIds;
-            _sites = CastSiteEntitiesToVerbatim(sites)?.ToDictionary(s => s.Id, s => s);
+            /*  _projects = CastProjectEntitiesToVerbatim(projectEntities).ToDictionary(p => p.Id, p => p);
+              _projectParameterEntities = projectParameterEntities;
+
+              _sightingProjectIds = sightingProjectIds
+                  .GroupBy(spi => spi.SightingId, spi => spi.ProjectId,
+                  (key, g) => new {SightingId = key, ProjectIds = g.ToArray()})
+                  .ToDictionary(g => g.SightingId, g => g.ProjectIds);
+              */
+            _sightingsProjects = GetSightingProjects(projectEntities, sightingProjectIds, projectParameterEntities);
+
+              _sites = CastSiteEntitiesToVerbatim(sites)?.ToDictionary(s => s.Id, s => s);
             _speciesCollections = CastSpeciesCollectionsToVerbatim(speciesCollections).ToList();
             _stages = CastMetdataEntityToVerbatim(stages)?.ToDictionary(s => s.Id, s => s);
             _substrates = CastMetdataEntityToVerbatim(substrates)?.ToDictionary(s => s.Id, s => s);
             _validationStatus = CastMetdataEntityToVerbatim(validationStatus)?.ToDictionary(vs => vs.Id, vs => vs);
             _units = CastMetdataEntityToVerbatim(units)?.ToDictionary(u => u.Id, u => u);
+        }
+
+        private IDictionary<int, Project[]> GetSightingProjects(IEnumerable<ProjectEntity> projectEntities, IEnumerable<(int SightingId, int ProjectId)> sightingProjectIds, IEnumerable<ProjectParameterEntity> projectParameterEntities)
+        {
+            if ((!projectEntities?.Any() ?? true) || (!sightingProjectIds?.Any() ?? true))
+            {
+                return null;
+            }
+
+            // Cast a projects to verbatim
+            var projects = CastProjectEntitiesToVerbatim(projectEntities).ToDictionary(p => p.Id, p => p);
+
+            // Create a copy of the project for each sighting
+            var sightingsProjects = sightingProjectIds
+                .GroupBy(spi => spi.SightingId, spi => projects[spi.ProjectId].DeepCopyByExpressionTree(),
+                    (key, g) => new { SightingId = key, Projects = g.ToArray() })
+                .ToDictionary(g => g.SightingId, g => g.Projects.ToDictionary(p => p.Id, p => p));
+
+
+            foreach (var projectParameterEntity in projectParameterEntities)
+            {
+                Project project = null;
+                
+                // Try to get projects by sighting id
+                if (sightingsProjects.TryGetValue(projectParameterEntity.SightingId, out var sightingProjects))
+                {
+                    // Try to get sighting project 
+                    sightingProjects.TryGetValue(projectParameterEntity.ProjectId, out project);
+                }
+                else
+                {
+                    // Sighting projects is missing, add it
+                    sightingProjects = new Dictionary<int, Project>();
+                    sightingsProjects.Add(projectParameterEntity.SightingId, sightingProjects);
+                }
+
+                if (project == null)
+                {
+                    if (!projects.ContainsKey(projectParameterEntity.ProjectId))
+                    {
+                        continue;
+                    }
+
+                    // Get project from all projects
+                    project = projects[projectParameterEntity.ProjectId].DeepCopyByExpressionTree();
+                    sightingProjects.Add(project.Id, project);
+                }
+
+                if (project.ProjectParameters == null)
+                {
+                    project.ProjectParameters = new List<ProjectParameter>();
+                }
+
+                project.ProjectParameters.Add(CastProjectParameterEntityToVerbatim(projectParameterEntity));
+            }
+
+            return sightingsProjects.ToDictionary(sp => sp.Key, sp => sp.Value.Values.ToArray());
         }
 
         /// <inheritdoc />
@@ -681,11 +703,16 @@ namespace SOS.Import.Factories.Harvest
                 sightingRelations);
 
             // Get projects & project parameters
-            var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds, _sightingProjectIds,
-                _projectEntityById, _projectParameterEntities);
-
-            return  from e in entities
-                select CastEntityToVerbatim(e, personSightings, projectEntityDictionaries);
+            /*var projectEntityDictionaries = GetProjectEntityDictionaries(sightingIds);
+            var projectEntitiesBySightingId =
+                _sightingProjectIds.ToDictionary(spi => spi.Key, spi => spi.Value.Select(v => _projects[v]));
+           
+            var projectParameterEntitiesBySightingId = _projectParameterEntities
+                .Where(p => sightingIds.Contains(p.SightingId))
+                .GroupBy(p => p.SightingId)
+                .ToDictionary(g => g.Key, g => g.AsEnumerable()); */
+            return from e in entities
+                select CastEntityToVerbatim(e, personSightings);
         }
     }
 }
