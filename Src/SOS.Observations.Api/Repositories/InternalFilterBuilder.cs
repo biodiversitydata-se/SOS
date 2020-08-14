@@ -32,12 +32,22 @@ namespace SOS.Observations.Api.Repositories
                             )));
                 }
 
-                if (internalFilter.UserId.HasValue)
+                if (internalFilter.ReportedByUserId.HasValue)
                 {
                     queryInternal.Add(q => q
                         .Terms(t => t
                             .Field(new Field("reportedByUserId"))
-                            .Terms(internalFilter.UserId)
+                            .Terms(internalFilter.ReportedByUserId)
+                        )
+                    );
+                }
+
+                if (internalFilter.ObservedByUserId.HasValue)
+                {
+                    queryInternal.Add(q => q
+                        .Terms(t => t
+                            .Field(new Field("occurrence.recordedByInternal.id"))
+                            .Terms(internalFilter.ObservedByUserId)
                         )
                     );
                 }
