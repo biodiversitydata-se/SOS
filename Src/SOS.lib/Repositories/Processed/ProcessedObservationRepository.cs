@@ -236,6 +236,10 @@ namespace SOS.Lib.Repositories.Processed
                     .MaxDegreeOfParallelism(Environment.ProcessorCount)
                     // number of items per bulk request
                     .Size(1000)
+                    .DroppedDocumentCallback((r, o) =>
+                    {
+                        Logger.LogError(r.Error.Reason);
+                    })
                 )
                 .Wait(TimeSpan.FromDays(1),
                     next => { Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}"); });

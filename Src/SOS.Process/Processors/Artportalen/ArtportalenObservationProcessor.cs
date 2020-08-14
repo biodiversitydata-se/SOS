@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using System.Threading.Tasks;
 using Hangfire;
@@ -199,8 +200,8 @@ namespace SOS.Process.Processors.Artportalen
             ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
             _artportalenVerbatimRepository.IncrementalMode = incrementalMode;
             using var cursor = await _artportalenVerbatimRepository.GetAllByCursorAsync();
-            int batchId = 0;
-
+            var batchId = 0;
+           
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {

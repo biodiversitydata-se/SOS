@@ -99,10 +99,19 @@ namespace SOS.Process.Processors
             DataProvider dataProvider,
             ICollection<ProcessedObservation> processedObservations)
         {
-            FieldMappingResolverHelper
-                .ResolveFieldMappedValues(
-                    processedObservations); // used for testing purpose. A setting decides whether values should be resolved for easier debugging of field mapped data.
-            return await ProcessRepository.AddManyAsync(processedObservations);
+            try
+            {
+                FieldMappingResolverHelper
+                    .ResolveFieldMappedValues(
+                        processedObservations); // used for testing purpose. A setting decides whether values should be resolved for easier debugging of field mapped data.
+                return await ProcessRepository.AddManyAsync(processedObservations);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Failed to commit batch for {dataProvider}");
+                return 0;
+            }
+           
         }
 
         protected bool IsBatchFilledToLimit(int count)

@@ -371,7 +371,7 @@ namespace SOS.Import.Factories.Harvest
 
                 if (!sightingProjects.ContainsKey(projectId))
                 {
-                    sightingProjects.Add(project.Id, project);
+                    sightingProjects.Add(project.Id, project.Clone());
                 }
             }
 
@@ -408,7 +408,7 @@ namespace SOS.Import.Factories.Harvest
                     }
 
                     // Get project from all projects
-                    project = projects[projectParameterEntity.ProjectId].DeepCopyByExpressionTree();
+                    project = projects[projectParameterEntity.ProjectId].Clone();
                     sightingProjects.Add(project.Id, project);
                 }
 

@@ -90,7 +90,7 @@ namespace SOS.Lib.Extensions
         /// <param name="original">Object to copy.</param>
         /// <param name="copiedReferencesDict">Dictionary of already copied objects (Keys: original objects, Values: their copies).</param>
         /// <returns></returns>
-        public static T DeepCopyByExpressionTree<T>(this T original, Dictionary<object, object> copiedReferencesDict = null)
+        public static T Clone<T>(this T original, Dictionary<object, object> copiedReferencesDict = null)
         {
             return (T)DeepCopyByExpressionTreeObj(original, false, copiedReferencesDict ?? new Dictionary<object, object>(new ReferenceEqualityComparer()));
         }
