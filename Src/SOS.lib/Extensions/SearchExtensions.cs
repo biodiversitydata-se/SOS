@@ -328,7 +328,7 @@ namespace SOS.Lib.Extensions
                 }
                 else
                 {
-                    if (filter.StartDate.HasValue)
+                    if (filter.EndDate.HasValue)
                     {
                         queryContainers.Add(q => q
                             .DateRange(r => r
@@ -340,7 +340,7 @@ namespace SOS.Lib.Extensions
                         );
                     }
 
-                    if (filter.EndDate.HasValue)
+                    if (filter.StartDate.HasValue)
                     {
                         queryContainers.Add(q => q
                             .DateRange(r => r
