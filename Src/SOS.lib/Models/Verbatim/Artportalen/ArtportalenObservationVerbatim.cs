@@ -278,5 +278,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
 
         public int? RegionalSightingStateId { get; set; }
         public IEnumerable<int> SightingPublishTypeIds { get; set; }
+
+        public IEnumerable<int> SpeciesFactsIds { get; set; }
     }
 }

@@ -283,5 +283,7 @@ namespace SOS.Import.Entities.Artportalen
         public int? RegionalSightingStateId { get; set; }
 
         public string SightingPublishTypeIds { get; set; }
+
+        public string SpeciesFactsIds { get; set; }
     }
 }

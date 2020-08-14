@@ -136,7 +136,8 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ConfirmedBy = verbatimObservation.ConfirmedBy;
                 obs.DeterminationYear = verbatimObservation.DeterminationYear;
                 obs.DeterminedBy = verbatimObservation.DeterminedBy;
-                
+                obs.SpeciesFactsIds = verbatimObservation.SpeciesFactsIds;
+
 
                 // Event
                 obs.Event = new ProcessedEvent();

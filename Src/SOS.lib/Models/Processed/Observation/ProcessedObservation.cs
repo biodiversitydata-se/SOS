@@ -330,6 +330,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public int VerbatimId { get; set; }
 
+        /// <summary>
+        /// Ids of Species Facts connected to Taxon
+        /// </summary>
+        public IEnumerable<int> SpeciesFactsIds { get; set; }
+
         #endregion Record level
 
         //public string VerbatimObservation { get; set; } // todo - this could be used to store the orginal verbatim observation.

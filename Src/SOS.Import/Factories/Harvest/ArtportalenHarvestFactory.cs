@@ -133,21 +133,9 @@ namespace SOS.Import.Factories.Harvest
 
             observation.RegionalSightingStateId = entity.RegionalSightingStateId;
 
-            if (!string.IsNullOrEmpty(entity.SightingPublishTypeIds))
-            {
-                var stringIds = entity.SightingPublishTypeIds.Split(",");
-                var ids = new List<int>();
+            observation.SightingPublishTypeIds = ConvertCsvStringToListOfIntegers(entity.SightingPublishTypeIds);
 
-                foreach (var stringId in stringIds)
-                {
-                    if (int.TryParse(stringId, out var id))
-                    {
-                        ids.Add(id);
-                    }
-                }
-
-                observation.SightingPublishTypeIds = ids.Any() ? ids : null;
-            }
+            observation.SpeciesFactsIds = ConvertCsvStringToListOfIntegers(entity.SpeciesFactsIds);
 
             if (observation.Site?.ParentSiteId != null)
             {
@@ -173,6 +161,27 @@ namespace SOS.Import.Factories.Harvest
             }
 
             return observation;
+        }
+
+        private static List<int> ConvertCsvStringToListOfIntegers(string s)
+        {
+            if (string.IsNullOrEmpty(s))
+            {
+                return null;
+            }
+
+            var stringIds = s.Split(",");
+            var ids = new List<int>();
+
+            foreach (var stringId in stringIds)
+            {
+                if (int.TryParse(stringId, out var id))
+                {
+                    ids.Add(id);
+                }
+            }
+
+            return ids.Any() ? ids : null;
         }
 
         #region Metadata
