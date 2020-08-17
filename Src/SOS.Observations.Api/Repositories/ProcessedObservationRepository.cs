@@ -148,7 +148,7 @@ namespace SOS.Observations.Api.Repositories
                 }             
                 queryList.Add(q => q
                         .Terms(t => t
-                            .Field("occurrence.sightingTypeSearchGroupId")
+                            .Field("artportalenInternal.sightingTypeSearchGroupId")
                             .Terms(sightingTypeSearchGroupFilter)
                         )
                     );
@@ -157,13 +157,13 @@ namespace SOS.Observations.Api.Repositories
             {
                 queryList.Add(q => q
                         .Terms(t => t
-                            .Field("occurrence.sightingTypeId")
+                            .Field("artportalenInternal.sightingTypeId")
                             .Terms(new int[] { 0, 3 })
                         )
                     );
                 queryList.Add(q => q
                         .Terms(t => t
-                            .Field("occurrence.sightingTypeSearchGroupId")
+                            .Field("artportalenInternal.sightingTypeSearchGroupId")
                             .Terms(new int[] { 0, 1, 32 })
                         )
                     );

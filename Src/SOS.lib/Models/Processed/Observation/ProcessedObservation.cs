@@ -135,23 +135,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     (http://www.biodiversitycollectionsindex.org/).
         /// </summary>
         public string CollectionId { get; set; }
-
-
-        /// <summary>
-        ///     Id of SightingSpeciesCollectionItem in Artportalen.
-        /// </summary>
-        public int? SightingSpeciesCollectionItemId { get; set; }
-
-        /// <summary>
-        ///     Has Triggered Validation Rules
-        /// </summary>
-        public bool HasTriggeredValidationRules { get; set; }
-
-        /// <summary>
-        ///     Has any Triggered Validation Rule with Warning
-        /// </summary>
-        public bool HasAnyTriggeredValidationRuleWithWarning { get; set; }
-
+       
         /// <summary>
         ///     Actions taken to make the shared data less specific or
         ///     complete than in its original form.
@@ -244,17 +228,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     to in the record.
         /// </summary>
         public string OwnerInstitutionCode { get; set; }
-
-        /// <summary>
-        ///     Private Collection
-        /// </summary>
-        public string PrivateCollection { get; set; }
-
-        /// <summary>
-        ///     Public Collection
-        /// </summary>
-        public string PublicCollection { get; set; }
-
+        
         /// <summary>
         ///     Protection level
         /// </summary>
@@ -319,21 +293,15 @@ namespace SOS.Lib.Models.Processed.Observation
         [Object]
         public ProcessedFieldMapValue Type { get; set; }
 
-
-        public string DeterminedBy { get; set; }
-        public int? DeterminationYear { get; set; }
-        public string ConfirmedBy { get; set; }
-        public int? ConfirmationYear { get; set; }
-
         /// <summary>
         /// Verbatim numeric id if applicable
         /// </summary>
         public int VerbatimId { get; set; }
 
         /// <summary>
-        /// Ids of Species Facts connected to Taxon
+        ///     Properties only used by Artportalen
         /// </summary>
-        public IEnumerable<int> SpeciesFactsIds { get; set; }
+        public ArtportalenInternal ArtportalenInternal { get; set; }
 
         #endregion Record level
 
