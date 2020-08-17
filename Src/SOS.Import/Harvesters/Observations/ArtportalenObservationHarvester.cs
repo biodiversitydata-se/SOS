@@ -98,7 +98,7 @@ namespace SOS.Import.Harvesters.Observations
                 await _sightingVerbatimRepository.AddManyAsync(verbatimObservations);
                 _logger.LogDebug($"Finish storing batch from id: {currentId} to id: {lastId}");
 
-                return verbatimObservations.Count();
+                return verbatimObservations?.Count() ?? 0;
             }
             catch (Exception e)
             {
