@@ -114,13 +114,10 @@ namespace SOS.Process.Processors.Artportalen
                 obs.CollectionId = verbatimObservation.CollectionID;
                 obs.DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.Artportalen}";
                 obs.DatasetName = "Artportalen";
-                obs.HasTriggeredValidationRules = verbatimObservation.HasTriggeredValidationRules;
-                obs.HasAnyTriggeredValidationRuleWithWarning = verbatimObservation.HasAnyTriggeredValidationRuleWithWarning;
                 obs.InformationWithheld = null;
                 obs.IsInEconomicZoneOfSweden = hasPosition;
                 obs.Language = Language.Swedish;
                 obs.Modified = endDate ?? verbatimObservation.ReportedDate;
-                obs.SightingSpeciesCollectionItemId = verbatimObservation.SightingSpeciesCollectionItemId;
                 obs.Type = null;
                 obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
                 obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
@@ -130,13 +127,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
                 obs.ReportedDate = verbatimObservation.ReportedDate;
                 obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
-                obs.PrivateCollection = verbatimObservation.PrivateCollection;
-                obs.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
-                obs.ConfirmationYear = verbatimObservation.ConfirmationYear;
-                obs.ConfirmedBy = verbatimObservation.ConfirmedBy;
-                obs.DeterminationYear = verbatimObservation.DeterminationYear;
-                obs.DeterminedBy = verbatimObservation.DeterminedBy;
-                obs.SpeciesFactsIds = verbatimObservation.SpeciesFactsIds;
+                
 
 
                 // Event
@@ -176,7 +167,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.County = GetSosId(verbatimObservation.Site?.County?.Id, _fieldMappings[FieldMappingFieldId.County]);
                 obs.Location.DecimalLatitude = point?.Coordinates?.Latitude ?? 0;
                 obs.Location.DecimalLongitude = point?.Coordinates?.Longitude ?? 0;
-                obs.Location.ExternalId = verbatimObservation.Site?.ExternalId;
                 obs.Location.GeodeticDatum = GeodeticDatum.Wgs84;
                 obs.Location.Locality = verbatimObservation.Site?.Name.Trim();
                 obs.Location.LocationId = $"urn:lsid:artportalen.se:site:{verbatimObservation.Site?.Id}";
@@ -211,7 +201,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.IsNeverFoundObservation = verbatimObservation.NotPresent;
                 obs.Occurrence.IsNotRediscoveredObservation = verbatimObservation.NotRecovered;
                 obs.Occurrence.IsPositiveObservation = !(verbatimObservation.NotPresent || verbatimObservation.NotRecovered);
-                obs.Occurrence.NoteOfInterest = verbatimObservation.NoteOfInterest;
                 obs.Occurrence.OrganismQuantityInt = verbatimObservation.Quantity;
                 obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
                 obs.Occurrence.RecordedBy = verbatimObservation.Observers;
@@ -224,13 +213,29 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.URL = $"http://www.artportalen.se/sighting/{verbatimObservation.Id}";
                 obs.Occurrence.Length = verbatimObservation.Length;
                 obs.Occurrence.Weight = verbatimObservation.Weight;
-                obs.Occurrence.SightingTypeId = verbatimObservation.SightingTypeId;
-                obs.Occurrence.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
-                obs.Occurrence.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;
-                obs.Occurrence.SightingPublishTypeIds = verbatimObservation.SightingPublishTypeIds;
+                obs.Occurrence.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
+                obs.Occurrence.ConfirmationYear = verbatimObservation.ConfirmationYear;
+                obs.Occurrence.ConfirmedBy = verbatimObservation.ConfirmedBy;
+                obs.Occurrence.DeterminationYear = verbatimObservation.DeterminationYear;
+                obs.Occurrence.DeterminedBy = verbatimObservation.DeterminedBy;
 
                 // Taxon
                 obs.Taxon = taxon;
+
+                // ArtportalenInternal
+                obs.ArtportalenInternal = new ArtportalenInternal();
+                obs.ArtportalenInternal.HasTriggeredValidationRules = verbatimObservation.HasTriggeredValidationRules;
+                obs.ArtportalenInternal.HasAnyTriggeredValidationRuleWithWarning = verbatimObservation.HasAnyTriggeredValidationRuleWithWarning;
+                obs.ArtportalenInternal.SightingSpeciesCollectionItemId = verbatimObservation.SightingSpeciesCollectionItemId;
+                obs.ArtportalenInternal.PrivateCollection = verbatimObservation.PrivateCollection;
+                obs.ArtportalenInternal.SpeciesFactsIds = verbatimObservation.SpeciesFactsIds;
+                obs.ArtportalenInternal.LocationExternalId = verbatimObservation.Site?.ExternalId;
+                obs.ArtportalenInternal.NoteOfInterest = verbatimObservation.NoteOfInterest;
+                obs.ArtportalenInternal.SightingTypeId = verbatimObservation.SightingTypeId;
+                obs.ArtportalenInternal.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
+                obs.ArtportalenInternal.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;
+                obs.ArtportalenInternal.SightingPublishTypeIds = verbatimObservation.SightingPublishTypeIds;
+
 
                 // Set dependent properties
                 var biotope = obs.Event.Biotope?.Value;

@@ -82,7 +82,7 @@ namespace SOS.Observations.Api.Repositories
                 {
                     queryInternal.Add(q => q
                         .Term(m => m
-                            .Field("occurrence.noteOfInterest")
+                            .Field("artportalenInternal.noteOfInterest")
                             .Value(true)));
                 }
 
@@ -169,7 +169,7 @@ namespace SOS.Observations.Api.Repositories
                 {
                     queryInternal.Add(q => q
                         .Term(m => m
-                            .Field("hasTriggeredValidationRules")
+                            .Field("artportalenInternal.hasTriggeredValidationRules")
                             .Value(true)));
                 }
 
@@ -177,7 +177,7 @@ namespace SOS.Observations.Api.Repositories
                 {
                     queryInternal.Add(q => q
                         .Term(m => m
-                            .Field("hasAnyTriggeredValidationRuleWithWarning")
+                            .Field("artportalenInternal.hasAnyTriggeredValidationRuleWithWarning")
                             .Value(true)));
                 }
 
@@ -276,7 +276,7 @@ namespace SOS.Observations.Api.Repositories
                 {
                     queryInternal.Add(q => q
                         .Term(m => m
-                            .Field("publicCollection.keyword")
+                            .Field("occurrence.publicCollection.keyword")
                             .Value(internalFilter.PublicCollection)));
                 }
 
@@ -284,7 +284,7 @@ namespace SOS.Observations.Api.Repositories
                 {
                     queryInternal.Add(q => q
                         .Term(m => m
-                            .Field("privateCollection.keyword")
+                            .Field("artportalenInternal.privateCollection.keyword")
                             .Value(internalFilter.PrivateCollection)));
                 }
 
@@ -348,7 +348,7 @@ namespace SOS.Observations.Api.Repositories
                 {
                     queryInternal.Add(q => q
                         .Terms(t => t
-                            .Field("occurrence.regionalSightingStateId")
+                            .Field("artportalenInternal.regionalSightingStateId")
                             .Terms(internalFilter.RegionalSightingStateIdsFilter)
                         )
                     );
@@ -358,7 +358,7 @@ namespace SOS.Observations.Api.Repositories
                 {
                     queryInternal.Add(q => q
                         .Terms(t => t
-                            .Field("occurrence.sightingPublishTypeIds")
+                            .Field("artportalenInternal.sightingPublishTypeIds")
                             .Terms(internalFilter.PublishTypeIdsFilter)
                         )
                     );
@@ -380,7 +380,7 @@ namespace SOS.Observations.Api.Repositories
                     {
                         queryInternal.Add(q => q
                             .Term(t => t
-                                .Field("speciesFactsIds")
+                                .Field("artportalenInternal.speciesFactsIds")
                                 .Value(factsId)
                             )
                         );
