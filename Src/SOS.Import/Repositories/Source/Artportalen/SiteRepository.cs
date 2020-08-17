@@ -113,6 +113,11 @@ namespace SOS.Import.Repositories.Source.Artportalen
         /// <inheritdoc />
         public async Task<IEnumerable<SiteEntity>> GetByIdsLiveAsync(IEnumerable<int> ids)
         {
+            if (!ids?.Any() ?? true)
+            {
+                return null;
+            }
+
             try
             {
                 return await QueryAsync<SiteEntity>(GetSiteQuery(      $"WHERE s.Id IN ({ string.Join(',', ids) })--@siteIds"), null/*new { siteIds = ids }*/, true);

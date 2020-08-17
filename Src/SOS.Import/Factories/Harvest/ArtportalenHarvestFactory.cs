@@ -436,14 +436,14 @@ namespace SOS.Import.Factories.Harvest
             {
                 return;
             }
-            
+
             var batchSize = 1000;
             var startIndex = 0;
             var idBatch = newSiteIds.Take(batchSize).ToArray();
 
             while (idBatch.Any())
             {
-                var sites = CastSiteEntitiesToVerbatim((await _siteRepository.GetByIdsLiveAsync(idBatch)).ToList());
+                var sites = CastSiteEntitiesToVerbatim((await _siteRepository.GetByIdsLiveAsync(idBatch))?.ToList());
 
                 if (sites?.Any() ?? false)
                 {
@@ -472,7 +472,7 @@ namespace SOS.Import.Factories.Harvest
         {
             if (!siteEntities?.Any() ?? true)
             {
-                return null;
+                return new List<Site>();
             }
 
             var sites = new List<Site>();
@@ -637,7 +637,7 @@ namespace SOS.Import.Factories.Harvest
             
             _sightingsProjects = GetSightingProjects(projectEntities, sightingProjectIds.ToList(), projectParameterEntities);
 
-            _sites = CastSiteEntitiesToVerbatim(sites)?.ToDictionary(s => s.Id, s => s);
+            _sites = CastSiteEntitiesToVerbatim(sites)?.ToDictionary(s => s.Id, s => s) ?? new Dictionary<int, Site>();
             _speciesCollections = CastSpeciesCollectionsToVerbatim(speciesCollections).ToList();
             _stages = CastMetdataEntityToVerbatim(stages)?.ToDictionary(s => s.Id, s => s);
             _substrates = CastMetdataEntityToVerbatim(substrates)?.ToDictionary(s => s.Id, s => s);
