@@ -4,6 +4,7 @@ namespace SOS.Lib.Models.DataValidation
 {
     public class DwcaDataValidationSummary<TVerbatim, TProcessed>
     {
+        public int TotalNumberOfObservationsInFile { get; set; }
         public int NrObservationsProcessed { get; set; }
         public int NrValidObservations { get; set; }
         public int NrInvalidObservations { get; set; }

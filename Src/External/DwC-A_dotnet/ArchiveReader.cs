@@ -175,5 +175,15 @@ namespace DwC_A
         }
 
         #endregion
+
+        public int GetNumberOfRowsInOccurrenceFile()
+        {
+
+            var fileReader = GetAsyncFileReader(RowTypes.Occurrence);
+            if (fileReader == null) return 0;
+            var numberOfRows = fileReader.GetNumberOfRows();
+            var headerRowCount = fileReader.FileMetaData.HeaderRowCount;
+            return numberOfRows - headerRowCount;
+        }
     }
 }

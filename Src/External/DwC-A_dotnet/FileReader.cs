@@ -41,6 +41,12 @@ namespace DwC_A
 
         public IEnumerable<IRow> DataRows => Rows.Skip(FileMetaData.HeaderRowCount);
 
+        public int GetNumberOfRows()
+        {
+            var lineCount = File.ReadLines(FileName).Count();
+            return lineCount;
+        }
+
         public async IAsyncEnumerable<IRow> GetRowsAsync()
         {
             await using var stream = new FileStream(FileName, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, true);

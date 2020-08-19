@@ -41,5 +41,7 @@ namespace DwC_A
         FieldType TryGetFieldMetaData(string term);
 
         int GetIdIndex();
+
+        int GetNumberOfRows();
     }
 }

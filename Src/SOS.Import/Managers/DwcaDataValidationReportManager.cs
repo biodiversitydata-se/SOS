@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using DwC_A;
 using Microsoft.Extensions.Logging;
@@ -84,6 +83,7 @@ namespace SOS.Import.Managers
                 _fieldMappings,
                 _areaHelper);
 
+            var totalNumberOfObservations = archiveReader.GetNumberOfRowsInOccurrenceFile();
             var observationsBatches = _dwcArchiveReader.ReadArchiveInBatchesAsync(
                 archiveReader,
                 dataProvider);
@@ -95,8 +95,10 @@ namespace SOS.Import.Managers
             int nrInvalidObservations = 0;
             await foreach (var observationsBatch in observationsBatches)
             {
+                if (nrProcessedObservations >= maxNrObservationsToRead) continue;
                 foreach (var verbatimObservation in observationsBatch)
                 {
+                    if (nrProcessedObservations >= maxNrObservationsToRead) continue;
                     var processedObservation = dwcaObservationFactory.CreateProcessedObservation(verbatimObservation);
                     nrProcessedObservations++;
                     _fieldMappingResolverHelper.ResolveFieldMappedValues(new List<ProcessedObservation>
@@ -136,6 +138,7 @@ namespace SOS.Import.Managers
 
             return new DwcaDataValidationSummary<DwcObservationVerbatim, ProcessedObservation>
             {
+                TotalNumberOfObservationsInFile = totalNumberOfObservations,
                 NrObservationsProcessed = nrProcessedObservations,
                 NrValidObservations = nrValidObservations,
                 NrInvalidObservations = nrInvalidObservations,
