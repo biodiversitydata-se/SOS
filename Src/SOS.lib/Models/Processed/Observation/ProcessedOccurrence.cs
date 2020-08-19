@@ -156,12 +156,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </remarks>
         [Object]
         public ProcessedFieldMapValue LifeStage { get; set; }
-
-        /// <summary>
-        ///     Note of Interest
-        /// </summary>
-        public bool NoteOfInterest { get; set; }
-
+        
         /// <summary>
         ///     An identifier for the Occurrence (as opposed to a
         ///     particular digital record of the occurrence).
@@ -296,23 +291,30 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     The reported weight
         /// </summary>
         public int? Weight { get; set; }
+
         /// <summary>
-        /// Sighting type
+        /// 
         /// </summary>
-        public int SightingTypeId { get; set; }
+        public string DeterminedBy { get; set; }
+
         /// <summary>
-        /// Sighting type search group id
+        /// 
         /// </summary>
-        public int SightingTypeSearchGroupId { get; set; }
-        
+        public int? DeterminationYear { get; set; }
+
         /// <summary>
-        /// Id of sightings RegionalSightingState
+        /// 
         /// </summary>
-        public int? RegionalSightingStateId { get; set; }
-        
+        public string ConfirmedBy { get; set; }
+
         /// <summary>
-        /// Id of publishing types.
+        /// 
         /// </summary>
-        public IEnumerable<int> SightingPublishTypeIds { get; set; }
+        public int? ConfirmationYear { get; set; }
+
+        /// <summary>
+        ///     Public Collection
+        /// </summary>
+        public string PublicCollection { get; set; }
     }
 }

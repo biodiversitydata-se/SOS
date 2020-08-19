@@ -71,9 +71,16 @@ namespace SOS.Import.Harvesters.Observations
                 // Get chunk of sightings
                 var sightings =
                     (await _sightingRepository.GetChunkAsync(currentId, _artportalenConfiguration.ChunkSize, incrementalHarvest))
-                    .ToArray();
+                    ?.ToArray();
                 _logger.LogDebug(
                     $"Finish getting Artportalen sightings from id: {currentId} to id: {lastId}");
+
+                if (!sightings?.Any() ?? true)
+                {
+                    _logger.LogDebug(
+                    $"No sightings found from id: {currentId} to id: {lastId}");
+                    return 0;
+                }
 
                 if (_artportalenConfiguration.AddTestSightings && !_hasAddedTestSightings)
                 {
@@ -98,7 +105,7 @@ namespace SOS.Import.Harvesters.Observations
                 await _sightingVerbatimRepository.AddManyAsync(verbatimObservations);
                 _logger.LogDebug($"Finish storing batch from id: {currentId} to id: {lastId}");
 
-                return verbatimObservations.Count();
+                return verbatimObservations?.Count() ?? 0;
             }
             catch (Exception e)
             {
@@ -367,6 +374,8 @@ namespace SOS.Import.Harvesters.Observations
                         minId = maxId - _artportalenConfiguration.MaxNumberOfSightingsHarvested.Value;
                     }
                 }
+
+                minId = 35300001;
 
                 // Set observation repository in incremental mode in order to store data in other collection
                 _sightingVerbatimRepository.IncrementalMode = incrementalHarvest;

@@ -31,6 +31,11 @@
         public string CountryPartName { get; set; }
 
         /// <summary>
+        /// External id
+        /// </summary>
+        public string ExternalId { get; set; }
+
+        /// <summary>
         ///     Name of county
         /// </summary>
         public int Id { get; set; }
