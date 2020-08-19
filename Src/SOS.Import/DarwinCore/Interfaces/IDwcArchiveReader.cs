@@ -18,7 +18,7 @@ namespace SOS.Import.DarwinCore.Interfaces
         IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple,
-            int batchSize);
+            int batchSize = 100000);
 
         /// <summary>
         ///     Reads a DwC-A file and returns the observations.

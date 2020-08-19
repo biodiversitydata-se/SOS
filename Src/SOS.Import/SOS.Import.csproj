@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\External\DwC-A_dotnet\DwC-A_dotnet.csproj" />
     <ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
+    <ProjectReference Include="..\SOS.Process\SOS.Process.csproj" />
   </ItemGroup>
 
   <ItemGroup>

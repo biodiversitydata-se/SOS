@@ -31,5 +31,17 @@ namespace SOS.Import.IntegrationTests
                 .GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
             return verbatimDbConfiguration;
         }
+
+        protected MongoDbConfiguration GetProcessDbConfiguration()
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .AddUserSecrets<TestBase>()
+                .Build();
+
+            var exportConfiguration = config.GetSection("ApplicationSettings").GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            return exportConfiguration;
+        }
     }
 }
