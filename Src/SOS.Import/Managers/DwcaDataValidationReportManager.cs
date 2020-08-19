@@ -69,7 +69,6 @@ namespace SOS.Import.Managers
              int nrInvalidObservationsLimit = 100,
              int maxNrObservationsToRead = 100000)
         {
-            //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             var dataProvider = new DataProvider
             {
                 Id = 0,

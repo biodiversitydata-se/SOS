@@ -90,6 +90,32 @@ namespace SOS.Import.IntegrationTests.Managers
             strJsonObservationCompare.Should().NotBeEmpty();
         }
 
+        [Fact]
+        public async Task Compare_SwedishButterflyMonitoring_verbatim_and_processed_data()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
+            const string savePath = @"c:\temp\DwcaDataValidationReport-SwedishButterflyMonitoring.json";
+            var validationReportManager = CreateDwcaDataValidationReportManager();
+            using var archiveReader = new ArchiveReader(archivePath, @"c:\temp");
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await validationReportManager.CreateDataValidationSummary(archiveReader);
+            var jsonSettings = CreateJsonSerializerSettings();
+            var strJsonObservationCompare = JsonConvert.SerializeObject(result, Formatting.Indented, jsonSettings);
+            if (File.Exists(savePath)) File.Delete(savePath);
+            await File.WriteAllTextAsync(savePath, strJsonObservationCompare);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            strJsonObservationCompare.Should().NotBeEmpty();
+        }
+
         private JsonSerializerSettings CreateJsonSerializerSettings()
         {
             var jsonResolver = new IgnorableSerializerContractResolver()

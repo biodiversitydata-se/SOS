@@ -12,6 +12,7 @@ using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,7 +87,16 @@ namespace SOS.Administration.Api
         {
             services.AddControllers()
                 .AddJsonOptions(x => { x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
-
+            
+            services.Configure<FormOptions>(options =>
+            {
+                options.ValueLengthLimit = int.MaxValue;
+                options.MultipartBodyLengthLimit = long.MaxValue; // <-- !!! long.MaxValue
+                options.MultipartBoundaryLengthLimit = int.MaxValue;
+                options.MultipartHeadersCountLimit = int.MaxValue;
+                options.MultipartHeadersLengthLimit = int.MaxValue;
+            });
+            
             // Swagger
             services.AddSwaggerGen(
                 options =>
