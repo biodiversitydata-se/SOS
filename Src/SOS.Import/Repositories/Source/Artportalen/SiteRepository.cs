@@ -22,6 +22,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.XCoord,
 	                s.YCoord,
                     s.Accuracy,
+					s.ExternalId,
 	                am.Id AS MunicipalityId,
 	                am.Name AS MunicipalityName,
 	                am.ParentId AS CountyId,
@@ -101,7 +102,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-                return await QueryAsync<SiteEntity>(GetSiteQuery());
+                return await QueryAsync<SiteEntity>(GetSiteQuery("WHERE s.Id IN (SELECT SiteId FROM SearchableSightings)"));
             }
             catch (Exception e)
             {

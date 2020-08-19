@@ -42,6 +42,18 @@ namespace SOS.Import.Factories.Harvest
         private ArtportalenObservationVerbatim CastEntityToVerbatim(SightingEntity entity,
             IDictionary<int, PersonSighting> personSightings)
         {
+            if (_sites.TryGetValue(entity.SiteId.HasValue ? entity.SiteId.Value : -1, out var site))
+            {
+                // Try to set parent site name if empty
+                if (site.ParentSiteId != null && string.IsNullOrEmpty(site.ParentSiteName))
+                {
+                    if (_sites.TryGetValue(site.ParentSiteId.Value, out var parentSite))
+                    {
+                        site.ParentSiteName = parentSite.Name;
+                    }
+                }
+            }
+
             var observation = new ArtportalenObservationVerbatim
             {
                 Activity = entity.ActivityId.HasValue && _activities.ContainsKey(entity.ActivityId.Value)
@@ -90,9 +102,7 @@ namespace SOS.Import.Factories.Harvest
                 QuantityOfSubstrate = entity.QuantityOfSubstrate,
                 ReportedDate = entity.RegisterDate,
                 RightsHolder = entity.RightsHolder,
-                Site = entity.SiteId.HasValue && _sites.ContainsKey(entity.SiteId.Value)
-                    ? _sites[entity.SiteId.Value]
-                    : null,
+                Site = site,
                 SightingSpeciesCollectionItemId = entity.SightingSpeciesCollectionItemId,
                 Stage = entity.StageId.HasValue && _stages.ContainsKey(entity.StageId.Value)
                     ? _stages[entity.StageId.Value]
@@ -132,21 +142,8 @@ namespace SOS.Import.Factories.Harvest
             };
 
             observation.RegionalSightingStateId = entity.RegionalSightingStateId;
-
             observation.SightingPublishTypeIds = ConvertCsvStringToListOfIntegers(entity.SightingPublishTypeIds);
-
             observation.SpeciesFactsIds = ConvertCsvStringToListOfIntegers(entity.SpeciesFactsIds);
-
-            if (observation.Site?.ParentSiteId != null)
-            {
-                if (_sites.ContainsKey(observation.Site.ParentSiteId.Value))
-                {
-                    var s = _sites[observation.Site.ParentSiteId.Value];
-                    observation.Site.ParentSiteName = s.Name;
-                }
-            }
-
-            if (observation.Site != null) observation.Site.ExternalId = entity.SiteExternalId;
 
             if (personSightings.TryGetValue(entity.Id, out var personSighting))
             {
@@ -516,6 +513,7 @@ namespace SOS.Import.Factories.Harvest
                 CountryPart = entity.CountryPartId.HasValue
                     ? new GeographicalArea { Id = entity.CountryPartId.Value, Name = entity.CountryPartName }
                     : null,
+                ExternalId = entity.ExternalId,
                 Id = entity.Id,
                 Municipality = entity.MunicipalityId.HasValue
                     ? new GeographicalArea { Id = entity.MunicipalityId.Value, Name = entity.MunicipalityName }

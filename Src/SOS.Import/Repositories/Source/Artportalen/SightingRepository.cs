@@ -70,7 +70,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                s.HasAnyTriggeredValidationRuleWithWarning,
 	                s.NoteOfInterest,
 	                si.DeterminationMethodId,
-	                site.ExternalId AS SiteExternalId,
                     s.SightingTypeId,
                     s.SightingTypeSearchGroupId,
                     ssci.OrganizationId AS OrganizationCollectorId,
@@ -95,7 +94,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					LEFT JOIN SightingDescription sdb ON si.SightingBiotopeDescriptionId = sdb.Id 
 					LEFT JOIN SightingDescription sds ON si.SightingSubstrateDescriptionId = sds.Id 
 					LEFT JOIN SightingDescription sdss ON si.SightingSubstrateSpeciesDescriptionId = sdss.Id
-                    LEFT JOIN Site site on site.Id = s.SiteId 
                     LEFT JOIN SightingRelation srDeterminer ON srDeterminer.SightingId = s.SightingId AND srDeterminer.IsPublic = 1 AND srDeterminer.SightingRelationTypeId = 3
                     LEFT JOIN SightingRelation srConfirmator ON srConfirmator.SightingId = s.SightingId AND srConfirmator.IsPublic = 1 AND srConfirmator.SightingRelationTypeId = 5
                     LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = ss.SightingId

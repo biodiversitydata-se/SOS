@@ -71,9 +71,16 @@ namespace SOS.Import.Harvesters.Observations
                 // Get chunk of sightings
                 var sightings =
                     (await _sightingRepository.GetChunkAsync(currentId, _artportalenConfiguration.ChunkSize, incrementalHarvest))
-                    .ToArray();
+                    ?.ToArray();
                 _logger.LogDebug(
                     $"Finish getting Artportalen sightings from id: {currentId} to id: {lastId}");
+
+                if (!sightings?.Any() ?? true)
+                {
+                    _logger.LogDebug(
+                    $"No sightings found from id: {currentId} to id: {lastId}");
+                    return 0;
+                }
 
                 if (_artportalenConfiguration.AddTestSightings && !_hasAddedTestSightings)
                 {
