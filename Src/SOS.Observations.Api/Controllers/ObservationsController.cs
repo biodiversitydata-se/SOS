@@ -159,5 +159,30 @@ namespace SOS.Observations.Api.Controllers
 
             return await GetChunkAsync(filter, skip, take, sortBy, sortOrder);
         }
+
+        /// <inheritdoc />
+        [HttpPost("searchaggregatedinternal")]
+        [ProducesResponseType(typeof(PagedResult<ProcessedObservation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> GetChunkAggregatedInternalAsync([FromBody] SearchFilterInternal filter, [FromQuery] AggregationType aggregationType)
+        {
+            try
+            {
+                var (isValid, validationErrors) = ValidateFilter(filter, 0, 1);
+                if (!isValid)
+                {
+                    return BadRequest(string.Join(". ", validationErrors));
+                }
+
+                return new OkObjectResult(await _observationManager.GetAggregatedChunkAsync(filter, aggregationType));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting batch of aggregated sightings");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

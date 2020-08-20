@@ -20,5 +20,13 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <returns></returns>
         Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder);
+
+        /// <summary>
+        ///     Get aggregated data
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="aggregationType"></param>
+        /// <returns></returns>
+        Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType);
     }
 }

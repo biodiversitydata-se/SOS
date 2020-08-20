@@ -295,7 +295,7 @@ namespace SOS.Import.Harvesters.Observations
 
                     // If we harvest all sightings from backup, get all sites at once to increase performance
                     _logger.LogDebug("Start getting sites");
-                    var sites = (await _siteRepository.GetAsync()).ToList();
+                    var sites = (List<SiteEntity>)null;// (await _siteRepository.GetAsync()).ToList();
                     _logger.LogDebug("Finish getting sites");
 
                     _logger.LogDebug("Start creating factory");
@@ -374,8 +374,6 @@ namespace SOS.Import.Harvesters.Observations
                         minId = maxId - _artportalenConfiguration.MaxNumberOfSightingsHarvested.Value;
                     }
                 }
-
-                minId = 35300001;
 
                 // Set observation repository in incremental mode in order to store data in other collection
                 _sightingVerbatimRepository.IncrementalMode = incrementalHarvest;

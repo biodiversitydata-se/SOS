@@ -69,7 +69,7 @@ namespace SOS.Observations.Api.Repositories
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
-            operation.Telemetry.Properties["Filter"] = filter.ToString(); 
+            operation.Telemetry.Properties["Filter"] = filter.ToString();
 
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(_indexName)
@@ -122,53 +122,145 @@ namespace SOS.Observations.Api.Repositories
             // When operation is disposed, telemetry item is sent.
         }
 
+        /// <inheritdoc />
+        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType)
+        {
+            if (!filter?.IsFilterActive ?? true)
+            {
+                return null;
+            }
+
+            var query = filter.ToQuery();
+            query = AddSightingTypeFilters(filter, query);
+            query = InternalFilterBuilder.AddFilters(filter, query);
+            query = InternalFilterBuilder.AddAggregationFilter(aggregationType, query);
+
+            var aggregations = AddAggregation(aggregationType);
+
+            var excludeQuery = CreateExcludeQuery(filter);
+            excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
+
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_Aggregated");
+
+            operation.Telemetry.Properties["Filter"] = filter.ToString();
+
+            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                .Index(_indexName)
+                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(aggregations)
+            );
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            var totalCount = searchResponse.HitsMetadata.Total.Value;
+
+            // Optional: explicitly send telemetry item:
+            _telemetry.StopOperation(operation);
+
+            return new PagedResult<dynamic>
+            {
+                Records = searchResponse
+                    .Aggregations
+                    .DateHistogram("aggregation")
+                    .Buckets?
+                    .Select(b =>
+                        new
+                        {
+                            b.Date,
+                            b.DocCount,
+                            Quantity = b.Sum("quantity").Value
+                        }),
+                Skip = 0,
+                Take = 1,
+                TotalCount = totalCount
+            };
+
+            // When operation is disposed, telemetry item is sent.
+        }
+
+        private static Func<AggregationContainerDescriptor<dynamic>, IAggregationContainer> AddAggregation(AggregationType aggregationType)
+        {
+            var di = DateInterval.Year;
+
+            switch (aggregationType)
+            {
+                case AggregationType.SightingsPerWeek:
+                case AggregationType.QuantityPerWeek:
+                    di = DateInterval.Week;
+                    break;
+                case AggregationType.SightingsPerYear:
+                case AggregationType.QuantityPerYear:
+                    di = DateInterval.Year;
+                    break;
+            }
+
+            return agg => agg
+                .DateHistogram("aggregation", dh => dh
+                    .Field("event.startDate")
+                    .CalendarInterval(di)
+                    .Aggregations(a => a
+                        .Sum("quantity", sum => sum
+                            .Field("occurrence.organismQuantityInt")
+                        )
+                    )
+                );
+        }
+
         private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddSightingTypeFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
         {
             var queryList = query.ToList();
-            
-            if(filter is SearchFilterInternal)
+
+            if (filter is SearchFilterInternal)
             {
-                var internalFilter = filter as SearchFilterInternal;                
+                var internalFilter = filter as SearchFilterInternal;
                 int[] sightingTypeSearchGroupFilter = null;
                 if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowMerged)
-                {                    
+                {
                     sightingTypeSearchGroupFilter = new int[] { 0, 1, 4, 16, 32, 128 };
                 }
                 else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowBoth)
-                {                 
+                {
                     sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 16, 32, 128 };
                 }
                 else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
-                {                 
+                {
                     sightingTypeSearchGroupFilter = new int[] { 0, 2 };
                 }
                 else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowSightingsInMerged)
-                {                 
-                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 32, 128 };
-                }             
+                {
+                    sightingTypeSearchGroupFilter = new int[] {0, 1, 2, 4, 32, 128};
+                }
+
                 queryList.Add(q => q
-                        .Terms(t => t
-                            .Field("artportalenInternal.sightingTypeSearchGroupId")
-                            .Terms(sightingTypeSearchGroupFilter)
-                        )
-                    );
+                    .Terms(t => t
+                        .Field("artportalenInternal.sightingTypeSearchGroupId")
+                        .Terms(sightingTypeSearchGroupFilter)
+                    )
+                );
             }
             else
             {
                 queryList.Add(q => q
-                        .Terms(t => t
-                            .Field("artportalenInternal.sightingTypeId")
-                            .Terms(new int[] { 0, 3 })
-                        )
-                    );
+                    .Terms(t => t
+                        .Field("artportalenInternal.sightingTypeId")
+                        .Terms(new int[] {0, 3})
+                    )
+                );
                 queryList.Add(q => q
-                        .Terms(t => t
-                            .Field("artportalenInternal.sightingTypeSearchGroupId")
-                            .Terms(new int[] { 0, 1, 32 })
-                        )
-                    );
+                    .Terms(t => t
+                        .Field("artportalenInternal.sightingTypeSearchGroupId")
+                        .Terms(new int[] {0, 1, 32})
+                    )
+                );
 
             }
+
             query = queryList;
             return query;
         }
