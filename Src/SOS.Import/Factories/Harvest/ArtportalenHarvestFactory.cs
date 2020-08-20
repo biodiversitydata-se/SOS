@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
@@ -42,122 +43,134 @@ namespace SOS.Import.Factories.Harvest
         private ArtportalenObservationVerbatim CastEntityToVerbatim(SightingEntity entity,
             IDictionary<int, PersonSighting> personSightings)
         {
-            if (_sites.TryGetValue(entity.SiteId.HasValue ? entity.SiteId.Value : -1, out var site))
+            if (entity == null)
             {
-                // Try to set parent site name if empty
-                if (site.ParentSiteId != null && string.IsNullOrEmpty(site.ParentSiteName))
+                return null;
+            }
+
+            try
+            {
+                if (_sites.TryGetValue(entity.SiteId.HasValue ? entity.SiteId.Value : -1, out var site))
                 {
-                    if (_sites.TryGetValue(site.ParentSiteId.Value, out var parentSite))
+                    // Try to set parent site name if empty
+                    if (site.ParentSiteId != null && string.IsNullOrEmpty(site.ParentSiteName))
                     {
-                        site.ParentSiteName = parentSite.Name;
+                        if (_sites.TryGetValue(site.ParentSiteId.Value, out var parentSite))
+                        {
+                            site.ParentSiteName = parentSite.Name;
+                        }
                     }
                 }
-            }
 
-            var observation = new ArtportalenObservationVerbatim
-            {
-                Activity = entity.ActivityId.HasValue && _activities.ContainsKey(entity.ActivityId.Value)
-                    ? _activities[entity.ActivityId.Value]
-                    : null,
-                Biotope = entity.BiotopeId.HasValue && _biotopes.ContainsKey(entity.BiotopeId.Value)
-                    ? _biotopes[entity.BiotopeId.Value]
-                    : null,
-                BiotopeDescription = entity.BiotopeDescription,
-                CollectionID = entity.CollectionID,
-                Comment = entity.Comment,
-                DiscoveryMethod = entity.DiscoveryMethodId.HasValue && _discoveryMethods.ContainsKey(entity.DiscoveryMethodId.Value)
-                    ? _discoveryMethods[entity.DiscoveryMethodId.Value]
-                    : null,
-                DeterminationMethod = entity.DeterminationMethodId.HasValue && _determinationMethods.ContainsKey(entity.DeterminationMethodId.Value)
-                    ? _determinationMethods[entity.DeterminationMethodId.Value]
-                    : null,
-                EndDate = entity.EndDate,
-                EndTime = entity.EndTime,
-                Gender = entity.GenderId.HasValue && _genders.ContainsKey(entity.GenderId.Value)
-                    ? _genders[entity.GenderId.Value]
-                    : null,
-                HasImages = entity.HasImages,
-                HasTriggeredValidationRules = entity.HasTriggeredValidationRules,
-                HasAnyTriggeredValidationRuleWithWarning = entity.HasAnyTriggeredValidationRuleWithWarning,
-                HiddenByProvider = entity.HiddenByProvider,
-                Id = entity.Id,
-                OwnerOrganization =
-                    entity.OwnerOrganizationId.HasValue &&
-                    _organizations.ContainsKey(entity.OwnerOrganizationId.Value)
-                        ? _organizations[entity.OwnerOrganizationId.Value]
+                var observation = new ArtportalenObservationVerbatim
+                {
+                    Activity = entity.ActivityId.HasValue && _activities.ContainsKey(entity.ActivityId.Value)
+                        ? _activities[entity.ActivityId.Value]
                         : null,
-                Label = entity.Label,
-                Length = entity.Length,
-                MaxDepth = entity.MaxDepth,
-                MaxHeight = entity.MaxHeight,
-                MigrateSightingObsId = entity.MigrateSightingObsId,
-                MigrateSightingPortalId = entity.MigrateSightingPortalId,
-                MinDepth = entity.MinDepth,
-                MinHeight = entity.MinHeight,
-                NoteOfInterest = entity.NoteOfInterest,
-                NotPresent = entity.NotPresent,
-                NotRecovered = entity.NotRecovered,
-                ProtectedBySystem = entity.ProtectedBySystem,
-                Quantity = entity.Quantity,
-                QuantityOfSubstrate = entity.QuantityOfSubstrate,
-                ReportedDate = entity.RegisterDate,
-                RightsHolder = entity.RightsHolder,
-                Site = site,
-                SightingSpeciesCollectionItemId = entity.SightingSpeciesCollectionItemId,
-                Stage = entity.StageId.HasValue && _stages.ContainsKey(entity.StageId.Value)
-                    ? _stages[entity.StageId.Value]
-                    : null,
-                StartDate = entity.StartDate,
-                StartTime = entity.StartTime,
-                Substrate = entity.SubstrateId.HasValue && _substrates.ContainsKey(entity.SubstrateId.Value)
-                    ? _substrates[entity.SubstrateId.Value]
-                    : null,
-                SubstrateDescription = entity.SubstrateDescription,
-                SubstrateSpeciesDescription = entity.SubstrateSpeciesDescription,
-                SubstrateSpeciesId = entity.SubstrateSpeciesId,
-                TaxonId = entity.TaxonId,
-                Unit = entity.UnitId.HasValue && _units.ContainsKey(entity.UnitId.Value)
-                    ? _units[entity.UnitId.Value]
-                    : null,
-                Unspontaneous = entity.Unspontaneous,
-                UnsureDetermination = entity.UnsureDetermination,
-                URL = entity.URL,
-                ValidationStatus = _validationStatus.ContainsKey(entity.ValidationStatusId)
-                    ? _validationStatus[entity.ValidationStatusId]
-                    : null,
-                Weight = entity.Weight,
-                Projects = _sightingsProjects.ContainsKey(entity.Id) ? _sightingsProjects[entity.Id] : null,
-                SightingTypeId = entity.SightingTypeId,
-                SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId,
-                PublicCollection = entity.OrganizationCollectorId.HasValue && _organizations.ContainsKey(entity.OrganizationCollectorId.Value)
-                    ? _organizations[entity.OrganizationCollectorId.Value]
-                    : null,
-                PrivateCollection = entity.UserCollectorId.HasValue && _personByUserId.ContainsKey(entity.UserCollectorId.Value)
-                    ? _personByUserId[entity.UserCollectorId.Value].FullName
-                    : null,
-                DeterminedBy = entity.DeterminerUserId.HasValue && _personByUserId.ContainsKey(entity.DeterminerUserId.Value) ? _personByUserId[entity.DeterminerUserId.Value].FullName : null,
-                DeterminationYear = entity.DeterminationYear,
-                ConfirmedBy = entity.ConfirmatorUserId.HasValue && _personByUserId.ContainsKey(entity.ConfirmatorUserId.Value) ? _personByUserId[entity.ConfirmatorUserId.Value].FullName : null,
-                ConfirmationYear = entity.ConfirmationYear
-            };
+                    Biotope = entity.BiotopeId.HasValue && _biotopes.ContainsKey(entity.BiotopeId.Value)
+                        ? _biotopes[entity.BiotopeId.Value]
+                        : null,
+                    BiotopeDescription = entity.BiotopeDescription,
+                    CollectionID = entity.CollectionID,
+                    Comment = entity.Comment,
+                    DiscoveryMethod = entity.DiscoveryMethodId.HasValue && _discoveryMethods.ContainsKey(entity.DiscoveryMethodId.Value)
+                        ? _discoveryMethods[entity.DiscoveryMethodId.Value]
+                        : null,
+                    DeterminationMethod = entity.DeterminationMethodId.HasValue && _determinationMethods.ContainsKey(entity.DeterminationMethodId.Value)
+                        ? _determinationMethods[entity.DeterminationMethodId.Value]
+                        : null,
+                    EndDate = entity.EndDate,
+                    EndTime = entity.EndTime,
+                    Gender = entity.GenderId.HasValue && _genders.ContainsKey(entity.GenderId.Value)
+                        ? _genders[entity.GenderId.Value]
+                        : null,
+                    HasImages = entity.HasImages,
+                    HasTriggeredValidationRules = entity.HasTriggeredValidationRules,
+                    HasAnyTriggeredValidationRuleWithWarning = entity.HasAnyTriggeredValidationRuleWithWarning,
+                    HiddenByProvider = entity.HiddenByProvider,
+                    Id = entity.Id,
+                    OwnerOrganization =
+                        entity.OwnerOrganizationId.HasValue &&
+                        _organizations.ContainsKey(entity.OwnerOrganizationId.Value)
+                            ? _organizations[entity.OwnerOrganizationId.Value]
+                            : null,
+                    Label = entity.Label,
+                    Length = entity.Length,
+                    MaxDepth = entity.MaxDepth,
+                    MaxHeight = entity.MaxHeight,
+                    MigrateSightingObsId = entity.MigrateSightingObsId,
+                    MigrateSightingPortalId = entity.MigrateSightingPortalId,
+                    MinDepth = entity.MinDepth,
+                    MinHeight = entity.MinHeight,
+                    NoteOfInterest = entity.NoteOfInterest,
+                    NotPresent = entity.NotPresent,
+                    NotRecovered = entity.NotRecovered,
+                    ProtectedBySystem = entity.ProtectedBySystem,
+                    Quantity = entity.Quantity,
+                    QuantityOfSubstrate = entity.QuantityOfSubstrate,
+                    ReportedDate = entity.RegisterDate,
+                    RightsHolder = entity.RightsHolder,
+                    Site = site,
+                    SightingSpeciesCollectionItemId = entity.SightingSpeciesCollectionItemId,
+                    Stage = entity.StageId.HasValue && _stages.ContainsKey(entity.StageId.Value)
+                        ? _stages[entity.StageId.Value]
+                        : null,
+                    StartDate = entity.StartDate,
+                    StartTime = entity.StartTime,
+                    Substrate = entity.SubstrateId.HasValue && _substrates.ContainsKey(entity.SubstrateId.Value)
+                        ? _substrates[entity.SubstrateId.Value]
+                        : null,
+                    SubstrateDescription = entity.SubstrateDescription,
+                    SubstrateSpeciesDescription = entity.SubstrateSpeciesDescription,
+                    SubstrateSpeciesId = entity.SubstrateSpeciesId,
+                    TaxonId = entity.TaxonId,
+                    Unit = entity.UnitId.HasValue && _units.ContainsKey(entity.UnitId.Value)
+                        ? _units[entity.UnitId.Value]
+                        : null,
+                    Unspontaneous = entity.Unspontaneous,
+                    UnsureDetermination = entity.UnsureDetermination,
+                    URL = entity.URL,
+                    ValidationStatus = _validationStatus.ContainsKey(entity.ValidationStatusId)
+                        ? _validationStatus[entity.ValidationStatusId]
+                        : null,
+                    Weight = entity.Weight,
+                    Projects = _sightingsProjects.ContainsKey(entity.Id) ? _sightingsProjects[entity.Id] : null,
+                    SightingTypeId = entity.SightingTypeId,
+                    SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId,
+                    PublicCollection = entity.OrganizationCollectorId.HasValue && _organizations.ContainsKey(entity.OrganizationCollectorId.Value)
+                        ? _organizations[entity.OrganizationCollectorId.Value]
+                        : null,
+                    PrivateCollection = entity.UserCollectorId.HasValue && _personByUserId.ContainsKey(entity.UserCollectorId.Value)
+                        ? _personByUserId[entity.UserCollectorId.Value].FullName
+                        : null,
+                    DeterminedBy = entity.DeterminerUserId.HasValue && _personByUserId.ContainsKey(entity.DeterminerUserId.Value) ? _personByUserId[entity.DeterminerUserId.Value].FullName : null,
+                    DeterminationYear = entity.DeterminationYear,
+                    ConfirmedBy = entity.ConfirmatorUserId.HasValue && _personByUserId.ContainsKey(entity.ConfirmatorUserId.Value) ? _personByUserId[entity.ConfirmatorUserId.Value].FullName : null,
+                    ConfirmationYear = entity.ConfirmationYear
+                };
 
-            observation.RegionalSightingStateId = entity.RegionalSightingStateId;
-            observation.SightingPublishTypeIds = ConvertCsvStringToListOfIntegers(entity.SightingPublishTypeIds);
-            observation.SpeciesFactsIds = ConvertCsvStringToListOfIntegers(entity.SpeciesFactsIds);
+                observation.RegionalSightingStateId = entity.RegionalSightingStateId;
+                observation.SightingPublishTypeIds = ConvertCsvStringToListOfIntegers(entity.SightingPublishTypeIds);
+                observation.SpeciesFactsIds = ConvertCsvStringToListOfIntegers(entity.SpeciesFactsIds);
 
-            if (personSightings.TryGetValue(entity.Id, out var personSighting))
-            {
-                observation.VerifiedBy = personSighting.VerifiedBy;
-                observation.VerifiedByInternal = personSighting.VerifiedByInternal;
-                observation.Observers = personSighting.Observers;
-                observation.ObserversInternal = personSighting.ObserversInternal;
-                observation.ReportedBy = personSighting.ReportedBy;
-                observation.SpeciesCollection = personSighting.SpeciesCollection;
-                observation.ReportedByUserId = personSighting.ReportedByUserId;
-                observation.ReportedByUserAlias = personSighting.ReportedByUserAlias;
+                if (personSightings.TryGetValue(entity.Id, out var personSighting))
+                {
+                    observation.VerifiedBy = personSighting.VerifiedBy;
+                    observation.VerifiedByInternal = personSighting.VerifiedByInternal;
+                    observation.Observers = personSighting.Observers;
+                    observation.ObserversInternal = personSighting.ObserversInternal;
+                    observation.ReportedBy = personSighting.ReportedBy;
+                    observation.SpeciesCollection = personSighting.SpeciesCollection;
+                    observation.ReportedByUserId = personSighting.ReportedByUserId;
+                    observation.ReportedByUserAlias = personSighting.ReportedByUserAlias;
+                }
+
+                return observation;
             }
-
-            return observation;
+            catch(Exception e)
+            {
+                return null;
+            } 
         }
 
         private static List<int> ConvertCsvStringToListOfIntegers(string s)
@@ -633,7 +646,7 @@ namespace SOS.Import.Factories.Harvest
             _organizationById = CastOrganizationEntityToVerbatim(organizationById)?.ToDictionary(o => o.Id, o => o);
             _personByUserId = CastPersonEntityToVerbatim(personByUserId)?.ToDictionary(p => p.Id, p => p);
             
-            _sightingsProjects = GetSightingProjects(projectEntities, sightingProjectIds.ToList(), projectParameterEntities);
+            _sightingsProjects = GetSightingProjects(projectEntities, sightingProjectIds.ToList(), projectParameterEntities) ?? new Dictionary<int, Project[]>();
 
             _sites = CastSiteEntitiesToVerbatim(sites)?.ToDictionary(s => s.Id, s => s) ?? new Dictionary<int, Site>();
             _speciesCollections = CastSpeciesCollectionsToVerbatim(speciesCollections).ToList();

@@ -79,8 +79,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                srConfirmator.UserId AS ConfirmatorUserId,
 	                srConfirmator.DeterminationYear AS ConfirmationYear,
 	                svr.RegionalSightingStateId as RegionalSightingStateId,
-                    (select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = s.SightingId group by SightingId) SightingPublishTypeIds,
-                    (select string_agg(SpeciesFactId , ',') from SpeciesFactTaxon sft where sft.TaxonId = s.TaxonId group by sft.TaxonId) SpeciesFactsIds
+                    /*(select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = s.SightingId group by SightingId)*/ null AS SightingPublishTypeIds,
+                   /* (select string_agg(SpeciesFactId , ',') from SpeciesFactTaxon sft where sft.TaxonId = s.TaxonId group by sft.TaxonId)*/ null AS SpeciesFactsIds
                 FROM
 	                SearchableSightings s WITH(NOLOCK)
 					INNER JOIN Sighting si ON s.SightingId = si.Id
