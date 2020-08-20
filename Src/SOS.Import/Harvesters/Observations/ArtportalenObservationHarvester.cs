@@ -377,6 +377,7 @@ namespace SOS.Import.Harvesters.Observations
 
                 // Set observation repository in incremental mode in order to store data in other collection
                 _sightingVerbatimRepository.IncrementalMode = incrementalHarvest;
+                _harvestFactory.IncrementalMode = incrementalHarvest;
 
                 var nrSightingsHarvested = 0;
 
