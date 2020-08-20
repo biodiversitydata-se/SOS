@@ -62,6 +62,22 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
+        /// <inheritdoc />
+        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType)
+        {
+            try
+            {
+                filter = await _filterManager.PrepareFilter(filter);
+                var processedObservations = await _processedObservationRepository.GetAggregatedChunkAsync(filter, aggregationType);
+                return processedObservations;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get aggregated chunk of observations");
+                return null;
+            }
+        }
+
         private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)
         {
             if (string.IsNullOrEmpty(filter.FieldTranslationCultureCode))

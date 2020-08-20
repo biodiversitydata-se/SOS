@@ -113,6 +113,7 @@ namespace SOS.Import.IoC.Modules
 
             // Managers
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
+            builder.RegisterType<DwcaDataValidationReportManager>().As<IDwcaDataValidationReportManager>().InstancePerLifetimeScope();
 
             // Repositories source
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
@@ -241,6 +242,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<TaxonHarvestJob>().As<ITaxonHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumHarvestJob>().As<IVirtualHerbariumHarvestJob>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<CreateDwcaDataValidationReportJob>().As<ICreateDwcaDataValidationReportJob>().InstancePerLifetimeScope();
         }
     }
 }

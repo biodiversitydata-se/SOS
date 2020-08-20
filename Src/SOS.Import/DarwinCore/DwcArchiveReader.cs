@@ -27,7 +27,7 @@ namespace SOS.Import.DarwinCore
         public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
             ArchiveReader archiveReader,
             IIdIdentifierTuple idIdentifierTuple,
-            int batchSize)
+            int batchSize = 100000)
         {
             var occurrenceReader = CreateOccurrenceReader(archiveReader.CoreFile.FileMetaData.RowType);
             await foreach (var batch in occurrenceReader.ReadArchiveInBatchesAsync(archiveReader, idIdentifierTuple,
