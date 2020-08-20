@@ -12,6 +12,7 @@ namespace SOS.Lib.Json
     /// </summary>
     public class IgnorableSerializerContractResolver : DefaultContractResolver
     {
+        public bool SetStringPropertyDefaultsToEmptyString { get; set; }
         protected readonly Dictionary<Type, HashSet<string>> Ignores = new Dictionary<Type, HashSet<string>>();
         protected readonly Dictionary<Type, DefaultValueHandling> KeepTypesWithDefaultValue = new Dictionary<Type, DefaultValueHandling>();
 
@@ -62,6 +63,11 @@ namespace SOS.Lib.Json
                 || IsIgnored(property.DeclaringType.BaseType, property.PropertyName))
             {
                 property.ShouldSerialize = instance => false;
+            }
+
+            if (SetStringPropertyDefaultsToEmptyString && property.PropertyType == typeof(string))
+            {
+                property.DefaultValue = "";
             }
 
             // Preserve specified properties even though they have a default value

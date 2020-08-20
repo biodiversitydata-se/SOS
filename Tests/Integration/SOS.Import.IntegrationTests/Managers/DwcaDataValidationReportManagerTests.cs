@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using DwC_A;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
+using MongoDB.Driver.Core.Operations;
 using Moq;
 using Newtonsoft.Json;
 using SOS.Import.DarwinCore;
@@ -11,6 +12,7 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Json;
+using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed;
@@ -118,7 +120,7 @@ namespace SOS.Import.IntegrationTests.Managers
 
         private JsonSerializerSettings CreateJsonSerializerSettings()
         {
-            var jsonResolver = new IgnorableSerializerContractResolver()
+            var jsonResolver = new IgnorableSerializerContractResolver { SetStringPropertyDefaultsToEmptyString = true}
                 .Ignore<ProcessedObservation>(obs => obs.Location.Point)
                 .Ignore<ProcessedObservation>(obs => obs.Location.PointWithBuffer)
                 .Ignore<ProcessedObservation>(obs => obs.IsInEconomicZoneOfSweden)
@@ -132,7 +134,8 @@ namespace SOS.Import.IntegrationTests.Managers
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 ContractResolver = jsonResolver,
-                DefaultValueHandling = DefaultValueHandling.Ignore
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore
             };
 
             return jsonSettings;
