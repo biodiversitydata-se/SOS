@@ -375,8 +375,6 @@ namespace SOS.Import.Harvesters.Observations
                     }
                 }
 
-                minId = 37500000;
-
                 // Set observation repository in incremental mode in order to store data in other collection
                 _sightingVerbatimRepository.IncrementalMode = incrementalHarvest;
 
