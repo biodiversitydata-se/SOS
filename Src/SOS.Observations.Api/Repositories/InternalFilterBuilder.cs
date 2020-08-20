@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Nest;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Observations.Api.Repositories
@@ -330,14 +331,14 @@ namespace SOS.Observations.Api.Repositories
 
                 if (internalFilter.OnlySecondHandInformation)
                 {
-                    queryInternal.Add(q=>q
-                        .Wildcard(w=>w
+                    queryInternal.Add(q => q
+                        .Wildcard(w => w
                             .Field("occurrence.recordedBy")
                             .Value("Via*")));
 
-                    queryInternal.Add(q=>q
-                        .Script(s=>s
-                            .Script(sc=>sc
+                    queryInternal.Add(q => q
+                        .Script(s => s
+                            .Script(sc => sc
                                 .Source("doc['reportedByUserId'].value ==  doc['occurrence.recordedByInternal.id'].value")
                             )
                         )
@@ -369,7 +370,7 @@ namespace SOS.Observations.Api.Repositories
                     queryInternal.Add(q => q
                         .Terms(t => t
                             .Field("location.locationId")
-                            .Terms(internalFilter.SiteIds.Select(s=>$"urn:lsid:artportalen.se:site:{s}"))
+                            .Terms(internalFilter.SiteIds.Select(s => $"urn:lsid:artportalen.se:site:{s}"))
                         )
                     );
                 }
@@ -477,6 +478,38 @@ namespace SOS.Observations.Api.Repositories
             }
 
             return excludeQueryInternal;
+        }
+
+        public static List<Func<QueryContainerDescriptor<object>, QueryContainer>> AddAggregationFilter(AggregationType aggregationType, IEnumerable<Func<QueryContainerDescriptor<object>, QueryContainer>> query)
+        {
+            var aggregationQuery = query.ToList();
+
+            // Do only include sightings whose period don't exceeds one week/year
+            var maxDuration = 0;
+            switch (aggregationType)
+            {
+                case AggregationType.QuantityPerWeek:
+                case AggregationType.SightingsPerWeek:
+                    maxDuration = 7;
+                    break;
+                case AggregationType.QuantityPerYear:
+                case AggregationType.SightingsPerYear:
+                    maxDuration = 365;
+                    break;
+                default:
+                    maxDuration = 365;
+                    break;
+            }
+
+            aggregationQuery.Add(q => q
+                .Script(s => s
+                    .Script(sc => sc
+                        .Source($@" (doc['event.endDate'].value.toInstant().toEpochMilli() - doc['event.startDate'].value.toInstant().toEpochMilli()) / 1000 / 86400 < {maxDuration} ")
+                    )
+                )
+            );
+
+            return aggregationQuery;
         }
     }
 }
