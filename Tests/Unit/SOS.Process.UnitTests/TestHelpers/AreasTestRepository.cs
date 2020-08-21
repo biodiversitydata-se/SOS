@@ -4,22 +4,27 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using Nest;
 using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Process.UnitTests.TestHelpers
 {
     public static class AreasTestRepository
     {
-        public static IEnumerable<Area> LoadAreas(IEnumerable<AreaType> areaTypes)
+        public static IEnumerable<AreaWithGeometry> LoadAreas(IEnumerable<AreaType> areaTypes)
         {
-            var areaCollection = new List<Area>();
+            var areaCollection = new List<AreaWithGeometry>();
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             foreach (var areaType in areaTypes)
             {
-                IEnumerable<Area> areas;
+                IEnumerable<AreaWithGeometry> areas;
                 switch (areaType)
                 {
                     case AreaType.County:
@@ -38,7 +43,7 @@ namespace SOS.Process.UnitTests.TestHelpers
             return areaCollection;
         }
 
-        private static IEnumerable<Area> LoadAreas(string filePath, AreaType areaType)
+        private static IEnumerable<AreaWithGeometry> LoadAreas(string filePath, AreaType areaType)
         {
             var featureCollection = LoadFeatureCollection(filePath);
             var areas = ConvertToAreas(featureCollection, areaType);
@@ -53,18 +58,18 @@ namespace SOS.Process.UnitTests.TestHelpers
             return featureCollection;
         }
 
-        private static IEnumerable<Area> ConvertToAreas(IEnumerable<IFeature> features, AreaType areaType)
+        private static IEnumerable<AreaWithGeometry> ConvertToAreas(IEnumerable<IFeature> features, AreaType areaType)
         {
             return features.Select(a => ConvertToArea(a, areaType));
         }
 
-        private static Area ConvertToArea(IFeature feature, AreaType areaType)
+        private static AreaWithGeometry ConvertToArea(IFeature feature, AreaType areaType)
         {
-            return new Area(areaType)
+            return new AreaWithGeometry(areaType)
             {
                 Id = int.Parse(feature.Attributes["id"].ToString()),
                 FeatureId = feature.Attributes["nativeId"].ToString(),
-                //Geometry = feature.Geometry.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoJsonGeometry(),
+                Geometry = feature.Geometry.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).ToGeoShape(),
                 Name = feature.Attributes["name"].ToString()
             };
         }
