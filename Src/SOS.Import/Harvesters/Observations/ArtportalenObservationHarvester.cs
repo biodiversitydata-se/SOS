@@ -381,6 +381,7 @@ namespace SOS.Import.Harvesters.Observations
 
                 var nrSightingsHarvested = 0;
 
+                // If status still is initialized value success and maxid is greater than min id
                 if (maxId > minId)
                 {
                     var currentId = minId;
@@ -424,9 +425,9 @@ namespace SOS.Import.Harvesters.Observations
                 }
                 
                 // Update harvest info
+                harvestInfo.Status = RunStatus.Success;
                 harvestInfo.DataLastModified = await _sightingRepository.GetLastModifiedDateAsyc();
                 harvestInfo.End = DateTime.Now;
-                harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = nrSightingsHarvested;
             }
             catch (JobAbortedException)

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
-using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Managers.Interfaces;
 using SOS.Lib.Enums;
@@ -105,11 +104,6 @@ namespace SOS.Import.Jobs
                     return true;
                 }
 
-                throw new Exception("Failed to harvest incremental data");
-            }
-            catch (JobAbortedException)
-            {
-                _logger.LogInformation("Observation harvest incremental job was cancelled.");
                 return false;
             }
             catch (Exception e)
