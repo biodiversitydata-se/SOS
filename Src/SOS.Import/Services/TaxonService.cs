@@ -108,24 +108,17 @@ namespace SOS.Import.Services
 
             // Get all taxa from file
             taxonCsv.Configuration.RegisterClassMap<TaxonMapper>();
-            var matchRegex = new Regex(DyntaxaTaxonIdPrefix + @"\d+$");
-            // todo - remove
-            var taxa = taxonCsv
-                .GetRecords<DarwinCoreTaxon>()
-                .Where(t => matchRegex.IsMatch(t.TaxonID))
-                .ToDictionary(t => t.TaxonID, t => t);
-
             var alltaxa = taxonCsv
                 .GetRecords<DarwinCoreTaxon>().ToArray();
             
             var taxonByTaxonId = alltaxa
-                .Where(t => t.TaxonomicStatus == "accepted")
+                .Where(taxon => taxon.TaxonomicStatus == "accepted")
                 .ToDictionary(taxon => taxon.TaxonID, taxon => taxon);
 
             var synonymsByTaxonId = alltaxa
-                .Where(t => t.TaxonomicStatus != "accepted")
-                .GroupBy(g => g.AcceptedNameUsageID)
-                .ToDictionary(g => g.Key, g => g.ToArray());
+                .Where(taxon => taxon.TaxonomicStatus != "accepted")
+                .GroupBy(taxon => taxon.AcceptedNameUsageID)
+                .ToDictionary(grouping => grouping.Key, grouping => grouping.ToArray());
 
             // Merge synonyms into taxa
             foreach (var taxon in taxonByTaxonId.Values)
@@ -141,14 +134,6 @@ namespace SOS.Import.Services
 
                     taxon.SynonymeNames = synonymeNames;
                 }
-            }
-
-            // Create initial Dynamic properties
-            // todo - remove
-            foreach (var taxon in taxa.Values)
-            {
-                taxon.DynamicProperties = new TaxonDynamicProperties();
-                taxon.Id = taxon.DynamicProperties.DyntaxaTaxonId = GetTaxonIdfromDyntaxaGuid(taxon.TaxonID);
             }
 
             foreach (var taxon in taxonByTaxonId.Values)
