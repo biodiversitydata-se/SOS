@@ -275,6 +275,7 @@ namespace SOS.Import.Harvesters.Observations
             {
                 if (_harvestFactory == null)
                 {
+                    _logger.LogDebug("Start getting metadata");
                     var activities = await GetActivitiesAsync();
                     var (biotopes,
                         genders,
@@ -287,6 +288,7 @@ namespace SOS.Import.Harvesters.Observations
                         determinationMethods) = await GetMetadataAsync();
 
                     cancellationToken?.ThrowIfCancellationRequested();
+                    _logger.LogDebug("Finish getting metadata");
 
                     _logger.LogDebug("Start creating factory");
                     _harvestFactory = new ArtportalenHarvestFactory(
@@ -319,11 +321,12 @@ namespace SOS.Import.Harvesters.Observations
                     _logger.LogDebug("Finsih creating factory");
                 }
 
+                _logger.LogDebug("Start getting sighting metadata");
                 var (personByUserId, organizationById) = await GetPersonsAndOrganizationsAsync();
                 var (projectEntityById, projectParameterEntities, sightingProjectIds) =
                     await GetProjectRelatedAsync();
                 var speciesCollections = await GetSpeciesCollections();
-
+                _logger.LogDebug("Finsih getting sighting metadata");
                 _logger.LogDebug("Start initializing factory");
                 _harvestFactory.Initialize(organizationById,
                     personByUserId,
