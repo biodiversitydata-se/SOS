@@ -286,17 +286,7 @@ namespace SOS.Import.Harvesters.Observations
                         discoveryMethods,
                         determinationMethods) = await GetMetadataAsync();
 
-                    var (personByUserId, organizationById) = await GetPersonsAndOrganizationsAsync();
-                    var (projectEntityById, projectParameterEntities, sightingProjectIds) =
-                        await GetProjectRelatedAsync();
-                    var speciesCollections = await GetSpeciesCollections();
-                    
                     cancellationToken?.ThrowIfCancellationRequested();
-
-                    // If we harvest all sightings from backup, get all sites at once to increase performance
-                    _logger.LogDebug("Start getting sites");
-                    var sites = (List<SiteEntity>)null;// (await _siteRepository.GetAsync()).ToList();
-                    _logger.LogDebug("Finish getting sites");
 
                     _logger.LogDebug("Start creating factory");
                     _harvestFactory = new ArtportalenHarvestFactory(
@@ -308,13 +298,6 @@ namespace SOS.Import.Harvesters.Observations
                         discoveryMethods,
                         genders,
                         organizations,
-                        organizationById,
-                        personByUserId,
-                        projectEntityById,
-                        projectParameterEntities,
-                        sightingProjectIds,
-                        sites,
-                        speciesCollections,
                         stages,
                         substrates,
                         validationStatus,
@@ -328,13 +311,6 @@ namespace SOS.Import.Harvesters.Observations
                     discoveryMethods = null;
                     genders = null;
                     organizations = null;
-                    organizationById = null;
-                    personByUserId = null;
-                    projectEntityById = null;
-                    projectParameterEntities = null;
-                    sightingProjectIds = null;
-                    sites = null;
-                    speciesCollections = null;
                     stages = null;
                     substrates = null;
                     validationStatus = null;
@@ -342,6 +318,27 @@ namespace SOS.Import.Harvesters.Observations
 
                     _logger.LogDebug("Finsih creating factory");
                 }
+
+                var (personByUserId, organizationById) = await GetPersonsAndOrganizationsAsync();
+                var (projectEntityById, projectParameterEntities, sightingProjectIds) =
+                    await GetProjectRelatedAsync();
+                var speciesCollections = await GetSpeciesCollections();
+
+                _logger.LogDebug("Start initializing factory");
+                _harvestFactory.Initialize(organizationById,
+                    personByUserId,
+                    projectEntityById,
+                    projectParameterEntities,
+                    sightingProjectIds,
+                    speciesCollections);
+
+                organizationById = null;
+                personByUserId = null;
+                projectEntityById = null;
+                projectParameterEntities = null;
+                sightingProjectIds = null;
+                speciesCollections = null;
+                _logger.LogDebug("Finish initializing factory");
 
                 // Get source min and max id
                 int minId, maxId;
@@ -439,6 +436,9 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogError(e, "Failed aggregation of sightings");
                 harvestInfo.Status = RunStatus.Failed;
             }
+
+            // Free up resources
+            _harvestFactory.DeInitialize();
 
             return harvestInfo;
         }

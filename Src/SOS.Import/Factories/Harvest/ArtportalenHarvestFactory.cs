@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,22 +16,22 @@ namespace SOS.Import.Factories.Harvest
     public class ArtportalenHarvestFactory : IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
     {
         private readonly ISiteRepository _siteRepository;
-        private readonly ISightingRelationRepository _sightingRelationRepository;
+        private ISightingRelationRepository _sightingRelationRepository;
         private readonly IDictionary<int, MetadataWithCategory> _activities;
         private readonly IDictionary<int, Metadata> _biotopes;
         private readonly IDictionary<int, Metadata> _genders;
         private readonly IDictionary<int, Metadata> _organizations;
-        private readonly IDictionary<int, Organization> _organizationById;
+        private IDictionary<int, Organization> _organizationById;
         private readonly ConcurrentDictionary<int, Site> _sites;
-        private readonly IList<SpeciesCollectionItem> _speciesCollections;
+        private IList<SpeciesCollectionItem> _speciesCollections;
         private readonly IDictionary<int, Metadata> _stages;
         private readonly IDictionary<int, Metadata> _substrates;
         private readonly IDictionary<int, Metadata> _validationStatus;
         private readonly IDictionary<int, Metadata> _units;
         private readonly IDictionary<int, Metadata> _discoveryMethods;
         private readonly IDictionary<int, Metadata> _determinationMethods;
-        private readonly IDictionary<int, Person> _personByUserId;
-        private readonly IDictionary<int, Project[]> _sightingsProjects;
+        private IDictionary<int, Person> _personByUserId;
+        private IDictionary<int, Project[]> _sightingsProjects;
 
         /// <summary>
         /// Cast sighting itemEntity to model .
@@ -587,12 +586,6 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="genders"></param>
         /// <param name="organizations"></param>
         /// <param name="organizationById"></param>
-        /// <param name="personByUserId"></param>
-        /// <param name="projectEntities"></param>
-        /// <param name="projectParameterEntities"></param>
-        /// <param name="sightingProjectIds"></param>
-        /// <param name="sites"></param>
-        /// <param name="speciesCollections"></param>
         /// <param name="stages"></param>
         /// <param name="substrates"></param>
         /// <param name="validationStatus"></param>
@@ -606,13 +599,6 @@ namespace SOS.Import.Factories.Harvest
             IEnumerable<MetadataEntity> discoveryMethods,
             IEnumerable<MetadataEntity> genders,
             IEnumerable<MetadataEntity> organizations,
-            IEnumerable<OrganizationEntity> organizationById,
-            IEnumerable<PersonEntity> personByUserId,
-            IEnumerable<ProjectEntity> projectEntities,
-            IEnumerable<ProjectParameterEntity> projectParameterEntities,
-            IEnumerable<(int SightingId, int ProjectId)> sightingProjectIds,
-            List<SiteEntity> sites,
-            IEnumerable<SpeciesCollectionItemEntity> speciesCollections,
             IEnumerable<MetadataEntity> stages,
             IEnumerable<MetadataEntity> substrates,
             IEnumerable<MetadataEntity> validationStatus,
@@ -626,17 +612,42 @@ namespace SOS.Import.Factories.Harvest
             _discoveryMethods = CastMetdataEntityToVerbatim(discoveryMethods)?.ToDictionary(dm => dm.Id, dm => dm);
             _genders = CastMetdataEntityToVerbatim(genders)?.ToDictionary(g => g.Id, g => g);
             _organizations = CastMetdataEntityToVerbatim(organizations)?.ToDictionary(o => o.Id, o => o);
-            _organizationById = CastOrganizationEntityToVerbatim(organizationById)?.ToDictionary(o => o.Id, o => o);
-            _personByUserId = CastPersonEntityToVerbatim(personByUserId)?.ToDictionary(p => p.Id, p => p);
-            
-            _sightingsProjects = GetSightingProjects(projectEntities, sightingProjectIds.ToList(), projectParameterEntities) ?? new Dictionary<int, Project[]>();
-
-            _sites = CastSiteEntitiesToVerbatim(sites)?.ToConcurrentDictionary(s => s.Id, s => s) ?? new ConcurrentDictionary<int, Site>();
-            _speciesCollections = CastSpeciesCollectionsToVerbatim(speciesCollections).ToList();
             _stages = CastMetdataEntityToVerbatim(stages)?.ToDictionary(s => s.Id, s => s);
             _substrates = CastMetdataEntityToVerbatim(substrates)?.ToDictionary(s => s.Id, s => s);
             _validationStatus = CastMetdataEntityToVerbatim(validationStatus)?.ToDictionary(vs => vs.Id, vs => vs);
             _units = CastMetdataEntityToVerbatim(units)?.ToDictionary(u => u.Id, u => u);
+
+            _sites = new ConcurrentDictionary<int, Site>();
+        }
+
+        /// <summary>
+        /// Initialize factory with fresh meta data
+        /// </summary>
+        /// <param name="organizationById"></param>
+        /// <param name="personByUserId"></param>
+        /// <param name="projectEntities"></param>
+        /// <param name="projectParameterEntities"></param>
+        /// <param name="sightingProjectIds"></param>
+        /// <param name="speciesCollections"></param>
+        public void Initialize(IEnumerable<OrganizationEntity> organizationById,
+            IEnumerable<PersonEntity> personByUserId,
+            IEnumerable<ProjectEntity> projectEntities,
+            IEnumerable<ProjectParameterEntity> projectParameterEntities,
+            IEnumerable<(int SightingId, int ProjectId)> sightingProjectIds,
+            IEnumerable<SpeciesCollectionItemEntity> speciesCollections)
+        {
+            _organizationById = CastOrganizationEntityToVerbatim(organizationById)?.ToDictionary(o => o.Id, o => o);
+            _personByUserId = CastPersonEntityToVerbatim(personByUserId)?.ToDictionary(p => p.Id, p => p);
+            _sightingsProjects = GetSightingProjects(projectEntities, sightingProjectIds.ToList(), projectParameterEntities) ?? new Dictionary<int, Project[]>();
+            _speciesCollections = CastSpeciesCollectionsToVerbatim(speciesCollections).ToList();
+        }
+
+        public void DeInitialize()
+        {
+            _organizationById = null;
+            _personByUserId = null;
+            _sightingsProjects = null;
+            _speciesCollections = null;
         }
 
         public bool IncrementalMode { get; set; }
