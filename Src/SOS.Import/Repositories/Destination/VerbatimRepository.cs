@@ -20,6 +20,8 @@ namespace SOS.Import.Repositories.Destination
 
         private readonly string _collectionName;
 
+        private string CollectionName => IncrementalMode ? $"{_collectionName}_incremental" : _collectionName;
+
         protected readonly IMongoClient Client;
 
         /// <summary>
@@ -67,7 +69,7 @@ namespace SOS.Import.Repositories.Destination
         ///     Get client
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(IncrementalMode ? $"{_collectionName}_incremental" : _collectionName);
+        protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(CollectionName);
 
         /// <inheritdoc />
         public async Task<bool> AddAsync(TEntity item)
@@ -148,7 +150,7 @@ namespace SOS.Import.Repositories.Destination
         /// <inheritdoc />
         public async Task<bool> AddCollectionAsync()
         {
-            return await AddCollectionAsync(_collectionName);
+            return await AddCollectionAsync(CollectionName);
         }
 
         /// <inheritdoc />
@@ -195,7 +197,7 @@ namespace SOS.Import.Repositories.Destination
         /// <inheritdoc />
         public async Task<bool> DeleteCollectionAsync()
         {
-            return await DeleteCollectionAsync(_collectionName);
+            return await DeleteCollectionAsync(CollectionName);
         }
 
         /// <inheritdoc />
