@@ -47,6 +47,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
 
             _taxonByScientificName = new HashMapDictionary<string, ProcessedTaxon>();
+
             foreach (var processedTaxon in _taxonByTaxonId.Values)
             {
                 _taxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
@@ -529,6 +530,20 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             string taxonRank)
         {
             ProcessedTaxon taxon = null;
+
+            if (!string.IsNullOrEmpty(taxonId))
+            {
+                //string lastInteger = Regex.Match(taxonId, @"\d+", RegexOptions.RightToLeft).Value;
+                string firstInteger = Regex.Match(taxonId, @"\d+").Value;
+                if (int.TryParse(firstInteger, out int parsedTaxonId))
+                {
+                    _taxonByTaxonId.TryGetValue(parsedTaxonId, out taxon);
+                }
+                
+                if (taxon != null) return taxon;
+            }
+            
+
             if (_taxonByScientificName.TryGetValues(scientificName?.ToLower(), out var result))
             {
                 if (result.Count == 1)

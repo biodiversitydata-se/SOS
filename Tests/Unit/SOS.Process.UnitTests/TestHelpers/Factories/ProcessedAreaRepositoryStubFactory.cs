@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Moq;
+using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -15,6 +16,16 @@ namespace SOS.Process.UnitTests.TestHelpers.Factories
             processedAreaRepositoryStub
                 .Setup(avm => avm.GetAllAsync())
                 .ReturnsAsync(areas);
+
+            processedAreaRepositoryStub
+                .Setup(avm => avm.GetAsync(It.IsAny<AreaType[]>()))
+                .ReturnsAsync(areas);
+
+            // todo - load geometry for each area and store them in a dictionary.
+            IGeoShape geometry = new PointGeoShape(new GeoCoordinate(0,0));
+            processedAreaRepositoryStub
+                .Setup(avm => avm.GetGeometryAsync(It.IsAny<int>()))
+                .ReturnsAsync(geometry);
 
             return processedAreaRepositoryStub;
         }

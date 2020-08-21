@@ -313,6 +313,11 @@ namespace SOS.Lib.Models.DarwinCore
         public IEnumerable<DarwinCoreVernacularName> VernacularNames { get; set; }
 
         /// <summary>
+        ///     Synonyme names (scientific names).
+        /// </summary>
+        public IEnumerable<DarwinCoreSynonymeName> SynonymeNames { get; set; }
+
+        /// <summary>
         ///     Systematic sort order
         /// </summary>
         public int SortOrder { get; set; }

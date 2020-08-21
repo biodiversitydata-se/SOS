@@ -80,6 +80,11 @@ namespace SOS.TestHelpers.Helpers.Builders
             return With(entity => entity.ScientificName = scientificName);
         }
 
+        public DwcObservationVerbatimBuilder WithTaxonId(string taxonId)
+        {
+            return With(entity => entity.TaxonID = taxonId);
+        }
+
         public DwcObservationVerbatimBuilder WithDateIdentified(string dateIdentified)
         {
             return With(entity => entity.DateIdentified = dateIdentified);

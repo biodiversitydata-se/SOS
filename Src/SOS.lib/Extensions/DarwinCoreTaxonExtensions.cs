@@ -18,6 +18,7 @@ namespace SOS.Lib.Extensions
                 ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties?.ParentDyntaxaTaxonId,
                 SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties?.SecondaryParentDyntaxaTaxonIds,
                 VernacularNames = sourceTaxon.VernacularNames?.ToTaxonVernacularNames(),
+                SynonymeNames = sourceTaxon.SynonymeNames?.ToTaxonSynonymeNames(),
                 AcceptedNameUsage = sourceTaxon.AcceptedNameUsage,
                 AcceptedNameUsageID = sourceTaxon.AcceptedNameUsageID,
                 ActionPlan = sourceTaxon.DynamicProperties?.ActionPlan,
@@ -107,6 +108,35 @@ namespace SOS.Lib.Extensions
                 IsPreferredName = darwinCoreVernacularName.IsPreferredName,
                 Language = darwinCoreVernacularName.Language,
                 Name = darwinCoreVernacularName.VernacularName
+            };
+        }
+
+        /// <summary>
+        ///     Cast DarwinCoreSynonymeNames to TaxonSynonymeNames.
+        /// </summary>
+        /// <param name="synonyms"></param>
+        /// <returns></returns>
+        private static IEnumerable<TaxonSynonymeName> ToTaxonSynonymeNames(
+            this IEnumerable<DarwinCoreSynonymeName> synonyms)
+        {
+            return synonyms?.Select(m => m.ToTaxonSynonymeName());
+        }
+
+        /// <summary>
+        ///     Cast DarwinCoreSynonymeName object to TaxonSynonymeName.
+        /// </summary>
+        /// <param name="synonyme"></param>
+        /// <returns></returns>
+        private static TaxonSynonymeName ToTaxonSynonymeName(this DarwinCoreSynonymeName synonyme)
+        {
+            return new TaxonSynonymeName()
+            {
+                Name = synonyme.ScientificName,
+                Author = synonyme.ScientificNameAuthorship,
+                NomenclaturalStatus = synonyme.NomenclaturalStatus,
+                TaxonomicStatus = synonyme.TaxonomicStatus,
+                //NameId = synonyme.NameId, // probably not needed
+                //Remarks = synonyme.TaxonRemarks // probably not needed
             };
         }
     }
