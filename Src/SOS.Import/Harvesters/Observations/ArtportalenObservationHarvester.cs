@@ -38,7 +38,6 @@ namespace SOS.Import.Harvesters.Observations
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private bool _hasAddedTestSightings;
-        private ArtportalenHarvestFactory _harvestFactory;
 
         /// <summary>
         ///     Add test sightings for testing purpose.
@@ -53,12 +52,14 @@ namespace SOS.Import.Harvesters.Observations
         }
 
         /// <summary>
-        /// Harvest a batch of sightings
+        ///  Harvest a batch of sightings
         /// </summary>
+        /// <param name="harvestFactory"></param>
         /// <param name="currentId"></param>
         /// <param name="incrementalHarvest"></param>
         /// <returns></returns>
         private async Task<int> HarvestBatchAsync(
+            ArtportalenHarvestFactory harvestFactory,
             int currentId,
             bool incrementalHarvest
         )
@@ -93,7 +94,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogDebug($"Start casting entities to verbatim from id: {currentId} to id: {lastId}");
 
                 // Cast sightings to verbatim observations
-                var verbatimObservations = await _harvestFactory.CastEntitiesToVerbatimsAsync(sightings);
+                var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(sightings);
                 
                 // We don't need entities in memory any more
                 sightings = null;
@@ -273,53 +274,20 @@ namespace SOS.Import.Harvesters.Observations
 
             try
             {
-                if (_harvestFactory == null)
-                {
-                    _logger.LogDebug("Start getting metadata");
-                    var activities = await GetActivitiesAsync();
-                    var (biotopes,
-                        genders,
-                        organizations,
-                        stages,
-                        substrates,
-                        units,
-                        validationStatus,
-                        discoveryMethods,
-                        determinationMethods) = await GetMetadataAsync();
+                _logger.LogDebug("Start getting metadata");
+                var activities = await GetActivitiesAsync();
+                var (biotopes,
+                    genders,
+                    organizations,
+                    stages,
+                    substrates,
+                    units,
+                    validationStatus,
+                    discoveryMethods,
+                    determinationMethods) = await GetMetadataAsync();
 
-                    cancellationToken?.ThrowIfCancellationRequested();
-                    _logger.LogDebug("Finish getting metadata");
-
-                    _logger.LogDebug("Start creating factory");
-                    _harvestFactory = new ArtportalenHarvestFactory(
-                        _siteRepository,
-                        _sightingRelationRepository,
-                        activities,
-                        biotopes,
-                        determinationMethods,
-                        discoveryMethods,
-                        genders,
-                        organizations,
-                        stages,
-                        substrates,
-                        validationStatus,
-                        units
-                    );
-
-                    // Clean up to release memory
-                    activities = null;
-                    biotopes = null;
-                    determinationMethods = null;
-                    discoveryMethods = null;
-                    genders = null;
-                    organizations = null;
-                    stages = null;
-                    substrates = null;
-                    validationStatus = null;
-                    units = null;
-
-                    _logger.LogDebug("Finsih creating factory");
-                }
+                cancellationToken?.ThrowIfCancellationRequested();
+                _logger.LogDebug("Finish getting metadata");
 
                 _logger.LogDebug("Start getting sighting metadata");
                 var (personByUserId, organizationById) = await GetPersonsAndOrganizationsAsync();
@@ -327,22 +295,49 @@ namespace SOS.Import.Harvesters.Observations
                     await GetProjectRelatedAsync();
                 var speciesCollections = await GetSpeciesCollections();
                 _logger.LogDebug("Finsih getting sighting metadata");
-                _logger.LogDebug("Start initializing factory");
-                _harvestFactory.Initialize(organizationById,
+
+                _logger.LogDebug("Start creating factory");
+                var harvestFactory = new ArtportalenHarvestFactory(
+                    _siteRepository,
+                    _sightingRelationRepository,
+                    activities,
+                    biotopes,
+                    determinationMethods,
+                    discoveryMethods,
+                    genders,
+                    organizations,
+                    stages,
+                    substrates,
+                    validationStatus,
+                    units,
+                    organizationById,
                     personByUserId,
                     projectEntityById,
                     projectParameterEntities,
                     sightingProjectIds,
-                    speciesCollections);
+                    speciesCollections
+                );
 
+                // Clean up to release memory
+                activities = null;
+                biotopes = null;
+                determinationMethods = null;
+                discoveryMethods = null;
+                genders = null;
+                organizations = null;
+                stages = null;
+                substrates = null;
+                validationStatus = null;
+                units = null;
                 organizationById = null;
                 personByUserId = null;
                 projectEntityById = null;
                 projectParameterEntities = null;
                 sightingProjectIds = null;
                 speciesCollections = null;
-                _logger.LogDebug("Finish initializing factory");
 
+                _logger.LogDebug("Finsih creating factory");
+                
                 // Get source min and max id
                 int minId, maxId;
 
@@ -377,7 +372,7 @@ namespace SOS.Import.Harvesters.Observations
 
                 // Set observation repository in incremental mode in order to store data in other collection
                 _sightingVerbatimRepository.IncrementalMode = incrementalHarvest;
-                _harvestFactory.IncrementalMode = incrementalHarvest;
+                harvestFactory.IncrementalMode = incrementalHarvest;
 
                 var nrSightingsHarvested = 0;
 
@@ -408,7 +403,7 @@ namespace SOS.Import.Harvesters.Observations
                         await _semaphore.WaitAsync();
 
                         // Add batch task to list
-                        harvestBatchTasks.Add(HarvestBatchAsync(
+                        harvestBatchTasks.Add(HarvestBatchAsync(harvestFactory,
                             currentId, incrementalHarvest));
 
                         // Calculate start of next chunk
@@ -440,9 +435,6 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogError(e, "Failed aggregation of sightings");
                 harvestInfo.Status = RunStatus.Failed;
             }
-
-            // Free up resources
-            _harvestFactory.DeInitialize();
 
             return harvestInfo;
         }

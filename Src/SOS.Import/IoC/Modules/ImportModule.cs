@@ -165,7 +165,7 @@ namespace SOS.Import.IoC.Modules
             // Add harvesters
             builder.RegisterType<AreaHarvester>().As<IAreaHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenObservationHarvester>().As<IArtportalenObservationHarvester>()
-                .SingleInstance();
+                .InstancePerLifetimeScope();
             builder.RegisterType<ClamPortalObservationHarvester>().As<IClamPortalObservationHarvester>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<DwcObservationHarvester>().As<IDwcObservationHarvester>().InstancePerLifetimeScope();
