@@ -38,11 +38,14 @@ namespace SOS.Import.Factories
                         organizationById,
                         filteredSpeciesCollectionItems);
 
-                    foreach (var pair in speciesCollectionBySightingId)
+                    if (speciesCollectionBySightingId?.Any() ?? false)
                     {
-                        personSightingBySightingId.Add(pair.Key, new PersonSighting { SpeciesCollection = pair.Value });
+                        foreach (var pair in speciesCollectionBySightingId)
+                        {
+                            personSightingBySightingId.Add(pair.Key, new PersonSighting { SpeciesCollection = pair.Value });
+                        }
                     }
-
+                    
                     //------------------------------------------------------------------------------
                     // Add VerifiedBy values
                     //------------------------------------------------------------------------------
@@ -50,28 +53,31 @@ namespace SOS.Import.Factories
                         filteredSpeciesCollectionItems,
                         sightingRelations);
 
-                    foreach (var pair in verifiedByStringBySightingId)
+                    if (verifiedByStringBySightingId?.Any() ?? false)
                     {
-                        var users = new List<UserInternal>();
-                        if (pair.Value.determiner != null)
+                        foreach (var pair in verifiedByStringBySightingId)
                         {
-                            users.Add(pair.Value.determiner);
-                        }
+                            var users = new List<UserInternal>();
+                            if (pair.Value.determiner != null)
+                            {
+                                users.Add(pair.Value.determiner);
+                            }
 
-                        if (pair.Value.confirmator != null)
-                        {
-                            users.Add(pair.Value.confirmator);
-                        }
+                            if (pair.Value.confirmator != null)
+                            {
+                                users.Add(pair.Value.confirmator);
+                            }
 
-                        if (personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
-                        {
-                            personSighting.VerifiedBy = pair.Value.names;
-                            personSighting.VerifiedByInternal = users;
-                        }
-                        else
-                        {
-                            personSightingBySightingId.Add(pair.Key,
-                                new PersonSighting { VerifiedBy = pair.Value.names, VerifiedByInternal = users });
+                            if (personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
+                            {
+                                personSighting.VerifiedBy = pair.Value.names;
+                                personSighting.VerifiedByInternal = users;
+                            }
+                            else
+                            {
+                                personSightingBySightingId.Add(pair.Key,
+                                    new PersonSighting { VerifiedBy = pair.Value.names, VerifiedByInternal = users });
+                            }
                         }
                     }
                 }
@@ -164,7 +170,7 @@ namespace SOS.Import.Factories
             foreach (var speciesCollectionItem in speciesCollectionItems)
             {
                 // Collection is collector
-                if (speciesCollectionItem.CollectorId.HasValue &&
+                if ((personById?.Any() ?? false) && speciesCollectionItem.CollectorId.HasValue &&
                     personById.TryGetValue(speciesCollectionItem.CollectorId.Value, out var person))
                 {
                     if (speciesCollectionBySightingId.ContainsKey(speciesCollectionItem.SightingId))
@@ -178,7 +184,7 @@ namespace SOS.Import.Factories
                 }
 
                 // Collection is Organization
-                if (speciesCollectionItem.OrganizationId.HasValue &&
+                if ((speciesCollectionItems?.Any() ?? false) && speciesCollectionItem.OrganizationId.HasValue &&
                     organizationById.TryGetValue(speciesCollectionItem.OrganizationId.Value, out var organization))
                 {
                     if (speciesCollectionBySightingId.ContainsKey(speciesCollectionItem.SightingId))
@@ -201,7 +207,7 @@ namespace SOS.Import.Factories
         {
             var observersBySightingId = new Dictionary<int, (string name, IEnumerable<UserInternal> alias)>();
 
-            if (!sightingRelations?.Any() ?? true)
+            if ((!sightingRelations?.Any() ?? true) || (!personsByUserId?.Any() ?? true))
             {
                 return observersBySightingId;
             }
