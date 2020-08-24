@@ -425,7 +425,7 @@ namespace SOS.Import.Harvesters.Observations
                 }
                 
                 // Update harvest info
-                harvestInfo.Status = RunStatus.Success;
+                harvestInfo.Status = maxId >= minId ? RunStatus.Success : RunStatus.Failed;
                 harvestInfo.DataLastModified = await _sightingRepository.GetLastModifiedDateAsyc();
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Count = nrSightingsHarvested;

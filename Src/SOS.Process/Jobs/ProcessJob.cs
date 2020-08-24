@@ -7,6 +7,7 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
@@ -398,11 +399,20 @@ namespace SOS.Process.Jobs
                         _logger.LogInformation("Finish creating indexes");
                     }
 
-                    if (toggleInstanceOnSuccess && !incrementalMode)
+                    if (!incrementalMode)
                     {
-                        _logger.LogInformation("Toggle instance");
-                        await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
-                            .InActiveInstance);
+                        if (toggleInstanceOnSuccess)
+                        {
+                            _logger.LogInformation("Toggle instance");
+                            await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
+                                .InActiveInstance);
+                        }
+
+                        // Enqueue incremental harvest/process job to Hangfire in order to get latest sightings
+                        var jobId = BackgroundJob.Enqueue<IObservationsHarvestIncrementalJob>(job => job.RunAsync(
+                            cancellationToken));
+
+                        _logger.LogInformation($"Incremental harvest/process job Job with Id={jobId} was enqueued");
                     }
                 }
 

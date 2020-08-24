@@ -11,6 +11,8 @@ namespace SOS.Lib.Jobs.Import
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [DisableConcurrentExecution(10)]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         Task<bool> RunAsync(IJobCancellationToken cancellationToken);
 
         /// <summary>
@@ -20,6 +22,8 @@ namespace SOS.Lib.Jobs.Import
         /// <param name="processDataProviderIdOrIdentifiers"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [DisableConcurrentExecution(10)]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         Task<bool> RunAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
             List<string> processDataProviderIdOrIdentifiers,
@@ -31,6 +35,8 @@ namespace SOS.Lib.Jobs.Import
         /// <param name="harvestDataProviderIdOrIdentifiers"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [DisableConcurrentExecution(10)]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         Task<bool> RunHarvestObservationsAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
             IJobCancellationToken cancellationToken);
