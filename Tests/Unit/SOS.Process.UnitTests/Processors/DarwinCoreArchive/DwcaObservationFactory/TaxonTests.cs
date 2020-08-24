@@ -9,15 +9,25 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
     [CollectionDefinition("DwcaObservationFactory collection")]
     public class TaxonTests : IClassFixture<DwcaObservationFactoryFixture>
     {
+        private readonly DwcaObservationFactoryFixture _fixture;
+
         public TaxonTests(DwcaObservationFactoryFixture fixture)
         {
             _fixture = fixture;
         }
 
-        private readonly DwcaObservationFactoryFixture _fixture;
-
-        [Fact]
-        public void Taxon_with_lowercase_Scientific_Name_equus_asinus_is_parsed()
+        /// <remarks>
+        /// Only Mammalia taxon and its underlying taxa is available in this unit test to keep the execution time fast.
+        /// </remarks>
+        [Theory]
+        [InlineData(null, "233622", 233622)] // find by taxon id
+        [InlineData(null, "urn:lsid:dyntaxa.se:Taxon:233622", 233622)] // find integer in guid
+        [InlineData("equus asinus", null, 233622)] // find by scientific name
+        [InlineData("Felis lynx", null, 100057)] // find by synonyme
+        public void Succeeds_to_parse_taxon_from_taxonId_and_scientific_name(
+            string scientificName,
+            string taxonId,
+            int expectedParsedTaxonId)
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -25,22 +35,33 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder
                 .WithDefaultValues()
-                .WithScientificName("equus asinus")
+                .WithScientificName(scientificName)
+                .WithTaxonId(taxonId)
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            int? parsedTaxonId = observation.Taxon?.Id;
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Taxon.DyntaxaTaxonId.Should().Be(Taxon.EquusAsinus.DyntaxaTaxonId);
+            parsedTaxonId.Should().Be(expectedParsedTaxonId);
         }
 
-        [Fact]
-        public void Taxon_with_null_as_Scientific_Name_cant_find_DyntaxaTaxonId()
+        /// <remarks>
+        /// Only Mammalia taxon and its underlying taxa is available in this unit test to keep the execution time fast.
+        /// </remarks>
+        [Theory]
+        [InlineData(null, null)] // all null values
+        [InlineData(null, "TaxonId_text_without_taxon_id")] // text with no id
+        [InlineData(null, "TaxonId_text_with_id_that_doesnt_exist_9999999")] // taxon id that doesn't exist
+        [InlineData(null, "TaxonId_text_with_id_that_is_larger_than_max_integer_9999999000000000000")] // integer larger than int.max
+        public void Fails_to_parse_taxon_from_taxonId_and_scientific_name(
+            string scientificName,
+            string taxonId)
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -48,41 +69,19 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder
                 .WithDefaultValues()
-                .WithScientificName(null)
+                .WithScientificName(scientificName)
+                .WithTaxonId(taxonId)
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Taxon.DyntaxaTaxonId.Should().Be(default);
-        }
-
-        [Fact]
-        public void Taxon_with_Scientific_Name_Equus_asinus_is_parsed()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var builder = new DwcObservationVerbatimBuilder();
-            var dwcaObservation = builder
-                .WithDefaultValues()
-                .WithScientificName("Equus asinus")
-                .Build();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Taxon.DyntaxaTaxonId.Should().Be(Taxon.EquusAsinus.DyntaxaTaxonId);
+            observation.Taxon.Should().BeNull();
         }
     }
 }

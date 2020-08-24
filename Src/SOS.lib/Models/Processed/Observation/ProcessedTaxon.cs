@@ -19,6 +19,12 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<TaxonVernacularName> VernacularNames { get; set; }
 
         /// <summary>
+        ///     Synonyme names.
+        /// </summary>
+        [Nested]
+        public IEnumerable<TaxonSynonymeName> SynonymeNames { get; set; }
+
+        /// <summary>
         ///     Darwin Core term name: acceptedNameUsage.
         ///     The full name, with authorship and date information
         ///     if known, of the currently valid (zoological) or

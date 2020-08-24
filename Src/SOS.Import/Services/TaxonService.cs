@@ -108,20 +108,53 @@ namespace SOS.Import.Services
 
             // Get all taxa from file
             taxonCsv.Configuration.RegisterClassMap<TaxonMapper>();
-            var matchRegex = new Regex(DyntaxaTaxonIdPrefix + @"\d+$");
-            var taxa = taxonCsv
-                .GetRecords<DarwinCoreTaxon>()
-                .Where(t => matchRegex.IsMatch(t.TaxonID))
-                .ToDictionary(t => t.TaxonID, t => t);
+            var alltaxa = taxonCsv
+                .GetRecords<DarwinCoreTaxon>().ToArray();
+            
+            var taxonByTaxonId = alltaxa
+                .Where(taxon => taxon.TaxonomicStatus == "accepted")
+                .ToDictionary(taxon => taxon.TaxonID, taxon => taxon);
 
-            // Create initial Dynamic properties
-            foreach (var taxon in taxa.Values)
+            var synonymsByTaxonId = alltaxa
+                .Where(taxon => taxon.TaxonomicStatus != "accepted")
+                .GroupBy(taxon => taxon.AcceptedNameUsageID)
+                .ToDictionary(grouping => grouping.Key, grouping => grouping.ToArray());
+
+            // Merge synonyms into taxa
+            foreach (var taxon in taxonByTaxonId.Values)
+            {
+                if (synonymsByTaxonId.TryGetValue(taxon.TaxonID, out DarwinCoreTaxon[] synonyms))
+                {
+                    var synonymeNames = new List<DarwinCoreSynonymeName>();
+                    
+                    foreach (var dwcSynonyme in synonyms)
+                    {
+                        synonymeNames.Add(CreateDarwinCoreSynonymeName(dwcSynonyme));
+                    }
+
+                    taxon.SynonymeNames = synonymeNames;
+                }
+            }
+
+            foreach (var taxon in taxonByTaxonId.Values)
             {
                 taxon.DynamicProperties = new TaxonDynamicProperties();
                 taxon.Id = taxon.DynamicProperties.DyntaxaTaxonId = GetTaxonIdfromDyntaxaGuid(taxon.TaxonID);
             }
 
-            return taxa;
+            return taxonByTaxonId;
+        }
+
+        private static DarwinCoreSynonymeName CreateDarwinCoreSynonymeName(DarwinCoreTaxon dwcSynonyme)
+        {
+            DarwinCoreSynonymeName synonyme = new DarwinCoreSynonymeName();
+            synonyme.ScientificName = dwcSynonyme.ScientificName;
+            synonyme.NomenclaturalStatus = dwcSynonyme.NomenclaturalStatus;
+            synonyme.ScientificNameAuthorship = dwcSynonyme.ScientificNameAuthorship;
+            synonyme.TaxonomicStatus = dwcSynonyme.TaxonomicStatus;
+            //synonyme.NameId = synonyme.TaxonID; // probably not needed
+            //synonyme.TaxonRemarks = synonyme.TaxonRemarks; // probably not needed
+            return synonyme;
         }
 
         private static int GetTaxonIdfromDyntaxaGuid(string dyntaxaTaxonGuid)
