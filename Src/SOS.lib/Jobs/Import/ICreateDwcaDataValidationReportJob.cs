@@ -9,9 +9,14 @@ namespace SOS.Lib.Jobs.Import
     public interface ICreateDwcaDataValidationReportJob
     {
         /// <summary>
-        ///     Run DwC-A compare
+        ///     Run create DwC-A validation report job.
         /// </summary>
         /// <returns></returns>
-        Task<string> RunAsync(string archivePath, IJobCancellationToken cancellationToken);
+        Task<string> RunAsync(
+            string archivePath,
+            int maxNrObservationsToRead,
+            int nrValidObservationsInReport,
+            int nrInvalidObservationsInReport,
+            IJobCancellationToken cancellationToken);
     }
 }

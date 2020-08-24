@@ -51,6 +51,9 @@ namespace SOS.Import.Jobs
 
         public async Task<string> RunAsync(
             string archivePath,
+            int maxNrObservationsToRead,
+            int nrValidObservationsInReport,
+            int nrInvalidObservationsInReport,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -59,7 +62,11 @@ namespace SOS.Import.Jobs
                 string compactSavePath = Path.Combine(_dwcaConfiguration.ImportPath, $"Compact-DwcaDataValidationReport-{Path.GetFileNameWithoutExtension(archivePath)}.json");
                 string verboseSavePath = Path.Combine(_dwcaConfiguration.ImportPath, $"Verbose-DwcaDataValidationReport-{Path.GetFileNameWithoutExtension(archivePath)}.json");
                 using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
-                var dataValidationSummary = await _dwcaDataValidationReportManager.CreateDataValidationSummary(archiveReader);
+                var dataValidationSummary = await _dwcaDataValidationReportManager.CreateDataValidationSummary(
+                    archiveReader,
+                    maxNrObservationsToRead,
+                    nrValidObservationsInReport,
+                    nrInvalidObservationsInReport);
                 
                 // Serialize and save compact JSON file
                 var compactJsonSettings = CreateCompactJsonSerializerSettings();

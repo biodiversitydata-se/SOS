@@ -96,23 +96,22 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
             var obs = new ProcessedObservation();
             obs.DataProviderId = _dataProvider.Id;
-            //StoreVerbatimObservation(obs, verbatimObservation); // todo - this could be used to store the original verbatim observation
+            //AddVerbatimObservationAsJson(obs, verbatimObservation); // todo - this could be used to store the original verbatim observation
 
             // Other
             //obs.Id = verbatimObservation.Id;
             // todo - handle properties below.
             //obs.DataProviderId = verbatimObservation.DataProviderId;
             //obs.DataProviderIdentifier = verbatimObservation.DataProviderIdentifier;
-            //obs.ObservationAudubonMedia = verbatimObservation.ObservationAudubonMedia;
-            //obs.EventAudubonMedia = verbatimObservation.EventAudubonMedia;
-            //obs.ObservationMultimedia = verbatimObservation.ObservationMultimedia;
-            //obs.EventMultimedia = verbatimObservation.EventMultimedia;
-            //obs.ObservationMeasurementOrFacts = verbatimObservation.ObservationMeasurementOrFacts;
-            //obs.EventMeasurementOrFacts = verbatimObservation.EventMeasurementOrFacts;
-            //obs.ObservationExtendedMeasurementOrFacts = verbatimObservation.ObservationExtendedMeasurementOrFacts;
-            //obs.EventExtendedMeasurementOrFacts = verbatimObservation.EventExtendedMeasurementOrFacts;
 
             // Record level
+            obs.Media = CreateProcessedMultimedia(
+                verbatimObservation.ObservationMultimedia,
+                verbatimObservation.ObservationAudubonMedia);
+            if (verbatimObservation.ObservationMeasurementOrFacts.HasItems())
+                obs.MeasurementOrFacts = verbatimObservation.ObservationMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
+            else if (verbatimObservation.ObservationExtendedMeasurementOrFacts.HasItems())
+                obs.MeasurementOrFacts = verbatimObservation.ObservationExtendedMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
             obs.AccessRights = GetSosId(verbatimObservation.AccessRights,
                 _fieldMappings[FieldMappingFieldId.AccessRights]);
             obs.BasisOfRecord = GetSosId(verbatimObservation.BasisOfRecord,
@@ -213,7 +212,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             //return obs;
         }
 
-        private static void StoreVerbatimObservation(ProcessedObservation obs,
+        private static void AddVerbatimObservationAsJson(ProcessedObservation obs,
             DwcObservationVerbatim verbatimObservation)
         {
             //obs.VerbatimObservation = JsonConvert.SerializeObject(
@@ -223,6 +222,23 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             //    {
             //        NullValueHandling = NullValueHandling.Ignore
             //    });
+        }
+
+        private ICollection<ProcessedMultimedia> CreateProcessedMultimedia(
+            ICollection<DwcMultimedia> verbatimMultimedia, 
+            ICollection<DwcAudubonMedia> verbatimAudubonMedia)
+        {
+            if (verbatimMultimedia.HasItems())
+            {
+                return verbatimMultimedia.Select(dwcMultimedia => dwcMultimedia.ToProcessedMultimedia()).ToArray();
+            }
+
+            if (verbatimAudubonMedia.HasItems())
+            {
+                return verbatimAudubonMedia.Select(dwcAudubonMedia => dwcAudubonMedia.ToProcessedMultimedia()).ToArray();
+            }
+
+            return null;
         }
 
         private ProcessedOrganism CreateProcessedOrganism(DwcObservationVerbatim verbatimObservation)
@@ -298,6 +314,15 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
             processedEvent.StartDate = startDate;
             processedEvent.EndDate = endDate;
+
+            processedEvent.Media = CreateProcessedMultimedia(
+                verbatimObservation.EventMultimedia,
+                verbatimObservation.EventAudubonMedia);
+            if (verbatimObservation.EventMeasurementOrFacts.HasItems())
+                processedEvent.MeasurementOrFacts = verbatimObservation.EventMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
+            else if (verbatimObservation.EventExtendedMeasurementOrFacts.HasItems())
+                processedEvent.MeasurementOrFacts = verbatimObservation.EventExtendedMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
+
 
             // todo - Can we map the following fields?
             // processedEvent.Biotope = GetSosId(verbatimObservation?.Bioptope?.Id, _fieldMappings[FieldMappingFieldId.Biotope]);
@@ -389,6 +414,11 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 processedLocation.VerbatimLatitude = processedLocation.DecimalLatitude;
                 processedLocation.VerbatimLongitude = processedLocation.DecimalLongitude;
                 processedLocation.VerbatimSRS = processedLocation.GeodeticDatum;
+            }
+
+            if (!processedLocation.DecimalLongitude.HasValue || !processedLocation.DecimalLatitude.HasValue)
+            {
+                return processedLocation; // No coordinates provided
             }
 
             Point wgs84Point = null;

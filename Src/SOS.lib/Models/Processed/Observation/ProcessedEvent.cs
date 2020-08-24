@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
@@ -148,5 +149,17 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Examples: spring 1910, Marzo 2002, 1999-03-XX, 17IV1934
         /// </summary>
         public string VerbatimEventDate { get; set; }
+
+        /// <summary>
+        ///     Multimedia linked to the event
+        /// </summary>
+        [Nested]
+        public ICollection<ProcessedMultimedia> Media { get; set; }
+
+        /// <summary>
+        ///     Measurement or facts linked to the event.
+        /// </summary>
+        [Nested]
+        public ICollection<ProcessedExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
     }
 }
