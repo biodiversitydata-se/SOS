@@ -10,6 +10,8 @@ namespace SOS.Lib.Jobs.Import
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [DisableConcurrentExecution(10)]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         Task<bool> RunAsync(IJobCancellationToken cancellationToken);
     }
 }

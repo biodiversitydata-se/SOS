@@ -585,11 +585,16 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="discoveryMethods"></param>
         /// <param name="genders"></param>
         /// <param name="organizations"></param>
-        /// <param name="organizationById"></param>
         /// <param name="stages"></param>
         /// <param name="substrates"></param>
         /// <param name="validationStatus"></param>
         /// <param name="units"></param>
+        /// <param name="organizationById"></param>
+        /// <param name="personByUserId"></param>
+        /// <param name="projectEntities"></param>
+        /// <param name="projectParameterEntities"></param>
+        /// <param name="sightingProjectIds"></param>
+        /// <param name="speciesCollections"></param>
         public ArtportalenHarvestFactory(
             ISiteRepository siteRepository,
             ISightingRelationRepository sightingRelationRepository,
@@ -602,7 +607,13 @@ namespace SOS.Import.Factories.Harvest
             IEnumerable<MetadataEntity> stages,
             IEnumerable<MetadataEntity> substrates,
             IEnumerable<MetadataEntity> validationStatus,
-            IEnumerable<MetadataEntity> units)
+            IEnumerable<MetadataEntity> units,
+            IEnumerable<OrganizationEntity> organizationById,
+            IEnumerable<PersonEntity> personByUserId,
+            IEnumerable<ProjectEntity> projectEntities,
+            IEnumerable<ProjectParameterEntity> projectParameterEntities,
+            IEnumerable<(int SightingId, int ProjectId)> sightingProjectIds,
+            IEnumerable<SpeciesCollectionItemEntity> speciesCollections)
         {
             _siteRepository = siteRepository;
             _sightingRelationRepository = sightingRelationRepository;
@@ -617,37 +628,12 @@ namespace SOS.Import.Factories.Harvest
             _validationStatus = CastMetdataEntityToVerbatim(validationStatus)?.ToDictionary(vs => vs.Id, vs => vs);
             _units = CastMetdataEntityToVerbatim(units)?.ToDictionary(u => u.Id, u => u);
 
-            _sites = new ConcurrentDictionary<int, Site>();
-        }
-
-        /// <summary>
-        /// Initialize factory with fresh meta data
-        /// </summary>
-        /// <param name="organizationById"></param>
-        /// <param name="personByUserId"></param>
-        /// <param name="projectEntities"></param>
-        /// <param name="projectParameterEntities"></param>
-        /// <param name="sightingProjectIds"></param>
-        /// <param name="speciesCollections"></param>
-        public void Initialize(IEnumerable<OrganizationEntity> organizationById,
-            IEnumerable<PersonEntity> personByUserId,
-            IEnumerable<ProjectEntity> projectEntities,
-            IEnumerable<ProjectParameterEntity> projectParameterEntities,
-            IEnumerable<(int SightingId, int ProjectId)> sightingProjectIds,
-            IEnumerable<SpeciesCollectionItemEntity> speciesCollections)
-        {
             _organizationById = CastOrganizationEntityToVerbatim(organizationById)?.ToDictionary(o => o.Id, o => o);
             _personByUserId = CastPersonEntityToVerbatim(personByUserId)?.ToDictionary(p => p.Id, p => p);
             _sightingsProjects = GetSightingProjects(projectEntities, sightingProjectIds.ToList(), projectParameterEntities) ?? new Dictionary<int, Project[]>();
             _speciesCollections = CastSpeciesCollectionsToVerbatim(speciesCollections).ToList();
-        }
 
-        public void DeInitialize()
-        {
-            _organizationById = null;
-            _personByUserId = null;
-            _sightingsProjects = null;
-            _speciesCollections = null;
+            _sites = new ConcurrentDictionary<int, Site>();
         }
 
         public bool IncrementalMode { get; set; }
