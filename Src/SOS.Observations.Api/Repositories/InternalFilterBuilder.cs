@@ -12,6 +12,12 @@ namespace SOS.Observations.Api.Repositories
     /// </summary>
     public static class InternalFilterBuilder
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddFilters(
             SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
         {
@@ -458,6 +464,12 @@ namespace SOS.Observations.Api.Repositories
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="excludeQuery"></param>
+        /// <returns></returns>
         public static List<Func<QueryContainerDescriptor<object>, QueryContainer>> AddExcludeFilters(
             SearchFilter filter, List<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery)
         {
@@ -480,6 +492,12 @@ namespace SOS.Observations.Api.Repositories
             return excludeQueryInternal;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="aggregationType"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public static List<Func<QueryContainerDescriptor<object>, QueryContainer>> AddAggregationFilter(AggregationType aggregationType, IEnumerable<Func<QueryContainerDescriptor<object>, QueryContainer>> query)
         {
             var aggregationQuery = query.ToList();

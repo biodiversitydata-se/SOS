@@ -33,6 +33,7 @@ namespace SOS.Observations.Api.Repositories
         /// <param name="elasticClient"></param>
         /// <param name="client"></param>
         /// <param name="elasticConfiguration"></param>
+        /// <param name="telemetry"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepository(
             IElasticClient elasticClient,
@@ -145,7 +146,8 @@ namespace SOS.Observations.Api.Repositories
                 AggregationType.SightingsPerWeek => DateInterval.Week,
                 AggregationType.QuantityPerWeek => DateInterval.Week,
                 AggregationType.SightingsPerYear => DateInterval.Year,
-                AggregationType.QuantityPerYear => DateInterval.Year
+                AggregationType.QuantityPerYear => DateInterval.Year,
+                _ => throw new ArgumentOutOfRangeException(nameof(aggregationType), aggregationType, null)
             };
 
             IAggregationContainer Aggregation(AggregationContainerDescriptor<dynamic> agg) => agg
@@ -350,10 +352,7 @@ namespace SOS.Observations.Api.Repositories
         private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddSightingTypeFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
         {
             var queryList = query.ToList();
-
-            // For local dev
-            return queryList;
-
+            
             if (filter is SearchFilterInternal)
             {
                 var internalFilter = filter as SearchFilterInternal;
