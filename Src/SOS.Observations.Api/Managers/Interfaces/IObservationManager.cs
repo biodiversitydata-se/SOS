@@ -26,7 +26,11 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="aggregationType"></param>
+        /// <param name="take"></param>
+        /// <param name="sortBy"></param>
+        /// <param name="skip"></param>
+        /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType);
+        Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take, string sortBy, SearchSortOrder sortOrder);
     }
 }

@@ -305,6 +305,18 @@ namespace SOS.Lib.Models.Processed.Observation
 
         #endregion Record level
 
+        /// <summary>
+        ///     Media linked to the observation
+        /// </summary>
+        [Nested]
+        public ICollection<ProcessedMultimedia> Media { get; set; }
+
+        /// <summary>
+        ///     Measurement or fact linked to the observation.
+        /// </summary>
+        [Nested]
+        public ICollection<ProcessedExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
+
         //public string VerbatimObservation { get; set; } // todo - this could be used to store the orginal verbatim observation.
     }
 }

@@ -63,11 +63,10 @@ namespace SOS.Import.Managers
                 true);
         }
 
-        public async Task<DwcaDataValidationSummary<DwcObservationVerbatim, ProcessedObservation>> CreateDataValidationSummary(
-             ArchiveReader archiveReader,
-             int nrValidObservationsLimit = 100,
-             int nrInvalidObservationsLimit = 100,
-             int maxNrObservationsToRead = 100000)
+        public async Task<DwcaDataValidationSummary<DwcObservationVerbatim, ProcessedObservation>>
+            CreateDataValidationSummary(ArchiveReader archiveReader,
+                int maxNrObservationsToRead = 100000,
+                int nrValidObservationsInReport = 100, int nrInvalidObservationsInReport = 100)
         {
             var dataProvider = new DataProvider
             {
@@ -107,7 +106,7 @@ namespace SOS.Import.Managers
                     if (observationValidation.IsValid)
                     {
                         nrValidObservations++;
-                        if (validObservations.Count < nrValidObservationsLimit)
+                        if (validObservations.Count < nrValidObservationsInReport)
                         {
                             validObservations.Add(new ValidObservationTuple<DwcObservationVerbatim, ProcessedObservation>
                             {
@@ -119,7 +118,7 @@ namespace SOS.Import.Managers
                     else
                     {
                         nrInvalidObservations++;
-                        if (invalidObservations.Count < nrInvalidObservationsLimit)
+                        if (invalidObservations.Count < nrInvalidObservationsInReport)
                         {
                             invalidObservations.Add(new InvalidObservationTuple<DwcObservationVerbatim>
                             {

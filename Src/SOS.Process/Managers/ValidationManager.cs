@@ -87,7 +87,12 @@ namespace SOS.Process.Managers
                 observationValidation.Defects.Add("CoordinateUncertaintyInMeters exceeds max value 100 km");
             }
 
-            if (!observation.IsInEconomicZoneOfSweden)
+            if (observation.Location == null || !observation.Location.DecimalLatitude.HasValue ||
+                !observation.Location.DecimalLongitude.HasValue)
+            {
+                observationValidation.Defects.Add("Coordinate is missing");
+            }
+            else if (!observation.IsInEconomicZoneOfSweden)
             {
                 observationValidation.Defects.Add("Sighting outside Swedish economic zone");
             }

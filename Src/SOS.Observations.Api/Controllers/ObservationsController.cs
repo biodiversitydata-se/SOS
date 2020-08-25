@@ -81,7 +81,6 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="fieldMappingManager"></param>
-        /// <param name="areaManager"></param>
         /// <param name="logger"></param>
         public ObservationsController(
             IObservationManager observationManager,
@@ -166,7 +165,13 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> GetChunkAggregatedInternalAsync([FromBody] SearchFilterInternal filter, [FromQuery] AggregationType aggregationType)
+        public async Task<IActionResult> GetChunkAggregatedInternalAsync([FromBody] SearchFilterInternal filter,
+            [FromQuery] AggregationType aggregationType,
+            [FromQuery] int skip = 0,
+            [FromQuery] int take = 100, 
+            [FromQuery] string sortBy = "",
+            [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc
+            )
         {
             try
             {
@@ -176,7 +181,9 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(string.Join(". ", validationErrors));
                 }
 
-                return new OkObjectResult(await _observationManager.GetAggregatedChunkAsync(filter, aggregationType));
+                var result = await _observationManager.GetAggregatedChunkAsync(filter, aggregationType, skip, take, sortBy, sortOrder);
+
+                return new OkObjectResult(result);
             }
             catch (Exception e)
             {

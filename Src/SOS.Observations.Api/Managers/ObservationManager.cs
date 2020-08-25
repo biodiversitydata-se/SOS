@@ -63,13 +63,19 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType)
+        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take, string sortBy, SearchSortOrder sortOrder)
         {
             try
             {
                 filter = await _filterManager.PrepareFilter(filter);
-                var processedObservations = await _processedObservationRepository.GetAggregatedChunkAsync(filter, aggregationType);
-                return processedObservations;
+
+                if(aggregationType.IsDateHistogram())
+                    return await _processedObservationRepository.GetAggregatedHistogramChunkAsync(filter, aggregationType);
+
+                if(aggregationType.IsSpeciesSightingsList())
+                    return await _processedObservationRepository.GetAggregatedChunkAsync(filter, aggregationType, skip, take, sortBy, sortOrder);
+
+                return null;
             }
             catch (Exception e)
             {

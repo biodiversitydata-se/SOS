@@ -51,7 +51,11 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                if (model.DwcaFile == null) return new BadRequestObjectResult("No file is provided");
                 if (model.DwcaFile.Length == 0) return new BadRequestObjectResult("No file content");
+                if (model.MaxNrObservationsToRead <= 0) return new BadRequestObjectResult("MxNrObservationsToRead must be > 0");
+                if (model.MaxNrObservationsToRead < model.NrInvalidObservationsInReport + model.NrInvalidObservationsInReport)
+                    return new BadRequestObjectResult("MxNrObservationsToRead must be > NrInvalidObservationsInReport + NrInvalidObservationsInReport");
 
                 // Upload file and save temporarily on file system.
                 string filename = FilenameHelper.CreateFilenameWithDate(model.DwcaFile.FileName, true);
@@ -62,7 +66,12 @@ namespace SOS.Administration.Api.Controllers
 
                 // Enqueue job to Hangfire.
                 BackgroundJob.Enqueue<ICreateDwcaDataValidationReportJob>(job =>
-                    job.RunAsync(filePath, JobCancellationToken.Null));
+                    job.RunAsync(
+                        filePath, 
+                        model.MaxNrObservationsToRead,
+                        model.NrValidObservationsInReport,
+                        model.NrInvalidObservationsInReport,
+                        JobCancellationToken.Null));
                 return new OkObjectResult($"Create DwC-A data validation report job for file \"{model.DwcaFile.FileName}\" was enqueued to Hangfire.");
             }
             catch (Exception e)
