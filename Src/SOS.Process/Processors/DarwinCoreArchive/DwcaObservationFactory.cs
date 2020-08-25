@@ -125,17 +125,17 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             obs.DynamicProperties = verbatimObservation.DynamicProperties;
             obs.InformationWithheld = verbatimObservation.InformationWithheld;
             obs.InstitutionCode = verbatimObservation.InstitutionCode;
-            obs.InstitutionId =
-                ProcessedFieldMapValue.Create(verbatimObservation
-                    .InstitutionID); // todo - Create DarwinCore field mapping.
+            obs.InstitutionId = GetSosId(verbatimObservation.InstitutionID,
+                _fieldMappings[FieldMappingFieldId.Institution]); // todo - Create DarwinCore field mapping.
             obs.Language = verbatimObservation.Language;
             obs.License = verbatimObservation.License;
             obs.Modified = DwcParser.ParseDate(verbatimObservation.Modified);
             obs.OwnerInstitutionCode = verbatimObservation.OwnerInstitutionCode;
             obs.References = verbatimObservation.References;
             obs.RightsHolder = verbatimObservation.RightsHolder;
-            obs.Type = ProcessedFieldMapValue.Create(verbatimObservation
-                .Type); // todo - Create DarwinCore field mapping.
+            obs.Type = GetSosId(verbatimObservation.Type,
+                _fieldMappings[FieldMappingFieldId.Type]); // todo - Create DarwinCore field mapping.
+
             // todo - handle the following fields?
             // obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
             // obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
@@ -473,24 +473,24 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedOccurrence.EstablishmentMeans = GetSosId(verbatimObservation.EstablishmentMeans,
                 _fieldMappings[FieldMappingFieldId.EstablishmentMeans]);
             processedOccurrence.IndividualCount = verbatimObservation.IndividualCount;
-            processedOccurrence.LifeStage =
-                ProcessedFieldMapValue.Create(verbatimObservation
-                    .LifeStage); // todo - create DarwinCore field mapping for FieldMappingFieldId.LifeStage.
+            processedOccurrence.LifeStage = GetSosId(verbatimObservation.LifeStage,
+                _fieldMappings[FieldMappingFieldId.LifeStage]); // todo - create DarwinCore field mapping for FieldMappingFieldId.LifeStage.
             processedOccurrence.OccurrenceId = verbatimObservation.OccurrenceID;
             processedOccurrence.OccurrenceRemarks = verbatimObservation.OccurrenceRemarks;
-            processedOccurrence.OccurrenceStatus = GetSosId(verbatimObservation.OccurrenceStatus,
-                _fieldMappings[FieldMappingFieldId.OccurrenceStatus]);
+            processedOccurrence.OccurrenceStatus = GetSosId(
+                verbatimObservation.OccurrenceStatus,
+                _fieldMappings[FieldMappingFieldId.OccurrenceStatus],
+                (int)OccurrenceStatusId.Present);
             processedOccurrence.OrganismQuantity = verbatimObservation.OrganismQuantity;
-            processedOccurrence.OrganismQuantityUnit =
-                ProcessedFieldMapValue.Create(verbatimObservation
-                    .OrganismQuantityType); // todo - create DarwinCore field mapping for FieldMappingFieldId.OrganismQuantityUnit.
+            processedOccurrence.OrganismQuantityUnit = GetSosId(verbatimObservation.OrganismQuantityType,
+                _fieldMappings[FieldMappingFieldId.Unit]); // todo - create DarwinCore field mapping for FieldMappingFieldId.OrganismQuantityUnit.
             processedOccurrence.OtherCatalogNumbers = verbatimObservation.OtherCatalogNumbers;
             processedOccurrence.Preparations = verbatimObservation.Preparations;
             processedOccurrence.RecordedBy = verbatimObservation.RecordedBy;
             processedOccurrence.RecordNumber = verbatimObservation.RecordNumber;
-            processedOccurrence.Activity =
-                ProcessedFieldMapValue.Create(verbatimObservation
-                    .ReproductiveCondition); // todo - create DarwinCore field mapping for FieldMappingFieldId.Activity.
+            processedOccurrence.Activity = GetSosId(verbatimObservation.ReproductiveCondition,
+                _fieldMappings[FieldMappingFieldId.Activity]); // todo - create DarwinCore field mapping for FieldMappingFieldId.Activity.
+
             processedOccurrence.Gender = GetSosId(verbatimObservation.Sex, _fieldMappings[FieldMappingFieldId.Gender]);
             processedOccurrence.IsNaturalOccurrence = true;
             processedOccurrence.IsNeverFoundObservation =
@@ -870,6 +870,15 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                     var mapping = fieldMappings.Mappings.Single();
                     var sosIdByValue = mapping.GetIdByValueDictionary(convertValuesToLowercase);
                     dic.Add(fieldMapping.Id, sosIdByValue);
+                }
+            }
+
+            // Add missing entries. Initialize with empty dictionary.
+            foreach (FieldMappingFieldId fieldMappingFieldId in (FieldMappingFieldId[])Enum.GetValues(typeof(FieldMappingFieldId)))
+            {
+                if (!dic.ContainsKey(fieldMappingFieldId))
+                {
+                    dic.Add(fieldMappingFieldId, new Dictionary<object, int>());
                 }
             }
 
