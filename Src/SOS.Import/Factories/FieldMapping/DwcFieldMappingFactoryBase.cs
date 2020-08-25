@@ -34,6 +34,7 @@ namespace SOS.Import.Factories.FieldMapping
         }
 
         protected abstract ICollection<FieldMappingValue> GetFieldMappingValues();
+        protected abstract Dictionary<string, int> GetMappingSynonyms();
 
         protected virtual List<ExternalSystemMapping> GetExternalSystemMappings(
             ICollection<FieldMappingValue> fieldMappingValues)
@@ -47,6 +48,7 @@ namespace SOS.Import.Factories.FieldMapping
         protected virtual ExternalSystemMapping GetDwcExternalSystemMapping(
             ICollection<FieldMappingValue> fieldMappingValues)
         {
+            var mappingSynonyms = GetMappingSynonyms();
             var dwcMapping = new ExternalSystemMapping
             {
                 Id = ExternalSystemId.DarwinCore,
@@ -79,6 +81,18 @@ namespace SOS.Import.Factories.FieldMapping
                         Value = stringVariation,
                         SosId = fieldMappingValue.Id
                     });
+                }
+
+                if (mappingSynonyms != null)
+                {
+                    foreach (var keyValuePair in mappingSynonyms.Where(pair => pair.Value == fieldMappingValue.Id))
+                    {
+                        mappingField.Values.Add(new ExternalSystemMappingValue
+                        {
+                            Value = keyValuePair.Key,
+                            SosId = fieldMappingValue.Id
+                        });
+                    }
                 }
             }
 
