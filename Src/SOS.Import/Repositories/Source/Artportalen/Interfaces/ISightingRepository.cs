@@ -43,9 +43,10 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         Task<DateTime?> GetLastModifiedDateAsyc();
 
         /// <summary>
-        ///     Get all connections between project and sighting
+        /// Get connections between project and sighting
         /// </summary>
+        /// <param name="sightingIds"></param>
         /// <returns></returns>
-        Task<IEnumerable<(int SightingId, int ProjectId)>> GetProjectIdsAsync();
+        Task<IEnumerable<(int SightingId, int ProjectId)>> GetSightingProjectIdsAsync(IEnumerable<int> sightingIds);
     }
 }

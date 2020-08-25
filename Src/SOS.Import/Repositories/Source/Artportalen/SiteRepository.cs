@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Extensions;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
@@ -14,7 +16,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	/// </summary>
 	public class SiteRepository : BaseRepository<SiteRepository>, ISiteRepository
     {
-        private string GetSiteQuery(string where = "") =>
+        private string GetSiteQuery(string join) =>
             $@"
                 SELECT 
 	                s.Id,
@@ -37,6 +39,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 					s.PresentationNameParishRegion
                 FROM 
 	                Site s 
+                    { join } 
 	                LEFT JOIN -- Bad data exists, some sites are connected to more than one Municipality
 	                (
 		                 SELECT
@@ -80,8 +83,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 			                SiteAreas sa
 			                INNER JOIN Area a ON sa.AreasId = a.Id AND a.AreaDatasetId = 19 
 	                ) AS sapa ON s.Id = sapa.SiteId AND sapa.ParishIndex = 1
-	                LEFT JOIN Area apa ON sapa.AreasId = apa.Id
-                    { where }";
+	                LEFT JOIN Area apa ON sapa.AreasId = apa.Id";
 
 		/// <summary>
 		///     Constructor
@@ -98,7 +100,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-                return await QueryAsync<SiteEntity>(GetSiteQuery("WHERE s.Id IN (SELECT SiteId FROM SearchableSightings)"));
+               
+
+				return await QueryAsync<SiteEntity>(GetSiteQuery("INNER JOIN SearchableSightings ss ON s.Id = ss.SiteId"));
             }
             catch (Exception e)
             {
@@ -117,7 +121,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
 
             try
             {
-                return await QueryAsync<SiteEntity>(GetSiteQuery(      $"WHERE s.Id IN ({ string.Join(',', ids) })--@siteIds"), null/*new { siteIds = ids }*/, live);
+                return await QueryAsync<SiteEntity>(GetSiteQuery(      
+                        $"INNER JOIN @tvp t ON s.Id = t.Id"), 
+                    new { tvp = ids.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, live);
             }
             catch (Exception e)
             {

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
@@ -41,10 +43,10 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     a.ParentId
                 FROM 
 	                Area a
-                WHERE
-                    a.AreaDatasetId IN (" + string.Join(",", areaTypes) + ")";
+                    INNER JOIN @tvp t ON a.AreaDatasetId = t.Id";
 
-                return await QueryAsync<AreaEntity>(query);
+                return await QueryAsync<AreaEntity>(query,
+                    new { tvp = areaTypes.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") });
             }
             catch (Exception e)
             {
@@ -69,10 +71,10 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     a.ParentId
                 FROM 
 	                Area a
-                WHERE
-                    a.AreaDatasetId IN (" + string.Join(",", areaTypes) + ")";
+                    INNER JOIN @tvp t ON a.AreaDatasetId = t.Id";
 
-                return await QueryAsync<AreaEntity>(query);
+                return await QueryAsync<AreaEntity>(query,
+                    new { tvp = areaTypes.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") });
             }
             catch (Exception e)
             {

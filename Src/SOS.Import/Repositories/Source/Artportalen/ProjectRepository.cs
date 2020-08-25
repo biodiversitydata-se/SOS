@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Extensions;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
@@ -62,11 +65,16 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ProjectParameterEntity>> GetProjectParametersAsync()
+        public async Task<IEnumerable<ProjectParameterEntity>> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds)
         {
             try
             {
-                const string query = @"
+                if (!sightingIds?.Any() ?? true)
+                {
+                    return null;
+                }
+
+                var query = $@"
                 SELECT
                     SearchableSightings.SightingId							AS SightingId,
 	                Project.Id												AS ProjectId,	                	                
@@ -79,7 +87,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 		                WHEN ProjectParameter.ProjectParameterTypeId = 3
 		                THEN 'double'
 		                ELSE 'string' END									AS DataType	                
-	                FROM SearchableSightings SearchableSightings WITH (NOLOCK)	                
+	                FROM SearchableSightings SearchableSightings WITH (NOLOCK)	 
+                    INNER JOIN @tvp t ON SearchableSightings.SightingId = t.Id 
 	                INNER JOIN SightingState AS SightingState ON SightingState.SightingId = SearchableSightings.SightingId
 		                AND SightingState.SightingStateTypeId = 30  -- A sighting that has been made public.
 		                AND SightingState.IsActive = 1				-- if edited several records w/ IsActive = 0
@@ -88,7 +97,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                INNER JOIN ProjectParameter AS ProjectParameter ON ProjectParameterValue.ProjectParameterId = ProjectParameter.Id
 	                INNER JOIN Project AS Project ON Project.Id = ProjectParameter.ProjectId
 	                WHERE
-		                 (SearchableSightings.HiddenByProvider IS NULL OR SearchableSightings.HiddenByProvider < getDate())
+                        (SearchableSightings.HiddenByProvider IS NULL OR SearchableSightings.HiddenByProvider < getDate())
 		                AND
 		                (SearchableSightings.SightingTypeId = 0 OR SearchableSightings.SightingTypeId = 3)  
 		                AND
@@ -102,7 +111,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
 		                AND
 		                Project.IsHideAll = 0";
 
-                return await QueryAsync<ProjectParameterEntity>(query);
+                return await QueryAsync<ProjectParameterEntity>(
+                    query, 
+                    new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") });
             }
             catch (Exception e)
             {
