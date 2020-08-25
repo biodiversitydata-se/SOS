@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Extensions;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
@@ -22,13 +22,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-                var tvpTable = new DataTable();
-                tvpTable.Columns.Add(new DataColumn("Id", typeof(int)));
-                foreach (var id in sightingIds)
-                {
-                    tvpTable.Rows.Add(id);
-                }
-
                 const string query = @"
                 SELECT	                
 	                sr.SightingId,
@@ -43,7 +36,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     AND sr.IsPublic = 1";
 
                 return await QueryAsync<SightingRelationEntity>(query,
-                    new {tvp = tvpTable.AsTableValuedParameter("dbo.IdValueTable")});
+                    new {tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable")});
             }
             catch (Exception e)
             {

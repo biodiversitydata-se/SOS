@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services.Interfaces;
+using SOS.Lib.Extensions;
 
 namespace SOS.Import.Repositories.Source.Artportalen
 {
@@ -101,9 +103,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 WHERE
 	                { where }
 	                AND s.TaxonId IS NOT NULL	 
-                    AND s.SightingTypeId IN(0, 3) 
+                    AND (s.SightingTypeId = 0 OR s.SightingTypeId = 3)
 	                AND s.HiddenByProvider IS NULL
-	                AND s.ValidationStatusId NOT IN(50)	   
+	                AND s.ValidationStatusId <> 50   
                     AND s.SightingTypeSearchGroupId & 33 > 0
 	                AND ss.IsActive = 1
 	                AND ss.SightingStateTypeId = 30 --Published
@@ -223,19 +225,23 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<(int SightingId, int ProjectId)>> GetProjectIdsAsync()
+        public async Task<IEnumerable<(int SightingId, int ProjectId)>> GetSightingProjectIdsAsync(IEnumerable<int> sightingIds)
         {
             try
             {
-                const string query = @"
+                string query = $@"
                 SELECT 
                     ps.SightingId AS SightingId,
 	                ps.ProjectId AS ProjectId
                 FROM 
 	                ProjectSighting ps
-                ORDER BY ps.ProjectId DESC";
+                    INNER JOIN @tvp t ON ps.SightingId = t.Id 
+                ORDER BY 
+                    ps.ProjectId DESC";
 
-                return await QueryAsync<(int SightingId, int ProjectId)>(query);
+                return await QueryAsync<(int SightingId, int ProjectId)>(
+                    query,
+                    new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") });
             }
             catch (Exception e)
             {

@@ -16,9 +16,10 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         Task<IEnumerable<ProjectEntity>> GetProjectsAsync();
 
         /// <summary>
-        ///     Get all project parameters.
+        /// Get all project parameters for passed sightings
         /// </summary>
+        /// <param name="sightingIds"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProjectParameterEntity>> GetProjectParametersAsync();
+        Task<IEnumerable<ProjectParameterEntity>> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds);
     }
 }

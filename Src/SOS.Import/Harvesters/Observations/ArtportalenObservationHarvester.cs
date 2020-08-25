@@ -189,21 +189,6 @@ namespace SOS.Import.Harvesters.Observations
         }
 
         /// <summary>
-        /// Initialize project related data
-        /// </summary>
-        /// <returns></returns>
-        private async Task<(IEnumerable<ProjectEntity>, IEnumerable<ProjectParameterEntity>, IEnumerable<(int, int)>)> GetProjectRelatedAsync()
-        {
-            _logger.LogDebug("Start getting projects & project parameters");
-            var projectEntityById = (await _projectRepository.GetProjectsAsync());
-            var projectParameterEntities = await _projectRepository.GetProjectParametersAsync();
-            var sightingProjectIds = await _sightingRepository.GetProjectIdsAsync();
-            _logger.LogDebug("Finish getting projects & project parameters");
-
-            return (projectEntityById, projectParameterEntities, sightingProjectIds);
-        }
-
-        /// <summary>
         /// Initialize species collections
         /// </summary>
         /// <returns></returns>
@@ -291,13 +276,16 @@ namespace SOS.Import.Harvesters.Observations
 
                 _logger.LogDebug("Start getting sighting metadata");
                 var (personByUserId, organizationById) = await GetPersonsAndOrganizationsAsync();
-                var (projectEntityById, projectParameterEntities, sightingProjectIds) =
-                    await GetProjectRelatedAsync();
+
+                var projectEntities = await _projectRepository.GetProjectsAsync();
+                
                 var speciesCollections = await GetSpeciesCollections();
                 _logger.LogDebug("Finsih getting sighting metadata");
 
                 _logger.LogDebug("Start creating factory");
                 var harvestFactory = new ArtportalenHarvestFactory(
+                    _projectRepository,
+                    _sightingRepository,
                     _siteRepository,
                     _sightingRelationRepository,
                     activities,
@@ -312,9 +300,7 @@ namespace SOS.Import.Harvesters.Observations
                     units,
                     organizationById,
                     personByUserId,
-                    projectEntityById,
-                    projectParameterEntities,
-                    sightingProjectIds,
+                    projectEntities,
                     speciesCollections
                 );
 
@@ -331,9 +317,7 @@ namespace SOS.Import.Harvesters.Observations
                 units = null;
                 organizationById = null;
                 personByUserId = null;
-                projectEntityById = null;
-                projectParameterEntities = null;
-                sightingProjectIds = null;
+                projectEntities = null;
                 speciesCollections = null;
 
                 _logger.LogDebug("Finsih creating factory");
