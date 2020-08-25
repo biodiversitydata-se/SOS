@@ -222,13 +222,13 @@ namespace SOS.Observations.Api.Repositories
             query = InternalFilterBuilder.AddAggregationFilter(aggregationType, query);
 
             // Aggregation for distinct count
-            IAggregationContainer AggregationCardinality(AggregationContainerDescriptor<dynamic> agg) => agg
+            static IAggregationContainer AggregationCardinality(AggregationContainerDescriptor<dynamic> agg) => agg
                 .Cardinality("species_count", c => c
                     .Field("taxon.scientificName")
                 );
 
             // Result-aggregation on taxon.id
-            IAggregationContainer Aggregation(AggregationContainerDescriptor<dynamic> agg, int size) => agg
+            static IAggregationContainer Aggregation(AggregationContainerDescriptor<dynamic> agg, int size) => agg
                 .Terms("species", t => t
                     .Field("taxon.scientificName")
                     .Order(o=>o.KeyAscending())
@@ -327,26 +327,6 @@ namespace SOS.Observations.Api.Repositories
             };
 
             // When operation is disposed, telemetry item is sent.
-        }
-
-        private static Func<AggregationContainerDescriptor<dynamic>, IAggregationContainer> AddAggregation(int resultSize)
-        {
-           return agg => agg
-                    .Terms("species", t => t
-                        .Field("taxon.id")
-                        .Aggregations(thAgg => thAgg
-                            .TopHits("info", info => info
-                                .Size(1)
-                                .Source(src => src
-                                    .Includes(inc => inc
-                                        .Fields("taxon.scientificName", "taxon.vernacularName", "taxon.scientificNameAuthorship", "taxon.redlistCategory")
-                                    )
-                                )
-                            )
-                        )
-                        .Order(o => o.CountDescending())
-                        .Size(resultSize)
-                    );
         }
 
         private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddSightingTypeFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
