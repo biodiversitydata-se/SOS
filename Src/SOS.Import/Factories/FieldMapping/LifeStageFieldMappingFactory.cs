@@ -38,7 +38,40 @@ namespace SOS.Import.Factories.FieldMapping
         {
             var stages = await _metadataRepository.GetStagesAsync();
             var fieldMappingValues = base.ConvertToLocalizedFieldMappingValues(stages.ToArray());
+            int id = fieldMappingValues.Max(f => f.Id);
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "zygote"));
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "embryo"));
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "seed"));
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "spore"));
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "pollen"));
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "sporophyte"));
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "gametophyte"));
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "sperm"));
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "immature"));
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "dormant"));
+
             return fieldMappingValues;
+        }
+
+        private FieldMappingValue CreateFieldMappingValue(int id, string value)
+        {
+            return new FieldMappingValue
+            {
+                Id = id,
+                Value = value,
+                Localized = true,
+                Translations = CreateTranslation(value),
+                IsCustomValue = true
+            };
+        }
+
+        private List<FieldMappingTranslation> CreateTranslation(string value)
+        {
+            return new List<FieldMappingTranslation>
+            {
+                new FieldMappingTranslation() {CultureCode = "sv-SE", Value = value},
+                new FieldMappingTranslation() {CultureCode = "en-GB", Value = value}
+            };
         }
 
         protected override List<ExternalSystemMapping> GetExternalSystemMappings(
@@ -157,11 +190,16 @@ namespace SOS.Import.Factories.FieldMapping
                 {"3K+", "at least 3rd calendar year"},
                 {"ATH", "at least 3rd calendar year"},
                 {"ATH (after third year)", "at least 3rd calendar year"},
-                {"fruiting", "in fruit"}
+                {"fruiting", "in fruit"},
+                {"male, immature", "immature"},
+                {"female, immature", "immature"},
+                {"immature male", "immature"},
+                {"immature female", "immature"},
+                {"embryos", "embryo"}
             };
 
             /*
-                todo - Add new values for subadult, nauplius, embryo, c1, c2, c3, c4, c5?
+                todo - Add new values for subadult, nauplius, c1, c2, c3, c4, c5?
                 subad.
                 sub-adult
                 sub-adults
@@ -181,9 +219,6 @@ namespace SOS.Import.Factories.FieldMapping
                 "C3 (Copepodite III)"
                 "C4 (Copepodite IV)"
                 "C5 (Copepodite V)"
-                "embryo"
-                "embryos"
-                "embryo"
                 */
         }
     }

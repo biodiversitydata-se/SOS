@@ -27,6 +27,13 @@ namespace SOS.Lib.Models.Shared
         [BsonIgnoreIfNull]
         public ICollection<FieldMappingTranslation> Translations { get; set; }
 
+        /// <summary>
+        /// True if the value doesn't exist in Artportalen; otherwise false.
+        /// </summary>
+        [BsonIgnore]
+        [JsonIgnore]
+        public bool IsCustomValue { get; set; }
+
         public override string ToString()
         {
             return $"{nameof(Id)}: {Id}, {nameof(Description)}: {Description}";

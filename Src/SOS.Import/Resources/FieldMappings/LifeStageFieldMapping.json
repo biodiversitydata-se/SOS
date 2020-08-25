@@ -872,6 +872,156 @@
           "Value": "teleomorph (perfect)"
         }
       ]
+    },
+    {
+      "Id": 58,
+      "Value": "zygote",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "zygote"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "zygote"
+        }
+      ]
+    },
+    {
+      "Id": 59,
+      "Value": "embryo",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "embryo"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "embryo"
+        }
+      ]
+    },
+    {
+      "Id": 60,
+      "Value": "seed",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "seed"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "seed"
+        }
+      ]
+    },
+    {
+      "Id": 61,
+      "Value": "spore",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "spore"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "spore"
+        }
+      ]
+    },
+    {
+      "Id": 62,
+      "Value": "pollen",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "pollen"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "pollen"
+        }
+      ]
+    },
+    {
+      "Id": 63,
+      "Value": "sporophyte",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sporophyte"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "sporophyte"
+        }
+      ]
+    },
+    {
+      "Id": 64,
+      "Value": "gametophyte",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "gametophyte"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "gametophyte"
+        }
+      ]
+    },
+    {
+      "Id": 65,
+      "Value": "sperm",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "sperm"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "sperm"
+        }
+      ]
+    },
+    {
+      "Id": 66,
+      "Value": "immature",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "immature"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "immature"
+        }
+      ]
+    },
+    {
+      "Id": 67,
+      "Value": "dormant",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "dormant"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "dormant"
+        }
+      ]
     }
   ],
   "ExternalSystemsMapping": [
@@ -1695,6 +1845,66 @@
             {
               "Value": "teleomorph (perfect)",
               "SosId": 57
+            },
+            {
+              "Value": "zygote",
+              "SosId": 58
+            },
+            {
+              "Value": "embryo",
+              "SosId": 59
+            },
+            {
+              "Value": "embryos",
+              "SosId": 59
+            },
+            {
+              "Value": "seed",
+              "SosId": 60
+            },
+            {
+              "Value": "spore",
+              "SosId": 61
+            },
+            {
+              "Value": "pollen",
+              "SosId": 62
+            },
+            {
+              "Value": "sporophyte",
+              "SosId": 63
+            },
+            {
+              "Value": "gametophyte",
+              "SosId": 64
+            },
+            {
+              "Value": "sperm",
+              "SosId": 65
+            },
+            {
+              "Value": "immature",
+              "SosId": 66
+            },
+            {
+              "Value": "male, immature",
+              "SosId": 66
+            },
+            {
+              "Value": "female, immature",
+              "SosId": 66
+            },
+            {
+              "Value": "immature male",
+              "SosId": 66
+            },
+            {
+              "Value": "immature female",
+              "SosId": 66
+            },
+            {
+              "Value": "dormant",
+              "SosId": 67
             }
           ]
         }
