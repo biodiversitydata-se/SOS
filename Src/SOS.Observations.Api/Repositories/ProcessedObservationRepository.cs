@@ -12,6 +12,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Models.AggregatedResult;
 using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Repositories
@@ -123,7 +124,7 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType)
+        public async Task<PagedResult<dynamic>> GetAggregatedHistogramChunkAsync(SearchFilter filter, AggregationType aggregationType)
         {
             if (!filter?.IsFilterActive ?? true)
             {
@@ -133,18 +134,34 @@ namespace SOS.Observations.Api.Repositories
             var query = filter.ToQuery();
             query = AddSightingTypeFilters(filter, query);
             query = InternalFilterBuilder.AddFilters(filter, query);
-            query = InternalFilterBuilder.AddAggregationFilter(aggregationType, query);
-
-            var aggregations = AddAggregation(aggregationType);
 
             var excludeQuery = CreateExcludeQuery(filter);
             excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
 
-            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_Aggregated");
+            query = InternalFilterBuilder.AddAggregationFilter(aggregationType, query);
+
+            var di = aggregationType switch
+            {
+                AggregationType.SightingsPerWeek => DateInterval.Week,
+                AggregationType.QuantityPerWeek => DateInterval.Week,
+                AggregationType.SightingsPerYear => DateInterval.Year,
+                AggregationType.QuantityPerYear => DateInterval.Year
+            };
+
+            IAggregationContainer Aggregation(AggregationContainerDescriptor<dynamic> agg) => agg
+                    .DateHistogram("aggregation", dh => dh
+                        .Field("event.startDate")
+                        .CalendarInterval(di)
+                        .Aggregations(a => a
+                            .Sum("quantity", sum => sum
+                                .Field("occurrence.organismQuantityInt"))));
+
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_Aggregated_Histogram");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
 
             var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                .Size(0)
                 .Index(_indexName)
                 .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
                 .Query(q => q
@@ -153,68 +170,189 @@ namespace SOS.Observations.Api.Repositories
                         .Filter(query)
                     )
                 )
-                .Aggregations(aggregations)
+                .Aggregations(Aggregation)
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
             var totalCount = searchResponse.HitsMetadata.Total.Value;
 
-            // Optional: explicitly send telemetry item:
             _telemetry.StopOperation(operation);
+
+            var result = searchResponse
+                .Aggregations
+                .DateHistogram("aggregation")
+                .Buckets?
+                .Select(b =>
+                    new
+                    {
+                        b.Date,
+                        b.DocCount,
+                        Quantity = b.Sum("quantity").Value
+                    }).ToList();
 
             return new PagedResult<dynamic>
             {
-                Records = searchResponse
-                    .Aggregations
-                    .DateHistogram("aggregation")
-                    .Buckets?
-                    .Select(b =>
-                        new
-                        {
-                            b.Date,
-                            b.DocCount,
-                            Quantity = b.Sum("quantity").Value
-                        }),
+                Records = result,
                 Skip = 0,
-                Take = 1,
+                Take = result?.Count ?? 0,
                 TotalCount = totalCount
             };
 
             // When operation is disposed, telemetry item is sent.
         }
 
-        private static Func<AggregationContainerDescriptor<dynamic>, IAggregationContainer> AddAggregation(AggregationType aggregationType)
+        /// <inheritdoc />
+        public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take, string sortBy, SearchSortOrder sortOrder)
         {
-            var di = DateInterval.Year;
-
-            switch (aggregationType)
+            if (!filter?.IsFilterActive ?? true)
             {
-                case AggregationType.SightingsPerWeek:
-                case AggregationType.QuantityPerWeek:
-                    di = DateInterval.Week;
-                    break;
-                case AggregationType.SightingsPerYear:
-                case AggregationType.QuantityPerYear:
-                    di = DateInterval.Year;
-                    break;
+                return null;
             }
 
-            return agg => agg
-                .DateHistogram("aggregation", dh => dh
-                    .Field("event.startDate")
-                    .CalendarInterval(di)
-                    .Aggregations(a => a
-                        .Sum("quantity", sum => sum
-                            .Field("occurrence.organismQuantityInt")
+            var query = filter.ToQuery();
+            query = AddSightingTypeFilters(filter, query);
+            query = InternalFilterBuilder.AddFilters(filter, query);
+
+            var excludeQuery = CreateExcludeQuery(filter);
+            excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
+
+            query = InternalFilterBuilder.AddAggregationFilter(aggregationType, query);
+
+            // Aggregation for distinct count
+            IAggregationContainer AggregationCardinality(AggregationContainerDescriptor<dynamic> agg) => agg
+                .Cardinality("species_count", c => c
+                    .Field("taxon.scientificName")
+                );
+
+            // Result-aggregation on taxon.id
+            IAggregationContainer Aggregation(AggregationContainerDescriptor<dynamic> agg, int size) => agg
+                .Terms("species", t => t
+                    .Field("taxon.scientificName")
+                    .Order(o=>o.KeyAscending())
+                    .Aggregations(thAgg => thAgg
+                        .TopHits("info", info => info
+                            .Size(1)
+                            .Source(src => src
+                                .Includes(inc => inc
+                                    .Fields("taxon.id", "taxon.scientificName", "taxon.vernacularName", "taxon.scientificNameAuthorship", "taxon.redlistCategory")
+                                )
+                            )
                         )
                     )
+                    .Order(o => o.KeyAscending())
+                    .Size(size)
                 );
+
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_Aggregated");
+            operation.Telemetry.Properties["Filter"] = filter.ToString();
+
+            // Get number of distinct values
+            var searchResponseCount = await _elasticClient.SearchAsync<dynamic>(s => s
+                .Size(0)
+                .Index(_indexName)
+                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(AggregationCardinality)
+            );
+
+            // Calculate size to fetch. If zero, get all
+            var maxResult = (int?)searchResponseCount.Aggregations.Cardinality("species_count").Value ?? 0;
+            var size = skip + take < maxResult ? skip + take : maxResult;
+            if (skip == 0 && take == 0)
+            {
+                size = maxResult;
+                take = maxResult;
+            }
+
+            if (aggregationType == AggregationType.SpeciesSightingsListTaxonCount)
+            {
+                return new PagedResult<dynamic>
+                {
+                    Records = new List<string>(),
+                    Skip = 0,
+                    Take = 0,
+                    TotalCount = maxResult
+                };
+            }
+
+            // Get the real result
+            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                .Size(0)
+                .Index(_indexName)
+                .Source(filter.OutputFields.ToProjection(filter is SearchFilterInternal))
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a=>Aggregation(a, size))
+            );
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            
+            _telemetry.StopOperation(operation);
+
+            var result = searchResponse
+                .Aggregations
+                .Terms("species")
+                .Buckets?
+                .Select(b =>
+                    new AggregatedSpecies
+                    {
+                        TaxonId = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.Id ?? 0,
+                        DocCount = b.DocCount,
+                        VernacularName = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.VernacularName ?? "",
+                        ScientificNameAuthorship = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.ScientificNameAuthorship ?? "",
+                        ScientificName = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.ScientificName ?? "",
+                        RedlistCategory = b.TopHits("info").Documents<AggregatedSpeciesInfo>().FirstOrDefault()?.Taxon.RedlistCategory ?? ""
+                    })?
+                .Skip(skip)
+                .Take(take);
+
+            return new PagedResult<dynamic>
+            {
+                Records = result,
+                Skip = skip,
+                Take = take,
+                TotalCount = maxResult
+            };
+
+            // When operation is disposed, telemetry item is sent.
+        }
+
+        private static Func<AggregationContainerDescriptor<dynamic>, IAggregationContainer> AddAggregation(int resultSize)
+        {
+           return agg => agg
+                    .Terms("species", t => t
+                        .Field("taxon.id")
+                        .Aggregations(thAgg => thAgg
+                            .TopHits("info", info => info
+                                .Size(1)
+                                .Source(src => src
+                                    .Includes(inc => inc
+                                        .Fields("taxon.scientificName", "taxon.vernacularName", "taxon.scientificNameAuthorship", "taxon.redlistCategory")
+                                    )
+                                )
+                            )
+                        )
+                        .Order(o => o.CountDescending())
+                        .Size(resultSize)
+                    );
         }
 
         private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddSightingTypeFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
         {
             var queryList = query.ToList();
+
+            // For local dev
+            return queryList;
 
             if (filter is SearchFilterInternal)
             {
@@ -234,7 +372,7 @@ namespace SOS.Observations.Api.Repositories
                 }
                 else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowSightingsInMerged)
                 {
-                    sightingTypeSearchGroupFilter = new int[] {0, 1, 2, 4, 32, 128};
+                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 32, 128 };
                 }
 
                 queryList.Add(q => q
@@ -249,13 +387,13 @@ namespace SOS.Observations.Api.Repositories
                 queryList.Add(q => q
                     .Terms(t => t
                         .Field("artportalenInternal.sightingTypeId")
-                        .Terms(new int[] {0, 3})
+                        .Terms(new int[] { 0, 3 })
                     )
                 );
                 queryList.Add(q => q
                     .Terms(t => t
                         .Field("artportalenInternal.sightingTypeSearchGroupId")
-                        .Terms(new int[] {0, 1, 32})
+                        .Terms(new int[] { 0, 1, 32 })
                     )
                 );
 

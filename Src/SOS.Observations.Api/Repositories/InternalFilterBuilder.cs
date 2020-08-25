@@ -484,30 +484,26 @@ namespace SOS.Observations.Api.Repositories
         {
             var aggregationQuery = query.ToList();
 
-            // Do only include sightings whose period don't exceeds one week/year
-            var maxDuration = 0;
-            switch (aggregationType)
+            if (aggregationType.IsDateHistogram())
             {
-                case AggregationType.QuantityPerWeek:
-                case AggregationType.SightingsPerWeek:
-                    maxDuration = 7;
-                    break;
-                case AggregationType.QuantityPerYear:
-                case AggregationType.SightingsPerYear:
-                    maxDuration = 365;
-                    break;
-                default:
-                    maxDuration = 365;
-                    break;
-            }
+                // Do only include sightings whose period don't exceeds one week/year
+                var maxDuration = aggregationType switch
+                {
+                    AggregationType.QuantityPerWeek => 7,
+                    AggregationType.SightingsPerWeek => 7,
+                    AggregationType.QuantityPerYear => 365,
+                    AggregationType.SightingsPerYear => 365,
+                    _ => 365
+                };
 
-            aggregationQuery.Add(q => q
-                .Script(s => s
-                    .Script(sc => sc
-                        .Source($@" (doc['event.endDate'].value.toInstant().toEpochMilli() - doc['event.startDate'].value.toInstant().toEpochMilli()) / 1000 / 86400 < {maxDuration} ")
+                aggregationQuery.Add(q => q
+                    .Script(s => s
+                        .Script(sc => sc
+                            .Source($@" (doc['event.endDate'].value.toInstant().toEpochMilli() - doc['event.startDate'].value.toInstant().toEpochMilli()) / 1000 / 86400 < {maxDuration} ")
+                        )
                     )
-                )
-            );
+                );
+            }
 
             return aggregationQuery;
         }
