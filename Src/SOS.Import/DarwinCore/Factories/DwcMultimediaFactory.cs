@@ -11,7 +11,10 @@ namespace SOS.Import.DarwinCore.Factories
             foreach (var fieldType in row.FieldMetaData)
             {
                 var val = row[fieldType.Index];
-                DwcTermValueMapper.MapValueByTerm(item, fieldType.Term, val);
+                if (!string.IsNullOrEmpty(val))
+                {
+                    DwcTermValueMapper.MapValueByTerm(item, fieldType.Term, val);
+                }
             }
 
             return item;

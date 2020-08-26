@@ -18,7 +18,10 @@ namespace SOS.Import.DarwinCore.Factories
             foreach (var fieldType in row.FieldMetaData)
             {
                 var val = row[fieldType.Index];
-                DwcTermValueMapper.MapValueByTerm(dwcEvent, fieldType.Term, val);
+                if (!string.IsNullOrEmpty(val))
+                {
+                    DwcTermValueMapper.MapValueByTerm(dwcEvent, fieldType.Term, val);
+                }
             }
 
             dwcEvent.RecordId = row[idIndex];
