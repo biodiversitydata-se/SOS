@@ -1318,7 +1318,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         ///     An identifier given to the Occurrence at the time it was
         ///     recorded. Often serves as a link between field notes and
         ///     an Occurrence record, such as a specimen collector's number.
-        ///     This property is currently not used.
         /// </summary>
         public string RecordNumber { get; set; }
 
@@ -1327,7 +1326,6 @@ namespace SOS.Lib.Models.Verbatim.DarwinCore
         ///     The reproductive condition of the biological individual(s)
         ///     represented in the Occurrence.
         ///     Recommended best practice is to use a controlled vocabulary.
-        ///     This property is currently not used.
         /// </summary>
         public string ReproductiveCondition { get; set; }
 

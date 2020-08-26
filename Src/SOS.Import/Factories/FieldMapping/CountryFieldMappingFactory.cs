@@ -21,5 +21,10 @@ namespace SOS.Import.Factories.FieldMapping
 
             return fieldMappingValues;
         }
+
+        protected override Dictionary<string, int> GetMappingSynonyms()
+        {
+            return null;
+        }
     }
 }

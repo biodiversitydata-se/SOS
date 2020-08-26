@@ -163,7 +163,7 @@ namespace SOS.Import.Factories.FieldMapping
             };
 
             // 1-1 mapping between Id fields.
-            foreach (var fieldMappingValue in fieldMappingValues)
+            foreach (var fieldMappingValue in fieldMappingValues.Where(f => !f.IsCustomValue))
             {
                 mappingField.Values.Add(new ExternalSystemMappingValue
                 {

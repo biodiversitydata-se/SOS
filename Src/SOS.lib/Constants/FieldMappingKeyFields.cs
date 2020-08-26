@@ -10,5 +10,6 @@
         public const string DwcStateProvince = "stateProvince";
         public const string AreaDatasetIdFeatureIdTuple = "<AreaDatasetId,FeatureId>";
         public const string Guid = "GUID";
+        public const string DwcLifeStage = "lifeStage";
     }
 }

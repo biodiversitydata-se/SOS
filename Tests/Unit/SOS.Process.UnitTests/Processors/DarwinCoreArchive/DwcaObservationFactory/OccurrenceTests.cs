@@ -64,8 +64,17 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         {
         }
 
-        [Fact]
-        public void LifeStage_value_adult_is_field_mapped()
+        /// <remarks>
+        /// Only Mammalia taxon and its underlying taxa is available in this unit test to keep the execution time fast.
+        /// </remarks>
+        [Theory]
+        [InlineData("adult", LifeStageId.Adult)]
+        [InlineData("egg", LifeStageId.Egg)]
+        [InlineData("eggs", LifeStageId.Egg)]
+        [InlineData("juvenile", LifeStageId.Juvenile)]
+        public void Succeeds_to_parse_LifeStage_from_the_dwc_lifeStage_field(
+            string dwcLifeStage,
+            LifeStageId expectedLifeStageId)
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -73,65 +82,18 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder
                 .WithDefaultValues()
-                .WithLifeStage("adult")
+                .WithLifeStage(dwcLifeStage)
                 .Build();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+            var observation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
 
             //-----------------------------------------------------------------------------------------------------------
-            // Asserts
+            // Assert
             //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.LifeStage.Id.Should().Be((int) LifeStageId.Adult);
-        }
-
-
-        [Fact]
-        public void LifeStage_value_egg_is_field_mapped()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var builder = new DwcObservationVerbatimBuilder();
-            var dwcaObservation = builder
-                .WithDefaultValues()
-                .WithLifeStage("egg")
-                .Build();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Asserts
-            //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.LifeStage.Id.Should().Be((int) LifeStageId.Egg);
-        }
-
-        [Fact]
-        public void LifeStage_value_juvenile_is_field_mapped()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var builder = new DwcObservationVerbatimBuilder();
-            var dwcaObservation = builder
-                .WithDefaultValues()
-                .WithLifeStage("juvenile")
-                .Build();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Asserts
-            //-----------------------------------------------------------------------------------------------------------
-            result.Occurrence.LifeStage.Id.Should().Be((int) LifeStageId.Juvenile);
+            observation.Occurrence.LifeStage.Id.Should().Be((int)expectedLifeStageId);
         }
 
         [Fact]

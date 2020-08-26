@@ -222,16 +222,19 @@ namespace SOS.Observations.Api.Repositories
             query = InternalFilterBuilder.AddAggregationFilter(aggregationType, query);
 
             // Aggregation for distinct count
-            IAggregationContainer AggregationCardinality(AggregationContainerDescriptor<dynamic> agg) => agg
+            static IAggregationContainer AggregationCardinality(AggregationContainerDescriptor<dynamic> agg) => agg
                 .Cardinality("species_count", c => c
                     .Field("taxon.scientificName")
                 );
 
             // Result-aggregation on taxon.id
-            IAggregationContainer Aggregation(AggregationContainerDescriptor<dynamic> agg, int size) => agg
+            static IAggregationContainer Aggregation(AggregationContainerDescriptor<dynamic> agg, int size) => agg
                 .Terms("species", t => t
-                    .Field("taxon.scientificName")
-                    .Order(o=>o.KeyAscending())
+                    .Script(s => s
+                        // Build a sortable key
+                        .Source("doc['taxon.sortOrder'].value + '-' + doc['taxon.scientificName'].value")
+                    )
+                    .Order(o => o.KeyAscending())
                     .Aggregations(thAgg => thAgg
                         .TopHits("info", info => info
                             .Size(1)
@@ -268,7 +271,7 @@ namespace SOS.Observations.Api.Repositories
             var size = skip + take < maxResult ? skip + take : maxResult;
             if (skip == 0 && take == 0)
             {
-                size = maxResult;
+                size = maxResult == 0 ? 1 : maxResult;
                 take = maxResult;
             }
 
@@ -294,11 +297,11 @@ namespace SOS.Observations.Api.Repositories
                         .Filter(query)
                     )
                 )
-                .Aggregations(a=>Aggregation(a, size))
+                .Aggregations(a => Aggregation(a, size))
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
-            
+
             _telemetry.StopOperation(operation);
 
             var result = searchResponse
@@ -329,30 +332,10 @@ namespace SOS.Observations.Api.Repositories
             // When operation is disposed, telemetry item is sent.
         }
 
-        private static Func<AggregationContainerDescriptor<dynamic>, IAggregationContainer> AddAggregation(int resultSize)
-        {
-           return agg => agg
-                    .Terms("species", t => t
-                        .Field("taxon.id")
-                        .Aggregations(thAgg => thAgg
-                            .TopHits("info", info => info
-                                .Size(1)
-                                .Source(src => src
-                                    .Includes(inc => inc
-                                        .Fields("taxon.scientificName", "taxon.vernacularName", "taxon.scientificNameAuthorship", "taxon.redlistCategory")
-                                    )
-                                )
-                            )
-                        )
-                        .Order(o => o.CountDescending())
-                        .Size(resultSize)
-                    );
-        }
-
         private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddSightingTypeFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
         {
             var queryList = query.ToList();
-            
+
             if (filter is SearchFilterInternal)
             {
                 var internalFilter = filter as SearchFilterInternal;
