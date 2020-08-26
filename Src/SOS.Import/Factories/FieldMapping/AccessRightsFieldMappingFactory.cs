@@ -22,7 +22,8 @@ namespace SOS.Import.Factories.FieldMapping
                 new FieldMappingValue {Id = 0, Value = "Free usage"},
                 new FieldMappingValue {Id = 1, Value = "Not for public usage"},
                 new FieldMappingValue {Id = 2, Value = "CC0"},
-                new FieldMappingValue {Id = 3, Value = "CC BY"}
+                new FieldMappingValue {Id = 3, Value = "CC BY"},
+                new FieldMappingValue {Id = 4, Value = "CC BY-NC"}
             };
 
             return fieldMappingValues;

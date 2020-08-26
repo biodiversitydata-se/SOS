@@ -22,6 +22,11 @@
       "Id": 3,
       "Value": "CC BY",
       "Localized": false
+    },
+    {
+      "Id": 4,
+      "Value": "CC BY-NC",
+      "Localized": false
     }
   ],
   "ExternalSystemsMapping": [
@@ -53,6 +58,14 @@
             {
               "Value": "CC BY",
               "SosId": 3
+            },
+            {
+              "Value": "CC BY-NC",
+              "SosId": 4
+            },
+            {
+              "Value": "CC BY NC",
+              "SosId": 4
             }
           ]
         }
