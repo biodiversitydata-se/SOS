@@ -255,7 +255,6 @@ namespace SOS.Lib.Extensions
                 Occurrence = processedObservation.Occurrence?.ToDarwinCore(),
                 OwnerInstitutionCode = processedObservation.OwnerInstitutionCode,
                 References = processedObservation.References,
-                Rights = processedObservation.Rights,
                 RightsHolder = processedObservation.RightsHolder,
                 Taxon = processedObservation.Taxon.ToDarwinCore(),
                 Type = processedObservation.Type?.Value

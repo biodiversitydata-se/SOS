@@ -268,14 +268,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public DateTime? ReportedDate { get; set; }
 
         /// <summary>
-        ///     Information about rights held in and over the resource.
-        ///     Typically, rights information includes a statement
-        ///     about various property rights associated with the resource,
-        ///     including intellectual property rights.
-        /// </summary>
-        public string Rights { get; set; }
-
-        /// <summary>
         ///     A person or organization owning or
         ///     managing rights over the resource.
         /// </summary>
