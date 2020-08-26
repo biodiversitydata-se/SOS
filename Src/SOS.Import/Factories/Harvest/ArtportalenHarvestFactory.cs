@@ -1,46 +1,35 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
+using SOS.Import.Containers.Interfaces;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Factories.Harvest.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Factories.Harvest
 {
     public class ArtportalenHarvestFactory : IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
     {
+        private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
+
         private readonly IProjectRepository _projectRepository;
         private readonly ISightingRepository _sightingRepository;
         private readonly ISiteRepository _siteRepository;
         private ISightingRelationRepository _sightingRelationRepository;
-        private readonly IDictionary<int, MetadataWithCategory> _activities;
-        private readonly IDictionary<int, Metadata> _biotopes;
-        private readonly IDictionary<int, Metadata> _genders;
-        private readonly IDictionary<int, Metadata> _organizations;
-        private IDictionary<int, Organization> _organizationById;
-        private readonly ConcurrentDictionary<int, Site> _sites;
-        private IList<SpeciesCollectionItem> _speciesCollections;
-        private readonly IDictionary<int, Metadata> _stages;
-        private readonly IDictionary<int, Metadata> _substrates;
-        private readonly IDictionary<int, Metadata> _validationStatus;
-        private readonly IDictionary<int, Metadata> _units;
-        private readonly IDictionary<int, Metadata> _discoveryMethods;
-        private readonly IDictionary<int, Metadata> _determinationMethods;
-        private IDictionary<int, Person> _personByUserId;
-        private IDictionary<int, Project> _projects;
+        private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
+
+        private readonly IDictionary<int, Site> _sites;
 
         /// <summary>
         /// Cast sighting itemEntity to model .
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="personSightings"></param>
-        /// <param name="projectEntityDictionaries"></param>
+        /// <param name="sightingsProjects"></param>
         /// <returns></returns>
         private ArtportalenObservationVerbatim CastEntityToVerbatim(SightingEntity entity,
             IDictionary<int, PersonSighting> personSightings,
@@ -51,7 +40,6 @@ namespace SOS.Import.Factories.Harvest
                 return null;
             }
             
-           
             if (_sites.TryGetValue(entity.SiteId.HasValue ? entity.SiteId.Value : -1, out var site))
             {
                 // Try to set parent site name if empty
@@ -66,25 +54,25 @@ namespace SOS.Import.Factories.Harvest
 
             var observation = new ArtportalenObservationVerbatim
             {
-                Activity = entity.ActivityId.HasValue && _activities.ContainsKey(entity.ActivityId.Value)
-                    ? _activities[entity.ActivityId.Value]
+                Activity = entity.ActivityId.HasValue && _artportalenMetadataContainer.Activities.ContainsKey(entity.ActivityId.Value)
+                    ? _artportalenMetadataContainer.Activities[entity.ActivityId.Value]
                     : null,
-                Biotope = entity.BiotopeId.HasValue && _biotopes.ContainsKey(entity.BiotopeId.Value)
-                    ? _biotopes[entity.BiotopeId.Value]
+                Biotope = entity.BiotopeId.HasValue && _artportalenMetadataContainer.Biotopes.ContainsKey(entity.BiotopeId.Value)
+                    ? _artportalenMetadataContainer.Biotopes[entity.BiotopeId.Value]
                     : null,
                 BiotopeDescription = entity.BiotopeDescription,
                 CollectionID = entity.CollectionID,
                 Comment = entity.Comment,
-                DiscoveryMethod = entity.DiscoveryMethodId.HasValue && _discoveryMethods.ContainsKey(entity.DiscoveryMethodId.Value)
-                    ? _discoveryMethods[entity.DiscoveryMethodId.Value]
+                DiscoveryMethod = entity.DiscoveryMethodId.HasValue && _artportalenMetadataContainer.DiscoveryMethods.ContainsKey(entity.DiscoveryMethodId.Value)
+                    ? _artportalenMetadataContainer.DiscoveryMethods[entity.DiscoveryMethodId.Value]
                     : null,
-                DeterminationMethod = entity.DeterminationMethodId.HasValue && _determinationMethods.ContainsKey(entity.DeterminationMethodId.Value)
-                    ? _determinationMethods[entity.DeterminationMethodId.Value]
+                DeterminationMethod = entity.DeterminationMethodId.HasValue && _artportalenMetadataContainer.DeterminationMethods.ContainsKey(entity.DeterminationMethodId.Value)
+                    ? _artportalenMetadataContainer.DeterminationMethods[entity.DeterminationMethodId.Value]
                     : null,
                 EndDate = entity.EndDate,
                 EndTime = entity.EndTime,
-                Gender = entity.GenderId.HasValue && _genders.ContainsKey(entity.GenderId.Value)
-                    ? _genders[entity.GenderId.Value]
+                Gender = entity.GenderId.HasValue && _artportalenMetadataContainer.Genders.ContainsKey(entity.GenderId.Value)
+                    ? _artportalenMetadataContainer.Genders[entity.GenderId.Value]
                     : null,
                 HasImages = entity.HasImages,
                 HasTriggeredValidationRules = entity.HasTriggeredValidationRules,
@@ -93,8 +81,8 @@ namespace SOS.Import.Factories.Harvest
                 Id = entity.Id,
                 OwnerOrganization =
                     entity.OwnerOrganizationId.HasValue &&
-                    _organizations.ContainsKey(entity.OwnerOrganizationId.Value)
-                        ? _organizations[entity.OwnerOrganizationId.Value]
+                    _artportalenMetadataContainer.Organizations.ContainsKey(entity.OwnerOrganizationId.Value)
+                        ? _artportalenMetadataContainer.Organizations[entity.OwnerOrganizationId.Value]
                         : null,
                 Label = entity.Label,
                 Length = entity.Length,
@@ -114,40 +102,40 @@ namespace SOS.Import.Factories.Harvest
                 RightsHolder = entity.RightsHolder,
                 Site = site,
                 SightingSpeciesCollectionItemId = entity.SightingSpeciesCollectionItemId,
-                Stage = entity.StageId.HasValue && _stages.ContainsKey(entity.StageId.Value)
-                    ? _stages[entity.StageId.Value]
+                Stage = entity.StageId.HasValue && _artportalenMetadataContainer.Stages.ContainsKey(entity.StageId.Value)
+                    ? _artportalenMetadataContainer.Stages[entity.StageId.Value]
                     : null,
                 StartDate = entity.StartDate,
                 StartTime = entity.StartTime,
-                Substrate = entity.SubstrateId.HasValue && _substrates.ContainsKey(entity.SubstrateId.Value)
-                    ? _substrates[entity.SubstrateId.Value]
+                Substrate = entity.SubstrateId.HasValue && _artportalenMetadataContainer.Substrates.ContainsKey(entity.SubstrateId.Value)
+                    ? _artportalenMetadataContainer.Substrates[entity.SubstrateId.Value]
                     : null,
                 SubstrateDescription = entity.SubstrateDescription,
                 SubstrateSpeciesDescription = entity.SubstrateSpeciesDescription,
                 SubstrateSpeciesId = entity.SubstrateSpeciesId,
                 TaxonId = entity.TaxonId,
-                Unit = entity.UnitId.HasValue && _units.ContainsKey(entity.UnitId.Value)
-                    ? _units[entity.UnitId.Value]
+                Unit = entity.UnitId.HasValue && _artportalenMetadataContainer.Units.ContainsKey(entity.UnitId.Value)
+                    ? _artportalenMetadataContainer.Units[entity.UnitId.Value]
                     : null,
                 Unspontaneous = entity.Unspontaneous,
                 UnsureDetermination = entity.UnsureDetermination,
                 URL = entity.URL,
-                ValidationStatus = _validationStatus.ContainsKey(entity.ValidationStatusId)
-                    ? _validationStatus[entity.ValidationStatusId]
+                ValidationStatus = _artportalenMetadataContainer.ValidationStatus.ContainsKey(entity.ValidationStatusId)
+                    ? _artportalenMetadataContainer.ValidationStatus[entity.ValidationStatusId]
                     : null,
                 Weight = entity.Weight,
                 Projects = sightingsProjects.ContainsKey(entity.Id) ? sightingsProjects[entity.Id] : null,
                 SightingTypeId = entity.SightingTypeId,
                 SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId,
-                PublicCollection = entity.OrganizationCollectorId.HasValue && _organizations.ContainsKey(entity.OrganizationCollectorId.Value)
-                    ? _organizations[entity.OrganizationCollectorId.Value]
+                PublicCollection = entity.OrganizationCollectorId.HasValue && _artportalenMetadataContainer.Organizations.ContainsKey(entity.OrganizationCollectorId.Value)
+                    ? _artportalenMetadataContainer.Organizations[entity.OrganizationCollectorId.Value]
                     : null,
-                PrivateCollection = entity.UserCollectorId.HasValue && _personByUserId.ContainsKey(entity.UserCollectorId.Value)
-                    ? _personByUserId[entity.UserCollectorId.Value].FullName
+                PrivateCollection = entity.UserCollectorId.HasValue && _artportalenMetadataContainer.PersonByUserId.ContainsKey(entity.UserCollectorId.Value)
+                    ? _artportalenMetadataContainer.PersonByUserId[entity.UserCollectorId.Value].FullName
                     : null,
-                DeterminedBy = entity.DeterminerUserId.HasValue && _personByUserId.ContainsKey(entity.DeterminerUserId.Value) ? _personByUserId[entity.DeterminerUserId.Value].FullName : null,
+                DeterminedBy = entity.DeterminerUserId.HasValue && _artportalenMetadataContainer.PersonByUserId.ContainsKey(entity.DeterminerUserId.Value) ? _artportalenMetadataContainer.PersonByUserId[entity.DeterminerUserId.Value].FullName : null,
                 DeterminationYear = entity.DeterminationYear,
-                ConfirmedBy = entity.ConfirmatorUserId.HasValue && _personByUserId.ContainsKey(entity.ConfirmatorUserId.Value) ? _personByUserId[entity.ConfirmatorUserId.Value].FullName : null,
+                ConfirmedBy = entity.ConfirmatorUserId.HasValue && _artportalenMetadataContainer.PersonByUserId.ContainsKey(entity.ConfirmatorUserId.Value) ? _artportalenMetadataContainer.PersonByUserId[entity.ConfirmatorUserId.Value].FullName : null,
                 ConfirmationYear = entity.ConfirmationYear
             };
 
@@ -191,140 +179,8 @@ namespace SOS.Import.Factories.Harvest
             return ids.Any() ? ids : null;
         }
 
-        #region Metadata
-        /// <summary>
-        ///     Cast multiple sightings entities to models
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        private IEnumerable<Metadata> CastMetdataEntityToVerbatim(IEnumerable<MetadataEntity> entities)
-        {
-            if (!entities?.Any() ?? true)
-            {
-                return null;
-            }
-
-            var metadataItems = new Dictionary<int, Metadata>();
-            foreach (var entity in entities)
-            {
-                if (!metadataItems.ContainsKey(entity.Id))
-                {
-                    metadataItems.Add(entity.Id, new Metadata(entity.Id));
-                }
-
-                metadataItems[entity.Id].Translations.Add(new MetadataTranslation
-                { Culture = entity.CultureCode, Value = entity.Translation });
-            }
-
-            return metadataItems.Values;
-        }
-
-        /// <summary>
-        ///     Cast multiple sightings entities to models
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        private IEnumerable<MetadataWithCategory> CastMetdataWithCategoryEntityToVerbatim(
-            IEnumerable<MetadataWithCategoryEntity> entities)
-        {
-            if (!entities?.Any() ?? true)
-            {
-                return null;
-            }
-
-            var metadataItems = new Dictionary<int, MetadataWithCategory>();
-            foreach (var entity in entities)
-            {
-                if (!metadataItems.ContainsKey(entity.Id))
-                {
-                    metadataItems.Add(entity.Id, new MetadataWithCategory(entity.Id, entity.CategoryId));
-                }
-
-                var metadata = metadataItems[entity.Id];
-                metadata.Translations.Add(new MetadataTranslation
-                {
-                    Culture = entity.CultureCode,
-                    Value = entity.Translation
-                });
-
-                metadata.Category.Translations.Add(new MetadataTranslation
-                {
-                    Culture = entity.CultureCode,
-                    Value = entity.CategoryName
-                });
-            }
-
-            return metadataItems.Values;
-        }
-        #endregion Metadata
-
-        #region Organization
-        /// <summary>
-        ///     Cast multiple projects to aggregates
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        private IEnumerable<Organization> CastOrganizationEntityToVerbatim(IEnumerable<OrganizationEntity> entities)
-        {
-            return from o in entities
-                   select new Organization
-                   {
-                       Id = o.Id,
-                       Name = o.Name,
-                       OrganizationId = o.OrganizationId
-                   };
-        }
-        #endregion Organization
-
-        #region Person
-        private IEnumerable<Person> CastPersonEntityToVerbatim(IEnumerable<PersonEntity> entities)
-        {
-            return from e in entities
-                   select new Person
-                   {
-                       Id = e.Id,
-                       UserId = e.UserId,
-                       FirstName = e.FirstName,
-                       LastName = e.LastName,
-                       Alias = e.Alias
-                   };
-        }
-        #endregion Person
-
         #region Project
-        /// <summary>
-        ///     Cast multiple projects entities to models
-        /// </summary>
-        /// <param name="entities"></param>
-        /// <returns></returns>
-        private IEnumerable<Project> CastProjectEntitiesToVerbatim(IEnumerable<ProjectEntity> entities)
-        {
-            return from p in entities
-                   select CastProjectEntityToVerbatim(p);
-        }
-
-        /// <summary>
-        ///     Cast single project entity to verbatim
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        private Project CastProjectEntityToVerbatim(ProjectEntity entity)
-        {
-            return new Project
-            {
-                Category = entity.Category,
-                Description = entity.Description,
-                EndDate = entity.EndDate,
-                Id = entity.Id,
-                IsPublic = entity.IsPublic,
-                Name = entity.Name,
-                Owner = entity.Owner,
-                StartDate = entity.StartDate,
-                SurveyMethod = entity.SurveyMethod,
-                SurveyMethodUrl = entity.SurveyMethodUrl
-            };
-        }
-
+        
         /// <summary>
         ///     Cast project parameter itemEntity to aggregate
         /// </summary>
@@ -345,7 +201,7 @@ namespace SOS.Import.Factories.Harvest
 
         private async Task<IDictionary<int, Project[]>> GetSightingsProjects(IEnumerable<int> sightingIds)
         {
-            if (!_projects?.Any() ?? true)
+            if (!_artportalenMetadataContainer?.Projects?.Any() ?? true)
             {
                 return null;
             }
@@ -365,7 +221,7 @@ namespace SOS.Import.Factories.Harvest
             {
                 var (sightingId, projectId) = sightingProjectIds[i];
 
-                if (!_projects.TryGetValue(projectId, out var project))
+                if (!_artportalenMetadataContainer.Projects.TryGetValue(projectId, out var project))
                 {
                     continue;
                 }
@@ -401,13 +257,13 @@ namespace SOS.Import.Factories.Harvest
 
                 if (project == null)
                 {
-                    if (!_projects.ContainsKey(projectParameterEntity.ProjectId))
+                    if (!_artportalenMetadataContainer.Projects.ContainsKey(projectParameterEntity.ProjectId))
                     {
                         continue;
                     }
 
                     // Get project from all projects
-                    project = _projects[projectParameterEntity.ProjectId].Clone();
+                    project = _artportalenMetadataContainer.Projects[projectParameterEntity.ProjectId].Clone();
                     sightingProjects.Add(project.Id, project);
                 }
 
@@ -562,20 +418,36 @@ namespace SOS.Import.Factories.Harvest
         private IEnumerable<SpeciesCollectionItem> CastSpeciesCollectionsToVerbatim(
             IEnumerable<SpeciesCollectionItemEntity> entities)
         {
+            if (!entities?.Any() ?? true)
+            {
+                return null;
+            }
+
             return from s in entities
-                   select new SpeciesCollectionItem
-                   {
-                       SightingId = s.SightingId,
-                       CollectorId = s.CollectorId,
-                       OrganizationId = s.OrganizationId,
-                       DeterminerText = s.DeterminerText,
-                       DeterminerYear = s.DeterminerYear,
-                       Description = s.Description,
-                       ConfirmatorText = s.ConfirmatorText,
-                       ConfirmatorYear = s.ConfirmatorYear
-                   };
+                select new SpeciesCollectionItem
+                {
+                    SightingId = s.SightingId,
+                    CollectorId = s.CollectorId,
+                    OrganizationId = s.OrganizationId,
+                    DeterminerText = s.DeterminerText,
+                    DeterminerYear = s.DeterminerYear,
+                    Description = s.Description,
+                    ConfirmatorText = s.ConfirmatorText,
+                    ConfirmatorYear = s.ConfirmatorYear
+                };
+        }
+
+        /// <summary>
+        /// Initialize species collections
+        /// </summary>
+        /// <param name="sightingIds"></param>
+        /// <returns></returns>
+        private async Task<IList<SpeciesCollectionItem>> GetSpeciesCollections(IEnumerable<int> sightingIds)
+        {
+            return CastSpeciesCollectionsToVerbatim(await _speciesCollectionRepository.GetBySightingAsync(sightingIds))?.ToList();
         }
         #endregion SpeciesCollections
+
 
         /// <summary>
         /// Constructor
@@ -584,65 +456,28 @@ namespace SOS.Import.Factories.Harvest
         /// <param name="sightingRepository"></param>
         /// <param name="siteRepository"></param>
         /// <param name="sightingRelationRepository"></param>
-        /// <param name="activities"></param>
-        /// <param name="biotopes"></param>
-        /// <param name="determinationMethods"></param>
-        /// <param name="discoveryMethods"></param>
-        /// <param name="genders"></param>
-        /// <param name="organizations"></param>
-        /// <param name="stages"></param>
-        /// <param name="substrates"></param>
-        /// <param name="validationStatus"></param>
-        /// <param name="units"></param>
-        /// <param name="organizationById"></param>
-        /// <param name="personByUserId"></param>
-        /// <param name="sightingProjectIds"></param>
-        /// <param name="speciesCollections"></param>
+        /// <param name="speciesCollectionRepository"></param>
+        /// <param name="artportalenMetadataContainer"></param>
         public ArtportalenHarvestFactory(
             IProjectRepository projectRepository,
             ISightingRepository sightingRepository,
             ISiteRepository siteRepository,
             ISightingRelationRepository sightingRelationRepository,
-            IEnumerable<MetadataWithCategoryEntity> activities,
-            IEnumerable<MetadataEntity> biotopes,
-            IEnumerable<MetadataEntity> determinationMethods,
-            IEnumerable<MetadataEntity> discoveryMethods,
-            IEnumerable<MetadataEntity> genders,
-            IEnumerable<MetadataEntity> organizations,
-            IEnumerable<MetadataEntity> stages,
-            IEnumerable<MetadataEntity> substrates,
-            IEnumerable<MetadataEntity> validationStatus,
-            IEnumerable<MetadataEntity> units,
-            IEnumerable<OrganizationEntity> organizationById,
-            IEnumerable<PersonEntity> personByUserId,
-            IEnumerable<ProjectEntity> projectEntities,
-            IEnumerable<SpeciesCollectionItemEntity> speciesCollections)
+            ISpeciesCollectionItemRepository speciesCollectionRepository,
+            IArtportalenMetadataContainer artportalenMetadataContainer)
         {
             _projectRepository = projectRepository;
             _sightingRepository = sightingRepository;
             _siteRepository = siteRepository;
             _sightingRelationRepository = sightingRelationRepository;
-            
-            _activities = CastMetdataWithCategoryEntityToVerbatim(activities)?.ToDictionary(a => a.Id, a => a);
-            _biotopes = CastMetdataEntityToVerbatim(biotopes)?.ToDictionary(b => b.Id, b => b);
-            _determinationMethods = CastMetdataEntityToVerbatim(determinationMethods)?.ToDictionary(dm => dm.Id, dm => dm);
-            _discoveryMethods = CastMetdataEntityToVerbatim(discoveryMethods)?.ToDictionary(dm => dm.Id, dm => dm);
-            _genders = CastMetdataEntityToVerbatim(genders)?.ToDictionary(g => g.Id, g => g);
-            _organizations = CastMetdataEntityToVerbatim(organizations)?.ToDictionary(o => o.Id, o => o);
-            _stages = CastMetdataEntityToVerbatim(stages)?.ToDictionary(s => s.Id, s => s);
-            _substrates = CastMetdataEntityToVerbatim(substrates)?.ToDictionary(s => s.Id, s => s);
-            _validationStatus = CastMetdataEntityToVerbatim(validationStatus)?.ToDictionary(vs => vs.Id, vs => vs);
-            _units = CastMetdataEntityToVerbatim(units)?.ToDictionary(u => u.Id, u => u);
-            _projects = CastProjectEntitiesToVerbatim(projectEntities).ToDictionary(p => p.Id, p => p);
-            _organizationById = CastOrganizationEntityToVerbatim(organizationById)?.ToDictionary(o => o.Id, o => o);
-            _personByUserId = CastPersonEntityToVerbatim(personByUserId)?.ToDictionary(p => p.Id, p => p);
-            _speciesCollections = CastSpeciesCollectionsToVerbatim(speciesCollections).ToList();
+            _speciesCollectionRepository = speciesCollectionRepository;
 
-            _sites = new ConcurrentDictionary<int, Site>();
+            _artportalenMetadataContainer = artportalenMetadataContainer;
+            _sites = new Dictionary<int, Site>();
         }
 
         public bool IncrementalMode { get; set; }
-
+        
         /// <inheritdoc />
         public async Task<IEnumerable<ArtportalenObservationVerbatim>> CastEntitiesToVerbatimsAsync(SightingEntity[] entities)
         {
@@ -676,11 +511,13 @@ namespace SOS.Import.Factories.Harvest
             var sightingRelations =
                 CastSightingRelationsToVerbatim(await _sightingRelationRepository.GetAsync(sightingIds)).ToArray();
 
+            var speciesCollections = await GetSpeciesCollections(sightingIds);
+
             var personSightings = PersonSightingFactory.CreatePersonSightingDictionary(
                 sightingIds,
-                _personByUserId,
-                _organizationById,
-                _speciesCollections,
+                _artportalenMetadataContainer.PersonByUserId,
+                _artportalenMetadataContainer.OrganizationById,
+                speciesCollections,
                 sightingRelations);
 
             return from e in entities

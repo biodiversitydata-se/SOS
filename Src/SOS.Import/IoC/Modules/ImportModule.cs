@@ -1,5 +1,7 @@
 ﻿using System.Text;
 using Autofac;
+using SOS.Import.Containers;
+using SOS.Import.Containers.Interfaces;
 using SOS.Import.DarwinCore;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Import.Factories.FieldMapping;
@@ -110,6 +112,9 @@ namespace SOS.Import.IoC.Modules
 
             // Darwin Core
             builder.RegisterType<DwcArchiveReader>().As<IDwcArchiveReader>().InstancePerLifetimeScope();
+
+            // Containers
+            builder.RegisterType<ArtportalenMetadataContainer>().As<IArtportalenMetadataContainer>().SingleInstance();
 
             // Managers
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();

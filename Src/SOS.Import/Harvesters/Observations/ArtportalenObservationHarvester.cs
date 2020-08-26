@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SOS.Import.Containers.Interfaces;
 
 namespace SOS.Import.Harvesters.Observations
 {
@@ -37,6 +38,7 @@ namespace SOS.Import.Harvesters.Observations
         private readonly ISiteRepository _siteRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
         private bool _hasAddedTestSightings;
 
         /// <summary>
@@ -189,19 +191,6 @@ namespace SOS.Import.Harvesters.Observations
         }
 
         /// <summary>
-        /// Initialize species collections
-        /// </summary>
-        /// <returns></returns>
-        private async Task<IEnumerable<SpeciesCollectionItemEntity>> GetSpeciesCollections()
-        {
-            _logger.LogDebug("Start getting species collection data");
-            var speciesCollections = await _speciesCollectionRepository.GetAsync();
-            _logger.LogDebug("Finish getting species collection data");
-
-            return speciesCollections;
-        }
-
-        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="artportalenConfiguration"></param>
@@ -228,6 +217,7 @@ namespace SOS.Import.Harvesters.Observations
             ISightingRelationRepository sightingRelationRepository,
             ISpeciesCollectionItemRepository speciesCollectionItemRepository,
             IProcessedObservationRepository processedObservationRepository,
+            IArtportalenMetadataContainer artportalenMetadataContainer,
             ILogger<ArtportalenObservationHarvester> logger)
         {
             _artportalenConfiguration = artportalenConfiguration ??
@@ -246,6 +236,8 @@ namespace SOS.Import.Harvesters.Observations
             _speciesCollectionRepository = speciesCollectionItemRepository ??
                                            throw new ArgumentNullException(nameof(speciesCollectionItemRepository));
             _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
+            _artportalenMetadataContainer = artportalenMetadataContainer ?? throw new ArgumentNullException(nameof(artportalenMetadataContainer));
+
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads);
@@ -259,28 +251,48 @@ namespace SOS.Import.Harvesters.Observations
 
             try
             {
-                _logger.LogDebug("Start getting metadata");
-                var activities = await GetActivitiesAsync();
-                var (biotopes,
-                    genders,
-                    organizations,
-                    stages,
-                    substrates,
-                    units,
-                    validationStatus,
-                    discoveryMethods,
-                    determinationMethods) = await GetMetadataAsync();
+                // Populate data on full harvest or if it's not initialized
+                if (!incrementalHarvest || !_artportalenMetadataContainer.IsInitialized)
+                {
+                    _logger.LogDebug("Start getting metadata");
+                    var activities = await GetActivitiesAsync();
+                    var (biotopes,
+                        genders,
+                        organizations,
+                        stages,
+                        substrates,
+                        units,
+                        validationStatus,
+                        discoveryMethods,
+                        determinationMethods) = await GetMetadataAsync();
 
-                cancellationToken?.ThrowIfCancellationRequested();
-                _logger.LogDebug("Finish getting metadata");
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    _logger.LogDebug("Finish getting metadata");
 
-                _logger.LogDebug("Start getting sighting metadata");
-                var (personByUserId, organizationById) = await GetPersonsAndOrganizationsAsync();
+                    _logger.LogDebug("Start getting sighting metadata");
+                    var (personByUserId, organizationById) = await GetPersonsAndOrganizationsAsync();
 
-                var projectEntities = await _projectRepository.GetProjectsAsync();
-                
-                var speciesCollections = await GetSpeciesCollections();
-                _logger.LogDebug("Finsih getting sighting metadata");
+                    var projectEntities = await _projectRepository.GetProjectsAsync();
+                    _logger.LogDebug("Finsih getting sighting metadata");
+
+                    _logger.LogDebug("Start Initialize metadata");
+                    _artportalenMetadataContainer.Initialize(
+                        activities,
+                        biotopes,
+                        determinationMethods,
+                        discoveryMethods,
+                        genders,
+                        organizationById,
+                        organizations,
+                        personByUserId,
+                        projectEntities,
+                        stages,
+                        substrates,
+                        units, 
+                        validationStatus);
+
+                    _logger.LogDebug("Finish Initialize metadata");
+                }
 
                 _logger.LogDebug("Start creating factory");
                 var harvestFactory = new ArtportalenHarvestFactory(
@@ -288,38 +300,9 @@ namespace SOS.Import.Harvesters.Observations
                     _sightingRepository,
                     _siteRepository,
                     _sightingRelationRepository,
-                    activities,
-                    biotopes,
-                    determinationMethods,
-                    discoveryMethods,
-                    genders,
-                    organizations,
-                    stages,
-                    substrates,
-                    validationStatus,
-                    units,
-                    organizationById,
-                    personByUserId,
-                    projectEntities,
-                    speciesCollections
+                    _speciesCollectionRepository,
+                    _artportalenMetadataContainer
                 );
-
-                // Clean up to release memory
-                activities = null;
-                biotopes = null;
-                determinationMethods = null;
-                discoveryMethods = null;
-                genders = null;
-                organizations = null;
-                stages = null;
-                substrates = null;
-                validationStatus = null;
-                units = null;
-                organizationById = null;
-                personByUserId = null;
-                projectEntities = null;
-                speciesCollections = null;
-
                 _logger.LogDebug("Finsih creating factory");
                 
                 // Get source min and max id

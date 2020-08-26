@@ -23,10 +23,11 @@ namespace SOS.Import.IntegrationTests.Repositories
                 artportalenDataService,
                 new Mock<ILogger<SpeciesCollectionItemRepository>>().Object);
 
+            var sightingIds = new[] {1, 2, 3, 4, 5};
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var speciesCollectionItemEntities = await speciesCollectionItemRepository.GetAsync();
+            var speciesCollectionItemEntities = await speciesCollectionItemRepository.GetBySightingAsync(sightingIds);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
