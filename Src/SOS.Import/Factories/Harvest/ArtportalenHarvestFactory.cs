@@ -264,7 +264,7 @@ namespace SOS.Import.Factories.Harvest
 
                     // Get project from all projects
                     project = _artportalenMetadataContainer.Projects[projectParameterEntity.ProjectId].Clone();
-                    sightingProjects.Add(project.Id, project);
+                    sightingProjects.Add(project.Id, project.Clone());
                 }
 
                 if (project.ProjectParameters == null)
@@ -275,7 +275,7 @@ namespace SOS.Import.Factories.Harvest
                 project.ProjectParameters.Add(CastProjectParameterEntityToVerbatim(projectParameterEntity));
             }
 
-            return sightingsProjects.ToDictionary(sp => sp.Key, sp => sp.Value.Values.ToArray());
+            return sightingsProjects.Any() ? sightingsProjects.ToDictionary(sp => sp.Key, sp => sp.Value.Values.ToArray()) : null;
         }
         #endregion Project
 
@@ -296,7 +296,7 @@ namespace SOS.Import.Factories.Harvest
             var startIndex = 0;
             var idBatch = newSiteIds.Take(batchSize).ToArray();
 
-            while (idBatch.Any())
+            while (idBatch?.Any() ?? false)
             {
                 var sites = CastSiteEntitiesToVerbatim((await _siteRepository.GetByIdsAsync(idBatch, IncrementalMode))?.ToList());
 
@@ -308,7 +308,7 @@ namespace SOS.Import.Factories.Harvest
                     }
 
                     startIndex += batchSize;
-                    idBatch = newSiteIds.Skip(startIndex).Take(batchSize).ToArray();
+                    idBatch = newSiteIds.Skip(startIndex).Take(batchSize)?.ToArray();
                 }
             }
         }
@@ -321,13 +321,13 @@ namespace SOS.Import.Factories.Harvest
         /// <returns></returns>
         private IEnumerable<Site> CastSiteEntitiesToVerbatim(List<SiteEntity> siteEntities)
         {
+            var sites = new List<Site>();
+
             if (!siteEntities?.Any() ?? true)
             {
-                return new List<Site>();
+                return sites;
             }
 
-            var sites = new List<Site>();
-      
             var batchSize = 100000;
             while (siteEntities.Count > 0)
             {
@@ -509,7 +509,7 @@ namespace SOS.Import.Factories.Harvest
 
             // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
             var sightingRelations =
-                CastSightingRelationsToVerbatim(await _sightingRelationRepository.GetAsync(sightingIds)).ToArray();
+                CastSightingRelationsToVerbatim(await _sightingRelationRepository.GetAsync(sightingIds))?.ToArray();
 
             var speciesCollections = await GetSpeciesCollections(sightingIds);
 

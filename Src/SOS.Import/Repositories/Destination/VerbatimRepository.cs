@@ -115,13 +115,13 @@ namespace SOS.Import.Repositories.Destination
 
             var success = true;
             var count = 0;
-            var batch = entities.Skip(0).Take(_batchSize).ToArray();
+            var batch = entities.Skip(0).Take(_batchSize)?.ToArray();
 
             while (batch?.Any() ?? false)
             {
                 success = success && await AddBatchAsync(batch, mongoCollection);
                 count++;
-                batch = entities.Skip(_batchSize * count).Take(_batchSize).ToArray();
+                batch = entities.Skip(_batchSize * count).Take(_batchSize)?.ToArray();
             }
 
             return success;
