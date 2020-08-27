@@ -27,11 +27,12 @@ namespace SOS.Process.Processors.DarwinCoreArchive
     /// </summary>
     public class DwcaObservationFactory
     {
+        private const int DefaultCoordinateUncertaintyInMeters = 10000;
         private readonly IAreaHelper _areaHelper;
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
         private readonly HashMapDictionary<string, ProcessedTaxon> _taxonByScientificName;
-       private readonly HashMapDictionary<string, ProcessedTaxon> _taxonBySynonymeName;
+        private readonly HashMapDictionary<string, ProcessedTaxon> _taxonBySynonymeName;
         private readonly IDictionary<int, ProcessedTaxon> _taxonByTaxonId;
 
         private readonly List<string> errors = new List<string>();
@@ -357,7 +358,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 MappingNotFoundLogic.UseDefaultValue);
             processedLocation.CoordinatePrecision = verbatimObservation.CoordinatePrecision.ParseDouble();
             processedLocation.CoordinateUncertaintyInMeters =
-                verbatimObservation.CoordinateUncertaintyInMeters?.ParseInt();
+                verbatimObservation.CoordinateUncertaintyInMeters?.ParseInt() ?? DefaultCoordinateUncertaintyInMeters;
             processedLocation.Country = GetSosId(
                 verbatimObservation.Country,
                 _fieldMappings[FieldMappingFieldId.Country],
