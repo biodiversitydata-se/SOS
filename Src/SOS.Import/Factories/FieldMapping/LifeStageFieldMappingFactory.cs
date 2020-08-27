@@ -39,6 +39,9 @@ namespace SOS.Import.Factories.FieldMapping
             var stages = await _metadataRepository.GetStagesAsync();
             var fieldMappingValues = base.ConvertToLocalizedFieldMappingValues(stages.ToArray());
             int id = fieldMappingValues.Max(f => f.Id);
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "Nauplius larva", "Nauplius larv"));
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "Copepodite", "Copepodit"));
+            fieldMappingValues.Add(CreateFieldMappingValue(++id, "Sub adult"));
             fieldMappingValues.Add(CreateFieldMappingValue(++id, "zygote"));
             fieldMappingValues.Add(CreateFieldMappingValue(++id, "embryo"));
             fieldMappingValues.Add(CreateFieldMappingValue(++id, "seed"));
@@ -47,8 +50,8 @@ namespace SOS.Import.Factories.FieldMapping
             fieldMappingValues.Add(CreateFieldMappingValue(++id, "sporophyte"));
             fieldMappingValues.Add(CreateFieldMappingValue(++id, "gametophyte"));
             fieldMappingValues.Add(CreateFieldMappingValue(++id, "sperm"));
-            fieldMappingValues.Add(CreateFieldMappingValue(++id, "immature"));
             fieldMappingValues.Add(CreateFieldMappingValue(++id, "dormant"));
+            
 
             return fieldMappingValues;
         }
@@ -65,12 +68,34 @@ namespace SOS.Import.Factories.FieldMapping
             };
         }
 
+        private FieldMappingValue CreateFieldMappingValue(int id, string english, string swedish)
+        {
+            return new FieldMappingValue
+            {
+                Id = id,
+                Value = english,
+                Localized = true,
+                Translations = CreateTranslation(english, swedish),
+                IsCustomValue = true
+            };
+        }
+
+        private List<FieldMappingTranslation> CreateTranslation(string english, string swedish)
+        {
+            return new List<FieldMappingTranslation>
+            {
+                new FieldMappingTranslation {CultureCode = "sv-SE", Value = swedish},
+                new FieldMappingTranslation {CultureCode = "en-GB", Value = english}
+            };
+        }
+
+
         private List<FieldMappingTranslation> CreateTranslation(string value)
         {
             return new List<FieldMappingTranslation>
             {
-                new FieldMappingTranslation() {CultureCode = "sv-SE", Value = value},
-                new FieldMappingTranslation() {CultureCode = "en-GB", Value = value}
+                new FieldMappingTranslation {CultureCode = "sv-SE", Value = value},
+                new FieldMappingTranslation {CultureCode = "en-GB", Value = value}
             };
         }
 
@@ -195,31 +220,29 @@ namespace SOS.Import.Factories.FieldMapping
                 {"female, immature", "immature"},
                 {"immature male", "immature"},
                 {"immature female", "immature"},
-                {"embryos", "embryo"}
+                {"embryos", "embryo"},
+                {"NP (Nauplius)", "Nauplius larva"},
+                {"NP", "Nauplius larva"},
+                {"Nauplius larvae", "Nauplius larva"},
+                {"C1 (Copepodite I)", "Copepodite"},
+                {"C2 (Copepodite II)", "Copepodite"},
+                {"C3 (Copepodite III)", "Copepodite"},
+                {"C4 (Copepodite IV)", "Copepodite"},
+                {"C5 (Copepodite V)", "Copepodite"},
+                {"immature", "Sub adult"},
+                {"omogen", "Sub adult"},
+                {"subad.", "Sub adult"},
+                {"subad", "Sub adult"},
+                {"sub-adult", "Sub adult"},
+                {"sub-adults", "Sub adult"},
+                {"subadult male", "Sub adult"},
+                {"subadult", "Sub adult"},
+                {"subadults", "Sub adult"},
+                {"sub adults", "Sub adult"},
+                {"male, subadult", "Sub adult"},
+                {"subadult female", "Sub adult"},
+                {"subadult male, femal", "Sub adult"}
             };
-
-            /*
-                todo - Add new values for subadult, nauplius, c1, c2, c3, c4, c5?
-                subad.
-                sub-adult
-                sub-adults
-                subadult male
-                subadult
-                subadults
-                male, subadult
-                sub adult
-                subadult female
-                subad
-                sub-adult female
-                SUBADULT MALE, FEMAL
-                sub adults
-                NP (Nauplius)
-                "C1 (Copepodite I)"
-                "C2 (Copepodite II)"
-                "C3 (Copepodite III)"
-                "C4 (Copepodite IV)"
-                "C5 (Copepodite V)"
-                */
         }
     }
 }

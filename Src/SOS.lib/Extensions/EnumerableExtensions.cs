@@ -23,5 +23,23 @@ namespace SOS.Lib.Extensions
         {
             return (source?.Any() ?? false);
         }
+
+        /// <summary>
+        /// Check if enumerable has duplicates
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static bool HasDuplicates<T>(this IEnumerable<T> source)
+        {
+            var hs = new HashSet<T>();
+
+            foreach (var item in source)
+            {
+                if (!hs.Add(item)) return true;
+            }
+
+            return false;
+        }
     }
 }
