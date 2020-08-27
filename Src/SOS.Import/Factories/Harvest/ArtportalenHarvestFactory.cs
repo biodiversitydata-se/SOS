@@ -296,7 +296,7 @@ namespace SOS.Import.Factories.Harvest
             var startIndex = 0;
             var idBatch = newSiteIds.Take(batchSize).ToArray();
 
-            while (idBatch.Any())
+            while (idBatch?.Any() ?? false)
             {
                 var sites = CastSiteEntitiesToVerbatim((await _siteRepository.GetByIdsAsync(idBatch, IncrementalMode))?.ToList());
 
@@ -308,7 +308,7 @@ namespace SOS.Import.Factories.Harvest
                     }
 
                     startIndex += batchSize;
-                    idBatch = newSiteIds.Skip(startIndex).Take(batchSize).ToArray();
+                    idBatch = newSiteIds.Skip(startIndex).Take(batchSize)?.ToArray();
                 }
             }
         }
@@ -321,13 +321,13 @@ namespace SOS.Import.Factories.Harvest
         /// <returns></returns>
         private IEnumerable<Site> CastSiteEntitiesToVerbatim(List<SiteEntity> siteEntities)
         {
+            var sites = new List<Site>();
+
             if (!siteEntities?.Any() ?? true)
             {
-                return new List<Site>();
+                return sites;
             }
 
-            var sites = new List<Site>();
-      
             var batchSize = 100000;
             while (siteEntities.Count > 0)
             {
