@@ -244,10 +244,8 @@ namespace SOS.Lib.Extensions
                 Event = processedObservation.Event?.ToDarwinCore(),
                 Identification = processedObservation.Identification?.ToDarwinCore(),
                 InformationWithheld = processedObservation.InformationWithheld,
-                InstitutionCode = processedObservation.InstitutionId?.Value,
-                InstitutionID = processedObservation.InstitutionId == null
-                    ? null
-                    : $"urn:lsid:artdata.slu.se:organization:{processedObservation.InstitutionId.Id}",
+                InstitutionCode = processedObservation.InstitutionCode?.Value,
+                InstitutionID = processedObservation.InstitutionId,
                 Language = processedObservation.Language,
                 Location = processedObservation.Location?.ToDarwinCore(),
                 MeasurementOrFact = null,
@@ -255,7 +253,6 @@ namespace SOS.Lib.Extensions
                 Occurrence = processedObservation.Occurrence?.ToDarwinCore(),
                 OwnerInstitutionCode = processedObservation.OwnerInstitutionCode,
                 References = processedObservation.References,
-                Rights = processedObservation.Rights,
                 RightsHolder = processedObservation.RightsHolder,
                 Taxon = processedObservation.Taxon.ToDarwinCore(),
                 Type = processedObservation.Type?.Value

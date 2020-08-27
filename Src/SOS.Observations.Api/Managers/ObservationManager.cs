@@ -101,7 +101,7 @@ namespace SOS.Observations.Api.Managers
                     ResolveFieldMappedValue(obs, FieldMappingFieldId.AccessRights,
                         nameof(ProcessedObservation.AccessRights));
                     ResolveFieldMappedValue(obs, FieldMappingFieldId.Institution,
-                        nameof(ProcessedObservation.InstitutionId));
+                        nameof(ProcessedObservation.InstitutionCode));
 
                     if (obs.TryGetValue(nameof(ProcessedObservation.Location).ToLower(), out var locationObject))
                     {

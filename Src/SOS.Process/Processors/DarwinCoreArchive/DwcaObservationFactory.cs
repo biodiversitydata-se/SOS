@@ -124,8 +124,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             obs.DatasetName = verbatimObservation.DatasetName;
             obs.DynamicProperties = verbatimObservation.DynamicProperties;
             obs.InformationWithheld = verbatimObservation.InformationWithheld;
-            obs.InstitutionCode = verbatimObservation.InstitutionCode;
-            obs.InstitutionId = GetSosId(verbatimObservation.InstitutionID,
+            obs.InstitutionId = verbatimObservation.InstitutionID;
+            obs.InstitutionCode = GetSosId(verbatimObservation.InstitutionCode,
                 _fieldMappings[FieldMappingFieldId.Institution]); // todo - Create DarwinCore field mapping.
             obs.Language = verbatimObservation.Language;
             obs.License = verbatimObservation.License;

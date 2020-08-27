@@ -176,21 +176,21 @@ namespace SOS.Lib.Models.Processed.Observation
         public string InformationWithheld { get; set; }
 
         /// <summary>
-        ///     The name (or acronym) in use by the institution having custody of
-        ///     the object(s) or information referred to in the record.
-        /// </summary>
-        public string InstitutionCode { get; set; }
-
-        /// <summary>
         ///     The name (or acronym) in use by the institution
         ///     having custody of the object(s) or information
         ///     referred to in the record.
+        /// </summary>
+        public string InstitutionId { get; set; }
+
+        /// <summary>
+        ///     The name (or acronym) in use by the institution having custody of
+        ///     the object(s) or information referred to in the record.
         /// </summary>
         /// <remarks>
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue InstitutionId { get; set; }
+        public ProcessedFieldMapValue InstitutionCode { get; set; }
 
         /// <summary>
         ///     Internal flag used in validation. must be true to be stored in processed data
@@ -266,14 +266,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [Date]
         public DateTime? ReportedDate { get; set; }
-
-        /// <summary>
-        ///     Information about rights held in and over the resource.
-        ///     Typically, rights information includes a statement
-        ///     about various property rights associated with the resource,
-        ///     including intellectual property rights.
-        /// </summary>
-        public string Rights { get; set; }
 
         /// <summary>
         ///     A person or organization owning or

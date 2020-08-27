@@ -523,6 +523,16 @@ namespace SOS.Observations.Api.Repositories
                 );
             }
 
+            if (aggregationType.IsSpeciesSightingsList())
+            {
+                aggregationQuery.Add(q => q
+                    .Terms(t => t
+                        .Field("artportalenInternal.sightingTypeId")
+                        .Terms(new int[] { 0,1,3,8,10 })    // Got this filter from Artportalen.Infrastructure.Repositories.SearchRepository.cs:7092
+                    )
+                );
+            }
+
             return aggregationQuery;
         }
     }

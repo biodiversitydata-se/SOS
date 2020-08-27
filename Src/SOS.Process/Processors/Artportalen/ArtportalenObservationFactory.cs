@@ -249,7 +249,10 @@ namespace SOS.Process.Processors.Artportalen
                 
                 obs.Identification.ValidationStatus = GetSosId(verbatimObservation?.ValidationStatus?.Id, _fieldMappings[FieldMappingFieldId.ValidationStatus]);
                 obs.Occurrence.LifeStage = GetSosId(verbatimObservation?.Stage?.Id, _fieldMappings[FieldMappingFieldId.LifeStage]);
-                obs.InstitutionId = GetSosId(verbatimObservation?.OwnerOrganization?.Id, _fieldMappings[FieldMappingFieldId.Institution]);
+                obs.InstitutionCode = GetSosId(verbatimObservation?.OwnerOrganization?.Id, _fieldMappings[FieldMappingFieldId.Institution]);
+                obs.InstitutionId = verbatimObservation?.OwnerOrganization == null
+                    ? null
+                    : $"urn:lsid:artdata.slu.se:organization:{verbatimObservation.OwnerOrganization.Id}";
                 obs.Occurrence.OrganismQuantityUnit = GetSosId(
                     verbatimObservation?.Unit?.Id, 
                     _fieldMappings[FieldMappingFieldId.Unit],
