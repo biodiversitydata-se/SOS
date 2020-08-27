@@ -4,6 +4,7 @@ using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SOS.Import.Containers;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters.Observations;
 using SOS.Import.Repositories.Destination.Artportalen;
@@ -67,13 +68,13 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 projectRepository,
                 sightingRepository,
                 siteRepositoryMock.Object,
-                //siteRepository,
                 sightingVerbatimRepository,
                 personRepository,
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
                 _processedObservationRepository,
+                new ArtportalenMetadataContainer(), 
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -123,13 +124,13 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 projectRepository,
                 sightingRepository,
                 siteRepositoryMock.Object,
-                //siteRepository,
                 sightingVerbatimRepositoryMock.Object,
                 personRepository,
                 organizationRepository,
                 sightingRelationRepository,
                 speciesCollectionItemRepository,
                 _processedObservationRepository,
+                new ArtportalenMetadataContainer(), 
                 new Mock<ILogger<ArtportalenObservationHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

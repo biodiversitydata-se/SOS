@@ -59,7 +59,7 @@ namespace SOS.Import.Jobs
         {
             try
             {
-                _logger.LogInformation("Start Harvest Jobs");
+                _logger.LogInformation("Start incremental harvest jobs");
 
                 //------------------------------------------------------------------------
                 // 1. Ensure that any data provider is added

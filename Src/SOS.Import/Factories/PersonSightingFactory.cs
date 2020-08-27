@@ -26,17 +26,14 @@ namespace SOS.Import.Factories
 
             if (speciesCollectionItems?.Any() ?? false)
             {
-                var filteredSpeciesCollectionItems =
-                speciesCollectionItems.Where(x => sightingIds.Contains(x.SightingId)).ToArray();
-
-                if (filteredSpeciesCollectionItems?.Any() ?? false)
+                if (speciesCollectionItems?.Any() ?? false)
                 {
                     //------------------------------------------------------------------------------
                     // Add SpeciesCollection values
                     //------------------------------------------------------------------------------
                     var speciesCollectionBySightingId = CreateSpeciesCollectionDictionary(personByUserId,
                         organizationById,
-                        filteredSpeciesCollectionItems);
+                        speciesCollectionItems);
 
                     if (speciesCollectionBySightingId?.Any() ?? false)
                     {
@@ -50,7 +47,7 @@ namespace SOS.Import.Factories
                     // Add VerifiedBy values
                     //------------------------------------------------------------------------------
                     var verifiedByStringBySightingId = CreateVerifiedByStringDictionary(personByUserId,
-                        filteredSpeciesCollectionItems,
+                        speciesCollectionItems,
                         sightingRelations);
 
                     if (verifiedByStringBySightingId?.Any() ?? false)
