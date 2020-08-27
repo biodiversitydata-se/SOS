@@ -264,7 +264,7 @@ namespace SOS.Import.Factories.Harvest
 
                     // Get project from all projects
                     project = _artportalenMetadataContainer.Projects[projectParameterEntity.ProjectId].Clone();
-                    sightingProjects.Add(project.Id, project);
+                    sightingProjects.Add(project.Id, project.Clone());
                 }
 
                 if (project.ProjectParameters == null)
@@ -275,7 +275,7 @@ namespace SOS.Import.Factories.Harvest
                 project.ProjectParameters.Add(CastProjectParameterEntityToVerbatim(projectParameterEntity));
             }
 
-            return sightingsProjects.ToDictionary(sp => sp.Key, sp => sp.Value.Values.ToArray());
+            return sightingsProjects.Any() ? sightingsProjects.ToDictionary(sp => sp.Key, sp => sp.Value.Values.ToArray()) : null;
         }
         #endregion Project
 
@@ -509,7 +509,7 @@ namespace SOS.Import.Factories.Harvest
 
             // Get Observers, ReportedBy, SpeciesCollection & VerifiedBy
             var sightingRelations =
-                CastSightingRelationsToVerbatim(await _sightingRelationRepository.GetAsync(sightingIds)).ToArray();
+                CastSightingRelationsToVerbatim(await _sightingRelationRepository.GetAsync(sightingIds))?.ToArray();
 
             var speciesCollections = await GetSpeciesCollections(sightingIds);
 

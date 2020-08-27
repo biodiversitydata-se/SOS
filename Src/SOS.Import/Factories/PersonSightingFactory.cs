@@ -181,7 +181,7 @@ namespace SOS.Import.Factories
                 }
 
                 // Collection is Organization
-                if ((speciesCollectionItems?.Any() ?? false) && speciesCollectionItem.OrganizationId.HasValue &&
+                if ((speciesCollectionItems?.Any() ?? false) && (organizationById?.Any() ?? false) && speciesCollectionItem.OrganizationId.HasValue &&
                     organizationById.TryGetValue(speciesCollectionItem.OrganizationId.Value, out var organization))
                 {
                     if (speciesCollectionBySightingId.ContainsKey(speciesCollectionItem.SightingId))
@@ -294,10 +294,13 @@ namespace SOS.Import.Factories
                     verifiedByDataSightingId.Add(determinerRelation.SightingId, vbd);
                 }
 
-                if (personById.TryGetValue(determinerRelation.UserId, out var person))
+                if (personById?.Any() ?? false)
                 {
-                    vbd.DeterminerName = person.FullName;
-                    vbd.DeterminerInternal = new UserInternal {Id = person.Id, UserAlias = person.Alias};
+                    if (personById.TryGetValue(determinerRelation.UserId, out var person))
+                    {
+                        vbd.DeterminerName = person.FullName;
+                        vbd.DeterminerInternal = new UserInternal { Id = person.Id, UserAlias = person.Alias };
+                    }
                 }
 
                 vbd.SightingRelationDeterminationYear = determinerRelation.DeterminationYear;

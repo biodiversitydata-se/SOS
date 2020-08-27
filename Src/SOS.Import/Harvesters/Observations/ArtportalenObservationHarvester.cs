@@ -50,7 +50,7 @@ namespace SOS.Import.Harvesters.Observations
             IEnumerable<int> sightingIds)
         {
             var extraSightings = sightingRepository.GetChunkAsync(sightingIds).Result;
-            sightings = extraSightings.Union(sightings.Where(s => extraSightings.All(e => e.Id != s.Id))).ToArray();
+            sightings = extraSightings.Union(sightings.Where(s => extraSightings.All(e => e.Id != s.Id)))?.ToArray();
         }
 
         /// <summary>
@@ -137,7 +137,8 @@ namespace SOS.Import.Harvesters.Observations
         /// Initialize meta data
         /// </summary>
         /// <returns></returns>
-        private async Task<(IEnumerable<MetadataEntity>, 
+        private async Task<(
+            IEnumerable<MetadataEntity>, 
             IEnumerable<MetadataEntity>, 
             IEnumerable<MetadataEntity>, 
             IEnumerable<MetadataEntity>, 
