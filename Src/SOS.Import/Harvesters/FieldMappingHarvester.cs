@@ -15,6 +15,7 @@ using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Extensions;
 
 namespace SOS.Import.Harvesters
 {
@@ -192,8 +193,34 @@ namespace SOS.Import.Harvesters
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, filename);
             var str = File.ReadAllText(filePath, Encoding.UTF8);
-            var fieldMappings = JsonConvert.DeserializeObject<FieldMapping>(str);
-            return fieldMappings;
+            var fieldMapping = JsonConvert.DeserializeObject<FieldMapping>(str);
+            ValidateFieldMapping(fieldMapping);
+            return fieldMapping;
+        }
+
+        private void ValidateFieldMapping(FieldMapping fieldMapping)
+        {
+            var externalSystemMappingFields = fieldMapping?.ExternalSystemsMapping?.SelectMany(mapping => mapping.Mappings);
+            if (externalSystemMappingFields == null) return;
+
+            foreach (var externalSystemMappingField in externalSystemMappingFields)
+            {
+                // Check if there exists duplicate synonyms.
+                if (externalSystemMappingField.Values.First().Value is string)
+                {
+                    if (externalSystemMappingField.Values.Select(m => m.Value.ToString()?.ToLower()).HasDuplicates())
+                    {
+                        throw new Exception($"Duplicate mappings exist for field \"{fieldMapping.Name}\"");
+                    }
+                }
+                else
+                {
+                    if (externalSystemMappingField.Values.Select(m => m.Value).HasDuplicates())
+                    {
+                        throw new Exception($"Duplicate mappings exist for field \"{fieldMapping.Name}\"");
+                    }
+                }
+            }
         }
 
         private (string Filename, byte[] Bytes) CreateFieldMappingFileResult(FieldMapping fieldMapping, string fileName)
