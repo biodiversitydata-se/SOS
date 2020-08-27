@@ -176,21 +176,21 @@ namespace SOS.Lib.Models.Processed.Observation
         public string InformationWithheld { get; set; }
 
         /// <summary>
-        ///     The name (or acronym) in use by the institution having custody of
-        ///     the object(s) or information referred to in the record.
-        /// </summary>
-        public string InstitutionCode { get; set; }
-
-        /// <summary>
         ///     The name (or acronym) in use by the institution
         ///     having custody of the object(s) or information
         ///     referred to in the record.
+        /// </summary>
+        public string InstitutionId { get; set; }
+
+        /// <summary>
+        ///     The name (or acronym) in use by the institution having custody of
+        ///     the object(s) or information referred to in the record.
         /// </summary>
         /// <remarks>
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue InstitutionId { get; set; }
+        public ProcessedFieldMapValue InstitutionCode { get; set; }
 
         /// <summary>
         ///     Internal flag used in validation. must be true to be stored in processed data

@@ -54,7 +54,7 @@ namespace SOS.Process.Helpers
                 ResolveFieldMappedValue(observation.Type, valueMappingDictionaries[FieldMappingFieldId.Type]);
                 ResolveFieldMappedValue(observation.AccessRights,
                     valueMappingDictionaries[FieldMappingFieldId.AccessRights]);
-                ResolveFieldMappedValue(observation.InstitutionId,
+                ResolveFieldMappedValue(observation.InstitutionCode,
                     valueMappingDictionaries[FieldMappingFieldId.Institution]);
                 ResolveFieldMappedValue(observation.Location?.County,
                     valueMappingDictionaries[FieldMappingFieldId.County]);
