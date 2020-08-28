@@ -340,12 +340,30 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedIdentification.IdentificationQualifier = verbatimObservation.IdentificationQualifier;
             processedIdentification.IdentificationReferences = verbatimObservation.IdentificationReferences;
             processedIdentification.IdentificationRemarks = verbatimObservation.IdentificationRemarks;
-            //processedIdentification.ValidationStatusId = GetSosId(verbatimObservation.IdentificationVerificationStatus, _fieldMappings[FieldMappingFieldId.ValidationStatus]); // todo - Create DarwinCore field mapping.
-            //processedIdentification.Validated = ? // todo -
-            //processedIdentification.UncertainDetermination = ? // todo - 
+            processedIdentification.ValidationStatus = GetSosId(verbatimObservation.IdentificationVerificationStatus, _fieldMappings[FieldMappingFieldId.ValidationStatus]);
+            processedIdentification.Validated = GetIsValidated(processedIdentification.ValidationStatus);
+            //processedIdentification.UncertainDetermination = !processedIdentification.Validated; // todo - is this correct?
             processedIdentification.IdentifiedBy = verbatimObservation.IdentifiedBy;
             processedIdentification.TypeStatus = verbatimObservation.TypeStatus;
             return processedIdentification;
+        }
+
+        private bool GetIsValidated(ProcessedFieldMapValue validationStatus)
+        {
+            if (validationStatus == null) return false;
+            switch (validationStatus.Id)
+            {
+                case (int)ValidationStatusId.Verified:
+                case (int)ValidationStatusId.ApprovedBasedOnDeterminatorsVerification:
+                case (int)ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording:
+                case (int)ValidationStatusId.ApprovedBasedOnReportersDocumentation:
+                case (int)ValidationStatusId.ApprovedBasedOnReportersOldRarityForm:
+                case (int)ValidationStatusId.ApprovedBasedOnReportersRarityForm:
+                case (int)ValidationStatusId.ApprovedSpecimenCheckedByValidator:
+                    return true;
+            }
+
+            return false;
         }
 
         private ProcessedLocation CreateProcessedLocation(DwcObservationVerbatim verbatimObservation)

@@ -175,5 +175,76 @@ namespace SOS.Import.Factories.FieldMapping
             artportalenMapping.Mappings.Add(mappingField);
             return artportalenMapping;
         }
+
+        protected Dictionary<string, int> CreateDwcMappings(ICollection<FieldMappingValue> fieldMappingValues, Dictionary<string, string> dwcMappingSynonyms)
+        {
+            Dictionary<string, int> sosIdByText = new Dictionary<string, int>();
+
+            foreach (var fieldMappingValue in fieldMappingValues)
+            {
+                foreach (var fieldMappingTranslation in fieldMappingValue.Translations)
+                {
+                    if (!string.IsNullOrWhiteSpace(fieldMappingTranslation.Value))
+                    {
+                        if (!sosIdByText.ContainsKey(fieldMappingTranslation.Value))
+                        {
+                            sosIdByText.Add(fieldMappingTranslation.Value, fieldMappingValue.Id);
+                        }
+                    }
+                }
+
+                foreach (var keyValuePair in dwcMappingSynonyms.Where(pair => pair.Value == fieldMappingValue.Value))
+                {
+                    if (!sosIdByText.ContainsKey(keyValuePair.Key))
+                    {
+                        sosIdByText.Add(keyValuePair.Key, fieldMappingValue.Id);
+                    }
+                }
+            }
+
+            return sosIdByText;
+        }
+
+        protected FieldMappingValue CreateFieldMappingValue(int id, string value)
+        {
+            return new FieldMappingValue
+            {
+                Id = id,
+                Value = value,
+                Localized = true,
+                Translations = CreateTranslation(value),
+                IsCustomValue = true
+            };
+        }
+
+        protected FieldMappingValue CreateFieldMappingValue(int id, string english, string swedish)
+        {
+            return new FieldMappingValue
+            {
+                Id = id,
+                Value = english,
+                Localized = true,
+                Translations = CreateTranslation(english, swedish),
+                IsCustomValue = true
+            };
+        }
+
+        protected List<FieldMappingTranslation> CreateTranslation(string english, string swedish)
+        {
+            return new List<FieldMappingTranslation>
+            {
+                new FieldMappingTranslation {CultureCode = "sv-SE", Value = swedish},
+                new FieldMappingTranslation {CultureCode = "en-GB", Value = english}
+            };
+        }
+
+        protected List<FieldMappingTranslation> CreateTranslation(string value)
+        {
+            return new List<FieldMappingTranslation>
+            {
+                new FieldMappingTranslation {CultureCode = "sv-SE", Value = value},
+                new FieldMappingTranslation {CultureCode = "en-GB", Value = value}
+            };
+        }
     }
 }

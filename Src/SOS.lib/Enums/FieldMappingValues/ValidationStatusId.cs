@@ -6,6 +6,12 @@
     public enum ValidationStatusId
     {
         /// <summary>
+        ///     Verifired.
+        ///     (Validerad)
+        /// </summary>
+        Verified = 0,
+
+        /// <summary>
         ///     Unvalidated.
         ///     (Ovaliderad)
         /// </summary>

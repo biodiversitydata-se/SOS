@@ -56,49 +56,6 @@ namespace SOS.Import.Factories.FieldMapping
             return fieldMappingValues;
         }
 
-        private FieldMappingValue CreateFieldMappingValue(int id, string value)
-        {
-            return new FieldMappingValue
-            {
-                Id = id,
-                Value = value,
-                Localized = true,
-                Translations = CreateTranslation(value),
-                IsCustomValue = true
-            };
-        }
-
-        private FieldMappingValue CreateFieldMappingValue(int id, string english, string swedish)
-        {
-            return new FieldMappingValue
-            {
-                Id = id,
-                Value = english,
-                Localized = true,
-                Translations = CreateTranslation(english, swedish),
-                IsCustomValue = true
-            };
-        }
-
-        private List<FieldMappingTranslation> CreateTranslation(string english, string swedish)
-        {
-            return new List<FieldMappingTranslation>
-            {
-                new FieldMappingTranslation {CultureCode = "sv-SE", Value = swedish},
-                new FieldMappingTranslation {CultureCode = "en-GB", Value = english}
-            };
-        }
-
-
-        private List<FieldMappingTranslation> CreateTranslation(string value)
-        {
-            return new List<FieldMappingTranslation>
-            {
-                new FieldMappingTranslation {CultureCode = "sv-SE", Value = value},
-                new FieldMappingTranslation {CultureCode = "en-GB", Value = value}
-            };
-        }
-
         protected override List<ExternalSystemMapping> GetExternalSystemMappings(
            ICollection<FieldMappingValue> fieldMappingValues)
         {
@@ -120,7 +77,8 @@ namespace SOS.Import.Factories.FieldMapping
                 Mappings = new List<ExternalSystemMappingField>()
             };
 
-            var dwcMappings = GetDwcMappings(fieldMappingValues);
+            var dwcMappingSynonyms = GetDwcMappingSynonyms();
+            var dwcMappings = CreateDwcMappings(fieldMappingValues, dwcMappingSynonyms);
             var mappingField = new ExternalSystemMappingField
             {
                 Key = FieldMappingKeyFields.DwcLifeStage,
@@ -130,36 +88,6 @@ namespace SOS.Import.Factories.FieldMapping
 
             externalSystemMapping.Mappings.Add(mappingField);
             return externalSystemMapping;
-        }
-
-        private Dictionary<string, int> GetDwcMappings(ICollection<FieldMappingValue> fieldMappingValues)
-        {
-            Dictionary<string, string> dwcMappingSynonyms = GetDwcMappingSynonyms();
-            Dictionary<string, int> sosIdByText = new Dictionary<string, int>();
-            
-            foreach (var fieldMappingValue in fieldMappingValues)
-            {
-                foreach (var fieldMappingTranslation in fieldMappingValue.Translations)
-                {
-                    if (!string.IsNullOrWhiteSpace(fieldMappingTranslation.Value))
-                    {
-                        if (!sosIdByText.ContainsKey(fieldMappingTranslation.Value))
-                        {
-                            sosIdByText.Add(fieldMappingTranslation.Value, fieldMappingValue.Id);
-                        }
-                    }
-                }
-
-                foreach (var keyValuePair in dwcMappingSynonyms.Where(pair => pair.Value == fieldMappingValue.Value))
-                {
-                    if (!sosIdByText.ContainsKey(keyValuePair.Key))
-                    {
-                        sosIdByText.Add(keyValuePair.Key, fieldMappingValue.Id);
-                    }
-                }
-            }
-
-            return sosIdByText;
         }
 
         private Dictionary<string, string> GetDwcMappingSynonyms()

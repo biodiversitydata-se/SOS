@@ -11,5 +11,6 @@
         public const string AreaDatasetIdFeatureIdTuple = "<AreaDatasetId,FeatureId>";
         public const string Guid = "GUID";
         public const string DwcLifeStage = "lifeStage";
+        public const string DwcIdentificationVerificationStatus = "identificationVerificationStatus";
     }
 }

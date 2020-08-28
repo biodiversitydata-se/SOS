@@ -85,6 +85,32 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             result.Identification.ValidationStatus.Id.Should().Be((int) ValidationStatusId.Unvalidated);
+            result.Identification.Validated.Should().BeFalse();
         }
+
+        [Fact]
+        public void IdentificationVerificationStatus_with_verified_value_is_fieldmapped_to_Verified_statusId()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var builder = new DwcObservationVerbatimBuilder();
+            var dwcaObservation = builder
+                .WithDefaultValues()
+                .WithIdentificationVerificationStatus("verified")
+                .Build();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Identification.ValidationStatus.Id.Should().Be((int)ValidationStatusId.Verified);
+            result.Identification.Validated.Should().BeTrue();
+        }
+
     }
 }
