@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using DwC_A.Factories;
 using DwC_A.Meta;
 using DwC_A.Terms;
@@ -112,6 +113,21 @@ namespace DwC_A
         public IAsyncFileReader GetAsyncCoreFile()
         {
             return coreFile;
+        }
+
+        public XDocument GetEmlXmlDocument()
+        {
+            try
+            {
+                if (MetaData.Metadata == null) return null;
+                string filePath = Path.Combine(OutputPath, MetaData.Metadata);
+                XDocument xDocument = XDocument.Load(filePath);
+                return xDocument;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         /// <summary>

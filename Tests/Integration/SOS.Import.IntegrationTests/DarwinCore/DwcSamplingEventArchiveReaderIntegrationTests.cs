@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.XPath;
 using DwC_A;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -82,6 +83,30 @@ namespace SOS.Import.IntegrationTests.DarwinCore
             dwcEvent.MeasurementOrFacts
                 .Single(measurement => measurement.MeasurementType == "Site type")
                 .MeasurementValue.Should().Be("Point site");
+        }
+
+        [Fact]
+        public async Task Read_eml_xml_data()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const string archivePath = "./resources/dwca/dwca-event-mof-swedish-butterfly-monitoring.zip";
+            var dwcArchiveReader = new DwcSamplingEventArchiveReader(new NullLogger<DwcArchiveReader>());
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            using var archiveReader = new ArchiveReader(archivePath);
+            var emlXdocument = archiveReader.GetEmlXmlDocument();
+            var title = emlXdocument.XPathSelectElement("//dataset/title")?.Value;
+            var organization = emlXdocument.XPathSelectElement("//dataset/metadataProvider/organizationName")?.Value;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            title.Should().Be("Swedish Butterfly Monitoring Scheme (SeBMS)");
+            organization.Should().Be("Department of Biology, Lund University, Sweden");
         }
     }
 }
