@@ -12,6 +12,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -939,6 +940,21 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         {
             UseSourceValue,
             UseDefaultValue
+        }
+
+        public void ValidateVerbatimData(DwcObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
+        {
+            validationRemarksBuilder.NrValidatedObservations++;
+
+            if (string.IsNullOrWhiteSpace(verbatimObservation.CoordinateUncertaintyInMeters))
+            {
+                validationRemarksBuilder.NrMissingCoordinateUncertaintyInMeters++;
+            }
+
+            if (string.IsNullOrWhiteSpace(verbatimObservation.IdentificationVerificationStatus))
+            {
+                validationRemarksBuilder.NrMissingIdentificationVerificationStatus++;
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using DwC_A;
 using Microsoft.Extensions.Logging;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -91,6 +92,7 @@ namespace SOS.Import.Managers
             int nrProcessedObservations = 0;
             int nrValidObservations = 0;
             int nrInvalidObservations = 0;
+            var validationRemarksBuilder = new DwcaValidationRemarksBuilder();
             await foreach (var observationsBatch in observationsBatches)
             {
                 if (nrProcessedObservations >= maxNrObservationsToRead) continue;
@@ -101,7 +103,7 @@ namespace SOS.Import.Managers
                     nrProcessedObservations++;
                     _fieldMappingResolverHelper.ResolveFieldMappedValues(new List<ProcessedObservation>
                         {processedObservation});
-
+                    dwcaObservationFactory.ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);
                     var observationValidation = _validationManager.ValidateObservation(processedObservation);
                     if (observationValidation.IsValid)
                     {
@@ -134,12 +136,18 @@ namespace SOS.Import.Managers
                 if (nrProcessedObservations >= maxNrObservationsToRead) break;
             }
 
+            var remarks = validationRemarksBuilder.CreateRemarks();
+            if (!remarks.HasItems())
+            {
+                remarks.Add("Everything looks ok. Great!");
+            }
             return new DwcaDataValidationSummary<DwcObservationVerbatim, ProcessedObservation>
             {
                 TotalNumberOfObservationsInFile = totalNumberOfObservations,
                 NrObservationsProcessed = nrProcessedObservations,
                 NrValidObservations = nrValidObservations,
                 NrInvalidObservations = nrInvalidObservations,
+                Remarks = remarks,
                 InvalidObservations = invalidObservations,
                 ValidObservations = validObservations
             };

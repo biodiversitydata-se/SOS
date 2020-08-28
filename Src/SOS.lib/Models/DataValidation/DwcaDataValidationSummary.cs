@@ -8,6 +8,7 @@ namespace SOS.Lib.Models.DataValidation
         public int NrObservationsProcessed { get; set; }
         public int NrValidObservations { get; set; }
         public int NrInvalidObservations { get; set; }
+        public List<string> Remarks { get; set; }
         public List<ValidObservationTuple<TVerbatim, TProcessed>> ValidObservations { get; set; }
         public List<InvalidObservationTuple<TVerbatim>> InvalidObservations { get; set; }
     }
