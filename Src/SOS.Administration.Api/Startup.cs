@@ -139,9 +139,10 @@ namespace SOS.Administration.Api
                         {
                             MigrationOptions = new MongoMigrationOptions
                             {
-                                MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                                MigrationStrategy = new DropMongoMigrationStrategy(),
                                 BackupStrategy = new CollectionMongoBackupStrategy()
-                            }
+                            },
+                            CheckConnection = true
                         })
             );
         }
