@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Administration.Api
@@ -133,15 +134,16 @@ namespace SOS.Administration.Api
                     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                     .UseSimpleAssemblyNameTypeSerializer()
                     .UseRecommendedSerializerSettings()
-                    .UseMongoStorage(hangfireDbConfiguration.GetMongoDbSettings(),
+                    .UseMongoStorage(new MongoClient(hangfireDbConfiguration.GetMongoDbSettings()),
                         hangfireDbConfiguration.DatabaseName,
                         new MongoStorageOptions
                         {
                             MigrationOptions = new MongoMigrationOptions
                             {
-                                MigrationStrategy = new DropMongoMigrationStrategy(),
+                                MigrationStrategy = new MigrateMongoMigrationStrategy(),
                                 BackupStrategy = new CollectionMongoBackupStrategy()
                             },
+                            Prefix = "hangfire",
                             CheckConnection = true
                         })
             );

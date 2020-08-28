@@ -83,12 +83,14 @@ namespace SOS.Lib.Configuration.Shared
             {
                 mongoSettings.Server =
                     Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)).FirstOrDefault();
+                mongoSettings.ConnectionMode = ConnectionMode.Standalone;
             }
             else
             {
-                mongoSettings.Servers = Hosts.Select(h => new MongoServerAddress(h.Name, h.Port));
+                mongoSettings.Servers = Hosts.Select(h => new MongoServerAddress(h.Name, h.Port)).ToArray();
+                mongoSettings.ConnectionMode = ConnectionMode.ReplicaSet;
+                mongoSettings.ReplicaSetName = ReplicaSetName;
             }
-
             return mongoSettings;
         }
     }
