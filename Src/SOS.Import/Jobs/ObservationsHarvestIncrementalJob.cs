@@ -74,13 +74,13 @@ namespace SOS.Import.Jobs
                 //------------------------------------------------------------------------
                 // 2. Harvest observations directly without enqueuing to Hangfire
                 //------------------------------------------------------------------------
-                _logger.LogInformation("Start observasions harvest jobs");
+                _logger.LogInformation("Start incremental observasions harvest jobs");
                 var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<bool>>();
                 foreach (var dataProvider in dataProviders)
                 {
                     var harvestJob = _harvestJobByType[dataProvider.Type];
                     harvestTaskByDataProvider.Add(dataProvider, harvestJob.RunAsync(true, cancellationToken));
-                    _logger.LogDebug($"Added {dataProvider.Name} harvest");
+                    _logger.LogDebug($"Added {dataProvider.Name} incremental harvest");
                 }
 
                 await Task.WhenAll(harvestTaskByDataProvider.Values);
@@ -102,7 +102,7 @@ namespace SOS.Import.Jobs
                         false,
                         cancellationToken));
 
-                    _logger.LogInformation($"Process Job with Id={jobId} was enqueued");
+                    _logger.LogInformation($"Incremental Process Job with Id={jobId} was enqueued");
                     return true;
                 }
 

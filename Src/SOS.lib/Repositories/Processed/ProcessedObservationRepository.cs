@@ -191,7 +191,7 @@ namespace SOS.Lib.Repositories.Processed
                      )
                 );
                
-                return (int)res.Aggregations.Max("maxId").Value;
+                return (int)(res.Aggregations.Max("maxId")?.Value ?? 0);
             }
             catch (Exception e)
             {
