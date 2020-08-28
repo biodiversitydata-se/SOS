@@ -245,17 +245,12 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public string References { get; set; }
 
-        // <summary>
-        /// Name of the person that reported the species observation.
+        /// <summary>
+        ///     Name of the person that reported the species observation.
         /// </summary>
         [Keyword]
         public string ReportedBy { get; set; }
-
-        // <summary>
-        /// User id of the person that reported the species observation.
-        /// </summary>
-        public int? ReportedByUserId { get; set; }
-
+        
         /// <summary>
         ///     Alias for the reporter, internal use only
         /// </summary>

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Nest;
-using SOS.Lib.Models.Shared;
+﻿using Nest;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -242,12 +240,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     (recordNumber), should be listed first.
         /// </summary>
         public string RecordedBy { get; set; }
-
-        /// <summary>
-        ///     Internal field used for searches by Artportalen, contains extra user information
-        /// </summary>
-        public IEnumerable<UserInternal> RecordedByInternal { get; set; }
-
+        
         /// <summary>
         ///     An identifier given to the Occurrence at the time it was
         ///     recorded. Often serves as a link between field notes and
