@@ -12,7 +12,7 @@ namespace SOS.Import.Managers.Interfaces
 {
     public interface IDwcaDataValidationReportManager
     {
-        Task<DwcaDataValidationSummary<DwcObservationVerbatim, ProcessedObservation>> CreateDataValidationSummary(
+        Task<DwcaDataValidationReport<DwcObservationVerbatim, ProcessedObservation>> CreateDataValidationSummary(
             ArchiveReader archiveReader,
             int maxNrObservationsToRead = 100000,
             int nrValidObservationsInReport = 100, 

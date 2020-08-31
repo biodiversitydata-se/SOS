@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Constants;
+﻿using System;
+using SOS.Lib.Constants;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -16,6 +17,24 @@ namespace SOS.Lib.Models.Processed.Observation
         {
             return new ProcessedFieldMapValue
                 {Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
+        }
+
+        protected bool Equals(ProcessedFieldMapValue other)
+        {
+            return Id == other.Id && Value == other.Value;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((ProcessedFieldMapValue) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Value);
         }
     }
 }
