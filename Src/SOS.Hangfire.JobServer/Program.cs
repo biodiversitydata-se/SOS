@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using Nest;
 using NLog.Web;
 using SOS.Export.IoC.Modules;
@@ -96,7 +97,7 @@ namespace SOS.Hangfire.JobServer
                             .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                             .UseSimpleAssemblyNameTypeSerializer()
                             .UseRecommendedSerializerSettings()
-                            .UseMongoStorage(hangfireDbConfiguration.GetMongoDbSettings(),
+                            .UseMongoStorage(new MongoClient(hangfireDbConfiguration.GetMongoDbSettings()),
                                 hangfireDbConfiguration.DatabaseName,
                                 new MongoStorageOptions
                                 {
@@ -104,9 +105,12 @@ namespace SOS.Hangfire.JobServer
                                     {
                                         MigrationStrategy = new MigrateMongoMigrationStrategy(),
                                         BackupStrategy = new CollectionMongoBackupStrategy()
-                                    }
+                                    },
+                                    Prefix = "hangfire",
+                                    CheckConnection = true
                                 })
                     );
+
                     GlobalJobFilters.Filters.Add(
                         new HangfireJobExpirationTimeAttribute(hangfireDbConfiguration.JobExpirationDays));
 

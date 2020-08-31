@@ -190,12 +190,12 @@ namespace SOS.Lib.Repositories.Processed
                         )
                      )
                 );
-
-                return (int)res.Aggregations.Max("maxId").Value;
+               
+                return (int)(res.Aggregations?.Max("maxId")?.Value ?? 0);
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Logger.LogError(e, $"Failed to get max id for provider: { providerId }, index: { IndexName }");
                 return 0;
             }
         }

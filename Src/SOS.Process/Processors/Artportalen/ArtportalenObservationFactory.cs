@@ -123,7 +123,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
                 obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
                 obs.ReportedBy = verbatimObservation.ReportedBy;
-                obs.ReportedByUserId = verbatimObservation.ReportedByUserId;
                 obs.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
                 obs.ReportedDate = verbatimObservation.ReportedDate;
                 obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
@@ -181,7 +180,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.Point = point;
                 obs.Location.PointLocation = verbatimObservation.Site?.Point?.ToGeoLocation();
                 obs.Location.PointWithBuffer = (PolygonGeoShape) verbatimObservation.Site?.PointWithBuffer.ToGeoShape();
-                obs.Location.PresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
                 obs.Location.Province = GetSosId(verbatimObservation.Site?.Province?.Id, _fieldMappings[FieldMappingFieldId.Province]);
                 obs.Location.VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord : 0;
                 obs.Location.VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0;
@@ -204,7 +202,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.OrganismQuantityInt = verbatimObservation.Quantity;
                 obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
                 obs.Occurrence.RecordedBy = verbatimObservation.Observers;
-                obs.Occurrence.RecordedByInternal = verbatimObservation.ObserversInternal;
                 obs.Occurrence.RecordNumber = verbatimObservation.Label;
                 obs.Occurrence.OccurrenceRemarks = verbatimObservation.Comment;
                 obs.Occurrence.OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
@@ -235,6 +232,9 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
                 obs.ArtportalenInternal.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;
                 obs.ArtportalenInternal.SightingPublishTypeIds = verbatimObservation.SightingPublishTypeIds;
+                obs.ArtportalenInternal.ReportedByUserId = verbatimObservation.ReportedByUserId;
+                obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
+                obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.ObserversInternal;
 
 
                 // Set dependent properties

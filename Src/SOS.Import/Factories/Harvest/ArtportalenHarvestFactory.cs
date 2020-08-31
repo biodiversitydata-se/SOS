@@ -124,7 +124,7 @@ namespace SOS.Import.Factories.Harvest
                     ? _artportalenMetadataContainer.ValidationStatus[entity.ValidationStatusId]
                     : null,
                 Weight = entity.Weight,
-                Projects = sightingsProjects.ContainsKey(entity.Id) ? sightingsProjects[entity.Id] : null,
+                Projects = sightingsProjects?.ContainsKey(entity.Id) ?? false ? sightingsProjects[entity.Id] : null,
                 SightingTypeId = entity.SightingTypeId,
                 SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId,
                 PublicCollection = entity.OrganizationCollectorId.HasValue && _artportalenMetadataContainer.Organizations.ContainsKey(entity.OrganizationCollectorId.Value)

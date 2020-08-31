@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using MongoDB.Driver;
 using Nest;
 using NLog.Web;
 using SOS.Lib.Configuration.ObservationApi;
@@ -96,8 +97,6 @@ namespace SOS.Observations.Api
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            
-
             services.AddControllers()
                 .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter()); });
 
@@ -163,7 +162,7 @@ namespace SOS.Observations.Api
                     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                     .UseSimpleAssemblyNameTypeSerializer()
                     .UseRecommendedSerializerSettings()
-                    .UseMongoStorage(mongoConfiguration.GetMongoDbSettings(),
+                    .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
                         mongoConfiguration.DatabaseName,
                         new MongoStorageOptions
                         {
@@ -171,7 +170,9 @@ namespace SOS.Observations.Api
                             {
                                 MigrationStrategy = new MigrateMongoMigrationStrategy(),
                                 BackupStrategy = new CollectionMongoBackupStrategy()
-                            }
+                            },
+                            Prefix = "hangfire",
+                            CheckConnection = true
                         })
             );
 

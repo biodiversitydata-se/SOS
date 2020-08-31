@@ -74,39 +74,37 @@ namespace SOS.Import.Jobs
                 //------------------------------------------------------------------------
                 // 2. Harvest observations directly without enqueuing to Hangfire
                 //------------------------------------------------------------------------
-                _logger.LogInformation("Start observasions harvest jobs");
+                _logger.LogInformation("Start incremental observasions harvest jobs");
                 var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<bool>>();
                 foreach (var dataProvider in dataProviders)
                 {
                     var harvestJob = _harvestJobByType[dataProvider.Type];
                     harvestTaskByDataProvider.Add(dataProvider, harvestJob.RunAsync(true, cancellationToken));
-                    _logger.LogDebug($"Added {dataProvider.Name} harvest");
+                    _logger.LogDebug($"Added {dataProvider.Name} incremental harvest");
                 }
 
                 await Task.WhenAll(harvestTaskByDataProvider.Values);
-                _logger.LogInformation("Finish observasions incremental harvest jobs");
+                var success = harvestTaskByDataProvider.All(p => p.Value.Result);
+                _logger.LogInformation($"Finish observasions incremental harvest jobs. Success: { success }");
+
+                if (!success)
+                {
+                    return false;
+                }
 
                 //---------------------------------------------------------------------------------------------------------
                 // 3. If harvest was successful, go on with enqueuing processing job to Hangfire
                 //---------------------------------------------------------------------------------------------------------
-                if (harvestTaskByDataProvider.All(p => p.Value.Result))
-                {
-                  
+                var jobId = BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(
+                    dataProviders.Select(dataProvider => dataProvider.Identifier).ToList(),
+                    false,
+                    true,
+                    false,
+                    false,
+                    cancellationToken));
 
-                    // Enqueue process job to Hangfire
-                    var jobId = BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(
-                        dataProviders.Select(dataProvider => dataProvider.Identifier).ToList(),
-                        false,
-                        true,
-                        false,
-                        false,
-                        cancellationToken));
-
-                    _logger.LogInformation($"Process Job with Id={jobId} was enqueued");
-                    return true;
-                }
-
-                return false;
+                _logger.LogInformation($"Incremental Process Job with Id={ jobId } was enqueued");
+                return true;
             }
             catch (Exception e)
             {

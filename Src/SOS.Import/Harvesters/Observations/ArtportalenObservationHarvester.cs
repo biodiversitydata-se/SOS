@@ -311,8 +311,8 @@ namespace SOS.Import.Harvesters.Observations
 
                 if (incrementalHarvest)
                 {
-                    // Make sure incremental mode is false to get max id from last full harvest
-                    _processedObservationRepository.IncrementalMode = false;
+                    // Make sure incremental mode is true to get max id from live instance
+                    _processedObservationRepository.IncrementalMode = true;
 
                     // We start from last harvested sighting and end at latest added sighting (live data)
                     minId = await _processedObservationRepository.GetMaxIdForProviderAsync(1) + 1;
@@ -338,7 +338,6 @@ namespace SOS.Import.Harvesters.Observations
                     }
                 }
 
-                minId = 300001;
                 // Set observation repository in incremental mode in order to store data in other collection
                 _sightingVerbatimRepository.IncrementalMode = incrementalHarvest;
                 harvestFactory.IncrementalMode = incrementalHarvest;
