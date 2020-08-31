@@ -322,7 +322,7 @@ namespace SOS.Process.Jobs
                 }
 
                 var processingResult = await Task.WhenAll(processTaskByDataProvider.Values);
-                var success = processTaskByDataProvider.Values.All(t => t.Result.Status == RunStatus.Success);
+                var success = processingResult.All(t => t.Status == RunStatus.Success);
 
                 // Don't create a dwc file in incremental mode
                 if (!incrementalMode)
