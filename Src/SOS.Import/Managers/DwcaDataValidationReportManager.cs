@@ -140,17 +140,16 @@ namespace SOS.Import.Managers
                                 VerbatimObservation = verbatimObservation,
                                 ProcessedObservationDefects = observationValidation.Defects
                             });
+                        }
 
-                            foreach (var validationDefect in observationValidation.Defects)
+                        foreach (var validationDefect in observationValidation.Defects)
+                        {
+                            if (!observationDefects.ContainsKey(validationDefect))
                             {
-                                if (!observationDefects.ContainsKey(validationDefect))
-                                {
-                                    observationDefects.Add(validationDefect, 0);
-                                }
-
-                                observationDefects[validationDefect]++;
+                                observationDefects.Add(validationDefect, 0);
                             }
-                            
+
+                            observationDefects[validationDefect]++;
                         }
                     }
 
