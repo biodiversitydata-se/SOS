@@ -43,7 +43,7 @@ namespace SOS.Observations.Api.Repositories
                 {
                     queryInternal.Add(q => q
                         .Terms(t => t
-                            .Field(new Field("reportedByUserId"))
+                            .Field(new Field("artportalenInternal.reportedByUserId"))
                             .Terms(internalFilter.ReportedByUserId)
                         )
                     );
@@ -53,7 +53,7 @@ namespace SOS.Observations.Api.Repositories
                 {
                     queryInternal.Add(q => q
                         .Terms(t => t
-                            .Field(new Field("occurrence.recordedByInternal.id"))
+                            .Field(new Field("artportalenInternal.occurrenceRecordedByInternal.id"))
                             .Terms(internalFilter.ObservedByUserId)
                         )
                     );

@@ -98,11 +98,6 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </remarks>
         [Object]
         public ProcessedFieldMapValue Parish { get; set; }
-
-        /// <summary>
-        ///     The original presentation name for ParisRegion from data provider
-        /// </summary>
-        public string PresentationNameParishRegion { get; set; }
  
         /// <summary>
         ///     Darwin Core term name: stateProvince.
