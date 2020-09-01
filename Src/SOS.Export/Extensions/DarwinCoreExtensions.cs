@@ -396,10 +396,55 @@ namespace SOS.Export.Extensions
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
             IEnumerable<ProcessedObservation> processedObservations)
         {
-            return processedObservations
-                .SelectMany(observation => observation.Projects != null ? 
-                    observation.Projects.SelectMany(project => ToExtendedMeasurementOrFactRows(project, observation.Occurrence.OccurrenceId)) : 
-                    Enumerable.Empty<ExtendedMeasurementOrFactRow>());
+            return processedObservations.SelectMany(ToExtendedMeasurementOrFactRows);
+        }
+
+        public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
+            ProcessedObservation observation)
+        {
+            IEnumerable<ExtendedMeasurementOrFactRow> occurrenceEmof = null;
+            IEnumerable<ExtendedMeasurementOrFactRow> eventEmof = null;
+            IEnumerable<ExtendedMeasurementOrFactRow> projectEmof = null;
+            if (observation.MeasurementOrFacts != null)
+            {
+                occurrenceEmof = observation.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow());
+            }
+
+            if (observation.Event.MeasurementOrFacts != null)
+            {
+                eventEmof = observation.Event.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(observation.Event.EventId));
+            }
+
+            if (observation.Projects != null)
+            {
+                projectEmof = observation.Projects.SelectMany(project =>
+                    ToExtendedMeasurementOrFactRows(project, observation.Occurrence.OccurrenceId));
+            }
+
+            return (occurrenceEmof ?? Enumerable.Empty<ExtendedMeasurementOrFactRow>())
+                .Union(eventEmof ?? Enumerable.Empty<ExtendedMeasurementOrFactRow>())
+                .Union(projectEmof ?? Enumerable.Empty<ExtendedMeasurementOrFactRow>());
+        }
+
+        private static ExtendedMeasurementOrFactRow ToExtendedMeasurementOrFactRow(
+            this ProcessedExtendedMeasurementOrFact processedEmof, string eventId = null)
+        {
+            return new ExtendedMeasurementOrFactRow
+            {
+                MeasurementAccuracy = processedEmof.MeasurementAccuracy,
+                MeasurementDeterminedBy = processedEmof.MeasurementDeterminedBy,
+                MeasurementDeterminedDate = processedEmof.MeasurementDeterminedDate,
+                MeasurementID = processedEmof.MeasurementID,
+                MeasurementMethod = processedEmof.MeasurementMethod,
+                MeasurementRemarks = !string.IsNullOrEmpty(eventId) ? ($"Measurement for EventID \"{eventId}\". " + processedEmof.MeasurementRemarks).TrimEnd() : processedEmof.MeasurementRemarks,
+                MeasurementType = processedEmof.MeasurementType,
+                MeasurementTypeID = processedEmof.MeasurementTypeID,
+                MeasurementUnit = processedEmof.MeasurementUnit,
+                MeasurementUnitID = processedEmof.MeasurementUnitID,
+                MeasurementValue = processedEmof.MeasurementValue,
+                MeasurementValueID = processedEmof.MeasurementValueID,
+                OccurrenceID = processedEmof.OccurrenceID
+            };
         }
 
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this

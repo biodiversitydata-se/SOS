@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using DwC_A;
 using Microsoft.Extensions.Logging;
+using SOS.Export.Extensions;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -123,10 +125,21 @@ namespace SOS.Import.Managers
                         nrValidObservations++;
                         if (validObservations.Count < nrValidObservationsInReport)
                         {
+                            var dwcObservation = processedObservation.ToDarwinCore();
+                            IEnumerable<ExtendedMeasurementOrFactRow> emofRows = processedObservation.ToExtendedMeasurementOrFactRows();
+                            var dwcExport = new DwcExport
+                            {
+                                Observation = dwcObservation,
+                                Extensions = new DwcExportExtensions()
+                                {
+                                    ExtendedMeasurementOrFacts = emofRows
+                                }
+                            };
                             validObservations.Add(new ValidObservationTuple<DwcObservationVerbatim, ProcessedObservation>
                             {
                                 VerbatimObservation = verbatimObservation,
-                                ProcessedObservation = processedObservation
+                                ProcessedObservation = processedObservation,
+                                DwcExport = dwcExport
                             });
                         }
                     }
