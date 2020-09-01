@@ -39,15 +39,25 @@ namespace SOS.Lib.Helpers
                 return null;
             }
 
-            if (!date2.HasValue)
+            string format = "yyyy-MM-dd";
+            if (!date2.HasValue || date1 == date2)
             {
-                return date1.Value.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ssK", CultureInfo.InvariantCulture);
+                if (date1.Value.TimeOfDay.TotalSeconds > 0)
+                {
+                    format = "yyyy-MM-dd'T'HH:mm:ssK";
+                }
+                return date1.Value.ToString(format, CultureInfo.InvariantCulture);
+            }
+
+            if (date1.Value.TimeOfDay.TotalSeconds > 0 || date2.Value.TimeOfDay.TotalSeconds > 0)
+            {
+                format = "yyyy-MM-dd'T'HH:mm:ssK";
             }
 
             return string.Format(
                 "{0}/{1}",
-                date1.Value.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ssK", CultureInfo.InvariantCulture),
-                date2.Value.ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ssK", CultureInfo.InvariantCulture));
+                date1.Value.ToString(format, CultureInfo.InvariantCulture),
+                date2.Value.ToString(format, CultureInfo.InvariantCulture));
         }
 
         /// <summary>
@@ -63,15 +73,19 @@ namespace SOS.Lib.Helpers
                 return null;
             }
 
-            if (!date2.HasValue)
+            if (!date2.HasValue || date1 == date2)
             {
-                return date1.Value.ToUniversalTime().ToString("HH:mm:ssK", CultureInfo.InvariantCulture);
+                if (Math.Abs(date1.Value.TimeOfDay.TotalSeconds) < 0.001) return null;
+
+                return date1.Value.ToString("HH:mm:ssK", CultureInfo.InvariantCulture);
             }
+
+            if (Math.Abs(date1.Value.TimeOfDay.TotalSeconds) < 0.001 || Math.Abs(date2.Value.TimeOfDay.TotalSeconds) < 0.001) return null;
 
             return string.Format(
                 "{0}/{1}",
-                date1.Value.ToUniversalTime().ToString("HH:mm:ssK", CultureInfo.InvariantCulture),
-                date2.Value.ToUniversalTime().ToString("HH:mm:ssK", CultureInfo.InvariantCulture));
+                date1.Value.ToString("HH:mm:ssK", CultureInfo.InvariantCulture),
+                date2.Value.ToString("HH:mm:ssK", CultureInfo.InvariantCulture));
         }
 
         private static readonly Regex RxNewLineTab = new Regex(@"\r\n?|\n|\t", RegexOptions.Compiled);
