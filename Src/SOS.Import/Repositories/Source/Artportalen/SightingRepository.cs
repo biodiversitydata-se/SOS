@@ -13,14 +13,44 @@ namespace SOS.Import.Repositories.Source.Artportalen
 {
     public class SightingRepository : BaseRepository<SightingRepository>, ISightingRepository
     {
+        private string GetSightingQuery(string where) => GetSightingQuery(0, null, where);
+
+        private string GetSightingQuery(int top, string where) => GetSightingQuery(0, null, where);
+
+        private string GetSightingQuery(string join, string where) => GetSightingQuery(0, join, where);
+
+        private string SightingsFromBasics => @"
+            SearchableSightings s WITH(NOLOCK)
+	        INNER JOIN SightingState ss ON s.SightingId = ss.SightingId";
+
+        private string SightingWhereBasics => @"
+            s.TaxonId IS NOT NULL	 
+            AND (s.SightingTypeId = 0 OR s.SightingTypeId = 3)
+	        AND s.HiddenByProvider IS NULL
+	        AND s.ValidationStatusId <> 50   
+            AND s.SightingTypeSearchGroupId & 33 > 0
+	        AND ss.IsActive = 1
+	        AND ss.SightingStateTypeId = 30 --Published
+	        AND (ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
+        
+
         /// <summary>
-		/// Create sighting query
-		/// </summary>
-		/// <param name="where"></param>
-		/// <returns></returns>
-        private string GetSightingQuery(string where) =>
-            $@"
-                SELECT DISTINCT
+        /// Create sighting query
+        /// </summary>
+        /// <param name="top"></param>
+        /// <param name="where"></param>
+        /// <returns></returns>
+        private string GetSightingQuery(int top, string join, string where)
+        {
+            var topCount = "";
+
+            if (top > 0)
+            {
+                topCount = $"TOP {top}";
+            }
+
+            var query = $@"
+                SELECT DISTINCT {topCount} 
                     s.ActivityId,
                     s.DiscoveryMethodId,
 					s.BiotopeId,
@@ -28,6 +58,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     ssci.Label AS CollectionID,
                     ssci.Id as SightingSpeciesCollectionItemId,
 	                scp.Comment,
+                    s.EditDate,
 	                s.EndDate,
 	                s.EndTime,
 	                s.GenderId,
@@ -84,9 +115,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     (select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = s.SightingId group by SightingId) AS SightingPublishTypeIds,
                     (select string_agg(SpeciesFactId , ',') from SpeciesFactTaxon sft where sft.TaxonId = s.TaxonId group by sft.TaxonId) AS SpeciesFactsIds
                 FROM
-	                SearchableSightings s WITH(NOLOCK)
+	                {SightingsFromBasics}
+                    {join}
 					INNER JOIN Sighting si ON s.SightingId = si.Id
-	                INNER JOIN SightingState ss ON s.SightingId = ss.SightingId
 	                LEFT JOIN SightingCommentPublic scp ON s.SightingId = scp.SightingId
 	                LEFT JOIN SightingSpeciesCollectionItem ssci ON s.SightingId = ssci.SightingId
 	                LEFT JOIN SightingBarcode sb ON s.SightingId = sb.SightingId
@@ -101,15 +132,12 @@ namespace SOS.Import.Repositories.Source.Artportalen
                     LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = ss.SightingId
                     LEFT JOIN StatusValidationRule svr on svr.Id = tvr.StatusValidationRuleId                    
                 WHERE
-	                { where }
-	                AND s.TaxonId IS NOT NULL	 
-                    AND (s.SightingTypeId = 0 OR s.SightingTypeId = 3)
-	                AND s.HiddenByProvider IS NULL
-	                AND s.ValidationStatusId <> 50   
-                    AND s.SightingTypeSearchGroupId & 33 > 0
-	                AND ss.IsActive = 1
-	                AND ss.SightingStateTypeId = 30 --Published
-	                AND (ss.EndDate IS NULL OR ss.EndDate > GETDATE()) ";
+	                {SightingWhereBasics}
+                    {where} ";
+
+            return query;
+        }
+            
 
         /// <summary>
         ///     Constructor
@@ -122,13 +150,37 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<SightingEntity>> GetChunkAsync(int startId, int maxRows, bool liveData)
+        public async Task<int> CountModifiedSinceAsync(DateTime sinceDate)
         {
             try
             {
-                var query = GetSightingQuery("s.SightingId BETWEEN @StartId AND @EndId");
+                string query = $@"
+                SELECT 
+                    DISTINCT COUNT(s.Id) 
+		        FROM 
+		            {SightingsFromBasics}
+                WHERE 
+                    {SightingWhereBasics}
+                    AND s.EditDate > @modifiedSince";
 
-                return await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}, liveData);
+                return (await QueryAsync<int>(query, new { modifiedSince = sinceDate.ToLocalTime() }, Live)).FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error live max id");
+
+                return 0;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<SightingEntity>> GetChunkAsync(int startId, int maxRows)
+        {
+            try
+            {
+                var query = GetSightingQuery("AND s.SightingId BETWEEN @StartId AND @EndId");
+
+                return await QueryAsync<SightingEntity>(query, new {StartId = startId, EndId = startId + maxRows - 1}, Live);
             }
             catch (Exception e)
             {
@@ -138,19 +190,31 @@ namespace SOS.Import.Repositories.Source.Artportalen
             }
         }
 
-        /// <summary>
-        ///     Get sightings for the specified sighting ids. Used for testing purpose for retrieving specific sightings from
-        ///     Artportalen.
-        ///     This method should be the same as GetChunkAsync(int startId, int maxRows), with
-        ///     the difference that this method uses a list of sighting ids instead of (startId, maxRows).
-        /// </summary>
+        /// <inheritdoc />
         public async Task<IEnumerable<SightingEntity>> GetChunkAsync(IEnumerable<int> sightingIds)
         {
             try
             {
-                var query = GetSightingQuery("s.SightingId in @ids");
+                var query = GetSightingQuery("INNER JOIN @tvp t ON s.SightingId = t.Id", null);
 
-                return await QueryAsync<SightingEntity>(query, new {ids = sightingIds});
+                return await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, Live);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting sightings");
+
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<SightingEntity>> GetChunkAsync(DateTime modifiedSince, int maxRows)
+        {
+            try
+            {
+                var query = GetSightingQuery(maxRows, "AND s.EditDate > @modifiedSince");
+
+                return await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live);
             }
             catch (Exception e)
             {
@@ -165,14 +229,16 @@ namespace SOS.Import.Repositories.Source.Artportalen
         {
             try
             {
-                const string query = @"
+                string query = $@"
                 SELECT 
-                    MIN(SightingId) AS Item1,
-                    MAX(SightingId) AS Item2
+                    MIN(s.SightingId) AS Item1,
+                    MAX(s.SightingId) AS Item2
 		        FROM 
-		            SearchableSightings s";
+		            {SightingsFromBasics}
+                WHERE 
+                    {SightingWhereBasics}";
 
-                return (await QueryAsync<Tuple<int, int>>(query)).FirstOrDefault();
+                return (await QueryAsync<Tuple<int, int>>(query, null, Live)).FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -183,42 +249,46 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<int> GetMaxIdLiveAsync()
-        {
-            try
-            {
-                const string query = @"
-                SELECT 
-                    MAX(SightingId) 
-		        FROM 
-		            SearchableSightings";
-
-                return (await QueryAsync<int>(query, null, true)).FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error live max id");
-
-                return 0;
-            }
-        }
-
-        /// <inheritdoc />
         public async Task<DateTime?> GetLastModifiedDateAsyc()
         {
             try
             {
-                const string query = @"
+                string query = $@"
                 SELECT 
-	                MAX(EditDate)
+	                MAX(s.EditDate)
                 FROM 
-	                Sighting";
+	               {SightingsFromBasics}
+                WHERE
+                    {SightingWhereBasics}";
 
-                return (await QueryAsync<DateTime?>(query)).FirstOrDefault();
+                return (await QueryAsync<DateTime?>(query, null, Live)).FirstOrDefault();
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Error getting last modified date");
+
+                return null;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<int>> GetModifiedIdsAsync(DateTime modifiedSince)
+        {
+            try
+            {
+                var query = $@"SELECT DISTINCT    
+	               s.SightingId AS Id
+                FROM
+	                {SightingsFromBasics}
+                WHERE
+	                {SightingWhereBasics}
+                    AND s.EditDate > @modifiedSince";
+
+                return await QueryAsync<int>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "Error getting modified id's");
 
                 return null;
             }
@@ -241,7 +311,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 
                 return await QueryAsync<(int SightingId, int ProjectId)>(
                     query,
-                    new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") });
+                    new { tvp = sightingIds.ToDataTable().AsTableValuedParameter("dbo.IdValueTable") }, Live);
             }
             catch (Exception e)
             {
@@ -249,5 +319,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 return null;
             }
         }
+
+        /// <inheritdoc />
+        public bool Live { get; set; }
     }
 }

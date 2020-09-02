@@ -12,17 +12,19 @@ namespace SOS.Lib.Models.Processed.Observation
     public class ProcessedObservation : IEntity<string>
     {
         /// <summary>
+        ///     List of defects found in harvest
+        /// </summary>
+        [Object]
+        public IDictionary<string, string> Defects { get; set; }
+
+        /// <summary>
         ///     The category of information pertaining to an event (an
         ///     action that occurs at a place and during a period of time).
         /// </summary>
         [Object]
         public ProcessedEvent Event { get; set; }
 
-        /// <summary>
-        ///     List of defects found in harvest
-        /// </summary>
-        [Object]
-        public IDictionary<string, string> Defects { get; set; }
+        
 
         /// <summary>
         ///     Geological information, such as stratigraphy, that qualifies a region or place.

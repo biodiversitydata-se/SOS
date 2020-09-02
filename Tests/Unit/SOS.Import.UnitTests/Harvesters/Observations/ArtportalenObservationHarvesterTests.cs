@@ -137,7 +137,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
 
             _sightingRepositoryMock.Setup(sr => sr.GetIdSpanAsync())
                 .ReturnsAsync(new Tuple<int, int>(1, 1));
-            _sightingRepositoryMock.Setup(sr => sr.GetChunkAsync(It.IsAny<int>(), It.IsAny<int>(), false))
+            _sightingRepositoryMock.Setup(sr => sr.GetChunkAsync(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(
                     new[] {new SightingEntity {Id = 1, ActivityId = 1, GenderId = 1, SiteId = 1, StageId = 1}});
             _sightingRepositoryMock.Setup(sr => sr.GetSightingProjectIdsAsync(It.IsAny<IEnumerable<int>>()))

@@ -53,67 +53,204 @@ namespace SOS.Import.Harvesters.Observations
             sightings = extraSightings.Union(sightings.Where(s => extraSightings.All(e => e.Id != s.Id)))?.ToArray();
         }
 
+        #region Full
+        /// <summary>
+        /// Harvest all sightings
+        /// </summary>
+        /// <param name="harvestFactory"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<int> HarvestAllAsync(ArtportalenHarvestFactory harvestFactory, IJobCancellationToken cancellationToken)
+        {
+            _sightingRepository.Live = false;
+
+            // Get source min and max id
+            var (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
+
+            // MaxNumberOfSightingsHarvested is a debug feature. If it's set calculate minid to get last sightings.
+            // This make it easier to test incremental harvest since it has a max limit from last modified
+            if (_artportalenConfiguration.MaxNumberOfSightingsHarvested.HasValue && _artportalenConfiguration.MaxNumberOfSightingsHarvested > 0)
+            {
+                minId = maxId - _artportalenConfiguration.MaxNumberOfSightingsHarvested.Value;
+            }
+
+            // If status still is initialized value success and maxid is greater than min id
+            if (maxId > minId)
+            {
+                var nrSightingsHarvested = 0;
+                var currentId = minId;
+                var harvestBatchTasks = new List<Task<int>>();
+
+                _logger.LogDebug("Start getting Artportalen sightings");
+                
+                var batchIndex = 0;
+                // Loop until all sightings are fetched
+                while (currentId <= maxId)
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    if (_artportalenConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        currentId - minId >= _artportalenConfiguration.MaxNumberOfSightingsHarvested)
+                    {
+                        break;
+                    }
+
+                    await _semaphore.WaitAsync();
+                    batchIndex++;
+
+                    // Add batch task to list
+                    harvestBatchTasks.Add(HarvestBatchAsync(harvestFactory,
+                        _sightingRepository.GetChunkAsync(currentId, _artportalenConfiguration.ChunkSize), 
+                        batchIndex,
+                       false));
+
+                   
+                    // Calculate start of next chunk
+                    currentId += _artportalenConfiguration.ChunkSize;
+                }
+
+                // Execute harvest tasks, no of parallel threads running is handled by semaphore
+                await Task.WhenAll(harvestBatchTasks);
+
+                // Sum each batch harvested
+                nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
+
+                _logger.LogDebug($"Finish getting Artportalen sightings ({ nrSightingsHarvested })");
+
+                return nrSightingsHarvested;
+            }
+
+            return -1;
+        }
+        #endregion Full
+
+        #region Incremental
+        private async Task<int> HarvestIncrementalAsync(ArtportalenHarvestFactory harvestFactory,
+            IJobCancellationToken cancellationToken)
+        {
+            // Make sure incremental mode is true to get max id from live instance
+            _processedObservationRepository.IncrementalMode = true;
+            harvestFactory.IncrementalMode = true;
+            _sightingRepository.Live = true;
+
+            // We start from last harvested sighting 
+            var lastModified = await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1);
+            var modifiedCount = await _sightingRepository.CountModifiedSinceAsync(lastModified);
+
+            if (modifiedCount == 0)
+            {
+                return 0;
+            }
+
+            // Check if number of sightings to harvest exceeds live harvest limit
+            if (modifiedCount > _artportalenConfiguration.CatchUpLimit)
+            {
+                _logger.LogInformation("Canceling Artportalen harvest. To many sightings for live harvest.");
+
+                throw new JobAbortedException();
+            }
+
+            var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(lastModified))?.ToArray();
+
+            if (!idsToHarvest?.Any() ?? true)
+            {
+                return -1;
+            }
+
+            var harvestBatchTasks = new List<Task<int>>();
+
+            _logger.LogDebug("Start getting Artportalen sightings (live)");
+
+            var idBatch = idsToHarvest.Skip(0).Take(_artportalenConfiguration.ChunkSize);
+            var batchCount = 0;
+
+            // Loop until all sightings are fetched
+            while (idBatch.Any())
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
+
+                await _semaphore.WaitAsync();
+
+                batchCount++;
+
+                // Add batch task to list
+                harvestBatchTasks.Add(HarvestBatchAsync(harvestFactory,
+                    _sightingRepository.GetChunkAsync(idBatch),
+                    batchCount,
+                    true));
+
+                idBatch = idsToHarvest.Skip(batchCount * _artportalenConfiguration.ChunkSize).Take(_artportalenConfiguration.ChunkSize);
+            }
+
+            // Execute harvest tasks, no of parallel threads running is handled by semaphore
+            await Task.WhenAll(harvestBatchTasks);
+
+            // Sum each batch harvested
+            var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
+
+            _logger.LogDebug($"Finish getting Artportalen sightings (live) ({ nrSightingsHarvested })");
+
+            return nrSightingsHarvested;
+        }
+        #endregion Incremental
+
         /// <summary>
         ///  Harvest a batch of sightings
         /// </summary>
         /// <param name="harvestFactory"></param>
-        /// <param name="currentId"></param>
-        /// <param name="incrementalHarvest"></param>
+        /// <param name="getChunkTask"></param>
+        /// <param name="batchIndex"></param>
+        /// <param name="incremenatlMode"></param>
         /// <returns></returns>
         private async Task<int> HarvestBatchAsync(
             ArtportalenHarvestFactory harvestFactory,
-            int currentId,
-            bool incrementalHarvest
+            Task<IEnumerable<SightingEntity>> getChunkTask,
+            int batchIndex,
+            bool incremenatlMode
         )
         {
-            var lastId = currentId + _artportalenConfiguration.ChunkSize - 1;
             try
             {
                 _logger.LogDebug(
-                    $"Start getting Artportalen sightings from id: {currentId} to id: {lastId}");
+                    $"Start getting Artportalen sightings ({batchIndex})");
                 // Get chunk of sightings
-                var sightings =
-                    (await _sightingRepository.GetChunkAsync(currentId, _artportalenConfiguration.ChunkSize, incrementalHarvest))
-                    ?.ToArray();
+                var sightings = (await getChunkTask)?.ToArray();
                 _logger.LogDebug(
-                    $"Finish getting Artportalen sightings from id: {currentId} to id: {lastId}");
+                    $"Finish getting Artportalen sightings ({batchIndex})");
 
                 if (!sightings?.Any() ?? true)
                 {
                     _logger.LogDebug(
-                    $"No sightings found from id: {currentId} to id: {lastId}");
+                    $"No sightings found ({batchIndex})");
                     return 0;
                 }
 
-                if (_artportalenConfiguration.AddTestSightings && !_hasAddedTestSightings)
+                if (_artportalenConfiguration.AddTestSightings && !incremenatlMode && !_hasAddedTestSightings)
                 {
+                    _hasAddedTestSightings = true;
                     _logger.LogDebug("Start adding test sightings");
                     AddTestSightings(_sightingRepository, ref sightings, _artportalenConfiguration.AddTestSightingIds);
-                    _hasAddedTestSightings = true;
                     _logger.LogDebug("Finish adding test sightings");
                 }
 
-                _logger.LogDebug($"Start casting entities to verbatim from id: {currentId} to id: {lastId}");
+                _logger.LogDebug($"Start casting entities to verbatim ({batchIndex})");
 
                 // Cast sightings to verbatim observations
                 var verbatimObservations = await harvestFactory.CastEntitiesToVerbatimsAsync(sightings);
-                
-                // We don't need entities in memory any more
-                sightings = null;
-                
-                _logger.LogDebug($"Finsih casting entities to verbatim from id: {currentId} to id: {lastId}");
-                
-                _logger.LogDebug($"Start storing batch from id: {currentId} to id: {lastId}");
+
+                _logger.LogDebug($"Finsih casting entities to verbatim ({batchIndex})");
+
+                _logger.LogDebug($"Start storing batch ({batchIndex})");
                 // Add sightings to mongodb
+
                 await _sightingVerbatimRepository.AddManyAsync(verbatimObservations);
-                _logger.LogDebug($"Finish storing batch from id: {currentId} to id: {lastId}");
+                _logger.LogDebug($"Finish storing batch ({batchIndex})");
 
                 return verbatimObservations?.Count() ?? 0;
             }
             catch (Exception e)
             {
                 _logger.LogError(e,
-                    $"Harvest Artportalen sightings from id: {currentId} to id: {lastId} failed.");
+                    $"Harvest Artportalen sightings ({batchIndex})");
             }
             finally
             {
@@ -138,10 +275,10 @@ namespace SOS.Import.Harvesters.Observations
         /// </summary>
         /// <returns></returns>
         private async Task<(
-            IEnumerable<MetadataEntity>, 
-            IEnumerable<MetadataEntity>, 
-            IEnumerable<MetadataEntity>, 
-            IEnumerable<MetadataEntity>, 
+            IEnumerable<MetadataEntity>,
+            IEnumerable<MetadataEntity>,
+            IEnumerable<MetadataEntity>,
+            IEnumerable<MetadataEntity>,
             IEnumerable<MetadataEntity>,
             IEnumerable<MetadataEntity>,
             IEnumerable<MetadataEntity>,
@@ -166,14 +303,14 @@ namespace SOS.Import.Harvesters.Observations
             await Task.WhenAll(metaDataTasks);
             _logger.LogDebug("Finish getting meta data");
 
-            return (metaDataTasks[0].Result, 
-                metaDataTasks[1].Result, 
-                metaDataTasks[2].Result, 
-                metaDataTasks[3].Result, 
-                metaDataTasks[4].Result, 
-                metaDataTasks[5].Result, 
-                metaDataTasks[6].Result, 
-                metaDataTasks[7].Result, 
+            return (metaDataTasks[0].Result,
+                metaDataTasks[1].Result,
+                metaDataTasks[2].Result,
+                metaDataTasks[3].Result,
+                metaDataTasks[4].Result,
+                metaDataTasks[5].Result,
+                metaDataTasks[6].Result,
+                metaDataTasks[7].Result,
                 metaDataTasks[8].Result);
         }
 
@@ -289,7 +426,7 @@ namespace SOS.Import.Harvesters.Observations
                         projectEntities,
                         stages,
                         substrates,
-                        units, 
+                        units,
                         validationStatus);
 
                     _logger.LogDebug("Finish Initialize metadata");
@@ -303,92 +440,23 @@ namespace SOS.Import.Harvesters.Observations
                     _sightingRelationRepository,
                     _speciesCollectionRepository,
                     _artportalenMetadataContainer
-                );
+                )
+                {
+                    IncrementalMode = incrementalHarvest
+                };
                 _logger.LogDebug("Finsih creating factory");
-                
-                // Get source min and max id
-                int minId, maxId;
 
-                if (incrementalHarvest)
-                {
-                    // Make sure incremental mode is true to get max id from live instance
-                    _processedObservationRepository.IncrementalMode = true;
-
-                    // We start from last harvested sighting and end at latest added sighting (live data)
-                    minId = await _processedObservationRepository.GetMaxIdForProviderAsync(1) + 1;
-                    maxId = await _sightingRepository.GetMaxIdLiveAsync();
-            
-                    // Check if number of sightings to harvest exceeds live harvest limit
-                    if (maxId - minId > _artportalenConfiguration.CatchUpLimit)
-                    {
-                        _logger.LogInformation("Canceling Artportalen harvest. To many sightings for live harvest.");
-
-                        throw new JobAbortedException();
-                    }
-                }
-                else
-                {
-                    (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
-
-                    // MaxNumberOfSightingsHarvested is a debug feature. If it's set calculate minid to get last sightings.
-                    // This make it easier to test incremental harvest since it has a max limit from last created 
-                    if (_artportalenConfiguration.MaxNumberOfSightingsHarvested.HasValue && _artportalenConfiguration.MaxNumberOfSightingsHarvested > 0)
-                    {
-                        minId = maxId - _artportalenConfiguration.MaxNumberOfSightingsHarvested.Value;
-                    }
-                }
-
-                // Set observation repository in incremental mode in order to store data in other collection
                 _sightingVerbatimRepository.IncrementalMode = incrementalHarvest;
-                harvestFactory.IncrementalMode = incrementalHarvest;
 
-                var nrSightingsHarvested = 0;
+                // Make sure we have an empty collection
+                _logger.LogDebug("Empty collection");
+                await _sightingVerbatimRepository.DeleteCollectionAsync();
+                await _sightingVerbatimRepository.AddCollectionAsync();
 
-                // If status still is initialized value success and maxid is greater than min id
-                if (maxId > minId)
-                {
-                    var currentId = minId;
-                    var harvestBatchTasks = new List<Task<int>>();
-                    // Don't add test sightings when we harvest live data
-                    _hasAddedTestSightings = incrementalHarvest;
+                var nrSightingsHarvested = incrementalHarvest ? await HarvestIncrementalAsync(harvestFactory, cancellationToken) : await HarvestAllAsync(harvestFactory, cancellationToken);
 
-                    // Make sure we have an empty collection
-                    _logger.LogDebug("Empty collection");
-                    await _sightingVerbatimRepository.DeleteCollectionAsync();
-                    await _sightingVerbatimRepository.AddCollectionAsync();
-
-                    _logger.LogDebug("Start getting Artportalen sightings");
-                    // Loop until all sightings are fetched
-                    while (currentId <= maxId)
-                    {
-                        cancellationToken?.ThrowIfCancellationRequested();
-                        if (_artportalenConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                            currentId - minId >= _artportalenConfiguration.MaxNumberOfSightingsHarvested)
-                        {
-                            break;
-                        }
-
-                        await _semaphore.WaitAsync();
-
-                        // Add batch task to list
-                        harvestBatchTasks.Add(HarvestBatchAsync(harvestFactory,
-                            currentId, incrementalHarvest));
-
-                        // Calculate start of next chunk
-                        currentId += _artportalenConfiguration.ChunkSize;
-                    }
-
-                    // Execute harvest tasks, no of parallel threads running is handled by semaphore
-                    await Task.WhenAll(harvestBatchTasks);
-
-                    // Sum each batch harvested
-                    nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
-
-                    _logger.LogDebug($"Finish getting Artportalen sightings ({ nrSightingsHarvested })");
-                }
-                
                 // Update harvest info
-                harvestInfo.Status = maxId >= minId ? RunStatus.Success : RunStatus.Failed;
+                harvestInfo.Status = nrSightingsHarvested >= 0 ? RunStatus.Success : RunStatus.Failed;
                 harvestInfo.DataLastModified = await _sightingRepository.GetLastModifiedDateAsyc();
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Count = nrSightingsHarvested;

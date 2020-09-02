@@ -204,7 +204,7 @@ namespace SOS.Import.Jobs
                 //------------------------------------------------------------------------
                 // 3. Harvest observations directly without enqueuing to Hangfire
                 //------------------------------------------------------------------------
-                _logger.LogInformation("Start observasions harvest jobs");
+                _logger.LogInformation("Start observations harvest jobs");
                 var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<bool>>();
                 foreach (var dataProvider in harvestDataProviders)
                 {

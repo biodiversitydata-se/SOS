@@ -157,6 +157,13 @@ namespace SOS.Process.Processors.Artportalen
                 await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                 Logger.LogDebug($"End validating Artportalen batch ({startId}-{endId})");
 
+                if (incrementalMode)
+                {
+                    Logger.LogDebug($"Start deleteing live data ({startId}-{endId})");
+                    var success = await  DeleteProviderBatchAsync(dataProvider, verbatimObservationsBatch.Select(v => v.Id).ToArray());
+                    Logger.LogDebug($"Finish deleteing live data ({startId}-{endId}) {success}");
+                }
+
                 Logger.LogDebug($"Start storing Artportalen batch ({startId}-{endId})");
                 var successCount = await CommitBatchAsync(dataProvider, processedObservationsBatch.ToArray());
                 Logger.LogDebug($"Finish storing Artportalen batch ({startId}-{endId})");
@@ -207,36 +214,46 @@ namespace SOS.Process.Processors.Artportalen
                 observations.Add(observationFactory.CreateProcessedObservation(verbatimObservation));
                 if (IsBatchFilledToLimit(observations.Count))
                 {
-                    cancellationToken?.ThrowIfCancellationRequested();
-                    var invalidObservations = ValidationManager.ValidateObservations(ref observations);
-                    await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-                    verbatimCount += await CommitBatchAsync(dataProvider, observations);
-
-                    if (!incrementalMode)
-                    {
-                        await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider, batchId++.ToString());
-                    }
-
-                    observations.Clear();
-                    Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
+                    verbatimCount += await ValidateAndStoreObservations(dataProvider, observations, incrementalMode, batchId++, cancellationToken);
                 }
             });
 
             // Commit remaining batch (not filled to limit).
             if (observations.Any())
             {
-                cancellationToken?.ThrowIfCancellationRequested();
-                var invalidObservations = ValidationManager.ValidateObservations(ref observations);
-                await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
-                verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                
-                if (!incrementalMode)
-                {
-                    await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider, batchId.ToString());
-                }
-                    
-                Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
+                verbatimCount += await ValidateAndStoreObservations(dataProvider, observations, incrementalMode, batchId, cancellationToken);
             }
+
+            return verbatimCount;
+        }
+
+        private async Task<int> ValidateAndStoreObservations(
+            DataProvider dataProvider,
+            ICollection<ProcessedObservation> observations,
+            bool incrementalMode, 
+            int batchId,
+            IJobCancellationToken cancellationToken)
+        {
+            cancellationToken?.ThrowIfCancellationRequested();
+            var invalidObservations = ValidationManager.ValidateObservations(ref observations);
+            await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
+
+            if (incrementalMode)
+            {
+                Logger.LogDebug("Start deleteing live data");
+                var success = await DeleteProviderBatchAsync(dataProvider, observations.Select(v => v.VerbatimId).ToArray());
+                Logger.LogDebug($"Finish deleteing live data {success}");
+            }
+
+            var verbatimCount = await CommitBatchAsync(dataProvider, observations);
+
+            if (!incrementalMode)
+            {
+                await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider, batchId.ToString());
+            }
+
+            observations.Clear();
+            Logger.LogDebug($"Artportalen sightings processed: {verbatimCount}");
 
             return verbatimCount;
         }

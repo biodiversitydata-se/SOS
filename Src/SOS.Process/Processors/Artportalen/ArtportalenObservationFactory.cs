@@ -117,7 +117,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.InformationWithheld = null;
                 obs.IsInEconomicZoneOfSweden = hasPosition;
                 obs.Language = Language.Swedish;
-                obs.Modified = endDate ?? verbatimObservation.ReportedDate;
+                obs.Modified = verbatimObservation.EditDate.ToUniversalTime();
                 obs.Type = null;
                 obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
                 obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
@@ -126,8 +126,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
                 obs.ReportedDate = verbatimObservation.ReportedDate;
                 obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
-                
-
 
                 // Event
                 obs.Event = new ProcessedEvent();

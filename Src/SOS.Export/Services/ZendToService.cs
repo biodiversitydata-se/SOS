@@ -42,7 +42,7 @@ namespace SOS.Export.Services
                 new KeyValuePair<string, string>("note", _configuration.Message),
                 new KeyValuePair<string, string>("confirmDelivery", "0"),
                 new KeyValuePair<string, string>("informRecipients", "1"),
-                new KeyValuePair<string, string>("informPasscode", "0"),
+                new KeyValuePair<string, string>("informPasscode", "1"),
                 new KeyValuePair<string, string>("checksumFiles", "0"),
                 new KeyValuePair<string, string>("encryptFiles", "0"),
                 new KeyValuePair<string, string>("recipient_1", "1"),

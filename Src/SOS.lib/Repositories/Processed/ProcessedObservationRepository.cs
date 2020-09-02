@@ -70,14 +70,14 @@ namespace SOS.Lib.Repositories.Processed
         {
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
             _indexPrefix = elasticConfiguration?.IndexPrefix ?? throw new ArgumentNullException(nameof(elasticConfiguration));
-            _scrollBatchSize = client.ReadBatchSize; 
+            _scrollBatchSize = client.ReadBatchSize;
         }
 
         public string IndexName => string.IsNullOrEmpty(_indexPrefix)
             ? $"{CurrentInstanceName.ToLower()}"
             : $"{_indexPrefix.ToLower()}-{CurrentInstanceName.ToLower()}";
 
-        
+
         /// <inheritdoc />
         public new async Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items)
         {
@@ -173,6 +173,67 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
+        public async Task<bool> DeleteProviderBatchAsync(
+            DataProvider dataProvider,
+            ICollection<int> verbatimIds)
+        {
+            try
+            {
+                // Create the collection
+                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q => q
+                    .Index(IndexName)
+                    .Query(q => q
+                        .Term(t => t
+                            .Field(f => f.DataProviderId)
+                            .Value(dataProvider.Id)
+                         )
+                    )
+                    .Query(q => q
+                        .Terms(t => t
+                            .Field(f => f.VerbatimId)
+                            .Terms(verbatimIds)
+                        )
+                    )
+                );
+
+                return res.IsValid;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
+        }
+
+        public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
+        {
+            try
+            {
+                // Create the collection
+                var res = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                    .Index(IndexName)
+                    .Query(q => q
+                        .Term(t => t
+                            .Field(f => f.DataProviderId)
+                            .Value(providerId)))
+                    .Aggregations(a => a
+                        .Max("latestModified", m => m
+                            .Field(f => f.Modified)
+                        )
+                    )
+                );
+
+                var epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+                return epoch.AddMilliseconds(res.Aggregations?.Max("latestModified")?.Value ?? 0).ToUniversalTime();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Failed to get max id for provider: { providerId }, index: { IndexName }");
+                return DateTime.MinValue;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<int> GetMaxIdForProviderAsync(int providerId)
         {
             try
@@ -190,7 +251,7 @@ namespace SOS.Lib.Repositories.Processed
                         )
                      )
                 );
-               
+
                 return (int)(res.Aggregations?.Max("maxId")?.Value ?? 0);
             }
             catch (Exception e)
@@ -199,6 +260,7 @@ namespace SOS.Lib.Repositories.Processed
                 return 0;
             }
         }
+
 
         /// <inheritdoc />
         public async Task<bool> VerifyCollectionAsync()

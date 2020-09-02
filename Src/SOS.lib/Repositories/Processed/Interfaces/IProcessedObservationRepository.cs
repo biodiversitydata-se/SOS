@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -36,6 +37,14 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<bool> DeleteProviderDataAsync(DataProvider dataProvider);
 
         /// <summary>
+        /// Delete provider batch
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="verbatimIds"></param>
+        /// <returns></returns>
+        Task<bool> DeleteProviderBatchAsync(DataProvider dataProvider, ICollection<int> verbatimIds);
+
+        /// <summary>
         /// Delete observations by occurence id
         /// </summary>
         /// <param name="occurenceIds"></param>
@@ -46,6 +55,13 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <returns></returns>
         Task CreateIndexAsync();
+
+        /// <summary>
+        /// Get latest modified document date for passed provider
+        /// </summary>
+        /// <param name="providerId"></param>
+        /// <returns></returns>
+        Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId);
 
         /// <summary>
         /// Get max id for specified provider

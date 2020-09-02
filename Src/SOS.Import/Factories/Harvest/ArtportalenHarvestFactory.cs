@@ -69,6 +69,7 @@ namespace SOS.Import.Factories.Harvest
                 DeterminationMethod = entity.DeterminationMethodId.HasValue && _artportalenMetadataContainer.DeterminationMethods.ContainsKey(entity.DeterminationMethodId.Value)
                     ? _artportalenMetadataContainer.DeterminationMethods[entity.DeterminationMethodId.Value]
                     : null,
+                EditDate = entity.EditDate,
                 EndDate = entity.EndDate,
                 EndTime = entity.EndTime,
                 Gender = entity.GenderId.HasValue && _artportalenMetadataContainer.Genders.ContainsKey(entity.GenderId.Value)
