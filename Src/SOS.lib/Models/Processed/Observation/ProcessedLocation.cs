@@ -465,7 +465,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     should be stored in verbatimSRS and the coordinate
         ///     system should be stored in verbatimCoordinateSystem.
         /// </summary>
-        public double? VerbatimLatitude { get; set; }
+        public string VerbatimLatitude { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: verbatimLocality.
@@ -481,7 +481,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     should be stored in verbatimSRS and the coordinate
         ///     system should be stored in verbatimCoordinateSystem.
         /// </summary>
-        public double? VerbatimLongitude { get; set; }
+        public string VerbatimLongitude { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: verbatimSRS.

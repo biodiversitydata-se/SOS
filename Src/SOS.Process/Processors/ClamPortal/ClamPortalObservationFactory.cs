@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Nest;
 using NetTopologySuite.Geometries;
@@ -94,8 +95,8 @@ namespace SOS.Process.Processors.ClamPortal
                         ?.ToCircle(verbatimObservation.CoordinateUncertaintyInMeters)?.ToGeoShape(),
                     LocationRemarks = verbatimObservation.LocationRemarks,
                     MaximumDepthInMeters = verbatimObservation.MaximumDepthInMeters,
-                    VerbatimLatitude = verbatimObservation.DecimalLatitude,
-                    VerbatimLongitude = verbatimObservation.DecimalLongitude,
+                    VerbatimLatitude = verbatimObservation.DecimalLatitude.ToString(CultureInfo.InvariantCulture),
+                    VerbatimLongitude = verbatimObservation.DecimalLongitude.ToString(CultureInfo.InvariantCulture),
                     VerbatimCoordinateSystem = "EPSG:4326",
                     WaterBody = verbatimObservation.WaterBody
                 },

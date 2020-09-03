@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -421,19 +422,19 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             processedLocation.VerbatimCoordinateSystem = verbatimObservation.VerbatimCoordinateSystem;
             processedLocation.VerbatimDepth = verbatimObservation.VerbatimDepth;
             processedLocation.VerbatimElevation = verbatimObservation.VerbatimElevation;
-            processedLocation.VerbatimLatitude = verbatimObservation.VerbatimLatitude.ParseDouble();
+            processedLocation.VerbatimLatitude = verbatimObservation.VerbatimLatitude;
             processedLocation.VerbatimLocality = verbatimObservation.VerbatimLocality;
-            processedLocation.VerbatimLongitude = verbatimObservation.VerbatimLongitude.ParseDouble();
+            processedLocation.VerbatimLongitude = verbatimObservation.VerbatimLongitude;
             processedLocation.VerbatimSRS = verbatimObservation.VerbatimSRS;
             processedLocation.WaterBody = verbatimObservation.WaterBody;
 
-            if (!processedLocation.VerbatimLatitude.HasValue &&
-                !processedLocation.VerbatimLongitude.HasValue &&
+            if (string.IsNullOrWhiteSpace(processedLocation.VerbatimLatitude) &&
+                string.IsNullOrWhiteSpace(processedLocation.VerbatimLongitude) &&
                 string.IsNullOrWhiteSpace(processedLocation.VerbatimSRS))
             {
-                processedLocation.VerbatimLatitude = processedLocation.DecimalLatitude;
-                processedLocation.VerbatimLongitude = processedLocation.DecimalLongitude;
-                processedLocation.VerbatimSRS = processedLocation.GeodeticDatum;
+                processedLocation.VerbatimLatitude = verbatimObservation.DecimalLatitude;
+                processedLocation.VerbatimLongitude = verbatimObservation.DecimalLongitude;
+                processedLocation.VerbatimSRS = verbatimObservation.GeodeticDatum;
             }
 
             if (!processedLocation.DecimalLongitude.HasValue || !processedLocation.DecimalLatitude.HasValue)

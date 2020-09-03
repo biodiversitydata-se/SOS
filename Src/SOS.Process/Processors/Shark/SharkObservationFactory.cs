@@ -92,8 +92,8 @@ namespace SOS.Process.Processors.Shark
                     PointLocation = wgs84Point?.ToGeoLocation(),
                     PointWithBuffer = (PolygonGeoShape) wgs84Point?.ToCircle(ProcessConstants.DefaultAccuracyInMeters)
                         ?.ToGeoShape(),
-                    VerbatimLatitude = verbatim.SampleLatitudeDd,
-                    VerbatimLongitude = verbatim.SampleLongitudeDd
+                    VerbatimLatitude = verbatim.SampleLatitudeDd?.ToString(),
+                    VerbatimLongitude = verbatim.SampleLongitudeDd?.ToString()
                 },
                 Occurrence = new ProcessedOccurrence
                 {

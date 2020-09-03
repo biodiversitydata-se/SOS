@@ -181,8 +181,8 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.PointLocation = verbatimObservation.Site?.Point?.ToGeoLocation();
                 obs.Location.PointWithBuffer = (PolygonGeoShape) verbatimObservation.Site?.PointWithBuffer.ToGeoShape();
                 obs.Location.Province = GetSosId(verbatimObservation.Site?.Province?.Id, _fieldMappings[FieldMappingFieldId.Province]);
-                obs.Location.VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord : 0;
-                obs.Location.VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord : 0;
+                obs.Location.VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord.ToString() : null;
+                obs.Location.VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord.ToString() : null;
                 obs.Location.VerbatimCoordinateSystem = "EPSG:3857";
 
                 // Occurrence
