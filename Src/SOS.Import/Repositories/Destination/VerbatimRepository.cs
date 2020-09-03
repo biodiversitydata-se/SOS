@@ -22,6 +22,11 @@ namespace SOS.Import.Repositories.Destination
 
         private string CollectionName => IncrementalMode ? $"{_collectionName}_incremental" : _collectionName;
 
+        /// <summary>
+        ///     Disposed
+        /// </summary>
+        private bool _disposed;
+
         protected readonly IMongoClient Client;
 
         /// <summary>
@@ -34,10 +39,7 @@ namespace SOS.Import.Repositories.Destination
         /// </summary>
         protected readonly ILogger<VerbatimRepository<TEntity, TKey>> Logger;
 
-        /// <summary>
-        ///     Disposed
-        /// </summary>
-        private bool _disposed;
+       
 
         /// <summary>
         ///     Constructor

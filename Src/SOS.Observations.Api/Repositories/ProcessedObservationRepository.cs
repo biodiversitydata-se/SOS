@@ -140,23 +140,20 @@ namespace SOS.Observations.Api.Repositories
             excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
 
             query = InternalFilterBuilder.AddAggregationFilter(aggregationType, query);
-
-            var di = aggregationType switch
-            {
-                AggregationType.SightingsPerWeek => DateInterval.Week,
-                AggregationType.QuantityPerWeek => DateInterval.Week,
-                AggregationType.SightingsPerYear => DateInterval.Year,
-                AggregationType.QuantityPerYear => DateInterval.Year,
-                _ => throw new ArgumentOutOfRangeException(nameof(aggregationType), aggregationType, null)
-            };
-
+            
+            var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             IAggregationContainer Aggregation(AggregationContainerDescriptor<dynamic> agg) => agg
-                    .DateHistogram("aggregation", dh => dh
-                        .Field("event.startDate")
-                        .CalendarInterval(di)
-                        .Aggregations(a => a
-                            .Sum("quantity", sum => sum
-                                .Field("occurrence.organismQuantityInt"))));
+                .DateHistogram("aggregation", dh => dh
+                    .Field("event.startDate")
+                    .CalendarInterval(DateInterval.Day)
+                    .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
+                    .Format("yyyy-MM-dd")
+                    .Aggregations(a => a
+                        .Sum("quantity", sum => sum
+                            .Field("occurrence.organismQuantityInt")
+                        )
+                    )
+                );
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_Aggregated_Histogram");
 
@@ -188,7 +185,7 @@ namespace SOS.Observations.Api.Repositories
                 .Select(b =>
                     new
                     {
-                        b.Date,
+                        Date = DateTime.Parse(b.KeyAsString),
                         b.DocCount,
                         Quantity = b.Sum("quantity").Value
                     }).ToList();
