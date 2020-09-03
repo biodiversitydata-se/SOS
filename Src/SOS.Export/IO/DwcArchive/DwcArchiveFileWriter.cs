@@ -159,6 +159,11 @@ namespace SOS.Export.IO.DwcArchive
             ICollection<ProcessedObservation> processedObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart)
         {
+            if (!processedObservations?.Any() ?? true)
+            {
+                return;
+            }
+
             var fieldDescriptions = FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose();
 
             // Create Occurrence CSV file
@@ -173,6 +178,12 @@ namespace SOS.Export.IO.DwcArchive
             // Create EMOF CSV file
             string emofCsvFilePath = filePathByFilePart[DwcaFilePart.Emof];
             var emofRows = processedObservations.ToExtendedMeasurementOrFactRows();
+
+            if (!emofRows?.Any() ?? true)
+            {
+                return;
+            }
+
             await using StreamWriter emofFileStream = File.AppendText(emofCsvFilePath);
             await _extendedMeasurementOrFactCsvWriter.WriteHeaderlessEmofCsvFileAsync(
                 emofRows,

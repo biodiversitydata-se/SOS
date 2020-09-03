@@ -26,7 +26,6 @@ namespace SOS.Import.Harvesters.Observations
     public class ArtportalenObservationHarvester : IArtportalenObservationHarvester
     {
         private readonly ArtportalenConfiguration _artportalenConfiguration;
-        private readonly ILogger<ArtportalenObservationHarvester> _logger;
         private readonly IMetadataRepository _metadataRepository;
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IPersonRepository _personRepository;
@@ -39,6 +38,7 @@ namespace SOS.Import.Harvesters.Observations
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
+        private readonly ILogger<ArtportalenObservationHarvester> _logger;
         private bool _hasAddedTestSightings;
 
         /// <summary>

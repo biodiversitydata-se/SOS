@@ -396,7 +396,7 @@ namespace SOS.Export.Extensions
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
             IEnumerable<ProcessedObservation> processedObservations)
         {
-            return processedObservations.SelectMany(ToExtendedMeasurementOrFactRows);
+            return processedObservations?.SelectMany(ToExtendedMeasurementOrFactRows);
         }
 
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
@@ -450,7 +450,7 @@ namespace SOS.Export.Extensions
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
             IEnumerable<ProcessedProject> projects, string occurrenceId)
         {
-            return projects.SelectMany(project => ToExtendedMeasurementOrFactRows(project, occurrenceId));
+            return projects?.SelectMany(project => ToExtendedMeasurementOrFactRows(project, occurrenceId));
         }
 
         private static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(
@@ -461,7 +461,7 @@ namespace SOS.Export.Extensions
                 return Enumerable.Empty<ExtendedMeasurementOrFactRow>();
             }
 
-            var rows = project.ProjectParameters.Select(projectParameter =>
+            var rows = project?.ProjectParameters?.Select(projectParameter =>
                 ToExtendedMeasurementOrFactRow(occurrenceId, project, projectParameter));
             return rows;
         }
