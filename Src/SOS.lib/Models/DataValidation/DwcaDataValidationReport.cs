@@ -35,6 +35,7 @@ namespace SOS.Lib.Models.DataValidation
         public int NrInvalidObservations { get; set; }
         public List<string> Remarks { get; set; }
         public List<DefectItem> ObservationDefects { get; set; }
+        public List<string> NonMatchingScientificNames { get; set; }
     }
 
     public class DistinctValuesSummary
