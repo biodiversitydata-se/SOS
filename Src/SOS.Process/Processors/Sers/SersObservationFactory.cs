@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Nest;
 using NetTopologySuite.Geometries;
@@ -86,8 +87,8 @@ namespace SOS.Process.Processors.Sers
                     PointLocation = wgs84Point?.ToGeoLocation(),
                     PointWithBuffer =
                         (PolygonGeoShape) wgs84Point?.ToCircle(verbatim.CoordinateUncertaintyInMeters)?.ToGeoShape(),
-                    VerbatimLatitude = verbatim.DecimalLatitude,
-                    VerbatimLongitude = verbatim.DecimalLongitude
+                    VerbatimLatitude = verbatim.DecimalLatitude.ToString(CultureInfo.InvariantCulture),
+                    VerbatimLongitude = verbatim.DecimalLongitude.ToString(CultureInfo.InvariantCulture)
                 },
                 Modified = verbatim.Modified.HasValue ? verbatim.Modified.Value.ToUniversalTime() : (DateTime?) null,
                 Occurrence = new ProcessedOccurrence

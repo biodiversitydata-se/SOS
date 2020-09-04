@@ -121,9 +121,9 @@ namespace SOS.Lib.Extensions
                 VerbatimCoordinateSystem = source.VerbatimCoordinateSystem,
                 VerbatimDepth = source.VerbatimDepth,
                 VerbatimElevation = source.VerbatimElevation,
-                VerbatimLatitude = source.VerbatimLatitude?.ToString("0.0###########"),
+                VerbatimLatitude = source.VerbatimLatitude,
                 VerbatimLocality = source.VerbatimLocality,
-                VerbatimLongitude = source.VerbatimLongitude?.ToString("0.0###########"),
+                VerbatimLongitude = source.VerbatimLongitude,
                 VerbatimSRS = source.VerbatimSRS,
                 WaterBody = source.WaterBody
             };
@@ -235,7 +235,7 @@ namespace SOS.Lib.Extensions
             {
                 AccessRights = processedObservation.AccessRights?.Value,
                 BasisOfRecord = processedObservation.BasisOfRecord?.Value,
-                BibliographicCitation = processedObservation.BasisOfRecord?.Value,
+                BibliographicCitation = processedObservation.BibliographicCitation,
                 CollectionCode = processedObservation.CollectionCode,
                 CollectionID = processedObservation.CollectionId,
                 DataGeneralizations = processedObservation.DataGeneralizations,

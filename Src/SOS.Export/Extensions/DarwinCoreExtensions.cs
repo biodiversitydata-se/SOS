@@ -29,7 +29,7 @@ namespace SOS.Export.Extensions
             {
                 AccessRights = processedDarwinCore.AccessRights,
                 BasisOfRecord = processedDarwinCore.BasisOfRecord,
-                BibliographicCitation = processedDarwinCore.BasisOfRecord,
+                BibliographicCitation = processedDarwinCore.BibliographicCitation,
                 CollectionCode = processedDarwinCore.CollectionCode,
                 CollectionID = processedDarwinCore.CollectionID,
                 DataGeneralizations = processedDarwinCore.DataGeneralizations,

@@ -199,13 +199,14 @@ namespace SOS.Import.Managers
             var remarks = validationRemarksBuilder.CreateRemarks();
             if (!remarks.HasItems())
             {
-                remarks.Add("Everything looks ok. Great!");
+                remarks.Add("No remarks.");
             }
             return new DwcaDataValidationReport<DwcObservationVerbatim, ProcessedObservation>
             {
-                Settings = new { NrValidObservationsInReport = nrValidObservationsInReport, NrInvalidObservationsInReport = nrInvalidObservationsInReport},
+                Settings = new { MaxNrObservationsToProcess = maxNrObservationsToRead, NrValidObservationsInReport = nrValidObservationsInReport, NrInvalidObservationsInReport = nrInvalidObservationsInReport},
                 Summary = new DwcaDataValidationReportSummary
                 {
+                    ReportCreatedDate = DateTime.Now.ToString("yyyy-MM-dd"),
                     TotalNumberOfObservationsInFile = totalNumberOfObservations,
                     NrObservationsProcessed = nrProcessedObservations,
                     NrValidObservations = nrValidObservations,

@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Globalization;
+using FluentAssertions;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Process.UnitTests.TestHelpers;
@@ -70,8 +71,8 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             result.Location.DecimalLongitude.Should().BeApproximately(Coordinates.TranasMunicipality.Longitude, 0.0001);
             result.Location.GeodeticDatum.Should().Be(CoordinateSys.WGS84.EpsgCode());
             result.Location.VerbatimSRS.Should().Be(CoordinateSys.ETRS89.EpsgCode());
-            result.Location.VerbatimLongitude.Should().BeApproximately(Coordinates.TranasMunicipality.Etrs89X, 0.0001);
-            result.Location.VerbatimLatitude.Should().BeApproximately(Coordinates.TranasMunicipality.Etrs89Y, 0.0001);
+            result.Location.VerbatimLongitude.Should().Be(Coordinates.TranasMunicipality.Etrs89X.ToString(CultureInfo.InvariantCulture));
+            result.Location.VerbatimLatitude.Should().Be(Coordinates.TranasMunicipality.Etrs89Y.ToString(CultureInfo.InvariantCulture));
         }
 
         [Fact]
@@ -99,8 +100,8 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             result.Location.DecimalLongitude.Should().BeApproximately(Coordinates.TranasMunicipality.Longitude, 0.0001);
             result.Location.GeodeticDatum.Should().Be(CoordinateSys.WGS84.EpsgCode());
             result.Location.VerbatimSRS.Should().Be(CoordinateSys.Rt90_25_gon_v.EpsgCode());
-            result.Location.VerbatimLongitude.Should().BeApproximately(Coordinates.TranasMunicipality.RT90X, 0.0001);
-            result.Location.VerbatimLatitude.Should().BeApproximately(Coordinates.TranasMunicipality.RT90Y, 0.0001);
+            result.Location.VerbatimLongitude.Should().Be(Coordinates.TranasMunicipality.RT90X.ToString(CultureInfo.InvariantCulture));
+            result.Location.VerbatimLatitude.Should().Be(Coordinates.TranasMunicipality.RT90Y.ToString(CultureInfo.InvariantCulture));
         }
 
         [Fact]
@@ -128,10 +129,8 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             result.Location.DecimalLongitude.Should().BeApproximately(Coordinates.TranasMunicipality.Longitude, 0.0001);
             result.Location.GeodeticDatum.Should().Be(CoordinateSys.WGS84.EpsgCode());
             result.Location.VerbatimSRS.Should().Be(CoordinateSys.SWEREF99_TM.EpsgCode());
-            result.Location.VerbatimLongitude.Should()
-                .BeApproximately(Coordinates.TranasMunicipality.Sweref99TmX, 0.0001);
-            result.Location.VerbatimLatitude.Should()
-                .BeApproximately(Coordinates.TranasMunicipality.Sweref99TmY, 0.0001);
+            result.Location.VerbatimLongitude.Should().Be(Coordinates.TranasMunicipality.Sweref99TmX.ToString(CultureInfo.InvariantCulture));
+            result.Location.VerbatimLatitude.Should().Be(Coordinates.TranasMunicipality.Sweref99TmY.ToString(CultureInfo.InvariantCulture));
         }
 
         [Fact]
@@ -159,10 +158,8 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             result.Location.DecimalLongitude.Should().BeApproximately(Coordinates.TranasMunicipality.Longitude, 0.0001);
             result.Location.GeodeticDatum.Should().Be(CoordinateSys.WGS84.EpsgCode());
             result.Location.VerbatimSRS.Should().Be(CoordinateSys.WebMercator.EpsgCode());
-            result.Location.VerbatimLongitude.Should()
-                .BeApproximately(Coordinates.TranasMunicipality.WebMercatorX, 0.0001);
-            result.Location.VerbatimLatitude.Should()
-                .BeApproximately(Coordinates.TranasMunicipality.WebMercatorY, 0.0001);
+            result.Location.VerbatimLongitude.Should().Be(Coordinates.TranasMunicipality.WebMercatorX.ToString(CultureInfo.InvariantCulture));
+            result.Location.VerbatimLatitude.Should().Be(Coordinates.TranasMunicipality.WebMercatorY.ToString(CultureInfo.InvariantCulture));
         }
 
         [Fact]
