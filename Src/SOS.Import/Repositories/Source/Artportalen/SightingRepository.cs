@@ -167,9 +167,9 @@ namespace SOS.Import.Repositories.Source.Artportalen
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Error live max id");
+                Logger.LogError(e, "Error counting modified items");
 
-                return 0;
+                return -1;
             }
         }
 

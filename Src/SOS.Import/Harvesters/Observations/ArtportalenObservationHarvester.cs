@@ -136,9 +136,9 @@ namespace SOS.Import.Harvesters.Observations
             var lastModified = await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1);
             var modifiedCount = await _sightingRepository.CountModifiedSinceAsync(lastModified);
 
-            if (modifiedCount == 0)
+            if (modifiedCount < 1)
             {
-                return 0;
+                return modifiedCount;
             }
 
             // Check if number of sightings to harvest exceeds live harvest limit

@@ -48,8 +48,8 @@ Their values are stored as JSON files in the _Src\SOS.Import\Resources\FieldMapp
 
 **Import of [Field Name]FieldMapping.json to MongoDb**
 1.  Copy _[Field Name]FieldMapping.json_ to the \Src\SOS.Import\Resources\FieldMappings directory. Make sure the Copty to Output Directory property has the _Copy if newer_ value.
-2.  Launch the SOS.Hangfire.UI API and run _/HarvestJobs/ImportFieldMapping/Run_. Once the job has been run, the field mapping has entered the FieldMapping collection in the sos-verbatim database.
-3.  Then run _/ProcessJob/CopyFieldMapping/Run_ to copy the field mappings from sos-verbatim to sos-processed database.
+2.  Launch the SOS.Hangfire.UI API and run _/HarvestJobs/ImportFieldMapping/Run_. Once the job has been run, the field mapping has entered the FieldMapping collection in the sos-harvest database.
+3.  Then run _/ProcessJob/CopyFieldMapping/Run_ to copy the field mappings from sos-harvest to sos database.
 
 **Process [Field Name]**
 1.  Add a property of type _ProcessedFieldMapValue_ to the _SOS.Lib.Models.Processed.Sighting.ProcessedObservation_ class, for the new field.

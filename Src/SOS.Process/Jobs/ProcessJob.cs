@@ -221,7 +221,7 @@ namespace SOS.Process.Jobs
                 if (!incrementalMode)
                 {
                     //----------------------------------------------------------------------
-                    // 3. Copy field mappings and taxa from sos-verbatim to sos-processed
+                    // 3. Copy field mappings and taxa from sos-harvest to sos
                     //----------------------------------------------------------------------
                     _logger.LogInformation("Start copying taxonomy and fieldmapping from verbatim to processed db");
                     var metadataTasks = new[]

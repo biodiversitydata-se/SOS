@@ -205,11 +205,11 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
+        /// <inheritdoc />
         public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
         {
             try
             {
-                // Create the collection
                 var res = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
                     .Index(IndexName)
                     .Query(q => q
@@ -228,36 +228,8 @@ namespace SOS.Lib.Repositories.Processed
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Failed to get max id for provider: { providerId }, index: { IndexName }");
+                Logger.LogError(e, $"Failed to get last modified date for provider: { providerId }, index: { IndexName }");
                 return DateTime.MinValue;
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<int> GetMaxIdForProviderAsync(int providerId)
-        {
-            try
-            {
-                // Create the collection
-                var res = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
-                    .Index(IndexName)
-                    .Query(q => q
-                        .Term(t => t
-                            .Field(f => f.DataProviderId)
-                            .Value(providerId)))
-                    .Aggregations(a => a
-                        .Max("maxId", m => m
-                        .Field(f => f.VerbatimId)
-                        )
-                     )
-                );
-
-                return (int)(res.Aggregations?.Max("maxId")?.Value ?? 0);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, $"Failed to get max id for provider: { providerId }, index: { IndexName }");
-                return 0;
             }
         }
 
