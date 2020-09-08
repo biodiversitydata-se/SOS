@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using MvmService;
 using SOS.Import.Services;
-using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Services.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Services

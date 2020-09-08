@@ -30,10 +30,8 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	        AND s.ValidationStatusId <> 50   
             AND s.SightingTypeSearchGroupId & 33 > 0
 	        AND ss.IsActive = 1
-	        AND ss.SightingStateTypeId = 30 --Published
-	        AND (ss.EndDate IS NULL OR ss.EndDate > GETDATE())";
+	        AND ss.SightingStateTypeId = 30 --Published";
         
-
         /// <summary>
         /// Create sighting query
         /// </summary>
@@ -150,30 +148,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<int> CountModifiedSinceAsync(DateTime sinceDate)
-        {
-            try
-            {
-                string query = $@"
-                SELECT 
-                    DISTINCT COUNT(s.Id) 
-		        FROM 
-		            {SightingsFromBasics}
-                WHERE 
-                    {SightingWhereBasics}
-                    AND s.EditDate > @modifiedSince";
-
-                return (await QueryAsync<int>(query, new { modifiedSince = sinceDate.ToLocalTime() }, Live)).FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error counting modified items");
-
-                return -1;
-            }
-        }
-
-        /// <inheritdoc />
         public async Task<IEnumerable<SightingEntity>> GetChunkAsync(int startId, int maxRows)
         {
             try
@@ -272,17 +246,19 @@ namespace SOS.Import.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<int>> GetModifiedIdsAsync(DateTime modifiedSince)
+        public async Task<IEnumerable<int>> GetModifiedIdsAsync(DateTime modifiedSince, int limit)
         {
             try
             {
-                var query = $@"SELECT DISTINCT    
+                var query = $@"SELECT TOP({limit})   
 	               s.SightingId AS Id
                 FROM
 	                {SightingsFromBasics}
                 WHERE
 	                {SightingWhereBasics}
-                    AND s.EditDate > @modifiedSince";
+                    AND s.EditDate > @modifiedSince
+                ORDER BY
+                    s.EditDate";
 
                 return await QueryAsync<int>(query, new { modifiedSince = modifiedSince.ToLocalTime() }, Live);
             }

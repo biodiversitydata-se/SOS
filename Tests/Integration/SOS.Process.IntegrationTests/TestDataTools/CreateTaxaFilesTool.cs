@@ -30,18 +30,6 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             return processedTaxonRepository;
         }
 
-        private TaxonVerbatimRepository CreateTaxonVerbatimRepository(int batchSize)
-        {
-            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var verbatimClient = new VerbatimClient(
-                verbatimDbConfiguration.GetMongoDbSettings(),
-                verbatimDbConfiguration.DatabaseName,
-                verbatimDbConfiguration.ReadBatchSize,
-                verbatimDbConfiguration.WriteBatchSize);
-            var taxonVerbatimRepository =
-                new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
-            return taxonVerbatimRepository;
-        }
 
         /// <summary>
         ///     Creates a Message pack file with a list of ProcessedBasicTaxon.
@@ -68,26 +56,6 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             var mammaliaProcessedTaxa = taxa.Where(m => mammaliaTaxonIds.Contains(m.DyntaxaTaxonId));
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
             var bin = MessagePackSerializer.Serialize(mammaliaProcessedTaxa, options);
-            File.WriteAllBytes(filePath, bin);
-        }
-
-        [Fact]
-        [Trait("Category", "Tool")]
-        public async Task CreateListOfDarwinCoreTaxonAsMessagePackFile()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            const int batchSize = 200000;
-            const string filePath = @"c:\temp\AllDarwinCoreTaxa.msgpck";
-            var taxonVerbatimRepository = CreateTaxonVerbatimRepository(batchSize);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var taxa = await taxonVerbatimRepository.GetBatchAsync(0, 0);
-            var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
-            var bin = MessagePackSerializer.Serialize(taxa, options);
             File.WriteAllBytes(filePath, bin);
         }
 

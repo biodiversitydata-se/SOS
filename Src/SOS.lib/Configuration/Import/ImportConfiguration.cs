@@ -53,16 +53,6 @@ namespace SOS.Lib.Configuration.Import
         public SharkServiceConfiguration SharkServiceConfiguration { get; set; }
 
         /// <summary>
-        ///     taxon attribute service configuration
-        /// </summary>
-        public TaxonAttributeServiceConfiguration TaxonAttributeServiceConfiguration { get; set; }
-
-        /// <summary>
-        ///     Taxon service configuration
-        /// </summary>
-        public TaxonServiceConfiguration TaxonServiceConfiguration { get; set; }
-
-        /// <summary>
         ///     Virtual Herbarium service configuration
         /// </summary>
         public VirtualHerbariumServiceConfiguration VirtualHerbariumServiceConfiguration { get; set; }

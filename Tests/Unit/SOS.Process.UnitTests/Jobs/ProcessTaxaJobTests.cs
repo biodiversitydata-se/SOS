@@ -11,6 +11,7 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Jobs;
+using SOS.Process.Processors.Taxon.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
 
@@ -26,22 +27,19 @@ namespace SOS.Process.UnitTests.Jobs
         /// </summary>
         public ProcessTaxaJobTests()
         {
-            _taxonVerbatimRepositoryMock = new Mock<ITaxonVerbatimRepository>();
-            _processedTaxonRepositoryMock = new Mock<IProcessedTaxonRepository>();
+            _taxonProcessorMock = new Mock<ITaxonProcessor>();
             _processInfoRepository = new Mock<IProcessInfoRepository>();
             _harvestInfoRepository = new Mock<IHarvestInfoRepository>();
             _loggerMock = new Mock<ILogger<ProcessTaxaJob>>();
         }
 
-        private readonly Mock<ITaxonVerbatimRepository> _taxonVerbatimRepositoryMock;
-        private readonly Mock<IProcessedTaxonRepository> _processedTaxonRepositoryMock;
+        private readonly Mock<ITaxonProcessor> _taxonProcessorMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
         private readonly Mock<ILogger<ProcessTaxaJob>> _loggerMock;
 
         private ProcessTaxaJob TestObject => new ProcessTaxaJob(
-            _taxonVerbatimRepositoryMock.Object,
-            _processedTaxonRepositoryMock.Object,
+            _taxonProcessorMock.Object,
             _harvestInfoRepository.Object,
             _processInfoRepository.Object,
             _loggerMock.Object);
@@ -56,39 +54,27 @@ namespace SOS.Process.UnitTests.Jobs
 
             Action create = () => new ProcessTaxaJob(
                 null,
-                _processedTaxonRepositoryMock.Object,
                 _harvestInfoRepository.Object,
                 _processInfoRepository.Object,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("taxonVerbatimRepository");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("taxonProcessor");
 
             create = () => new ProcessTaxaJob(
-                _taxonVerbatimRepositoryMock.Object,
-                null,
-                _harvestInfoRepository.Object,
-                _processInfoRepository.Object,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processedTaxonRepository");
-
-            create = () => new ProcessTaxaJob(
-                _taxonVerbatimRepositoryMock.Object,
-                _processedTaxonRepositoryMock.Object,
+                _taxonProcessorMock.Object,
                 null,
                 _processInfoRepository.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("harvestInfoRepository");
 
             create = () => new ProcessTaxaJob(
-                _taxonVerbatimRepositoryMock.Object,
-                _processedTaxonRepositoryMock.Object,
+                _taxonProcessorMock.Object,
                 _harvestInfoRepository.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processInfoRepository");
 
             create = () => new ProcessTaxaJob(
-                _taxonVerbatimRepositoryMock.Object,
-                _processedTaxonRepositoryMock.Object,
+                _taxonProcessorMock.Object,
                 _harvestInfoRepository.Object,
                 _processInfoRepository.Object,
                 null);
@@ -105,7 +91,7 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _taxonVerbatimRepositoryMock.Setup(r => r.GetAllAsync())
+            _taxonProcessorMock.Setup(r => r.ProcessTaxaAsync())
                 .Throws<Exception>();
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -133,14 +119,8 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            _taxonVerbatimRepositoryMock.Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new List<DarwinCoreTaxon>
-                {
-                    new DarwinCoreTaxon {Id = 100024, ScientificName = "Canus Lupus"}
-                });
-
-            _processedTaxonRepositoryMock.Setup(r => r.DeleteCollectionAsync())
-                .ReturnsAsync(false);
+            _taxonProcessorMock.Setup(r => r.ProcessTaxaAsync())
+                .ReturnsAsync(0);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -163,17 +143,8 @@ namespace SOS.Process.UnitTests.Jobs
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _taxonVerbatimRepositoryMock.Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new List<DarwinCoreTaxon>
-                {
-                    new DarwinCoreTaxon {Id = 100024, ScientificName = "Canus Lupus"}
-                });
-
-            _processedTaxonRepositoryMock.Setup(r => r.DeleteCollectionAsync())
-                .ReturnsAsync(true);
-
-            _processedTaxonRepositoryMock.Setup(r => r.AddManyAsync(It.IsAny<IEnumerable<ProcessedTaxon>>()))
-                .ReturnsAsync(true);
+            _taxonProcessorMock.Setup(r => r.ProcessTaxaAsync())
+                .ReturnsAsync(1);
 
             _harvestInfoRepository.Setup(r => r.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(new HarvestInfo("ID", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success});

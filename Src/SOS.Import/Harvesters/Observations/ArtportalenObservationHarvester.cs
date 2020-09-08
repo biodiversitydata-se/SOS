@@ -134,22 +134,9 @@ namespace SOS.Import.Harvesters.Observations
 
             // We start from last harvested sighting 
             var lastModified = await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1);
-            var modifiedCount = await _sightingRepository.CountModifiedSinceAsync(lastModified);
-
-            if (modifiedCount < 1)
-            {
-                return modifiedCount;
-            }
-
-            // Check if number of sightings to harvest exceeds live harvest limit
-            if (modifiedCount > _artportalenConfiguration.CatchUpLimit)
-            {
-                _logger.LogInformation("Canceling Artportalen harvest. To many sightings for live harvest.");
-
-                throw new JobAbortedException();
-            }
-
-            var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(lastModified))?.ToArray();
+            
+            // Get list of id's to Make sure we don't harvest more than #limit 
+            var idsToHarvest = (await _sightingRepository.GetModifiedIdsAsync(lastModified, _artportalenConfiguration.CatchUpLimit))?.ToArray();
 
             if (!idsToHarvest?.Any() ?? true)
             {

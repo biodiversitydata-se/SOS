@@ -90,45 +90,5 @@ namespace SOS.Administration.Api.Controllers
 
         #endregion Geo
 
-        #region Taxon
-
-        /// <inheritdoc />
-        [HttpPost("Taxon/Schedule/Daily")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult AddDailyTaxonHarvestJob([FromQuery] int hour, [FromQuery] int minute)
-        {
-            try
-            {
-                RecurringJob.AddOrUpdate<ITaxonHarvestJob>(nameof(ITaxonHarvestJob), job => job.RunAsync(),
-                    $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
-                return new OkObjectResult("Taxon harvest job added");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Adding taxon harvest job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpPost("Taxon/Run")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult RunTaxonHarvestJob()
-        {
-            try
-            {
-                BackgroundJob.Enqueue<ITaxonHarvestJob>(job => job.RunAsync());
-                return new OkObjectResult("Taxon harvest job was enqueued to Hangfire.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Enqueuing Taxon harvest job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        #endregion Taxon
     }
 }

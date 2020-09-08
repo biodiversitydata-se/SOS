@@ -66,8 +66,6 @@ namespace SOS.Process.IntegrationTests.Jobs
             var areaHelper = new AreaHelper(
                 new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()),
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>()));
-            var taxonVerbatimRepository =
-                new TaxonVerbatimRepository(verbatimClient, new NullLogger<TaxonVerbatimRepository>());
             var fieldMappingVerbatimRepository =
                 new FieldMappingVerbatimRepository(verbatimClient, new NullLogger<FieldMappingVerbatimRepository>());
             var taxonProcessedRepository =
@@ -190,7 +188,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             var copyFieldMappingsJob = new CopyFieldMappingsJob(fieldMappingVerbatimRepository,
                 processedFieldMappingRepository, harvestInfoRepository, processInfoRepository,
                 new NullLogger<CopyFieldMappingsJob>());
-            var processTaxaJob = new ProcessTaxaJob(taxonVerbatimRepository, taxonProcessedRepository,
+            var processTaxaJob = new ProcessTaxaJob(null, // todo
                 harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());
             var dwcaProcessor = new DwcaObservationProcessor(
                 new DwcaVerbatimRepository(verbatimClient, new NullLogger<DwcaVerbatimRepository>()),

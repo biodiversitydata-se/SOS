@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Verbatim.Shark;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Import.Services
 {

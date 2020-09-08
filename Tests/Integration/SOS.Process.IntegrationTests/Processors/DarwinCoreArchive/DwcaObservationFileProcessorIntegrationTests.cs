@@ -31,6 +31,7 @@ using SOS.Process.Processors.DarwinCoreArchive;
 using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
 using Xunit.Abstractions;
+using TaxonManager = SOS.Export.Managers.TaxonManager;
 
 namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 {

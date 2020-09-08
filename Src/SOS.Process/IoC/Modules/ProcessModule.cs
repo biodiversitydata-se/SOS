@@ -31,10 +31,15 @@ using SOS.Process.Processors.Sers;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark;
 using SOS.Process.Processors.Shark.Interfaces;
+using SOS.Process.Processors.Taxon;
+using SOS.Process.Processors.Taxon.Interfaces;
 using SOS.Process.Processors.VirtualHerbarium;
 using SOS.Process.Processors.VirtualHerbarium.Interfaces;
 using SOS.Process.Repositories.Source;
 using SOS.Process.Repositories.Source.Interfaces;
+using SOS.Process.Services;
+using SOS.Process.Services.Interfaces;
+
 
 namespace SOS.Process.IoC.Modules
 {
@@ -49,7 +54,12 @@ namespace SOS.Process.IoC.Modules
             {
                 builder.RegisterInstance(Configurations.ProcessConfiguration.FieldMapping).As<FieldMappingConfiguration>().SingleInstance();
             }
-
+            if (Configurations.ProcessConfiguration.TaxonAttributeServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ProcessConfiguration.TaxonAttributeServiceConfiguration)
+                    .As<TaxonAttributeServiceConfiguration>().SingleInstance();
+            if (Configurations.ProcessConfiguration.TaxonServiceConfiguration != null)
+                builder.RegisterInstance(Configurations.ProcessConfiguration.TaxonServiceConfiguration).As<TaxonServiceConfiguration>()
+                    .SingleInstance();
             builder.RegisterInstance(Configurations.ProcessConfiguration).As<ProcessConfiguration>().SingleInstance();
 
             // Vebatim Mongo Db
@@ -93,7 +103,6 @@ namespace SOS.Process.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>()
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<TaxonVerbatimRepository>().As<ITaxonVerbatimRepository>().InstancePerLifetimeScope();
 
             // Repositories destination 
             builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
@@ -123,6 +132,9 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<VirtualHerbariumObservationProcessor>().As<IVirtualHerbariumObservationProcessor>()
                 .InstancePerLifetimeScope();
 
+            builder.RegisterType<TaxonProcessor>().As<ITaxonProcessor>()
+                .InstancePerLifetimeScope();
+
             // Add managers
             builder.RegisterType<InstanceManager>().As<IInstanceManager>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().InstancePerLifetimeScope();
@@ -135,6 +147,11 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ProcessTaxaJob>().As<IProcessTaxaJob>().InstancePerLifetimeScope();
             builder.RegisterType<CopyFieldMappingsJob>().As<ICopyFieldMappingsJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessAreasJob>().As<IProcessAreasJob>().InstancePerLifetimeScope();
+
+            // Add services
+            builder.RegisterType<TaxonAttributeService>().As<ITaxonAttributeService>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonService>().As<ITaxonService>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonServiceProxy>().As<ITaxonServiceProxy>().InstancePerLifetimeScope();
         }
     }
 }
