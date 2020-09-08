@@ -217,7 +217,6 @@ namespace SOS.Import.Jobs
                 var artportalenHarvestTask = harvestTaskByDataProvider
                     .Single(pair => pair.Key.Identifier == DataProviderIdentifiers.Artportalen).Value;
                 if (artportalenHarvestTask.Result &&
-                    resourceHarvestTasks[DataProviderType.Taxa].Result &&
                     resourceHarvestTasks[DataProviderType.FieldMappings].Result)
                 {
                     // Ensure that Artportalen always is included in processDataProviders

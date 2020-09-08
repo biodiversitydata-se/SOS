@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
 using SOS.Import.Containers.Interfaces;
@@ -21,6 +22,7 @@ namespace SOS.Import.Factories.Harvest
         private readonly ISiteRepository _siteRepository;
         private ISightingRelationRepository _sightingRelationRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
+        private int _verbatimId;
 
         private readonly IDictionary<int, Site> _sites;
 
@@ -39,7 +41,9 @@ namespace SOS.Import.Factories.Harvest
             {
                 return null;
             }
-            
+
+            var id = Interlocked.Increment(ref _verbatimId);
+
             if (_sites.TryGetValue(entity.SiteId.HasValue ? entity.SiteId.Value : -1, out var site))
             {
                 // Try to set parent site name if empty
@@ -79,7 +83,8 @@ namespace SOS.Import.Factories.Harvest
                 HasTriggeredValidationRules = entity.HasTriggeredValidationRules,
                 HasAnyTriggeredValidationRuleWithWarning = entity.HasAnyTriggeredValidationRuleWithWarning,
                 HiddenByProvider = entity.HiddenByProvider,
-                Id = entity.Id,
+                Id = id,
+                SightingId = entity.Id,
                 OwnerOrganization =
                     entity.OwnerOrganizationId.HasValue &&
                     _artportalenMetadataContainer.Organizations.ContainsKey(entity.OwnerOrganizationId.Value)
@@ -475,6 +480,8 @@ namespace SOS.Import.Factories.Harvest
 
             _artportalenMetadataContainer = artportalenMetadataContainer;
             _sites = new Dictionary<int, Site>();
+
+            _verbatimId = 0;
         }
 
         public bool IncrementalMode { get; set; }

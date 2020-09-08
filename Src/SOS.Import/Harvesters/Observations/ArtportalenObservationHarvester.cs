@@ -103,7 +103,6 @@ namespace SOS.Import.Harvesters.Observations
                         batchIndex,
                        false));
 
-                   
                     // Calculate start of next chunk
                     currentId += _artportalenConfiguration.ChunkSize;
                 }
