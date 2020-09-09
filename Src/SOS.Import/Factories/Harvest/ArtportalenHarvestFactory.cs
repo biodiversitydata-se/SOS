@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -24,23 +25,10 @@ namespace SOS.Import.Factories.Harvest
         private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
 
-       
-        /// <summary>
-        /// Not the cleanest counter, but it works. 
-        /// </summary>
-        private readonly ConcurrentBag<int> _threadSafeBag = new ConcurrentBag<int>();
-        private int NextId
-        {
-            get
-            {
-                _threadSafeBag.TryTake(out var currentId);
-                currentId++;
-                _threadSafeBag.Add(currentId);
-                return currentId;
-            }
-        }
+        private int _idCounter;
+        private int NextId => Interlocked.Increment(ref _idCounter);
         
-        private readonly IDictionary<int, Site> _sites;
+        private readonly ConcurrentDictionary<int, Site> _sites;
 
         /// <summary>
         /// Cast sighting itemEntity to model .
@@ -493,7 +481,7 @@ namespace SOS.Import.Factories.Harvest
             _speciesCollectionRepository = speciesCollectionRepository;
 
             _artportalenMetadataContainer = artportalenMetadataContainer;
-            _sites = new Dictionary<int, Site>();
+            _sites = new ConcurrentDictionary<int, Site>();
         }
 
         public bool IncrementalMode { get; set; }
@@ -540,8 +528,13 @@ namespace SOS.Import.Factories.Harvest
                 speciesCollections,
                 sightingRelations);
 
-            return from e in entities
-                select CastEntityToVerbatim(e, personSightings, sightingsProjects);
+            var verbatims = new List<ArtportalenObservationVerbatim>();
+            for (var i = 0; i < entities.Length; i++)
+            {
+                verbatims.Add(CastEntityToVerbatim(entities[i], personSightings, sightingsProjects));
+            }
+
+            return verbatims;
         }
 
     }
