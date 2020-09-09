@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using NGeoHash;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
-using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
+using BoundingBox = NGeoHash.BoundingBox;
+using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -190,6 +194,117 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Error getting batch of aggregated sightings");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+        }
+
+        /// <summary>
+        /// Aggregate observations to grid cells
+        /// Precision (GeoHash length)	Area width x height
+        /// 1	5,009.4km x 4,992.6km
+        /// 2	1,252.3km x 624.1km
+        /// 3	156.5km x 156km
+        /// 4	39.1km x 19.5km
+        /// 5	4.9km x 4.9km
+        /// 6	1.2km x 609.4m
+        /// 7	152.9m x 152.4m
+        /// 8	38.2m x 19m
+        /// 9	4.8m x 4.8m
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="precision"></param>
+        /// <param name="bboxGeoHash"></param>
+        /// <param name="bboxLeft"></param>
+        /// <param name="bboxTop"></param>
+        /// <param name="bboxRight"></param>
+        /// <param name="bboxBottom"></param>
+        /// <returns></returns>
+        [HttpPost("geogridsearch")]
+        [ProducesResponseType(typeof(GeoGridResult), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetGeogridAsync([FromBody] SearchFilter filter,
+            [FromQuery] int precision = 1,
+            [FromQuery] string bboxGeoHash = null,
+            [FromQuery] double? bboxLeft = null,
+            [FromQuery] double? bboxTop = null,
+            [FromQuery] double? bboxRight = null,
+            [FromQuery] double? bboxBottom = null
+        )
+        {
+            try
+            {
+                var (isValid, validationErrors) = ValidateFilter(filter, 0, 1);
+                if (!isValid)
+                {
+                    return BadRequest(string.Join(". ", validationErrors));
+                }
+
+                if (precision < 1 || precision > 9)
+                {
+                    return BadRequest("precision must be between 1 and 9");
+                }
+
+                Result<LatLonBoundingBox> bbox = GetBoundingBox(bboxGeoHash, bboxLeft, bboxTop, bboxRight, bboxBottom);
+                if (bbox.IsFailure)
+                {
+                    return BadRequest(bbox.Error);
+                }
+
+                var result = await _observationManager.GetGeogridAggregationAsync(filter, precision, bbox.Value);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                return new OkObjectResult(result.Value);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting batch of aggregated sightings");
+                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+            }
+        }
+
+        private static Result<LatLonBoundingBox> GetBoundingBox(string bboxGeoHash, double? bboxLeft, double? bboxTop,
+            double? bboxRight, double? bboxBottom)
+        {
+            LatLonBoundingBox bbox;
+            if (bboxLeft.HasValue && bboxTop.HasValue && bboxRight.HasValue && bboxBottom.HasValue)
+            {
+                bbox = new LatLonBoundingBox
+                {
+                    TopLeft = new LatLonCoordinate(bboxTop.Value, bboxLeft.Value),
+                    BottomRight = new LatLonCoordinate(bboxBottom.Value, bboxRight.Value)
+                };
+            }
+            else if (!string.IsNullOrWhiteSpace(bboxGeoHash))
+            {
+                BoundingBox geoHashBbox;
+                try
+                {
+                    geoHashBbox = GeoHash.DecodeBbox(bboxGeoHash);
+                }
+                catch (Exception)
+                {
+                    return Result.Failure<LatLonBoundingBox>("bboxGeoHash is invalid");
+                }
+
+                bbox = new LatLonBoundingBox
+                {
+                    GeoHash = bboxGeoHash,
+                    TopLeft = new LatLonCoordinate(geoHashBbox.Maximum.Lat, geoHashBbox.Minimum.Lon),
+                    BottomRight = new LatLonCoordinate(geoHashBbox.Minimum.Lat, geoHashBbox.Maximum.Lon)
+                };
+            }
+            else
+            {
+                bbox = new LatLonBoundingBox
+                {
+                    TopLeft = new LatLonCoordinate(90, -180),
+                    BottomRight = new LatLonCoordinate(-90, 180)
+                };
+            }
+
+            return Result.Success(bbox);
         }
     }
 }

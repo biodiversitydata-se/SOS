@@ -2,18 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using Nest;
+using NGeoHash;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Models.AggregatedResult;
 using SOS.Observations.Api.Repositories.Interfaces;
+using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Repositories
 {
@@ -421,6 +426,104 @@ namespace SOS.Observations.Api.Repositories
             }
 
             return queryContainers;
+        }
+
+        public async Task<Result<GeoGridResult>> GetGeogridAggregationAsync(
+                SearchFilter filter,
+                int precision,
+                LatLonBoundingBox bbox)
+        {
+            const int maxNrBucketsInElactic = 65535;
+            const int maxNrReturnedBuckets = 10000;
+            if (!filter?.IsFilterActive ?? true)
+            {
+                return null;
+            }
+
+            var query = filter.ToQuery();
+            query = AddSightingTypeFilters(filter, query);
+            query = InternalFilterBuilder.AddFilters(filter, query);
+            var excludeQuery = CreateExcludeQuery(filter);
+            excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
+
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_GeoAggregated");
+            operation.Telemetry.Properties["Filter"] = filter.ToString();
+
+            var searchResponseZoomedInGrid = await _elasticClient.SearchAsync<dynamic>(s => s
+                .Index(_indexName)
+                .Size(0)
+                .Aggregations(a => a.GeoHash("geohash_grid", g => g
+                    .Field("location.pointLocation")
+                    .Size(maxNrBucketsInElactic + 1)
+                    .GeoHashPrecision((GeoHashPrecision)precision)
+                    .Bounds(b => b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation()))
+                    .Aggregations(b => b
+                        .Cardinality("taxa_count", t => t
+                            .Field("taxon.id")))
+                    //.Terms("taxa_unique", t => t
+                    //    .Field("taxon.id")))
+                    )
+                )
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+            
+            );
+            if (!searchResponseZoomedInGrid.IsValid)
+            {
+                if (searchResponseZoomedInGrid.ServerError.Error.CausedBy.Type == "too_many_buckets_exception")
+                {
+                    return Result.Failure<GeoGridResult>($"The number of cells that will be returned is too large. The limit is {maxNrReturnedBuckets} cells. Try using lower precision or a smaller bounding box.");
+                }
+
+                throw new InvalidOperationException(searchResponseZoomedInGrid.DebugInformation);
+            }
+
+            var nrOfGridCells = (int?)searchResponseZoomedInGrid.Aggregations.GeoHash("geohash_grid").Buckets?.Count ?? 0;
+            if (nrOfGridCells >= maxNrReturnedBuckets)
+            {
+                return Result.Failure<GeoGridResult>($"The number of cells that will be returned is too large. The limit is {maxNrReturnedBuckets} cells. Try using lower precision or a smaller bounding box.");
+            }
+
+            _telemetry.StopOperation(operation);
+
+            var georesult = searchResponseZoomedInGrid
+                .Aggregations
+                .Terms("geohash_grid")
+                .Buckets?
+                .Select(b =>
+                    new GridCell()
+                    {
+                        ObservationsCount = b.DocCount,
+                        TaxaCount = (long?)b.Cardinality("taxa_count")?.Value,
+                        BoundingBox = GetBoundingBoxFromGeoHash(b.Key)
+                    });
+
+            var gridResult = new GeoGridResult()
+            {
+                BoundingBox = bbox,
+                Precision = precision,
+                GridCellCount = nrOfGridCells,
+                GridCells = georesult
+            };
+
+            // When operation is disposed, telemetry item is sent.
+            return Result.Success(gridResult);
+        }
+
+        private LatLonBoundingBox GetBoundingBoxFromGeoHash(string geoHash)
+        {
+            var geoHashBbox = GeoHash.DecodeBbox(geoHash);
+            var bbox = new LatLonBoundingBox()
+            {
+                GeoHash = geoHash,
+                TopLeft = new LatLonCoordinate(geoHashBbox.Maximum.Lat, geoHashBbox.Minimum.Lon),
+                BottomRight = new LatLonCoordinate(geoHashBbox.Minimum.Lat, geoHashBbox.Maximum.Lon)
+            };
+            return bbox;
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Observations.Api.Managers.Interfaces
@@ -32,5 +34,14 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="sortOrder"></param>
         /// <returns></returns>
         Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take, string sortBy, SearchSortOrder sortOrder);
+
+        /// <summary>
+        /// Get aggregated grid cells data.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="precision"></param>
+        /// <param name="bbox"></param>
+        /// <returns></returns>
+        Task<Result<GeoGridResult>> GetGeogridAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox);
     }
 }
