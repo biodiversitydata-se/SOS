@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,17 +14,32 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Factories.Harvest
 {
-    public class ArtportalenHarvestFactory : IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
+    internal class ArtportalenHarvestFactory : IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
     {
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
 
         private readonly IProjectRepository _projectRepository;
         private readonly ISightingRepository _sightingRepository;
         private readonly ISiteRepository _siteRepository;
-        private ISightingRelationRepository _sightingRelationRepository;
+        private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
-        private int _verbatimId;
 
+       
+        /// <summary>
+        /// Not the cleanest counter, but it works. 
+        /// </summary>
+        private readonly ConcurrentBag<int> _threadSafeBag = new ConcurrentBag<int>();
+        private int NextId
+        {
+            get
+            {
+                _threadSafeBag.TryTake(out var currentId);
+                currentId++;
+                _threadSafeBag.Add(currentId);
+                return currentId;
+            }
+        }
+        
         private readonly IDictionary<int, Site> _sites;
 
         /// <summary>
@@ -41,8 +57,6 @@ namespace SOS.Import.Factories.Harvest
             {
                 return null;
             }
-
-            var id = Interlocked.Increment(ref _verbatimId);
 
             if (_sites.TryGetValue(entity.SiteId.HasValue ? entity.SiteId.Value : -1, out var site))
             {
@@ -83,7 +97,7 @@ namespace SOS.Import.Factories.Harvest
                 HasTriggeredValidationRules = entity.HasTriggeredValidationRules,
                 HasAnyTriggeredValidationRuleWithWarning = entity.HasAnyTriggeredValidationRuleWithWarning,
                 HiddenByProvider = entity.HiddenByProvider,
-                Id = id,
+                Id = NextId,
                 SightingId = entity.Id,
                 OwnerOrganization =
                     entity.OwnerOrganizationId.HasValue &&
@@ -480,8 +494,6 @@ namespace SOS.Import.Factories.Harvest
 
             _artportalenMetadataContainer = artportalenMetadataContainer;
             _sites = new Dictionary<int, Site>();
-
-            _verbatimId = 0;
         }
 
         public bool IncrementalMode { get; set; }

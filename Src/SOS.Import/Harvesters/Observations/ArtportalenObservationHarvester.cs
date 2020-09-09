@@ -439,7 +439,10 @@ namespace SOS.Import.Harvesters.Observations
                 await _sightingVerbatimRepository.DeleteCollectionAsync();
                 await _sightingVerbatimRepository.AddCollectionAsync();
 
-                var nrSightingsHarvested = incrementalHarvest ? await HarvestIncrementalAsync(harvestFactory, cancellationToken) : await HarvestAllAsync(harvestFactory, cancellationToken);
+                var nrSightingsHarvested = incrementalHarvest ? 
+                    await HarvestIncrementalAsync(harvestFactory, cancellationToken) 
+                    : 
+                    await HarvestAllAsync(harvestFactory, cancellationToken);
 
                 // Update harvest info
                 harvestInfo.Status = nrSightingsHarvested >= 0 ? RunStatus.Success : RunStatus.Failed;
