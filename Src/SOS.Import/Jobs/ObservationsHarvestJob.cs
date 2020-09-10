@@ -24,12 +24,10 @@ namespace SOS.Import.Jobs
         private readonly IFieldMappingImportJob _fieldMappingImportJob;
         private readonly Dictionary<DataProviderType, IHarvestJob> _harvestJobByType;
         private readonly ILogger<ObservationsHarvestJob> _logger;
-        private readonly ITaxonHarvestJob _taxonHarvestJob;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="taxonHarvestJob"></param>
         /// <param name="fieldMappingImportJob"></param>
         /// <param name="artportalenHarvestJob"></param>
         /// <param name="clamPortalHarvestJob"></param>
@@ -44,7 +42,6 @@ namespace SOS.Import.Jobs
         /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
         public ObservationsHarvestJob(
-            ITaxonHarvestJob taxonHarvestJob,
             IFieldMappingImportJob fieldMappingImportJob,
             IArtportalenHarvestJob artportalenHarvestJob,
             IClamPortalHarvestJob clamPortalHarvestJob,
@@ -59,7 +56,6 @@ namespace SOS.Import.Jobs
             IDataProviderManager dataProviderManager,
             ILogger<ObservationsHarvestJob> logger)
         {
-            _taxonHarvestJob = taxonHarvestJob ?? throw new ArgumentNullException(nameof(taxonHarvestJob));
             _fieldMappingImportJob =
                 fieldMappingImportJob ?? throw new ArgumentNullException(nameof(fieldMappingImportJob));
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
@@ -196,7 +192,6 @@ namespace SOS.Import.Jobs
                 //-----------------------------------------------------------------------------
                 _logger.LogInformation("Start resource harvest jobs (taxonomy & field mappings)");
                 var resourceHarvestTasks = new Dictionary<DataProviderType, Task<bool>>();
-                resourceHarvestTasks.Add(DataProviderType.Taxa, _taxonHarvestJob.RunAsync());
                 resourceHarvestTasks.Add(DataProviderType.FieldMappings, _fieldMappingImportJob.RunAsync());
                 await Task.WhenAll(resourceHarvestTasks.Values);
                 _logger.LogInformation("Finish resource harvest jobs (taxonomy & field mappings)");
@@ -222,7 +217,6 @@ namespace SOS.Import.Jobs
                 var artportalenHarvestTask = harvestTaskByDataProvider
                     .Single(pair => pair.Key.Identifier == DataProviderIdentifiers.Artportalen).Value;
                 if (artportalenHarvestTask.Result &&
-                    resourceHarvestTasks[DataProviderType.Taxa].Result &&
                     resourceHarvestTasks[DataProviderType.FieldMappings].Result)
                 {
                     // Ensure that Artportalen always is included in processDataProviders

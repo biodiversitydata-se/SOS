@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Factories.FieldMapping.Interfaces;
-using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
+using SOS.Import.Repositories.Destination.Area.Interfaces;
 using SOS.Lib.Enums;
 
 namespace SOS.Import.Factories.FieldMapping
@@ -12,8 +12,8 @@ namespace SOS.Import.Factories.FieldMapping
     public class ParishFieldMappingFactory : GeoRegionFieldMappingFactoryBase, IFieldMappingCreatorFactory
     {
         public ParishFieldMappingFactory(
-            IAreaVerbatimRepository areaVerbatimRepository,
-            ILogger<GeoRegionFieldMappingFactoryBase> logger) : base(areaVerbatimRepository, logger)
+            IAreaProcessedRepository areaProcessedRepository,
+            ILogger<ParishFieldMappingFactory> logger) : base(areaProcessedRepository, logger)
         {
         }
 

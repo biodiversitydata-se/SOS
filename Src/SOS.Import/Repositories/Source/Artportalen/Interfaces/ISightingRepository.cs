@@ -11,13 +11,6 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
     public interface ISightingRepository
     {
         /// <summary>
-        /// Count sightings modified since passed date
-        /// </summary>
-        /// <param name="sinceDate"></param>
-        /// <returns></returns>
-        Task<int> CountModifiedSinceAsync(DateTime sinceDate);
-
-        /// <summary>
         /// Get chunk of sightings from Artportalen
         /// </summary>
         /// <param name="startId"></param>
@@ -50,8 +43,9 @@ namespace SOS.Import.Repositories.Source.Artportalen.Interfaces
         /// Get list of id's of modified items
         /// </summary>
         /// <param name="modifiedSince"></param>
+        /// <param name="limit"></param>
         /// <returns></returns>
-        Task<IEnumerable<int>> GetModifiedIdsAsync(DateTime modifiedSince);
+        Task<IEnumerable<int>> GetModifiedIdsAsync(DateTime modifiedSince, int limit);
 
         /// <summary>
         /// Get connections between project and sighting

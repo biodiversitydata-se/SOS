@@ -38,7 +38,7 @@ namespace SOS.Import.Repositories.Source.Artportalen
 	                a.AreaDatasetId,
                     a.Id,
                     a.FeatureId,
-                    a.Polygon,
+                    a.Polygon.STAsText() AS PolygonWKT,
 	                a.Name,
                     a.ParentId
                 FROM 

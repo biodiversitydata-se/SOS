@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.SqlServer.Types;
 using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -536,16 +535,16 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
-        ///     Cast sql geometry to IGeometry
+        ///     Cast wkt string to IGeometry
         /// </summary>
-        /// <param name="sqlGeometry"></param>
+        /// <param name="wkt"></param>
         /// <returns></returns>
         public static Geometry ToGeometry(
-            this SqlGeometry sqlGeometry)
+            this string wkt)
         {
             var factory = new GeometryFactory();
             var wktReader = new WKTReader(factory);
-            return wktReader.Read(sqlGeometry.STAsText().ToSqlString().ToString());
+            return wktReader.Read(wkt);
         }
 
         /// <summary>

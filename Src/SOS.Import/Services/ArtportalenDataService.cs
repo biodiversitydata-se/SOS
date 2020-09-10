@@ -38,17 +38,30 @@ namespace SOS.Import.Services
         {
             using var conn = Connection(live);
             conn.Open();
+            var transaction = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
 
-            return (await conn.QueryAsync<T>(
-                new CommandDefinition(
-                    query,
-                    parameters,
-                    null,
-                    5 * 60, // 5 minutes
-                    CommandType.Text,
-                    CommandFlags.NoCache
-                )
-            )).ToArray();
+            IEnumerable<T> result = null;
+            try
+            {
+                result = (await conn.QueryAsync<T>(
+                    new CommandDefinition(
+                        query,
+                        parameters,
+                        transaction,
+                        5 * 60, // 5 minutes
+                        CommandType.Text,
+                        CommandFlags.NoCache
+                    )
+                )).ToArray();
+
+                transaction.Commit();
+            }
+            catch (Exception e)
+            {
+                transaction.Rollback();
+            }
+
+            return result;
         }
     }
 }

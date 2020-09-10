@@ -13,6 +13,8 @@ using SOS.Import.Jobs;
 using SOS.Import.Managers;
 using SOS.Import.Managers.Interfaces;
 using SOS.Import.Repositories.Destination;
+using SOS.Import.Repositories.Destination.Area;
+using SOS.Import.Repositories.Destination.Area.Interfaces;
 using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Destination.ClamPortal;
@@ -34,8 +36,6 @@ using SOS.Import.Repositories.Destination.Sers;
 using SOS.Import.Repositories.Destination.Sers.Interfaces;
 using SOS.Import.Repositories.Destination.Shark;
 using SOS.Import.Repositories.Destination.Shark.Interfaces;
-using SOS.Import.Repositories.Destination.Taxon;
-using SOS.Import.Repositories.Destination.Taxon.Interfaces;
 using SOS.Import.Repositories.Destination.VirtualHerbarium;
 using SOS.Import.Repositories.Destination.VirtualHerbarium.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen;
@@ -49,6 +49,8 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Services;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Import.IoC.Modules
 {
@@ -90,12 +92,7 @@ namespace SOS.Import.IoC.Modules
             if (Configurations.ImportConfiguration.SharkServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.SharkServiceConfiguration).As<SharkServiceConfiguration>()
                     .SingleInstance();
-            if (Configurations.ImportConfiguration.TaxonAttributeServiceConfiguration != null)
-                builder.RegisterInstance(Configurations.ImportConfiguration.TaxonAttributeServiceConfiguration)
-                    .As<TaxonAttributeServiceConfiguration>().SingleInstance();
-            if (Configurations.ImportConfiguration.TaxonServiceConfiguration != null)
-                builder.RegisterInstance(Configurations.ImportConfiguration.TaxonServiceConfiguration).As<TaxonServiceConfiguration>()
-                    .SingleInstance();
+           
             if (Configurations.ImportConfiguration.VirtualHerbariumServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.VirtualHerbariumServiceConfiguration)
                     .As<VirtualHerbariumServiceConfiguration>().SingleInstance();
@@ -138,7 +135,8 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
 
             // Repositories destination
-            builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<AreaProcessedRepository>().As<IAreaProcessedRepository>().InstancePerLifetimeScope();
+
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>().InstancePerLifetimeScope();
@@ -157,7 +155,6 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<SightingVerbatimRepository>().As<ISightingVerbatimRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<TaxonVerbatimRepository>().As<ITaxonVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>()
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
 
@@ -182,7 +179,6 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SersObservationHarvester>().As<ISersObservationHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationHarvester>().As<ISharkObservationHarvester>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<TaxonHarvester>().As<ITaxonHarvester>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationHarvester>().As<IVirtualHerbariumObservationHarvester>()
                 .InstancePerLifetimeScope();
 
@@ -220,9 +216,6 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<NorsObservationService>().As<INorsObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<SersObservationService>().As<ISersObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationService>().As<ISharkObservationService>().InstancePerLifetimeScope();
-            builder.RegisterType<TaxonServiceProxy>().As<ITaxonServiceProxy>().InstancePerLifetimeScope();
-            builder.RegisterType<TaxonService>().As<ITaxonService>().InstancePerLifetimeScope();
-            builder.RegisterType<TaxonAttributeService>().As<ITaxonAttributeService>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationService>().As<IVirtualHerbariumObservationService>()
                 .InstancePerLifetimeScope();
 
@@ -244,7 +237,6 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SharkHarvestJob>().As<ISharkHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationsHarvestJob>().As<IObservationsHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationsHarvestIncrementalJob>().As<IObservationsHarvestIncrementalJob>().InstancePerLifetimeScope();
-            builder.RegisterType<TaxonHarvestJob>().As<ITaxonHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumHarvestJob>().As<IVirtualHerbariumHarvestJob>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<CreateDwcaDataValidationReportJob>().As<ICreateDwcaDataValidationReportJob>().InstancePerLifetimeScope();

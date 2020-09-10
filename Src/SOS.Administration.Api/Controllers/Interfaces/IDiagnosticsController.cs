@@ -13,11 +13,5 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<IActionResult> GetFieldMappingsDiffAsZipFile();
-
-        /// <summary>
-        ///     Get diff between generated, verbatim and processed areas.
-        /// </summary>
-        /// <returns></returns>
-        Task<IActionResult> GetAreasDiffAsZipFile();
     }
 }

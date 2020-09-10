@@ -1,6 +1,4 @@
-﻿using Microsoft.SqlServer.Types;
-
-namespace SOS.Import.Entities.Artportalen
+﻿namespace SOS.Import.Entities.Artportalen
 {
     public class AreaEntity
     {
@@ -17,7 +15,7 @@ namespace SOS.Import.Entities.Artportalen
         /// <summary>
         ///     Area geometry
         /// </summary>
-        public SqlGeometry Polygon { get; set; }
+        public string PolygonWKT { get; set; }
 
         /// <summary>
         ///     Name of area

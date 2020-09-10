@@ -147,6 +147,11 @@ namespace SOS.Process.Processors.Artportalen
                 var verbatimObservationsBatch = await _artportalenVerbatimRepository.GetBatchAsync(startId, endId);
                 Logger.LogDebug($"Finish fetching Artportalen batch ({startId}-{endId})");
 
+                if (!verbatimObservationsBatch?.Any() ?? true)
+                {
+                    return 0;
+                }
+
                 Logger.LogDebug($"Start processing Artportalen batch ({startId}-{endId})");
                 var processedObservationsBatch =
                     observationFactory.CreateProcessedObservations(verbatimObservationsBatch);

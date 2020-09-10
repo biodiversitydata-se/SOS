@@ -38,7 +38,6 @@ namespace SOS.Process.Jobs
     {
         private readonly IDwcArchiveFileWriterCoordinator _dwcArchiveFileWriterCoordinator;
         private readonly IAreaHelper _areaHelper;
-        private readonly ICopyFieldMappingsJob _copyFieldMappingsJob;
         private readonly IDataProviderManager _dataProviderManager;
         private readonly IInstanceManager _instanceManager;
         private readonly IValidationManager _validationManager;
@@ -68,7 +67,6 @@ namespace SOS.Process.Jobs
         /// <param name="dataProviderManager"></param>
         /// <param name="instanceManager"></param>
         /// <param name="validationManager"></param>
-        /// <param name="copyFieldMappingsJob"></param>
         /// <param name="processTaxaJob"></param>
         /// <param name="areaHelper"></param>
         /// <param name="dwcArchiveFileWriterCoordinator"></param>
@@ -90,7 +88,6 @@ namespace SOS.Process.Jobs
             IDataProviderManager dataProviderManager,
             IInstanceManager instanceManager,
             IValidationManager validationManager,
-            ICopyFieldMappingsJob copyFieldMappingsJob,
             IProcessTaxaJob processTaxaJob,
             IAreaHelper areaHelper,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
@@ -101,8 +98,6 @@ namespace SOS.Process.Jobs
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _processedTaxonRepository = processedTaxonRepository ??
                                         throw new ArgumentNullException(nameof(processedTaxonRepository));
-            _copyFieldMappingsJob =
-                copyFieldMappingsJob ?? throw new ArgumentNullException(nameof(copyFieldMappingsJob));
             _processTaxaJob = processTaxaJob ?? throw new ArgumentNullException(nameof(processTaxaJob));
             _instanceManager = instanceManager ?? throw new ArgumentNullException(nameof(instanceManager));
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
@@ -217,26 +212,21 @@ namespace SOS.Process.Jobs
                     return false;
                 }
 
-                // Use current taxa and field mappings if we are in incremental mode, to speed things up
+                // Use current taxa if we are in incremental mode, to speed things up
                 if (!incrementalMode)
                 {
                     //----------------------------------------------------------------------
-                    // 3. Copy field mappings and taxa from sos-verbatim to sos-processed
+                    // 3. Process taxa
                     //----------------------------------------------------------------------
-                    _logger.LogInformation("Start copying taxonomy and fieldmapping from verbatim to processed db");
-                    var metadataTasks = new[]
+                    _logger.LogInformation("Start processing taxonomy");
+                    
+                    if (!await _processTaxaJob.RunAsync())
                     {
-                        _copyFieldMappingsJob.RunAsync(),
-                        _processTaxaJob.RunAsync()
-                    };
-                    await Task.WhenAll(metadataTasks);
-                    if (!metadataTasks.All(t => t.Result))
-                    {
-                        _logger.LogError("Failed to copy taxonomy and fieldmapping from verbatim to processed db");
+                        _logger.LogError("Failed to process taxonomy");
                         return false;
                     }
 
-                    _logger.LogInformation("Finish copying taxonomy and fieldmapping from verbatim to processed db");
+                    _logger.LogInformation("Finish processing taxonomy");
                 }
                 
                 //--------------------------------------
@@ -331,7 +321,6 @@ namespace SOS.Process.Jobs
                     // 9. End create DwC CSV files and merge the files into multiple DwC-A files.
                     //----------------------------------------------------------------------------
                     await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
-                    _dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
                 }
 
                 //----------------------------------------------
@@ -441,7 +430,10 @@ namespace SOS.Process.Jobs
             }
             finally
             {
-                _dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
+                if (!incrementalMode)
+                {
+                    _dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
+                }
             }
         }
     }

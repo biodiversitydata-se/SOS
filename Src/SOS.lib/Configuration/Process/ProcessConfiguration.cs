@@ -1,6 +1,4 @@
-﻿using SOS.Lib.Configuration.Shared;
-
-namespace SOS.Lib.Configuration.Process
+﻿namespace SOS.Lib.Configuration.Process
 {
     /// <summary>
     ///     Root config
@@ -21,5 +19,15 @@ namespace SOS.Lib.Configuration.Process
         ///     Field mapping
         /// </summary>
         public FieldMappingConfiguration FieldMapping { get; set; }
+
+        /// <summary>
+        ///     taxon attribute service configuration
+        /// </summary>
+        public TaxonAttributeServiceConfiguration TaxonAttributeServiceConfiguration { get; set; }
+
+        /// <summary>
+        ///     Taxon service configuration
+        /// </summary>
+        public TaxonServiceConfiguration TaxonServiceConfiguration { get; set; }
     }
 }

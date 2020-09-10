@@ -10,6 +10,7 @@ using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
+using SOS.Lib.Services;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Harvesters.Observations

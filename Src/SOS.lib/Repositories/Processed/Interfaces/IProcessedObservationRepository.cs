@@ -64,13 +64,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId);
 
         /// <summary>
-        /// Get max id for specified provider
-        /// </summary>
-        /// <param name="providerId"></param>
-        /// <returns></returns>
-        Task<int> GetMaxIdForProviderAsync(int providerId);
-
-        /// <summary>
         /// Verify that collection exists
         /// </summary>
         /// <returns></returns>

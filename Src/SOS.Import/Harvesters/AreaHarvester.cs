@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Factories.Harvest;
 using SOS.Import.Harvesters.Interfaces;
-using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
+using SOS.Import.Repositories.Destination.Area.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -20,9 +20,10 @@ namespace SOS.Import.Harvesters
     public class AreaHarvester : IAreaHarvester
     {
         private readonly IAreaRepository _areaRepository;
-        private readonly IAreaVerbatimRepository _areaVerbatimRepository;
+        private readonly IAreaProcessedRepository _areaProcessedRepository;
         private readonly ILogger<AreaHarvester> _logger;
         private readonly AreaHarvestFactory _harvestFactory;
+
 
         /// <summary>
         ///     Constructor
@@ -32,12 +33,12 @@ namespace SOS.Import.Harvesters
         /// <param name="logger"></param>
         public AreaHarvester(
             IAreaRepository areaRepository,
-            IAreaVerbatimRepository areaVerbatimRepository,
+            IAreaProcessedRepository areaProcessedRepository,
             ILogger<AreaHarvester> logger)
         {
             _areaRepository = areaRepository ?? throw new ArgumentNullException(nameof(areaRepository));
-            _areaVerbatimRepository =
-                areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
+            _areaProcessedRepository =
+                areaProcessedRepository ?? throw new ArgumentNullException(nameof(areaProcessedRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _harvestFactory = new AreaHarvestFactory();
@@ -56,26 +57,29 @@ namespace SOS.Import.Harvesters
                 _logger.LogDebug("Finish getting areas");
 
                 // Make sure we have an empty collection
-                if ((areas?.Any() ?? false) && await _areaVerbatimRepository.DeleteCollectionAsync())
+                if ((areas?.Any() ?? false) && await _areaProcessedRepository.DeleteCollectionAsync())
                 {
                     _logger.LogDebug("Start preparing area collection");
-                    await _areaVerbatimRepository.DropGeometriesAsync();
+                    await _areaProcessedRepository.DropGeometriesAsync();
 
-                    if (await _areaVerbatimRepository.AddCollectionAsync())
+                    if (await _areaProcessedRepository.AddCollectionAsync())
                     {
                         _logger.LogDebug("Finish preparing area collection");
                         _logger.LogDebug("Start adding areas");
 
-                        if (await _areaVerbatimRepository.AddManyAsync(await _harvestFactory.CastEntitiesToVerbatimsAsync(areas)))
+                        if (await _areaProcessedRepository.AddManyAsync(await _harvestFactory.CastEntitiesToVerbatimsAsync(areas)))
                         {
                             _logger.LogDebug("Finish adding areas");
 
                             _logger.LogDebug("Start casting geometries");
-                            var geometries = areas.ToDictionary(a => a.Id, a => a.Polygon?.ToGeometry());
+                            var geometries = areas.ToDictionary(a => a.Id, a => a
+                                .PolygonWKT?
+                                .ToGeometry()
+                                .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84));
                             _logger.LogDebug("Finsih casting geometries");
 
                             _logger.LogDebug("Start storing geometries");
-                            if (await _areaVerbatimRepository.StoreGeometriesAsync(geometries))
+                            if (await _areaProcessedRepository.StoreGeometriesAsync(geometries))
                             {
                                 _logger.LogDebug("Finish storing geometries");
                                 _logger.LogDebug("Adding areas succeeded");

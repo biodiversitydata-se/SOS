@@ -26,6 +26,7 @@ using SOS.Process.Managers;
 using SOS.Process.Processors.Artportalen;
 using SOS.Process.Repositories.Source;
 using Xunit;
+using TaxonManager = SOS.Export.Managers.TaxonManager;
 
 namespace SOS.Process.IntegrationTests.Processors.Artportalen
 {

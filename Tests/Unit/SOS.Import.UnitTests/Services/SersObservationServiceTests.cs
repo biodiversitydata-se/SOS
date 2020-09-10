@@ -6,8 +6,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Services;
-using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Services.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Services

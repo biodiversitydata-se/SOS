@@ -125,15 +125,15 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\FieldMappingEnums.cs";
-            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var importClient = new VerbatimClient(
+            var verbatimDbConfiguration = GetProcessDbConfiguration();
+            var processClient = new ProcessClient (
                 verbatimDbConfiguration.GetMongoDbSettings(),
                 verbatimDbConfiguration.DatabaseName,
                 verbatimDbConfiguration.ReadBatchSize,
-                verbatimDbConfiguration.WriteBatchSize);
+                verbatimDbConfiguration.WriteBatchSize); 
 
             var fieldMappingRepository =
-                new FieldMappingRepository(importClient, new NullLogger<FieldMappingRepository>());
+                new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

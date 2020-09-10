@@ -275,9 +275,15 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public int? ConfirmationYear { get; set; }
 
         /// <summary>
-        ///     Id of sighting
+        ///     Incremented number
         /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Sighting id
+        /// </summary>
+        public int SightingId { get; set; }
+
         public int SightingTypeSearchGroupId { get; set; }
         public int SightingTypeId { get; set; }
 

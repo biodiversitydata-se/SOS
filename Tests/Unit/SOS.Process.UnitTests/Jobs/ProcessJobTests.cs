@@ -53,7 +53,6 @@ namespace SOS.Process.UnitTests.Jobs
             _instanceManager = new Mock<IInstanceManager>();
             _validationManager = new Mock<IValidationManager>();
             _taxonProcessedRepository = new Mock<IProcessedTaxonRepository>();
-            _copyFieldMappingsJob = new Mock<ICopyFieldMappingsJob>();
             _processTaxaJob = new Mock<IProcessTaxaJob>();
             _clamPortalProcessor = new Mock<IClamPortalObservationProcessor>();
             _fishDataProcessor = new Mock<IFishDataObservationProcessor>();
@@ -75,7 +74,6 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IProcessedObservationRepository> _darwinCoreRepository;
         private readonly Mock<IProcessInfoRepository> _processInfoRepository;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
-        private readonly Mock<ICopyFieldMappingsJob> _copyFieldMappingsJob;
         private readonly Mock<IProcessTaxaJob> _processTaxaJob;
         private readonly Mock<IClamPortalObservationProcessor> _clamPortalProcessor;
         private readonly Mock<IFishDataObservationProcessor> _fishDataProcessor;
@@ -113,7 +111,6 @@ namespace SOS.Process.UnitTests.Jobs
             _dataProviderManager.Object,
             _instanceManager.Object,
             _validationManager.Object,
-            _copyFieldMappingsJob.Object,
             _processTaxaJob.Object,
             _areaHelper.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
@@ -532,8 +529,7 @@ namespace SOS.Process.UnitTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
 
             _dataProviderManager.Setup(dpm => dpm.GetAllDataProvidersAsync()).ReturnsAsync(new List<DataProvider> {new DataProvider{ Id = 1, Name = "Artportalen", Identifier = "Artportalen", Type = DataProviderType.ArtportalenObservations} });
-            _copyFieldMappingsJob.Setup(r => r.RunAsync())
-                .ReturnsAsync(true);
+            
             _processTaxaJob.Setup(r => r.RunAsync())
                 .ReturnsAsync(true);
 

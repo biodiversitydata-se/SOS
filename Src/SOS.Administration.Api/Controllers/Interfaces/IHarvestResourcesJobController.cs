@@ -22,20 +22,6 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         IActionResult RunAreasHarvestJob();
 
         /// <summary>
-        ///     Schedule daily taxon harvest job
-        /// </summary>
-        /// <param name="hour"></param>
-        /// <param name="minute"></param>
-        /// <returns></returns>
-        IActionResult AddDailyTaxonHarvestJob(int hour, int minute);
-
-        /// <summary>
-        ///     Run taxon harvest
-        /// </summary>
-        /// <returns></returns>
-        IActionResult RunTaxonHarvestJob();
-
-        /// <summary>
         ///     Run import field mapping.
         /// </summary>
         /// <returns></returns>

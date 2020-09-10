@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
 using SOS.Import.Containers.Interfaces;
@@ -12,17 +15,20 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 
 namespace SOS.Import.Factories.Harvest
 {
-    public class ArtportalenHarvestFactory : IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
+    internal class ArtportalenHarvestFactory : IHarvestFactory<SightingEntity[], ArtportalenObservationVerbatim>
     {
         private readonly IArtportalenMetadataContainer _artportalenMetadataContainer;
 
         private readonly IProjectRepository _projectRepository;
         private readonly ISightingRepository _sightingRepository;
         private readonly ISiteRepository _siteRepository;
-        private ISightingRelationRepository _sightingRelationRepository;
+        private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
 
-        private readonly IDictionary<int, Site> _sites;
+        private int _idCounter;
+        private int NextId => Interlocked.Increment(ref _idCounter);
+        
+        private readonly ConcurrentDictionary<int, Site> _sites;
 
         /// <summary>
         /// Cast sighting itemEntity to model .
@@ -39,7 +45,7 @@ namespace SOS.Import.Factories.Harvest
             {
                 return null;
             }
-            
+
             if (_sites.TryGetValue(entity.SiteId.HasValue ? entity.SiteId.Value : -1, out var site))
             {
                 // Try to set parent site name if empty
@@ -79,7 +85,8 @@ namespace SOS.Import.Factories.Harvest
                 HasTriggeredValidationRules = entity.HasTriggeredValidationRules,
                 HasAnyTriggeredValidationRuleWithWarning = entity.HasAnyTriggeredValidationRuleWithWarning,
                 HiddenByProvider = entity.HiddenByProvider,
-                Id = entity.Id,
+                Id = NextId,
+                SightingId = entity.Id,
                 OwnerOrganization =
                     entity.OwnerOrganizationId.HasValue &&
                     _artportalenMetadataContainer.Organizations.ContainsKey(entity.OwnerOrganizationId.Value)
@@ -474,7 +481,7 @@ namespace SOS.Import.Factories.Harvest
             _speciesCollectionRepository = speciesCollectionRepository;
 
             _artportalenMetadataContainer = artportalenMetadataContainer;
-            _sites = new Dictionary<int, Site>();
+            _sites = new ConcurrentDictionary<int, Site>();
         }
 
         public bool IncrementalMode { get; set; }
@@ -521,8 +528,13 @@ namespace SOS.Import.Factories.Harvest
                 speciesCollections,
                 sightingRelations);
 
-            return from e in entities
-                select CastEntityToVerbatim(e, personSightings, sightingsProjects);
+            var verbatims = new List<ArtportalenObservationVerbatim>();
+            for (var i = 0; i < entities.Length; i++)
+            {
+                verbatims.Add(CastEntityToVerbatim(entities[i], personSightings, sightingsProjects));
+            }
+
+            return verbatims;
         }
 
     }

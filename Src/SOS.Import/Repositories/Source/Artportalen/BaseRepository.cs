@@ -15,6 +15,11 @@ namespace SOS.Import.Repositories.Source.Artportalen
         private readonly IArtportalenDataService _artportalenDataService;
 
         /// <summary>
+        ///     Logger
+        /// </summary>
+        protected ILogger<T> Logger { get; }
+
+        /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="artportalenDataService"></param>
@@ -25,11 +30,6 @@ namespace SOS.Import.Repositories.Source.Artportalen
                 artportalenDataService ?? throw new ArgumentNullException(nameof(artportalenDataService));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
-        /// <summary>
-        ///     Logger
-        /// </summary>
-        protected ILogger<T> Logger { get; }
 
         /// <inheritdoc />
         public async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic parameters = null, bool live = false)

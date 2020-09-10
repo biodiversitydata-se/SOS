@@ -12,7 +12,6 @@
     <PackageReference Include="Hangfire.Core" Version="1.7.12" />
     <PackageReference Include="MailKit" Version="2.8.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.7" />
-    <PackageReference Include="Microsoft.SqlServer.Types" Version="14.0.1016.290" />
     <PackageReference Include="MongoDB.Driver" Version="2.11.1" />
     <PackageReference Include="MongoDB.Driver.GridFS" Version="2.11.1" />
     <PackageReference Include="NEST" Version="7.9.0" />

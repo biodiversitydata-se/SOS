@@ -221,7 +221,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     For Darwin Core, recommended best practice is to use an
         ///     encoding scheme, such as ISO 8601:2004(E).
         /// </summary>
-        [Date]
+        
         public DateTime? Modified { get; set; }
 
         /// <summary>

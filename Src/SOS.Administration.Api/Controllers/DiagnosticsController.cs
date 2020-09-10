@@ -19,7 +19,6 @@ namespace SOS.Administration.Api.Controllers
     [Route("[controller]")]
     public class DiagnosticsController : ControllerBase, IDiagnosticsController
     {
-        private readonly IAreaDiffHelper _areaDiffHelper;
         private readonly IAreaHarvester _areaHarvester;
         private readonly IFieldMappingDiffHelper _fieldMappingDiffHelper;
         private readonly IFieldMappingHarvester _fieldMappingHarvester;
@@ -37,7 +36,6 @@ namespace SOS.Administration.Api.Controllers
             IFieldMappingHarvester fieldMappingHarvester,
             IFieldMappingDiffHelper fieldMappingDiffHelper,
             IAreaHarvester areaHarvester,
-            IAreaDiffHelper areaDiffHelper,
             ILogger<DiagnosticsController> logger)
         {
             _fieldMappingHarvester =
@@ -45,7 +43,6 @@ namespace SOS.Administration.Api.Controllers
             _fieldMappingDiffHelper =
                 fieldMappingDiffHelper ?? throw new ArgumentNullException(nameof(fieldMappingDiffHelper));
             _areaHarvester = areaHarvester ?? throw new ArgumentNullException(nameof(areaHarvester));
-            _areaDiffHelper = areaDiffHelper ?? throw new ArgumentNullException(nameof(areaDiffHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -65,28 +62,6 @@ namespace SOS.Administration.Api.Controllers
                     await _fieldMappingHarvester.CreateAllFieldMappingsAsync(fieldMappingFieldIds);
                 var zipBytes = await _fieldMappingDiffHelper.CreateDiffZipFile(generatedFieldMappings);
                 return File(zipBytes, "application/zip", "FieldMappingDiffBetweenVerbatimAndProcessed.zip");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{MethodBase.GetCurrentMethod().Name}() failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <summary>
-        ///     Get diff between generated, verbatim and processed areas.
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("AreaDiffAsZipFile")]
-        [ProducesResponseType(typeof(byte[]), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetAreasDiffAsZipFile()
-        {
-            try
-            {
-                var generatedAreas = await _areaHarvester.GetAreasAsync();
-                var zipBytes = await _areaDiffHelper.CreateDiffZipFile(generatedAreas.ToArray());
-                return File(zipBytes, "application/zip", "AreaDiffBetweenVerbatimAndProcessed.zip");
             }
             catch (Exception e)
             {

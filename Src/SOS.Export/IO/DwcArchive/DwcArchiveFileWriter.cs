@@ -246,22 +246,45 @@ namespace SOS.Export.IO.DwcArchive
             // Create occurrence.csv
             compressedFileStream.PutNextEntry("occurrence.csv");
             await WriteOccurrenceHeaderRow(compressedFileStream);
-            foreach (var value in dwcaFilePartsInfo.FilePathByBatchIdAndFilePart.Values)
+
+            foreach (var occurrenceFile in Directory.EnumerateFiles(
+                dwcaFilePartsInfo.ExportFolder,
+                "occurrence*",
+                SearchOption.TopDirectoryOnly)
+            )
+            {
+                await using var readStream = File.OpenRead(occurrenceFile);
+                await readStream.CopyToAsync(compressedFileStream);
+            }
+
+
+           /* foreach (var value in dwcaFilePartsInfo.FilePathByBatchIdAndFilePart.Values)
             {
                 string occurrenceCsvFilePath = value[DwcaFilePart.Occurrence];
                 await using var readStream = File.OpenRead(occurrenceCsvFilePath);
                 await readStream.CopyToAsync(compressedFileStream);
-            }
+            }*/
 
             // Create emof.csv
             compressedFileStream.PutNextEntry("extendedMeasurementOrFact.csv");
             await WriteEmofHeaderRow(compressedFileStream);
-            foreach (var value in dwcaFilePartsInfo.FilePathByBatchIdAndFilePart.Values)
+
+            foreach (var emofFile in Directory.EnumerateFiles(
+                dwcaFilePartsInfo.ExportFolder,
+                "emof*",
+                SearchOption.TopDirectoryOnly)
+            )
+            {
+                await using var readStream = File.OpenRead(emofFile);
+                await readStream.CopyToAsync(compressedFileStream);
+            }
+
+           /* foreach (var value in dwcaFilePartsInfo.FilePathByBatchIdAndFilePart.Values)
             {
                 string emofCsvFilePath = value[DwcaFilePart.Emof];
                 await using var readStream = File.OpenRead(emofCsvFilePath);
                 await readStream.CopyToAsync(compressedFileStream);
-            }
+            }*/
         }
 
         private async Task WriteOccurrenceHeaderRow(ZipOutputStream compressedFileStream)

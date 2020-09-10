@@ -18,15 +18,15 @@ namespace SOS.Import.UnitTests.Repositories.Destination.FieldMappings
         /// </summary>
         public FieldMappingRepositoryTests()
         {
-            _importClient = new Mock<IVerbatimClient>();
+            _processClient = new Mock<IProcessClient>();
             _loggerMock = new Mock<ILogger<FieldMappingRepository>>();
         }
 
-        private readonly Mock<IVerbatimClient> _importClient;
+        private readonly Mock<IProcessClient> _processClient;
         private readonly Mock<ILogger<FieldMappingRepository>> _loggerMock;
 
         private FieldMappingRepository TestObject => new FieldMappingRepository(
-            _importClient.Object,
+            _processClient.Object,
             _loggerMock.Object);
 
         /// <summary>
@@ -40,10 +40,10 @@ namespace SOS.Import.UnitTests.Repositories.Destination.FieldMappings
             Action create = () => new FieldMappingRepository(
                 null,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("importClient");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("processClient");
 
             create = () => new FieldMappingRepository(
-                _importClient.Object,
+                _processClient.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }
