@@ -107,6 +107,28 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
+        /// <summary>
+        /// Get aggregated grid cells data.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="precision"></param>
+        /// <param name="bbox"></param>
+        /// <returns></returns>
+        public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox)
+        {
+            try
+            {
+                filter = await _filterManager.PrepareFilter(filter);
+                return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision, bbox);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get aggregated chunk of observations");
+                throw;
+            }
+        }
+
+
         private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)
         {
             if (string.IsNullOrEmpty(filter.FieldTranslationCultureCode))

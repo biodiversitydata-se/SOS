@@ -51,5 +51,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="bbox"></param>
         /// <returns></returns>
         Task<Result<GeoGridResult>> GetGeogridAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox);
+
+        Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom, LatLonBoundingBox bbox);
     }
 }

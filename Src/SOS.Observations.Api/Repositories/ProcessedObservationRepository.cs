@@ -449,7 +449,7 @@ namespace SOS.Observations.Api.Repositories
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_GeoAggregated");
             operation.Telemetry.Properties["Filter"] = filter.ToString();
 
-            var searchResponseZoomedInGrid = await _elasticClient.SearchAsync<dynamic>(s => s
+            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
                 .Index(_indexName)
                 .Size(0)
                 .Aggregations(a => a.GeoHash("geohash_grid", g => g
@@ -472,17 +472,17 @@ namespace SOS.Observations.Api.Repositories
                 )
             
             );
-            if (!searchResponseZoomedInGrid.IsValid)
+            if (!searchResponse.IsValid)
             {
-                if (searchResponseZoomedInGrid.ServerError.Error.CausedBy.Type == "too_many_buckets_exception")
+                if (searchResponse.ServerError.Error.CausedBy.Type == "too_many_buckets_exception")
                 {
                     return Result.Failure<GeoGridResult>($"The number of cells that will be returned is too large. The limit is {maxNrReturnedBuckets} cells. Try using lower precision or a smaller bounding box.");
                 }
 
-                throw new InvalidOperationException(searchResponseZoomedInGrid.DebugInformation);
+                throw new InvalidOperationException(searchResponse.DebugInformation);
             }
 
-            var nrOfGridCells = (int?)searchResponseZoomedInGrid.Aggregations.GeoHash("geohash_grid").Buckets?.Count ?? 0;
+            var nrOfGridCells = (int?)searchResponse.Aggregations.GeoHash("geohash_grid").Buckets?.Count ?? 0;
             if (nrOfGridCells >= maxNrReturnedBuckets)
             {
                 return Result.Failure<GeoGridResult>($"The number of cells that will be returned is too large. The limit is {maxNrReturnedBuckets} cells. Try using lower precision or a smaller bounding box.");
@@ -490,7 +490,7 @@ namespace SOS.Observations.Api.Repositories
 
             _telemetry.StopOperation(operation);
 
-            var georesult = searchResponseZoomedInGrid
+            var georesult = searchResponse
                 .Aggregations
                 .Terms("geohash_grid")
                 .Buckets?
@@ -513,6 +513,92 @@ namespace SOS.Observations.Api.Repositories
             // When operation is disposed, telemetry item is sent.
             return Result.Success(gridResult);
         }
+
+        public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(
+                SearchFilter filter,
+                int zoom,
+                LatLonBoundingBox bbox)
+        {
+            const int maxNrBucketsInElactic = 65535;
+            const int maxNrReturnedBuckets = 10000;
+            if (!filter?.IsFilterActive ?? true)
+            {
+                return null;
+            }
+
+            var query = filter.ToQuery();
+            query = AddSightingTypeFilters(filter, query);
+            query = InternalFilterBuilder.AddFilters(filter, query);
+            var excludeQuery = CreateExcludeQuery(filter);
+            excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
+
+            using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_GeoAggregated");
+            operation.Telemetry.Properties["Filter"] = filter.ToString();
+
+            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                .Index(_indexName)
+                .Size(0)
+                .Aggregations(a => a.Filter("geotile_filter", g => g
+                    .Filter(f => f.GeoBoundingBox(bb => bb
+                        .Field("location.pointLocation")
+                        .BoundingBox(b => b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation())
+                        )))
+                    .Aggregations(ab => ab.GeoTile("geotile_grid", gg => gg
+                        .Field("location.pointLocation")
+                        .Size(maxNrBucketsInElactic + 1)
+                        .Precision((GeoTilePrecision)zoom)
+                        .Aggregations(b => b
+                            .Cardinality("taxa_count", t => t
+                                .Field("taxon.id"))
+                        )))
+                    )
+                )
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+            );
+
+            
+            if (!searchResponse.IsValid)
+            {
+                if (searchResponse.ServerError.Error.CausedBy.Type == "too_many_buckets_exception")
+                {
+                    return Result.Failure<GeoGridTileResult>($"The number of cells that will be returned is too large. The limit is {maxNrReturnedBuckets} cells. Try using lower zoom or a smaller bounding box.");
+                }
+
+                throw new InvalidOperationException(searchResponse.DebugInformation);
+            }
+
+            var nrOfGridCells = (int?)searchResponse.Aggregations.Filter("geotile_filter").GeoTile("geotile_grid").Buckets?.Count ?? 0;
+            if (nrOfGridCells >= maxNrReturnedBuckets)
+            {
+                return Result.Failure<GeoGridTileResult>($"The number of cells that will be returned is too large. The limit is {maxNrReturnedBuckets} cells. Try using lower zoom or a smaller bounding box.");
+            }
+
+            _telemetry.StopOperation(operation);
+
+            var georesult = searchResponse
+                .Aggregations
+                .Filter("geotile_filter")
+                .GeoTile("geotile_grid")
+                .Buckets?
+                .Select(b => GridCellTile.Create(b.Key, b.DocCount, (long?)b.Cardinality("taxa_count").Value));
+
+            var gridResult = new GeoGridTileResult()
+            {
+                BoundingBox = bbox,
+                Zoom = zoom,
+                GridCellTileCount = nrOfGridCells,
+                GridCellTiles = georesult
+            };
+
+            // When operation is disposed, telemetry item is sent.
+            return Result.Success(gridResult);
+        }
+
 
         private LatLonBoundingBox GetBoundingBoxFromGeoHash(string geoHash)
         {
