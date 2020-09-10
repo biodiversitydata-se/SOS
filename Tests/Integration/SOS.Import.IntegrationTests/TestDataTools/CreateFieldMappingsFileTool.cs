@@ -26,15 +26,15 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\FieldMappings.json";
-            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var importClient = new VerbatimClient(
+            var verbatimDbConfiguration = GetProcessDbConfiguration();
+            var processClient = new ProcessClient (
                 verbatimDbConfiguration.GetMongoDbSettings(),
                 verbatimDbConfiguration.DatabaseName,
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize);
 
             var fieldMappingRepository =
-                new FieldMappingRepository(importClient, new NullLogger<FieldMappingRepository>());
+                new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -57,9 +57,8 @@ namespace SOS.Import.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\FieldMappings.msgpck";
             const int batchSize = 50000;
-            var importConfiguration = GetImportConfiguration();
-            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var importClient = new VerbatimClient(
+            var verbatimDbConfiguration = GetProcessDbConfiguration();
+            var importClient = new ProcessClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
                 verbatimDbConfiguration.DatabaseName,
                 verbatimDbConfiguration.ReadBatchSize,

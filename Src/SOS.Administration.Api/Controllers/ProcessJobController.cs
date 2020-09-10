@@ -37,24 +37,6 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpPost("Areas/Run")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult RunProcessAreasJob()
-        {
-            try
-            {
-                BackgroundJob.Enqueue<IProcessAreasJob>(job => job.RunAsync());
-                return new OkObjectResult("Process areas job was enqueued to Hangfire.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Enqueuing process areas job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
         [HttpPost("Daily")]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
@@ -223,24 +205,6 @@ namespace SOS.Administration.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Enqueuing process taxa job failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpPost("CopyFieldMapping/Run")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult RunCopyFieldMappingJob()
-        {
-            try
-            {
-                BackgroundJob.Enqueue<ICopyFieldMappingsJob>(job => job.RunAsync());
-                return new OkObjectResult("Copy field mapping job was enqueued to Hangfire.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Enqueuing copy field mapping job failed");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }

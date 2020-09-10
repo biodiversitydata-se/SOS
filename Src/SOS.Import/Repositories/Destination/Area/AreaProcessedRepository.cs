@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.GridFS;
 using NetTopologySuite.Geometries;
-using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
+using SOS.Import.Repositories.Destination.Area.Interfaces;
+using SOS.Import.Repositories.Resource;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.JsonConverters;
-using SOS.Lib.Models.Shared;
 
-namespace SOS.Import.Repositories.Destination.Artportalen
+namespace SOS.Import.Repositories.Destination.Area
 {
     /// <summary>
     ///     Area repository
     /// </summary>
-    public class AreaVerbatimRepository : VerbatimRepository<Area, int>, IAreaVerbatimRepository
+    public class AreaProcessedRepository : ResourceRepositoryBase<Lib.Models.Shared.Area, int>, IAreaProcessedRepository
     {
         private readonly GridFSBucket _gridFSBucket;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
@@ -23,11 +23,11 @@ namespace SOS.Import.Repositories.Destination.Artportalen
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="importClient"></param>
+        /// <param name="processClient"></param>
         /// <param name="logger"></param>
-        public AreaVerbatimRepository(
-            IVerbatimClient importClient,
-            ILogger<AreaVerbatimRepository> logger) : base(importClient, logger)
+        public AreaProcessedRepository(
+            IProcessClient processClient,
+            ILogger<AreaProcessedRepository> logger) : base(processClient, false, logger)
         {
             _jsonSerializerOptions = new JsonSerializerOptions();
             _jsonSerializerOptions.Converters.Add(new GeoShapeConverter());

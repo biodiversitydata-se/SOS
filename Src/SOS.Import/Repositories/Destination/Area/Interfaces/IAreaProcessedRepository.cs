@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using NetTopologySuite.Geometries;
-using SOS.Import.Repositories.Destination.Interfaces;
-using SOS.Lib.Models.Shared;
+using SOS.Import.Repositories.Resource.Interfaces;
 
-namespace SOS.Import.Repositories.Destination.Artportalen.Interfaces
+namespace SOS.Import.Repositories.Destination.Area.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IAreaVerbatimRepository : IVerbatimRepository<Area, int>
+    public interface IAreaProcessedRepository : IResourceRepositoryBase<SOS.Lib.Models.Shared.Area, int>
     {
         /// <summary>
         ///     Delete all geometries stored in Gridfs

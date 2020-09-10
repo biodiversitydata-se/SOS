@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
+using SOS.Import.Repositories.Destination.Area.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
@@ -15,20 +15,20 @@ namespace SOS.Import.Factories.FieldMapping
     /// </summary>
     public abstract class GeoRegionFieldMappingFactoryBase
     {
-        private readonly IAreaVerbatimRepository _areaVerbatimRepository;
+        private readonly IAreaProcessedRepository _areaProcessedRepository;
         private readonly ILogger<GeoRegionFieldMappingFactoryBase> _logger;
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="areaVerbatimRepository"></param>
+        /// <param name="areaProcessedRepository"></param>
         /// <param name="logger"></param>
         protected GeoRegionFieldMappingFactoryBase(
-            IAreaVerbatimRepository areaVerbatimRepository,
+            IAreaProcessedRepository areaProcessedRepository,
             ILogger<GeoRegionFieldMappingFactoryBase> logger)
         {
-            _areaVerbatimRepository =
-                areaVerbatimRepository ?? throw new ArgumentNullException(nameof(areaVerbatimRepository));
+            _areaProcessedRepository =
+                areaProcessedRepository ?? throw new ArgumentNullException(nameof(areaProcessedRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -36,7 +36,7 @@ namespace SOS.Import.Factories.FieldMapping
         protected async Task<Lib.Models.Shared.FieldMapping> CreateFieldMappingAsync(
             FieldMappingFieldId fieldMappingFieldId, AreaType areaType)
         {
-            var areas = (await _areaVerbatimRepository.GetAllAsync()).ToArray();
+            var areas = (await _areaProcessedRepository.GetAllAsync()).ToArray();
             var fieldMapping = CreateFieldMapping(areas, fieldMappingFieldId, areaType);
             return fieldMapping;
         }

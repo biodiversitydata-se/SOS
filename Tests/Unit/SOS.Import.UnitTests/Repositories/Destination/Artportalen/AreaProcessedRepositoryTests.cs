@@ -2,7 +2,7 @@ using System;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Repositories.Destination.Artportalen;
+using SOS.Import.Repositories.Destination.Area;
 using SOS.Lib.Database.Interfaces;
 using Xunit;
 
@@ -11,21 +11,21 @@ namespace SOS.Import.UnitTests.Repositories.Destination.Artportalen
     /// <summary>
     ///     Meta data repository tests
     /// </summary>
-    public class AreaVerbatimRepositoryTests
+    public class AreaProcessedRepositoryTests
     {
         /// <summary>
         ///     Constructor
         /// </summary>
-        public AreaVerbatimRepositoryTests()
+        public AreaProcessedRepositoryTests()
         {
-            _importClient = new Mock<IVerbatimClient>();
-            _loggerMock = new Mock<ILogger<AreaVerbatimRepository>>();
+            _importClient = new Mock<IProcessClient>();
+            _loggerMock = new Mock<ILogger<AreaProcessedRepository>>();
         }
 
-        private readonly Mock<IVerbatimClient> _importClient;
-        private readonly Mock<ILogger<AreaVerbatimRepository>> _loggerMock;
+        private readonly Mock<IProcessClient> _importClient;
+        private readonly Mock<ILogger<AreaProcessedRepository>> _loggerMock;
 
-        private AreaVerbatimRepository TestObject => new AreaVerbatimRepository(
+        private AreaProcessedRepository TestObject => new AreaProcessedRepository(
             _importClient.Object,
             _loggerMock.Object);
 
@@ -37,12 +37,12 @@ namespace SOS.Import.UnitTests.Repositories.Destination.Artportalen
         {
             TestObject.Should().NotBeNull();
 
-            Action create = () => new AreaVerbatimRepository(
+            Action create = () => new AreaProcessedRepository(
                 null,
                 _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("importClient");
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
 
-            create = () => new AreaVerbatimRepository(
+            create = () => new AreaProcessedRepository(
                 _importClient.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");

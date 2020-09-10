@@ -30,14 +30,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<IGeoShape> GetGeometryAsync(int areaId);
 
-        /// <summary>
-        ///     Save geometry to Gridfs
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        Task<bool> StoreGeometryAsync(int id, IGeoShape geometry);
-
         Task<List<Area>> GetAsync(AreaType[] areaTypes);
     }
 }

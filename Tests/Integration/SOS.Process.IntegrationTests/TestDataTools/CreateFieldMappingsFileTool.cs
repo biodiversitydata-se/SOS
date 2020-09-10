@@ -27,8 +27,8 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\FieldMappings.json";
             const int batchSize = 50000;
-            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var verbatimClient = new VerbatimClient(
+            var verbatimDbConfiguration = GetProcessDbConfiguration();
+            var verbatimClient = new ProcessClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
                 verbatimDbConfiguration.DatabaseName,
                 verbatimDbConfiguration.ReadBatchSize,
@@ -59,8 +59,8 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             const string filePath = @"c:\temp\FieldMappings.msgpck";
             const int batchSize = 50000;
-            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var verbatimClient = new VerbatimClient(
+            var verbatimDbConfiguration = GetProcessDbConfiguration();
+            var verbatimClient = new ProcessClient(
                 verbatimDbConfiguration.GetMongoDbSettings(),
                 verbatimDbConfiguration.DatabaseName,
                 verbatimDbConfiguration.ReadBatchSize,

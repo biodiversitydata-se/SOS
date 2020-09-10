@@ -77,16 +77,12 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<AreaHelper>().As<IAreaHelper>().SingleInstance();
             builder.RegisterType<FieldMappingDiffHelper>().As<IFieldMappingDiffHelper>().SingleInstance();
             builder.RegisterType<FieldMappingResolverHelper>().As<IFieldMappingResolverHelper>().SingleInstance();
-            builder.RegisterType<AreaDiffHelper>().As<IAreaDiffHelper>().SingleInstance();
 
             // Repositories source
-            builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ArtportalenVerbatimRepository>().As<IArtportalenVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<DwcaVerbatimRepository>().As<IDwcaVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<FieldMappingVerbatimRepository>().As<IFieldMappingVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<FishDataObservationVerbatimRepository>().As<IFishDataObservationVerbatimRepository>()
@@ -145,8 +141,6 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<CopyProviderDataJob>().As<ICopyProviderDataJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessJob>().As<IProcessJob>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessTaxaJob>().As<IProcessTaxaJob>().InstancePerLifetimeScope();
-            builder.RegisterType<CopyFieldMappingsJob>().As<ICopyFieldMappingsJob>().InstancePerLifetimeScope();
-            builder.RegisterType<ProcessAreasJob>().As<IProcessAreasJob>().InstancePerLifetimeScope();
 
             // Add services
             builder.RegisterType<TaxonAttributeService>().As<ITaxonAttributeService>().InstancePerLifetimeScope();

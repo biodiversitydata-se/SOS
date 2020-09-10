@@ -13,6 +13,8 @@ using SOS.Import.Jobs;
 using SOS.Import.Managers;
 using SOS.Import.Managers.Interfaces;
 using SOS.Import.Repositories.Destination;
+using SOS.Import.Repositories.Destination.Area;
+using SOS.Import.Repositories.Destination.Area.Interfaces;
 using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Destination.ClamPortal;
@@ -90,12 +92,7 @@ namespace SOS.Import.IoC.Modules
             if (Configurations.ImportConfiguration.SharkServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.SharkServiceConfiguration).As<SharkServiceConfiguration>()
                     .SingleInstance();
-           /* if (Configurations.ImportConfiguration.TaxonAttributeServiceConfiguration != null)
-                builder.RegisterInstance(Configurations.ImportConfiguration.TaxonAttributeServiceConfiguration)
-                    .As<TaxonAttributeServiceConfiguration>().SingleInstance();
-            if (Configurations.ImportConfiguration.TaxonServiceConfiguration != null)
-                builder.RegisterInstance(Configurations.ImportConfiguration.TaxonServiceConfiguration).As<TaxonServiceConfiguration>()
-                    .SingleInstance();*/
+           
             if (Configurations.ImportConfiguration.VirtualHerbariumServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.ImportConfiguration.VirtualHerbariumServiceConfiguration)
                     .As<VirtualHerbariumServiceConfiguration>().SingleInstance();
@@ -138,7 +135,8 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
 
             // Repositories destination
-            builder.RegisterType<AreaVerbatimRepository>().As<IAreaVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<AreaProcessedRepository>().As<IAreaProcessedRepository>().InstancePerLifetimeScope();
+
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>().InstancePerLifetimeScope();

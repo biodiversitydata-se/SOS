@@ -67,25 +67,6 @@ namespace SOS.Lib.Repositories.Processed
             return JsonSerializer.Deserialize<IGeoShape>(utfString, _jsonSerializerOptions);
         }
 
-        /// <inheritdoc />
-        public async Task<bool> StoreGeometryAsync(int id, IGeoShape geometry)
-        {
-            try
-            {
-                var fileName = $"geometry-{id}";
-                var geometryString = JsonSerializer.Serialize(geometry, _jsonSerializerOptions);
-                var byteArray = Encoding.UTF8.GetBytes(geometryString);
-
-                await _gridFSBucket.UploadFromBytesAsync(fileName, byteArray);
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
         public async Task<List<Area>> GetAsync(AreaType[] areaTypes)
         {
             var filter = Builders<Area>.Filter.In(y => y.AreaType, areaTypes);

@@ -10,12 +10,6 @@ namespace SOS.Administration.Api.Controllers.Interfaces
     public interface IProcessJobController
     {
         /// <summary>
-        ///     Run copy areas job.
-        /// </summary>
-        /// <returns></returns>
-        IActionResult RunProcessAreasJob();
-
-        /// <summary>
         ///     Add daily process job
         /// </summary>
         /// <param name="cleanStart"></param>
@@ -49,23 +43,9 @@ namespace SOS.Administration.Api.Controllers.Interfaces
             bool incrementalMode = false, bool copyFromActiveOnFail = false, bool toggleInstanceOnSuccess = true);
 
         /// <summary>
-        ///     Add daily process taxa job.
-        /// </summary>
-        /// <param name="hour"></param>
-        /// <param name="minute"></param>
-        /// <returns></returns>
-        IActionResult ScheduleDailyProcessTaxaJob([FromQuery] int hour, [FromQuery] int minute);
-
-        /// <summary>
         ///     Run process taxa job.
         /// </summary>
         /// <returns></returns>
         IActionResult RunProcessTaxaJob();
-
-        /// <summary>
-        ///     Run copy field mapping job.
-        /// </summary>
-        /// <returns></returns>
-        IActionResult RunCopyFieldMappingJob();
     }
 }

@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Harvesters;
-using SOS.Import.Repositories.Destination.Artportalen;
+using SOS.Import.Repositories.Destination.Area;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services;
 using SOS.Lib.Database;
@@ -25,13 +25,13 @@ namespace SOS.Import.IntegrationTests.Harvesters
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
 
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var areaVerbatimRepository = new AreaVerbatimRepository(
-                new VerbatimClient(
+            var areaVerbatimRepository = new AreaProcessedRepository(
+                new ProcessClient(
                     verbatimDbConfiguration.GetMongoDbSettings(),
                     verbatimDbConfiguration.DatabaseName,
                     verbatimDbConfiguration.ReadBatchSize,
                     verbatimDbConfiguration.WriteBatchSize),
-                new Mock<ILogger<AreaVerbatimRepository>>().Object);
+                new Mock<ILogger<AreaProcessedRepository>>().Object);
 
             var areaHarvester = new AreaHarvester(
                 new AreaRepository(artportalenDataService, new Mock<ILogger<AreaRepository>>().Object),
@@ -59,13 +59,13 @@ namespace SOS.Import.IntegrationTests.Harvesters
             var importConfiguration = GetImportConfiguration();
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var areaVerbatimRepository = new AreaVerbatimRepository(
-                new VerbatimClient(
+            var areaVerbatimRepository = new AreaProcessedRepository(
+                new ProcessClient(
                     verbatimDbConfiguration.GetMongoDbSettings(),
                     verbatimDbConfiguration.DatabaseName,
                     verbatimDbConfiguration.ReadBatchSize,
                     verbatimDbConfiguration.WriteBatchSize),
-                new Mock<ILogger<AreaVerbatimRepository>>().Object);
+                new Mock<ILogger<AreaProcessedRepository>>().Object);
 
             var areaHarvester = new AreaHarvester(
                 new AreaRepository(artportalenDataService, new Mock<ILogger<AreaRepository>>().Object),
