@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hangfire;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -17,7 +18,7 @@ namespace SOS.Process.Processors.Interfaces
         Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
-            bool incrementalMode,
+            JobRunModes mode,
             IJobCancellationToken cancellationToken);
     }
 }

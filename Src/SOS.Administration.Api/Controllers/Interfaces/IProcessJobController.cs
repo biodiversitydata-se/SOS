@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SOS.Lib.Enums;
 
 namespace SOS.Administration.Api.Controllers.Interfaces
 {
@@ -34,13 +35,10 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// Run process job for selected data providers
         /// </summary>
         /// <param name="dataProviderIdOrIdentifiers"></param>
-        /// <param name="cleanStart"></param>
-        /// <param name="incrementalMode"></param>
-        /// <param name="copyFromActiveOnFail"></param>
-        /// <param name="toggleInstanceOnSuccess"></param>
+        /// <param name="mode"></param>
         /// <returns></returns>
-        Task<IActionResult> RunProcessJob(List<string> dataProviderIdOrIdentifiers, bool cleanStart = true,
-            bool incrementalMode = false, bool copyFromActiveOnFail = false, bool toggleInstanceOnSuccess = true);
+        Task<IActionResult> RunProcessJob(List<string> dataProviderIdOrIdentifiers,
+            [FromQuery] JobRunModes mode);
 
         /// <summary>
         ///     Run process taxa job.

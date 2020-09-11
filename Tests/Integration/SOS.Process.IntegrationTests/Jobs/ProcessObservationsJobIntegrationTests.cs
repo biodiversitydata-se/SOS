@@ -15,6 +15,7 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Constants;
 using SOS.Lib.Database;
+using SOS.Lib.Enums;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Helpers;
@@ -242,10 +243,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             var result = await processJob.RunAsync(
                 new List<string> {DataProviderIdentifiers.ButterflyMonitoring},
-                false,
-                false,
-                false,
-                false,
+                JobRunModes.Full,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -267,10 +265,7 @@ namespace SOS.Process.IntegrationTests.Jobs
             //-----------------------------------------------------------------------------------------------------------
             var result = await processJob.RunAsync(
                 new List<string> {DataProviderIdentifiers.Artportalen},
-                false,
-                false,
-                false,
-                false,
+                JobRunModes.Full,
                 JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------

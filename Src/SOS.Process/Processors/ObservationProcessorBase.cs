@@ -45,20 +45,20 @@ namespace SOS.Process.Processors
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
-        /// <param name="incrementalMode"></param>
+        /// <param name="mode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
-            bool incrementalMode,
+            JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             Logger.LogInformation($"Start Processing {dataProvider} verbatim observations");
             var startTime = DateTime.Now;
             try
             {
-                if (!incrementalMode)
+                if (mode == JobRunModes.Full)
                 {
                     Logger.LogDebug($"Start deleting {dataProvider} data");
                     if (!await ProcessRepository.DeleteProviderDataAsync(dataProvider))
@@ -71,7 +71,7 @@ namespace SOS.Process.Processors
                 }
                 
                 Logger.LogDebug($"Start processing {dataProvider} data");
-                var verbatimCount = await ProcessObservations(dataProvider, taxa, incrementalMode, cancellationToken);
+                var verbatimCount = await ProcessObservations(dataProvider, taxa, mode, cancellationToken);
                 Logger.LogInformation($"Finish processing {dataProvider} data.");
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, verbatimCount);
@@ -91,7 +91,7 @@ namespace SOS.Process.Processors
         protected abstract Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
-            bool incrementalMode,
+            JobRunModes mode,
             IJobCancellationToken cancellationToken);
 
 

@@ -58,7 +58,7 @@ namespace SOS.Import.Jobs
                 : throw new Exception("Fish Data Harvest Job failed");
         }
         /// <inheritdoc />
-        public async Task<bool> RunAsync(bool incrementalHarvest, IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
             throw new NotImplementedException("Method not implemented for Fish data");
         }

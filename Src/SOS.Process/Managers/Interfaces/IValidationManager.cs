@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
 
@@ -31,8 +32,8 @@ namespace SOS.Process.Managers.Interfaces
         /// <summary>
         /// Make sure we have a invalid items collection
         /// </summary>
-        /// <param name="incrementalMode"></param>
+        /// <param name="mode"></param>
         /// <returns></returns>
-        Task VerifyCollectionAsync(bool incrementalMode);
+        Task VerifyCollectionAsync(JobRunModes mode);
     }
 }

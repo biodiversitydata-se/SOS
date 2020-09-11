@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Import.Managers.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
 
 namespace SOS.Administration.Api.Controllers
@@ -44,7 +45,7 @@ namespace SOS.Administration.Api.Controllers
             try
             {
                 RecurringJob.AddOrUpdate<IObservationsHarvestJob>(nameof(IObservationsHarvestJob),
-                    job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
+                    job => job.RunAsync(JobRunModes.Full, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Observations harvest and process job added");
             }
             catch (Exception e)
@@ -62,7 +63,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
+                BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunAsync(JobRunModes.Full, JobCancellationToken.Null));
                 return new OkObjectResult("Observations harvest and process job was enqueued to Hangfire.");
             }
             catch (Exception e)
@@ -124,6 +125,30 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <inheritdoc />
+        [HttpPost("Observations/Run/Incremental")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        public IActionResult RunIncrementalObservationHarvestAndProcessJob()
+        {
+            try
+            {
+                BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunAsync(
+                  JobRunModes.IncrementalActiveInstance,
+                        JobCancellationToken.Null));
+
+                
+
+                return new OkObjectResult("Incremental observation Harvest and process job enqued");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Enquing incremental observation Harvest and process job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <inheritdoc />
         [HttpPost("Observations/Schedule/Incremental")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -138,8 +163,8 @@ namespace SOS.Administration.Api.Controllers
                     return new BadRequestObjectResult("Run interval must be between 1 and 59");
                 }
 
-                RecurringJob.AddOrUpdate<IObservationsHarvestIncrementalJob>(
-                    nameof(IObservationsHarvestIncrementalJob), job => job.RunAsync(
+                RecurringJob.AddOrUpdate<IObservationsHarvestJob>(
+                    nameof(IObservationsHarvestJob), job => job.RunAsync(JobRunModes.IncrementalActiveInstance,
                         JobCancellationToken.Null),
                     $"*/{runIntervalInMinutes} * * * *", TimeZoneInfo.Local);
 

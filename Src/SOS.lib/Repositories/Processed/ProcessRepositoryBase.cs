@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -154,7 +155,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public bool IncrementalMode { get; set; }
+        public JobRunModes Mode { get; set; }
 
         /// <inheritdoc />
         public byte ActiveInstance => GetConfiguration()?.ActiveInstance ?? 1;
@@ -169,7 +170,7 @@ namespace SOS.Lib.Repositories.Processed
         public string InactiveInstanceName => GetInstanceName(InActiveInstance);
 
         /// <inheritdoc />
-        public string CurrentInstanceName=> IncrementalMode ? ActiveInstanceName : InactiveInstanceName;
+        public string CurrentInstanceName=> Mode == JobRunModes.IncrementalActiveInstance ? ActiveInstanceName : InactiveInstanceName;
 
         /// <inheritdoc />
         public async Task<bool> SetActiveInstanceAsync(byte instance)

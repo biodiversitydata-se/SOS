@@ -123,11 +123,11 @@ namespace SOS.Import.Harvesters.Observations
         #endregion Full
 
         #region Incremental
-        private async Task<int> HarvestIncrementalAsync(ArtportalenHarvestFactory harvestFactory,
+        private async Task<int> HarvestIncrementalAsync(JobRunModes mode, ArtportalenHarvestFactory harvestFactory,
             IJobCancellationToken cancellationToken)
         {
             // Make sure incremental mode is true to get max id from live instance
-            _processedObservationRepository.IncrementalMode = true;
+            _processedObservationRepository.Mode = mode;
             harvestFactory.IncrementalMode = true;
             _sightingRepository.Live = true;
 
@@ -144,7 +144,7 @@ namespace SOS.Import.Harvesters.Observations
 
             var harvestBatchTasks = new List<Task<int>>();
 
-            _logger.LogDebug("Start getting Artportalen sightings (live)");
+            _logger.LogDebug($"Start getting Artportalen sightings ({mode})");
 
             var idBatch = idsToHarvest.Skip(0).Take(_artportalenConfiguration.ChunkSize);
             var batchCount = 0;
@@ -173,7 +173,7 @@ namespace SOS.Import.Harvesters.Observations
             // Sum each batch harvested
             var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
-            _logger.LogDebug($"Finish getting Artportalen sightings (live) ({ nrSightingsHarvested })");
+            _logger.LogDebug($"Finish getting Artportalen sightings ({mode}) ({ nrSightingsHarvested })");
 
             return nrSightingsHarvested;
         }
@@ -368,7 +368,7 @@ namespace SOS.Import.Harvesters.Observations
         }
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestSightingsAsync(bool incrementalHarvest, IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestSightingsAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo(nameof(ArtportalenObservationVerbatim),
                 DataProviderType.ArtportalenObservations, DateTime.Now);
@@ -376,7 +376,7 @@ namespace SOS.Import.Harvesters.Observations
             try
             {
                 // Populate data on full harvest or if it's not initialized
-                if (!incrementalHarvest || !_artportalenMetadataContainer.IsInitialized)
+                if (mode == JobRunModes.Full || !_artportalenMetadataContainer.IsInitialized)
                 {
                     _logger.LogDebug("Start getting metadata");
                     var activities = await GetActivitiesAsync();
@@ -428,21 +428,21 @@ namespace SOS.Import.Harvesters.Observations
                     _artportalenMetadataContainer
                 )
                 {
-                    IncrementalMode = incrementalHarvest
+                    IncrementalMode = mode != JobRunModes.Full
                 };
                 _logger.LogDebug("Finsih creating factory");
 
-                _sightingVerbatimRepository.IncrementalMode = incrementalHarvest;
+                _sightingVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
 
                 // Make sure we have an empty collection
                 _logger.LogDebug("Empty collection");
                 await _sightingVerbatimRepository.DeleteCollectionAsync();
                 await _sightingVerbatimRepository.AddCollectionAsync();
 
-                var nrSightingsHarvested = incrementalHarvest ? 
-                    await HarvestIncrementalAsync(harvestFactory, cancellationToken) 
-                    : 
-                    await HarvestAllAsync(harvestFactory, cancellationToken);
+                var nrSightingsHarvested = mode == JobRunModes.Full ?
+                    await HarvestAllAsync(harvestFactory, cancellationToken)
+                    :
+                    await HarvestIncrementalAsync(mode, harvestFactory, cancellationToken);
 
                 // Update harvest info
                 harvestInfo.Status = nrSightingsHarvested >= 0 ? RunStatus.Success : RunStatus.Failed;

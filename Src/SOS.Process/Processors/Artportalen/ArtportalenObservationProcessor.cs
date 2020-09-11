@@ -74,35 +74,35 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
-        /// <param name="incrementalMode"></param>
+        /// <param name="mode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
-            bool incrementalMode,
+            JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             if (_processConfiguration.ParallelProcessing)
             {
-                return await ProcessObservationsParallel(dataProvider, taxa, incrementalMode, cancellationToken);
+                return await ProcessObservationsParallel(dataProvider, taxa, mode, cancellationToken);
             }
 
             // Sequential processing is used for easier debugging.
-            return await ProcessObservationsSequential(dataProvider, taxa, incrementalMode, cancellationToken);
+            return await ProcessObservationsSequential(dataProvider, taxa, mode, cancellationToken);
         }
 
         private async Task<int> ProcessObservationsParallel(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
-            bool incrementalMode,
+            JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             var observationFactory =
                 await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository);
             // Get min and max id from db
 
-            _artportalenVerbatimRepository.IncrementalMode = incrementalMode;
+            _artportalenVerbatimRepository.Mode = mode;
             (await _artportalenVerbatimRepository.GetIdSpanAsync())
                 .Deconstruct(out var batchStartId, out var maxId);
             var processBatchTasks = new List<Task<int>>();
@@ -112,7 +112,7 @@ namespace SOS.Process.Processors.Artportalen
                 await _semaphore.WaitAsync();
 
                 var batchEndId = batchStartId + _processedFieldMappingRepository.BatchSize - 1;
-                processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, incrementalMode, observationFactory,
+                processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, mode, observationFactory,
                     cancellationToken));
                 batchStartId = batchEndId + 1;
             }
@@ -136,7 +136,7 @@ namespace SOS.Process.Processors.Artportalen
             DataProvider dataProvider,
             int startId,
             int endId,
-            bool incrementalMode,
+            JobRunModes mode,
             ArtportalenObservationFactory observationFactory,
             IJobCancellationToken cancellationToken)
         {
@@ -162,7 +162,7 @@ namespace SOS.Process.Processors.Artportalen
                 await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                 Logger.LogDebug($"End validating Artportalen batch ({startId}-{endId})");
 
-                if (incrementalMode)
+                if (mode != JobRunModes.Full)
                 {
                     Logger.LogDebug($"Start deleteing live data ({startId}-{endId})");
                     var success = await  DeleteProviderBatchAsync(dataProvider, verbatimObservationsBatch.Select(v => v.Id).ToArray());
@@ -173,7 +173,7 @@ namespace SOS.Process.Processors.Artportalen
                 var successCount = await CommitBatchAsync(dataProvider, processedObservationsBatch.ToArray());
                 Logger.LogDebug($"Finish storing Artportalen batch ({startId}-{endId})");
 
-                if (!incrementalMode)
+                if (mode == JobRunModes.Full)
                 {
                     Logger.LogDebug($"Start writing Artportalen CSV ({startId}-{endId})");
                     var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservationsBatch, dataProvider, $"{startId}-{endId}");
@@ -202,14 +202,14 @@ namespace SOS.Process.Processors.Artportalen
         private async Task<int> ProcessObservationsSequential(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
-            bool incrementalMode,
+            JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
             var observationFactory =
                 await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository);
             ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
-            _artportalenVerbatimRepository.IncrementalMode = incrementalMode;
+            _artportalenVerbatimRepository.Mode = mode;
             using var cursor = await _artportalenVerbatimRepository.GetAllByCursorAsync();
             var batchId = 0;
            
@@ -219,14 +219,14 @@ namespace SOS.Process.Processors.Artportalen
                 observations.Add(observationFactory.CreateProcessedObservation(verbatimObservation));
                 if (IsBatchFilledToLimit(observations.Count))
                 {
-                    verbatimCount += await ValidateAndStoreObservations(dataProvider, observations, incrementalMode, batchId++, cancellationToken);
+                    verbatimCount += await ValidateAndStoreObservations(dataProvider, observations, mode, batchId++, cancellationToken);
                 }
             });
 
             // Commit remaining batch (not filled to limit).
             if (observations.Any())
             {
-                verbatimCount += await ValidateAndStoreObservations(dataProvider, observations, incrementalMode, batchId, cancellationToken);
+                verbatimCount += await ValidateAndStoreObservations(dataProvider, observations, mode, batchId, cancellationToken);
             }
 
             return verbatimCount;
@@ -235,7 +235,7 @@ namespace SOS.Process.Processors.Artportalen
         private async Task<int> ValidateAndStoreObservations(
             DataProvider dataProvider,
             ICollection<ProcessedObservation> observations,
-            bool incrementalMode, 
+            JobRunModes mode, 
             int batchId,
             IJobCancellationToken cancellationToken)
         {
@@ -243,7 +243,7 @@ namespace SOS.Process.Processors.Artportalen
             var invalidObservations = ValidationManager.ValidateObservations(ref observations);
             await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
 
-            if (incrementalMode)
+            if (mode != JobRunModes.Full)
             {
                 Logger.LogDebug("Start deleteing live data");
                 var success = await DeleteProviderBatchAsync(dataProvider, observations.Select(v => v.VerbatimId).ToArray());
@@ -252,7 +252,7 @@ namespace SOS.Process.Processors.Artportalen
 
             var verbatimCount = await CommitBatchAsync(dataProvider, observations);
 
-            if (!incrementalMode)
+            if (mode == JobRunModes.Full)
             {
                 await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider, batchId.ToString());
             }
