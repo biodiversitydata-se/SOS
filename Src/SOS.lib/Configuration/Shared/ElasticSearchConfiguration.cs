@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Configuration.Shared
+﻿using System;
+
+namespace SOS.Lib.Configuration.Shared
 {
     /// <summary>
     ///     ElasticSearch configuration properties
@@ -23,6 +25,22 @@
         /// <summary>
         ///     dev, st or at. prod is empty
         /// </summary>
-        public string IndexPrefix { get; set; }
+        public string IndexPrefix
+        {
+            get
+            {
+                // If prefix is "sos-local", add the machine name to the index
+                // to let developers have their own environment when running locally.
+                if (_indexPrefix == "sos-local")
+                {
+                    return $"sos-local-{Environment.MachineName}";
+                }
+
+                return _indexPrefix;
+            }
+            set => _indexPrefix = value;
+        }
+
+        private string _indexPrefix;
     }
 }
