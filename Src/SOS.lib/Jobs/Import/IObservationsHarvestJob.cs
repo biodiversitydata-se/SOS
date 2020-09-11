@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hangfire;
+using SOS.Lib.Enums;
 
 namespace SOS.Lib.Jobs.Import
 {
@@ -13,7 +14,7 @@ namespace SOS.Lib.Jobs.Import
         /// <returns></returns>
         [DisableConcurrentExecution(10)]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
-        Task<bool> RunAsync(IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken);
 
         /// <summary>
         ///     Harvest multiple sources and start processing when done

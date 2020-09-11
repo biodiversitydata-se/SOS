@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 
 namespace SOS.Process.Repositories.Source.Interfaces
@@ -82,6 +83,6 @@ namespace SOS.Process.Repositories.Source.Interfaces
         /// <summary>
         /// Set repository mode
         /// </summary>
-        bool IncrementalMode { get; set; }
+        JobRunModes Mode { get; set; }
     }
 }

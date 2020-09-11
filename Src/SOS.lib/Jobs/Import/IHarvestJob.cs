@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Hangfire;
+using SOS.Lib.Enums;
 
 namespace SOS.Lib.Jobs.Import
 {
@@ -15,9 +16,9 @@ namespace SOS.Lib.Jobs.Import
         /// <summary>
         /// Run job
         /// </summary>
-        /// <param name="incrementalHarvest"></param>
+        /// <param name="mode"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> RunAsync(bool incrementalHarvest, IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken);
     }
 }

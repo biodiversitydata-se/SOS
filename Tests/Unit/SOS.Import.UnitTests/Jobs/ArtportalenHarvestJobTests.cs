@@ -48,7 +48,7 @@ namespace SOS.Import.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _artportalenObservationHarvesterMock.Setup(ts => ts.HarvestSightingsAsync(false, JobCancellationToken.Null))
+            _artportalenObservationHarvesterMock.Setup(ts => ts.HarvestSightingsAsync(JobRunModes.Full, JobCancellationToken.Null))
                 .Throws<Exception>();
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -71,7 +71,7 @@ namespace SOS.Import.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _artportalenObservationHarvesterMock.Setup(ts => ts.HarvestSightingsAsync(false, JobCancellationToken.Null))
+            _artportalenObservationHarvesterMock.Setup(ts => ts.HarvestSightingsAsync(JobRunModes.Full, JobCancellationToken.Null))
                 .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Failed});
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
@@ -128,7 +128,7 @@ namespace SOS.Import.UnitTests.Managers
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            _artportalenObservationHarvesterMock.Setup(ts => ts.HarvestSightingsAsync(false, JobCancellationToken.Null))
+            _artportalenObservationHarvesterMock.Setup(ts => ts.HarvestSightingsAsync(JobRunModes.Full, JobCancellationToken.Null))
                 .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success, Count = 1 });
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));

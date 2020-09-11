@@ -21,14 +21,155 @@ namespace SOS.Import.Jobs
     public class ObservationsHarvestJob : IObservationsHarvestJob
     {
         private readonly IDataProviderManager _dataProviderManager;
-        private readonly IFieldMappingImportJob _fieldMappingImportJob;
         private readonly Dictionary<DataProviderType, IHarvestJob> _harvestJobByType;
         private readonly ILogger<ObservationsHarvestJob> _logger;
 
         /// <summary>
+        /// Run harvest and start processing on success if requested
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="harvestProviders"></param>
+        /// <param name="processProviders"></param>
+        /// <param name="processOnSuccess"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<bool> RunAsync(JobRunModes mode, 
+            IEnumerable<DataProvider> harvestProviders,
+            IEnumerable<DataProvider> processProviders,
+            bool processOnSuccess,
+            IJobCancellationToken cancellationToken)
+        {
+            _logger.LogInformation($"Start harvest job ({mode})");
+            var success = mode == JobRunModes.Full ?
+                await HarvestAll(harvestProviders, cancellationToken)
+                :
+                await HarvestIncremental(harvestProviders, mode, cancellationToken);
+
+
+            if (!success)
+            {
+                _logger.LogInformation($"Harvest job ({mode}) failed");
+                return false;
+            }
+            
+            if (processOnSuccess)
+            {
+                // If harvest was successful, go on with enqueuing processing job to Hangfire
+                var jobId = BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(
+                    processProviders.Select(dataProvider => dataProvider.Identifier).ToList(),
+                    mode,
+                    mode.Equals(JobRunModes.IncrementalInactiveInstance),
+                    cancellationToken));
+
+                _logger.LogInformation($"Process Job ({mode}) with Id={ jobId } was enqueued");
+            }
+
+            _logger.LogInformation($"Finish harvest job ({mode})");
+
+            return true;
+        }
+
+        /// <summary>
+        /// Harvest all
+        /// </summary>
+        /// <param name="dataProviders"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<bool> HarvestAll(
+            IEnumerable<DataProvider> dataProviders,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                _logger.LogInformation("Start Harvest Jobs");
+
+                //------------------------------------------------------------------------
+                // 1. Harvest observations directly without enqueuing to Hangfire
+                //------------------------------------------------------------------------
+                _logger.LogInformation("Start observations harvest jobs");
+                var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<bool>>();
+                foreach (var dataProvider in dataProviders)
+                {
+                    var harvestJob = _harvestJobByType[dataProvider.Type];
+                    harvestTaskByDataProvider.Add(dataProvider, harvestJob.RunAsync(cancellationToken));
+                    _logger.LogDebug($"Added {dataProvider.Name} harvest");
+                }
+
+                await Task.WhenAll(harvestTaskByDataProvider.Values);
+                _logger.LogInformation("Finish observasions harvest jobs");
+
+                //---------------------------------------------------------------------------------------------------------
+                // 3. If Artportalen harvest was successful, go on with enqueuing processing job to Hangfire
+                //---------------------------------------------------------------------------------------------------------
+                return  harvestTaskByDataProvider
+                    .Single(pair => pair.Key.Identifier == DataProviderIdentifiers.Artportalen).Value.Result;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Observation harvest job was cancelled.");
+                return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Observation harvest job was cancelled.");
+                throw new Exception("Failed to harvest data");
+            }
+        }
+
+        /// <summary>
+        /// Run job
+        /// </summary>
+        /// <param name="dataProviders"></param>
+        /// <param name="mode"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        private async Task<bool> HarvestIncremental(
+            IEnumerable<DataProvider> dataProviders,
+            JobRunModes mode,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                _logger.LogInformation("Start incremental harvest jobs");
+
+                //------------------------------------------------------------------------
+                // 1. Ensure that any data provider is added
+                //------------------------------------------------------------------------
+                if (!dataProviders.Any())
+                {
+                    _logger.LogError(
+                        "No data providers to incremental harvest");
+                    return false;
+                }
+
+                //------------------------------------------------------------------------
+                // 2. Harvest observations directly without enqueuing to Hangfire
+                //------------------------------------------------------------------------
+                _logger.LogInformation("Start incremental observasions harvest jobs");
+                var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<bool>>();
+                foreach (var dataProvider in dataProviders)
+                {
+                    var harvestJob = _harvestJobByType[dataProvider.Type];
+                    harvestTaskByDataProvider.Add(dataProvider, harvestJob.RunAsync(mode, cancellationToken));
+                    _logger.LogDebug($"Added {dataProvider.Name} incremental harvest");
+                }
+
+                await Task.WhenAll(harvestTaskByDataProvider.Values);
+                var success = harvestTaskByDataProvider.All(p => p.Value.Result);
+                _logger.LogInformation($"Finish observasions incremental harvest jobs. Success: { success }");
+
+                return success;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Observation harvest incremental job was cancelled.");
+                throw new Exception("Failed to harvest incremental data");
+            }
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="fieldMappingImportJob"></param>
         /// <param name="artportalenHarvestJob"></param>
         /// <param name="clamPortalHarvestJob"></param>
         /// <param name="fishDataHarvestJob"></param>
@@ -42,7 +183,6 @@ namespace SOS.Import.Jobs
         /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
         public ObservationsHarvestJob(
-            IFieldMappingImportJob fieldMappingImportJob,
             IArtportalenHarvestJob artportalenHarvestJob,
             IClamPortalHarvestJob clamPortalHarvestJob,
             IFishDataHarvestJob fishDataHarvestJob,
@@ -56,8 +196,6 @@ namespace SOS.Import.Jobs
             IDataProviderManager dataProviderManager,
             ILogger<ObservationsHarvestJob> logger)
         {
-            _fieldMappingImportJob =
-                fieldMappingImportJob ?? throw new ArgumentNullException(nameof(fieldMappingImportJob));
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             if (artportalenHarvestJob == null) throw new ArgumentNullException(nameof(artportalenHarvestJob));
@@ -85,15 +223,21 @@ namespace SOS.Import.Jobs
             };
         }
 
-        public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
+        /// <inheritdoc />
+        public async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
-            var allDataProviders = await _dataProviderManager.GetAllDataProviders();
-            return await RunAsync(
-                allDataProviders.Where(dataProvider => dataProvider.IncludeInScheduledHarvest).ToList(),
-                allDataProviders.Where(dataProvider => dataProvider.IsActive).ToList(),
-                cancellationToken);
+            var providers = (await _dataProviderManager.GetAllDataProviders()).Where(dp =>
+                dp.IsActive &&
+                dp.IncludeInScheduledHarvest && 
+                (
+                        mode.Equals(JobRunModes.Full) || 
+                        dp.SupportIncrementalHarvest)
+                ).ToList();
+
+            return await RunAsync(mode, providers, providers, true, cancellationToken);
         }
 
+        /// <inheritdoc />
         public async Task<bool> RunAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
             List<string> processDataProviderIdOrIdentifiers,
@@ -133,13 +277,12 @@ namespace SOS.Import.Jobs
                 return false;
             }
 
-            return await RunAsync(
-                harvestDataProviders.Select(d => d.Value).ToList(),
-                processDataProviders.Select(d => d.Value).ToList(),
-                cancellationToken);
+            return await RunAsync(JobRunModes.Full, harvestDataProviders.Select(p => p.Value), processDataProviders.Select(p => p.Value), true, cancellationToken);
+
+           
         }
 
-
+        /// <inheritdoc />
         public async Task<bool> RunHarvestObservationsAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
             IJobCancellationToken cancellationToken)
@@ -161,132 +304,9 @@ namespace SOS.Import.Jobs
                 return false;
             }
 
-            return await RunHarvestObservationsAsync(
+            return await HarvestAll(
                 harvestDataProviders.Select(d => d.Value).ToList(),
                 cancellationToken);
-        }
-
-        private async Task<bool> RunAsync(
-            List<DataProvider> harvestDataProviders,
-            List<DataProvider> processDataProviders,
-            IJobCancellationToken cancellationToken)
-        {
-            try
-            {
-                _logger.LogInformation("Start Harvest Jobs");
-
-                //------------------------------------------------------------------------
-                // 1. Ensure that Artportalen always is included in harvestDataProviders
-                //------------------------------------------------------------------------
-                if (harvestDataProviders.All(dataProvider =>
-                    dataProvider.Identifier != DataProviderIdentifiers.Artportalen))
-                {
-                    harvestDataProviders.Add(
-                        await _dataProviderManager.GetDataProviderByIdentifier(DataProviderIdentifiers.Artportalen));
-                    _logger.LogInformation(
-                        "Artportalen harvest was added to harvestDataProviders because it's mandatory.");
-                }
-
-                //-----------------------------------------------------------------------------
-                // 2. Harvest taxonomy & field mappings directly without enqueuing to Hangfire
-                //-----------------------------------------------------------------------------
-                _logger.LogInformation("Start resource harvest jobs (taxonomy & field mappings)");
-                var resourceHarvestTasks = new Dictionary<DataProviderType, Task<bool>>();
-                resourceHarvestTasks.Add(DataProviderType.FieldMappings, _fieldMappingImportJob.RunAsync());
-                await Task.WhenAll(resourceHarvestTasks.Values);
-                _logger.LogInformation("Finish resource harvest jobs (taxonomy & field mappings)");
-
-                //------------------------------------------------------------------------
-                // 3. Harvest observations directly without enqueuing to Hangfire
-                //------------------------------------------------------------------------
-                _logger.LogInformation("Start observations harvest jobs");
-                var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<bool>>();
-                foreach (var dataProvider in harvestDataProviders)
-                {
-                    var harvestJob = _harvestJobByType[dataProvider.Type];
-                    harvestTaskByDataProvider.Add(dataProvider, harvestJob.RunAsync(cancellationToken));
-                    _logger.LogDebug($"Added {dataProvider.Name} harvest");
-                }
-
-                await Task.WhenAll(harvestTaskByDataProvider.Values);
-                _logger.LogInformation("Finish observasions harvest jobs");
-
-                //---------------------------------------------------------------------------------------------------------
-                // 4. If Artportalen and resource harvest was successful, go on with enqueuing processing job to Hangfire
-                //---------------------------------------------------------------------------------------------------------
-                var artportalenHarvestTask = harvestTaskByDataProvider
-                    .Single(pair => pair.Key.Identifier == DataProviderIdentifiers.Artportalen).Value;
-                if (artportalenHarvestTask.Result &&
-                    resourceHarvestTasks[DataProviderType.FieldMappings].Result)
-                {
-                    // Ensure that Artportalen always is included in processDataProviders
-                    if (processDataProviders.All(dataProvider =>
-                        dataProvider.Identifier != DataProviderIdentifiers.Artportalen))
-                    {
-                        processDataProviders.Add(
-                            await _dataProviderManager.GetDataProviderByIdentifier(DataProviderIdentifiers
-                                .Artportalen));
-                        _logger.LogInformation(
-                            "Artportalen process was added to processDataProviders because it's mandatory.");
-                    }
-
-                    // Enqueue process job to Hangfire
-                    var jobId = BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(
-                        processDataProviders.Select(dataProvider => dataProvider.Identifier).ToList(),
-                        true,
-                        false,
-                        true,
-                        true,
-                        cancellationToken));
-
-                    _logger.LogInformation($"Process Job with Id={jobId} was enqueued");
-                    return true;
-                }
-
-                throw new Exception("Failed to harvest data");
-            }
-            catch (JobAbortedException)
-            {
-                _logger.LogInformation("Observation harvest job was cancelled.");
-                return false;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Observation harvest job was cancelled.");
-                throw new Exception("Failed to harvest data");
-            }
-        }
-
-        private async Task<bool> RunHarvestObservationsAsync(
-            List<DataProvider> harvestDataProviders,
-            IJobCancellationToken cancellationToken)
-        {
-            try
-            {
-                _logger.LogInformation("Start harvest observations jobs");
-                var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<bool>>();
-                foreach (var dataProvider in harvestDataProviders)
-                {
-                    var harvestJob = _harvestJobByType[dataProvider.Type];
-                    harvestTaskByDataProvider.Add(dataProvider, harvestJob.RunAsync(cancellationToken));
-                    _logger.LogDebug($"Added {dataProvider.Name} harvest");
-                }
-
-                var result = await Task.WhenAll(harvestTaskByDataProvider.Values);
-                _logger.LogInformation("Finish harvest observations jobs");
-
-                return result.All(res => res);
-            }
-            catch (JobAbortedException)
-            {
-                _logger.LogInformation("Observation harvest job was cancelled.");
-                return false;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Observation harvest job was cancelled.");
-                throw new Exception("Failed to harvest data");
-            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SOS.Lib.Enums;
 
 namespace SOS.Administration.Api.Controllers.Interfaces
 {
@@ -127,18 +128,18 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <summary>
         /// Add daily harvest of sightings from species data portal
         /// </summary>
-        /// <param name="incrementalHarvest"></param>
+        /// <param name="mode"></param>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult AddDailyArtportalenHarvestJob(bool incrementalHarvest, int hour, int minute);
+        IActionResult AddDailyArtportalenHarvestJob(JobRunModes mode, int hour, int minute);
 
         /// <summary>
         /// Run Artportalen sightings harvest
         /// </summary>
-        /// <param name="incrementalHarvest"></param>
+        /// <param name="mode"></param>
         /// <returns></returns>
-        IActionResult RunArtportalenHarvestJob(bool incrementalHarvest);
+        IActionResult RunArtportalenHarvestJob(JobRunModes mode);
 
         /// <summary>
         ///     Add daily harvest of sightings from Virtual Herbarium

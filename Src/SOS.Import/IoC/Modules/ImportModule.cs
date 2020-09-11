@@ -236,7 +236,6 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<SersHarvestJob>().As<ISersHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<SharkHarvestJob>().As<ISharkHarvestJob>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationsHarvestJob>().As<IObservationsHarvestJob>().InstancePerLifetimeScope();
-            builder.RegisterType<ObservationsHarvestIncrementalJob>().As<IObservationsHarvestIncrementalJob>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumHarvestJob>().As<IVirtualHerbariumHarvestJob>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<CreateDwcaDataValidationReportJob>().As<ICreateDwcaDataValidationReportJob>().InstancePerLifetimeScope();

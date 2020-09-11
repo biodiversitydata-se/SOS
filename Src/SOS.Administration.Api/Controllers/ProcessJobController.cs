@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Import.Managers.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 
 namespace SOS.Administration.Api.Controllers
@@ -104,10 +105,7 @@ namespace SOS.Administration.Api.Controllers
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> RunProcessJob(
             [FromQuery] List<string> dataProviderIdOrIdentifiers,
-            [FromQuery] bool cleanStart = false,
-            [FromQuery] bool incrementalMode = false,
-            [FromQuery] bool copyFromActiveOnFail = false,
-            [FromQuery] bool toggleInstanceOnSuccess = false)
+            [FromQuery] JobRunModes mode = JobRunModes.Full)
         {
             try
             {
@@ -124,8 +122,10 @@ namespace SOS.Administration.Api.Controllers
                     return new BadRequestObjectResult(result.Error);
                 }
 
-                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(dataProviderIdOrIdentifiers, cleanStart, incrementalMode,
-                    copyFromActiveOnFail, toggleInstanceOnSuccess, JobCancellationToken.Null));
+                BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(
+                    dataProviderIdOrIdentifiers, 
+                    mode,
+                    JobCancellationToken.Null));
                 return new OkObjectResult(
                     $"Process job was enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, dataProvidersToProcess.Select(res => " - " + res.Value))}");
             }

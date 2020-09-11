@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -106,18 +107,18 @@ namespace SOS.Process.Managers
         }
 
         /// <inheritdoc />
-        public async Task VerifyCollectionAsync(bool incrementalMode)
+        public async Task VerifyCollectionAsync(JobRunModes mode)
         {
-            var collectionCreated = true;
-            if (incrementalMode)
-            {
-                collectionCreated = await _invalidObservationRepository.VerifyCollectionAsync();
-            }
-            else
+            var collectionCreated = false;
+            if (mode == JobRunModes.Full)
             {
                 // Make sure invalid collection is empty 
                 await _invalidObservationRepository.DeleteCollectionAsync();
                 await _invalidObservationRepository.AddCollectionAsync();
+            }
+            else
+            {
+                collectionCreated = await _invalidObservationRepository.VerifyCollectionAsync();
             }
 
             if (collectionCreated)

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;
 
@@ -61,7 +62,7 @@ namespace SOS.Process.Repositories.Source
         ///     Get client
         /// </summary>
         /// <returns></returns>
-        protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(IncrementalMode ? $"{_collectionName}_incremental" : _collectionName);
+        protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(Mode == JobRunModes.Full ? _collectionName : $"{_collectionName}_incremental");
 
         /// <inheritdoc />
         public async Task<bool> CheckIfCollectionExistsAsync()
@@ -185,7 +186,7 @@ namespace SOS.Process.Repositories.Source
         }
 
         /// <inheritdoc />
-        public bool IncrementalMode { get; set; }
+        public JobRunModes Mode { get; set; }
 
         /// <summary>
         ///     Dispose

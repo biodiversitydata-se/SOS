@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using SOS.Lib.Enums;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
@@ -14,9 +15,9 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         int BatchSize { get; }
 
         /// <summary>
-        /// True if incremental mode is set
+        /// Run mode
         /// </summary>
-        bool IncrementalMode { get; set; }
+        JobRunModes Mode { get; set; }
 
         /// <summary>
         ///     Get 0 or 1 depending of witch instance to update

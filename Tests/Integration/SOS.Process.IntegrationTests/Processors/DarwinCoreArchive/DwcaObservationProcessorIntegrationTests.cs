@@ -61,7 +61,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var processingStatus =
-                await dwcaProcessor.ProcessAsync(dataProvider, taxonByTaxonId, false, JobCancellationToken.Null);
+                await dwcaProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -93,7 +93,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             //-----------------------------------------------------------------------------------------------------------
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
-            var processingStatus = await dwcaProcessor.ProcessAsync(dataProvider, taxonByTaxonId, false, JobCancellationToken.Null);
+            var processingStatus = await dwcaProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobRunModes.Full, JobCancellationToken.Null);
             await dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles(); // FinishAndWriteDwcaFiles()
             dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
 
