@@ -186,5 +186,8 @@
     <None Update="Resources\FieldMappings\ValidationStatusFieldMapping.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Sweden-grids\Sweden_Grid_10km_Wgs84.geojson">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

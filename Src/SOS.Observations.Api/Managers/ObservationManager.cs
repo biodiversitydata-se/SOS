@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -83,6 +84,50 @@ namespace SOS.Observations.Api.Managers
                 return null;
             }
         }
+
+        
+        /// <summary>
+        /// Get aggregated grid cells data.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="precision"></param>
+        /// <param name="bbox"></param>
+        /// <returns></returns>
+        public async Task<Result<GeoGridResult>> GetGeogridAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox)
+        {
+            try
+            {
+                filter = await _filterManager.PrepareFilter(filter);
+                return await _processedObservationRepository.GetGeogridAggregationAsync(filter, precision, bbox);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get aggregated chunk of observations");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get aggregated grid cells data.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="precision"></param>
+        /// <param name="bbox"></param>
+        /// <returns></returns>
+        public async Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox)
+        {
+            try
+            {
+                filter = await _filterManager.PrepareFilter(filter);
+                return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision, bbox);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get aggregated chunk of observations");
+                throw;
+            }
+        }
+
 
         private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)
         {

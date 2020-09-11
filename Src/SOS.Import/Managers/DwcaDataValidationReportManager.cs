@@ -106,7 +106,7 @@ namespace SOS.Import.Managers
                 processedFieldValues.Add(fieldMappingFieldId, new Dictionary<ProcessedFieldMapValue, int>());
                 verbatimFieldValues.Add(fieldMappingFieldId, new Dictionary<ProcessedFieldMapValue, HashSet<string>>());
             }
-
+            HashSet<string> nonMatchingScientificNames = new HashSet<string>();
             await foreach (var observationsBatch in observationsBatches)
             {
                 if (nrProcessedObservations >= maxNrObservationsToRead) continue;
@@ -157,6 +157,10 @@ namespace SOS.Import.Managers
 
                         foreach (var validationDefect in observationValidation.Defects)
                         {
+                            if (validationDefect == "Taxon not found" && string.IsNullOrWhiteSpace(verbatimObservation.TaxonID))
+                            {
+                                nonMatchingScientificNames.Add(verbatimObservation.ScientificName);
+                            }
                             if (!observationDefects.ContainsKey(validationDefect))
                             {
                                 observationDefects.Add(validationDefect, 0);
@@ -212,7 +216,8 @@ namespace SOS.Import.Managers
                     NrValidObservations = nrValidObservations,
                     NrInvalidObservations = nrInvalidObservations,
                     Remarks = remarks,
-                    ObservationDefects = observationDefects.OrderByDescending(m => m.Value).Select(m => new DefectItem { Defect = m.Key, Count = m.Value}).ToList()
+                    ObservationDefects = observationDefects.OrderByDescending(m => m.Value).Select(m => new DefectItem { Defect = m.Key, Count = m.Value}).ToList(),
+                    NonMatchingScientificNames = nonMatchingScientificNames.Count == 0 ? null : nonMatchingScientificNames.ToList()
                 },
                 InvalidObservations = invalidObservations,
                 ValidObservations = validObservations,
