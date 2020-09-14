@@ -18,7 +18,6 @@ namespace SOS.Process.Helpers
     {
         private readonly FieldMappingConfiguration _fieldMappingConfiguration;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
-
         private Dictionary<string, Dictionary<FieldMappingFieldId, Dictionary<int, string>>>
             _valueMappingDictionariesByCultureCode;
 
@@ -30,11 +29,10 @@ namespace SOS.Process.Helpers
                                                throw new ArgumentNullException(nameof(processedFieldMappingRepository));
             _fieldMappingConfiguration = fieldMappingConfiguration ??
                                          throw new ArgumentNullException(nameof(fieldMappingConfiguration));
-            if (fieldMappingConfiguration.ResolveValues)
-            {
-                Task.Run(InitializeAsync).Wait();
-            }
+            Task.Run(InitializeAsync).Wait();
         }
+
+        public FieldMappingConfiguration Configuration => _fieldMappingConfiguration;
 
         public void ResolveFieldMappedValues(IEnumerable<ProcessedObservation> processedObservations)
         {
@@ -123,5 +121,10 @@ namespace SOS.Process.Helpers
                 fieldMapValue.Value = translatedValue;
             }
         }
+    }
+
+    public class FieldMappingResolver
+    {
+
     }
 }
