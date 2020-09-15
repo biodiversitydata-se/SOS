@@ -9,12 +9,17 @@ namespace SOS.Observations.Api.Controllers.Interfaces
     public interface IExportsController
     {
         /// <summary>
-        ///     Request of a Darwin Core Archive file with observations based on provided filter
+        /// Get list of available export files
         /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="email"></param>
         /// <returns></returns>
-        IActionResult RunExportAndSendJob([FromBody] ExportFilter filter, [FromQuery] string email);
+        IActionResult GetExportFiles();
+
+        /// <summary>
+        /// Get url to export file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        IActionResult GetExportFileUrl([FromRoute] string fileName);
 
         /// <summary>
         ///     Get status of export job
@@ -22,5 +27,14 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="jobId">Job id returned when export was requested</param>
         /// <returns></returns>
         IActionResult GetExportStatus(string jobId);
+
+
+        /// <summary>
+        ///     Request of a Darwin Core Archive file with observations based on provided filter
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        IActionResult RunExportAndSendJob([FromBody] ExportFilter filter, [FromQuery] string email);
     }
 }

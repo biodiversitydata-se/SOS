@@ -29,5 +29,10 @@
         ///     Taxon service configuration
         /// </summary>
         public TaxonServiceConfiguration TaxonServiceConfiguration { get; set; }
+
+        /// <summary>
+        /// Blob storage container for export files
+        /// </summary>
+        public string Export_Container { get; set; }
     }
 }

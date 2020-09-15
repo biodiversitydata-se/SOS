@@ -234,7 +234,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
                 obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.ObserversInternal;
 
-
                 // Set dependent properties
                 var biotope = obs.Event.Biotope?.Value;
                 obs.Event.Habitat = (biotope != null

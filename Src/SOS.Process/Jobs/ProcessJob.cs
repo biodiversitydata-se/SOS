@@ -6,7 +6,9 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
+using SOS.Lib.Jobs.Export;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Processed;
@@ -46,6 +48,7 @@ namespace SOS.Process.Jobs
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly Dictionary<DataProviderType, IProcessor> _processorByType;
         private readonly IProcessTaxaJob _processTaxaJob;
+        private readonly string _exportContainer;
 
         private List<DataProvider> GetDataProvidersToProcess(List<string> dataProviderIdOrIdentifiers,
             List<DataProvider> allDataProviders)
@@ -192,17 +195,8 @@ namespace SOS.Process.Jobs
                 var processingResult = await Task.WhenAll(processTaskByDataProvider.Values);
                 var success = processingResult.All(t => t.Status == RunStatus.Success);
 
-                // Don't create a dwc file in incremental mode
-                if (mode == JobRunModes.Full)
-                {
-                    //----------------------------------------------------------------------------
-                    // 9. End create DwC CSV files and merge the files into multiple DwC-A files.
-                    //----------------------------------------------------------------------------
-                    await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
-                }
-
                 //----------------------------------------------
-                // 10. Update provider info 
+                // 9. Update provider info 
                 //----------------------------------------------
                 foreach (var task in processTaskByDataProvider)
                 {
@@ -214,7 +208,7 @@ namespace SOS.Process.Jobs
                 }
 
                 //-----------------------------------------
-                // 11. Save process info
+                // 10. Save process info
                 //-----------------------------------------
                 _logger.LogInformation("Start updating process info for observations");
                 foreach (var dataProvider in dataProvidersToProcess)
@@ -236,7 +230,7 @@ namespace SOS.Process.Jobs
                 if (mode == JobRunModes.Full)
                 {
                     //----------------------------------------------------------------------------
-                    // 12. If a data provider failed to process and it was not Artportalen,
+                    // 11. If a data provider failed to process and it was not Artportalen,
                     //     then try to copy that data from the active instance.
                     //----------------------------------------------------------------------------
 
@@ -256,7 +250,7 @@ namespace SOS.Process.Jobs
                 }
 
                 //---------------------------------
-                // 13. Create ElasticSearch index
+                // 12. Create ElasticSearch index
                 //---------------------------------
                 if (success)
                 {
@@ -270,10 +264,29 @@ namespace SOS.Process.Jobs
                     if (mode == JobRunModes.Full)
                     {
                         // Enqueue incremental harvest/process job to Hangfire in order to get latest sightings
+                        
                         var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunAsync(JobRunModes.IncrementalInactiveInstance,
                             cancellationToken));
 
-                        _logger.LogInformation($"Incremental harvest/process job Job with Id={jobId} was enqueued");
+                        _logger.LogInformation($"Incremental harvest/process job with Id={jobId} was enqueued");
+
+                        //----------------------------------------------------------------------------
+                        // 13. End create DwC CSV files and merge the files into multiple DwC-A files.
+                        //----------------------------------------------------------------------------
+                        var dwcFiles = await _dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles();
+
+                        if (dwcFiles?.Any() ?? false)
+                        {
+                            foreach (var dwcFile in dwcFiles)
+                            {
+                                // Enqueue upload file to blob storage job
+                                var uploadJobId = BackgroundJob.Enqueue<IUploadToStoreJob>(job => job.RunAsync(dwcFile, _exportContainer, true,
+                                    cancellationToken));
+
+                                _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
+                            }
+                        }
+                    
                     }
 
                     if (toggleInstanceOnSuccess)
@@ -360,6 +373,7 @@ namespace SOS.Process.Jobs
             IProcessTaxaJob processTaxaJob,
             IAreaHelper areaHelper,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+            ProcessConfiguration processConfiguration,
             ILogger<ProcessJob> logger) : base(harvestInfoRepository, processInfoRepository)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -401,6 +415,9 @@ namespace SOS.Process.Jobs
                 {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationProcessor},
                 {DataProviderType.DwcA, dwcaObservationProcessor}
             };
+
+            _exportContainer = processConfiguration?.Export_Container ??
+                               throw new ArgumentNullException(nameof(processConfiguration));
         }
 
 

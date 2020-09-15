@@ -71,6 +71,6 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="exportFolderPath"></param>
         /// <param name="dwcaFilePartsInfo"></param>
         /// <returns></returns>
-        Task CreateDwcArchiveFileAsync(string exportFolderPath, DwcaFilePartsInfo dwcaFilePartsInfo);
+        Task<string> CreateDwcArchiveFileAsync(string exportFolderPath, DwcaFilePartsInfo dwcaFilePartsInfo);
     }
 }

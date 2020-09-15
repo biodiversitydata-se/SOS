@@ -21,7 +21,7 @@ namespace SOS.Observations.Api.Controllers
     public class DOIsController : ControllerBase, IDOIsController
     {
         private readonly string _doiContainer;
-        private readonly IDOIManager _doiManager;
+        private readonly IBlobStorageManager _blobStorageManager;
         private readonly ILogger<ExportsController> _logger;
 
         /// <summary>
@@ -29,11 +29,11 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
-        public DOIsController(IDOIManager doiManager, BlobStorageConfiguration configuration,
+        public DOIsController(IBlobStorageManager blobStorageManager, BlobStorageConfiguration configuration,
             ILogger<ExportsController> logger)
         {
-            _doiManager = doiManager ?? throw new ArgumentNullException(nameof(doiManager));
-            _doiContainer = configuration?.DOI_Container ?? throw new ArgumentNullException(nameof(configuration));
+            _blobStorageManager = blobStorageManager ?? throw new ArgumentNullException(nameof(blobStorageManager));
+           _doiContainer = configuration?.Containers["doi"] ?? throw new ArgumentNullException(nameof(configuration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -67,7 +67,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var dois = await _doiManager.GetDOIsAsync(skip, take);
+                var dois = await _blobStorageManager.GetDOIsAsync(skip, take);
 
                 return new OkObjectResult(dois);
             }
@@ -86,7 +86,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var downloadUrl = _doiManager.GetDOIDownloadUrl(id);
+                var downloadUrl = _blobStorageManager.GetDOIDownloadUrl(id);
 
                 return new OkObjectResult(downloadUrl);
             }

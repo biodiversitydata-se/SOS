@@ -73,7 +73,6 @@ namespace SOS.Observations.Api.Repositories
             excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
 
             var sortDescriptor = sortBy.ToSortDescriptor<ProcessedObservation>(sortOrder);
-
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
@@ -366,23 +365,7 @@ namespace SOS.Observations.Api.Repositories
                     )
                 );
             }
-            else
-            {
-                queryList.Add(q => q
-                    .Terms(t => t
-                        .Field("artportalenInternal.sightingTypeId")
-                        .Terms(new int[] { 0, 3 })
-                    )
-                );
-                queryList.Add(q => q
-                    .Terms(t => t
-                        .Field("artportalenInternal.sightingTypeSearchGroupId")
-                        .Terms(new int[] { 0, 1, 32 })
-                    )
-                );
-
-            }
-
+           
             query = queryList;
             return query;
         }

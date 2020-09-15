@@ -50,7 +50,6 @@ namespace SOS.Import.Harvesters
             var harvestInfo = new HarvestInfo(nameof(Area), DataProviderType.ArtportalenObservations, DateTime.Now);
             try
             {
-                var start = DateTime.Now;
                 _logger.LogDebug("Start getting areas");
 
                 var areas = await _areaRepository.GetAsync();

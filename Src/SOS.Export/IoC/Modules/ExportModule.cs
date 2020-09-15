@@ -67,6 +67,7 @@ namespace SOS.Export.IoC.Modules
             // Add jobs
             builder.RegisterType<ExportAndSendJob>().As<IExportAndSendJob>().InstancePerLifetimeScope();
             builder.RegisterType<ExportAndStoreJob>().As<IExportAndStoreJob>().InstancePerLifetimeScope();
+            builder.RegisterType<UploadToStoreJob>().As<IUploadToStoreJob>().InstancePerLifetimeScope();
 
             // DwC Archive
             builder.RegisterType<DwcArchiveFileWriterCoordinator>().As<IDwcArchiveFileWriterCoordinator>().SingleInstance();

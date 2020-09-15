@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Castle.Components.DictionaryAdapter;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
@@ -69,6 +69,7 @@ namespace SOS.Process.UnitTests.Jobs
             _dwcaObservationProcessor = new Mock<IDwcaObservationProcessor>();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
             _dataProviderManager = new Mock<IDataProviderManager>();
+            _processConfigurationMock = new Mock<ProcessConfiguration>();
         }
 
         private readonly Mock<IProcessedObservationRepository> _darwinCoreRepository;
@@ -92,6 +93,7 @@ namespace SOS.Process.UnitTests.Jobs
         private readonly Mock<IAreaHelper> _areaHelper;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
         private readonly Mock<ILogger<ProcessJob>> _loggerMock;
+        private readonly Mock<ProcessConfiguration> _processConfigurationMock;
 
         private ProcessJob TestObject => new ProcessJob(
             _darwinCoreRepository.Object,
@@ -114,6 +116,7 @@ namespace SOS.Process.UnitTests.Jobs
             _processTaxaJob.Object,
             _areaHelper.Object,
             _dwcArchiveFileWriterCoordinatorMock.Object,
+            _processConfigurationMock.Object,
             _loggerMock.Object);
 
         /// <summary>

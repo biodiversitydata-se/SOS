@@ -224,6 +224,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 processTaxaJob,
                 areaHelper,
                 dwcArchiveFileWriterCoordinator,
+                new ProcessConfiguration(), 
                 new NullLogger<ProcessJob>());
 
             return processJob;
