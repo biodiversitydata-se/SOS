@@ -101,9 +101,14 @@ namespace SOS.Process.Processors
         {
             try
             {
-                FieldMappingResolverHelper
-                    .ResolveFieldMappedValues(
-                        processedObservations); // used for testing purpose. A setting decides whether values should be resolved for easier debugging of field mapped data.
+                if (FieldMappingResolverHelper.Configuration.ResolveValues)
+                {
+                    // used for testing purpose for easier debugging of field mapped data.
+                    FieldMappingResolverHelper
+                        .ResolveFieldMappedValues(
+                            processedObservations); 
+                }
+
                 return await ProcessRepository.AddManyAsync(processedObservations);
             }
             catch (Exception e)

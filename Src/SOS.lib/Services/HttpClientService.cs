@@ -81,7 +81,7 @@ namespace SOS.Lib.Services
         {
             var httpClient = GetClient(headerData);
 
-            var response = await httpClient.GetAsync(requestUri);
+            var response = await httpClient.GetAsync(requestUri, HttpCompletionOption.ResponseContentRead);
             return response.StatusCode == HttpStatusCode.OK ? await response.Content.ReadAsStreamAsync() : null;
         }
 
