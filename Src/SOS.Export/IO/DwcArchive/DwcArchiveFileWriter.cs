@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +16,6 @@ using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
@@ -193,30 +190,21 @@ namespace SOS.Export.IO.DwcArchive
             // todo
         }
 
-        public async Task CreateDwcArchiveFileAsync(string exportFolderPath, DwcaFilePartsInfo dwcaFilePartsInfo)
+        public async Task<string> CreateDwcArchiveFileAsync(string exportFolderPath, DwcaFilePartsInfo dwcaFilePartsInfo)
         {
             string tempFilePath = null;
             try
             {
                 tempFilePath = Path.Combine(exportFolderPath, $"Temp_{Path.GetRandomFileName()}.dwca.zip");
-                string filePath = Path.Combine(exportFolderPath, $"{dwcaFilePartsInfo.DataProvider.Identifier}.dwca.zip");
-                string previousFilePath = Path.Combine(exportFolderPath, $"{dwcaFilePartsInfo.DataProvider.Identifier}.previous.dwca.zip");
-
+                var filePath = Path.Combine(exportFolderPath, $"{dwcaFilePartsInfo.DataProvider.Identifier}.dwca.zip");
+                
                 // Create the DwC-A file
                 await CreateDwcArchiveFileAsync(dwcaFilePartsInfo, tempFilePath);
 
-                // Move the new new .zip file to correct path and archive the old .zip like <name>.previous.dwca.zip
-                if (File.Exists(filePath))
-                {
-                    // Replace the distributed .zip with the one just created
-                    File.Replace(tempFilePath, filePath, previousFilePath);
-                    _logger.LogInformation($"The .zip({filePath}) was replaced with the new file({tempFilePath}). Backup of the previous .zip created at {previousFilePath}.");
-                }
-                else
-                {
-                    File.Move(tempFilePath, filePath);
-                    _logger.LogInformation($"The .zip({filePath}) was missing. Moved the new file({tempFilePath}) to be the new distributed .zip.");
-                }
+                File.Move(tempFilePath, filePath, true);
+                _logger.LogInformation($"A new .zip({filePath}) was created.");
+
+                return filePath;
             }
             catch (Exception e)
             {

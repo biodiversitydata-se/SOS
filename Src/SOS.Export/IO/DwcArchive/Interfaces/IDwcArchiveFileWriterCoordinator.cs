@@ -34,6 +34,6 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <summary>
         /// Create DwC-A for each data provider and DwC-A for all data providers combined.
         /// </summary>
-        Task<bool> CreateDwcaFilesFromCreatedCsvFiles();
+        Task<IEnumerable<string>> CreateDwcaFilesFromCreatedCsvFiles();
     }
 }

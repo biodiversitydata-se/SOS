@@ -199,7 +199,7 @@ namespace SOS.Observations.Api
             // Add managers
             services.AddSingleton<IAreaManager, AreaManager>();
             services.AddSingleton<IDataProviderManager, DataProviderManager>();
-            services.AddSingleton<IDOIManager, DOIManager>();
+            services.AddSingleton<IBlobStorageManager, BlobStorageManager>();
             services.AddSingleton<IFieldMappingManager, FieldMappingManager>();
             services.AddSingleton<IObservationManager, ObservationManager>();
             services.AddSingleton<IProcessInfoManager, ProcessInfoManager>();

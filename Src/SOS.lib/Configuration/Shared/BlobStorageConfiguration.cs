@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Configuration.Shared
+﻿using System.Collections.Generic;
+
+namespace SOS.Lib.Configuration.Shared
 {
     /// <summary>
     ///     Settings for blob storage
@@ -16,9 +18,9 @@
         public string ConnectionString { get; set; }
 
         /// <summary>
-        ///     Name of DOI container
+        /// Blob storage containers
         /// </summary>
-        public string DOI_Container { get; set; }
+        public IDictionary<string, string> Containers { get; set; }
 
         /// <summary>
         ///     Storage key

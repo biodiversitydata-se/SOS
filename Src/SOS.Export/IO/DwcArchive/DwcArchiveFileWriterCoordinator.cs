@@ -88,23 +88,28 @@ namespace SOS.Export.IO.DwcArchive
         /// <summary>
         /// Create DwC-A for each data provider and DwC-A for all data providers combined.
         /// </summary>
-        public async Task<bool> CreateDwcaFilesFromCreatedCsvFiles()
+        public async Task<IEnumerable<string>> CreateDwcaFilesFromCreatedCsvFiles()
         {
             try
             {
-                if (!_dwcaFilesCreationConfiguration.IsEnabled) return true;
+                if (!_dwcaFilesCreationConfiguration.IsEnabled) return null;
+
+                var createdFiles = new List<string>();
                 foreach (var dwcaFileCreationInfo in _dwcaFilePartsInfoByDataProvider.Values)
                 {
-                    await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath, dwcaFileCreationInfo);
+                    var archiveFile = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                        _dwcaFilesCreationConfiguration.FolderPath, dwcaFileCreationInfo);
+                    createdFiles.Add(archiveFile);
                 }
 
                 DeleteTemporaryCreatedCsvFiles();
-                return true;
+               
+                return createdFiles.Where(fn => !string.IsNullOrEmpty(fn)).Select(fn => fn);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Merge CSV files into DwC-A failed");
-                return false;
+                return null;
             }
         }
 

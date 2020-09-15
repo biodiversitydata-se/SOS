@@ -41,7 +41,7 @@ namespace SOS.Observations.Api.IoC.Modules
             // Add managers
             builder.RegisterType<AreaManager>().As<IAreaManager>().SingleInstance(); // InstancePerLifetimeScope
             builder.RegisterType<DataProviderManager>().As<IDataProviderManager>().SingleInstance();
-            builder.RegisterType<DOIManager>().As<IDOIManager>().SingleInstance();
+            builder.RegisterType<BlobStorageManager>().As<IBlobStorageManager>().SingleInstance();
             builder.RegisterType<FieldMappingManager>().As<IFieldMappingManager>().SingleInstance();
             builder.RegisterType<ObservationManager>().As<IObservationManager>()
                 .SingleInstance(); // InstancePerLifetimeScope?

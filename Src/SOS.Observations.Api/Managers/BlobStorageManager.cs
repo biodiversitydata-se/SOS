@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.DOI;
+using SOS.Lib.Models.Misc;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
@@ -12,11 +14,11 @@ namespace SOS.Observations.Api.Managers
     /// <summary>
     ///     Area manager
     /// </summary>
-    public class DOIManager : IDOIManager
+    public class BlobStorageManager : IBlobStorageManager
     {
         private readonly IBlobStorageService _blobStorageService;
         private readonly IDOIRepository _doiRepository;
-        private readonly ILogger<DOIManager> _logger;
+        private readonly ILogger<BlobStorageManager> _logger;
 
         /// <summary>
         ///     Constructor
@@ -24,10 +26,10 @@ namespace SOS.Observations.Api.Managers
         /// <param name="doiRepository"></param>
         /// <param name="blobStorageService"></param>
         /// <param name="logger"></param>
-        public DOIManager(
+        public BlobStorageManager(
             IDOIRepository doiRepository,
             IBlobStorageService blobStorageService,
-            ILogger<DOIManager> logger)
+            ILogger<BlobStorageManager> logger)
         {
             _doiRepository = doiRepository ??
                              throw new ArgumentNullException(nameof(doiRepository));
@@ -40,6 +42,18 @@ namespace SOS.Observations.Api.Managers
         public string GetDOIDownloadUrl(Guid id)
         {
             return _blobStorageService.GetDOIDownloadUrl(id);
+        }
+
+        /// <inheritdoc />
+        public string GetExportDownloadUrl(string fileName)
+        {
+            return _blobStorageService.GetExportDownloadUrl(fileName);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<File> GetExportFiles()
+        {
+            return _blobStorageService.GetExportFiles();
         }
 
         /// <inheritdoc />
