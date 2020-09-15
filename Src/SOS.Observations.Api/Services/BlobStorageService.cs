@@ -55,7 +55,7 @@ namespace SOS.Observations.Services
 
             if (!CloudStorageAccount.TryParse(blobStorageConfiguration.ConnectionString, out var storageAccount))
             {
-                _logger.LogError("Failed to connect to blob storage");
+                _logger.LogError($"Failed to connect to blob storage {blobStorageConfiguration.ConnectionString}");
                 throw new Exception("Failed to connect to blob storage");
             }
 
@@ -82,7 +82,13 @@ namespace SOS.Observations.Services
         public IEnumerable<File> GetExportFiles()
         {
             var cloudBlobContainer = _cloudBlobClient.GetContainerReference(_exportContainer);
-            var blobs = cloudBlobContainer.ListBlobs().OfType<CloudBlockBlob>().ToList();
+
+            if (!cloudBlobContainer.Exists())
+            {
+                return null;
+            }
+
+            var blobs = cloudBlobContainer.ListBlobs()?.OfType<CloudBlockBlob>()?.ToList();
             return
                 from b
                     in blobs
