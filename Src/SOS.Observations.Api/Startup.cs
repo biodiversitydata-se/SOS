@@ -3,8 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Elasticsearch.Net;
 using Hangfire;
 using Hangfire.Dashboard;
@@ -16,7 +14,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using Nest;
@@ -69,27 +66,6 @@ namespace SOS.Observations.Api
         ///     Configuration
         /// </summary>
         public IConfiguration Configuration { get; }
-
-        /// <summary>
-        ///     Auto fac
-        /// </summary>
-        public ILifetimeScope AutofacContainer { get; private set; }
-
-        public void ConfigureLogging(ContainerBuilder builder, ILoggingBuilder logging)
-        {
-            logging.ClearProviders();
-            logging.AddConfiguration(Configuration.GetSection("Logging"))
-                .AddNLog($"nlog.{_environment}.config");
-        }
-
-        /// <summary>
-        ///     Register Autofac services. This runs after ConfigureServices so the things
-        ///     here will override registrations made in ConfigureServices.
-        /// </summary>
-        /// <param name="builder"></param>
-        public void ConfigureContainer(ContainerBuilder builder)
-        {
-        }
 
         /// <summary>
         ///     This method gets called by the runtime. Use this method to add services to the container.
@@ -228,8 +204,7 @@ namespace SOS.Observations.Api
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            AutofacContainer = app.ApplicationServices.GetAutofacRoot();
-
+            NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config");
             if (new[] {"dev", "local"}.Contains(env.EnvironmentName.ToLower()))
             {
                 app.UseDeveloperExceptionPage();
