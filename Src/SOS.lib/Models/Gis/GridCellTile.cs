@@ -1,4 +1,6 @@
 ﻿using System;
+using NetTopologySuite.Features;
+using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.Gis
 {
@@ -10,7 +12,6 @@ namespace SOS.Lib.Models.Gis
         public int Y { get; set; }
         public int Zoom { get; set; }
         public LatLonBoundingBox BoundingBox { get; set; }
-        
         public static GridCellTile Create(string key, long? observationsCount, long? taxaCount)
         {
             var zoomAndCoordinates = GetZoomAndCoordinatesFromKey(key);
@@ -29,6 +30,21 @@ namespace SOS.Lib.Models.Gis
             };
 
             return gridCellTile;
+        }
+
+        public Feature GetFeature(CoordinateSys coordinateSystem)
+        {
+            var attributes = new AttributesTable
+            {
+                {"ObservationsCount", ObservationsCount},
+                {"TaxaCount", TaxaCount},
+                {"X", X},
+                {"Y", Y},
+                {"Zoom", Zoom}
+            };
+
+            var feature = new Feature(BoundingBox.GetPolygon(coordinateSystem), attributes);
+            return feature;
         }
 
         private static LatLonCoordinate GetCoordinateFromTile(int x, int y, int zoom)
@@ -71,7 +87,7 @@ namespace SOS.Lib.Models.Gis
             return (Math.PI / 180) * angle;
         }
 
-        public static double ToDegrees(double radians)
+        private static double ToDegrees(double radians)
         {
             return radians * 180f / (float)Math.PI;
         }

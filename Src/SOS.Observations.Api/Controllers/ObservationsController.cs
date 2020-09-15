@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
@@ -266,10 +267,66 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        ///  Aggregate observations into grid cell tiles.
+        /// Aggregates observations into grid cells. Each grid cell contains the number
+        /// of observations and the number of unique taxa (usually species) in the grid cell.
+        /// The grid cells are squares in WGS84 coordinate system which means that they also
+        /// will be squares in the Web Mercator coordinate system.
         /// </summary>
+        /// <remarks>
+        /// If you choose to convert the coordinates into SWEREF99TM the squares will be of
+        /// different size in different places in Sweden.
+        ///
+        /// The following table shows the grid cell size (width) in different
+        /// coordinate systems for the different zoom levels.
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | Zoom level | WGS84    | Web Mercator  |     SWEREF99TM    |   SWEREF99TM   |
+        /// |            |          |               | (Southern Sweden) | (North Sweden) |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 1          |      180 |       20038km |            7813km |        11656km |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 2          |       90 |       10019km |            3906km |         5828km |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 3          |       45 |        5009km |            1953km |         2914km |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 4          |     22.5 |        2505km |             977km |         1457km |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 5          |    11.25 |        1252km |             488km |          729km |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 6          |    5.625 |         626km |             244km |          364km |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 7          |   2.8125 |         313km |             122km |          182km |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 8          | 1.406250 |         157km |              61km |           91km |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 9          | 0.703125 |          78km |              30km |           46km |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 10         | 0.351563 |          39km |              15km |           23km |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 11         | 0.175781 |          20km |             7630m |           11km |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 12         | 0.087891 |          10km |             3815m |          5692m |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 13         | 0.043945 |         4892m |             1907m |          2846m |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 14         | 0.021973 |         2446m |              954m |          1423m |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 15         | 0.010986 |         1223m |              477m |           711m |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 16         | 0.005493 |          611m |              238m |           356m |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 17         | 0.002747 |          306m |              119m |           178m |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 18         | 0.001373 |          153m |               60m |            89m |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 19         | 0.000687 |           76m |               30m |            44m |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 20         | 0.000343 |           38m |               15m |            22m |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// | 21         | 0.000172 |           19m |                7m |            11m |
+        /// +------------+----------+---------------+-------------------+----------------+
+        /// </remarks>
         /// <param name="filter">The search filter.</param>
-        /// <param name="zoom">A zoom level between 1 and 25.</param>
+        /// <param name="zoom">A zoom level between 1 and 21.</param>
         /// <param name="bboxGeoHash">Bounding box as a GeoHash. E.g. "u6sc".</param>
         /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
@@ -297,9 +354,9 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(string.Join(". ", validationErrors));
                 }
 
-                if (zoom < 1 || zoom > 25)
+                if (zoom < 1 || zoom > 21)
                 {
-                    return BadRequest("Zoom must be between 1 and 25");
+                    return BadRequest("Zoom must be between 1 and 21");
                 }
 
                 Result<LatLonBoundingBox> bbox = GetBoundingBox(bboxGeoHash, bboxLeft, bboxTop, bboxRight, bboxBottom);
@@ -315,6 +372,67 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 return new OkObjectResult(result.Value);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting batch of aggregated sightings");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Aggregates observations into grid cells and returns a GeoJSON file with all grid cells.
+        /// </summary>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="zoom">A zoom level between 1 and 21.</param>
+        /// <param name="bboxGeoHash">Bounding box as a GeoHash. E.g. "u6sc".</param>
+        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
+        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
+        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
+        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
+        /// <returns></returns>
+        [HttpPost("geogridgeojson")]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> GetGeogridGeoJsonInternalAsync([FromBody] SearchFilter filter,
+                    [FromQuery] int zoom = 1,
+                    [FromQuery] string bboxGeoHash = null,
+                    [FromQuery] double? bboxLeft = null,
+                    [FromQuery] double? bboxTop = null,
+                    [FromQuery] double? bboxRight = null,
+                    [FromQuery] double? bboxBottom = null
+                )
+        {
+            try
+            {
+                var (isValid, validationErrors) = ValidateFilter(filter, 0, 1);
+                if (!isValid)
+                {
+                    return BadRequest(string.Join(". ", validationErrors));
+                }
+
+                if (zoom < 1 || zoom > 21)
+                {
+                    return BadRequest("Zoom must be between 1 and 21");
+                }
+
+                Result<LatLonBoundingBox> bbox = GetBoundingBox(bboxGeoHash, bboxLeft, bboxTop, bboxRight, bboxBottom);
+                if (bbox.IsFailure)
+                {
+                    return BadRequest(bbox.Error);
+                }
+
+                var result = await _observationManager.GetGeogridTileAggregationAsync(filter, zoom, bbox.Value);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                string strJson = result.Value.GetFeatureCollectionGeoJson();
+                var bytes = Encoding.UTF8.GetBytes(strJson);
+                return File(bytes, "application/json", "grid.geojson");
             }
             catch (Exception e)
             {
