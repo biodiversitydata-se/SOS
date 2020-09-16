@@ -53,6 +53,7 @@ namespace SOS.Observations.Services
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
+            _logger.LogDebug($"Tries to connect to blob storage: {blobStorageConfiguration.ConnectionString?.Substring(0, 10)}...");
             if (!CloudStorageAccount.TryParse(blobStorageConfiguration.ConnectionString, out var storageAccount))
             {
                 _logger.LogError($"Failed to connect to blob storage ({blobStorageConfiguration.ConnectionString})");
@@ -85,6 +86,7 @@ namespace SOS.Observations.Services
 
             if (!cloudBlobContainer.Exists())
             {
+                _logger.LogDebug($"Container {_exportContainer} doesn't exists");
                 return null;
             }
 
