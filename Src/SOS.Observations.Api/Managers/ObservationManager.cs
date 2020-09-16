@@ -128,6 +128,12 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
+        /// <inheritdoc />
+        public async Task<long> GetMatchCountAsync(FilterBase filter)
+        {
+            return await _processedObservationRepository.GetMatchCountAsync(filter);
+        }
+
 
         private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)
         {

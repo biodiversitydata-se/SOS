@@ -4,6 +4,8 @@ namespace SOS.Lib.Configuration.ObservationApi
 {
     public class ObservationApiConfiguration
     {
+        public int  ExportObservationsLimit { get; set; } 
+
         public BlobStorageConfiguration BlobStorageConfiguration { get; set; }
 
         public MongoDbConfiguration ProcessDbConfiguration { get; set; }

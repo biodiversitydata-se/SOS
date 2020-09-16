@@ -171,6 +171,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IProcessClient>(processClient);
 
             // Add configuration
+            services.AddSingleton(observationApiConfiguration);
             services.AddSingleton(observationApiConfiguration.BlobStorageConfiguration);
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(observationApiConfiguration.UserServiceConfiguration);

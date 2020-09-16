@@ -45,5 +45,12 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<Result<GeoGridResult>> GetGeogridAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox);
 
         Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox);
+
+        /// <summary>
+        /// Get number of matching observations
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<long> GetMatchCountAsync(FilterBase filter);
     }
 }

@@ -19,7 +19,7 @@ namespace SOS.Observations.Api.Repositories
         /// <param name="query"></param>
         /// <returns></returns>
         public static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddFilters(
-            SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
+            FilterBase filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
         {
             var queryInternal = query.ToList();
             if (filter is SearchFilterInternal)
@@ -471,7 +471,7 @@ namespace SOS.Observations.Api.Repositories
         /// <param name="excludeQuery"></param>
         /// <returns></returns>
         public static List<Func<QueryContainerDescriptor<object>, QueryContainer>> AddExcludeFilters(
-            SearchFilter filter, List<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery)
+            FilterBase filter, List<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery)
         {
             var excludeQueryInternal = excludeQuery.ToList();
             if (filter is SearchFilterInternal)
