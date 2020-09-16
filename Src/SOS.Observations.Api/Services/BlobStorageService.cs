@@ -55,7 +55,7 @@ namespace SOS.Observations.Services
 
             if (!CloudStorageAccount.TryParse(blobStorageConfiguration.ConnectionString, out var storageAccount))
             {
-                _logger.LogError($"Failed to connect to blob storage {blobStorageConfiguration.ConnectionString}");
+                _logger.LogError($"Failed to connect to blob storage ({blobStorageConfiguration.ConnectionString})");
                 throw new Exception("Failed to connect to blob storage");
             }
 

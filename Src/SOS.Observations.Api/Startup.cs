@@ -56,8 +56,11 @@ namespace SOS.Observations.Api
                 .AddJsonFile($"appsettings.{_environment}.json", true)
                 .AddEnvironmentVariables();
 
-            //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
-            builder.AddUserSecrets<Startup>();
+            if (_environment.Equals("local"))
+            {
+                //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
+                builder.AddUserSecrets<Startup>();
+            }
 
             Configuration = builder.Build();
         }
