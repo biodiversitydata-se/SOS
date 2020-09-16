@@ -4,6 +4,6 @@
     {
         public long? ObservationsCount { get; set; }
         public long? TaxaCount { get; set; }
-        public LatLonBoundingBox BoundingBox { get; set; }
+        public LatLonGeohashBoundingBox BoundingBox { get; set; }
     }
 }

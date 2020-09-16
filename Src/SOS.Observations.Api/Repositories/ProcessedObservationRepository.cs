@@ -482,7 +482,7 @@ namespace SOS.Observations.Api.Repositories
                     {
                         ObservationsCount = b.DocCount,
                         TaxaCount = (long?)b.Cardinality("taxa_count")?.Value,
-                        BoundingBox = GetBoundingBoxFromGeoHash(b.Key)
+                        BoundingBox = LatLonGeohashBoundingBox.CreateFromGeohash(b.Key).Value
                     });
 
             var gridResult = new GeoGridResult()
@@ -580,19 +580,6 @@ namespace SOS.Observations.Api.Repositories
 
             // When operation is disposed, telemetry item is sent.
             return Result.Success(gridResult);
-        }
-
-
-        private LatLonBoundingBox GetBoundingBoxFromGeoHash(string geoHash)
-        {
-            var geoHashBbox = GeoHash.DecodeBbox(geoHash);
-            var bbox = new LatLonBoundingBox()
-            {
-                GeoHash = geoHash,
-                TopLeft = new LatLonCoordinate(geoHashBbox.Maximum.Lat, geoHashBbox.Minimum.Lon),
-                BottomRight = new LatLonCoordinate(geoHashBbox.Minimum.Lat, geoHashBbox.Maximum.Lon)
-            };
-            return bbox;
         }
     }
 }
