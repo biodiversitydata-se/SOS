@@ -44,22 +44,6 @@ namespace SOS.Lib.Models.Gis
         }
 
         public static Result<LatLonBoundingBox> Create(
-            string geohash,
-            double? left,
-            double? top,
-            double? right,
-            double? bottom)
-        {
-            // First try to create from geohash, then from bounds.
-            if (!string.IsNullOrWhiteSpace(geohash))
-            {
-                return CreateFromGeohash(geohash);
-            }
-
-            return Create(left, top, right, bottom);
-        }
-
-        public static Result<LatLonBoundingBox> Create(
             double? left,
             double? top,
             double? right,
@@ -95,7 +79,6 @@ namespace SOS.Lib.Models.Gis
 
             return Result.Success(bbox);
         }
-
 
         public static Result<LatLonBoundingBox> CreateFromGeohash(string geohash)
         {
