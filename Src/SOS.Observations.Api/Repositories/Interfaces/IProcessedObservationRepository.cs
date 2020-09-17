@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
@@ -53,5 +54,19 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         Task<Result<GeoGridResult>> GetGeogridAggregationAsync(SearchFilter filter, int precision, LatLonBoundingBox bbox);
 
         Task<Result<GeoGridTileResult>> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom, LatLonBoundingBox bbox);
+
+        /// <summary>
+        /// Get latest data modified date for passed provider 
+        /// </summary>
+        /// <param name="providerId"></param>
+        /// <returns></returns>
+        Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId);
+
+        /// <summary>
+        /// Get number of matches for query
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        Task<long> GetMatchCountAsync(FilterBase filter);
     }
 }

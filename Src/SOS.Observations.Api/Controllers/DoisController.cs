@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.DOI;
@@ -21,19 +22,25 @@ namespace SOS.Observations.Api.Controllers
     public class DOIsController : ControllerBase, IDOIsController
     {
         private readonly string _doiContainer;
+        private readonly IObservationManager _observationManager;
         private readonly IBlobStorageManager _blobStorageManager;
+        private readonly long _exportObservationsLimit;
         private readonly ILogger<ExportsController> _logger;
 
         /// <summary>
-        ///     Constructor
+        ///  Constructor
         /// </summary>
+        /// <param name="observationManager"></param>
+        /// <param name="blobStorageManager"></param>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
-        public DOIsController(IBlobStorageManager blobStorageManager, BlobStorageConfiguration configuration,
-            ILogger<ExportsController> logger)
+        public DOIsController(IObservationManager observationManager, IBlobStorageManager blobStorageManager, 
+            ObservationApiConfiguration configuration, ILogger<ExportsController> logger)
         {
+            _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _blobStorageManager = blobStorageManager ?? throw new ArgumentNullException(nameof(blobStorageManager));
-           _doiContainer = configuration?.Containers["doi"] ?? throw new ArgumentNullException(nameof(configuration));
+           _doiContainer = configuration?.BlobStorageConfiguration?.Containers["doi"] ?? throw new ArgumentNullException(nameof(configuration));
+           _exportObservationsLimit = configuration.ExportObservationsLimit;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -46,11 +53,23 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var matchCount = await _observationManager.GetMatchCountAsync(filter);
+
+                if (matchCount == 0)
+                {
+                    return NoContent();
+                }
+
+                if (matchCount > _exportObservationsLimit)
+                {
+                    return BadRequest($"Query exceeds limit of {_exportObservationsLimit} observations.");
+                }
+
                 var fileName = Guid.NewGuid().ToString();
                 var jobId = BackgroundJob.Enqueue<IExportAndStoreJob>(job =>
                     job.RunAsync(filter, _doiContainer, fileName, true, JobCancellationToken.Null));
 
-                return new OkObjectResult(new {fileName, jobId});
+                return new OkObjectResult(new { fileName = $"{fileName}.zip", jobId});
             }
             catch (Exception e)
             {

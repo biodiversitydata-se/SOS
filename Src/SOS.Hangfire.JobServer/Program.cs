@@ -47,7 +47,7 @@ namespace SOS.Hangfire.JobServer
         /// <param name="args"></param>
         /// <returns></returns>
         public static async Task Main(string[] args)
-        {
+        {            
             _env = args?.Any() ?? false
                 ? args[0].ToLower()
                 : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
@@ -85,7 +85,7 @@ namespace SOS.Hangfire.JobServer
                     logging
                         .ClearProviders()
                         .AddConfiguration(hostingContext.Configuration.GetSection("Logging"))
-                        .AddNLog($"nlog.{_env}.config");
+                        .AddNLog($"NLog.{_env}.config");
                 })
                 .ConfigureServices((hostContext, services) =>
                 {

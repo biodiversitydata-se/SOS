@@ -32,6 +32,96 @@ namespace SOS.Observations.Api.Repositories
         private readonly TelemetryClient _telemetry;
         private readonly string _indexName;
 
+        private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddSightingTypeFilters(FilterBase filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
+        {
+            var queryList = query.ToList();
+
+            if (filter is SearchFilterInternal)
+            {
+                var internalFilter = filter as SearchFilterInternal;
+                int[] sightingTypeSearchGroupFilter = null;
+                if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowMerged)
+                {
+                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 4, 16, 32, 128 };
+                }
+                else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowBoth)
+                {
+                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 16, 32, 128 };
+                }
+                else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
+                {
+                    sightingTypeSearchGroupFilter = new int[] { 0, 2 };
+                }
+                else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowSightingsInMerged)
+                {
+                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 32, 128 };
+                }
+
+                queryList.Add(q => q
+                    .Terms(t => t
+                        .Field("artportalenInternal.sightingTypeSearchGroupId")
+                        .Terms(sightingTypeSearchGroupFilter)
+                    )
+                );
+            }
+
+            query = queryList;
+            return query;
+        }
+
+        private static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateExcludeQuery(
+            FilterBase filter)
+        {
+            var queryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+
+            if (filter.GeometryFilter?.IsValid ?? false)
+            {
+                foreach (var geom in filter.GeometryFilter.Geometries)
+                {
+                    switch (geom.Type.ToLower())
+                    {
+                        case "holepolygon":
+                            if (filter.GeometryFilter.UsePointAccuracy)
+                            {
+                                queryContainers.Add(q => q
+                                    .GeoShape(gd => gd
+                                        .Field("location.pointWithBuffer")
+                                        .Shape(s => geom)
+                                        .Relation(GeoShapeRelation.Intersects)
+                                    )
+                                );
+                            }
+                            else
+                            {
+                                queryContainers.Add(q => q
+                                    .GeoShape(gd => gd
+                                        .Field("location.point")
+                                        .Shape(s => geom)
+                                        .Relation(GeoShapeRelation.Within)
+                                    )
+                                );
+                            }
+
+                            break;
+                    }
+                }
+            }
+
+            return queryContainers;
+        }
+
+        private LatLonBoundingBox GetBoundingBoxFromGeoHash(string geoHash)
+        {
+            var geoHashBbox = GeoHash.DecodeBbox(geoHash);
+            var bbox = new LatLonBoundingBox()
+            {
+                GeoHash = geoHash,
+                TopLeft = new LatLonCoordinate(geoHashBbox.Maximum.Lat, geoHashBbox.Minimum.Lon),
+                BottomRight = new LatLonCoordinate(geoHashBbox.Minimum.Lat, geoHashBbox.Maximum.Lon)
+            };
+            return bbox;
+        }
+
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -56,6 +146,18 @@ namespace SOS.Observations.Api.Repositories
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry)); ;
         }
 
+        private Tuple<IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, List<Func<QueryContainerDescriptor<object>, QueryContainer>>> GetCoreQueries(FilterBase filter)
+        {
+            var query = filter.ToQuery();
+            query = AddSightingTypeFilters(filter, query);
+            query = InternalFilterBuilder.AddFilters(filter, query);
+
+            var excludeQuery = CreateExcludeQuery(filter);
+            excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
+
+            return new Tuple<IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, List<Func<QueryContainerDescriptor<object>, QueryContainer>>>(query, excludeQuery);
+        }
+
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder)
@@ -65,12 +167,7 @@ namespace SOS.Observations.Api.Repositories
                 return null;
             }
 
-            var query = filter.ToQuery();
-            query = AddSightingTypeFilters(filter, query);
-            query = InternalFilterBuilder.AddFilters(filter, query);
-
-            var excludeQuery = CreateExcludeQuery(filter);
-            excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
+            var (query, excludeQuery) = GetCoreQueries(filter);
 
             var sortDescriptor = sortBy.ToSortDescriptor<ProcessedObservation>(sortOrder);
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
@@ -136,12 +233,7 @@ namespace SOS.Observations.Api.Repositories
                 return null;
             }
 
-            var query = filter.ToQuery();
-            query = AddSightingTypeFilters(filter, query);
-            query = InternalFilterBuilder.AddFilters(filter, query);
-
-            var excludeQuery = CreateExcludeQuery(filter);
-            excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
+            var (query, excludeQuery) = GetCoreQueries(filter);
 
             query = InternalFilterBuilder.AddAggregationFilter(aggregationType, query);
             
@@ -213,12 +305,7 @@ namespace SOS.Observations.Api.Repositories
                 return null;
             }
 
-            var query = filter.ToQuery();
-            query = AddSightingTypeFilters(filter, query);
-            query = InternalFilterBuilder.AddFilters(filter, query);
-
-            var excludeQuery = CreateExcludeQuery(filter);
-            excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
+            var (query, excludeQuery) = GetCoreQueries(filter);
 
             query = InternalFilterBuilder.AddAggregationFilter(aggregationType, query);
 
@@ -333,83 +420,59 @@ namespace SOS.Observations.Api.Repositories
             // When operation is disposed, telemetry item is sent.
         }
 
-        private static IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> AddSightingTypeFilters(SearchFilter filter, IEnumerable<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query)
+        /// <inheritdoc />
+        public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
         {
-            var queryList = query.ToList();
-
-            if (filter is SearchFilterInternal)
+            try
             {
-                var internalFilter = filter as SearchFilterInternal;
-                int[] sightingTypeSearchGroupFilter = null;
-                if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowMerged)
-                {
-                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 4, 16, 32, 128 };
-                }
-                else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowBoth)
-                {
-                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 16, 32, 128 };
-                }
-                else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.ShowOnlyMerged)
-                {
-                    sightingTypeSearchGroupFilter = new int[] { 0, 2 };
-                }
-                else if (internalFilter.TypeFilter == SearchFilterInternal.SightingTypeFilter.DoNotShowSightingsInMerged)
-                {
-                    sightingTypeSearchGroupFilter = new int[] { 0, 1, 2, 4, 32, 128 };
-                }
-
-                queryList.Add(q => q
-                    .Terms(t => t
-                        .Field("artportalenInternal.sightingTypeSearchGroupId")
-                        .Terms(sightingTypeSearchGroupFilter)
+                var res = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                    .Index(_indexName)
+                    .Query(q => q
+                        .Term(t => t
+                            .Field(f => f.DataProviderId)
+                            .Value(providerId)))
+                    .Aggregations(a => a
+                        .Max("latestModified", m => m
+                            .Field(f => f.Modified)
+                        )
                     )
                 );
+
+                var epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+                return epoch.AddMilliseconds(res.Aggregations?.Max("latestModified")?.Value ?? 0).ToUniversalTime();
             }
-           
-            query = queryList;
-            return query;
-        }
-
-        private static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> CreateExcludeQuery(
-            FilterBase filter)
-        {
-            var queryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-
-            if (filter.GeometryFilter?.IsValid ?? false)
+            catch (Exception e)
             {
-                foreach (var geom in filter.GeometryFilter.Geometries)
-                {
-                    switch (geom.Type.ToLower())
-                    {
-                        case "holepolygon":
-                            if (filter.GeometryFilter.UsePointAccuracy)
-                            {
-                                queryContainers.Add(q => q
-                                    .GeoShape(gd => gd
-                                        .Field("location.pointWithBuffer")
-                                        .Shape(s => geom)
-                                        .Relation(GeoShapeRelation.Intersects)
-                                    )
-                                );
-                            }
-                            else
-                            {
-                                queryContainers.Add(q => q
-                                    .GeoShape(gd => gd
-                                        .Field("location.point")
-                                        .Shape(s => geom)
-                                        .Relation(GeoShapeRelation.Within)
-                                    )
-                                );
-                            }
+                Logger.LogError(e, $"Failed to get last modified date for provider: { providerId }, index: { _indexName }");
+                return DateTime.MinValue;
+            }
+        }
 
-                            break;
-                    }
-                }
+        /// <inheritdoc />
+        public async Task<long> GetMatchCountAsync(FilterBase filter)
+        {
+            if (!filter?.IsFilterActive ?? true)
+            {
+                return 0;
             }
 
-            return queryContainers;
+            var (query, excludeQuery) = GetCoreQueries(filter);
+
+            var countResponse = await _elasticClient.CountAsync<dynamic>(s => s
+                .Index(_indexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+            );
+            if (!countResponse.IsValid) throw new InvalidOperationException(countResponse.DebugInformation);
+           
+            return countResponse.Count;
         }
+
+       
 
         public async Task<Result<GeoGridResult>> GetGeogridAggregationAsync(
                 SearchFilter filter,
@@ -423,11 +486,7 @@ namespace SOS.Observations.Api.Repositories
                 return null;
             }
 
-            var query = filter.ToQuery();
-            query = AddSightingTypeFilters(filter, query);
-            query = InternalFilterBuilder.AddFilters(filter, query);
-            var excludeQuery = CreateExcludeQuery(filter);
-            excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
+            var (query, excludeQuery) = GetCoreQueries(filter);
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_GeoAggregated");
             operation.Telemetry.Properties["Filter"] = filter.ToString();
@@ -509,11 +568,7 @@ namespace SOS.Observations.Api.Repositories
                 return null;
             }
 
-            var query = filter.ToQuery();
-            query = AddSightingTypeFilters(filter, query);
-            query = InternalFilterBuilder.AddFilters(filter, query);
-            var excludeQuery = CreateExcludeQuery(filter);
-            excludeQuery = InternalFilterBuilder.AddExcludeFilters(filter, excludeQuery);
+            var (query, excludeQuery) = GetCoreQueries(filter);
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_GeoAggregated");
             operation.Telemetry.Properties["Filter"] = filter.ToString();
