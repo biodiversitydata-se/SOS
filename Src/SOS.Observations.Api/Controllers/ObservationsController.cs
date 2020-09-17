@@ -441,6 +441,22 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        [HttpGet("Provider/{providerId}/lastmodified")]
+        [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetLatestModifiedDateForProviderAsync([FromRoute]int providerId)
+        {
+            try
+            {
+                return new OkObjectResult(await _observationManager.GetLatestModifiedDateForProviderAsync(providerId));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Error getting last modified date for provider {providerId}");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
         private static Result<LatLonBoundingBox> GetBoundingBox(string bboxGeoHash, double? bboxLeft, double? bboxTop,
             double? bboxRight, double? bboxBottom)
         {

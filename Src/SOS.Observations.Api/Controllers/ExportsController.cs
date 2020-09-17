@@ -79,26 +79,6 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpGet("Status")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult GetExportStatus([FromQuery] string jobId)
-        {
-            try
-            {
-                var connection = JobStorage.Current.GetConnection();
-                var jobData = connection.GetJobData(jobId);
-
-                return new OkObjectResult(jobData.State);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Getting export job status failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
         [HttpPost("Create")]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]

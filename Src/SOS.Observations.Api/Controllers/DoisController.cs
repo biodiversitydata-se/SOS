@@ -69,7 +69,7 @@ namespace SOS.Observations.Api.Controllers
                 var jobId = BackgroundJob.Enqueue<IExportAndStoreJob>(job =>
                     job.RunAsync(filter, _doiContainer, fileName, true, JobCancellationToken.Null));
 
-                return new OkObjectResult(new {fileName, jobId});
+                return new OkObjectResult(new { fileName = $"{fileName}.zip", jobId});
             }
             catch (Exception e)
             {

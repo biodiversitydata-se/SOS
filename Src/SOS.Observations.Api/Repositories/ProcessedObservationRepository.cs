@@ -421,6 +421,34 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
+        public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
+        {
+            try
+            {
+                var res = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                    .Index(_indexName)
+                    .Query(q => q
+                        .Term(t => t
+                            .Field(f => f.DataProviderId)
+                            .Value(providerId)))
+                    .Aggregations(a => a
+                        .Max("latestModified", m => m
+                            .Field(f => f.Modified)
+                        )
+                    )
+                );
+
+                var epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+                return epoch.AddMilliseconds(res.Aggregations?.Max("latestModified")?.Value ?? 0).ToUniversalTime();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Failed to get last modified date for provider: { providerId }, index: { _indexName }");
+                return DateTime.MinValue;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(FilterBase filter)
         {
             if (!filter?.IsFilterActive ?? true)

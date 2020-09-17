@@ -23,14 +23,6 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         IActionResult GetExportFileUrl(string fileName);
 
         /// <summary>
-        ///     Get status of export job
-        /// </summary>
-        /// <param name="jobId">Job id returned when export was requested</param>
-        /// <returns></returns>
-        IActionResult GetExportStatus(string jobId);
-
-
-        /// <summary>
         ///     Request of a Darwin Core Archive file with observations based on provided filter
         /// </summary>
         /// <param name="filter"></param>

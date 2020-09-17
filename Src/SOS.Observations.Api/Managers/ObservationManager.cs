@@ -129,6 +129,12 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
+        public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
+        {
+            return await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(providerId);
+        }
+
+        /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(FilterBase filter)
         {
             return await _processedObservationRepository.GetMatchCountAsync(filter);
