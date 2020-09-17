@@ -355,30 +355,6 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        private static Result<LatLonBoundingBox> GetBoundingBox(string bboxGeoHash, double? bboxLeft, double? bboxTop,
-            double? bboxRight, double? bboxBottom)
-        {
-            LatLonBoundingBox bbox;
-            if (bboxLeft.HasValue && bboxTop.HasValue && bboxRight.HasValue && bboxBottom.HasValue)
-            {
-                bbox = new LatLonBoundingBox
-                {
-                    TopLeft = new LatLonCoordinate(bboxTop.Value, bboxLeft.Value),
-                    BottomRight = new LatLonCoordinate(bboxBottom.Value, bboxRight.Value)
-                };
-            }
-            else if (!string.IsNullOrWhiteSpace(bboxGeoHash))
-            {
-                BoundingBox geoHashBbox;
-                try
-                {
-                    geoHashBbox = GeoHash.DecodeBbox(bboxGeoHash);
-                }
-                catch (Exception)
-                {
-                    return Result.Failure<LatLonBoundingBox>("bboxGeoHash is invalid");
-                }
-
         private Result<int> ValidateGeogridZoomArgument(int zoom, int minLimit, int maxLimit)
         {
             if (zoom < minLimit || zoom > maxLimit)
