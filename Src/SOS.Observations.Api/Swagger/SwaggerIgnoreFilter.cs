@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
+using SOS.Observations.Api.Dtos;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace SOS.Observations.Api.Swagger
@@ -33,10 +35,42 @@ namespace SOS.Observations.Api.Swagger
             }
 
             // Remove "Dto" suffix.
-            if (context.Type != null && context.Type.Name.EndsWith("Dto"))
+            if (context.Type != null && !context.Type.IsInterface && TypeEndsWithDto(context.Type))
             {
-                schema.Title = context.Type.Name.Substring(0, context.Type.Name.Length - 3);
+                schema.Title = GetNameWithoutDtoSuffix(context.Type);
             }
+        }
+
+        private bool TypeEndsWithDto(Type type)
+        {
+            if (type.IsGenericType)
+            {
+                return type.GetGenericArguments().Any(TypeEndsWithDto);
+            }
+
+            return type.Name.EndsWith("Dto");
+        }
+
+        private string GetNameWithoutDtoSuffix(Type type)
+        {
+            if (type.IsGenericType)
+            {
+                var name = type.Name.Substring(0, type.Name.IndexOf('`'));
+                if (name.EndsWith("Dto"))
+                {
+                    name = name.Substring(0, name.Length - 3);
+                }
+
+                var types = string.Join("", type.GetGenericArguments().Select(GetNameWithoutDtoSuffix));
+                return $"{types}{name}";
+            }
+
+            if (type.Name.EndsWith("Dto"))
+            {
+                return type.Name.Substring(0, type.Name.Length - 3);
+            }
+
+            return type.Name;
         }
     }
 }

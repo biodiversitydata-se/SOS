@@ -23,6 +23,11 @@ namespace SOS.Lib.Configuration.Shared
         public string[] Hosts { get; set; }
 
         /// <summary>
+        /// Max number of aggregation buckets.
+        /// </summary>
+        public int MaxNrAggregationBuckets { get; set; } = 65535;
+
+        /// <summary>
         ///     dev, st or at. prod is empty
         /// </summary>
         public string IndexPrefix

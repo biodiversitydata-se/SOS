@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search;
@@ -12,6 +13,11 @@ namespace SOS.Observations.Api.Managers.Interfaces
     /// </summary>
     public interface IObservationManager
     {
+        /// <summary>
+        /// Max number of aggregation buckets in ElasticSearch.
+        /// </summary>
+        int MaxNrElasticSearchAggregationBuckets { get; }
+
         /// <summary>
         ///     Get chunk of sightings
         /// </summary>
@@ -60,5 +66,11 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="filter"></param>
         /// <returns></returns>
         Task<long> GetMatchCountAsync(FilterBase filter);
+
+        Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+            SearchFilter filter,
+            LatLonBoundingBox bbox,
+            int skip,
+            int take);
     }
 }

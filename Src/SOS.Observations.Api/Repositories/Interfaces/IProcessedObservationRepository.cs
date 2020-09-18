@@ -13,6 +13,11 @@ namespace SOS.Observations.Api.Repositories.Interfaces
     public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, string>
     {
         /// <summary>
+        /// Max number of aggregation buckets in ElasticSearch.
+        /// </summary>
+        int MaxNrElasticSearchAggregationBuckets { get; }
+
+        /// <summary>
         ///     Get chunk of objects from repository
         /// </summary>
         /// <param name="filter"></param>
@@ -68,5 +73,11 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="filter"></param>
         /// <returns></returns>
         Task<long> GetMatchCountAsync(FilterBase filter);
+
+        Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+            SearchFilter filter,
+            LatLonBoundingBox bbox,
+            int skip,
+            int take);
     }
 }

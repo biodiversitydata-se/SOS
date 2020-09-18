@@ -43,6 +43,8 @@ namespace SOS.Observations.Api.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        public int MaxNrElasticSearchAggregationBuckets => _processedObservationRepository.MaxNrElasticSearchAggregationBuckets;
+
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder)
@@ -102,7 +104,7 @@ namespace SOS.Observations.Api.Managers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get aggregated chunk of observations");
+                _logger.LogError(e, "Failed to aggregate to geogrids.");
                 throw;
             }
         }
@@ -123,7 +125,7 @@ namespace SOS.Observations.Api.Managers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get aggregated chunk of observations");
+                _logger.LogError(e, "Failed to aggregate to geogrids.");
                 throw;
             }
         }
@@ -140,6 +142,23 @@ namespace SOS.Observations.Api.Managers
             return await _processedObservationRepository.GetMatchCountAsync(filter);
         }
 
+        public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+            SearchFilter filter,
+            LatLonBoundingBox bbox,
+            int skip,
+            int take)
+        {
+            try
+            {
+                filter = await _filterManager.PrepareFilter(filter);
+                return await _processedObservationRepository.GetTaxonAggregationAsync(filter, bbox, skip, take);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get taxon aggregation");
+                throw;
+            }
+        }
 
         private void ProcessNonLocalizedFieldMappings(SearchFilter filter, IEnumerable<object> processedObservations)
         {

@@ -278,7 +278,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error getting batch of aggregated sightings");
+                _logger.LogError(e, "GeoGridAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -334,7 +334,63 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error getting batch of aggregated sightings");
+                _logger.LogError(e, "GeoGridAggregationGeoJson error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Aggregates observation by taxon. Each item contains the number of observations for the specific taxon.
+        /// </summary>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="skip">Start index of returned records. Skip+Take must be less than or equal to 65535.</param>
+        /// <param name="take">End index of returned records. Skip+Take must be less than or equal to 65535.</param>
+        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
+        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
+        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
+        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
+        /// <returns></returns>
+        [HttpPost("TaxonAggregation")]
+        [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> TaxonAggregationAsync(
+            [FromBody] SearchFilter filter,
+            [FromQuery] int skip = 0,
+            [FromQuery] int take = 100,
+            [FromQuery] double? bboxLeft = null,
+            [FromQuery] double? bboxTop = null,
+            [FromQuery] double? bboxRight = null,
+            [FromQuery] double? bboxBottom = null)
+        {
+            try
+            {
+                var (isValid, validationErrors) = ValidateFilter(filter, 0, 1);
+                if (!isValid)
+                {
+                    return BadRequest(string.Join(". ", validationErrors));
+                }
+
+                var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
+                var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
+                var paramsValidationResult = Result.Combine(pagingArgumentsValidation, bboxOrError);
+                if (paramsValidationResult.IsFailure)
+                {
+                    return BadRequest(paramsValidationResult.Error);
+                }
+
+                var result = await _observationManager.GetTaxonAggregationAsync(filter, bboxOrError.Value, skip, take);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                PagedResultDto<TaxonAggregationItemDto> dto = result.Value.ToPagedResultDto(result.Value.Records.ToTaxonAggregationItemDtos());
+                return new OkObjectResult(dto);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "TaxonAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -363,6 +419,16 @@ namespace SOS.Observations.Api.Controllers
             }
 
             return Result.Success(zoom);
+        }
+        
+        private Result ValidatePagingArguments(int skip, int take)
+        {
+            if (skip < 0) return Result.Failure("Skip must be 0 or greater.");
+            if (take <= 0) return Result.Failure("Take must be greater than 0");
+            if (skip + take > _observationManager.MaxNrElasticSearchAggregationBuckets)
+                return Result.Failure($"Skip+Take={skip+take}. Skip+Take must be less than or equal to {_observationManager.MaxNrElasticSearchAggregationBuckets}.");
+
+            return Result.Success();
         }
     }
 }
