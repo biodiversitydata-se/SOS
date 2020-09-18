@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Hangfire;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Logging;
@@ -35,6 +37,34 @@ namespace SOS.Export.Services
             }
 
             _cloudBlobClient = storageAccount.CreateCloudBlobClient();
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> CopyFileAsync(string sourceContainer, string sourceFileName, string targetContainer, string targetFileName)
+        {
+            try
+            {
+                var source = _cloudBlobClient.GetContainerReference(sourceContainer);
+                var sourceBlob = source.GetBlockBlobReference(sourceFileName);
+                var target = _cloudBlobClient.GetContainerReference(targetContainer);
+                var targetBlob = target.GetBlobReference(targetFileName);
+                
+                await targetBlob.StartCopyAsync(sourceBlob.Uri);
+
+                while (targetBlob.CopyState.Status == CopyStatus.Pending)
+                {
+                    Thread.Sleep(500);
+                    await targetBlob.FetchAttributesAsync();
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to copy file");
+
+                return false;
+            }
         }
 
         /// <inheritdoc />

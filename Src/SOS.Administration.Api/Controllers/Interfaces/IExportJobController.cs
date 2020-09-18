@@ -29,5 +29,12 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// <returns></returns>
         IActionResult ScheduleDailyExportAndStoreJob(ExportFilter filter, string blobStorageContainer, string fileName,
             int hour, int minute);
+
+        /// <summary>
+        /// Make a DOI of a export file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        IActionResult RunExportToDoi([FromRoute] string fileName);
     }
 }
