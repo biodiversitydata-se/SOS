@@ -1,8 +1,14 @@
 {
-    "profiles": {
-        "SOS.Hangfire.JobServer": {
-            "commandName": "Project",
-            "commandLineArgs": "local"
-        }
+  "profiles": {
+    "SOS.Hangfire.JobServer": {
+      "commandName": "Project",
+      "commandLineArgs": "local"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "dev",        
+      }
     }
+  }
 }

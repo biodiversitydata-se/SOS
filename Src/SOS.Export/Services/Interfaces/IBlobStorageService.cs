@@ -8,6 +8,17 @@ namespace SOS.Export.Services.Interfaces
     public interface IBlobStorageService
     {
         /// <summary>
+        /// Copy file 
+        /// </summary>
+        /// <param name="sourceContainer"></param>
+        /// <param name="sourceFileName"></param>
+        /// <param name="targetContainer"></param>
+        /// <param name="targetFileName"></param>
+        /// <returns></returns>
+        Task<bool> CopyFileAsync(string sourceContainer, string sourceFileName, string targetContainer,
+            string targetFileName);
+
+        /// <summary>
         ///     Create container
         /// </summary>
         /// <param name="name"></param>

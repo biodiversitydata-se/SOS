@@ -88,5 +88,29 @@ namespace SOS.Administration.Api.Controllers
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <inheritdoc />
+        [HttpPost("{fileName}/ToDOI/Run")]
+        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        public IActionResult RunExportToDoi([FromRoute] string fileName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    return BadRequest("You must provide a file name");
+                }
+
+                BackgroundJob.Enqueue<IExportToDoiJob>(job => job.RunAsync(fileName, JobCancellationToken.Null));
+
+                return new OkObjectResult("Export file => DOI job started.");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Export file => DOI job failed to start");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
