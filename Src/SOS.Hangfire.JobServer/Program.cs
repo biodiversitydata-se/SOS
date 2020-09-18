@@ -52,6 +52,8 @@ namespace SOS.Hangfire.JobServer
                 ? args[0].ToLower()
                 : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
 
+            Console.WriteLine("Starting up in environment:"  + _env);
+
             if (new[] { "local", "dev", "st", "prod" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
             {
                 var host = CreateHostBuilder(args).Build();
