@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
@@ -34,11 +35,11 @@ namespace SOS.Observations.Api.Swagger
                 }
             }
 
-            // Remove "Dto" suffix.
-            if (context.Type != null && !context.Type.IsInterface && TypeEndsWithDto(context.Type))
-            {
-                schema.Title = GetNameWithoutDtoSuffix(context.Type);
-            }
+            //// Remove "Dto" suffix.
+            //if (context.Type != null && !ImplementsInterface(context.Type, typeof(IEnumerable)) && TypeEndsWithDto(context.Type))
+            //{
+            //    schema.Title = GetNameWithoutDtoSuffix(context.Type);
+            //}
         }
 
         private bool TypeEndsWithDto(Type type)
@@ -71,6 +72,13 @@ namespace SOS.Observations.Api.Swagger
             }
 
             return type.Name;
+        }
+
+        private bool ImplementsInterface(Type type, Type interfaceType)
+        {
+            var implementedInterfaces = type.GetTypeInfo().ImplementedInterfaces.ToList();
+            if (implementedInterfaces.Count == 0) return false;
+            return implementedInterfaces.Any(m => m == interfaceType);
         }
     }
 }
