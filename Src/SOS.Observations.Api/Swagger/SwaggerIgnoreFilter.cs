@@ -31,6 +31,12 @@ namespace SOS.Observations.Api.Swagger
                     }
                 }
             }
+
+            // Remove "Dto" suffix.
+            if (context.Type != null && context.Type.Name.EndsWith("Dto"))
+            {
+                schema.Title = context.Type.Name.Substring(0, context.Type.Name.Length - 3);
+            }
         }
     }
 }

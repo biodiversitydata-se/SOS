@@ -13,6 +13,8 @@ using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Controllers.Interfaces;
+using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using BoundingBox = NGeoHash.BoundingBox;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
@@ -198,153 +200,56 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Aggregate observations into grid cells.
-        /// </summary>
-        /// <param name="filter">The search filter.</param>
-        /// <param name="precision">
-        /// The zoom precision. Must be between 1 and 9.
-        /// 1 =	5,009.4km x 4,992.6km
-        /// 2 = 1,252.3km x 624.1km
-        /// 3 = 156.5km x 156km
-        /// 4 = 39.1km x 19.5km
-        /// 5 = 4.9km x 4.9km
-        /// 6 = 1.2km x 609.4m
-        /// 7 = 152.9m x 152.4m
-        /// 8 = 38.2m x 19m
-        /// 9 = 4.8m x 4.8m
-        /// </param>
-        /// <param name="bboxGeoHash">Bounding box as a GeoHash. E.g. "u6sc".</param>
-        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
-        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
-        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
-        /// <returns></returns>
-        [HttpPost("geogridsearch")]
-        [ProducesResponseType(typeof(GeoGridResult), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetGeogridAsync([FromBody] SearchFilter filter,
-            [FromQuery] int precision = 1,
-            [FromQuery] string bboxGeoHash = null,
-            [FromQuery] double? bboxLeft = null,
-            [FromQuery] double? bboxTop = null,
-            [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null
-        )
-        {
-            try
-            {
-                var (isValid, validationErrors) = ValidateFilter(filter, 0, 1);
-                if (!isValid)
-                {
-                    return BadRequest(string.Join(". ", validationErrors));
-                }
-
-                if (precision < 1 || precision > 9)
-                {
-                    return BadRequest("precision must be between 1 and 9");
-                }
-
-                Result<LatLonBoundingBox> bbox = GetBoundingBox(bboxGeoHash, bboxLeft, bboxTop, bboxRight, bboxBottom);
-                if (bbox.IsFailure)
-                {
-                    return BadRequest(bbox.Error);
-                }
-
-                var result = await _observationManager.GetGeogridAggregationAsync(filter, precision, bbox.Value);
-                if (result.IsFailure)
-                {
-                    return BadRequest(result.Error);
-                }
-
-                return new OkObjectResult(result.Value);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting batch of aggregated sightings");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <summary>
         /// Aggregates observations into grid cells. Each grid cell contains the number
         /// of observations and the number of unique taxa (usually species) in the grid cell.
         /// The grid cells are squares in WGS84 coordinate system which means that they also
-        /// will be squares in the Web Mercator coordinate system.
+        /// will be squares in the WGS84 Web Mercator coordinate system.
         /// </summary>
         /// <remarks>
-        /// If you choose to convert the coordinates into SWEREF99TM the squares will be of
-        /// different size in different places in Sweden.
-        ///
-        /// The following table shows the grid cell size (width) in different
+        /// The following table shows the approximate grid cell size (width) in different
         /// coordinate systems for the different zoom levels.
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | Zoom level | WGS84    | Web Mercator  |     SWEREF99TM    |   SWEREF99TM   |
-        /// |            |          |               | (Southern Sweden) | (North Sweden) |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 1          |      180 |       20038km |            7813km |        11656km |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 2          |       90 |       10019km |            3906km |         5828km |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 3          |       45 |        5009km |            1953km |         2914km |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 4          |     22.5 |        2505km |             977km |         1457km |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 5          |    11.25 |        1252km |             488km |          729km |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 6          |    5.625 |         626km |             244km |          364km |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 7          |   2.8125 |         313km |             122km |          182km |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 8          | 1.406250 |         157km |              61km |           91km |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 9          | 0.703125 |          78km |              30km |           46km |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 10         | 0.351563 |          39km |              15km |           23km |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 11         | 0.175781 |          20km |             7630m |           11km |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 12         | 0.087891 |          10km |             3815m |          5692m |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 13         | 0.043945 |         4892m |             1907m |          2846m |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 14         | 0.021973 |         2446m |              954m |          1423m |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 15         | 0.010986 |         1223m |              477m |           711m |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 16         | 0.005493 |          611m |              238m |           356m |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 17         | 0.002747 |          306m |              119m |           178m |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 18         | 0.001373 |          153m |               60m |            89m |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 19         | 0.000687 |           76m |               30m |            44m |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 20         | 0.000343 |           38m |               15m |            22m |
-        /// +------------+----------+---------------+-------------------+----------------+
-        /// | 21         | 0.000172 |           19m |                7m |            11m |
-        /// +------------+----------+---------------+-------------------+----------------+
+        /// | Zoom level | WGS84    | Web Mercator  |  SWEREF99TM(Southern Sweden) |  SWEREF99TM(North Sweden) |
+        /// |------------|----------|---------------|:----------------------------:|:-------------------------:|
+        /// | 1          |      180 |       20000km |                       8000km |                   12000km |
+        /// | 2          |       90 |       10000km |                       4000km |                    6000km |
+        /// | 3          |       45 |        5000km |                       2000km |                    3000km |
+        /// | 4          |     22.5 |        2500km |                       1000km |                    1500km |
+        /// | 5          |    11.25 |        1250km |                        500km |                     750km |
+        /// | 6          |    5.625 |         600km |                        250km |                     360km |
+        /// | 7          |   2.8125 |         300km |                        120km |                     180km |
+        /// | 8          | 1.406250 |         150km |                         60km |                      90km |
+        /// | 9          | 0.703125 |          80km |                         30km |                      45km |
+        /// | 10         | 0.351563 |          40km |                         15km |                      23km |
+        /// | 11         | 0.175781 |          20km |                          8km |                      11km |
+        /// | 12         | 0.087891 |          10km |                          4km |                       6km |
+        /// | 13         | 0.043945 |           5km |                          2km |                       3km |
+        /// | 14         | 0.021973 |         2500m |                        1000m |                     1400m |
+        /// | 15         | 0.010986 |         1200m |                         500m |                      700m |
+        /// | 16         | 0.005493 |          600m |                         240m |                      350m |
+        /// | 17         | 0.002747 |          300m |                         120m |                      180m |
+        /// | 18         | 0.001373 |          150m |                          60m |                       90m |
+        /// | 19         | 0.000687 |           80m |                          30m |                       45m |
+        /// | 20         | 0.000343 |           40m |                          15m |                       22m |
+        /// | 21         | 0.000172 |           19m |                           7m |                       11m |
         /// </remarks>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
-        /// <param name="bboxGeoHash">Bounding box as a GeoHash. E.g. "u6sc".</param>
         /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <returns></returns>
-        [HttpPost("geogridtilesearch")]
-        [ProducesResponseType(typeof(GeoGridTileResult), (int)HttpStatusCode.OK)]
+        [HttpPost("GeoGridAggregation")]
+        [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetGeogridTileAsync([FromBody] SearchFilter filter,
+        public async Task<IActionResult> GeogridSearchTileBasedAggregationAsync(
+            [FromBody] SearchFilter filter,
             [FromQuery] int zoom = 1,
-            [FromQuery] string bboxGeoHash = null,
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
             [FromQuery] double? bboxRight = null,
-            [FromQuery] double? bboxBottom = null
-        )
+            [FromQuery] double? bboxBottom = null)
         {
             try
             {
@@ -354,24 +259,22 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(string.Join(". ", validationErrors));
                 }
 
-                if (zoom < 1 || zoom > 21)
+                var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
+                var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
+                var paramsValidationResult = Result.Combine(zoomOrError, bboxOrError);
+                if (paramsValidationResult.IsFailure)
                 {
-                    return BadRequest("Zoom must be between 1 and 21");
+                    return BadRequest(paramsValidationResult.Error);
                 }
 
-                Result<LatLonBoundingBox> bbox = GetBoundingBox(bboxGeoHash, bboxLeft, bboxTop, bboxRight, bboxBottom);
-                if (bbox.IsFailure)
-                {
-                    return BadRequest(bbox.Error);
-                }
-
-                var result = await _observationManager.GetGeogridTileAggregationAsync(filter, zoom, bbox.Value);
+                var result = await _observationManager.GetGeogridTileAggregationAsync(filter, zoom, bboxOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
                 }
 
-                return new OkObjectResult(result.Value);
+                GeoGridResultDto dto = result.Value.ToGeoGridResultDto();
+                return new OkObjectResult(dto);
             }
             catch (Exception e)
             {
@@ -385,25 +288,23 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <param name="filter">The search filter.</param>
         /// <param name="zoom">A zoom level between 1 and 21.</param>
-        /// <param name="bboxGeoHash">Bounding box as a GeoHash. E.g. "u6sc".</param>
         /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
         /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
         /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
         /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
         /// <returns></returns>
-        [HttpPost("geogridgeojson")]
+        [HttpPost("GeoGridAggregationGeoJson")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> GetGeogridGeoJsonInternalAsync([FromBody] SearchFilter filter,
-                    [FromQuery] int zoom = 1,
-                    [FromQuery] string bboxGeoHash = null,
-                    [FromQuery] double? bboxLeft = null,
-                    [FromQuery] double? bboxTop = null,
-                    [FromQuery] double? bboxRight = null,
-                    [FromQuery] double? bboxBottom = null
-                )
+        public async Task<IActionResult> GeogridSearchTileBasedAggregationAsGeoJsonAsync(
+            [FromBody] SearchFilter filter,
+            [FromQuery] int zoom = 1,
+            [FromQuery] double? bboxLeft = null,
+            [FromQuery] double? bboxTop = null,
+            [FromQuery] double? bboxRight = null,
+            [FromQuery] double? bboxBottom = null)
         {
             try
             {
@@ -413,18 +314,15 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(string.Join(". ", validationErrors));
                 }
 
-                if (zoom < 1 || zoom > 21)
+                var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit:1, maxLimit:21);
+                var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
+                var paramsValidationResult = Result.Combine(zoomOrError, bboxOrError);
+                if (paramsValidationResult.IsFailure)
                 {
-                    return BadRequest("Zoom must be between 1 and 21");
+                    return BadRequest(paramsValidationResult.Error);
                 }
 
-                Result<LatLonBoundingBox> bbox = GetBoundingBox(bboxGeoHash, bboxLeft, bboxTop, bboxRight, bboxBottom);
-                if (bbox.IsFailure)
-                {
-                    return BadRequest(bbox.Error);
-                }
-
-                var result = await _observationManager.GetGeogridTileAggregationAsync(filter, zoom, bbox.Value);
+                var result = await _observationManager.GetGeogridTileAggregationAsync(filter, zoomOrError.Value, bboxOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -457,47 +355,14 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        private static Result<LatLonBoundingBox> GetBoundingBox(string bboxGeoHash, double? bboxLeft, double? bboxTop,
-            double? bboxRight, double? bboxBottom)
+        private Result<int> ValidateGeogridZoomArgument(int zoom, int minLimit, int maxLimit)
         {
-            LatLonBoundingBox bbox;
-            if (bboxLeft.HasValue && bboxTop.HasValue && bboxRight.HasValue && bboxBottom.HasValue)
+            if (zoom < minLimit || zoom > maxLimit)
             {
-                bbox = new LatLonBoundingBox
-                {
-                    TopLeft = new LatLonCoordinate(bboxTop.Value, bboxLeft.Value),
-                    BottomRight = new LatLonCoordinate(bboxBottom.Value, bboxRight.Value)
-                };
-            }
-            else if (!string.IsNullOrWhiteSpace(bboxGeoHash))
-            {
-                BoundingBox geoHashBbox;
-                try
-                {
-                    geoHashBbox = GeoHash.DecodeBbox(bboxGeoHash);
-                }
-                catch (Exception)
-                {
-                    return Result.Failure<LatLonBoundingBox>("bboxGeoHash is invalid");
-                }
-
-                bbox = new LatLonBoundingBox
-                {
-                    GeoHash = bboxGeoHash,
-                    TopLeft = new LatLonCoordinate(geoHashBbox.Maximum.Lat, geoHashBbox.Minimum.Lon),
-                    BottomRight = new LatLonCoordinate(geoHashBbox.Minimum.Lat, geoHashBbox.Maximum.Lon)
-                };
-            }
-            else
-            {
-                bbox = new LatLonBoundingBox
-                {
-                    TopLeft = new LatLonCoordinate(90, -180),
-                    BottomRight = new LatLonCoordinate(-90, 180)
-                };
+                return Result.Failure<int>($"Zoom must be between {minLimit} and {maxLimit}");
             }
 
-            return Result.Success(bbox);
+            return Result.Success(zoom);
         }
     }
 }
