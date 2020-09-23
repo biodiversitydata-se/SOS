@@ -154,14 +154,13 @@ namespace SOS.Export.Managers
             try
             {
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.CollectionName);
-                var fieldDescriptions = FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose();
+                var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
 
                 var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     filter,
                     fileName,
                     _processedObservationRepository,
                     fieldDescriptions,
-                    //FieldDescriptionHelper.GetDefaultDwcExportFieldDescriptions(),
                     processInfo,
                     _exportPath,
                     cancellationToken);

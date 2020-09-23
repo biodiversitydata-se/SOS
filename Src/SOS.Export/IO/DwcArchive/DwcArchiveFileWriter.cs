@@ -60,7 +60,7 @@ namespace SOS.Export.IO.DwcArchive
             string exportFolderPath,
             IJobCancellationToken cancellationToken)
         {
-            IEnumerable<FieldDescription> fieldDescriptions = FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose();
+            IEnumerable<FieldDescription> fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
 
             return await CreateDwcArchiveFileAsync(
                 filter,
@@ -161,7 +161,7 @@ namespace SOS.Export.IO.DwcArchive
                 return;
             }
 
-            var fieldDescriptions = FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose();
+            var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
 
             // Create Occurrence CSV file
             string occurrenceCsvFilePath = filePathByFilePart[DwcaFilePart.Occurrence];
@@ -251,7 +251,7 @@ namespace SOS.Export.IO.DwcArchive
 
         private async Task CreateDwcArchiveFileAsync(IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos, string tempFilePath)
         {
-            var fieldDescriptions = FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose().ToList();
+            var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().ToList();
             await using var stream = File.Create(tempFilePath);
             await using var compressedFileStream = new ZipOutputStream(stream, true) { EnableZip64 = Zip64Option.AsNecessary };
 
@@ -316,7 +316,7 @@ namespace SOS.Export.IO.DwcArchive
             await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
             var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
             _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvWriter,
-                FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose());
+                FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions());
             await streamWriter.FlushAsync();
         }
 

@@ -14,6 +14,7 @@ using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Mappings;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
@@ -125,17 +126,17 @@ namespace SOS.Export.IO.DwcArchive
         {
             csvWriter.WriteField(emofRow.OccurrenceID);
             csvWriter.WriteField(emofRow.MeasurementID);
-            csvWriter.WriteField(DwcFormatter.RemoveNewLineTabs(emofRow.MeasurementType));
+            csvWriter.WriteField(emofRow.MeasurementType.RemoveNewLineTabs());
             csvWriter.WriteField(emofRow.MeasurementTypeID);
-            csvWriter.WriteField(DwcFormatter.RemoveNewLineTabs(emofRow.MeasurementValue));
+            csvWriter.WriteField(emofRow.MeasurementValue.RemoveNewLineTabs());
             csvWriter.WriteField(emofRow.MeasurementValueID);
-            csvWriter.WriteField(DwcFormatter.RemoveNewLineTabs(emofRow.MeasurementAccuracy));
-            csvWriter.WriteField(DwcFormatter.RemoveNewLineTabs(emofRow.MeasurementUnit));
+            csvWriter.WriteField(emofRow.MeasurementAccuracy.RemoveNewLineTabs());
+            csvWriter.WriteField(emofRow.MeasurementUnit.RemoveNewLineTabs());
             csvWriter.WriteField(emofRow.MeasurementUnitID);
             csvWriter.WriteField(emofRow.MeasurementDeterminedDate);
-            csvWriter.WriteField(DwcFormatter.RemoveNewLineTabs(emofRow.MeasurementDeterminedBy));
-            csvWriter.WriteField(DwcFormatter.RemoveNewLineTabs(emofRow.MeasurementRemarks));
-            csvWriter.WriteField(DwcFormatter.RemoveNewLineTabs(emofRow.MeasurementMethod));
+            csvWriter.WriteField(emofRow.MeasurementDeterminedBy.RemoveNewLineTabs());
+            csvWriter.WriteField(emofRow.MeasurementRemarks.RemoveNewLineTabs());
+            csvWriter.WriteField(emofRow.MeasurementMethod.RemoveNewLineTabs());
 
             csvWriter.NextRecord();
         }
