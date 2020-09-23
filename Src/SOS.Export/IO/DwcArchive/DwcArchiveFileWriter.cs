@@ -217,7 +217,39 @@ namespace SOS.Export.IO.DwcArchive
             }
         }
 
+        public async Task<string> CreateCompleteDwcArchiveFileAsync(string exportFolderPath, IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos)
+        {
+            string tempFilePath = null;
+            try
+            {
+                tempFilePath = Path.Combine(exportFolderPath, $"Temp_{Path.GetRandomFileName()}.dwca.zip");
+                var filePath = Path.Combine(exportFolderPath, "sos.dwca.zip");
+
+                // Create the DwC-A file
+                await CreateDwcArchiveFileAsync(dwcaFilePartsInfos, tempFilePath);
+
+                File.Move(tempFilePath, filePath, true);
+                _logger.LogInformation($"A new .zip({filePath}) was created.");
+
+                return filePath;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Creating complete DwC-A .zip failed");
+                throw;
+            }
+            finally
+            {
+                if (tempFilePath != null && File.Exists(tempFilePath)) File.Delete(tempFilePath);
+            }
+        }
+
         private async Task CreateDwcArchiveFileAsync(DwcaFilePartsInfo dwcaFilePartsInfo, string tempFilePath)
+        {
+            await CreateDwcArchiveFileAsync(new[] { dwcaFilePartsInfo }, tempFilePath);
+        }
+
+        private async Task CreateDwcArchiveFileAsync(IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos, string tempFilePath)
         {
             var fieldDescriptions = FieldDescriptionHelper.GetDwcFieldDescriptionsForTestingPurpose().ToList();
             await using var stream = File.Create(tempFilePath);
@@ -234,45 +266,49 @@ namespace SOS.Export.IO.DwcArchive
             // Create occurrence.csv
             compressedFileStream.PutNextEntry("occurrence.csv");
             await WriteOccurrenceHeaderRow(compressedFileStream);
-
-            foreach (var occurrenceFile in Directory.EnumerateFiles(
-                dwcaFilePartsInfo.ExportFolder,
-                "occurrence*",
-                SearchOption.TopDirectoryOnly)
-            )
+            foreach (var dwcaFilePartsInfo in dwcaFilePartsInfos)
             {
-                await using var readStream = File.OpenRead(occurrenceFile);
-                await readStream.CopyToAsync(compressedFileStream);
+                foreach (var occurrenceFile in Directory.EnumerateFiles(
+                    dwcaFilePartsInfo.ExportFolder,
+                    "occurrence*",
+                    SearchOption.TopDirectoryOnly)
+                )
+                {
+                    await using var readStream = File.OpenRead(occurrenceFile);
+                    await readStream.CopyToAsync(compressedFileStream);
+                }
             }
-
-
-           /* foreach (var value in dwcaFilePartsInfo.FilePathByBatchIdAndFilePart.Values)
-            {
-                string occurrenceCsvFilePath = value[DwcaFilePart.Occurrence];
-                await using var readStream = File.OpenRead(occurrenceCsvFilePath);
-                await readStream.CopyToAsync(compressedFileStream);
-            }*/
+            
+            /* foreach (var value in dwcaFilePartsInfo.FilePathByBatchIdAndFilePart.Values)
+             {
+                 string occurrenceCsvFilePath = value[DwcaFilePart.Occurrence];
+                 await using var readStream = File.OpenRead(occurrenceCsvFilePath);
+                 await readStream.CopyToAsync(compressedFileStream);
+             }*/
 
             // Create emof.csv
             compressedFileStream.PutNextEntry("extendedMeasurementOrFact.csv");
             await WriteEmofHeaderRow(compressedFileStream);
-
-            foreach (var emofFile in Directory.EnumerateFiles(
-                dwcaFilePartsInfo.ExportFolder,
-                "emof*",
-                SearchOption.TopDirectoryOnly)
-            )
+            foreach (var dwcaFilePartsInfo in dwcaFilePartsInfos)
             {
-                await using var readStream = File.OpenRead(emofFile);
-                await readStream.CopyToAsync(compressedFileStream);
+                foreach (var emofFile in Directory.EnumerateFiles(
+                    dwcaFilePartsInfo.ExportFolder,
+                    "emof*",
+                    SearchOption.TopDirectoryOnly)
+                )
+                {
+                    await using var readStream = File.OpenRead(emofFile);
+                    await readStream.CopyToAsync(compressedFileStream);
+                }
             }
 
-           /* foreach (var value in dwcaFilePartsInfo.FilePathByBatchIdAndFilePart.Values)
-            {
-                string emofCsvFilePath = value[DwcaFilePart.Emof];
-                await using var readStream = File.OpenRead(emofCsvFilePath);
-                await readStream.CopyToAsync(compressedFileStream);
-            }*/
+            /* foreach (var value in dwcaFilePartsInfo.FilePathByBatchIdAndFilePart.Values)
+             {
+                 string emofCsvFilePath = value[DwcaFilePart.Emof];
+                 await using var readStream = File.OpenRead(emofCsvFilePath);
+                 await readStream.CopyToAsync(compressedFileStream);
+             }*/
+
         }
 
         private async Task WriteOccurrenceHeaderRow(ZipOutputStream compressedFileStream)

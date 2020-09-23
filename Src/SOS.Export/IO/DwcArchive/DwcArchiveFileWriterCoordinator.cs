@@ -88,23 +88,31 @@ namespace SOS.Export.IO.DwcArchive
         /// <summary>
         /// Create DwC-A for each data provider and DwC-A for all data providers combined.
         /// </summary>
+        /// <returns>A list with file paths to all created DwC-A files.</returns>
         public async Task<IEnumerable<string>> CreateDwcaFilesFromCreatedCsvFiles()
         {
             try
             {
                 if (!_dwcaFilesCreationConfiguration.IsEnabled) return null;
 
-                var createdFiles = new List<string>();
+                var createdDwcaFiles = new List<string>();
                 foreach (var dwcaFileCreationInfo in _dwcaFilePartsInfoByDataProvider.Values)
                 {
-                    var archiveFile = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                    var dwcaFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                         _dwcaFilesCreationConfiguration.FolderPath, dwcaFileCreationInfo);
-                    createdFiles.Add(archiveFile);
+                    createdDwcaFiles.Add(dwcaFilePath);
                 }
 
+                var completeDwcaFile =
+                    await _dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
+                        _dwcaFilePartsInfoByDataProvider.Values);
+
                 DeleteTemporaryCreatedCsvFiles();
-               
-                return createdFiles.Where(fn => !string.IsNullOrEmpty(fn)).Select(fn => fn);
+
+                return createdDwcaFiles
+                    .Where(fn => !string.IsNullOrEmpty(fn))
+                    .Select(fn => fn)
+                    .Union(new []{ completeDwcaFile});
             }
             catch (Exception e)
             {
