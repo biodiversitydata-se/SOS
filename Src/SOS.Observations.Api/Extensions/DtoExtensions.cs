@@ -51,5 +51,30 @@ namespace SOS.Observations.Api.Extensions
                 BoundingBox = gridCellTile.BoundingBox.ToLatLonBoundingBoxDto()
             };
         }
+
+        public static IEnumerable<TaxonAggregationItemDto> ToTaxonAggregationItemDtos(this IEnumerable<TaxonAggregationItem> taxonAggregationItems)
+        {
+            return taxonAggregationItems.Select(item => item.ToTaxonAggregationItemDto());
+        }
+
+        public static TaxonAggregationItemDto ToTaxonAggregationItemDto(this TaxonAggregationItem taxonAggregationItem)
+        {
+            return new TaxonAggregationItemDto
+            {
+                TaxonId = taxonAggregationItem.TaxonId,
+                ObservationCount = taxonAggregationItem.ObservationCount
+            };
+        }
+
+        public static PagedResultDto<TRecordDto> ToPagedResultDto<TRecord, TRecordDto>(this PagedResult<TRecord> pagedResult, IEnumerable<TRecordDto> records)
+        {
+            return new PagedResultDto<TRecordDto>
+            {
+                Records = records,
+                Skip = pagedResult.Skip,
+                Take = pagedResult.Take,
+                TotalCount = pagedResult.TotalCount
+            };
+        }
     }
 }

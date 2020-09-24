@@ -29,6 +29,7 @@ namespace SOS.Observations.Api.Repositories
         IProcessedObservationRepository
     {
         private readonly IElasticClient _elasticClient;
+        private readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly TelemetryClient _telemetry;
         private readonly string _indexName;
 
@@ -110,6 +111,8 @@ namespace SOS.Observations.Api.Repositories
             return queryContainers;
         }
 
+        public int MaxNrElasticSearchAggregationBuckets => _elasticConfiguration.MaxNrAggregationBuckets;
+
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -125,6 +128,7 @@ namespace SOS.Observations.Api.Repositories
             TelemetryClient telemetry,
             ILogger<ProcessedObservationRepository> logger) : base(client, true, logger)
         {
+            _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
 
             _indexName = string.IsNullOrEmpty(elasticConfiguration.IndexPrefix)
@@ -460,7 +464,102 @@ namespace SOS.Observations.Api.Repositories
             return countResponse.Count;
         }
 
-       
+        public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+            SearchFilter filter, 
+            LatLonBoundingBox bbox,
+            int skip,
+            int take)
+        {
+            if (!filter?.IsFilterActive ?? true)
+            {
+                return Result.Failure<PagedResult<TaxonAggregationItem>>("Filter is not set.");
+            }
+
+            var (query, excludeQuery) = GetCoreQueries(filter);
+
+            // Get number of taxa
+            var searchResponseCount = await _elasticClient.SearchAsync<dynamic>(s => s
+                .Index(_indexName)
+                .Size(0)
+                .Aggregations(a => a.Filter("bbox_filter", f => f
+                    .Filter(fq => fq.GeoBoundingBox(b => b
+                        .Field("location.pointLocation")
+                        .BoundingBox(box => box.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation())
+                        )))
+                    .Aggregations(ac => ac.Cardinality("taxa_count", c => c
+                        .Field("taxon.id")
+                        )))
+                )
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+            );
+            int? nrTaxa = (int?)searchResponseCount.Aggregations.Filter("bbox_filter").Cardinality("taxa_count").Value;
+            if (!nrTaxa.HasValue || nrTaxa == 0)
+            {
+                return Result.Success(new PagedResult<TaxonAggregationItem>
+                {
+                    Records = Enumerable.Empty<TaxonAggregationItem>(),
+                    Skip = skip,
+                    Take = take,
+                    TotalCount = 0
+                });
+            }
+
+            // Calculate size to fetch. 
+            var size = skip + take < nrTaxa ? skip + take : nrTaxa;
+            if (size > MaxNrElasticSearchAggregationBuckets)
+            {
+                return Result.Failure<PagedResult<TaxonAggregationItem>>($"Skip+Take={skip + take}. Skip+Take must be less than or equal to {MaxNrElasticSearchAggregationBuckets}.");
+            }
+            
+            // Get observation count for each taxon
+            var searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                .Index(_indexName)
+                .Size(0)
+                .Aggregations(a => a.Filter("bbox_filter", f => f
+                    .Filter(fq => fq.GeoBoundingBox(b => b
+                        .Field("location.pointLocation")
+                        .BoundingBox(box => box.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation())
+                        )))
+                    .Aggregations(ac => ac.Terms("taxa_count", t => t
+                        .Field("taxon.id")
+                        .Size(size)
+                    )))
+                )
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+            );
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            IEnumerable<TaxonAggregationItem> observationCountByTaxon = searchResponse
+                .Aggregations
+                .Filter("bbox_filter")
+                .Terms("taxa_count")
+                .Buckets
+                .Select(b => TaxonAggregationItem.Create(int.Parse(b.Key), Convert.ToInt32(b.DocCount)))
+                .Skip(skip)
+                .Take(take);
+
+            var pagedResult = new PagedResult<TaxonAggregationItem>
+            {
+                Records = observationCountByTaxon,
+                Skip = skip,
+                Take = take,
+                TotalCount = nrTaxa.Value
+            };
+
+            return Result.Success(pagedResult);
+        }
+
 
         public async Task<Result<GeoGridResult>> GetGeogridAggregationAsync(
                 SearchFilter filter,
@@ -471,7 +570,7 @@ namespace SOS.Observations.Api.Repositories
             const int maxNrReturnedBuckets = 10000;
             if (!filter?.IsFilterActive ?? true)
             {
-                return null;
+                return Result.Failure<GeoGridResult>("The filter is not set.");
             }
 
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -553,7 +652,7 @@ namespace SOS.Observations.Api.Repositories
             const int maxNrReturnedBuckets = 10000;
             if (!filter?.IsFilterActive ?? true)
             {
-                return null;
+                return Result.Failure<GeoGridTileResult>("The filter is not set.");
             }
 
             var (query, excludeQuery) = GetCoreQueries(filter);
