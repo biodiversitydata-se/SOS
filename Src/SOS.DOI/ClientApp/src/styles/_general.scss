@@ -1,0 +1,82 @@
+.main-spinner,
+.content-spinner {
+  font-size: 3em;
+  position: relative;
+  margin: 100px auto;
+  width: 40px;
+  height: 40px;
+  opacity: 0.5;
+}
+
+sg-header {
+  font-size: 0.9rem;
+}
+
+.content-spinner {
+  margin: auto;
+}
+
+.disable-text {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.w-1 {
+  //Used in tables. Should often not be tables. instead ul
+  width: 1%;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+ul.striped-list > li:nth-of-type(even) {
+  background-color: $table-accent-bg;
+}
+
+.searchhint {
+  &:first-child {
+    border-left: none;
+  }
+  border-left: 1px solid #ccc;
+  font-size: 0.7rem;
+}
+
+#breadcrumbs {
+  font-size: 0.85rem;
+  i.fa-angle-right {
+    font-size: 1rem;
+  }
+  a {
+    outline: none;
+  }
+  button.dropdown-toggle:focus {
+    color: $link-hover-color;
+    text-decoration: underline;
+  }
+  nav {
+    display: block;
+    &.hide-small {
+      @include media-breakpoint-down(md) {
+        display: none;
+      }
+    }
+  }
+}
+
+.about {
+  display: flex;
+  justify-content: center;
+  background-image: url(/assets/images/about_bg.jpg);
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+  background-position: center top;
+  .adb-plate-primary {
+    margin:$m-3;
+    max-width:992px;
+   
+  }
+}

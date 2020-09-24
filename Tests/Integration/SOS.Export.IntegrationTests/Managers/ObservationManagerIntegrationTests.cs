@@ -13,6 +13,7 @@ using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
+using SOS.Lib.Services.Interfaces;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.Managers

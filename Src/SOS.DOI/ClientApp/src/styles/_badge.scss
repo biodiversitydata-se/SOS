@@ -1,0 +1,19 @@
+//redlist badges
+.redlist-badge-lg {
+  display: flex;
+  align-items: center;
+  .badge {
+    font-size: 2rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 0.7rem 0.7rem;
+    margin-right: map-get($spacers, 2);
+  }
+  .title {
+    strong {
+      display: block;
+      font-size: 1.3rem;
+    }
+  }
+}
+//More special badges to come

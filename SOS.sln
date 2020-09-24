@@ -65,6 +65,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Observations.Api.Integr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Observations.Api.UnitTests", "Tests\Unit\SOS.Observations.Api.UnitTests\SOS.Observations.Api.UnitTests.csproj", "{147DAE82-B72C-49AF-B2A6-584BE4F5202C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.DOI", "Src\SOS.DOI\SOS.DOI.csproj", "{05F2617D-C213-4873-9931-EDB0BA94D1A7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,10 @@ Global
 		{147DAE82-B72C-49AF-B2A6-584BE4F5202C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{147DAE82-B72C-49AF-B2A6-584BE4F5202C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{147DAE82-B72C-49AF-B2A6-584BE4F5202C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05F2617D-C213-4873-9931-EDB0BA94D1A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05F2617D-C213-4873-9931-EDB0BA94D1A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05F2617D-C213-4873-9931-EDB0BA94D1A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05F2617D-C213-4873-9931-EDB0BA94D1A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -171,6 +177,7 @@ Global
 		{3AF27B20-8F97-469D-BD31-58AD3636635A} = {A1FE1227-E3C9-455B-9F43-FEEEFB131B25}
 		{73ED84F1-EE76-4A74-B263-C9E4D7A0BCFA} = {A3C5E4A0-5599-48B7-BE17-07E19D585ACE}
 		{147DAE82-B72C-49AF-B2A6-584BE4F5202C} = {E71FD295-A777-4518-AEB9-6E5E8D1097B0}
+		{05F2617D-C213-4873-9931-EDB0BA94D1A7} = {A1FE1227-E3C9-455B-9F43-FEEEFB131B25}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CBCE6ED-CC4F-4B55-913F-1231086E92FE}

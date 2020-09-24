@@ -77,5 +77,10 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     User id of the person that reported the species observation.
         /// </summary>
         public int? ReportedByUserId { get; set; }
+
+        /// <summary>
+        /// True if sighting was incremental harvested
+        /// </summary>
+        public bool IncrementalHarvested { get; set; }
     }
 }

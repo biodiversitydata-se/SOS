@@ -40,6 +40,7 @@ namespace SOS.Hangfire.JobServer
         private static ImportConfiguration _importConfiguration;
         private static ProcessConfiguration _processConfiguration;
         private static ExportConfiguration _exportConfiguration;
+        private static BlobStorageConfiguration _blobStorageConfiguration;
 
         /// <summary>
         ///     Application entry point
@@ -132,6 +133,8 @@ namespace SOS.Hangfire.JobServer
                         .Get<ProcessConfiguration>();
                     _exportConfiguration = hostContext.Configuration.GetSection(nameof(ExportConfiguration))
                         .Get<ExportConfiguration>();
+                    _blobStorageConfiguration = hostContext.Configuration.GetSection(nameof(BlobStorageConfiguration))
+                        .Get<BlobStorageConfiguration>();
 
                     //setup the elastic search configuration
                     var uris = _searchDbConfiguration.Hosts.Select(u => new Uri(u));
@@ -145,7 +148,7 @@ namespace SOS.Hangfire.JobServer
                             builder
                                 .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
                                 .RegisterModule(new ProcessModule { Configurations = (_processConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
-                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration) })
+                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration) })
                         );
                     }
                 )
@@ -192,7 +195,7 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine("Export settings:");
             sb.AppendLine("================");
             sb.AppendLine(
-                $"[BlobStorage].[ConnectionString]: {_exportConfiguration.BlobStorageConfiguration.ConnectionString}");
+                $"[BlobStorage].[ConnectionString]: {_blobStorageConfiguration.ConnectionString}");
             sb.AppendLine(
                 $"[MongoDb].[Servers]: {string.Join(", ", _searchDbConfiguration.Hosts.Select(x => x))}");
             sb.AppendLine($"[MongoDb].[DatabaseName]: {_processDbConfiguration.DatabaseName}");

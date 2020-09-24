@@ -1,0 +1,18 @@
+@mixin target-ie {
+  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    @content;
+  }
+}
+
+@mixin plate($bg-color,$color,$box-shadow){
+  background-color: $bg-color;
+  color: $color;
+  box-shadow: $box-shadow;
+  box-sizing: border-box;
+  border-radius: $border-radius;
+  padding: $p-3;
+  margin-bottom: $m-3;
+  @include media-breakpoint-down(sm) {
+    padding: $p-2;
+  }
+}

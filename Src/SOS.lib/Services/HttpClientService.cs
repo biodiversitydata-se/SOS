@@ -50,29 +50,24 @@ namespace SOS.Lib.Services
         /// <inheritdoc />
         public async Task<T> GetDataAsync<T>(Uri requestUri, Dictionary<string, string> headerData)
         {
-            var attempts = 0;
-            while (attempts < 3)
+            var httpClient = GetClient(headerData);
+            try
             {
-                var httpClient = GetClient(headerData);
-                try
-                {
-                    var httpResponseMessage = await httpClient.GetAsync(requestUri);
-                    var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<T>(jsonString);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"{requestUri.PathAndQuery} \n{ex.Message}");
-
-                    Thread.Sleep(1000);
-                    attempts++;
-                }
-                finally
-                {
-                    httpClient.Dispose();
-                }
+                var httpResponseMessage = await httpClient.GetAsync(requestUri);
+                var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<T>(jsonString);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{requestUri.PathAndQuery} \n{ex.Message}");
 
+                Thread.Sleep(1000);
+            }
+            finally
+            {
+                httpClient.Dispose();
+            }
+            
             return default;
         }
 

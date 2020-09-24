@@ -13,6 +13,8 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Jobs.Export;
+using SOS.Lib.Services;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Export.IoC.Modules
 {
@@ -24,7 +26,7 @@ namespace SOS.Export.IoC.Modules
         /// <summary>
         ///     Module configuration
         /// </summary>
-        public (ExportConfiguration ExportConfiguration, MongoDbConfiguration ProcessDbConfiguration) Configurations { get; set; }
+        public (ExportConfiguration ExportConfiguration, MongoDbConfiguration ProcessDbConfiguration, BlobStorageConfiguration BlobStorageConfiguration) Configurations { get; set; }
 
         /// <summary>
         ///     Load event
@@ -33,7 +35,7 @@ namespace SOS.Export.IoC.Modules
         protected override void Load(ContainerBuilder builder)
         {
             // Add configuration
-            builder.RegisterInstance(Configurations.ExportConfiguration.BlobStorageConfiguration).As<BlobStorageConfiguration>()
+            builder.RegisterInstance(Configurations.BlobStorageConfiguration).As<BlobStorageConfiguration>()
                 .SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.DwcaFilesCreationConfiguration).As<DwcaFilesCreationConfiguration>().SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.FileDestination).As<FileDestination>().SingleInstance();

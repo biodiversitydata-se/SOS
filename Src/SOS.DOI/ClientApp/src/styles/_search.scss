@@ -1,0 +1,54 @@
+//Remove this. Should be general disable class
+a.text-muted {
+  text-decoration: none !important;
+  pointer-events: none;
+  cursor: default;
+}
+
+.search-page {
+  .search-title {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    padding-bottom: $p-1;
+    h1 {
+      margin: 0;
+    }
+    > div,
+    > a {
+      white-space: nowrap;
+      padding-left: $p-3;
+    }
+  }
+  .search-body {
+    background-color: $adb-bgcolor-whiteblue;
+    padding: $p-2 $p-3;
+    border-radius: $border-radius;
+    .btn-link {
+      &:disabled {
+        //Remove when outer rules are fixed
+        color: #afc2e3;
+      }
+    }
+  }
+}
+
+.filters-panel {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  @include media-breakpoint-up(sm) {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+  .filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    .btn-filter {
+      margin-right: $m-1;
+      margin-bottom: $m-1;
+    }
+  }
+}

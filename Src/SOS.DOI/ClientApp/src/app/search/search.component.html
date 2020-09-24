@@ -1,0 +1,31 @@
+<div class="d-flex align-items-center justify-content-center py-5">
+  <form class="form-inline">
+    <div class="form-group mx-sm-3 mb-2">
+      <label for="searchFor" class="sr-only">Password</label>
+
+      <div class="input-group">
+        <input type="text" name="searchTerm" [(ngModel)]="_searchTerm" placeholder="Sök DOI" class="form-control">
+      </div>
+    </div>
+    <button type="button" (click)="onSearchClick()" class="btn btn-primary mb-2" [disabled]="_searchTerm <= ''">Sök</button>
+  </form>
+</div>
+<div *ngIf="_notFound" class="alert alert-warning" role="alert">
+  Kunde inte hitta någon DOI.
+</div>
+<table *ngIf="_data.length" class="table bg-transparent">
+  <thead>
+  <tr>
+    <th scope="col">DOI</th>
+    <th scope="col">Titles</th>
+    <th scope="col">Created</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let metadata of _data">
+    <th scope="row"><a [routerLink]="metadata.id">{{metadata.id}}</a></th>
+    <td><span *ngFor="let title of metadata.attributes.titles" class="mr-1">{{title.title}}</span></td>
+    <td>{{metadata.attributes.created}}</td>
+  </tr>
+  </tbody>
+</table>

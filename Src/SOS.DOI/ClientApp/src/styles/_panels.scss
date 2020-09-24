@@ -1,0 +1,129 @@
+//deprecated
+.adb-plate {
+  box-shadow: $adb-shadow;
+  &-inset {
+    background-color: $adb-bgcolor-greyblue;
+    box-shadow: inset rgba(0, 0, 0, 0.5) 0px 3px 3px -2px;
+  }
+}
+
+.adb-plate-primary {
+  @include plate($plate-primary-bg, $plate-primary-color, $plate-primary-shadow);
+  &-inset {
+    background-color: $plate-primary-inset-bg;
+    box-shadow: $plate-primary-inset-shadow;
+  }
+}
+
+.adb-panel2 {
+  box-sizing: border-box;
+  margin-bottom: $p-2;
+  .adb-panel-header {
+    padding: $p-3;
+    position: relative;
+    text-decoration: none;
+    color: $adb-panel-heading-color; //variable
+    background-color: $adb-panel-heading-bg; //variable
+    z-index: 1;
+    box-shadow: $adb-panel-main-shadow;
+    border-radius: 3px 3px 0 0;
+    &.expandable {
+      cursor: pointer;
+      &:hover {
+        background-color: $adb-panel-heading-bg-hover;
+      }
+      &.expanded::before {
+        min-width: 0.9em;
+        margin-right: $m-1;
+        content: "\f078";
+        font-family: "Font Awesome\ 5 Pro";
+        font-weight: 900;
+      }
+      &:not(.expanded)::before {
+        min-width: 0.9em;
+        margin-right: $m-1;
+        content: "\f054";
+        font-family: "Font Awesome\ 5 Pro";
+        font-weight: 900;
+      }
+    }
+    h2 {
+      margin: 0;
+    }
+    .adb-panel-title {
+      flex-grow: 1;
+    }
+  }
+  .adb-panel-content {
+    box-shadow: $adb-panel-main-shadow;
+    z-index: 100;
+    background-color: $adb-panel-content-bg;
+    transition: opacity 10s ease-out;
+    margin: 0 5px;
+    border-radius: 0 0 3px 3px;
+    padding: $p-3;
+    table {
+      thead {
+        background-color: #d3d3d3;
+      }
+      .td {
+        background-color: white;
+      }
+    }
+  }
+  &.loading {
+    input,
+    button {
+      pointer-events: none;
+      color: $text-muted;
+      opacity: $btn-disabled-opacity;
+    }
+  }
+}
+
+// probably move filter-box and filter-wrapper to search.scss later. Only used in search page
+.filter-box {
+  font-size: 0.875rem; //forced to set because of use of btn in dropdowns
+  flex: 1;
+  &.outlined {
+    background-color: $adb-bgcolor-whiteblue;
+    padding: $p-2;
+  }
+  border-radius: $border-radius;
+  > ul {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0;
+    padding: $p-1 0 0 $p-1;
+    list-style: none;
+    li {
+      padding-bottom: $p-1;
+      padding-right: $p-3;
+      &:last-child {
+        padding-right: 0;
+      }
+    }
+  }
+}
+
+.filter-box-row {
+  display: grid;
+  gap: $m-3;
+  @include media-breakpoint-up(md) {
+    grid-template-columns: 1fr 1fr;
+  }
+  @include media-breakpoint-up(lg) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+
+  @include target-ie {
+    display: flex;
+    flex-wrap: wrap;
+    .filter-box {
+      margin: $m-2;
+      min-width: 200px;
+    }
+    justify-content: space-between;
+  }
+}

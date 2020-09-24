@@ -26,27 +26,32 @@ namespace SOS.Process.Processors.Artportalen
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
         private readonly IDictionary<int, ProcessedTaxon> _taxa;
+        private readonly bool _incrementalMode;
 
         public ArtportalenObservationFactory(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
-            IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings)
+            IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings,
+            bool incrementalMode)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             {
                 _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
                 _fieldMappings = fieldMappings ?? throw new ArgumentNullException(nameof(fieldMappings));
             }
+
+            _incrementalMode = incrementalMode;
         }
 
         public static async Task<ArtportalenObservationFactory> CreateAsync(
             DataProvider dataProvider,
             IDictionary<int, ProcessedTaxon> taxa,
-            IProcessedFieldMappingRepository processedFieldMappingRepository)
+            IProcessedFieldMappingRepository processedFieldMappingRepository,
+            bool incrementalMode)
         {
             var allFieldMappings = await processedFieldMappingRepository.GetAllAsync();
             var fieldMappings = GetFieldMappingsDictionary(ExternalSystemId.Artportalen, allFieldMappings.ToArray());
-            return new ArtportalenObservationFactory(dataProvider, taxa, fieldMappings);
+            return new ArtportalenObservationFactory(dataProvider, taxa, fieldMappings, incrementalMode);
         }
 
         public ICollection<ProcessedObservation> CreateProcessedObservations(
@@ -233,6 +238,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.ReportedByUserId = verbatimObservation.ReportedByUserId;
                 obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
                 obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.ObserversInternal;
+                obs.ArtportalenInternal.IncrementalHarvested = _incrementalMode;
 
                 // Set dependent properties
                 var biotope = obs.Event.Biotope?.Value;

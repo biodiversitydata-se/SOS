@@ -1,0 +1,439 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,700');
+
+/* Redlist colors */
+.redlistBlack {
+    background-color: black;
+    color: white;
+}
+.redlistRed {
+    background-color: darkred;
+    color: white;
+}
+.redlistGrey {
+    background-color: darkgrey;
+}
+.redlistGreen {
+    background-color: green;
+    color: white;
+}
+.redlistWhite {
+    background-color: white;
+}
+
+
+body.adb-body {
+    background-color: $adb-bgcolor-greyblue;
+
+    h1 {
+        font-size: 2rem;
+
+        &.h4 {
+            font-size: 1.5rem !important;
+        }
+    }
+
+    strong {
+        font-weight: 600;
+    }
+
+    a, .btn-link {
+        text-decoration: none;
+        color: $adb-accent-blue;
+        cursor: pointer;
+
+        &.black {
+            color: $adb-text-black71;
+
+            &:hover {
+                color: $adb-text-black71;
+            }
+        }
+
+        &:hover,
+        &:active,
+        &:focus {
+            text-decoration: underline;
+            color: $adb-signal-blue;
+        }
+    }
+
+    .ui-widget button,
+    a .ui-widget {
+        font-family: $font-family-sans-serif !important;
+        font-weight: 300;
+    }
+
+    .modal-header h1 {
+        font-size: 1.25rem;
+    }
+}
+
+body.sticky-position-support:not(.ios-mobile) {
+    h1.sticky {
+        top: calc(#{$adb-asta-headermenu-height} - 0.2rem) !important;
+    }
+
+    .btn-sticky {
+        top: calc(#{$adb-asta-headermenu-height} + 0.5rem) !important;
+    }
+
+    .functionMenu {
+        top: $adb-asta-headermenu-height;
+    }
+}
+
+.wrapper {
+    width: 100%;
+    display: flex;
+    .maincontent {
+        width:100%;
+        min-width:200px;
+        min-height: 100vh;
+        transition: all 0.3s;
+    }
+}
+
+.secondary-detail {
+    background-color: $adb-bgcolor-greyblue;
+    box-shadow: $adb-shadow-input;
+    max-height: 20rem;
+    overflow: auto;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+
+    table {
+        width: 100%;
+
+        td {
+            padding: 0.25rem 0.5rem;
+        }
+
+        &.table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0) !important;
+        }
+
+        &.table-striped tbody tr:nth-of-type(even) {
+            background-color: rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .addToSelection {
+            display: inline-block;
+            padding: 0 1rem;
+        }
+    }
+}
+
+
+
+
+a.subcategory-header {
+    display: block;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    box-shadow: $adb-shadow;
+    background-color: #fff;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 5px;
+    position: relative;
+    z-index: 5;
+
+    &:hover {
+        text-decoration: none;
+        background-color: $adb-bgcolor-whiteblue;
+    }
+
+    strong {
+        display: inline-block;
+        width: 15rem;
+        margin-left: 0.7rem;
+    }
+}
+
+.subcategory-list-group {
+    margin-top: -6px;
+    margin-bottom: 8px;
+    z-index: 1;
+    background-color: $adb-bgcolor-whiteblue;
+    box-shadow: $adb-shadow;
+    border-radius: 0 0 0.25rem 0.25rem;
+
+    .item {
+        position: relative;
+        display: block;
+        padding: 0.5rem 1rem;
+
+        &:first-child {
+            margin-top:6px;
+        }
+
+        &:not(:last-child) {
+            border-bottom: 1px solid #ddd;
+        }
+    }
+}
+
+.btn-quickselect {
+    box-shadow: none !important;
+
+    .btn {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        color: $adb-text-black71;
+
+        &:not(.active), &:not(:active) {
+            color: $adb-text-black71;
+        }
+
+        &.active, &:active {
+            color: #fff;
+        }
+    }
+}
+
+
+
+
+/* TEMP Key */
+iframe {
+    width: 100%;
+    min-height: 800px;
+}
+
+/* TEMP MEGA MENU */
+.mega-menu {
+    padding: 10px 0px !important;
+    width: 540px;
+    border-radius: 0;
+    margin-top: 0px;
+}
+
+.mega-menu li {
+    display: inline-block;
+    float: left;
+    font-size: 0.94rem;
+    padding: 3px 0px;
+}
+
+.mega-menu li.mega-menu-column {
+    margin-right: 20px;
+    width: 150px;
+}
+
+.mega-menu .nav-header {
+    padding: 0 !important;
+    margin-bottom: 10px;
+    display: inline-block;
+    width: 100%;
+    border-bottom: 1px solid $adb-text-black50;
+}
+
+.mega-menu img {
+    padding-bottom: 10px;
+}
+/* Page info */
+.pageInfoContainer {
+    background-color: #fff;
+    border-radius: 0.25rem 0.25rem 0 0;
+    box-shadow: $adb-shadow;
+    position: relative;
+    /*z-index: 90;*/
+    clear: both;
+}
+
+
+#taxonPresentation .card p.shortText {
+    max-width: 30ch;
+}
+
+
+
+/* Search filter dropdown checklist*/
+#speciessearchfilters {
+    width: 100%;
+}
+
+/*
+    Styling of 3rd party stuff
+*/
+.ui-inputtext {
+    box-shadow: $adb-shadow-input;
+    border: 1px solid transparent;
+}
+
+body .ui-widget-overlay.ui-dialog-mask {
+    z-index: 1000;
+}
+
+.searchSumBadge {
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.externallink-item {
+    text-align: right;
+    text-decoration: underline;
+}
+
+.taxaTree .ui-state-highlight {
+    background: white;
+    color: #000000;
+}
+
+.adb-bg-white {
+    background-color: $adb-bgcolor-white;
+}
+
+.adb-search-highlight {
+    background-color: yellow;
+}
+
+.list-group-item.active .adb-search-highlight {
+    color: $adb-accent-blue !important;
+}
+
+/* Override 3rd-party styling of links */
+.ui-widget-content a {
+    color: $adb-accent-blue !important;
+
+    &:hover {
+        color: $adb-signal-blue !important;
+    }
+}
+
+
+/* Override 3rd-party styling in the gallery */
+#taxon-mediagallery {
+    .ui-tree .ui-tree-container {
+        padding: 0 0 0.5rem;
+        margin-left: -4px;
+    }
+
+    .ui-widget-content {
+        background-color: transparent;
+        border: none;
+        margin-bottom: 0.5rem;
+        max-width: 100%;
+    }
+
+    .ui-treenode-label.ui-state-highlight {
+        background-color: transparent !important;
+        color: $adb-text-black71 !important;
+    }
+}
+
+/* Override 3rd-party styling of toasts */
+.ui-toast {
+    .ui-toast-message {
+        border-radius: 0.25rem;
+        background-color: #fff;
+    }
+
+    .ui-toast-message-success {
+        background-color: $adb-complement-green;
+        color: #fff;
+        text-shadow: 0 0 2px rgba(0,0,0,0.5);
+    }
+
+    .ui-toast-message-info {
+        background-color: $adb-complement-blue;
+        color: #fff;
+        text-shadow: 0 0 2px rgba(0,0,0,0.5);
+    }
+
+    .ui-toast-message-error {
+        background-color: $adb-signal-red;
+        color: #fff;
+        text-shadow: 0 0 2px rgba(0,0,0,0.5);
+    }
+}
+
+body .ui-widget, body .ui-widget .ui-widget {
+    font-family: $font-family-sans-serif !important;
+}
+
+
+
+
+.map-header {
+    position: relative;
+    z-index: 55;
+    background-color: #fff;
+}
+
+/* Line height classes */
+.lh {
+    &-1 { line-height: 1; }
+    &-15 { line-height: 1.5; }
+    &-2 { line-height: 2; }
+}
+
+/* Letter-spacing classes */
+.letter-spacing {
+    &-04 {
+        letter-spacing: -0.04rem;
+    }
+}
+
+/* Indented paragraph */
+.indented-paragraph p {
+    margin: 0 0 0.5rem 1em;
+    text-indent: -1em;
+}
+
+
+/* Custom scollbar styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    /* Track */
+    &-track {
+        background: #ccc;
+    }
+    /* Handle background: #888; */
+    &-thumb {
+        border: 1px solid rgba(0,0,0,0.3);
+        background: rgb(111,111,111);
+
+        &:hover {
+            cursor: all-scroll;
+            background: #555;
+        }
+    }
+}
+
+.ui-autocomplete-panel {
+    top: initial !important;
+}
+
+
+.ol-control {
+    border: 2px solid rgba(0,0,0,0.2);
+    padding: 0;
+}
+
+.ol-control button {
+    background-color: #fff;
+    border-bottom: 1px solid #ccc;
+    color: black;
+    margin: 0;
+}
+.ol-control button:hover {
+    background-color: #e9ebee;
+}
+
+.ol-scale-line {
+    background: rgba(255,255,255,0.3);
+}
+.ol-scale-line-inner {
+    border: 1px solid black;
+    border-top: none;
+    color: black;
+}
+
+.ol-attribution.ol-control {
+    border: 0 !important;
+}

@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Jobs.Export;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Export.Jobs
 {

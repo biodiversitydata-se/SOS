@@ -1,0 +1,24 @@
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+.background {
+  min-height: 50px;
+  background-image: url(/assets/images/header_pattern.png);
+  background-repeat: repeat;
+  background-attachment: scroll;
+  background-position: center top;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: bold;
+}
+

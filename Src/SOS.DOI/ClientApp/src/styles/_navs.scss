@@ -1,0 +1,39 @@
+// These nav-tabs specific class exists because of the tab panel below that has top borders and
+// that the none active tabs have colors and border-bottom
+.nav-tabs {
+    .nav-item {
+      margin-left: 0.2rem;
+      a.nav-link {
+        text-decoration: none;
+        &.active {
+          z-index: 95;
+          position: relative;
+        }
+        &:not(.active) {
+          background-color: $adb-bgcolor-whiteblue;
+          &:hover {
+            background-color: white;
+          }
+        }
+      }
+    }
+  }
+
+  //TOTO: below override bootstrap variables as much as possible
+.nav-pills {
+    & .nav-link.active {
+        box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 1px 0px; /* Instead of a 1px solid border */
+        color: $adb-text-black;
+        background-color: $adb-bgcolor-white;
+        font-weight: 500;
+    }
+
+    & a.nav-link {
+        text-decoration: none;
+        color: $adb-text-black71;
+
+        &:hover {
+            color: $adb-text-black;
+        }
+    }
+}

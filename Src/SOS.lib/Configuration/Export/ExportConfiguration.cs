@@ -1,5 +1,4 @@
-﻿using SOS.Lib.Configuration.Shared;
-
+﻿
 namespace SOS.Lib.Configuration.Export
 {
     /// <summary>
@@ -7,11 +6,6 @@ namespace SOS.Lib.Configuration.Export
     /// </summary>
     public class ExportConfiguration
     {
-        /// <summary>
-        ///     Blob storage configuration
-        /// </summary>
-        public BlobStorageConfiguration BlobStorageConfiguration { get; set; }
-
         /// <summary>
         ///     Destination file settings
         /// </summary>

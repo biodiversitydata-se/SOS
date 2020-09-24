@@ -1,0 +1,18 @@
+  <div *ngIf="_doiData" class="jumbotron ml-5 mr-5">
+    <h1 class="display-8">{{_doiData.id}}</h1>
+
+    <ul class="list-group list-group-horizontal">
+      <li *ngFor="let title of _doiData.attributes.titles" class="list-group-item">{{ title.title }}</li>
+    </ul>
+
+    <p *ngFor="let description of _doiData.attributes.descriptions">{{ description.description }}</p>
+
+    <hr class="my-4">
+
+    <h3>Skapad {{ _doiData.attributes.created }} av</h3>
+    <ul class="list-group list-group-flush mb-3">
+      <li *ngFor="let creator of _doiData.attributes.creators" class="list-group-item">{{ creator.name }}</li>
+    </ul>
+
+    <a href="{{ _fileUrl }}" role="button" class="btn btn-primary btn-lg">Hämta</a>
+  </div>

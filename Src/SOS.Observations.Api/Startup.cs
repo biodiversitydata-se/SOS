@@ -23,6 +23,8 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.JsonConverters;
+using SOS.Lib.Services;
+using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories;
@@ -30,8 +32,6 @@ using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Observations.Api.Services;
 using SOS.Observations.Api.Services.Interfaces;
 using SOS.Observations.Api.Swagger;
-using SOS.Observations.Services;
-using SOS.Observations.Services.Interfaces;
 
 namespace SOS.Observations.Api
 {
@@ -170,9 +170,12 @@ namespace SOS.Observations.Api
                 processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
             services.AddSingleton<IProcessClient>(processClient);
 
+            var blobStorageConfiguration = Configuration.GetSection("BlobStorageConfiguration")
+                .Get<BlobStorageConfiguration>();
+
             // Add configuration
             services.AddSingleton(observationApiConfiguration);
-            services.AddSingleton(observationApiConfiguration.BlobStorageConfiguration);
+            services.AddSingleton(blobStorageConfiguration);
             services.AddSingleton(elasticConfiguration);
             services.AddSingleton(observationApiConfiguration.UserServiceConfiguration);
 
