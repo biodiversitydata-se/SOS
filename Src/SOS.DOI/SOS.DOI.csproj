@@ -67,6 +67,9 @@
     <None Update="ClientApp\src\models\datacite\doi-description.js.map">
       <DependentUpon>doi-description.js</DependentUpon>
     </None>
+    <None Update="ClientApp\src\models\datacite\doi-metadata.js">
+      <DependentUpon>doi-metadata.ts</DependentUpon>
+    </None>
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
