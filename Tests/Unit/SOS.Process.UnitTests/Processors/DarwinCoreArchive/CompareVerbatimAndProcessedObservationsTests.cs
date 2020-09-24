@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Newtonsoft.Json;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Process.Helpers;
 using SOS.Process.UnitTests.TestHelpers;

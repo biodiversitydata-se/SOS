@@ -12,6 +12,8 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Export;
 
 namespace SOS.Export.IoC.Modules
@@ -76,6 +78,9 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<DwcArchiveOccurrenceCsvWriter>().As<IDwcArchiveOccurrenceCsvWriter>().SingleInstance();
             builder.RegisterType<ExtendedMeasurementOrFactCsvWriter>().As<IExtendedMeasurementOrFactCsvWriter>()
                 .SingleInstance();
+
+            // Helpers
+            builder.RegisterType<FieldMappingResolverHelper>().As<IFieldMappingResolverHelper>().SingleInstance();
         }
     }
 }

@@ -10,6 +10,7 @@ using MongoDB.Driver;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -176,7 +177,7 @@ namespace SOS.Process.Processors.Artportalen
                 if (mode == JobRunModes.Full)
                 {
                     Logger.LogDebug($"Start writing Artportalen CSV ({startId}-{endId})");
-                    var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservationsBatch, dataProvider, $"{startId}-{endId}");
+                    await WriteObservationsToDwcaCsvFiles(processedObservationsBatch, dataProvider, $"{startId}-{endId}");
                     Logger.LogDebug($"Finish writing Artportalen CSV ({startId}-{endId})");
                 }
                    
@@ -254,7 +255,7 @@ namespace SOS.Process.Processors.Artportalen
 
             if (mode == JobRunModes.Full)
             {
-                await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider, batchId.ToString());
+                await WriteObservationsToDwcaCsvFiles(observations, dataProvider, batchId.ToString());
             }
 
             observations.Clear();

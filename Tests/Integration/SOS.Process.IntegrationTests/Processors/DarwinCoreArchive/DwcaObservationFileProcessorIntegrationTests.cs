@@ -20,6 +20,7 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;

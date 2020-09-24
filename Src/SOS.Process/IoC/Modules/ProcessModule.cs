@@ -3,6 +3,8 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;

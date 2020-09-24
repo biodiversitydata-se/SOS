@@ -6,6 +6,7 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -117,6 +118,22 @@ namespace SOS.Process.Processors
                 return 0;
             }
            
+        }
+
+        /// <summary>
+        /// Resolve field mapping values and then write the observations to DwC-A CSV files.
+        /// </summary>
+        /// <param name="processedObservations"></param>
+        /// <param name="dataProvider"></param>
+        /// <param name="batchId"></param>
+        /// <returns></returns>
+        protected async Task<bool> WriteObservationsToDwcaCsvFiles(
+            IEnumerable<ProcessedObservation> processedObservations,
+            DataProvider dataProvider,
+            string batchId = "")
+        {
+            FieldMappingResolverHelper.ResolveFieldMappedValues(processedObservations, "en-GB");
+            return await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservations, dataProvider, batchId);
         }
 
         protected async Task<bool> DeleteProviderBatchAsync(
