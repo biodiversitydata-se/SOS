@@ -57,7 +57,7 @@ namespace SOS.Export.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>()
+            builder.RegisterType<Lib.Repositories.Processed.ProcessedFieldMappingRepository>().As<Lib.Repositories.Processed.Interfaces.IProcessedFieldMappingRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().SingleInstance();
 

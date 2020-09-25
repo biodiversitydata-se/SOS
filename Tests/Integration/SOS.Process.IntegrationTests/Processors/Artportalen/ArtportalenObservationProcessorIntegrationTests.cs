@@ -134,15 +134,14 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-
+            var processedFieldMappingRepository =
+                new ProcessedFieldMappingRepository(exportClient, new NullLogger<ProcessedFieldMappingRepository>());
+            var fieldMappingResolverHelper =
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration());
             var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
-                    new Export.Repositories.ProcessedFieldMappingRepository(exportClient,
-                        new NullLogger<Export.Repositories.ProcessedFieldMappingRepository>()),
-                    new TaxonManager(
-                        new Export.Repositories.ProcessedTaxonRepository(exportClient,
-                            new NullLogger<Export.Repositories.ProcessedTaxonRepository>()),
-                        new NullLogger<TaxonManager>()), new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                    fieldMappingResolverHelper,
+                     new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>()

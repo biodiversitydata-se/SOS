@@ -5,6 +5,7 @@ using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.IO.DwcArchive.Interfaces;
+using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed;
@@ -132,7 +133,7 @@ namespace SOS.Process.Processors
             DataProvider dataProvider,
             string batchId = "")
         {
-            FieldMappingResolverHelper.ResolveFieldMappedValues(processedObservations, "en-GB");
+            FieldMappingResolverHelper.ResolveFieldMappedValues(processedObservations, Cultures.en_GB);
             return await dwcArchiveFileWriterCoordinator.WriteObservations(processedObservations, dataProvider, batchId);
         }
 

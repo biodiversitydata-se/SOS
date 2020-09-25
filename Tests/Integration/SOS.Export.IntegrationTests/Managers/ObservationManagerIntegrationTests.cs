@@ -11,9 +11,15 @@ using SOS.Export.Repositories;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
+using SOS.Lib.Helpers;
+using SOS.Lib.Repositories.Processed;
 using Xunit;
+using ProcessedObservationRepository = SOS.Export.Repositories.ProcessedObservationRepository;
+using ProcessedTaxonRepository = SOS.Export.Repositories.ProcessedTaxonRepository;
+using ProcessInfoRepository = SOS.Export.Repositories.ProcessInfoRepository;
 
 namespace SOS.Export.IntegrationTests.Managers
 {
@@ -34,11 +40,13 @@ namespace SOS.Export.IntegrationTests.Managers
                 new ProcessedTaxonRepository(exportClient,
                     new Mock<ILogger<ProcessedTaxonRepository>>().Object),
                 new Mock<ILogger<TaxonManager>>().Object);
+            var processedFieldMappingRepository =
+                new ProcessedFieldMappingRepository(exportClient, new NullLogger<ProcessedFieldMappingRepository>());
+            var fieldMappingResolverHelper =
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration());
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
-                    new ProcessedFieldMappingRepository(exportClient,
-                        new NullLogger<ProcessedFieldMappingRepository>()),
-                    taxonManager,
+                    fieldMappingResolverHelper,
                     new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new FileService(),

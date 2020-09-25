@@ -151,7 +151,7 @@ namespace SOS.Export.IO.DwcArchive
                 _fileService.DeleteFolder(temporaryZipExportFolderPath);
             }
         }
-
+        
         public async Task WriteHeaderlessDwcaFiles(
             ICollection<ProcessedObservation> processedObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart)
@@ -316,7 +316,7 @@ namespace SOS.Export.IO.DwcArchive
             await using var streamWriter = new StreamWriter(compressedFileStream, Encoding.UTF8, -1, true);
             var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
             _dwcArchiveOccurrenceCsvWriter.WriteHeaderRow(csvWriter,
-                FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions());
+               FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions());
             await streamWriter.FlushAsync();
         }
 

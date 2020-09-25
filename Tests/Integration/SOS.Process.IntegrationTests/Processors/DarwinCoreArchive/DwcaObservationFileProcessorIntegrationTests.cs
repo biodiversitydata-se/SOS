@@ -59,13 +59,6 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             }
 
             var elasticClient = new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris)));
-            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var verbatimClient = new VerbatimClient(
-                verbatimDbConfiguration.GetMongoDbSettings(),
-                verbatimDbConfiguration.DatabaseName,
-                verbatimDbConfiguration.ReadBatchSize,
-                verbatimDbConfiguration.WriteBatchSize);
-
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
                 processDbConfiguration.GetMongoDbSettings(),
@@ -101,12 +94,12 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 
             var processedFieldMappingRepository =
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
+            var fieldMappingResolverHelper =
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration());
             var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
-                    new Export.Repositories.ProcessedFieldMappingRepository(processClient, new NullLogger<Export.Repositories.ProcessedFieldMappingRepository>()),
-                    new TaxonManager(
-                        new Export.Repositories.ProcessedTaxonRepository(processClient, new NullLogger<Export.Repositories.ProcessedTaxonRepository>()),
-                        new NullLogger<Export.Managers.TaxonManager>()), new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                    fieldMappingResolverHelper,
+                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>()
