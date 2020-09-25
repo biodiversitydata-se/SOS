@@ -36,7 +36,6 @@
     <None Remove="ClientApp\src\models\datacite\doi-response.ts" />
     <None Remove="ClientApp\src\models\datacite\doi-title.ts" />
     <None Remove="ClientApp\src\models\datacite\index.ts" />
-    <None Remove="ClientApp\src\models\index.ts" />
     <None Remove="ClientApp\src\services\doi.service.ts" />
     <None Remove="ClientApp\src\services\httpclient.service.ts" />
     <None Remove="ClientApp\src\services\index.ts" />
@@ -50,9 +49,6 @@
     <TypeScriptCompile Include="ClientApp\src\models\datacite\doi-creator.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\datacite\doi-title.ts" />
     <TypeScriptCompile Include="ClientApp\src\models\datacite\index.ts">
-      <SubType>Code</SubType>
-    </TypeScriptCompile>
-    <TypeScriptCompile Include="ClientApp\src\models\index.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="ClientApp\src\services\doi.service.ts" />

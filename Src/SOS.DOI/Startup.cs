@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NLog.Web;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
@@ -73,6 +74,7 @@ namespace SOS.DOI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config");
             if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
