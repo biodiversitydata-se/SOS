@@ -10,6 +10,7 @@ using SOS.Export.IO.DwcArchive;
 using SOS.Export.Managers;
 using SOS.Export.Repositories;
 using SOS.Export.Services;
+using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
@@ -20,7 +21,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
 {
     public class DwcArchiveFileWriterIntegrationTests : TestBase
     {
-        private static ProcessClient CreateExportClient(MongoDbConfiguration exportConfiguration)
+        private ProcessClient CreateExportClient(MongoDbConfiguration exportConfiguration)
         {
             var exportClient = new ProcessClient(
                 exportConfiguration.GetMongoDbSettings(),
@@ -30,24 +31,27 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             return exportClient;
         }
 
-        private static DwcArchiveFileWriter CreateDwcArchiveFileWriter(ProcessClient exportClient)
+        private DwcArchiveFileWriter CreateDwcArchiveFileWriter(ProcessClient exportClient)
         {
-            var processedFieldMappingRepository = new ProcessedFieldMappingRepository(
-                exportClient,
-                new NullLogger<ProcessedFieldMappingRepository>());
+            var processDbConfiguration = GetProcessDbConfiguration();
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(
                 new DwcArchiveOccurrenceCsvWriter(
-                    processedFieldMappingRepository,
-                    new TaxonManager(
-                        new ProcessedTaxonRepository(exportClient,
-                            new Mock<ILogger<ProcessedTaxonRepository>>().Object),
-                        new Mock<ILogger<TaxonManager>>().Object),
-                    new Mock<ILogger<DwcArchiveOccurrenceCsvWriter>>().Object),
+                    CreateFieldMappingResolverHelper(CreateExportClient(processDbConfiguration)),
+                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
                 new ExtendedMeasurementOrFactCsvWriter(new Mock<ILogger<ExtendedMeasurementOrFactCsvWriter>>().Object),
                 new FileService(),
                 new Mock<ILogger<DwcArchiveFileWriter>>().Object);
             return dwcArchiveFileWriter;
         }
+
+        private FieldMappingResolverHelper CreateFieldMappingResolverHelper(ProcessClient client)
+        {
+            var processedFieldMappingRepository =
+                new Lib.Repositories.Processed.ProcessedFieldMappingRepository(client, new NullLogger<Lib.Repositories.Processed.ProcessedFieldMappingRepository>());
+            return new FieldMappingResolverHelper(processedFieldMappingRepository,
+                new FieldMappingConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
+        }
+
 
         private static ProcessedObservationRepository CreateProcessedObservationRepository(ProcessClient exportClient)
         {

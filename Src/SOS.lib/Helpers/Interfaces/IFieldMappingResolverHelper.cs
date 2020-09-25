@@ -2,7 +2,7 @@
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Models.Processed.Observation;
 
-namespace SOS.Process.Helpers.Interfaces
+namespace SOS.Lib.Helpers.Interfaces
 {
     public interface IFieldMappingResolverHelper
     {

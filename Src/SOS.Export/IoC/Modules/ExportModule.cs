@@ -12,6 +12,8 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
@@ -57,7 +59,7 @@ namespace SOS.Export.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>()
+            builder.RegisterType<Lib.Repositories.Processed.ProcessedFieldMappingRepository>().As<Lib.Repositories.Processed.Interfaces.IProcessedFieldMappingRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().SingleInstance();
 
@@ -78,6 +80,9 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<DwcArchiveOccurrenceCsvWriter>().As<IDwcArchiveOccurrenceCsvWriter>().SingleInstance();
             builder.RegisterType<ExtendedMeasurementOrFactCsvWriter>().As<IExtendedMeasurementOrFactCsvWriter>()
                 .SingleInstance();
+
+            // Helpers
+            builder.RegisterType<FieldMappingResolverHelper>().As<IFieldMappingResolverHelper>().SingleInstance();
         }
     }
 }

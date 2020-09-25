@@ -9,6 +9,7 @@ using MongoDB.Driver;
 using Moq;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.VirtualHerbarium;

@@ -194,7 +194,7 @@ namespace SOS.Process.Jobs
 
                 var processingResult = await Task.WhenAll(processTaskByDataProvider.Values);
                 var success = processingResult.All(t => t.Status == RunStatus.Success);
-
+                
                 //----------------------------------------------
                 // 9. Update provider info 
                 //----------------------------------------------

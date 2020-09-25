@@ -8,6 +8,7 @@ using SOS.Export.Extensions;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;

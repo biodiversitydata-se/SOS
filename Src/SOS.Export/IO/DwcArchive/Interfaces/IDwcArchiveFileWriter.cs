@@ -8,6 +8,7 @@ using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Export.IO.DwcArchive.Interfaces
 {
@@ -72,5 +73,13 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="dwcaFilePartsInfo"></param>
         /// <returns></returns>
         Task<string> CreateDwcArchiveFileAsync(string exportFolderPath, DwcaFilePartsInfo dwcaFilePartsInfo);
+
+        /// <summary>
+        /// Create a DwC-A file for all data providers.
+        /// </summary>
+        /// <param name="exportFolderPath"></param>
+        /// <param name="dwcaFilePartsInfos"></param>
+        /// <returns></returns>
+        Task<string> CreateCompleteDwcArchiveFileAsync(string exportFolderPath, IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos);
     }
 }

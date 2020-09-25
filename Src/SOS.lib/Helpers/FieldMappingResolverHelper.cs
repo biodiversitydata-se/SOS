@@ -7,14 +7,13 @@ using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Helpers.Interfaces;
 
-namespace SOS.Process.Helpers
+namespace SOS.Lib.Helpers
 {
     /// <summary>
     ///     Class that can be used for resolve field mapped values.
     /// </summary>
-    public class FieldMappingResolverHelper : IFieldMappingResolverHelper
+    public class FieldMappingResolverHelper : Interfaces.IFieldMappingResolverHelper
     {
         private readonly FieldMappingConfiguration _fieldMappingConfiguration;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
@@ -84,7 +83,7 @@ namespace SOS.Process.Helpers
                     valueMappingDictionaries[FieldMappingFieldId.EstablishmentMeans]);
                 ResolveFieldMappedValue(observation.Occurrence?.OccurrenceStatus,
                     valueMappingDictionaries[FieldMappingFieldId.OccurrenceStatus]);
-                ResolveFieldMappedValue(observation.Occurrence?.DiscoveryMethod, 
+                ResolveFieldMappedValue(observation.Occurrence?.DiscoveryMethod,
                     valueMappingDictionaries[FieldMappingFieldId.DiscoveryMethod]);
                 ResolveFieldMappedValue(observation.Identification?.DeterminationMethod,
                     valueMappingDictionaries[FieldMappingFieldId.DeterminationMethod]);
@@ -121,10 +120,5 @@ namespace SOS.Process.Helpers
                 fieldMapValue.Value = translatedValue;
             }
         }
-    }
-
-    public class FieldMappingResolver
-    {
-
     }
 }

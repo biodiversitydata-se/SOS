@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -78,7 +79,7 @@ namespace SOS.Process.Processors.Nors
                     var invalidObservations = ValidationManager.ValidateObservations(ref observations);
                     await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                     verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                    await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
+                    await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
                     observations.Clear();
                     Logger.LogDebug($"NORS Sightings processed: {verbatimCount}");
                 }
@@ -91,7 +92,7 @@ namespace SOS.Process.Processors.Nors
                 var invalidObservations = ValidationManager.ValidateObservations(ref observations);
                 await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                 verbatimCount += await CommitBatchAsync(dataProvider, observations);
-                await dwcArchiveFileWriterCoordinator.WriteObservations(observations, dataProvider);
+                await WriteObservationsToDwcaCsvFiles(observations, dataProvider);
                 Logger.LogDebug($"NORS Sightings processed: {verbatimCount}");
             }
 

@@ -104,7 +104,7 @@ namespace SOS.Process.Processors.ClamPortal
                 Occurrence = new ProcessedOccurrence
                 {
                     CatalogNumber = verbatimObservation.CatalogNumber.ToString(),
-                    OccurrenceId = verbatimObservation.OccurrenceId,
+                    OccurrenceId = verbatimObservation.OccurrenceId.Trim(),
                     IndividualCount = verbatimObservation.IndividualCount,
                     IsNaturalOccurrence = verbatimObservation.IsNaturalOccurrence,
                     IsNeverFoundObservation = verbatimObservation.IsNeverFoundObservation,

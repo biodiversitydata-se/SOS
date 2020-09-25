@@ -9,6 +9,7 @@ using MongoDB.Driver;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -165,8 +166,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                     var invalidObservations = ValidationManager.ValidateObservations(ref sightings);
                     await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                     verbatimCount += await CommitBatchAsync(dataProvider, sightings);
-                    //var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider);
-                    await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider, counter++.ToString());
+                    await WriteObservationsToDwcaCsvFiles(sightings, dataProvider, counter++.ToString());
                     sightings.Clear();
                     Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
                 }
@@ -179,8 +179,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 var invalidObservations = ValidationManager.ValidateObservations(ref sightings);
                 await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
                 verbatimCount += await CommitBatchAsync(dataProvider, sightings);
-                //var csvResult = await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider);
-                await dwcArchiveFileWriterCoordinator.WriteObservations(sightings, dataProvider, counter.ToString());
+                await WriteObservationsToDwcaCsvFiles(sightings, dataProvider, counter.ToString());
                 Logger.LogDebug($"DwC-A sightings processed: {verbatimCount}");
             }
 

@@ -16,6 +16,7 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Constants;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Helpers;
@@ -83,29 +84,29 @@ namespace SOS.Process.IntegrationTests.Jobs
             {
                 processedObservationRepository = new Mock<IProcessedObservationRepository>().Object;
             }
-
-            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
-                new DwcArchiveOccurrenceCsvWriter(
-                    new Export.Repositories.ProcessedFieldMappingRepository(processClient, new NullLogger<Export.Repositories.ProcessedFieldMappingRepository>()), 
-                    new TaxonManager(
-                        new Export.Repositories.ProcessedTaxonRepository(processClient, new NullLogger<Export.Repositories.ProcessedTaxonRepository>()), 
-                        new NullLogger<Export.Managers.TaxonManager>() ), new NullLogger<DwcArchiveOccurrenceCsvWriter>()), 
-                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()), 
-                new FileService(), 
-                new NullLogger<DwcArchiveFileWriter>()
-            ), new FileService(), new DwcaFilesCreationConfiguration {IsEnabled = true, FolderPath = @"c:\temp"}, new NullLogger<DwcArchiveFileWriterCoordinator>());
+            
             var processInfoRepository =
                 new ProcessInfoRepository(processClient, new NullLogger<ProcessInfoRepository>());
             var harvestInfoRepository =
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
             var processedFieldMappingRepository =
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
+            var fieldMappingResolverHelper =
+                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration());
+            var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
+                new DwcArchiveOccurrenceCsvWriter(
+                    fieldMappingResolverHelper,
+                    new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new FileService(),
+                new NullLogger<DwcArchiveFileWriter>()
+            ), new FileService(), new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());
             var clamPortalProcessor = new ClamPortalObservationProcessor(
                 new ClamObservationVerbatimRepository(verbatimClient,
                     new NullLogger<ClamObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator, 
                 validationManager,
                 new NullLogger<ClamPortalObservationProcessor>());
@@ -114,14 +115,16 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<FishDataObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), dwcArchiveFileWriterCoordinator, validationManager,
+                fieldMappingResolverHelper, 
+                dwcArchiveFileWriterCoordinator, 
+                validationManager,
                 new NullLogger<FishDataObservationProcessor>());
             var kulProcessor = new KulObservationProcessor(
                 new KulObservationVerbatimRepository(verbatimClient,
                     new NullLogger<KulObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<KulObservationProcessor>());
@@ -130,7 +133,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<MvmObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<MvmObservationProcessor>());
@@ -139,7 +142,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<NorsObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<NorsObservationProcessor>());
@@ -148,7 +151,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<SersObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<SersObservationProcessor>());
@@ -157,7 +160,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<SharkObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<SharkObservationProcessor>());
@@ -166,7 +169,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new NullLogger<VirtualHerbariumObservationVerbatimRepository>()),
                 areaHelper,
                 processedObservationRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()), 
+                fieldMappingResolverHelper, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
                 new NullLogger<VirtualHerbariumObservationProcessor>());
@@ -174,7 +177,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new ArtportalenVerbatimRepository(verbatimClient, new NullLogger<ArtportalenVerbatimRepository>()),
                 processedObservationRepository,
                 processedFieldMappingRepository,
-                new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
+                fieldMappingResolverHelper,
                 processConfiguration, 
                 dwcArchiveFileWriterCoordinator,
                 validationManager,
@@ -184,7 +187,6 @@ namespace SOS.Process.IntegrationTests.Jobs
                     new ElasticSearchConfiguration(), new NullLogger<ProcessedObservationRepository>()),
                 processInfoRepository,
                 new NullLogger<InstanceManager>());
-
             
             var processTaxaJob = new ProcessTaxaJob(null, // todo
                 harvestInfoRepository, processInfoRepository, new NullLogger<ProcessTaxaJob>());
