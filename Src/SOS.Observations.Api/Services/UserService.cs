@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Models.UserService;
+using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Services.Interfaces;
 
 namespace SOS.Observations.Api.Services

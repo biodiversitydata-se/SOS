@@ -1,0 +1,146 @@
+@mixin mixin-button-disabled {
+  color: $adb-text-black71;
+  background-color: $adb-bgcolor-white;
+  border: 1px solid #ccc;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.btn {
+  font-weight: 400;
+  /* Added 2018-12-12 to prevent a blue outline on button :focus state */
+  &:focus,
+  &.focus {
+    box-shadow: none !important;
+  }
+  &-primary {
+    cursor: pointer;
+    border: $adb-border-1;
+    box-shadow: $adb-shadow;
+    background-color: $adb-accent-blue;
+
+    &:focus,
+    &:active,
+    &:hover {
+      box-shadow: $adb-shadow-hover;
+      background-color: $adb-accent-darkblue;
+    }
+
+    &:not(:disabled):not(.disabled):active,
+    &:not(:disabled):not(.disabled).active,
+    &.active,
+    &:active {
+      box-shadow: $adb-shadow-inset !important;
+      background-color: $adb-accent-darkblue;
+    }
+
+    &:disabled,
+    &.disabled {
+      @include mixin-button-disabled;
+    }
+  }
+
+  &-secondary {
+    color: $adb-text-black;
+    background-color: $adb-bgcolor-white;
+    box-shadow: $adb-shadow-light;
+    border: 1px solid #ccc;
+    border-color: rgba(0, 0, 0, 0.2) rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.3) rgba(0, 0, 0, 0.2);
+
+    &:disabled,
+    &.disabled {
+      @include mixin-button-disabled;
+    }
+
+    /* Added 20190401 */
+    &:focus {
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    &:hover:not(:disabled):not(.disabled) {
+      color: $adb-text-black;
+      box-shadow: $adb-shadow;
+      background-color: $adb-bgcolor-whiteblue;
+    }
+
+    &:not(:disabled):not(.disabled):active,
+    &:not(:disabled):not(.disabled).active {
+      box-shadow: $adb-shadow-inset !important;
+      background-color: $adb-bgcolor-greyblue;
+    }
+  }
+  /* Added 20190401 */
+  &-outline-secondary {
+    &:focus {
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  &-group {
+    & > .btn,
+    &-vertical > .btn {
+      border: none;
+    }
+
+    &:not(.btn-group-dropdown),
+    &-vertical {
+      box-shadow: $adb-shadow;
+      border-radius: $adb-border-radius;
+
+      & > .btn:not(.btn-link):not(.btn-primary) {
+        &:focus,
+        &:active,
+        &.active {
+          box-shadow: $adb-shadow-inset;
+          color: $adb-text-white;
+          background-color: $adb-text-black50;
+        }
+      }
+    }
+
+    &-dropdown > .btn:hover:not(.btn-link):not(.btn-primary) {
+      box-shadow: $adb-shadow-hover;
+      background-color: $adb-bgcolor-greyblue;
+    }
+
+    & > .btn:not(.btn-link):not(.btn-primary) {
+      &:focus,
+      &:active,
+      &.active {
+        box-shadow: $adb-shadow-inset;
+        color: $adb-text-white;
+        background-color: $adb-text-black50;
+      }
+    }
+  }
+
+  &-help{
+    color:$link-hover-color;
+    padding:0;
+    &:hover,&:focus{
+      color:darken($link-hover-color,15);
+    }
+  }
+}
+
+.btn-link {
+  i {
+    min-width: 1em;
+  }
+}
+
+.btn-filter {
+  @include button-size($p-1, $p-2, $badge-font-size, 1em, $btn-border-radius-sm);
+  @include button-variant($dark, $dark, lighten($dark, 30%));
+  display: flex;
+  align-items: center;
+  &::after {
+    margin-left: $m-1;
+    content: "\f00d";
+    font-family: "Font Awesome\ 5 Pro";
+    font-weight: 900;
+  }
+  transition: none;
+}

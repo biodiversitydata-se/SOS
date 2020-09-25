@@ -1,0 +1,25 @@
+.h-title,
+.h-section,
+.h-subsection,
+.h-caption {
+  margin-top: 0;
+  margin-bottom: $headings-margin-bottom;
+  line-height: $headings-line-height;
+  color: $headings-color;
+}
+
+.h-title {
+  font-size: $h1-font-size; //temp use own variable?
+  font-weight: normal;
+}
+.h-section {
+  font-size: $h2-font-size; //temp use own variable?
+  font-weight: normal;
+}
+.h-subsection {
+  font-size: $h3-font-size; //temp use own variable?
+}
+.h-caption {
+  font-size: $h4-font-size; //temp use own variable?
+  font-weight: normal;
+}

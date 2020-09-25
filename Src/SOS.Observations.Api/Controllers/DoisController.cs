@@ -5,9 +5,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Jobs.Export;
-using SOS.Lib.Models.DOI;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -23,24 +21,21 @@ namespace SOS.Observations.Api.Controllers
     {
         private readonly string _doiContainer;
         private readonly IObservationManager _observationManager;
-        private readonly IBlobStorageManager _blobStorageManager;
         private readonly long _exportObservationsLimit;
         private readonly ILogger<ExportsController> _logger;
 
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
         /// <param name="observationManager"></param>
-        /// <param name="blobStorageManager"></param>
-        /// <param name="configuration"></param>
+        /// <param name="observationApiConfiguration"></param>
         /// <param name="logger"></param>
-        public DOIsController(IObservationManager observationManager, IBlobStorageManager blobStorageManager, 
-            ObservationApiConfiguration configuration, ILogger<ExportsController> logger)
+        public DOIsController(IObservationManager observationManager, 
+            ObservationApiConfiguration observationApiConfiguration,
+            ILogger<ExportsController> logger)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
-            _blobStorageManager = blobStorageManager ?? throw new ArgumentNullException(nameof(blobStorageManager));
-           _doiContainer = configuration?.BlobStorageConfiguration?.Containers["doi"] ?? throw new ArgumentNullException(nameof(configuration));
-           _exportObservationsLimit = configuration.ExportObservationsLimit;
+            _exportObservationsLimit = observationApiConfiguration?.ExportObservationsLimit ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -74,44 +69,6 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "Running DOI failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpGet]
-        [ProducesResponseType(typeof(PagedResult<DOI>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDOIsAsync([FromQuery] int skip = 0, [FromQuery] int take = 100)
-        {
-            try
-            {
-                var dois = await _blobStorageManager.GetDOIsAsync(skip, take);
-
-                return new OkObjectResult(dois);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Getting export job status failed");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpGet("{id}/URL")]
-        [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public IActionResult GetDOIFileUrl([FromRoute] Guid id)
-        {
-            try
-            {
-                var downloadUrl = _blobStorageManager.GetDOIDownloadUrl(id);
-
-                return new OkObjectResult(downloadUrl);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting DOI file");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }

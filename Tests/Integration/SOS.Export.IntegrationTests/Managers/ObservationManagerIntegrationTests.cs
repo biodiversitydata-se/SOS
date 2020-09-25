@@ -14,6 +14,7 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
+using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Processed;
 using Xunit;

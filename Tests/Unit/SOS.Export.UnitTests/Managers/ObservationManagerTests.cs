@@ -12,6 +12,7 @@ using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Services.Interfaces;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Managers

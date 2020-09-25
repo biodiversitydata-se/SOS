@@ -1,0 +1,449 @@
+.image-slider {
+  .image-picker {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    .scroll-area {
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      .item {
+        min-width: 6rem;
+        background-color: white;
+        border: 1px solid lightgrey;
+        border-radius: $border-radius;
+        padding: 0.25rem;
+        margin-left: 0.25rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        img {
+          height: 3rem;
+        }
+        &:first-child {
+          margin-left: 0;
+        }
+        &:hover {
+          opacity: 0.5;
+          cursor: pointer;
+        }
+        &.selected {
+          border: 2px solid $adb-signal-blue;
+        }
+      }
+    }
+  }
+  .thumb-text {
+    font-size: small;
+    max-width: 5rem;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+    white-space: nowrap;
+  }
+  figcaption {
+    min-height: 1.5rem;
+  }
+}
+.icon-image {
+  position: relative;
+  .icon {
+    display: none;
+  }
+  &:hover {
+    cursor: pointer;
+    .icon {
+      position: absolute;
+      display: block;
+      text-align: center;
+      top: 50%;
+      left: 50%;
+      z-index: 10;
+      color: #fff;
+      font-size: 2.5rem;
+    }
+  }
+}
+.not-validated {
+  background-color: black;
+  color: white;
+  position: relative;
+  img {
+    opacity: 0.5;
+  }
+  .centered {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.media-missing {
+  text-align: center;
+  border-radius: $border-radius;
+  background-color: $adb-bgcolor-whiteblue;
+  padding: 5rem;
+  font-size: 1.7rem;
+  color: rgba(0, 0, 0, 0.25);
+  margin-bottom: 1rem;
+}
+
+//OLD
+/* Zoom icon shown when hovering an image */
+.adb-magnify-image {
+  min-height: 70px;
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+
+  &:focus,
+  &:active,
+  &:hover {
+    &.adb-plate {
+      box-shadow: 0 0 10px 3px $adb-signal-blue;
+    }
+
+    .adb-magnify-image-icon {
+      opacity: 1;
+      transition: all 0.5s;
+    }
+  }
+
+  &-icon {
+    color: #fff;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    position: absolute;
+    font-size: 1.5rem;
+    top: 50%;
+    left: 50%;
+    background-color: rgba(0, 0, 0, 0.25);
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    padding: 20px;
+    border: 1px solid #fff;
+    line-height: 1;
+    opacity: 0;
+  }
+}
+
+/*
+    IMAGE SLIDER
+*/
+
+.groupslider-wrapper {
+  /*
+        This creates a problem with the modal
+    @include stickyPosition;
+    top: 0;
+    */
+
+  .thumbnail {
+    cursor: pointer;
+    outline: none;
+    .figure-caption {
+      max-width: 5rem;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    &.active {
+      .figure-caption {
+        font-weight: bold;
+      }
+
+      .figure-img {
+        box-shadow: 0 0 10px 2px $adb-signal-blue, 0 0 2px 2px $adb-signal-blue !important;
+      }
+    }
+
+    &:active,
+    &:focus,
+    &:hover {
+      .figure-img {
+        box-shadow: 0 0 0 2px $adb-signal-blue;
+      }
+    }
+  }
+}
+
+.groupslider {
+  outline: none;
+  font-size: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-bottom: none;
+
+  &-label {
+    max-width: 70%;
+    display: inline-block;
+    padding: 0.5rem;
+  }
+
+  &.hideindicators .carousel-indicators {
+    display: none !important;
+  }
+
+  .carousel-control-prev,
+  .carousel-control-next {
+    opacity: 1;
+    cursor: pointer;
+
+    &:active,
+    &:focus,
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+
+      .carousel-control-prev-icon,
+      .carousel-control-next-icon {
+        color: #fff;
+        background-color: $adb-accent-blue;
+      }
+    }
+  }
+
+  %groupslider-carousel-control-icon {
+    font-size: 14px;
+    line-height: 1;
+    font-family: "Font Awesome 5 Pro" !important;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    background-image: none;
+    color: #000;
+    font-size: 20px;
+    border-radius: 40px;
+    cursor: pointer;
+  }
+
+  .carousel-control-prev-icon {
+    @extend %groupslider-carousel-control-icon;
+    padding-right: 2px;
+
+    &:after {
+      content: "\F104";
+    }
+  }
+
+  .carousel-control-next-icon {
+    @extend %groupslider-carousel-control-icon;
+    padding-left: 2px;
+
+    &:after {
+      content: "\F105";
+    }
+  }
+}
+
+.imageslider {
+  outline: none;
+  background-color: $adb-bgcolor-whiteblue;
+  box-shadow: inset rgba(0, 0, 0, 0.5) 0px 1px 3px 0px;
+  text-align: center;
+  padding: 1rem 1rem 4rem;
+  margin-bottom: 1rem;
+
+  &.taxonslider {
+    padding: 0;
+    box-shadow: none;
+    text-align: initial;
+    align-items: stretch !important;
+    display: flex !important;
+    flex: 1 1 auto !important;
+
+    .carousel-inner {
+      align-items: stretch !important;
+      display: flex !important;
+
+      .card-footer.fa,
+      .card-footer.fas,
+      .card-footer.far {
+        font-size: 1rem;
+      }
+    }
+
+    .carousel-indicators {
+      top: 100%;
+      /*margin-top: 1rem;*/ /* Removed by MW 2019-05-08*/
+      bottom: auto;
+    }
+    /* Carousel override Added by MW 2019-05-08 */
+    .carousel-control-prev,
+    .carousel-control-next {
+      top: initial;
+      bottom: 0;
+      z-index: 20;
+    }
+    /* Carousel override Added by MW 2019-05-08 */
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      background-size: 12px !important;
+      width: 20px;
+      height: 20px;
+      border-radius: 20px;
+    }
+    /* Carousel override Added by MW 2019-05-08 */
+    .carousel-indicators {
+      margin-right: 20%;
+      margin-left: 20%;
+    }
+  }
+
+  .carousel-item img {
+    box-shadow: $adb-shadow;
+    max-width: 100%;
+
+    &.svg {
+      width: 100%;
+      background-color: #fff;
+      padding: 1rem;
+    }
+  }
+
+  a.svg {
+    width: 100%;
+  }
+
+  .carousel-indicators li {
+    height: 5px;
+    background-color: $adb-bgcolor-greyblue;
+
+    &.active {
+      background-color: #666;
+    }
+  }
+
+  .carousel-inner {
+    overflow: visible;
+  }
+
+  .carousel-caption {
+    padding: 0;
+    bottom: -40px;
+    color: $adb-text-black71;
+
+    p:not(:last-child) {
+      font-weight: bold;
+      font-size: 0.8rem;
+      text-shadow: 0px 0px 6px rgba(255, 255, 255, 0.8), 1px 1px 0px rgba(255, 255, 255, 0.8),
+        -1px 1px 0px rgba(255, 255, 255, 0.8), -1px -1px 0px rgba(255, 255, 255, 0.8),
+        1px -1px 0px rgba(255, 255, 255, 0.8);
+    }
+
+    p:last-child {
+      white-space: nowrap;
+    }
+  }
+  /* Carousel override Added by MW 2019-05-08 */
+  .carousel-control-prev,
+  .carousel-control-next {
+    top: 1rem;
+    /* lät topp till bottenjustering vara kvar så hela bilden är klickbar på sidan /MW */
+    align-items: initial;
+  }
+  /* Replaced by MW 2019-05-08*/
+  /*%carousel-control-icon {
+        background-color: $adb-accent-darkblue;
+        font-size: 14px;
+        line-height: 1;
+        font-family: "Font Awesome 5 Pro" !important;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        background-image: none;
+        color: #fff;
+        font-size: 30px;
+        width: 40px;
+        height: 40px;
+        border-radius: 40px;
+        cursor: pointer;
+    }*/
+  %carousel-control-icon {
+    background-color: $adb-accent-blue;
+    font-family: "Font Awesome 5 Pro" !important;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    color: transparent;
+    font-size: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 30px;
+    background-size: 20px;
+    cursor: pointer;
+  }
+
+  .carousel-control-prev-icon {
+    @extend %carousel-control-icon;
+    /*padding: 4px 3px 5px 0;*/ /* Removed by MW 2019-05-08*/
+    &:after {
+      content: "\F104";
+    }
+
+    &:focus,
+    &:active,
+    &:hover {
+      box-shadow: $adb-shadow-hover;
+      background-color: $adb-accent-darkblue;
+    }
+  }
+
+  .carousel-control-next-icon {
+    @extend %carousel-control-icon;
+    /*padding: 4px 0 5px 3px;*/ /* Removed by MW 2019-05-08*/
+    &:after {
+      content: "\F105";
+    }
+
+    &:focus,
+    &:active,
+    &:hover {
+      box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.8);
+      background-color: $adb-accent-darkblue;
+    }
+  }
+
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 5rem;
+    color: #fff;
+    opacity: 1;
+    /*display: none;*/ /* Removed by MW 2019-05-08*/
+  }
+
+  &:focus,
+  &:active,
+  &:hover {
+    .carousel-control-prev,
+    .carousel-control-next {
+      display: flex;
+    }
+  }
+  /* Added by MW 2019-05-08 */
+  &.taxonslider {
+    .carousel-control-prev,
+    .carousel-control-next {
+      width: 2.5rem;
+      display: initial;
+      margin-bottom: -1.5rem;
+    }
+
+    &:focus,
+    &:active,
+    &:hover {
+      .carousel-control-prev,
+      .carousel-control-next {
+        display: inline-block;
+      }
+    }
+  }
+}
+
+.img-missing {
+  background-color: $adb-bgcolor-whiteblue;
+  padding: 3rem 0 4rem 0;
+  color: rgba(0, 0, 0, 0.25);
+}

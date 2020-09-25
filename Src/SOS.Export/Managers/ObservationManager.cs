@@ -12,6 +12,7 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.DOI;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Export.Managers
 {

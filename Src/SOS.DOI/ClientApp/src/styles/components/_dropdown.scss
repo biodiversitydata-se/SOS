@@ -1,0 +1,64 @@
+.dropdown-menu {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: $adb-shadow-light;
+  padding: $p-2;
+  font-size: 0.9rem; // TODO: remove this when size increase in whole app
+}
+
+.dropdown,
+.dropup {
+  button.btn-link {
+    padding: 0;
+    color: $adb-text-black71;
+    &:hover,
+    &:active,
+    &:focus {
+      color: $adb-text-black71;
+    }
+  }
+
+ 
+  @include media-breakpoint-up(lg) {
+    .multicolumn {
+      columns: 3;
+      -webkit-columns: 3;
+      -moz-columns: 3;
+    }
+  }
+  @include media-breakpoint-up(xl) {
+    .multicolumn-2 {
+      columns: 2;
+      -webkit-columns: 2;
+      -moz-columns: 2;
+    }
+  }
+}
+
+
+.nav .dropdown a {
+  color: $adb-text-black71;
+  cursor: pointer;
+}
+.dropdown {
+  .form-check {
+    white-space: nowrap;
+    padding-bottom: 0.2rem;
+
+    &-label {
+      display: block;
+    }
+
+    input {
+      margin-top: 0.15rem;
+    }
+  }
+  /* Time-/Date-picker */
+  .ui-timepicker {
+    background-color: $adb-bgcolor-whiteblue;
+  }
+  .ui-tree {
+    width: auto;
+    max-width: 30rem;
+  }
+  
+}

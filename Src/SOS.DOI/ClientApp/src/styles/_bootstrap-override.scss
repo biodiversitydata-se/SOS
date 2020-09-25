@@ -1,0 +1,83 @@
+/*****SLU variables used by bootstrap*******/
+$adb-bgcolor-whiteblue: #f6f7f9;
+$adb-bgcolor-greyblue: #e9ebee;
+$adb-bgcolor-white: #fff;
+$adb-text-black: #000 !default;
+
+$adb-accent-blue: #2b61b4;
+$adb-signal-blue: #5bc0de;
+$adb-signal-green: #289e00;
+$adb-signal-red: #d9534f;
+$adb-signal-orange: #f0ad4e;
+
+$adb-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.5);
+$adb-shadow-hover: 0 0px 10px 0 rgba(0, 0, 0, 0.8);
+
+/* adb-panel */
+$adb-panel-main-shadow: $adb-shadow;
+$adb-panel-hover-shadow: $adb-shadow-hover;
+$adb-panel-heading-bg: $adb-bgcolor-white;
+$adb-panel-heading-bg-hover: #f2f1f1;
+$adb-panel-heading-color: $adb-text-black;
+$adb-panel-content-color: $adb-text-black;
+$adb-panel-content-bg: $adb-bgcolor-whiteblue;
+
+/* primary plate */
+$plate-primary-shadow: $adb-shadow;
+$plate-primary-bg: white;
+$plate-primary-color: $adb-text-black;
+$plate-primary-inset-bg: $adb-bgcolor-greyblue;
+$plate-primary-inset-shadow: inset rgba(0, 0, 0, 0.5) 0px 3px 3px -2px;
+
+/*Spacing*/
+$p-1: 0.25rem;
+$p-2: 0.5rem;
+$p-3: 1rem;
+
+$m-1: 0.25rem;
+$m-2: 0.5rem;
+$m-3: 1rem;
+
+/************Bootstrap override*************/
+$primary: $adb-accent-blue;
+$success: $adb-signal-green;
+$warning: $adb-signal-orange;
+$danger: $adb-signal-red;
+
+$line-height-base: 1.4;
+$input-btn-line-height: 1.5;
+$body-bg: $adb-bgcolor-greyblue;
+$body-color: $adb-text-black;
+$font-family-sans-serif: Roboto, Roboto, "Helvetica Neue", Arial, sans-serif;
+
+$link-color: $adb-accent-blue;
+$link-hover-color: $adb-signal-blue;
+
+$form-check-input-margin-y: 0.2em;
+
+//buttons
+$btn-link-disabled-color: #afc2e3;
+$thumbnail-bg: white;
+
+//Nav tabs
+$nav-link-disabled-color: rgba(0, 0, 0, 0.3);
+$nav-tabs-link-active-bg: #fff;
+$nav-tabs-link-active-border-color: #dee2e6 #dee2e6 #fff;
+$nav-tabs-border-color: transparent;
+
+/**Tables**/
+$table-bg: white;
+$table-cell-padding: 0.5rem;
+$table-cell-padding-sm: 0.5rem;
+$table-striped-order: even;
+$table-accent-bg: $adb-bgcolor-whiteblue;
+$table-border-width: 0;
+.table-striped th {
+  padding: 0.8rem 0.5rem;
+  background-color: $adb-bgcolor-greyblue;
+}
+
+/**dropdown menmu**/
+$dropdown-padding-y: 0.25rem;
+$dropdown-item-padding-y: 0.1rem;
+$dropdown-item-padding-x: $p-2;

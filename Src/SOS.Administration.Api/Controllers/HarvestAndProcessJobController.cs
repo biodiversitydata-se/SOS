@@ -44,7 +44,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                RecurringJob.AddOrUpdate<IObservationsHarvestJob>(nameof(IObservationsHarvestJob),
+                RecurringJob.AddOrUpdate<IObservationsHarvestJob>($"{nameof(IObservationsHarvestJob)}-Full",
                     job => job.RunAsync(JobRunModes.Full, JobCancellationToken.Null), $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Observations harvest and process job added");
             }
@@ -164,7 +164,7 @@ namespace SOS.Administration.Api.Controllers
                 }
 
                 RecurringJob.AddOrUpdate<IObservationsHarvestJob>(
-                    nameof(IObservationsHarvestJob), job => job.RunAsync(JobRunModes.IncrementalActiveInstance,
+                    $"{nameof(IObservationsHarvestJob)}-Incremental", job => job.RunAsync(JobRunModes.IncrementalActiveInstance,
                         JobCancellationToken.Null),
                     $"*/{runIntervalInMinutes} * * * *", TimeZoneInfo.Local);
 

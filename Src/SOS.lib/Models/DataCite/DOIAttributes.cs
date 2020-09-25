@@ -1,9 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.DataCite
 {
     public class DOIAttributes
     {
+        /// <summary>
+        ///  Creation date
+        /// </summary>
+        public DateTime Created { get; set; }
+
+        /// <summary>
+        /// LIst of DOI creators
+        /// </summary>
+        public IEnumerable<DOICreators> Creators { get; set; }
+
         /// <summary>
         /// Descriptions of DOI
         /// </summary>
@@ -13,14 +24,6 @@ namespace SOS.Lib.Models.DataCite
         /// Full DOI
         /// </summary>
         public string DOI { get; set; }
-
-        /// <summary>
-        /// DOI Event
-        /// publish - Triggers a state move from draft or registered to findable
-        /// register - Triggers a state move from draft to registered
-        /// hide - Triggers a state move from findable to registered
-        /// </summary>
-        public string Event { get; set; }
 
         /// <summary>
         /// Content formats. I.e. application/zip
@@ -38,11 +41,6 @@ namespace SOS.Lib.Models.DataCite
         public string Language { get; set; }
 
         /// <summary>
-        /// DOI Prefix
-        /// </summary>
-        public string Prefix { get; set; }
-
-        /// <summary>
         /// Publisher attribute
         /// </summary>
         public string Publisher { get; set; }
@@ -56,11 +54,6 @@ namespace SOS.Lib.Models.DataCite
         /// DOI state
         /// </summary>
         public string State { get; set; }
-
-        /// <summary>
-        /// DOI suffix
-        /// </summary>
-        public string Suffix { get; set; }
 
         /// <summary>
         /// Titles of DOI
