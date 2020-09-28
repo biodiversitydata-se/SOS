@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Ionic.Zip;
+using Ionic.Zlib;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Enums;
 using SOS.Export.Extensions;
@@ -253,7 +254,7 @@ namespace SOS.Export.IO.DwcArchive
         {
             var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().ToList();
             await using var stream = File.Create(tempFilePath);
-            await using var compressedFileStream = new ZipOutputStream(stream, true) { EnableZip64 = Zip64Option.AsNecessary };
+            await using var compressedFileStream = new ZipOutputStream(stream, true) { EnableZip64 = Zip64Option.AsNecessary, CompressionLevel = CompressionLevel.BestCompression };
 
             // Create meta.xml
             compressedFileStream.PutNextEntry("meta.xml");
