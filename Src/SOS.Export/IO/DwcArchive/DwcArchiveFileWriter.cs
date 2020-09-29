@@ -254,7 +254,7 @@ namespace SOS.Export.IO.DwcArchive
         {
             var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().ToList();
             await using var stream = File.Create(tempFilePath);
-            await using var compressedFileStream = new ZipOutputStream(stream, true) { EnableZip64 = Zip64Option.AsNecessary, CompressionLevel = CompressionLevel.BestCompression };
+            await using var compressedFileStream = new ZipOutputStream(stream, true) { EnableZip64 = Zip64Option.AsNecessary };
 
             // Create meta.xml
             compressedFileStream.PutNextEntry("meta.xml");
