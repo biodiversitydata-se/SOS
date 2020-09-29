@@ -33,9 +33,9 @@ namespace SOS.Observations.Api.Dtos
         public TaxonFilterDto Taxon { get; set; }
 
         /// <summary>
-        /// Region filter.
+        /// Area filter.
         /// </summary>
-        public IEnumerable<int> RegionIds { get; set; }
+        public IEnumerable<int> AreaIds { get; set; }
 
         /// <summary>
         /// Geometry filter 

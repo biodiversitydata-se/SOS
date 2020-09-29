@@ -86,7 +86,7 @@ namespace SOS.Observations.Api.Extensions
             filter.StartDate = searchFilterDto.Date?.StartDate;
             filter.EndDate = searchFilterDto.Date?.EndDate;
             filter.SearchOnlyBetweenDates = (searchFilterDto.Date?.SearchOnlyBetweenDates).GetValueOrDefault();
-            filter.AreaIds = searchFilterDto.RegionIds;
+            filter.AreaIds = searchFilterDto.AreaIds;
             filter.TaxonIds = searchFilterDto.Taxon?.TaxonIds;
             filter.IncludeUnderlyingTaxa = (searchFilterDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
             filter.RedListCategories = searchFilterDto.Taxon?.RedListCategories;
