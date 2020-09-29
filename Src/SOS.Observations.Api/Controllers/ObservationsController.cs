@@ -204,7 +204,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GeogridSearchTileBasedAggregationAsync(
-            [FromBody] SearchFilter filter,
+            [FromBody] SearchFilterDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
@@ -213,21 +213,16 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var (isValid, validationErrors) = ValidateFilter(filter, 0, 1);
-                if (!isValid)
-                {
-                    return BadRequest(string.Join(". ", validationErrors));
-                }
-
+                var filterValidation = ValidateSearchFilter(filter);
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(zoomOrError, bboxOrError);
+                var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError);
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetGeogridTileAggregationAsync(filter, zoom, bboxOrError.Value);
+                var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(), zoom, bboxOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -259,7 +254,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> GeogridSearchTileBasedAggregationAsGeoJsonAsync(
-            [FromBody] SearchFilter filter,
+            [FromBody] SearchFilterDto filter,
             [FromQuery] int zoom = 1,
             [FromQuery] double? bboxLeft = null,
             [FromQuery] double? bboxTop = null,
@@ -268,21 +263,16 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var (isValid, validationErrors) = ValidateFilter(filter, 0, 1);
-                if (!isValid)
-                {
-                    return BadRequest(string.Join(". ", validationErrors));
-                }
-
+                var filterValidation = ValidateSearchFilter(filter);
                 var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit:1, maxLimit:21);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(zoomOrError, bboxOrError);
+                var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError);
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetGeogridTileAggregationAsync(filter, zoomOrError.Value, bboxOrError.Value);
+                var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(), zoomOrError.Value, bboxOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -315,7 +305,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> TaxonAggregationAsync(
-            [FromBody] SearchFilter filter,
+            [FromBody] SearchFilterDto filter,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
             [FromQuery] double? bboxLeft = null,
@@ -325,21 +315,16 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var (isValid, validationErrors) = ValidateFilter(filter, 0, 1);
-                if (!isValid)
-                {
-                    return BadRequest(string.Join(". ", validationErrors));
-                }
-
+                var filterValidation = ValidateSearchFilter(filter);
                 var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
                 var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
-                var paramsValidationResult = Result.Combine(pagingArgumentsValidation, bboxOrError);
+                var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation, bboxOrError);
                 if (paramsValidationResult.IsFailure)
                 {
                     return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetTaxonAggregationAsync(filter, bboxOrError.Value, skip, take);
+                var result = await _observationManager.GetTaxonAggregationAsync(filter.ToSearchFilter(), bboxOrError.Value, skip, take);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
