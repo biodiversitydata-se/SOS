@@ -76,5 +76,31 @@ namespace SOS.Observations.Api.Extensions
                 TotalCount = pagedResult.TotalCount
             };
         }
+
+        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto)
+        {
+            if (searchFilterDto == null) return null;
+
+            var filter = new SearchFilter();
+            filter.OutputFields = searchFilterDto.OutputFields;
+            filter.StartDate = searchFilterDto.Date?.StartDate;
+            filter.EndDate = searchFilterDto.Date?.EndDate;
+            filter.SearchOnlyBetweenDates = (searchFilterDto.Date?.SearchOnlyBetweenDates).GetValueOrDefault();
+            filter.AreaIds = searchFilterDto.RegionIds;
+            filter.TaxonIds = searchFilterDto.Taxon?.TaxonIds;
+            filter.IncludeUnderlyingTaxa = (searchFilterDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
+            filter.RedListCategories = searchFilterDto.Taxon?.RedListCategories;
+            filter.DataProviderIds = searchFilterDto.DataProviderIds;
+            filter.FieldTranslationCultureCode = searchFilterDto.FieldTranslationCultureCode;
+            filter.OnlyValidated = searchFilterDto.OnlyValidated;
+            filter.PositiveSightings = searchFilterDto.PositiveSightings;
+            filter.GeometryFilter = searchFilterDto.Geometry == null ? null : new GeometryFilter
+            {
+                Geometries = searchFilterDto.Geometry.Geometries,
+                MaxDistanceFromPoint = searchFilterDto.Geometry.MaxDistanceFromPoint,
+                UsePointAccuracy = searchFilterDto.Geometry.UsePointAccuracy
+            };
+            return filter;
+        }
     }
 }

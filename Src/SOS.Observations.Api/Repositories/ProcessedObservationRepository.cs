@@ -154,11 +154,6 @@ namespace SOS.Observations.Api.Repositories
         public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder)
         {
-            if (!filter?.IsFilterActive ?? true)
-            {
-                return null;
-            }
-
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             var sortDescriptor = sortBy.ToSortDescriptor<ProcessedObservation>(sortOrder);

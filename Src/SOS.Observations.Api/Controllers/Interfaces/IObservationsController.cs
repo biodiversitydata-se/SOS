@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
+using SOS.Observations.Api.Dtos;
 
 namespace SOS.Observations.Api.Controllers.Interfaces
 {
@@ -31,7 +32,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         ///     "usePointAccuracy": false
         ///     }
         /// </example>
-        Task<IActionResult> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
+        Task<IActionResult> GetObservationsAsync(SearchFilterDto filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder);
 
         /// <summary>
