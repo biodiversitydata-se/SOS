@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SOS.Observations.Api.Dtos
+namespace SOS.Observations.Api.Dtos.Filter
 {
     /// <summary>
     /// Date filter.

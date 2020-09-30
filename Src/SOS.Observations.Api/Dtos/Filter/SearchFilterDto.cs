@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.Dtos
+namespace SOS.Observations.Api.Dtos.Filter
 {
     /// <summary>
     /// Search filter.
@@ -43,23 +41,22 @@ namespace SOS.Observations.Api.Dtos
         public GeometryFilterDto Geometry { get; set; }
 
         /// <summary>
-        /// True to return only validated sightings.
+        /// Set to true to return only validated sightings.
         /// </summary>
         public bool? OnlyValidated { get; set; }
 
         /// <summary>
-        /// True to return only positive sightings, false to return negative sightings, null to return both positive and
-        /// negative sightings.
-        /// A negative observation is an observation that was expected to be found but wasn't.
+        /// This property indicates whether to search for present observations and/or absent observations.
+        /// If no value is set, this will be set to include only present observations.
         /// </summary>
-        public bool? PositiveSightings { get; set; }
+        public OccurrenceStatusFilterValuesDto? OccurrenceStatus { get; set; }
 
         /// <summary>
-        ///  Field mapping translation culture code.
+        ///  Translation culture code for fields that are using a vocabulary.
         ///  Available values.
         ///  sv-SE (Swedish)
         ///  en-GB (English)
         /// </summary>
-        public string FieldTranslationCultureCode { get; set; }
+        public string TranslationCultureCode { get; set; }
     }
 }

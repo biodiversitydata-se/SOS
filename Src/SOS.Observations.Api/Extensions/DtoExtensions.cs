@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.Extensions
 {
@@ -91,15 +92,31 @@ namespace SOS.Observations.Api.Extensions
             filter.IncludeUnderlyingTaxa = (searchFilterDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
             filter.RedListCategories = searchFilterDto.Taxon?.RedListCategories;
             filter.DataProviderIds = searchFilterDto.DataProviderIds;
-            filter.FieldTranslationCultureCode = searchFilterDto.FieldTranslationCultureCode;
+            filter.FieldTranslationCultureCode = searchFilterDto.TranslationCultureCode;
             filter.OnlyValidated = searchFilterDto.OnlyValidated;
-            filter.PositiveSightings = searchFilterDto.PositiveSightings;
             filter.GeometryFilter = searchFilterDto.Geometry == null ? null : new GeometryFilter
             {
                 Geometries = searchFilterDto.Geometry.Geometries,
                 MaxDistanceFromPoint = searchFilterDto.Geometry.MaxDistanceFromPoint,
                 UsePointAccuracy = searchFilterDto.Geometry.UsePointAccuracy
             };
+
+            if (searchFilterDto.OccurrenceStatus != null)
+            {
+                switch (searchFilterDto.OccurrenceStatus)
+                {
+                    case OccurrenceStatusFilterValuesDto.Present:
+                        filter.PositiveSightings = true;
+                        break;
+                    case OccurrenceStatusFilterValuesDto.Absent:
+                        filter.PositiveSightings = false;
+                        break;
+                    case OccurrenceStatusFilterValuesDto.BothPresentAndAbsent:
+                        filter.PositiveSightings = null;
+                        break;
+                }
+            }
+
             return filter;
         }
     }

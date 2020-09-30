@@ -13,6 +13,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Controllers.Interfaces;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
@@ -430,12 +431,12 @@ namespace SOS.Observations.Api.Controllers
             var errors = new List<string>();
 
             // No culture code, set default
-            if (string.IsNullOrEmpty(filter?.FieldTranslationCultureCode))
+            if (string.IsNullOrEmpty(filter?.TranslationCultureCode))
             {
-                filter.FieldTranslationCultureCode = "sv-SE";
+                filter.TranslationCultureCode = "sv-SE";
             }
 
-            if (!new[] { "sv-SE", "en-GB" }.Contains(filter.FieldTranslationCultureCode,
+            if (!new[] { "sv-SE", "en-GB" }.Contains(filter.TranslationCultureCode,
                 StringComparer.CurrentCultureIgnoreCase))
             {
                 errors.Add("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");

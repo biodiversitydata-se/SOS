@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Observations.Api.Dtos
+namespace SOS.Observations.Api.Dtos.Filter
 {
     /// <summary>
     /// Taxon filter.
