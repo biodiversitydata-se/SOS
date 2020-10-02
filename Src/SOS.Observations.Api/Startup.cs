@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -110,7 +111,8 @@ namespace SOS.Observations.Api
             {
                 o.AssumeDefaultVersionWhenUnspecified = true;
                 o.DefaultApiVersion = new ApiVersion(1, 0);
-                o.ReportApiVersions = true;  
+                o.ReportApiVersions = true;
+                o.ApiVersionReader = new HeaderApiVersionReader("X-Api-Version");
             });
 
             services.AddVersionedApiExplorer(
