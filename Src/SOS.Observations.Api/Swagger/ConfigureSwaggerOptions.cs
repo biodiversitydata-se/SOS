@@ -38,7 +38,7 @@ namespace SOS.Observations.Api.Swagger
             {
                 Title = "SOS.Observations.Api",
                 Version = description.ApiVersion.ToString(),
-                Description = "Species Observation System (SOS) observations API"
+                Description = "Species Observation System (SOS) - Observations API"
             };
 
             if (description.IsDeprecated)

@@ -14,7 +14,6 @@ namespace SOS.Observations.Api.Controllers.V2
     /// </summary>
     [ApiVersion("2.0")]
     [Route("[controller]")]
-    [Route("v{version:apiVersion}/[controller]")]
     [ApiController]
     public class DataProvidersController : ControllerBase
     {
