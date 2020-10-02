@@ -12,9 +12,10 @@ using Hangfire.Mongo.Migration.Strategies.Backup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Nest;
 using NLog.Web;
@@ -32,6 +33,7 @@ using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Observations.Api.Services;
 using SOS.Observations.Api.Services.Interfaces;
 using SOS.Observations.Api.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace SOS.Observations.Api
 {
@@ -101,18 +103,34 @@ namespace SOS.Observations.Api
 
             // Add application insights.
             services.AddApplicationInsightsTelemetry(Configuration);
+            
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-            // Configure swagger
+            services.AddApiVersioning(o =>
+            {
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.DefaultApiVersion = new ApiVersion(1, 0);
+                o.ReportApiVersions = true;  
+            });
+
+            services.AddVersionedApiExplorer(
+                options =>
+                {
+                    // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
+                    // note: the specified format code will format the version as "'v'major[.minor][-status]"
+                    options.GroupNameFormat = "'v'VVV";
+
+                    // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
+                    // can also be used to control the format of the API version in route templates
+                    options.SubstituteApiVersionInUrl = true;
+                });
+            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
             services.AddSwaggerGen(
                 options =>
                 {
-                    options.SwaggerDoc("v1",
-                        new OpenApiInfo
-                        {
-                            Title = "SOS.Observations.Api",
-                            Version = "v1",
-                            Description = "Search sightings"
-                        });
+                    // add a custom operation filter which sets default values
+                    options.OperationFilter<SwaggerDefaultValues>();
+
                     var currentAssembly = Assembly.GetExecutingAssembly();
                     var xmlDocs = currentAssembly.GetReferencedAssemblies()
                         .Union(new AssemblyName[] { currentAssembly.GetName() })
@@ -126,9 +144,6 @@ namespace SOS.Observations.Api
 
                     options.SchemaFilter<SwaggerIgnoreFilter>();
                 });
-
-
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             var observationApiConfiguration = Configuration.GetSection("ObservationApiConfiguration")
                 .Get<ObservationApiConfiguration>();
@@ -209,7 +224,7 @@ namespace SOS.Observations.Api
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
         {
             NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config");
             if (new[] {"dev", "local"}.Contains(env.EnvironmentName.ToLower()))
@@ -226,7 +241,14 @@ namespace SOS.Observations.Api
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "SOS Search service"); });
+            app.UseSwaggerUI(options => {
+
+                foreach (var description in provider.ApiVersionDescriptions)
+                {
+                    options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                }
+            });
+
 
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
