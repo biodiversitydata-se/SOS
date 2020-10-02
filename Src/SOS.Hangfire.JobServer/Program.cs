@@ -41,6 +41,7 @@ namespace SOS.Hangfire.JobServer
         private static ProcessConfiguration _processConfiguration;
         private static ExportConfiguration _exportConfiguration;
         private static BlobStorageConfiguration _blobStorageConfiguration;
+        private static DataCiteServiceConfiguration _dataCiteServiceConfiguration;
 
         /// <summary>
         ///     Application entry point
@@ -135,7 +136,9 @@ namespace SOS.Hangfire.JobServer
                         .Get<ExportConfiguration>();
                     _blobStorageConfiguration = hostContext.Configuration.GetSection(nameof(BlobStorageConfiguration))
                         .Get<BlobStorageConfiguration>();
-
+                    _dataCiteServiceConfiguration = hostContext.Configuration.GetSection(nameof(DataCiteServiceConfiguration))
+                        .Get<DataCiteServiceConfiguration>();
+                    
                     //setup the elastic search configuration
                     var uris = _searchDbConfiguration.Hosts.Select(u => new Uri(u));
                     services.AddSingleton<IElasticClient>(
@@ -148,7 +151,7 @@ namespace SOS.Hangfire.JobServer
                             builder
                                 .RegisterModule(new ImportModule { Configurations = (_importConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
                                 .RegisterModule(new ProcessModule { Configurations = (_processConfiguration, _verbatimDbConfiguration, _processDbConfiguration) })
-                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration) })
+                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _dataCiteServiceConfiguration) })
                         );
                     }
                 )

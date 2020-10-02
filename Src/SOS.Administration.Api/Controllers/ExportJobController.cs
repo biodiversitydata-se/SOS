@@ -48,7 +48,7 @@ namespace SOS.Administration.Api.Controllers
                 }
 
                 return new OkObjectResult(BackgroundJob.Enqueue<IExportAndStoreJob>(job =>
-                    job.RunAsync(filter, blobStorageContainer, fileName, false, JobCancellationToken.Null)));
+                    job.RunAsync(filter, blobStorageContainer, fileName, JobCancellationToken.Null)));
             }
             catch (Exception e)
             {
@@ -78,7 +78,7 @@ namespace SOS.Administration.Api.Controllers
                 }
 
                 RecurringJob.AddOrUpdate<IExportAndStoreJob>(nameof(IExportAndStoreJob),
-                    job => job.RunAsync(filter, blobStorageContainer, fileName, false, JobCancellationToken.Null),
+                    job => job.RunAsync(filter, blobStorageContainer, fileName, JobCancellationToken.Null),
                     $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
                 return new OkObjectResult("Export Darwin Core Job Scheduled.");
             }

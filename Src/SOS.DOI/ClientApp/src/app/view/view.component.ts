@@ -28,15 +28,15 @@ export class ViewComponent implements OnInit {
 
     this._doiService.getDoiMetadata(prefix, suffix)
       .subscribe(
-        response => {
-          this._doiData = response?.data;
+        data => {
+          this._doiData = data;
         },
         err => {
           console.error(err);
         }
     );
 
-    this._doiService.getURL(suffix)
+    this._doiService.getURL(prefix, suffix)
       .subscribe(
         url => {
           this._fileUrl = url;

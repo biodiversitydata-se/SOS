@@ -207,7 +207,6 @@ namespace SOS.Observations.Api
             // Add repositories
             services.AddSingleton<IAreaRepository, AreaRepository>();
             services.AddSingleton<IDataProviderRepository, DataProviderRepository>();
-            services.AddSingleton<IDOIRepository, DOIRepository>();
             services.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddSingleton<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();

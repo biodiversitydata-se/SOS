@@ -1,18 +1,16 @@
   <div *ngIf="_doiData" class="jumbotron mr-5 ml-5">
     <h1 class="display-8">{{_doiData.id}}</h1>
 
-    <ul class="list-group list-group-horizontal">
-      <li *ngFor="let title of _doiData.attributes.titles" class="list-group-item">{{ title.title }}</li>
-    </ul>
+    <h2 *ngFor="let title of _doiData.attributes.titles">{{ title.title }}</h2>
+    <h3 *ngFor="let creator of _doiData.attributes.creators">{{ creator.name }}</h3>
 
     <p *ngFor="let description of _doiData.attributes.descriptions">{{ description.description }}</p>
 
+    <p>{{ _doiData.attributes.types.resourceType }} published {{ _doiData.attributes.publicationYear }} via {{ _doiData.attributes.publisher }}</p>
+
     <hr class="my-4">
 
-    <h3>Skapad {{ _doiData.attributes.created }} av</h3>
-    <ul class="list-group list-group-flush mb-3">
-      <li *ngFor="let creator of _doiData.attributes.creators" class="list-group-item">{{ creator.name }}</li>
-    </ul>
+    <p>Skapad {{ _doiData.attributes.created }}</p>
 
     <a href="{{ _fileUrl }}" role="button" class="btn btn-primary btn-lg">Hämta</a>
   </div>

@@ -25,10 +25,9 @@ namespace SOS.Export.Managers.Interfaces
         /// <param name="filter"></param>
         /// <param name="blobStorageContainer"></param>
         /// <param name="fileName"></param>
-        /// <param name="isDOI"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName, bool isDOI,
+        Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName,
             IJobCancellationToken cancellationToken);
     }
 }

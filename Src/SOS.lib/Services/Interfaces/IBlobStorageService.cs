@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Models.Misc;
 
@@ -29,11 +28,12 @@ namespace SOS.Lib.Services.Interfaces
         Task<bool> CreateContainerAsync(string name);
 
         /// <summary>
-        ///     Get DOI file download link
+        ///  Get DOI file download link
         /// </summary>
+        /// <param name="prefix"></param>
         /// <param name="suffix"></param>
         /// <returns></returns>
-        string GetDOIDownloadUrl(string suffix);
+        string GetDOIDownloadUrl(string prefix, string suffix);
 
         /// <summary>
         ///     Get DOI file download link

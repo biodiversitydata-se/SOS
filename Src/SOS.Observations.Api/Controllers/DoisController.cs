@@ -60,11 +60,12 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest($"Query exceeds limit of {_exportObservationsLimit} observations.");
                 }
 
-                var fileName = Guid.NewGuid().ToString();
-                var jobId = BackgroundJob.Enqueue<IExportAndStoreJob>(job =>
-                    job.RunAsync(filter, _doiContainer, fileName, true, JobCancellationToken.Null));
+                // Validate creators, title, publisher, publicationYear, resourceTypeGeneral
 
-                return new OkObjectResult(new { fileName = $"{fileName}.zip", jobId});
+                var jobId = BackgroundJob.Enqueue<ICreateDoiJob>(job =>
+                    job.RunAsync(filter, JobCancellationToken.Null));
+
+                return new OkObjectResult(new { jobId });
             }
             catch (Exception e)
             {

@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.DataCite;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Export.Jobs
@@ -16,41 +17,38 @@ namespace SOS.Export.Jobs
     /// <summary>
     ///     Artportalen harvest
     /// </summary>
-    public class ExportToDoiJob : IExportToDoiJob
+    public class CreateDoiJob : ICreateDoiJob
     {
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IObservationManager _observationManager;
         private readonly IDataCiteService _dataCiteService;
         private readonly string _doiContainer;
-        private readonly string _exportContainer;
         private readonly ILogger<ExportToDoiJob> _logger;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="blobStorageService"></param>
+        /// <param name="observationManager"></param>
         /// <param name="dataCiteService"></param>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
-        public ExportToDoiJob(IBlobStorageService blobStorageService, IDataCiteService dataCiteService, 
+        public CreateDoiJob(IObservationManager observationManager, IDataCiteService dataCiteService, 
             BlobStorageConfiguration configuration, ILogger<ExportToDoiJob> logger)
         {
-            _blobStorageService = blobStorageService ?? throw new ArgumentNullException(nameof(blobStorageService));
+            _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _dataCiteService = dataCiteService ?? throw new ArgumentNullException(nameof(dataCiteService));
             _doiContainer = configuration?.Containers["doi"] ?? throw new ArgumentNullException(nameof(configuration));
-            _exportContainer = configuration.Containers["export"];
 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(string fileName, IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(ExportFilter filter, IJobCancellationToken cancellationToken)
         {
             try
             {
-                _logger.LogInformation("Start export to DOI job");
+                _logger.LogInformation("Start creating DOI job");
 
-                //Get file suffix
-                var fileSuffix = Regex.Match(fileName, @"\.[0-9a-z]+$").Value;
+                _logger.LogDebug("Start creating DOI draft");
 
                 var metaData = new DOIMetadata
                 {
@@ -67,12 +65,12 @@ namespace SOS.Export.Jobs
                         Descriptions = new[] {
                             new DOIDescription
                             {
-                                Description = fileName,
+                                Description = JsonSerializer.Serialize(filter, new JsonSerializerOptions{ IgnoreNullValues = true }),
                                 DescriptionType = DescriptionType.Other
                             }
                         },
                         PublicationYear = DateTime.Now.Year, 
-                        Titles = new[] { new DOITitle{ Title = $"{fileName} {DateTime.Now.ToString("yyyy-MM-dd")}" }  },
+                        Titles = new[] { new DOITitle{ Title = "User created DOI"}  },
                         Publisher = "Artdatabanken",
                         Subjects = new[]
                         {
@@ -81,31 +79,26 @@ namespace SOS.Export.Jobs
                                 Subject = "Biological sciences"
                             }
                         },
-                        Suffix = $"{fileName.Replace(fileSuffix, "")}-{Guid.NewGuid()}",
                         Types = new DOITypes()
                         {
                             ResourceTypeGeneral = "Dataset",
-                            ResourceType ="Observations"
+                            ResourceType = "Observations"
                         }
                     },
                     Type = "dois"
                 };
 
-                _logger.LogDebug($"Start creating DOI draft");
                 metaData = await _dataCiteService.CreateDoiDraftAsync(metaData);
-                _logger.LogDebug($"Finish creating DOI draft");
+                _logger.LogDebug("Finish creating DOI draft");
 
                 var success = false;
 
                 if (metaData != null)
                 {
-                    var targetFileName = $"{metaData.Id}{fileSuffix}";
-
-                    _logger.LogDebug($"Start copy file ({fileName}) from {_exportContainer} to {_doiContainer}/{targetFileName}");
-
-                    success = await _blobStorageService.CopyFileAsync(_exportContainer, fileName, _doiContainer,
-                        targetFileName);
-                    _logger.LogDebug($"Finish copy file ({fileName}) from {_exportContainer} to {_doiContainer}/{targetFileName}");
+                    _logger.LogDebug($"Start creating DOI file ({metaData.Id})");
+                    success = await _observationManager.ExportAndStoreAsync(filter, _doiContainer, metaData.Id,
+                        cancellationToken);
+                    _logger.LogDebug($"Finish creating DOI file ({metaData.Id})");
 
                     if (success)
                     {
@@ -114,17 +107,17 @@ namespace SOS.Export.Jobs
                         _logger.LogDebug($"Finish publishing DOI ({metaData.Id})");
                     }
                 }
-                _logger.LogInformation($"End export to DOI job. Success: {success}");
+                _logger.LogInformation($"Finish creating DOI job. Success: {success}");
 
-                return success ? true : throw new Exception("Export to DOI job failed");
+                return success ? true : throw new Exception("Creating DOI job failed");
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation("Export to DOI job was cancelled.");
+                _logger.LogInformation("Creating DOI job was cancelled.");
             }
             catch (Exception e)
             {
-                _logger.LogInformation("Failed to create DOI from export.", e);
+                _logger.LogInformation("Failed to create DOI.", e);
             }
             return false;
         }

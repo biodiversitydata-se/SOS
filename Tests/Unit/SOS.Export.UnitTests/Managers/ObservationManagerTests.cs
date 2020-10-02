@@ -27,7 +27,6 @@ namespace SOS.Export.UnitTests.Managers
         /// </summary>
         public ObservationManagerTests()
         {
-            _doiRepository = new Mock<IDOIRepository>();
             _dwcArchiveFileWriterMock = new Mock<IDwcArchiveFileWriter>();
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
             _processInfoRepositoryMock = new Mock<IProcessInfoRepository>();
@@ -38,7 +37,6 @@ namespace SOS.Export.UnitTests.Managers
             _loggerMock = new Mock<ILogger<ObservationManager>>();
         }
 
-        private readonly Mock<IDOIRepository> _doiRepository;
         private readonly Mock<IDwcArchiveFileWriter> _dwcArchiveFileWriterMock;
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
         private readonly Mock<IProcessInfoRepository> _processInfoRepositoryMock;
@@ -52,7 +50,6 @@ namespace SOS.Export.UnitTests.Managers
         ///     Return object to be tested
         /// </summary>
         private ObservationManager TestObject => new ObservationManager(
-            _doiRepository.Object,
             _dwcArchiveFileWriterMock.Object,
             _processedObservationRepositoryMock.Object,
             _processInfoRepositoryMock.Object,
@@ -327,7 +324,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), false,
+            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), 
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -369,8 +366,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), false,
-                JobCancellationToken.Null);
+            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -395,7 +391,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), false,
+            var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), 
                 JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
