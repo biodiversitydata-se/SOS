@@ -10,7 +10,6 @@ using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Helpers;
-using SOS.Lib.Models.DOI;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Services.Interfaces;
 
@@ -23,7 +22,6 @@ namespace SOS.Export.Managers
     {
         private readonly IFilterManager _filterManager;
         private readonly IBlobStorageService _blobStorageService;
-        private readonly IDOIRepository _doiRepository;
         private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
         private readonly string _exportPath;
         private readonly IFileService _fileService;
@@ -35,7 +33,6 @@ namespace SOS.Export.Managers
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="doiRepository"></param>
         /// <param name="dwcArchiveFileWriter"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="processInfoRepository"></param>
@@ -45,7 +42,7 @@ namespace SOS.Export.Managers
         /// <param name="fileDestination"></param>
         /// <param name="filterManager"></param>
         /// <param name="logger"></param>
-        public ObservationManager(IDOIRepository doiRepository,
+        public ObservationManager(
             IDwcArchiveFileWriter dwcArchiveFileWriter,
             IProcessedObservationRepository processedObservationRepository,
             IProcessInfoRepository processInfoRepository,
@@ -56,7 +53,6 @@ namespace SOS.Export.Managers
             IFilterManager filterManager,
             ILogger<ObservationManager> logger)
         {
-            _doiRepository = doiRepository ?? throw new ArgumentNullException(nameof(doiRepository));
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _processInfoRepository =
@@ -96,7 +92,7 @@ namespace SOS.Export.Managers
 
         /// <inheritdoc />
         public async Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName,
-            bool isDOI, IJobCancellationToken cancellationToken)
+           IJobCancellationToken cancellationToken)
         {
             var zipFilePath = "";
             try
@@ -112,21 +108,6 @@ namespace SOS.Export.Managers
 
                 // Upload file to blob storage
                 var success = await _blobStorageService.UploadBlobAsync(zipFilePath, blobStorageContainer);
-
-                // If upload was successful and it's a DOI
-                if (success && isDOI)
-                {
-                    var doi = new DOI
-                    {
-                        Container = blobStorageContainer,
-                        Id = Guid.Parse(fileName),
-                        Filter = filter,
-                        Created = DateTime.Now,
-                        CreatedBy = "Todo"
-                    };
-
-                    return await _doiRepository.AddAsync(doi);
-                }
 
                 return success;
             }

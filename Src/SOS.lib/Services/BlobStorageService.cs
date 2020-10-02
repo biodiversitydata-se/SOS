@@ -63,7 +63,7 @@ namespace SOS.Lib.Services
             }
 
             _cloudBlobClient = storageAccount.CreateCloudBlobClient();
-            _doiContainer = blobStorageConfiguration?.Containers["doi"];
+            _doiContainer = blobStorageConfiguration.Containers["doi"];
             _exportContainer = blobStorageConfiguration?.Containers["export"];
         }
 
@@ -122,9 +122,9 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public string GetDOIDownloadUrl(string suffix)
+        public string GetDOIDownloadUrl(string prefix, string suffix)
         {
-            var fileName = $"{suffix}.zip";
+            var fileName = $"{prefix}/{suffix}.zip";
 
             return GetFileDownloadUrl(_doiContainer, fileName);
         }

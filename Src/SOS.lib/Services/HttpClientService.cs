@@ -4,15 +4,40 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using SOS.Lib.Services.Interfaces;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Lib.Services
 {
+    public static class JsonSerialaztionHelper
+    {
+        /// <summary>
+        /// Serialization options
+        /// </summary>
+        public static JsonSerializerOptions SerializerOptions
+        {
+            get
+            {
+                var options = new JsonSerializerOptions
+                {
+                    IgnoreNullValues = true,
+                    PropertyNamingPolicy = null,
+                    WriteIndented = true
+                };
+                options.Converters.Add(new JsonStringEnumConverter(null));
+
+                return options;
+            }
+        }
+    }
+
     /// <inheritdoc />
     public class HttpClientService : IHttpClientService
     {
@@ -22,6 +47,62 @@ namespace SOS.Lib.Services
         ///     Disposed
         /// </summary>
         private bool _disposed;
+
+        private HttpClient GetClient(Dictionary<string, string> headerData = null)
+        {
+            var httpClient = new HttpClient
+            {
+                Timeout = TimeSpan.FromMinutes(30)
+            };
+
+            if (headerData?.Any() ?? false)
+            {
+                var userName = headerData
+                    .FirstOrDefault(hd => hd.Key.Equals("username", StringComparison.CurrentCultureIgnoreCase)).Value;
+                var password = headerData
+                    .FirstOrDefault(hd => hd.Key.Equals("password", StringComparison.CurrentCultureIgnoreCase)).Value;
+
+                // Add basic authentication if user name and password is passed in header data
+                if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
+                {
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                        AuthenticationSchemes.Basic.ToString(),
+                        Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}"))
+                    );
+                }
+
+                foreach (var data in headerData.Where(
+                    hd => !
+                    (
+                        hd.Key.Equals("username", StringComparison.CurrentCultureIgnoreCase) ||
+                        hd.Key.Equals("password", StringComparison.CurrentCultureIgnoreCase))
+                    )
+                )
+                {
+                    httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
+                }
+            }
+
+            return httpClient;
+        }
+
+        /// <summary>
+        ///     Dispose
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+            }
+
+            _disposed = true;
+        }
 
         /// <summary>
         ///     Constructor
@@ -54,14 +135,13 @@ namespace SOS.Lib.Services
             try
             {
                 var httpResponseMessage = await httpClient.GetAsync(requestUri);
-                var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<T>(jsonString);
+                httpResponseMessage.EnsureSuccessStatusCode();
+ 
+                return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerialaztionHelper.SerializerOptions);
             }
             catch (Exception ex)
             {
                 _logger.LogError($"{requestUri.PathAndQuery} \n{ex.Message}");
-
-                Thread.Sleep(1000);
             }
             finally
             {
@@ -77,76 +157,77 @@ namespace SOS.Lib.Services
             var httpClient = GetClient(headerData);
 
             var response = await httpClient.GetAsync(requestUri, HttpCompletionOption.ResponseContentRead);
+           
             return response.StatusCode == HttpStatusCode.OK ? await response.Content.ReadAsStreamAsync() : null;
         }
 
         /// <inheritdoc />
         public async Task<T> PostDataAsync<T>(Uri requestUri, object model)
         {
-            return await PostDataAsync<T>(requestUri, model, null);
+            return await PostDataAsync<T>(requestUri, model, null, "application/json");
         }
 
         /// <inheritdoc />
         public async Task<T> PostDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData)
         {
-            var attempts = 0;
-            while (attempts < 3)
+            return await PostDataAsync<T>(requestUri, model, headerData, "application/json");
+        }
+
+        /// <inheritdoc />
+        public async Task<T> PostDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData, string contentType)
+        {
+            var httpClient = GetClient(headerData);
+            try
             {
-                var httpClient = GetClient(headerData);
-                try
-                {
-                    var httpResponseMessage = await httpClient.PostAsync(requestUri, new JsonContent(model));
-                    var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
+                var httpResponseMessage = await httpClient.PostAsync(requestUri, new JsonContent(model, contentType));
+                httpResponseMessage.EnsureSuccessStatusCode();
 
-                    return JsonConvert.DeserializeObject<T>(jsonString);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Attempt {attempts} to {requestUri.AbsolutePath} failed");
-
-                    // If last attempt log error
-                    if (attempts == 2)
-                    {
-                        _logger.LogError(ex.Message);
-                    }
-
-                    Thread.Sleep(1000);
-                    attempts++;
-                }
-                finally
-                {
-                    httpClient.Dispose();
-                }
+                return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerialaztionHelper.SerializerOptions);
             }
-
+            catch (Exception ex)
+            {
+                _logger.LogError($"Post to {requestUri.AbsolutePath} failed");
+            }
+            finally
+            {
+                httpClient.Dispose();
+            }
+            
             return default;
         }
 
         /// <inheritdoc />
         public async Task<T> PutDataAsync<T>(Uri requestUri, object model)
         {
-            var attempts = 0;
-            while (attempts < 3)
-            {
-                var httpClient = GetClient();
-                try
-                {
-                    var httpResponseMessage = await httpClient.PutAsync(requestUri, new JsonContent(model));
-                    var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<T>(jsonString);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"{requestUri.PathAndQuery} \n{ex.Message}");
+            return await PutDataAsync<T>(requestUri, model, null, "application/json");
+        }
 
-                    Thread.Sleep(1000);
-                    attempts++;
-                }
-                finally
-                {
-                    httpClient.Dispose();
-                }
+        /// <inheritdoc />
+        public async Task<T> PutDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData)
+        {
+            return await PutDataAsync<T>(requestUri, model, headerData, "application/json");
+        }
+
+        /// <inheritdoc />
+        public async Task<T> PutDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData, string contentType)
+        {
+            var httpClient = GetClient(headerData);
+            try
+            {
+                var httpResponseMessage = await httpClient.PutAsync(requestUri, new JsonContent(model, contentType));
+                httpResponseMessage.EnsureSuccessStatusCode();
+               
+                return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerialaztionHelper.SerializerOptions);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{requestUri.PathAndQuery} \n{ex.Message}");
+            }
+            finally
+            {
+                httpClient.Dispose();
+            }
+           
 
             return default;
         }
@@ -154,66 +235,24 @@ namespace SOS.Lib.Services
         /// <inheritdoc />
         public async Task<T> DeleteDataAsync<T>(Uri requestUri)
         {
-            var attempts = 0;
-            while (attempts < 3)
+            var httpClient = GetClient();
+            try
             {
-                var httpClient = GetClient();
-                try
-                {
-                    var httpResponseMessage = await httpClient.DeleteAsync(requestUri);
-                    var jsonString = await httpResponseMessage.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<T>(jsonString);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"{requestUri.PathAndQuery} \n{ex.Message}");
-
-                    Thread.Sleep(1000);
-                    attempts++;
-                }
-                finally
-                {
-                    httpClient.Dispose();
-                }
+                var httpResponseMessage = await httpClient.DeleteAsync(requestUri);
+                return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync());
             }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{requestUri.PathAndQuery} \n{ex.Message}");
 
+                Thread.Sleep(1000);
+            }
+            finally
+            {
+                httpClient.Dispose();
+            }
+            
             return default;
-        }
-
-        private HttpClient GetClient(Dictionary<string, string> headerData = null)
-        {
-            var httpClient = new HttpClient
-            {
-                Timeout = TimeSpan.FromMinutes(30)
-            };
-
-            if (headerData?.Any() ?? false)
-            {
-                foreach (var data in headerData)
-                {
-                    httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
-                }
-            }
-
-            return httpClient;
-        }
-
-        /// <summary>
-        ///     Dispose
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-            }
-
-            _disposed = true;
         }
     }
 
@@ -223,12 +262,14 @@ namespace SOS.Lib.Services
     public class JsonContent : StringContent
     {
         /// <summary>
-        ///     Serialize object to json
+        ///  Serialize object to json
         /// </summary>
         /// <param name="obj"></param>
-        public JsonContent(object obj) :
-            base(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")
+        /// <param name="contentType"></param>
+        public JsonContent(object obj, string contentType) :
+            base(JsonSerializer.Serialize(obj, JsonSerialaztionHelper.SerializerOptions), Encoding.UTF8, contentType)
         {
+  
         }
     }
 }

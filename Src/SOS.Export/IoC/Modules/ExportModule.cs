@@ -28,7 +28,10 @@ namespace SOS.Export.IoC.Modules
         /// <summary>
         ///     Module configuration
         /// </summary>
-        public (ExportConfiguration ExportConfiguration, MongoDbConfiguration ProcessDbConfiguration, BlobStorageConfiguration BlobStorageConfiguration) Configurations { get; set; }
+        public (ExportConfiguration ExportConfiguration, 
+            MongoDbConfiguration ProcessDbConfiguration, 
+            BlobStorageConfiguration BlobStorageConfiguration,
+            DataCiteServiceConfiguration DataCiteServiceConfiguration) Configurations { get; set; }
 
         /// <summary>
         ///     Load event
@@ -38,6 +41,8 @@ namespace SOS.Export.IoC.Modules
         {
             // Add configuration
             builder.RegisterInstance(Configurations.BlobStorageConfiguration).As<BlobStorageConfiguration>()
+                .SingleInstance();
+            builder.RegisterInstance(Configurations.DataCiteServiceConfiguration).As<DataCiteServiceConfiguration>()
                 .SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.DwcaFilesCreationConfiguration).As<DwcaFilesCreationConfiguration>().SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.FileDestination).As<FileDestination>().SingleInstance();
@@ -54,7 +59,6 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<FilterManager>().As<IFilterManager>().InstancePerLifetimeScope();
 
             // Repositories mongo
-            builder.RegisterType<DOIRepository>().As<IDOIRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedObservationRepository>().As<IProcessedObservationRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
@@ -65,10 +69,12 @@ namespace SOS.Export.IoC.Modules
 
             // Services
             builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().InstancePerLifetimeScope();
+            builder.RegisterType<DataCiteService>().As<IDataCiteService>().InstancePerLifetimeScope();
             builder.RegisterType<FileService>().As<IFileService>().InstancePerLifetimeScope();
             builder.RegisterType<ZendToService>().As<IZendToService>().InstancePerLifetimeScope();
 
             // Add jobs
+            builder.RegisterType<CreateDoiJob>().As<ICreateDoiJob>().InstancePerLifetimeScope();
             builder.RegisterType<ExportAndSendJob>().As<IExportAndSendJob>().InstancePerLifetimeScope();
             builder.RegisterType<ExportAndStoreJob>().As<IExportAndStoreJob>().InstancePerLifetimeScope();
             builder.RegisterType<ExportToDoiJob>().As<IExportToDoiJob>().InstancePerLifetimeScope();

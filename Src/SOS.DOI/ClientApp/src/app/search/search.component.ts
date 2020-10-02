@@ -19,10 +19,10 @@ export class SearchComponent {
   onSearchClick(): void {
     this._doiService.search(this._searchTerm)
       .subscribe(
-        response => {
-          this._data = response?.data;
+        data => {
+          this._data = data;
 
-          this._notFound = this._data?.length === 0;
+          this._notFound = this._data.length === 0;
         },
         err => {
           console.error(err);

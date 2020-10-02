@@ -2,12 +2,12 @@
 
 namespace SOS.Lib.Models.DataCite
 {
-    public class DOITitle
+    public class DOISubject
     {
         /// <summary>
         /// DOI title
         /// </summary>
-        [JsonPropertyName("title")]
-        public string Title { get; set; }
+        [JsonPropertyName("subject")]
+        public string Subject { get; set; }
     }
 }

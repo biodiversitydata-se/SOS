@@ -33,14 +33,14 @@ namespace SOS.DOI.Controllers
         }
 
         /// <inheritdoc />
-        [HttpGet("{suffix}/URL")]
+        [HttpGet("{prefix}/{suffix}/URL")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult GetDOIFileUrl([FromRoute] string suffix)
+        public IActionResult GetDOIFileUrl([FromRoute] string prefix, [FromRoute] string suffix)
         {
             try
             {
-                var downloadUrl = _blobStorageService.GetDOIDownloadUrl(suffix);
+                var downloadUrl = _blobStorageService.GetDOIDownloadUrl(prefix, suffix);
 
                 return new OkObjectResult(downloadUrl);
             }

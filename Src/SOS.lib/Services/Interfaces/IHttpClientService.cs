@@ -36,16 +36,17 @@ namespace SOS.Lib.Services.Interfaces
         Task<Stream> GetFileStreamAsync(Uri requestUri, Dictionary<string, string> headerData = null);
 
         /// <summary>
-        ///     Post request
+        /// Post request
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="requestUri"></param>
         /// <param name="model"></param>
+        /// <param name="contentType"></param>
         /// <returns></returns>
         Task<T> PostDataAsync<T>(Uri requestUri, object model);
 
         /// <summary>
-        ///     Post request with header data
+        /// Post request with header data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="requestUri"></param>
@@ -55,13 +56,45 @@ namespace SOS.Lib.Services.Interfaces
         Task<T> PostDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData);
 
         /// <summary>
-        ///     Put requests
+        /// Post request with header data and content type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="requestUri"></param>
+        /// <param name="model"></param>
+        /// <param name="headerData"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        Task<T> PostDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData, string contentType);
+
+        /// <summary>
+        /// Put requests
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="requestUri"></param>
         /// <param name="model"></param>
         /// <returns></returns>
         Task<T> PutDataAsync<T>(Uri requestUri, object model);
+
+        /// <summary>
+        /// Put request
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="requestUri"></param>
+        /// <param name="model"></param>
+        /// <param name="headerData"></param>
+        /// <returns></returns>
+        Task<T> PutDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData);
+
+        /// <summary>
+        /// Put requests
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="requestUri"></param>
+        /// <param name="model"></param>
+        /// <param name="headerData"></param>
+        /// <param name="contentType"></param>
+        /// <returns></returns>
+        Task<T> PutDataAsync<T>(Uri requestUri, object model, Dictionary<string, string> headerData, string contentType);
 
         /// <summary>
         ///     Delete requests

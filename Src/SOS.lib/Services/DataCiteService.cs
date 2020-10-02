@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Models.DataCite;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Lib.Services
@@ -15,6 +16,15 @@ namespace SOS.Lib.Services
         private readonly IHttpClientService _httpClientService;
         private readonly DataCiteServiceConfiguration _dataCiteServiceConfiguration;
         private readonly ILogger<DataCiteService> _logger;
+
+        private Dictionary<string, string> GetBasciAuthenticationHeader()
+        {
+            return new Dictionary<string, string>
+            {
+                { "userName", _dataCiteServiceConfiguration.UserName },
+                { "password", _dataCiteServiceConfiguration.Password }
+            };
+        }
 
         /// <summary>
         /// Constructor
@@ -34,19 +44,40 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<bool> CreateDoiAsync()
+        public async Task<DOIMetadata> CreateDoiDraftAsync(DOIMetadata data)
         {
-            return await _httpClientService.GetDataAsync<bool>(
-                new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/Todo"));
+            if (data == null)
+            {
+                return null;
+            }
+
+            if (data.Attributes == null)
+            {
+                data.Attributes = new DOIAttributes();
+            }
+
+            // Create a DOI 
+            data.Attributes.DOI = $"{_dataCiteServiceConfiguration.DoiPrefix}/{ (string.IsNullOrEmpty(data.Attributes.Suffix) ? Guid.NewGuid().ToString() : data.Attributes.Suffix) }";
+
+            var doiRequest = new DOI<DOIMetadata>
+            {
+                Data = data
+            };
+
+            // Validate creators, title, publisher, publicationYear, resourceTypeGeneral
+            var doi = await _httpClientService.PostDataAsync<DOI<DOIMetadata>>(
+                new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois"), doiRequest, GetBasciAuthenticationHeader(), "application/vnd.api+json");
+
+            return doi?.Data;
         }
 
         /// <inheritdoc />
-        public async Task<Models.DataCite.DOIResponse<Models.DataCite.DOIMetadata>> GetMetadataAsync(string prefix, string suffix)
+        public async Task<DOIMetadata> GetMetadataAsync(string prefix, string suffix)
         {
             try
             {
-                return await _httpClientService.GetDataAsync<Models.DataCite.DOIResponse<Models.DataCite.DOIMetadata>>(
-                    new Uri($"{ _dataCiteServiceConfiguration.BaseAddress }/dois/{ prefix }/{ suffix }"));
+                return (await _httpClientService.GetDataAsync<DOI<DOIMetadata>>(
+                    new Uri($"{ _dataCiteServiceConfiguration.BaseAddress }/dois/{ prefix }/{ suffix }"))).Data;
             }
             catch (Exception e)
             {
@@ -57,12 +88,43 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<Models.DataCite.DOIResponse<IEnumerable<Models.DataCite.DOIMetadata>>> SearchMetadataAsync(string searchFor)
+        public async Task<bool> PublishDoiAsync(DOIMetadata data)
+        {
+            if (data?.Attributes == null)
+            {
+                return false;
+            }
+
+            data.Attributes.Event = "publish";
+            data.Attributes.Url = $"{_dataCiteServiceConfiguration.DoiUrl}/{data.Id}";
+            data.Attributes.Identifiers = new[]
+            {
+                new DOIIdentifier
+                {
+                    Identifier = $"https://doi.org/{data.Id}",
+                    IdentifierType = "DOI"
+                }
+            };
+            var doiRequest = new DOI<DOIMetadata>
+            {
+                Data = data
+            };
+
+            var response = await _httpClientService.PutDataAsync<dynamic>(
+                new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois/{data.Id}"), doiRequest, GetBasciAuthenticationHeader(), "application/vnd.api+json");
+
+            return response != null;
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<DOIMetadata>> SearchMetadataAsync(string searchFor)
         {
             try
             {
-                return await _httpClientService.GetDataAsync<Models.DataCite.DOIResponse<IEnumerable<Models.DataCite.DOIMetadata>>>(
-                    new Uri($"{ _dataCiteServiceConfiguration.BaseAddress }/dois?client-id=gbif.gbif&query=+{searchFor.Replace(" ", "+")}&sort=created:desc"));
+               var response = await _httpClientService.GetDataAsync<DOI<IEnumerable<DOIMetadata>>>(
+                    new Uri($"{ _dataCiteServiceConfiguration.BaseAddress }/dois?client-id={_dataCiteServiceConfiguration.ClientId}&query=+{searchFor.Replace(" ", "+")}&sort=created:desc"));
+
+               return response?.Data;
             }
             catch (Exception e)
             {

@@ -29,14 +29,14 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
-        public async Task<bool> RunAsync(ExportFilter filter, string blobStorageContainer, string fileName, bool isDOI,
+        public async Task<bool> RunAsync(ExportFilter filter, string blobStorageContainer, string fileName, 
             IJobCancellationToken cancellationToken)
         {
             try
             {
                 _logger.LogInformation("Start export and store job");
                 var success = await _observationManager.ExportAndStoreAsync(filter, blobStorageContainer, fileName,
-                    isDOI, cancellationToken);
+                    cancellationToken);
 
                 _logger.LogInformation($"End export and store job. Success: {success}");
 

@@ -11,14 +11,15 @@ namespace SOS.DOI.Controllers.Interfaces
         /// <param name="prefix"></param>
         /// <param name="suffix"></param>
         /// <returns></returns>
-        Task<IActionResult> GetMetadata([FromRoute] string prefix, [FromRoute] string suffix);
+        Task<IActionResult> GetMetadata(string prefix, string suffix);
 
         /// <summary>
-        /// Get DOI download URL
+        ///  Get DOI download URL
         /// </summary>
+        /// <param name="prefix"></param>
         /// <param name="suffix"></param>
         /// <returns></returns>
-        IActionResult GetDOIFileUrl(string suffix);
+        IActionResult GetDOIFileUrl(string prefix, string suffix);
 
         /// <summary>
         /// Search for DOI's

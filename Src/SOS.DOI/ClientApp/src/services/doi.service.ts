@@ -15,16 +15,16 @@ export class DoiService {
   * @param prefix
   * @param suffix
   */
-  getDoiMetadata(prefix: string, suffix: string): Observable<IResponse<IMetadata>> {
-    return this._httpClientService.getAsync<IResponse<IMetadata>>(
+  getDoiMetadata(prefix: string, suffix: string): Observable<IMetadata> {
+    return this._httpClientService.getAsync<IMetadata>(
       `doi/${prefix}/${suffix}`
     );
   }
 
-  getURL(doiSuffix: string): Observable<string> {
-    doiSuffix = '30400d5e-7a34-4e1d-9669-2d054689d54f';
+  getURL(prefix: string, suffix: string): Observable<string> {
+   
     return this._httpClientService.getString(
-      `doi/${doiSuffix}/URL`
+      `doi/${prefix}/${suffix}/URL`
     );
   }
 
@@ -32,8 +32,8 @@ export class DoiService {
    * Search for a DOI
    * @param searchFor
    */
-  search(searchFor: string): Observable<IResponse<Array<IMetadata>>> {
-    return this._httpClientService.getAsync<IResponse<Array<IMetadata>>>(
+  search(searchFor: string): Observable<Array<IMetadata>> {
+    return this._httpClientService.getAsync<Array<IMetadata>>(
       `doi/search?searchFor=${ searchFor.replace(/\s/, '+') }`
     );
   }
