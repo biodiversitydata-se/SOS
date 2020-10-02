@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.Extensions
 {
@@ -75,6 +76,48 @@ namespace SOS.Observations.Api.Extensions
                 Take = pagedResult.Take,
                 TotalCount = pagedResult.TotalCount
             };
+        }
+
+        public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto)
+        {
+            if (searchFilterDto == null) return null;
+
+            var filter = new SearchFilter();
+            filter.OutputFields = searchFilterDto.OutputFields;
+            filter.StartDate = searchFilterDto.Date?.StartDate;
+            filter.EndDate = searchFilterDto.Date?.EndDate;
+            filter.SearchOnlyBetweenDates = (searchFilterDto.Date?.SearchOnlyBetweenDates).GetValueOrDefault();
+            filter.AreaIds = searchFilterDto.AreaIds;
+            filter.TaxonIds = searchFilterDto.Taxon?.TaxonIds;
+            filter.IncludeUnderlyingTaxa = (searchFilterDto.Taxon?.IncludeUnderlyingTaxa).GetValueOrDefault();
+            filter.RedListCategories = searchFilterDto.Taxon?.RedListCategories;
+            filter.DataProviderIds = searchFilterDto.DataProviderIds;
+            filter.FieldTranslationCultureCode = searchFilterDto.TranslationCultureCode;
+            filter.OnlyValidated = searchFilterDto.OnlyValidated;
+            filter.GeometryFilter = searchFilterDto.Geometry == null ? null : new GeometryFilter
+            {
+                Geometries = searchFilterDto.Geometry.Geometries,
+                MaxDistanceFromPoint = searchFilterDto.Geometry.MaxDistanceFromPoint,
+                UsePointAccuracy = searchFilterDto.Geometry.UsePointAccuracy
+            };
+
+            if (searchFilterDto.OccurrenceStatus != null)
+            {
+                switch (searchFilterDto.OccurrenceStatus)
+                {
+                    case OccurrenceStatusFilterValuesDto.Present:
+                        filter.PositiveSightings = true;
+                        break;
+                    case OccurrenceStatusFilterValuesDto.Absent:
+                        filter.PositiveSightings = false;
+                        break;
+                    case OccurrenceStatusFilterValuesDto.BothPresentAndAbsent:
+                        filter.PositiveSightings = null;
+                        break;
+                }
+            }
+
+            return filter;
         }
     }
 }

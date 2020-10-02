@@ -154,11 +154,6 @@ namespace SOS.Observations.Api.Repositories
         public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder)
         {
-            if (!filter?.IsFilterActive ?? true)
-            {
-                return null;
-            }
-
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             var sortDescriptor = sortBy.ToSortDescriptor<ProcessedObservation>(sortOrder);
@@ -470,11 +465,6 @@ namespace SOS.Observations.Api.Repositories
             int skip,
             int take)
         {
-            if (!filter?.IsFilterActive ?? true)
-            {
-                return Result.Failure<PagedResult<TaxonAggregationItem>>("Filter is not set.");
-            }
-
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             // Get number of taxa
@@ -566,13 +556,7 @@ namespace SOS.Observations.Api.Repositories
                 int precision,
                 LatLonBoundingBox bbox)
         {
-            const int maxNrBucketsInElactic = 65535;
             const int maxNrReturnedBuckets = 10000;
-            if (!filter?.IsFilterActive ?? true)
-            {
-                return Result.Failure<GeoGridResult>("The filter is not set.");
-            }
-
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_GeoAggregated");
@@ -583,7 +567,7 @@ namespace SOS.Observations.Api.Repositories
                 .Size(0)
                 .Aggregations(a => a.GeoHash("geohash_grid", g => g
                     .Field("location.pointLocation")
-                    .Size(maxNrBucketsInElactic + 1)
+                    .Size(maxNrReturnedBuckets + 1)
                     .GeoHashPrecision((GeoHashPrecision)precision)
                     .Bounds(b => b.TopLeft(bbox.TopLeft.ToGeoLocation()).BottomRight(bbox.BottomRight.ToGeoLocation()))
                     .Aggregations(b => b
@@ -612,7 +596,7 @@ namespace SOS.Observations.Api.Repositories
             }
 
             var nrOfGridCells = (int?)searchResponse.Aggregations.GeoHash("geohash_grid").Buckets?.Count ?? 0;
-            if (nrOfGridCells >= maxNrReturnedBuckets)
+            if (nrOfGridCells > maxNrReturnedBuckets)
             {
                 return Result.Failure<GeoGridResult>($"The number of cells that will be returned is too large. The limit is {maxNrReturnedBuckets} cells. Try using lower precision or a smaller bounding box.");
             }
@@ -648,13 +632,7 @@ namespace SOS.Observations.Api.Repositories
                 int zoom,
                 LatLonBoundingBox bbox)
         {
-            const int maxNrBucketsInElactic = 65535;
             const int maxNrReturnedBuckets = 10000;
-            if (!filter?.IsFilterActive ?? true)
-            {
-                return Result.Failure<GeoGridTileResult>("The filter is not set.");
-            }
-
             var (query, excludeQuery) = GetCoreQueries(filter);
 
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search_GeoAggregated");
@@ -670,7 +648,7 @@ namespace SOS.Observations.Api.Repositories
                         )))
                     .Aggregations(ab => ab.GeoTile("geotile_grid", gg => gg
                         .Field("location.pointLocation")
-                        .Size(maxNrBucketsInElactic + 1)
+                        .Size(maxNrReturnedBuckets + 1)
                         .Precision((GeoTilePrecision)zoom)
                         .Aggregations(b => b
                             .Cardinality("taxa_count", t => t
@@ -689,7 +667,7 @@ namespace SOS.Observations.Api.Repositories
             
             if (!searchResponse.IsValid)
             {
-                if (searchResponse.ServerError.Error.CausedBy.Type == "too_many_buckets_exception")
+                if (searchResponse.ServerError.Error?.CausedBy.Type == "too_many_buckets_exception")
                 {
                     return Result.Failure<GeoGridTileResult>($"The number of cells that will be returned is too large. The limit is {maxNrReturnedBuckets} cells. Try using lower zoom or a smaller bounding box.");
                 }
@@ -698,7 +676,7 @@ namespace SOS.Observations.Api.Repositories
             }
 
             var nrOfGridCells = (int?)searchResponse.Aggregations.Filter("geotile_filter").GeoTile("geotile_grid").Buckets?.Count ?? 0;
-            if (nrOfGridCells >= maxNrReturnedBuckets)
+            if (nrOfGridCells > maxNrReturnedBuckets)
             {
                 return Result.Failure<GeoGridTileResult>($"The number of cells that will be returned is too large. The limit is {maxNrReturnedBuckets} cells. Try using lower zoom or a smaller bounding box.");
             }

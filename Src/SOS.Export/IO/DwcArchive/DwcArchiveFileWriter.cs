@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Ionic.Zip;
+using Ionic.Zlib;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Enums;
 using SOS.Export.Extensions;

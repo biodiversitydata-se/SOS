@@ -292,7 +292,7 @@ namespace SOS.Lib.Extensions
                 queryContainers.Add(q => q
                     .Terms(t => t
                         .Field("taxon.redlistCategory")
-                        .Terms(filter.RedListCategories)
+                        .Terms(filter.RedListCategories.Select(m => m.ToLower()))
                     )
                 );
             }
