@@ -47,7 +47,7 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <summary>
-        ///     Get diff between generated, verbatim and processed field mappings.
+        ///     Get diff between generated, Json files and processed field mappings.
         /// </summary>
         /// <returns></returns>
         [HttpGet("FieldMappingDiffAsZipFile")]
@@ -65,7 +65,7 @@ namespace SOS.Administration.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{MethodBase.GetCurrentMethod().Name}() failed");
+                _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
