@@ -7,7 +7,6 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Logging;
 using Nest;
-using NGeoHash;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
@@ -28,6 +27,7 @@ namespace SOS.Observations.Api.Repositories
     public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, string>,
         IProcessedObservationRepository
     {
+        private const int ElasticSearchMaxRecords = 10000;
         private readonly IElasticClient _elasticClient;
         private readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly TelemetryClient _telemetry;
@@ -174,11 +174,11 @@ namespace SOS.Observations.Api.Repositories
                 )
                 .Sort(sort => sortDescriptor)
             );
-
+            
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
             var totalCount = searchResponse.HitsMetadata.Total.Value;
-
+            
             if (filter is SearchFilterInternal)
             {
                 var internalFilter = filter as SearchFilterInternal;
@@ -196,6 +196,20 @@ namespace SOS.Observations.Api.Repositories
                     if (!countResponse.IsValid) throw new InvalidOperationException(countResponse.DebugInformation);
                     totalCount = countResponse.Count;
                 }
+            }
+            else if (totalCount >= ElasticSearchMaxRecords) // calculate correct number of observations
+            {
+                var observationCountResponse = await _elasticClient.CountAsync<dynamic>(s => s
+                    .Index(_indexName)
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery)
+                            .Filter(query)
+                        )
+                    )
+                );
+                if (!observationCountResponse.IsValid) throw new InvalidOperationException(observationCountResponse.DebugInformation);
+                totalCount = observationCountResponse.Count;
             }
 
             // Optional: explicitly send telemetry item:
