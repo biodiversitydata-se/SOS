@@ -72,7 +72,7 @@ namespace SOS.Export.Jobs
                             }
                         },
                         PublicationYear = DateTime.Now.Year, 
-                        Titles = new[] { new DOITitle{ Title = $"{fileName} {DateTime.Now.ToString("yyyy-MM-dd")}" }  },
+                        Titles = new[] { new DOITitle{ Title = $"{fileName} {DateTime.Now.ToLocalTime().ToShortDateString()}" }  },
                         Publisher = "Artdatabanken",
                         Subjects = new[]
                         {

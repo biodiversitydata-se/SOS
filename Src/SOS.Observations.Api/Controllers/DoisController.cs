@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
@@ -17,9 +19,9 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
+    [Authorize/*(Roles = "Privat")*/]
     public class DOIsController : ControllerBase, IDOIsController
     {
-        private readonly string _doiContainer;
         private readonly IObservationManager _observationManager;
         private readonly long _exportObservationsLimit;
         private readonly ILogger<ExportsController> _logger;
@@ -48,6 +50,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var creatorEmail = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
                 var matchCount = await _observationManager.GetMatchCountAsync(filter);
 
                 if (matchCount == 0)
