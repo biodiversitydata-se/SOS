@@ -15,10 +15,14 @@ namespace SOS.Observations.Api.Managers
     /// </summary>
     public class FieldMappingManager : IFieldMappingManager
     {
-        private static readonly object InitLock = new object();
         private readonly ILogger<FieldMappingManager> _logger;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private Dictionary<FieldMappingFieldId, Dictionary<int, string>> _nonLocalizedTranslationDictionary;
+        
+        /// <summary>
+        ///     A dictionary with translations grouped by the following properties in order:
+        ///     FieldMappingFieldId, SosId, CultureCode.
+        /// </summary>
         private Dictionary<FieldMappingFieldId, Dictionary<int, Dictionary<string, string>>> _translationDictionary;
 
         /// <summary>
@@ -33,48 +37,14 @@ namespace SOS.Observations.Api.Managers
             _processedFieldMappingRepository = processedFieldMappingRepository ??
                                                throw new ArgumentNullException(nameof(processedFieldMappingRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            Task.Run(InitializeAsync).Wait();
         }
 
-        /// <summary>
-        ///     A dictionary with translations grouped by the following properties in order:
-        ///     FieldMappingFieldId, SosId, CultureCode.
-        /// </summary>
-        private Dictionary<FieldMappingFieldId, Dictionary<int, Dictionary<string, string>>> TranslationDictionary
+        private async Task InitializeAsync()
         {
-            get
-            {
-                if (_translationDictionary == null)
-                {
-                    lock (InitLock)
-                    {
-                        if (_translationDictionary == null)
-                        {
-                            _translationDictionary = CreateLocalizedTranslationDictionaryAsync().Result;
-                        }
-                    }
-                }
-
-                return _translationDictionary;
-            }
-        }
-
-        private Dictionary<FieldMappingFieldId, Dictionary<int, string>> NonLocalizedTranslationDictionary
-        {
-            get
-            {
-                if (_nonLocalizedTranslationDictionary == null)
-                {
-                    lock (InitLock)
-                    {
-                        if (_nonLocalizedTranslationDictionary == null)
-                        {
-                            _nonLocalizedTranslationDictionary = CreateNonLocalizedTranslationDictionaryAsync().Result;
-                        }
-                    }
-                }
-
-                return _nonLocalizedTranslationDictionary;
-            }
+            _translationDictionary = await CreateLocalizedTranslationDictionaryAsync();
+            _nonLocalizedTranslationDictionary = await CreateNonLocalizedTranslationDictionaryAsync();
         }
 
         /// <inheritdoc />
@@ -87,7 +57,7 @@ namespace SOS.Observations.Api.Managers
         public bool TryGetTranslatedValue(FieldMappingFieldId fieldId, string cultureCode, int sosId,
             out string translatedValue)
         {
-            if (TranslationDictionary[fieldId].TryGetValue(sosId, out var translationByCultureCode))
+            if (_translationDictionary[fieldId].TryGetValue(sosId, out var translationByCultureCode))
             {
                 translatedValue = translationByCultureCode[cultureCode];
                 return true;
@@ -100,7 +70,7 @@ namespace SOS.Observations.Api.Managers
         /// <inheritdoc />
         public bool TryGetValue(FieldMappingFieldId fieldId, int sosId, out string translatedValue)
         {
-            return NonLocalizedTranslationDictionary[fieldId].TryGetValue(sosId, out translatedValue);
+            return _nonLocalizedTranslationDictionary[fieldId].TryGetValue(sosId, out translatedValue);
         }
 
         private async Task<Dictionary<FieldMappingFieldId, Dictionary<int, Dictionary<string, string>>>>

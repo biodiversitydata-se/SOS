@@ -134,7 +134,7 @@ namespace SOS.Process.Processors.Artportalen
 
                 // Event
                 obs.Event = new ProcessedEvent();
-                obs.Event.Biotope = GetSosId(verbatimObservation?.Biotope?.Id, _fieldMappings[FieldMappingFieldId.Biotope]);
+                obs.Event.Biotope = GetSosIdFromMetadata(verbatimObservation?.Biotope, _fieldMappings[FieldMappingFieldId.Biotope]);
                 obs.Event.BiotopeDescription = verbatimObservation.BiotopeDescription;
                 obs.Event.EndDate = endDate?.ToUniversalTime();
                 obs.Event.QuantityOfSubstrate = verbatimObservation.QuantityOfSubstrate;
@@ -151,7 +151,7 @@ namespace SOS.Process.Processors.Artportalen
                     obs.Event.SubstrateSpeciesScientificName = substratTaxon.ScientificName;
                 }
 
-                obs.Event.Substrate = GetSosId(verbatimObservation?.Substrate?.Id, _fieldMappings[FieldMappingFieldId.Substrate]);
+                obs.Event.Substrate = GetSosIdFromMetadata(verbatimObservation?.Substrate, _fieldMappings[FieldMappingFieldId.Substrate]);
 
                 // Identification
                 obs.Identification = new ProcessedIdentification();
@@ -166,7 +166,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.CoordinateUncertaintyInMeters = verbatimObservation.Site?.Accuracy;
                 obs.Location.Country = new ProcessedFieldMapValue {Id = (int) CountryId.Sweden};
                 obs.Location.CountryCode = CountryCode.Sweden;
-                obs.Location.County = GetSosId(verbatimObservation.Site?.County?.Id, _fieldMappings[FieldMappingFieldId.County]);
+                obs.Location.County = GetSosId(verbatimObservation.Site?.County?.Id, _fieldMappings[FieldMappingFieldId.County], null, verbatimObservation.Site?.County?.Name);
                 obs.Location.DecimalLatitude = point?.Coordinates?.Latitude ?? 0;
                 obs.Location.DecimalLongitude = point?.Coordinates?.Longitude ?? 0;
                 obs.Location.GeodeticDatum = GeodeticDatum.Wgs84;
@@ -176,14 +176,14 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
                 obs.Location.MinimumDepthInMeters = verbatimObservation.MinDepth;
                 obs.Location.MinimumElevationInMeters = verbatimObservation.MinHeight;
-                obs.Location.Municipality = GetSosId(verbatimObservation.Site?.Municipality?.Id, _fieldMappings[FieldMappingFieldId.Municipality]);
+                obs.Location.Municipality = GetSosId(verbatimObservation.Site?.Municipality?.Id, _fieldMappings[FieldMappingFieldId.Municipality], null, verbatimObservation.Site?.Municipality?.Name);
                 obs.Location.ParentLocationId = verbatimObservation.Site?.ParentSiteId;
                 obs.Location.ParentLocality = verbatimObservation.Site?.ParentSiteName?.Trim();
-                obs.Location.Parish = GetSosId(verbatimObservation.Site?.Parish?.Id, _fieldMappings[FieldMappingFieldId.Parish]);
+                obs.Location.Parish = GetSosId(verbatimObservation.Site?.Parish?.Id, _fieldMappings[FieldMappingFieldId.Parish], null, verbatimObservation.Site?.Parish?.Name);
                 obs.Location.Point = point;
                 obs.Location.PointLocation = verbatimObservation.Site?.Point?.ToGeoLocation();
                 obs.Location.PointWithBuffer = (PolygonGeoShape) verbatimObservation.Site?.PointWithBuffer.ToGeoShape();
-                obs.Location.Province = GetSosId(verbatimObservation.Site?.Province?.Id, _fieldMappings[FieldMappingFieldId.Province]);
+                obs.Location.Province = GetSosId(verbatimObservation.Site?.Province?.Id, _fieldMappings[FieldMappingFieldId.Province], null, verbatimObservation.Site?.Province?.Name);
                 obs.Location.VerbatimLatitude = hasPosition ? verbatimObservation.Site.YCoord.ToString() : null;
                 obs.Location.VerbatimLongitude = hasPosition ? verbatimObservation.Site.XCoord.ToString() : null;
                 obs.Location.VerbatimCoordinateSystem = "EPSG:3857";
@@ -247,21 +247,21 @@ namespace SOS.Process.Processors.Artportalen
                     : obs.Event.BiotopeDescription).WithMaxLength(255);
 
                 // Get field mapping values
-                obs.Occurrence.Gender = GetSosId(verbatimObservation.Gender?.Id, _fieldMappings[FieldMappingFieldId.Gender]);
-                obs.Occurrence.Activity = GetSosId(verbatimObservation.Activity?.Id, _fieldMappings[FieldMappingFieldId.Activity]);
+                obs.Occurrence.Gender = GetSosIdFromMetadata(verbatimObservation?.Gender, _fieldMappings[FieldMappingFieldId.Gender]);
+                obs.Occurrence.Activity = GetSosIdFromMetadata(verbatimObservation?.Activity, _fieldMappings[FieldMappingFieldId.Activity]);
                 
-                obs.Identification.ValidationStatus = GetSosId(verbatimObservation?.ValidationStatus?.Id, _fieldMappings[FieldMappingFieldId.ValidationStatus]);
-                obs.Occurrence.LifeStage = GetSosId(verbatimObservation?.Stage?.Id, _fieldMappings[FieldMappingFieldId.LifeStage]);
-                obs.InstitutionCode = GetSosId(verbatimObservation?.OwnerOrganization?.Id, _fieldMappings[FieldMappingFieldId.Institution]);
+                obs.Identification.ValidationStatus = GetSosIdFromMetadata(verbatimObservation?.ValidationStatus, _fieldMappings[FieldMappingFieldId.ValidationStatus]);
+                obs.Occurrence.LifeStage = GetSosIdFromMetadata(verbatimObservation?.Stage, _fieldMappings[FieldMappingFieldId.LifeStage]);
+                obs.InstitutionCode = GetSosIdFromMetadata(verbatimObservation?.OwnerOrganization, _fieldMappings[FieldMappingFieldId.Institution]);
                 obs.InstitutionId = verbatimObservation?.OwnerOrganization == null
                     ? null
                     : $"urn:lsid:artdata.slu.se:organization:{verbatimObservation.OwnerOrganization.Id}";
-                obs.Occurrence.OrganismQuantityUnit = GetSosId(
-                    verbatimObservation?.Unit?.Id, 
+                obs.Occurrence.OrganismQuantityUnit = GetSosIdFromMetadata(
+                    verbatimObservation?.Unit, 
                     _fieldMappings[FieldMappingFieldId.Unit],
                     (int) UnitId.Individuals); // todo - if verbatimObservation.Unit is null, should the value be set to "Individuals"? This is how it works in SSOS.
-                obs.Occurrence.DiscoveryMethod = GetSosId(verbatimObservation?.DiscoveryMethod?.Id, _fieldMappings[FieldMappingFieldId.DiscoveryMethod]);
-                obs.Identification.DeterminationMethod = GetSosId(verbatimObservation?.DeterminationMethod?.Id, _fieldMappings[FieldMappingFieldId.DeterminationMethod]);
+                obs.Occurrence.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, _fieldMappings[FieldMappingFieldId.DiscoveryMethod]);
+                obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation?.DeterminationMethod, _fieldMappings[FieldMappingFieldId.DeterminationMethod]);
 
                 return obs;
             }
@@ -276,10 +276,14 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="val"></param>
         /// <param name="sosIdByProviderValue"></param>
-        /// <param name="defaultValue"></param>
+        /// <param name="defaultId"></param>
+        /// <param name="valueIfValNotFound"></param>
         /// <returns></returns>
-        private static ProcessedFieldMapValue GetSosId(int? val, IDictionary<object, int> sosIdByProviderValue,
-            int? defaultValue = null)
+        private static ProcessedFieldMapValue GetSosId(
+            int? val, 
+            IDictionary<object, int> sosIdByProviderValue,
+            int? defaultId = null,
+            string valueIfValNotFound = null)
         {
             if (!val.HasValue || sosIdByProviderValue == null) return null;
 
@@ -288,14 +292,57 @@ namespace SOS.Process.Processors.Artportalen
                 return new ProcessedFieldMapValue {Id = sosId};
             }
 
-            if (defaultValue.HasValue)
+            if (defaultId.HasValue)
             {
-                return new ProcessedFieldMapValue {Id = defaultValue.Value};
+                return new ProcessedFieldMapValue {Id = defaultId.Value};
+            }
+
+            if (!string.IsNullOrEmpty(valueIfValNotFound))
+            {
+                return new ProcessedFieldMapValue
+                    { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = valueIfValNotFound };
             }
 
             return new ProcessedFieldMapValue
                 {Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString()};
         }
+
+        /// <summary>
+        ///     Get SOS internal Id for the id specific for the data provider.
+        /// </summary>
+        /// <param name="metadata"></param>
+        /// <param name="sosIdByProviderValue"></param>
+        /// <param name="defaultId"></param>
+        /// <returns></returns>
+        private static ProcessedFieldMapValue GetSosIdFromMetadata(
+            Metadata metadata,
+            IDictionary<object, int> sosIdByProviderValue,
+            int? defaultId = null)
+        {
+            int? val = metadata?.Id;
+            if (!val.HasValue || sosIdByProviderValue == null) return null;
+
+            if (sosIdByProviderValue.TryGetValue(val.Value, out var sosId))
+            {
+                return new ProcessedFieldMapValue { Id = sosId };
+            }
+
+            var metadataValue = metadata?.Translate(Cultures.en_GB, Cultures.sv_SE);
+            if (metadataValue != null)
+            {
+                return new ProcessedFieldMapValue
+                    { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = metadataValue };
+            }
+
+            if (defaultId.HasValue)
+            {
+                return new ProcessedFieldMapValue { Id = defaultId.Value };
+            }
+
+            return new ProcessedFieldMapValue
+                { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
+        }
+
 
         private ProcessedProject CreateProcessedProject(Project project)
         {
