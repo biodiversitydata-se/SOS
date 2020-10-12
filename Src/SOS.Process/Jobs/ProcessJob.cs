@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
@@ -422,6 +423,7 @@ namespace SOS.Process.Jobs
 
 
         /// <inheritdoc />
+        [DisplayName("Process verbatim observations for passed providers")]
         public async Task<bool> RunAsync(
         List<string> dataProviderIdOrIdentifiers,
         JobRunModes mode,
@@ -458,6 +460,7 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Process verbatim observations for all active providers")]
         public async Task<bool> RunAsync(
             bool cleanStart,
             bool copyFromActiveOnFail,

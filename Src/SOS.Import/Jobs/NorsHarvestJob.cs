@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -39,6 +40,7 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Harvest observations from NORS")]
         public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
             _logger.LogInformation("Start NORS Harvest Job");

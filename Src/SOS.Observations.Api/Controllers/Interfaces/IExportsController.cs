@@ -26,8 +26,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         ///     Request of a Darwin Core Archive file with observations based on provided filter
         /// </summary>
         /// <param name="filter"></param>
-        /// <param name="email"></param>
         /// <returns></returns>
-        Task<IActionResult> RunExportAndSendJob(ExportFilter filter, string email);
+        Task<IActionResult> RunExportAndSendJob(ExportFilter filter);
     }
 }

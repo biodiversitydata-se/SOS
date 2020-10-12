@@ -14,7 +14,6 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Repositories.Source.Interfaces;

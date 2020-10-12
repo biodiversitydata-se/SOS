@@ -29,7 +29,8 @@ namespace SOS.Lib.Services
                 {
                     IgnoreNullValues = true,
                     PropertyNamingPolicy = null,
-                    WriteIndented = true
+                    WriteIndented = true,
+                    PropertyNameCaseInsensitive = true
                 };
                 options.Converters.Add(new JsonStringEnumConverter(null));
 

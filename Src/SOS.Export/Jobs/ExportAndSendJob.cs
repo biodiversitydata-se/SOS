@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -29,6 +30,7 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Create a DwC-A file using passed filter and send an email when file is ready to download")]
         public async Task<bool> RunAsync(ExportFilter filter, string email, IJobCancellationToken cancellationToken)
         {
             try

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Jobs.Process;
@@ -28,6 +29,7 @@ namespace SOS.Process.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Activate passed ElasticSearch instance")]
         public async Task<bool> RunAsync(byte instance)
         {
             // Activate passed instance

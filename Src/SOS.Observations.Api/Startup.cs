@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +10,7 @@ using Hangfire.Dashboard;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 using Nest;
 using NLog.Web;
@@ -35,6 +38,7 @@ using SOS.Observations.Api.Services;
 using SOS.Observations.Api.Services.Interfaces;
 using SOS.Observations.Api.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace SOS.Observations.Api
 {
@@ -86,12 +90,12 @@ namespace SOS.Observations.Api
             var identityServerConfiguration = Configuration.GetSection("IdentityServer").Get<IdentityServerConfiguration>();
 
             // Authentication
-            services.AddAuthentication("Bearer")
-                .AddJwtBearer("Bearer", options =>
-                {
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options => {
+                    options.Audience = identityServerConfiguration.Audience;
                     options.Authority = identityServerConfiguration.Authority;
                     options.RequireHttpsMetadata = identityServerConfiguration.RequireHttpsMetadata;
-                    options.Audience = identityServerConfiguration.Audience;
+                    options.TokenValidationParameters.RoleClaimType = "rname";
                 });
 
             // Add Mvc Core services
@@ -128,10 +132,10 @@ namespace SOS.Observations.Api
                 });
             services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
             services.AddSwaggerGen(
-                options =>
+                swagger =>
                 {
                     // add a custom operation filter which sets default values
-                    options.OperationFilter<SwaggerDefaultValues>();
+                    swagger.OperationFilter<SwaggerDefaultValues>();
 
                     var currentAssembly = Assembly.GetExecutingAssembly();
                     var xmlDocs = currentAssembly.GetReferencedAssemblies()
@@ -141,10 +145,35 @@ namespace SOS.Observations.Api
 
                     Array.ForEach(xmlDocs, (d) =>
                     {
-                        options.IncludeXmlComments(d);
+                        swagger.IncludeXmlComments(d);
                     });
 
-                    options.SchemaFilter<SwaggerIgnoreFilter>();
+                    swagger.SchemaFilter<SwaggerIgnoreFilter>();
+
+                    swagger.AddSecurityDefinition("Bearer", //Name the security scheme
+                        new OpenApiSecurityScheme
+                        {
+                            Name = "Authorization",
+                            Description = "JWT Authorization header using the Bearer scheme.",
+                            In = ParameterLocation.Header,
+                            Type = SecuritySchemeType.Http, //We set the scheme type to http since we're using bearer authentication
+                            Scheme = "bearer" //The name of the HTTP Authorization scheme to be used in the Authorization header. In this case "bearer".
+                        });
+
+                    swagger.AddSecurityRequirement(new OpenApiSecurityRequirement{
+                        {
+                            new OpenApiSecurityScheme{
+                                Scheme = "bearer",
+                                Name = "Bearer",
+                                In = ParameterLocation.Header,
+                                Reference = new OpenApiReference{
+                                    Id = "Bearer", //The name of the previously defined security scheme.
+                                    Type = ReferenceType.SecurityScheme
+                                }
+                            },
+                            new List<string>()
+                        }
+                    });
                 });
 
             var observationApiConfiguration = Configuration.GetSection("ObservationApiConfiguration")
@@ -247,6 +276,7 @@ namespace SOS.Observations.Api
                 foreach (var description in provider.ApiVersionDescriptions)
                 {
                     options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                    options.DocExpansion(DocExpansion.None);
                 }
             });
 

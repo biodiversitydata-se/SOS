@@ -77,7 +77,6 @@ namespace SOS.Import.Harvesters.Observations
             // If status still is initialized value success and maxid is greater than min id
             if (maxId > minId)
             {
-                var nrSightingsHarvested = 0;
                 var currentId = minId;
                 var harvestBatchTasks = new List<Task<int>>();
 
@@ -111,7 +110,7 @@ namespace SOS.Import.Harvesters.Observations
                 await Task.WhenAll(harvestBatchTasks);
 
                 // Sum each batch harvested
-                nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
+                var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
                 _logger.LogDebug($"Finish getting Artportalen sightings ({ nrSightingsHarvested })");
 

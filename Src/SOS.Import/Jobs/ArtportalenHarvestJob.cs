@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -42,12 +43,14 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Make a full harvest of observations from Artportalen")]
         public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
             return await RunAsync(JobRunModes.Full, cancellationToken);
         }
 
         /// <inheritdoc />
+        [DisplayName("Harvest observations from Artportalen")]
         public async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
             _logger.LogInformation("Start Artportalen Harvest Job");

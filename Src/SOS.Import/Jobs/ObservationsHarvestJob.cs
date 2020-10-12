@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
@@ -224,6 +225,7 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Harvest and process observations from active providers")]
         public async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
             var providers = (await _dataProviderManager.GetAllDataProviders()).Where(dp =>
@@ -238,6 +240,7 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Harvest and process observations from passed provides")]
         public async Task<bool> RunAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
             List<string> processDataProviderIdOrIdentifiers,
@@ -283,6 +286,7 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Harvest and process observations from passed provides")]
         public async Task<bool> RunHarvestObservationsAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
             IJobCancellationToken cancellationToken)

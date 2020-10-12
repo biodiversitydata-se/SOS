@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Process.Services.Interfaces;
 using SOS.Lib.Constants;
@@ -43,11 +42,11 @@ namespace SOS.Process.Services
         {
             try
             {
-                var redlistPeriod = await _httpClientService.GetDataAsync<dynamic>(
+                var redlistPeriod = await _httpClientService.GetDataAsync<RedlistPeriodModel>(
                     new Uri($"{_taxonAttributeServiceConfiguration.BaseAddress}/Periods/CurrentRedlistPeriod"),
                     GetHeaderData());
 
-                return redlistPeriod.id;
+                return redlistPeriod.Id;
             }
             catch (Exception e)
             {

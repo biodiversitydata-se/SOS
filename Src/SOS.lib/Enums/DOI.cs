@@ -15,9 +15,4 @@
         TableOfContents, 
         TechnicalInfo
     }
-
-    public enum RelatedIdentifierType
-    {
-        DOI
-    }
 }

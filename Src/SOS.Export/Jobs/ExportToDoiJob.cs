@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -43,6 +44,7 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Copy export file to DOI repository and give it a DOI")]
         public async Task<bool> RunAsync(string fileName, IJobCancellationToken cancellationToken)
         {
             try
@@ -72,7 +74,7 @@ namespace SOS.Export.Jobs
                             }
                         },
                         PublicationYear = DateTime.Now.Year, 
-                        Titles = new[] { new DOITitle{ Title = $"{fileName} {DateTime.Now.ToString("yyyy-MM-dd")}" }  },
+                        Titles = new[] { new DOITitle{ Title = $"{fileName} {DateTime.Now.ToLocalTime().ToShortDateString()}" }  },
                         Publisher = "Artdatabanken",
                         Subjects = new[]
                         {
