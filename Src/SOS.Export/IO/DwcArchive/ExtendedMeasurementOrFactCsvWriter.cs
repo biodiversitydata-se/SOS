@@ -8,16 +8,11 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Export.Extensions;
-using SOS.Export.IO.Csv.Converters;
 using SOS.Export.IO.DwcArchive.Interfaces;
-using SOS.Export.Mappings;
 using SOS.Export.Models;
 using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 
 namespace SOS.Export.IO.DwcArchive
