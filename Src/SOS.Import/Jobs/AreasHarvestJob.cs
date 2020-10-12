@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Harvesters.Interfaces;
@@ -34,6 +35,7 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Harvest areas from Artportalen")]
         public async Task<bool> RunAsync()
         {
             _logger.LogInformation("Start Geo Harvest Job");

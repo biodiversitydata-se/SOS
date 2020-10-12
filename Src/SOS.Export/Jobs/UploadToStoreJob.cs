@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 using Hangfire;
@@ -29,6 +30,7 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Upload file to blob storage")]
         public async Task<bool> RunAsync(string sourcePath, string blobStorageContainer,
             bool deleteSourceOnSuccess, IJobCancellationToken cancellationToken)
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.Extensions.Logging;
@@ -42,6 +43,7 @@ namespace SOS.Import.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Harvest all observations from Clam portal")]
         public async Task<bool> RunAsync(IJobCancellationToken cancellationToken)
         {
             _logger.LogInformation("Start Clam Portal Harvest Job");

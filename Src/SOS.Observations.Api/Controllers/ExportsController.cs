@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.ObservationApi;
@@ -80,17 +82,19 @@ namespace SOS.Observations.Api.Controllers
 
         /// <inheritdoc />
         [HttpPost("Create")]
+        [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> RunExportAndSendJob([FromBody] ExportFilter filter, [FromQuery] string email)
+        public async Task<IActionResult> RunExportAndSendJob([FromBody] ExportFilter filter)
         {
             try
             {
+                var email = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
                 if (string.IsNullOrEmpty(email))
                 {
-                    return BadRequest("You must provide a e-mail address");
+                    return BadRequest("Could not find a e-mail address");
                 }
                 
                 var emailRegex =

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Hangfire;
@@ -42,6 +43,7 @@ namespace SOS.Export.Jobs
         }
 
         /// <inheritdoc />
+        [DisplayName("Create a DwC-A file using passed filter and give it a DOI")]
         public async Task<bool> RunAsync(ExportFilter filter, IJobCancellationToken cancellationToken)
         {
             try
