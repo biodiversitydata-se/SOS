@@ -24,7 +24,7 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public GeographicalArea County { get; set; }
 
         /// <summary>
-        ///     Countyry part of site
+        ///     Country part of site
         /// </summary>
         public GeographicalArea CountryPart { get; set; }
 
