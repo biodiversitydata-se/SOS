@@ -65,7 +65,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<Lib.Repositories.Processed.ProcessedFieldMappingRepository>().As<Lib.Repositories.Processed.Interfaces.IProcessedFieldMappingRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<AreaRepository>().As<IAreaRepository>().SingleInstance();
+            builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
 
             // Services
             builder.RegisterType<BlobStorageService>().As<IBlobStorageService>().InstancePerLifetimeScope();
@@ -81,13 +81,13 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<UploadToStoreJob>().As<IUploadToStoreJob>().InstancePerLifetimeScope();
 
             // DwC Archive
-            builder.RegisterType<DwcArchiveFileWriterCoordinator>().As<IDwcArchiveFileWriterCoordinator>().SingleInstance();
-            builder.RegisterType<DwcArchiveFileWriter>().As<IDwcArchiveFileWriter>().SingleInstance();
-            builder.RegisterType<DwcArchiveOccurrenceCsvWriter>().As<IDwcArchiveOccurrenceCsvWriter>().SingleInstance();
+            builder.RegisterType<DwcArchiveFileWriterCoordinator>().As<IDwcArchiveFileWriterCoordinator>().InstancePerLifetimeScope();
+            builder.RegisterType<DwcArchiveFileWriter>().As<IDwcArchiveFileWriter>().InstancePerLifetimeScope();
+            builder.RegisterType<DwcArchiveOccurrenceCsvWriter>().As<IDwcArchiveOccurrenceCsvWriter>().InstancePerLifetimeScope();
             builder.RegisterType<ExtendedMeasurementOrFactCsvWriter>().As<IExtendedMeasurementOrFactCsvWriter>()
-                .SingleInstance();
+                .InstancePerLifetimeScope();
 
-            // Helpers
+            // Helpers, static data => single instance 
             builder.RegisterType<FieldMappingResolverHelper>().As<IFieldMappingResolverHelper>().SingleInstance();
         }
     }

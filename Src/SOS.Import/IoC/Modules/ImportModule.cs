@@ -110,7 +110,7 @@ namespace SOS.Import.IoC.Modules
             // Darwin Core
             builder.RegisterType<DwcArchiveReader>().As<IDwcArchiveReader>().InstancePerLifetimeScope();
 
-            // Containers
+            // Containers, single instance for best performance (re-init on full harvest)
             builder.RegisterType<ArtportalenMetadataContainer>().As<IArtportalenMetadataContainer>().SingleInstance();
 
             // Managers
