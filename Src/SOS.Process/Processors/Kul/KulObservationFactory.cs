@@ -106,7 +106,7 @@ namespace SOS.Process.Processors.Kul
                 OwnerInstitutionCode = verbatim.Owner,
                 ProtectionLevel = GetProtectionLevel(),
                 ReportedBy = verbatim.ReportedBy,
-                ReportedDate = verbatim.Start,
+                ReportedDate = verbatim.Start.ToUniversalTime(),
                 Taxon = taxon
             };
 

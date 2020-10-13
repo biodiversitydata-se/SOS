@@ -133,7 +133,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
                 obs.ReportedBy = verbatimObservation.ReportedBy;
                 obs.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
-                obs.ReportedDate = verbatimObservation.ReportedDate;
+                obs.ReportedDate = verbatimObservation.ReportedDate?.ToUniversalTime();
                 obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
 
 
@@ -498,11 +498,11 @@ namespace SOS.Process.Processors.Artportalen
                 IsPublic = project.IsPublic,
                 Category = project.Category,
                 Description = project.Description,
-                EndDate = project.EndDate,
+                EndDate = project.EndDate?.ToUniversalTime(),
                 Id = project.Id.ToString(),
                 Name = project.Name,
                 Owner = project.Owner,
-                StartDate = project.StartDate,
+                StartDate =  project.StartDate?.ToUniversalTime(),
                 SurveyMethod = project.SurveyMethod,
                 SurveyMethodUrl = project.SurveyMethodUrl,
                 ProjectParameters = project.ProjectParameters?.Select(CreateProcessedProjectParameter)

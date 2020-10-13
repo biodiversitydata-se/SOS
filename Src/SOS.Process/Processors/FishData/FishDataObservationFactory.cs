@@ -105,7 +105,7 @@ namespace SOS.Process.Processors.FishData
                 OwnerInstitutionCode = verbatim.Owner,
                 ProtectionLevel = GetProtectionLevel(),
                 ReportedBy = verbatim.ReportedBy,
-                ReportedDate = verbatim.Start,
+                ReportedDate = verbatim.Start.ToUniversalTime(),
                 Taxon = taxon
             };
 

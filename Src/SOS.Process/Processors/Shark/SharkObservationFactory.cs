@@ -63,12 +63,8 @@ namespace SOS.Process.Processors.Shark
                 DatasetName = verbatim.DatasetName,
                 Event = new ProcessedEvent
                 {
-                    EndDate = verbatim.SampleDate.HasValue
-                        ? verbatim.SampleDate.Value.ToUniversalTime()
-                        : (DateTime?) null,
-                    StartDate = verbatim.SampleDate.HasValue
-                        ? verbatim.SampleDate.Value.ToUniversalTime()
-                        : (DateTime?) null,
+                    EndDate = verbatim.SampleDate?.ToUniversalTime(),
+                    StartDate = verbatim.SampleDate?.ToUniversalTime(),
                     VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.SampleDate)
                 },
                 Identification = new ProcessedIdentification
