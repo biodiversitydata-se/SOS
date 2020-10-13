@@ -130,7 +130,7 @@ namespace SOS.Process.Services
                         synonymeNames.Add(CreateDarwinCoreSynonymeName(dwcSynonyme));
                     }
 
-                    taxon.SynonymeNames = synonymeNames;
+                    taxon.Synonyms = synonymeNames;
                 }
             }
 

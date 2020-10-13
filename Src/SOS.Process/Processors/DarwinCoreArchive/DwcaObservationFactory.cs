@@ -56,9 +56,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             foreach (var processedTaxon in _taxonByTaxonId.Values)
             {
                 _taxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
-                if (processedTaxon.SynonymeNames != null)
+                if (processedTaxon.Synonyms != null)
                 {
-                    foreach (var synonyme in processedTaxon.SynonymeNames)
+                    foreach (var synonyme in processedTaxon.Synonyms)
                     {
                         _taxonBySynonymeName.Add(synonyme.Name.ToLower(), processedTaxon);
                     }

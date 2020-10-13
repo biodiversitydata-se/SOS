@@ -22,7 +22,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Synonyme names.
         /// </summary>
         [Nested]
-        public IEnumerable<TaxonSynonymeName> SynonymeNames { get; set; }
+        public IEnumerable<TaxonSynonymeName> Synonyms { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: acceptedNameUsage.
