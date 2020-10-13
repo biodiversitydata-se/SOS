@@ -470,7 +470,8 @@ namespace SOS.Lib.Extensions
                     .Field("occurrence.sightingTypeSearchGroupId")
                     .Field("location.point")
                     .Field("location.pointLocation")
-                    .Field("location.pointWithBuffer"));
+                    .Field("location.pointWithBuffer")
+                    .Field("isInEconomicZoneOfSweden"));
             }
             else
             {
@@ -485,6 +486,7 @@ namespace SOS.Lib.Extensions
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer")
                     .Field("location.parentLocationId")
+                    .Field("isInEconomicZoneOfSweden")
                 );
             }
 

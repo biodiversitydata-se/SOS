@@ -143,12 +143,6 @@ namespace SOS.Lib.Models.DarwinCore
         public string InstitutionID { get; set; }
 
         /// <summary>
-        ///     Internal flag used in validation. must be true to be stored in processed data
-        /// </summary>
-        [JsonIgnore]
-        public bool IsInEconomicZoneOfSweden { get; set; }
-
-        /// <summary>
         ///     Darwin Core term name: dcterms:language.
         ///     A language of the resource.
         ///     Recommended best practice is to use a controlled
