@@ -273,7 +273,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     URL to occurrence
         /// </summary>
-        public string URL { get; set; }
+        public string Url { get; set; }
 
         /// <summary>
         ///     The reported length

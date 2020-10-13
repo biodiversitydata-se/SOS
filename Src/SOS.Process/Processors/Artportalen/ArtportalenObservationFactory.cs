@@ -215,7 +215,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
                     ? new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Absent}
                     : new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Present};
-                obs.Occurrence.URL = $"http://www.artportalen.se/sighting/{verbatimObservation.SightingId}";
+                obs.Occurrence.Url = $"http://www.artportalen.se/sighting/{verbatimObservation.SightingId}";
                 obs.Occurrence.Length = verbatimObservation.Length;
                 obs.Occurrence.Weight = verbatimObservation.Weight;
                 obs.Occurrence.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
