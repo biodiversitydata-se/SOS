@@ -1,4 +1,5 @@
 ﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -132,7 +133,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 _fieldMappings[FieldMappingFieldId.Institution]); // todo - Create DarwinCore field mapping.
             obs.Language = verbatimObservation.Language;
             obs.License = verbatimObservation.License;
-            obs.Modified = DwcParser.ParseDate(verbatimObservation.Modified);
+            obs.Modified = DwcParser.ParseDate(verbatimObservation.Modified)?.ToUniversalTime();
             obs.OwnerInstitutionCode = verbatimObservation.OwnerInstitutionCode;
             obs.References = verbatimObservation.References;
             obs.RightsHolder = verbatimObservation.RightsHolder;
@@ -315,8 +316,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 out var startDate,
                 out var endDate);
 
-            processedEvent.StartDate = startDate;
-            processedEvent.EndDate = endDate;
+            processedEvent.StartDate = startDate?.ToUniversalTime();
+            processedEvent.EndDate = endDate?.ToUniversalTime();
 
             processedEvent.Media = CreateProcessedMultimedia(
                 verbatimObservation.EventMultimedia,
@@ -337,7 +338,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private ProcessedIdentification CreateProcessedIdentification(DwcObservationVerbatim verbatimObservation)
         {
             var processedIdentification = new ProcessedIdentification();
-            processedIdentification.DateIdentified = verbatimObservation.DateIdentified?.ParseDateTime();
+            processedIdentification.DateIdentified = verbatimObservation.DateIdentified?.ParseDateTime()?.ToUniversalTime();
             processedIdentification.IdentificationId = verbatimObservation.IdentificationID;
             processedIdentification.IdentificationQualifier = verbatimObservation.IdentificationQualifier;
             processedIdentification.IdentificationReferences = verbatimObservation.IdentificationReferences;
@@ -666,11 +667,11 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 IsPublic = project.IsPublic,
                 Category = project.Category,
                 Description = project.Description,
-                EndDate = project.EndDate,
+                EndDate = project.EndDate?.ToUniversalTime(),
                 Id = project.Id.ToString(),
                 Name = project.Name,
                 Owner = project.Owner,
-                StartDate = project.StartDate,
+                StartDate = project.StartDate?.ToUniversalTime(),
                 SurveyMethod = project.SurveyMethod,
                 SurveyMethodUrl = project.SurveyMethodUrl,
                 ProjectParameters = project.ProjectParameters?.Select(CreateProcessedProjectParameter)

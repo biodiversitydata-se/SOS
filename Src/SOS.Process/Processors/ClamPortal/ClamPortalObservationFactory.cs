@@ -100,7 +100,7 @@ namespace SOS.Process.Processors.ClamPortal
                     VerbatimCoordinateSystem = "EPSG:4326",
                     WaterBody = verbatimObservation.WaterBody
                 },
-                Modified = verbatimObservation.Modified ?? DateTime.MinValue,
+                Modified = verbatimObservation.Modified?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime(),
                 Occurrence = new ProcessedOccurrence
                 {
                     CatalogNumber = verbatimObservation.CatalogNumber.ToString(),
@@ -128,7 +128,7 @@ namespace SOS.Process.Processors.ClamPortal
                         }
                     },
                 ReportedBy = verbatimObservation.ReportedBy,
-                ReportedDate = verbatimObservation.ReportedDate,
+                ReportedDate = verbatimObservation.ReportedDate.ToUniversalTime(),
                 RightsHolder = verbatimObservation.RightsHolder,
                 Taxon = taxon
             };

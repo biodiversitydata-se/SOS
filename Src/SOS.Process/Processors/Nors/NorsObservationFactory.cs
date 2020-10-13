@@ -89,7 +89,7 @@ namespace SOS.Process.Processors.Nors
                     VerbatimLatitude = verbatim.DecimalLatitude.ToString(CultureInfo.InvariantCulture),
                     VerbatimLongitude = verbatim.DecimalLongitude.ToString(CultureInfo.InvariantCulture)
                 },
-                Modified = verbatim.Modified.HasValue ? verbatim.Modified.Value.ToUniversalTime() : (DateTime?) null,
+                Modified = verbatim.Modified?.ToUniversalTime(),
                 Occurrence = new ProcessedOccurrence
                 {
                     CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
@@ -104,7 +104,7 @@ namespace SOS.Process.Processors.Nors
                 OwnerInstitutionCode = verbatim.Owner,
                 ProtectionLevel = GetProtectionLevel(),
                 ReportedBy = verbatim.ReportedBy,
-                ReportedDate = verbatim.Start,
+                ReportedDate = verbatim.Start.ToUniversalTime(),
                 Taxon = taxon
             };
 
