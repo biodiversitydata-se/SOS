@@ -11,6 +11,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Process.Helpers.Interfaces;
 
 namespace SOS.Import.Harvesters
 {
@@ -21,9 +22,9 @@ namespace SOS.Import.Harvesters
     {
         private readonly IAreaRepository _areaRepository;
         private readonly IAreaProcessedRepository _areaProcessedRepository;
+        private readonly IAreaHelper _areaHelper;
         private readonly ILogger<AreaHarvester> _logger;
         private readonly AreaHarvestFactory _harvestFactory;
-
 
         /// <summary>
         ///     Constructor
@@ -34,11 +35,13 @@ namespace SOS.Import.Harvesters
         public AreaHarvester(
             IAreaRepository areaRepository,
             IAreaProcessedRepository areaProcessedRepository,
+            IAreaHelper areaHelper,
             ILogger<AreaHarvester> logger)
         {
             _areaRepository = areaRepository ?? throw new ArgumentNullException(nameof(areaRepository));
             _areaProcessedRepository =
                 areaProcessedRepository ?? throw new ArgumentNullException(nameof(areaProcessedRepository));
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _harvestFactory = new AreaHarvestFactory();
@@ -81,6 +84,11 @@ namespace SOS.Import.Harvesters
                             if (await _areaProcessedRepository.StoreGeometriesAsync(geometries))
                             {
                                 _logger.LogDebug("Finish storing geometries");
+
+                                _logger.LogDebug("Start clearing cache");
+                                _areaHelper.ClearCache();
+                                _logger.LogDebug("Finish clearing cache");
+
                                 _logger.LogDebug("Adding areas succeeded");
 
                                 // Update harvest info

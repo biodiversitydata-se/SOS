@@ -19,6 +19,11 @@ namespace SOS.Process.Helpers.Interfaces
         void AddAreaDataToProcessedObservation(ProcessedObservation processedObservation);
 
         /// <summary>
+        /// Clear area cache
+        /// </summary>
+        void ClearCache();
+
+        /// <summary>
         ///     Save cache so we can use it after restart
         /// </summary>
         void PersistCache();
