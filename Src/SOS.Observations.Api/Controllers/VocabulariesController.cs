@@ -38,6 +38,26 @@ namespace SOS.Observations.Api.Controllers
         /// Get all term vocabularies.
         /// </summary>
         /// <returns></returns>
+        [HttpGet("")]
+        [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetAllVocabulariesAsync()
+        {
+            try
+            {
+                return new OkObjectResult(await _fieldMappingManager.GetFieldMappingsAsync());
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting term vocabularies");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Get all term vocabularies.
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("Terms")]
         [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
