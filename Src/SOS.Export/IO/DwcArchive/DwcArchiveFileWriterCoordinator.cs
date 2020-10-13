@@ -94,25 +94,22 @@ namespace SOS.Export.IO.DwcArchive
             try
             {
                 if (!_dwcaFilesCreationConfiguration.IsEnabled) return null;
-
-                var createdDwcaFiles = new List<string>();
+                var dwcaCreationTasks = new List<Task<string>>();
                 foreach (var dwcaFileCreationInfo in _dwcaFilePartsInfoByDataProvider.Values)
                 {
-                    var dwcaFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
-                        _dwcaFilesCreationConfiguration.FolderPath, dwcaFileCreationInfo);
-                    createdDwcaFiles.Add(dwcaFilePath);
+                    dwcaCreationTasks.Add(_dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                        _dwcaFilesCreationConfiguration.FolderPath, dwcaFileCreationInfo));
                 }
 
-                var completeDwcaFile =
-                    await _dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
-                        _dwcaFilePartsInfoByDataProvider.Values);
-
+                dwcaCreationTasks.Add(_dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,
+                    _dwcaFilePartsInfoByDataProvider.Values));
+                var createdDwcaFiles = await Task.WhenAll(dwcaCreationTasks);
+                
                 DeleteTemporaryCreatedCsvFiles();
 
                 return createdDwcaFiles
                     .Where(fn => !string.IsNullOrEmpty(fn))
-                    .Select(fn => fn)
-                    .Union(new []{ completeDwcaFile});
+                    .Select(fn => fn);
             }
             catch (Exception e)
             {
@@ -120,8 +117,7 @@ namespace SOS.Export.IO.DwcArchive
                 return null;
             }
         }
-
-
+       
         private DwcaFilePartsInfo CreateDwcaFilePartsInfo(DataProvider dataProvider)
         {
             var dwcaFilePartsInfo = DwcaFilePartsInfo.Create(dataProvider, _dwcaFilesCreationConfiguration.FolderPath);
