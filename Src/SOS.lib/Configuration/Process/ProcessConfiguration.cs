@@ -16,6 +16,11 @@
         public int NoOfThreads { get; set; }
 
         /// <summary>
+        /// Run incremental harvest after full harvest 
+        /// </summary>
+        public bool RunIncrementalAfterFull { get; set; }
+
+        /// <summary>
         ///     Field mapping
         /// </summary>
         public FieldMappingConfiguration FieldMapping { get; set; }

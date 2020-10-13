@@ -50,6 +50,7 @@ namespace SOS.Process.Jobs
         private readonly Dictionary<DataProviderType, IProcessor> _processorByType;
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly string _exportContainer;
+        private readonly bool _runIncrementalAfterFull;
 
         private List<DataProvider> GetDataProvidersToProcess(List<string> dataProviderIdOrIdentifiers,
             List<DataProvider> allDataProviders)
@@ -264,13 +265,16 @@ namespace SOS.Process.Jobs
 
                     if (mode == JobRunModes.Full)
                     {
-                        // Enqueue incremental harvest/process job to Hangfire in order to get latest sightings
+                        if (_runIncrementalAfterFull)
+                        {
+                            // Enqueue incremental harvest/process job to Hangfire in order to get latest sightings
+
+                            var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunAsync(JobRunModes.IncrementalInactiveInstance,
+                                cancellationToken));
+
+                            _logger.LogInformation($"Incremental harvest/process job with Id={jobId} was enqueued");
+                        }
                         
-                        var jobId = BackgroundJob.Enqueue<IObservationsHarvestJob>(job => job.RunAsync(JobRunModes.IncrementalInactiveInstance,
-                            cancellationToken));
-
-                        _logger.LogInformation($"Incremental harvest/process job with Id={jobId} was enqueued");
-
                         //----------------------------------------------------------------------------
                         // 13. End create DwC CSV files and merge the files into multiple DwC-A files.
                         //----------------------------------------------------------------------------
@@ -287,7 +291,6 @@ namespace SOS.Process.Jobs
                                 _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
                             }
                         }
-                    
                     }
 
                     if (toggleInstanceOnSuccess)
@@ -419,6 +422,7 @@ namespace SOS.Process.Jobs
 
             _exportContainer = processConfiguration?.Export_Container ??
                                throw new ArgumentNullException(nameof(processConfiguration));
+            _runIncrementalAfterFull = processConfiguration.RunIncrementalAfterFull;
         }
 
 
