@@ -18,7 +18,7 @@ namespace SOS.Lib.Extensions
                 ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties?.ParentDyntaxaTaxonId,
                 SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties?.SecondaryParentDyntaxaTaxonIds,
                 VernacularNames = sourceTaxon.VernacularNames?.ToTaxonVernacularNames(),
-                SynonymeNames = sourceTaxon.SynonymeNames?.ToTaxonSynonymeNames(),
+                Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymeNames(),
                 AcceptedNameUsage = sourceTaxon.AcceptedNameUsage,
                 AcceptedNameUsageID = sourceTaxon.AcceptedNameUsageID,
                 ActionPlan = sourceTaxon.DynamicProperties?.ActionPlan,

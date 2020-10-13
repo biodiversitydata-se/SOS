@@ -315,7 +315,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// <summary>
         ///     Synonyme names (scientific names).
         /// </summary>
-        public IEnumerable<DarwinCoreSynonymeName> SynonymeNames { get; set; }
+        public IEnumerable<DarwinCoreSynonymeName> Synonyms { get; set; }
 
         /// <summary>
         ///     Systematic sort order
