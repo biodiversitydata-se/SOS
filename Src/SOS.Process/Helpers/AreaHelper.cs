@@ -28,7 +28,7 @@ namespace SOS.Process.Helpers
         private readonly AreaType[] _areaTypes =
             {AreaType.County, AreaType.Province, AreaType.Municipality, AreaType.Parish, AreaType.EconomicZoneOfSweden};
 
-        private readonly IDictionary<string, PositionLocation> _featureCache;
+        private IDictionary<string, PositionLocation> _featureCache;
         private readonly IProcessedAreaRepository _processedAreaRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly STRtree<IFeature> _strTree;
@@ -50,7 +50,7 @@ namespace SOS.Process.Helpers
             _strTree = new STRtree<IFeature>();
 
             // Try to get saved cache
-            _featureCache = InitializeCache();
+            InitializeCache();
 
             Task.Run(InitializeAsync).Wait();
         }
@@ -86,6 +86,15 @@ namespace SOS.Process.Helpers
             SetProvincePartIdByCoordinate(processedObservation);
         }
 
+        public void ClearCache()
+        {
+            if (File.Exists(CacheFileName))
+            {
+                File.Delete(CacheFileName);
+            }
+            InitializeCache();
+        }
+
         /// <inheritdoc />
         public void PersistCache()
         {
@@ -98,10 +107,10 @@ namespace SOS.Process.Helpers
         ///     Get save cache if it exists
         /// </summary>
         /// <returns></returns>
-        private static IDictionary<string, PositionLocation> InitializeCache()
+        private void InitializeCache()
         {
             // Try to get saved cache
-            return File.Exists(CacheFileName)
+            _featureCache = File.Exists(CacheFileName)
                 ? JsonConvert.DeserializeObject<IDictionary<string, PositionLocation>>(
                     File.ReadAllText(CacheFileName, Encoding.UTF8))
                 : new ConcurrentDictionary<string, PositionLocation>();
