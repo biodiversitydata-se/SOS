@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -92,7 +94,14 @@ namespace SOS.Export.Managers
 
         /// <inheritdoc />
         public async Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName,
-           IJobCancellationToken cancellationToken)
+            IJobCancellationToken cancellationToken)
+        {
+            return await ExportAndStoreAsync(filter, blobStorageContainer, fileName, null, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName, string emailAddress,
+            IJobCancellationToken cancellationToken)
         {
             var zipFilePath = "";
             try
@@ -106,8 +115,21 @@ namespace SOS.Export.Managers
                 // Make sure container exists
                 await _blobStorageService.CreateContainerAsync(blobStorageContainer);
 
-                // Upload file to blob storage
-                var success = await _blobStorageService.UploadBlobAsync(zipFilePath, blobStorageContainer);
+                var tasks = new List<Task<bool>>
+                {
+                    // Upload file to blob storage
+                    _blobStorageService.UploadBlobAsync(zipFilePath, blobStorageContainer),
+                };
+
+                if (!string.IsNullOrEmpty(emailAddress))
+                {
+                    // Send file to user
+                    tasks.Add(_zendToService.SendFile(emailAddress, JsonConvert.SerializeObject(filter), zipFilePath));
+                }
+
+                await Task.WhenAll(tasks);
+
+                var success = tasks.All(t => t.Result);
 
                 return success;
             }

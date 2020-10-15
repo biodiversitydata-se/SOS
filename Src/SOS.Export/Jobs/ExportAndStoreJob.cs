@@ -37,7 +37,7 @@ namespace SOS.Export.Jobs
             try
             {
                 _logger.LogInformation("Start export and store job");
-                var success = await _observationManager.ExportAndStoreAsync(filter, blobStorageContainer, fileName,
+                var success = await _observationManager.ExportAndStoreAsync(filter, blobStorageContainer, fileName, 
                     cancellationToken);
 
                 _logger.LogInformation($"End export and store job. Success: {success}");

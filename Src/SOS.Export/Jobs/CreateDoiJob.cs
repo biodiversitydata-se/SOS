@@ -57,7 +57,7 @@ namespace SOS.Export.Jobs
 
         /// <inheritdoc />
         [DisplayName("Create a DwC-A file using passed filter and give it a DOI")]
-        public async Task<bool> RunAsync(ExportFilter filter, IJobCancellationToken cancellationToken)
+        public async Task<bool> RunAsync(ExportFilter filter, string emailAddress, IJobCancellationToken cancellationToken)
         {
             try
             {
@@ -111,7 +111,7 @@ namespace SOS.Export.Jobs
                 {
                     _logger.LogDebug($"Start creating DOI file ({metaData.Id})");
                     success = await _observationManager.ExportAndStoreAsync(filter, _doiContainer, metaData.Id,
-                        cancellationToken);
+                        emailAddress, cancellationToken);
                     _logger.LogDebug($"Finish creating DOI file ({metaData.Id})");
 
                     if (success)
