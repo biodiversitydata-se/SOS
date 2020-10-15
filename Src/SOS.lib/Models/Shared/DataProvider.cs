@@ -101,7 +101,7 @@ namespace SOS.Lib.Models.Shared
         {
             get;
             set;
-        } // todo - decide if we should remove this property and just keep harvesting info in HarvestInfo MongoDB collection.
+        } 
 
         /// <summary>
         ///     Process info for instance 0. Currently used for testing purpose.
@@ -111,7 +111,7 @@ namespace SOS.Lib.Models.Shared
         {
             get;
             set;
-        } // todo - decide if we should remove this property and just keep processing info in ProcessInfo MongoDB collection.
+        } 
 
         /// <summary>
         ///     Process info for instance 1. Currently used for testing purpose.
@@ -121,7 +121,7 @@ namespace SOS.Lib.Models.Shared
         {
             get;
             set;
-        } // todo - decide if we should remove this property and just keep processing info in ProcessInfo MongoDB collection.
+        }
 
         /// <summary>
         ///     Id.

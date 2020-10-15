@@ -7,6 +7,11 @@ namespace SOS.Lib.Configuration.Export
     public class ExportConfiguration
     {
         /// <summary>
+        /// DOI meta data
+        /// </summary>
+        public DOIConfiguration DOIConfiguration { get; set; }
+     
+        /// <summary>
         ///     Destination file settings
         /// </summary>
         public FileDestination FileDestination { get; set; }

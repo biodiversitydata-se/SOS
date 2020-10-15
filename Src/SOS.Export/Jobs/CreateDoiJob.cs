@@ -1,16 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
+using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.DataCite;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Export.Jobs
@@ -22,7 +26,9 @@ namespace SOS.Export.Jobs
     {
         private readonly IObservationManager _observationManager;
         private readonly IDataCiteService _dataCiteService;
+        private readonly IDataProviderRepository _dataProviderRepository;
         private readonly string _doiContainer;
+        private readonly DOIConfiguration _doiConfiguration;
         private readonly ILogger<ExportToDoiJob> _logger;
 
         /// <summary>
@@ -30,15 +36,22 @@ namespace SOS.Export.Jobs
         /// </summary>
         /// <param name="observationManager"></param>
         /// <param name="dataCiteService"></param>
+        /// <param name="dataProviderRepository"></param>
         /// <param name="configuration"></param>
+        /// <param name="doiConfiguration"></param>
         /// <param name="logger"></param>
-        public CreateDoiJob(IObservationManager observationManager, IDataCiteService dataCiteService, 
-            BlobStorageConfiguration configuration, ILogger<ExportToDoiJob> logger)
+        public CreateDoiJob(IObservationManager observationManager, 
+            IDataCiteService dataCiteService,
+            IDataProviderRepository dataProviderRepository,
+            BlobStorageConfiguration configuration,
+            DOIConfiguration doiConfiguration,
+            ILogger<ExportToDoiJob> logger)
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _dataCiteService = dataCiteService ?? throw new ArgumentNullException(nameof(dataCiteService));
+            _dataProviderRepository = dataProviderRepository ?? throw  new ArgumentNullException(nameof(dataProviderRepository));
             _doiContainer = configuration?.Containers["doi"] ?? throw new ArgumentNullException(nameof(configuration));
-
+            _doiConfiguration = doiConfiguration ?? throw new ArgumentNullException(nameof(doiConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -50,46 +63,45 @@ namespace SOS.Export.Jobs
             {
                 _logger.LogInformation("Start creating DOI job");
 
-                _logger.LogDebug("Start creating DOI draft");
+                var descriptions = _doiConfiguration.Descriptions as List<DOIDescription> ?? new List<DOIDescription>();
+                descriptions.Add(new DOIDescription
+                {
+                    Description = JsonSerializer.Serialize(filter, new JsonSerializerOptions { IgnoreNullValues = true }),
+                    DescriptionType = DescriptionType.Other
+                });
+
+                var dataProviders = (await _dataProviderRepository.GetAllAsync())?.Where(dp => dp.IsActive);
+                if (filter.DataProviderIds?.Any() ?? false)
+                {
+                    dataProviders = dataProviders?.Where(dp => dp.IsActive && filter.DataProviderIds.Contains(dp.Id)).ToList();
+                }
 
                 var metaData = new DOIMetadata
                 {
                     Attributes = new DOIAttributes
                     {
+                        Contributors = dataProviders?.Select(dp => new DOIContributor
+                        {
+                            ContributorType = ContributorType.DataCollector,
+                            Name = dp.Name,
+                            NameType = NameType.Organizational
+                        }),
                         Creators = new[]
                         {
-                            new DOICreator
-                            {
-                                Name = "Artdatabanken",
-                                NameType = CreatorNameType.Organizational
-                            }
+                            _doiConfiguration.Creator
                         },
-                        Descriptions = new[] {
-                            new DOIDescription
-                            {
-                                Description = JsonSerializer.Serialize(filter, new JsonSerializerOptions{ IgnoreNullValues = true }),
-                                DescriptionType = DescriptionType.Other
-                            }
-                        },
-                        PublicationYear = DateTime.Now.Year, 
-                        Titles = new[] { new DOITitle{ Title = "User created DOI"}  },
-                        Publisher = "Artdatabanken",
-                        Subjects = new[]
-                        {
-                            new DOISubject
-                            {
-                                Subject = "Biological sciences"
-                            }
-                        },
-                        Types = new DOITypes()
-                        {
-                            ResourceTypeGeneral = "Dataset",
-                            ResourceType = "Observations"
-                        }
+                        Descriptions = descriptions,
+                        Formats = _doiConfiguration.Formats,
+                        PublicationYear = DateTime.Now.Year,
+                        Titles = new[] { new DOITitle { Title = $"Occurrence records download on {DateTime.Now.ToString("yyyy-MM-dd")}" } },
+                        Publisher = _doiConfiguration.Publisher,
+                        Subjects = _doiConfiguration.Subjects,
+                        Types = _doiConfiguration.Types
                     },
                     Type = "dois"
                 };
 
+                _logger.LogDebug("Start creating DOI draft");
                 metaData = await _dataCiteService.CreateDoiDraftAsync(metaData);
                 _logger.LogDebug("Finish creating DOI draft");
 
@@ -104,6 +116,16 @@ namespace SOS.Export.Jobs
 
                     if (success)
                     {
+                        metaData.Attributes.Url = $"{_doiConfiguration.Url}/{metaData.Id}";
+                        metaData.Attributes.Identifiers = new[]
+                        {
+                            new DOIIdentifier
+                            {
+                                Identifier = $"https://doi.org/{metaData.Id}",
+                                IdentifierType = "DOI"
+                            }
+                        };
+
                         _logger.LogDebug($"Start publishing DOI ({metaData.Id})");
                         success = await _dataCiteService.PublishDoiAsync(metaData);
                         _logger.LogDebug($"Finish publishing DOI ({metaData.Id})");

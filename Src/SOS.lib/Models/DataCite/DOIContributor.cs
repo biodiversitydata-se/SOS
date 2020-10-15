@@ -3,7 +3,7 @@ using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.DataCite
 {
-    public class DOICreator
+    public class DOIContributor
     {
         /// <summary>
         /// Name of creator
@@ -20,13 +20,7 @@ namespace SOS.Lib.Models.DataCite
         /// <summary>
         /// Given name of creator
         /// </summary>
-        [JsonPropertyName("givenName")]
-        public string GivenName { get; set; }
-
-        /// <summary>
-        /// Family name of creator
-        /// </summary>
-        [JsonPropertyName("familyName")]
-        public string FamilyName { get; set; }
+        [JsonPropertyName("contributorType")]
+        public ContributorType ContributorType { get; set; }
     }
 }

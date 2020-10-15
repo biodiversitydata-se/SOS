@@ -13,11 +13,6 @@
         public string DoiPrefix { get; set; }
 
         /// <summary>
-        /// Url to DOI information and file
-        /// </summary>
-        public string DoiUrl { get; set; }
-
-        /// <summary>
         /// Basic authentication password
         /// </summary>
         public string Password { get; set; }

@@ -8,11 +8,10 @@ using NetTopologySuite.Geometries;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters;
 using SOS.Import.Repositories.Destination.Area.Interfaces;
-using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Process.Repositories.Source.Interfaces;
+using SOS.Process.Helpers.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Harvesters
@@ -29,16 +28,19 @@ namespace SOS.Import.UnitTests.Harvesters
         {
             _areaRepositoryMock = new Mock<IAreaRepository>();
             _areaProcessedRepository = new Mock<IAreaProcessedRepository>();
+            _areaHelperMock = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<AreaHarvester>>();
         }
 
         private readonly Mock<IAreaRepository> _areaRepositoryMock;
         private readonly Mock<IAreaProcessedRepository> _areaProcessedRepository;
+        private readonly Mock<IAreaHelper> _areaHelperMock;
         private readonly Mock<ILogger<AreaHarvester>> _loggerMock;
 
         private AreaHarvester TestObject => new AreaHarvester(
             _areaRepositoryMock.Object,
             _areaProcessedRepository.Object,
+            _areaHelperMock.Object,
             _loggerMock.Object);
 
         /// <summary>
@@ -52,18 +54,28 @@ namespace SOS.Import.UnitTests.Harvesters
             Action create = () => new AreaHarvester(
                 null,
                 _areaProcessedRepository.Object,
+                _areaHelperMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaRepository");
 
             create = () => new AreaHarvester(
                 _areaRepositoryMock.Object,
                 null,
+                _areaHelperMock.Object,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaProcessedRepository");
 
             create = () => new AreaHarvester(
                 _areaRepositoryMock.Object,
                 _areaProcessedRepository.Object,
+                null,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("areaHelper");
+
+            create = () => new AreaHarvester(
+                _areaRepositoryMock.Object,
+                _areaProcessedRepository.Object,
+                _areaHelperMock.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");
         }

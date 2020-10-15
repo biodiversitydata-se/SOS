@@ -8,6 +8,9 @@ using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
+using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Process.Helpers;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Harvesters
@@ -36,6 +39,7 @@ namespace SOS.Import.IntegrationTests.Harvesters
             var areaHarvester = new AreaHarvester(
                 new AreaRepository(artportalenDataService, new Mock<ILogger<AreaRepository>>().Object),
                 areaVerbatimRepository,
+                new AreaHelper(new Mock<IProcessedAreaRepository>().Object, new Mock<IProcessedFieldMappingRepository>().Object), 
                 new Mock<ILogger<AreaHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -70,6 +74,7 @@ namespace SOS.Import.IntegrationTests.Harvesters
             var areaHarvester = new AreaHarvester(
                 new AreaRepository(artportalenDataService, new Mock<ILogger<AreaRepository>>().Object),
                 areaVerbatimRepository,
+                new AreaHelper(new Mock<IProcessedAreaRepository>().Object, new Mock<IProcessedFieldMappingRepository>().Object),
                 new Mock<ILogger<AreaHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

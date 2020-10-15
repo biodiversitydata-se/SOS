@@ -90,30 +90,26 @@ namespace SOS.Lib.Services
         /// <inheritdoc />
         public async Task<bool> PublishDoiAsync(DOIMetadata data)
         {
-            if (data?.Attributes == null)
+            try
             {
-                return false;
+                data.Attributes.Event = "publish";
+
+                var doiRequest = new DOI<DOIMetadata>
+                {
+                    Data = data
+                };
+
+               await _httpClientService.PutDataAsync<DOI<DOIMetadata>>(
+                    new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois/{data.Id}"), doiRequest, GetBasciAuthenticationHeader(), "application/vnd.api+json");
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("Failed to publish DOI", e);
             }
 
-            data.Attributes.Event = "publish";
-            data.Attributes.Url = $"{_dataCiteServiceConfiguration.DoiUrl}/{data.Id}";
-            data.Attributes.Identifiers = new[]
-            {
-                new DOIIdentifier
-                {
-                    Identifier = $"https://doi.org/{data.Id}",
-                    IdentifierType = "DOI"
-                }
-            };
-            var doiRequest = new DOI<DOIMetadata>
-            {
-                Data = data
-            };
-
-            var response = await _httpClientService.PutDataAsync<dynamic>(
-                new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois/{data.Id}"), doiRequest, GetBasciAuthenticationHeader(), "application/vnd.api+json");
-
-            return response != null;
+            return false;
         }
 
         /// <inheritdoc />

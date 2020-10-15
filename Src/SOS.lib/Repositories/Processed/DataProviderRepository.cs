@@ -38,25 +38,12 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                if (collectionName == "ProcessedObservation-0")
-                {
-                    var filter = Builders<DataProvider>.Filter.Eq(dataProvider => dataProvider.Id, dataProviderId);
-                    var update = Builders<DataProvider>.Update.Set(dataProvider => dataProvider.ProcessInfoInstance0,
-                        providerInfo);
-                    var updateResult = await MongoCollection.UpdateOneAsync(filter, update);
-                    return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
-                }
-
-                if (collectionName == "ProcessedObservation-1")
-                {
-                    var filter = Builders<DataProvider>.Filter.Eq(dataProvider => dataProvider.Id, dataProviderId);
-                    var update = Builders<DataProvider>.Update.Set(dataProvider => dataProvider.ProcessInfoInstance1,
-                        providerInfo);
-                    var updateResult = await MongoCollection.UpdateOneAsync(filter, update);
-                    return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
-                }
-
-                return false;
+                var filter = Builders<DataProvider>.Filter.Eq(dataProvider => dataProvider.Id, dataProviderId);
+                var update = Builders<DataProvider>.Update.Set(dataProvider => 
+                        collectionName == "ProcessedObservation-0" ? dataProvider.ProcessInfoInstance0 : dataProvider.ProcessInfoInstance1,
+                    providerInfo);
+                var updateResult = await MongoCollection.UpdateOneAsync(filter, update);
+                return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
             }
             catch (Exception e)
             {

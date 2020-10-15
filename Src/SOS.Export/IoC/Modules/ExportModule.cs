@@ -44,6 +44,8 @@ namespace SOS.Export.IoC.Modules
                 .SingleInstance();
             builder.RegisterInstance(Configurations.DataCiteServiceConfiguration).As<DataCiteServiceConfiguration>()
                 .SingleInstance();
+            builder.RegisterInstance(Configurations.ExportConfiguration.DOIConfiguration).As<DOIConfiguration>()
+                .SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.DwcaFilesCreationConfiguration).As<DwcaFilesCreationConfiguration>().SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.FileDestination).As<FileDestination>().SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.ZendToConfiguration).As<ZendToConfiguration>().SingleInstance();

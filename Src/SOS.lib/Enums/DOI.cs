@@ -1,9 +1,9 @@
 ﻿namespace SOS.Lib.Enums
 {
-    public enum CreatorNameType
+    public enum NameType
     {
-        Personal,
-        Organizational
+        Personal = 1,
+        Organizational = 2
     }
 
     public enum DescriptionType
@@ -14,5 +14,30 @@
         SeriesInformation, 
         TableOfContents, 
         TechnicalInfo
+    }
+
+    public enum ContributorType
+    {
+        ContactPerson,
+        DataCollector,
+        DataCurator,
+        DataManager,
+        Distributor,
+        Editor,
+        HostingInstitution,
+        Producer,
+        ProjectLeader,
+        ProjectManager,
+        ProjectMember,
+        RegistrationAgency,
+        RegistrationAuthority,
+        RelatedPerson,
+        Researcher,
+        ResearchGroup,
+        RightsHolder,
+        Sponsor,
+        Supervisor,
+        WorkPackageLeader,
+        Other
     }
 }

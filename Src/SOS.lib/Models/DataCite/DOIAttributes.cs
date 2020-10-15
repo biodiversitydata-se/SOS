@@ -13,6 +13,12 @@ namespace SOS.Lib.Models.DataCite
         public DateTime Created { get; set; }
 
         /// <summary>
+        /// LIst of DOI contributors
+        /// </summary>
+        [JsonPropertyName("contributors")]
+        public IEnumerable<DOIContributor> Contributors { get; set; }
+
+        /// <summary>
         /// LIst of DOI creators
         /// </summary>
         [JsonPropertyName("creators")]
