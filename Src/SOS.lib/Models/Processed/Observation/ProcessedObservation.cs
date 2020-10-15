@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Nest;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Swagger;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -15,6 +16,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     List of defects found in harvest
         /// </summary>
         [Object]
+        [SwaggerExclude]
         public IDictionary<string, string> Defects { get; set; }
 
         /// <summary>
@@ -198,6 +200,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Internal flag used in validation. must be true to be stored in processed data
         /// </summary>
         [JsonIgnore]
+        [SwaggerExclude]
         public bool IsInEconomicZoneOfSweden { get; set; }
 
         /// <summary>
@@ -252,10 +255,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [Keyword]
         public string ReportedBy { get; set; }
-        
+
         /// <summary>
         ///     Alias for the reporter, internal use only
         /// </summary>
+        [SwaggerExclude]
         public string ReportedByUserAlias { get; set; }
 
         /// <summary>

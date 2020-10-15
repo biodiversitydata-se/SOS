@@ -1,4 +1,5 @@
 ﻿using Nest;
+using SOS.Lib.Swagger;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -383,18 +384,21 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Point (WGS84)
         /// </summary>
         [GeoShape]
+        [SwaggerExclude]
         public PointGeoShape Point { get; set; }
 
         /// <summary>
         ///     Point used in distance from point search
         /// </summary>
         [GeoPoint]
+        [SwaggerExclude]
         public GeoLocation PointLocation { get; set; }
 
         /// <summary>
         ///     Point with accuracy buffer (WGS84)
         /// </summary>
         [GeoShape]
+        [SwaggerExclude]
         public PolygonGeoShape PointWithBuffer { get; set; }
 
         /// <summary>
@@ -512,6 +516,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Internal field: The parent location id of the current location, this is used by Artportalen for bird locations that
         ///     have one main location and several sublocation
         /// </summary>
+        [SwaggerExclude]
         public int? ParentLocationId { get; set; }
 
         /// <summary>

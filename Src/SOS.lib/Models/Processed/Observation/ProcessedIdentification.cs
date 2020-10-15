@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Nest;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Swagger;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -75,6 +76,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         ///     List of userids and aliases matching the IdentifiedBy string, internal use only
         /// </summary>
+        [SwaggerExclude]
         public IEnumerable<UserInternal> IdentifiedByInternal { get; set; }
 
         /// <summary>

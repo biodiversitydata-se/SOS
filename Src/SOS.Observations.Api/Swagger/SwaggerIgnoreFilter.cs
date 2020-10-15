@@ -4,11 +4,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
+using SOS.Lib.Swagger;
 using SOS.Observations.Api.Dtos;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace SOS.Observations.Api.Swagger
 {
+    
+
     /// <summary>
     ///     Swagger ignore filter
     /// </summary>
@@ -22,7 +25,7 @@ namespace SOS.Observations.Api.Swagger
         public void Apply(OpenApiSchema schema, SchemaFilterContext context)
         {
             var excludeProperties = context.Type?.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => p.GetCustomAttributes(typeof(JsonIgnoreAttribute), true)?.Any() == true);
+                .Where(p => (p.GetCustomAttributes(typeof(JsonIgnoreAttribute), true)?.Any() == true) || p.GetCustomAttribute<SwaggerExcludeAttribute>() != null);
             if (excludeProperties != null)
             {
                 foreach (var property in excludeProperties)
