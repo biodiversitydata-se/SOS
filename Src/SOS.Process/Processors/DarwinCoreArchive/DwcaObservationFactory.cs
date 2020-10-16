@@ -34,15 +34,15 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         private readonly IAreaHelper _areaHelper;
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
-        private readonly HashMapDictionary<string, ProcessedTaxon> _taxonByScientificName;
-        private readonly HashMapDictionary<string, ProcessedTaxon> _taxonBySynonymeName;
-        private readonly IDictionary<int, ProcessedTaxon> _taxonByTaxonId;
+        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificName;
+        private readonly HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymeName;
+        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxonByTaxonId;
 
         private readonly List<string> errors = new List<string>();
 
         public DwcaObservationFactory(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings,
             IAreaHelper areaHelper)
         {
@@ -51,8 +51,8 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             _fieldMappings = fieldMappings ?? throw new ArgumentNullException(nameof(fieldMappings));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
 
-            _taxonByScientificName = new HashMapDictionary<string, ProcessedTaxon>();
-            _taxonBySynonymeName = new HashMapDictionary<string, ProcessedTaxon>();
+            _taxonByScientificName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
+            _taxonBySynonymeName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             foreach (var processedTaxon in _taxonByTaxonId.Values)
             {
                 _taxonByScientificName.Add(processedTaxon.ScientificName.ToLower(), processedTaxon);
@@ -68,7 +68,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
         public static async Task<DwcaObservationFactory> CreateAsync(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IProcessedFieldMappingRepository processedFieldMappingRepository,
             IAreaHelper areaHelper)
         {
@@ -80,7 +80,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return new DwcaObservationFactory(dataProvider, taxa, fieldMappings, areaHelper);
         }
 
-        public IEnumerable<ProcessedObservation> CreateProcessedObservations(
+        public IEnumerable<Observation> CreateProcessedObservations(
             IEnumerable<DwcObservationVerbatim> verbatimObservations)
         {
             return verbatimObservations.Select(CreateProcessedObservation);
@@ -91,14 +91,14 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public ProcessedObservation CreateProcessedObservation(DwcObservationVerbatim verbatimObservation)
+        public Observation CreateProcessedObservation(DwcObservationVerbatim verbatimObservation)
         {
             if (verbatimObservation == null)
             {
                 return null;
             }
 
-            var obs = new ProcessedObservation();
+            var obs = new Observation();
             obs.DataProviderId = _dataProvider.Id;
             //AddVerbatimObservationAsJson(obs, verbatimObservation); // todo - this could be used to store the original verbatim observation
 
@@ -216,7 +216,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             //return obs;
         }
 
-        private static void AddVerbatimObservationAsJson(ProcessedObservation obs,
+        private static void AddVerbatimObservationAsJson(Observation obs,
             DwcObservationVerbatim verbatimObservation)
         {
             //obs.VerbatimObservation = JsonConvert.SerializeObject(
@@ -228,7 +228,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             //    });
         }
 
-        private ICollection<ProcessedMultimedia> CreateProcessedMultimedia(
+        private ICollection<Multimedia> CreateProcessedMultimedia(
             ICollection<DwcMultimedia> verbatimMultimedia, 
             ICollection<DwcAudubonMedia> verbatimAudubonMedia)
         {
@@ -245,9 +245,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return null;
         }
 
-        private ProcessedOrganism CreateProcessedOrganism(DwcObservationVerbatim verbatimObservation)
+        private Organism CreateProcessedOrganism(DwcObservationVerbatim verbatimObservation)
         {
-            var processedOrganism = new ProcessedOrganism();
+            var processedOrganism = new Organism();
             processedOrganism.OrganismId = verbatimObservation.OrganismID;
             processedOrganism.OrganismName = verbatimObservation.OrganismName;
             processedOrganism.OrganismScope = verbatimObservation.OrganismScope;
@@ -259,9 +259,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return processedOrganism;
         }
 
-        private ProcessedGeologicalContext CreateProcessedGeologicalContext(DwcObservationVerbatim verbatimObservation)
+        private GeologicalContext CreateProcessedGeologicalContext(DwcObservationVerbatim verbatimObservation)
         {
-            var processedGeologicalContext = new ProcessedGeologicalContext();
+            var processedGeologicalContext = new GeologicalContext();
             processedGeologicalContext.Bed = verbatimObservation.Bed;
             processedGeologicalContext.EarliestAgeOrLowestStage = verbatimObservation.EarliestAgeOrLowestStage;
             processedGeologicalContext.EarliestEonOrLowestEonothem = verbatimObservation.EarliestEonOrLowestEonothem;
@@ -286,16 +286,16 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return processedGeologicalContext;
         }
 
-        private ProcessedMaterialSample CreateProcessedMaterialSample(DwcObservationVerbatim verbatimObservation)
+        private MaterialSample CreateProcessedMaterialSample(DwcObservationVerbatim verbatimObservation)
         {
-            var processedMaterialSample = new ProcessedMaterialSample();
+            var processedMaterialSample = new MaterialSample();
             processedMaterialSample.MaterialSampleId = verbatimObservation.MaterialSampleID;
             return processedMaterialSample;
         }
 
-        private ProcessedEvent CreateProcessedEvent(DwcObservationVerbatim verbatimObservation)
+        private Event CreateProcessedEvent(DwcObservationVerbatim verbatimObservation)
         {
-            var processedEvent = new ProcessedEvent();
+            var processedEvent = new Event();
             processedEvent.EventId = verbatimObservation.EventID;
             processedEvent.ParentEventId = verbatimObservation.ParentEventID;
             processedEvent.EventRemarks = verbatimObservation.EventRemarks;
@@ -335,9 +335,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return processedEvent;
         }
 
-        private ProcessedIdentification CreateProcessedIdentification(DwcObservationVerbatim verbatimObservation)
+        private Identification CreateProcessedIdentification(DwcObservationVerbatim verbatimObservation)
         {
-            var processedIdentification = new ProcessedIdentification();
+            var processedIdentification = new Identification();
             processedIdentification.DateIdentified = verbatimObservation.DateIdentified?.ParseDateTime()?.ToUniversalTime();
             processedIdentification.IdentificationId = verbatimObservation.IdentificationID;
             processedIdentification.IdentificationQualifier = verbatimObservation.IdentificationQualifier;
@@ -351,7 +351,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return processedIdentification;
         }
 
-        private bool GetIsValidated(ProcessedFieldMapValue validationStatus)
+        private bool GetIsValidated(VocabularyValue validationStatus)
         {
             if (validationStatus == null) return false;
             switch (validationStatus.Id)
@@ -369,9 +369,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return false;
         }
 
-        private ProcessedLocation CreateProcessedLocation(DwcObservationVerbatim verbatimObservation)
+        private Lib.Models.Processed.Observation.Location CreateProcessedLocation(DwcObservationVerbatim verbatimObservation)
         {
-            var processedLocation = new ProcessedLocation();
+            var processedLocation = new Lib.Models.Processed.Observation.Location();
             processedLocation.Continent = GetSosId(
                 verbatimObservation.Continent,
                 _fieldMappings[FieldMappingFieldId.Continent],
@@ -482,9 +482,9 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return result;
         }
 
-        private ProcessedOccurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatimObservation)
+        private Occurrence CreateProcessedOccurrence(DwcObservationVerbatim verbatimObservation)
         {
-            var processedOccurrence = new ProcessedOccurrence();
+            var processedOccurrence = new Occurrence();
             processedOccurrence.AssociatedMedia = verbatimObservation.AssociatedMedia;
             processedOccurrence.AssociatedReferences = verbatimObservation.AssociatedReferences;
             processedOccurrence.AssociatedSequences = verbatimObservation.AssociatedSequences;
@@ -533,7 +533,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return processedOccurrence;
         }
 
-        private ProcessedTaxon CreateProcessedTaxon(DwcObservationVerbatim verbatimObservation)
+        private Lib.Models.Processed.Observation.Taxon CreateProcessedTaxon(DwcObservationVerbatim verbatimObservation)
         {
             // Get all taxon values from Dyntaxa instead of the provided DarwinCore data.
             var processedTaxon = TryGetTaxonInformation(
@@ -547,7 +547,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             return processedTaxon;
         }
 
-        private ProcessedTaxon TryGetTaxonInformation(
+        private Lib.Models.Processed.Observation.Taxon TryGetTaxonInformation(
             string taxonId,
             string scientificName,
             string scientificNameAuthorship,
@@ -555,7 +555,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             string kingdom,
             string taxonRank)
         {
-            ProcessedTaxon taxon = null;
+            Lib.Models.Processed.Observation.Taxon taxon = null;
 
             if (!string.IsNullOrEmpty(taxonId))
             {
@@ -613,28 +613,28 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         //    return new ProcessedFieldMapValue { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val };
         //}
 
-        private ProcessedFieldMapValue GetSosId(string val,
+        private VocabularyValue GetSosId(string val,
             IDictionary<object, int> sosIdByValue,
             int? defaultValue = null,
             MappingNotFoundLogic mappingNotFoundLogic = MappingNotFoundLogic.UseSourceValue)
         {
             if (string.IsNullOrWhiteSpace(val) || sosIdByValue == null)
             {
-                return defaultValue.HasValue ? new ProcessedFieldMapValue {Id = defaultValue.Value} : null;
+                return defaultValue.HasValue ? new VocabularyValue {Id = defaultValue.Value} : null;
             }
 
             var lookupVal = val.ToLower();
             if (sosIdByValue.TryGetValue(lookupVal, out var sosId))
             {
-                return new ProcessedFieldMapValue {Id = sosId};
+                return new VocabularyValue {Id = sosId};
             }
 
             if (mappingNotFoundLogic == MappingNotFoundLogic.UseDefaultValue && defaultValue.HasValue)
             {
-                return new ProcessedFieldMapValue {Id = defaultValue.Value};
+                return new VocabularyValue {Id = defaultValue.Value};
             }
 
-            return new ProcessedFieldMapValue
+            return new VocabularyValue
                 {Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
         }
 
@@ -645,24 +645,24 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="val"></param>
         /// <param name="sosIdByValue"></param>
         /// <returns></returns>
-        private static ProcessedFieldMapValue GetSosId(int? val, IDictionary<object, int> sosIdByValue)
+        private static VocabularyValue GetSosId(int? val, IDictionary<object, int> sosIdByValue)
         {
             if (!val.HasValue || sosIdByValue == null) return null;
 
             if (sosIdByValue.TryGetValue(val.Value, out var sosId))
             {
-                return new ProcessedFieldMapValue {Id = sosId};
+                return new VocabularyValue {Id = sosId};
             }
 
-            return new ProcessedFieldMapValue
+            return new VocabularyValue
                 {Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString()};
         }
 
-        private ProcessedProject CreateProcessedProject(Project project)
+        private Lib.Models.Processed.Observation.Project CreateProcessedProject(Lib.Models.Verbatim.Artportalen.Project project)
         {
             if (project == null) return null;
 
-            return new ProcessedProject
+            return new Lib.Models.Processed.Observation.Project
             {
                 IsPublic = project.IsPublic,
                 Category = project.Category,
@@ -674,18 +674,18 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 StartDate = project.StartDate?.ToUniversalTime(),
                 SurveyMethod = project.SurveyMethod,
                 SurveyMethodUrl = project.SurveyMethodUrl,
-                ProjectParameters = project.ProjectParameters?.Select(CreateProcessedProjectParameter)
+                ProjectParameters = project.ProjectParameters?.Select(this.CreateProcessedProjectParameter)
             };
         }
 
-        private ProcessedProjectParameter CreateProcessedProjectParameter(ProjectParameter projectParameter)
+        private Lib.Models.Processed.Observation.ProjectParameter CreateProcessedProjectParameter(Lib.Models.Verbatim.Artportalen.ProjectParameter projectParameter)
         {
             if (projectParameter == null)
             {
                 return null;
             }
 
-            return new ProcessedProjectParameter
+            return new Lib.Models.Processed.Observation.ProjectParameter
             {
                 Value = projectParameter.Value,
                 DataType = projectParameter.DataType,
@@ -696,7 +696,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
             };
         }
 
-        private string GetSamplingProtocol(IEnumerable<Project> projects)
+        private string GetSamplingProtocol(IEnumerable<Lib.Models.Verbatim.Artportalen.Project> projects)
         {
             if (!projects?.Any() ?? true) return null;
 
@@ -729,7 +729,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="hiddenByProvider"></param>
         /// <param name="protectedBySystem"></param>
         /// <returns></returns>
-        private int CalculateProtectionLevel(ProcessedTaxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
+        private int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
         {
             if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
             {
@@ -762,7 +762,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="taxa"></param>
         /// <returns></returns>
         private string GetSubstrateDescription(ArtportalenObservationVerbatim verbatimObservation,
-            IDictionary<int, ProcessedTaxon> taxa)
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
         {
             if (verbatimObservation == null)
             {
@@ -811,7 +811,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <param name="verbatimObservation"></param>
         /// <param name="taxon"></param>
         /// <returns></returns>
-        public int? GetBirdNestActivityId(ArtportalenObservationVerbatim verbatimObservation, ProcessedTaxon taxon)
+        public int? GetBirdNestActivityId(ArtportalenObservationVerbatim verbatimObservation, Lib.Models.Processed.Observation.Taxon taxon)
         {
             if (verbatimObservation == null || taxon == null)
             {

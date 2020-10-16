@@ -8,7 +8,7 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Repository for retrieving processd taxa.
     /// </summary>
-    public class ProcessedTaxonRepository : MongoDbProcessedRepositoryBase<ProcessedTaxon, int>, IProcessedTaxonRepository
+    public class ProcessedTaxonRepository : MongoDbProcessedRepositoryBase<Taxon, int>, IProcessedTaxonRepository
     {
         /// <summary>
         ///     Constructor.

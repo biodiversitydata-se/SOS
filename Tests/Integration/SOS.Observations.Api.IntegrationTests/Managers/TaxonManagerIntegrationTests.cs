@@ -21,7 +21,7 @@ namespace SOS.Observations.Api.IntegrationTests.Managers
 
             var processedTaxonRepository = new ProcessedTaxonRepository(
                 processClient,
-                new NullLogger<ProcessBaseRepository<ProcessedTaxon, int>>());
+                new NullLogger<ProcessBaseRepository<Taxon, int>>());
             var taxonManager = new TaxonManager(processedTaxonRepository, new NullLogger<TaxonManager>());
             return taxonManager;
         }

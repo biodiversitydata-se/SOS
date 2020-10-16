@@ -33,12 +33,12 @@ namespace SOS.Lib.Helpers
 
         public FieldMappingConfiguration Configuration => _fieldMappingConfiguration;
 
-        public void ResolveFieldMappedValues(IEnumerable<ProcessedObservation> processedObservations)
+        public void ResolveFieldMappedValues(IEnumerable<Observation> processedObservations)
         {
             ResolveFieldMappedValues(processedObservations, _fieldMappingConfiguration.LocalizationCultureCode);
         }
 
-        public void ResolveFieldMappedValues(IEnumerable<ProcessedObservation> processedObservations,
+        public void ResolveFieldMappedValues(IEnumerable<Observation> processedObservations,
             string cultureCode)
         {
             if (!_fieldMappingConfiguration.ResolveValues) return;
@@ -110,7 +110,7 @@ namespace SOS.Lib.Helpers
         }
 
         private void ResolveFieldMappedValue(
-            ProcessedFieldMapValue fieldMapValue,
+            VocabularyValue fieldMapValue,
             Dictionary<int, string> valueById)
         {
             if (fieldMapValue == null) return;

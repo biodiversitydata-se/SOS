@@ -10,7 +10,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, string>
+    public interface IProcessedObservationRepository : IBaseRepository<Observation, string>
     {
         /// <summary>
         /// Max number of aggregation buckets in ElasticSearch.

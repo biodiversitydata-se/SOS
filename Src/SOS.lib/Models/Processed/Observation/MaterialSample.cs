@@ -9,7 +9,7 @@
     ///     A whole organism preserved in a collection. A part of an organism isolated for some purpose. A soil sample. A
     ///     marine microbial sample.
     /// </example>
-    public class ProcessedMaterialSample
+    public class MaterialSample
     {
         /// <summary>
         ///     An identifier for the MaterialSample (as opposed to a particular digital record of the material sample).

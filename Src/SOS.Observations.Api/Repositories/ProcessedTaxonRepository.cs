@@ -10,7 +10,7 @@ namespace SOS.Observations.Api.Repositories
 {
     /// <summary>
     /// </summary>
-    public class ProcessedTaxonRepository : ProcessBaseRepository<ProcessedTaxon, int>, IProcessedTaxonRepository
+    public class ProcessedTaxonRepository : ProcessBaseRepository<Taxon, int>, IProcessedTaxonRepository
     {
         /// <summary>
         ///     Constructor
@@ -19,7 +19,7 @@ namespace SOS.Observations.Api.Repositories
         /// <param name="logger"></param>
         public ProcessedTaxonRepository(
             IProcessClient client,
-            ILogger<ProcessBaseRepository<ProcessedTaxon, int>> logger) : base(client, false, logger)
+            ILogger<ProcessBaseRepository<Taxon, int>> logger) : base(client, false, logger)
         {
         }
 
@@ -29,11 +29,11 @@ namespace SOS.Observations.Api.Repositories
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcessedBasicTaxon>> GetBasicTaxonChunkAsync(int skip, int take)
+        public async Task<IEnumerable<BasicTaxon>> GetBasicTaxonChunkAsync(int skip, int take)
         {
             var res = await MongoCollection
                 .Find(x => true)
-                .Project(m => new ProcessedBasicTaxon
+                .Project(m => new BasicTaxon
                 {
                     DyntaxaTaxonId = m.DyntaxaTaxonId,
                     Id = m.Id,
@@ -54,7 +54,7 @@ namespace SOS.Observations.Api.Repositories
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcessedTaxon>> GetChunkAsync(int skip, int take)
+        public async Task<IEnumerable<Taxon>> GetChunkAsync(int skip, int take)
         {
             var res = await MongoCollection
                 .Find(x => true)

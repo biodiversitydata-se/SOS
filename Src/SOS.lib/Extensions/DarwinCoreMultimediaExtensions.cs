@@ -8,9 +8,9 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class DarwinCoreMultimediaExtensions
     {
-        public static ProcessedMultimedia ToProcessedMultimedia(this DwcMultimedia dwcMultimedia)
+        public static Multimedia ToProcessedMultimedia(this DwcMultimedia dwcMultimedia)
         {
-            return new ProcessedMultimedia
+            return new Multimedia
             {
                 Type = dwcMultimedia.Type,
                 Format = dwcMultimedia.Format,
@@ -30,9 +30,9 @@ namespace SOS.Lib.Extensions
             };
         }
 
-        public static ProcessedMultimedia ToProcessedMultimedia(this DwcAudubonMedia dwcAudubonMedia)
+        public static Multimedia ToProcessedMultimedia(this DwcAudubonMedia dwcAudubonMedia)
         {
-            return new ProcessedMultimedia
+            return new Multimedia
             {
                 Type = dwcAudubonMedia.Type,
                 Format = dwcAudubonMedia.Format,

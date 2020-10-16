@@ -154,7 +154,7 @@ namespace SOS.Export.IO.DwcArchive
         }
         
         public async Task WriteHeaderlessDwcaFiles(
-            ICollection<ProcessedObservation> processedObservations,
+            ICollection<Observation> processedObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart)
         {
             if (!processedObservations?.Any() ?? true)

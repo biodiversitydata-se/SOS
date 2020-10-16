@@ -9,7 +9,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     /// <summary>
     ///     Processed data class
     /// </summary>
-    public interface IProcessedObservationRepository : IProcessRepositoryBase<ProcessedObservation>
+    public interface IProcessedObservationRepository : IProcessRepositoryBase<Observation>
     {
         public string IndexName { get; }
 
@@ -20,7 +20,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <param name="observations"></param>
         /// <returns></returns>
-        new Task<int> AddManyAsync(IEnumerable<ProcessedObservation> observations);
+        new Task<int> AddManyAsync(IEnumerable<Observation> observations);
 
         /// <summary>
         ///     Copy provider data from active instance to inactive instance.

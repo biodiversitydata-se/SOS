@@ -63,7 +63,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="filePathByFilePart"></param>
         /// <returns></returns>
         Task WriteHeaderlessDwcaFiles(
-            ICollection<ProcessedObservation> dwcObservations,
+            ICollection<Observation> dwcObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart);
 
         /// <summary>

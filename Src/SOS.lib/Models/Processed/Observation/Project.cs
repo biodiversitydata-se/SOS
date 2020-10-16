@@ -9,7 +9,7 @@ namespace SOS.Lib.Models.Processed.Observation
     ///     Conservation related information about the taxon that
     ///     the species observation is attached to.
     /// </summary>
-    public class ProcessedProject
+    public class Project
     {
         /// <summary>
         ///     Not defined in Darwin Core.
@@ -95,6 +95,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Project parameters.
         /// </summary>
         [Nested]
-        public IEnumerable<ProcessedProjectParameter> ProjectParameters { get; set; }
+        public IEnumerable<ProjectParameter> ProjectParameters { get; set; }
     }
 }

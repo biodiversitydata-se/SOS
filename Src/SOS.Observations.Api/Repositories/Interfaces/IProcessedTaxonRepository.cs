@@ -6,7 +6,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IProcessedTaxonRepository : IBaseRepository<ProcessedTaxon, int>
+    public interface IProcessedTaxonRepository : IBaseRepository<Taxon, int>
     {
         /// <summary>
         ///     Get chunk of objects from repository
@@ -14,7 +14,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessedTaxon>> GetChunkAsync(int skip, int take);
+        Task<IEnumerable<Taxon>> GetChunkAsync(int skip, int take);
 
         /// <summary>
         ///     Get chunk of ProcessedBasicTaxon objects from repository.
@@ -22,6 +22,6 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProcessedBasicTaxon>> GetBasicTaxonChunkAsync(int skip, int take);
+        Task<IEnumerable<BasicTaxon>> GetBasicTaxonChunkAsync(int skip, int take);
     }
 }

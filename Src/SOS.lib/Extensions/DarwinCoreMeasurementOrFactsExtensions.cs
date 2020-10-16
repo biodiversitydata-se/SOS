@@ -8,9 +8,9 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class DarwinCoreMeasurementOrFactsExtensions
     {
-        public static ProcessedExtendedMeasurementOrFact ToProcessedExtendedMeasurementOrFact(this DwcMeasurementOrFact dwcMeasurementOrFact)
+        public static ExtendedMeasurementOrFact ToProcessedExtendedMeasurementOrFact(this DwcMeasurementOrFact dwcMeasurementOrFact)
         {
-            return new ProcessedExtendedMeasurementOrFact
+            return new ExtendedMeasurementOrFact
             {
                 MeasurementID = dwcMeasurementOrFact.MeasurementID,
                 MeasurementType = dwcMeasurementOrFact.MeasurementType,
@@ -24,9 +24,9 @@ namespace SOS.Lib.Extensions
             };
         }
 
-        public static ProcessedExtendedMeasurementOrFact ToProcessedExtendedMeasurementOrFact(this DwcExtendedMeasurementOrFact dwcEmof)
+        public static ExtendedMeasurementOrFact ToProcessedExtendedMeasurementOrFact(this DwcExtendedMeasurementOrFact dwcEmof)
         {
-            return new ProcessedExtendedMeasurementOrFact()
+            return new ExtendedMeasurementOrFact()
             {
                 MeasurementID = dwcEmof.MeasurementID,
                 MeasurementType = dwcEmof.MeasurementType,

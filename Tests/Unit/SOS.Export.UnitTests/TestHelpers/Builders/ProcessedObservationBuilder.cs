@@ -2,7 +2,7 @@
 
 namespace SOS.Export.UnitTests.TestHelpers.Builders
 {
-    public class ProcessedObservationBuilder : BuilderBase<ProcessedObservationBuilder, ProcessedObservation>
+    public class ProcessedObservationBuilder : BuilderBase<ProcessedObservationBuilder, Observation>
     {
         public ProcessedObservationBuilder WithDecimalLatitude(double decimalLatitude)
         {
@@ -24,16 +24,16 @@ namespace SOS.Export.UnitTests.TestHelpers.Builders
             return With(entity => entity.Occurrence.OccurrenceRemarks = occurrenceRemarks);
         }
 
-        protected override ProcessedObservation CreateEntity()
+        protected override Observation CreateEntity()
         {
-            var observation = new ProcessedObservation
+            var observation = new Observation
             {
-                Location = new ProcessedLocation(),
-                Event = new ProcessedEvent(),
-                Identification = new ProcessedIdentification(),
-                MaterialSample = new ProcessedMaterialSample(),
-                Occurrence = new ProcessedOccurrence(),
-                Taxon = new ProcessedTaxon()
+                Location = new Location(),
+                Event = new Event(),
+                Identification = new Identification(),
+                MaterialSample = new MaterialSample(),
+                Occurrence = new Occurrence(),
+                Taxon = new Taxon()
             };
 
             return observation;

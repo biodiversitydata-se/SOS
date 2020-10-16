@@ -159,7 +159,7 @@ namespace SOS.Process.Processors.Taxon
         ///     each nodes parents.
         /// </summary>
         /// <param name="taxa"></param>
-        private void CalculateHigherClassificationField(ICollection<ProcessedTaxon> taxa)
+        private void CalculateHigherClassificationField(ICollection<Lib.Models.Processed.Observation.Taxon> taxa)
         {
             var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
             var taxonById = taxa.ToDictionary(m => m.Id, m => m);

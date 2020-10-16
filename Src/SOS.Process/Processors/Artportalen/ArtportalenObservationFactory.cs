@@ -27,12 +27,12 @@ namespace SOS.Process.Processors.Artportalen
     {
         private readonly DataProvider _dataProvider;
         private readonly IDictionary<FieldMappingFieldId, IDictionary<object, int>> _fieldMappings;
-        private readonly IDictionary<int, ProcessedTaxon> _taxa;
+        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
         private readonly bool _incrementalMode;
 
         public ArtportalenObservationFactory(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<FieldMappingFieldId, IDictionary<object, int>> fieldMappings,
             bool incrementalMode)
         {
@@ -47,7 +47,7 @@ namespace SOS.Process.Processors.Artportalen
 
         public static async Task<ArtportalenObservationFactory> CreateAsync(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IProcessedFieldMappingRepository processedFieldMappingRepository,
             bool incrementalMode)
         {
@@ -56,7 +56,7 @@ namespace SOS.Process.Processors.Artportalen
             return new ArtportalenObservationFactory(dataProvider, taxa, fieldMappings, incrementalMode);
         }
 
-        public ICollection<ProcessedObservation> CreateProcessedObservations(
+        public ICollection<Observation> CreateProcessedObservations(
             IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
         {
             return verbatimObservations.Select(CreateProcessedObservation).ToArray();
@@ -73,7 +73,7 @@ namespace SOS.Process.Processors.Artportalen
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public ProcessedObservation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation)
+        public Observation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation)
         {
             try
             {
@@ -105,18 +105,18 @@ namespace SOS.Process.Processors.Artportalen
                     ? verbatimObservation.EndDate.Value.ToLocalTime() + verbatimObservation.EndTime
                     : verbatimObservation.EndDate;
 
-                var obs = new ProcessedObservation();
+                var obs = new Observation();
 
                 // Record level
                 obs.VerbatimId = verbatimObservation.SightingId;
                 obs.DataProviderId = _dataProvider.Id;
                 obs.AccessRights = !verbatimObservation.ProtectedBySystem && verbatimObservation.HiddenByProvider.HasValue &&
                                    verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) < DateTime.Now
-                    ? new ProcessedFieldMapValue {Id = (int) AccessRightsId.FreeUsage}
-                    : new ProcessedFieldMapValue {Id = (int) AccessRightsId.NotForPublicUsage};
+                    ? new VocabularyValue {Id = (int) AccessRightsId.FreeUsage}
+                    : new VocabularyValue {Id = (int) AccessRightsId.NotForPublicUsage};
                 obs.BasisOfRecord = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
-                    ? new ProcessedFieldMapValue {Id = (int) BasisOfRecordId.HumanObservation}
-                    : new ProcessedFieldMapValue {Id = (int) BasisOfRecordId.PreservedSpecimen};
+                    ? new VocabularyValue {Id = (int) BasisOfRecordId.HumanObservation}
+                    : new VocabularyValue {Id = (int) BasisOfRecordId.PreservedSpecimen};
                 obs.CollectionCode = string.IsNullOrEmpty(verbatimObservation.SpeciesCollection)
                     ? "Artportalen"
                     : verbatimObservation.SpeciesCollection;
@@ -138,7 +138,7 @@ namespace SOS.Process.Processors.Artportalen
 
 
                 // Event
-                obs.Event = new ProcessedEvent();
+                obs.Event = new Event();
                 obs.Event.Biotope = GetSosIdFromMetadata(verbatimObservation?.Biotope, _fieldMappings[FieldMappingFieldId.Biotope]);
                 obs.Event.BiotopeDescription = verbatimObservation.BiotopeDescription;
                 obs.Event.EndDate = endDate?.ToUniversalTime();
@@ -159,17 +159,17 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Event.Substrate = GetSosIdFromMetadata(verbatimObservation?.Substrate, _fieldMappings[FieldMappingFieldId.Substrate]);
 
                 // Identification
-                obs.Identification = new ProcessedIdentification();
+                obs.Identification = new Identification();
                 obs.Identification.IdentifiedBy = verbatimObservation.VerifiedBy;
                 obs.Identification.IdentifiedByInternal = verbatimObservation.VerifiedByInternal;
                 obs.Identification.Validated = new[] {60, 61, 62, 63, 64, 65}.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);
                 obs.Identification.UncertainDetermination = verbatimObservation.UnsureDetermination;
 
                 // Location
-                obs.Location = new ProcessedLocation();
-                obs.Location.Continent = new ProcessedFieldMapValue {Id = (int) ContinentId.Europe};
+                obs.Location = new Location();
+                obs.Location.Continent = new VocabularyValue {Id = (int) ContinentId.Europe};
                 obs.Location.CoordinateUncertaintyInMeters = verbatimObservation.Site?.Accuracy;
-                obs.Location.Country = new ProcessedFieldMapValue {Id = (int) CountryId.Sweden};
+                obs.Location.Country = new VocabularyValue {Id = (int) CountryId.Sweden};
                 obs.Location.CountryCode = CountryCode.Sweden;
                 obs.Location.County = GetSosId(verbatimObservation.Site?.County?.Id, _fieldMappings[FieldMappingFieldId.County], null, verbatimObservation.Site?.County?.Name);
                 obs.Location.DecimalLatitude = point?.Coordinates?.Latitude ?? 0;
@@ -194,7 +194,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Location.VerbatimCoordinateSystem = "EPSG:3857";
 
                 // Occurrence
-                obs.Occurrence = new ProcessedOccurrence();
+                obs.Occurrence = new Occurrence();
                 obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages
                     ? $"http://www.artportalen.se/sighting/{verbatimObservation.SightingId}#SightingDetailImages"
                     : "";
@@ -213,8 +213,8 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Occurrence.RecordNumber = verbatimObservation.Label;
                 obs.Occurrence.OccurrenceRemarks = verbatimObservation.Comment;
                 obs.Occurrence.OccurrenceStatus = verbatimObservation.NotPresent || verbatimObservation.NotRecovered
-                    ? new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Absent}
-                    : new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Present};
+                    ? new VocabularyValue {Id = (int) OccurrenceStatusId.Absent}
+                    : new VocabularyValue {Id = (int) OccurrenceStatusId.Present};
                 obs.Occurrence.Url = $"http://www.artportalen.se/sighting/{verbatimObservation.SightingId}";
                 obs.Occurrence.Length = verbatimObservation.Length;
                 obs.Occurrence.Weight = verbatimObservation.Weight;
@@ -281,7 +281,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="verbatimObservation"></param>
         /// <param name="taxon"></param>
         /// <returns></returns>
-        private ArtportalenObservationVerbatim DiffuseObservation(ArtportalenObservationVerbatim verbatimObservation, ProcessedTaxon taxon)
+        private ArtportalenObservationVerbatim DiffuseObservation(ArtportalenObservationVerbatim verbatimObservation, Lib.Models.Processed.Observation.Taxon taxon)
         {
             verbatimObservation.Comment = "";
             verbatimObservation.ReportedBy = "";
@@ -351,7 +351,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="verbatimObservation"></param>
         /// <param name="obs"></param>
         /// <returns></returns>
-        private GeoJsonGeometry DiffusePoint(GeoJsonGeometry point, ArtportalenObservationVerbatim observationVerbatim, ProcessedTaxon taxon)
+        private GeoJsonGeometry DiffusePoint(GeoJsonGeometry point, ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
             var originalPoint = point;
             var diffusedPoint = point;
@@ -383,7 +383,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="verbatimObservation"></param>
         /// <param name="obs"></param>
         /// <returns></returns>
-        private GeoJsonGeometry DiffusePolygon(GeoJsonGeometry polygon, ArtportalenObservationVerbatim observationVerbatim, ProcessedTaxon taxon)
+        private GeoJsonGeometry DiffusePolygon(GeoJsonGeometry polygon, ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
             var originalPoint = polygon;
             var diffusedPoint = polygon;
@@ -424,7 +424,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="defaultId"></param>
         /// <param name="valueIfValNotFound"></param>
         /// <returns></returns>
-        private static ProcessedFieldMapValue GetSosId(
+        private static VocabularyValue GetSosId(
             int? val, 
             IDictionary<object, int> sosIdByProviderValue,
             int? defaultId = null,
@@ -434,21 +434,21 @@ namespace SOS.Process.Processors.Artportalen
 
             if (sosIdByProviderValue.TryGetValue(val.Value, out var sosId))
             {
-                return new ProcessedFieldMapValue {Id = sosId};
+                return new VocabularyValue {Id = sosId};
             }
 
             if (defaultId.HasValue)
             {
-                return new ProcessedFieldMapValue {Id = defaultId.Value};
+                return new VocabularyValue {Id = defaultId.Value};
             }
 
             if (!string.IsNullOrEmpty(valueIfValNotFound))
             {
-                return new ProcessedFieldMapValue
+                return new VocabularyValue
                     { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = valueIfValNotFound };
             }
 
-            return new ProcessedFieldMapValue
+            return new VocabularyValue
                 {Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString()};
         }
 
@@ -459,7 +459,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="sosIdByProviderValue"></param>
         /// <param name="defaultId"></param>
         /// <returns></returns>
-        private static ProcessedFieldMapValue GetSosIdFromMetadata(
+        private static VocabularyValue GetSosIdFromMetadata(
             Metadata metadata,
             IDictionary<object, int> sosIdByProviderValue,
             int? defaultId = null)
@@ -469,31 +469,31 @@ namespace SOS.Process.Processors.Artportalen
 
             if (sosIdByProviderValue.TryGetValue(val.Value, out var sosId))
             {
-                return new ProcessedFieldMapValue { Id = sosId };
+                return new VocabularyValue { Id = sosId };
             }
 
             var metadataValue = metadata?.Translate(Cultures.en_GB, Cultures.sv_SE);
             if (metadataValue != null)
             {
-                return new ProcessedFieldMapValue
+                return new VocabularyValue
                     { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = metadataValue };
             }
 
             if (defaultId.HasValue)
             {
-                return new ProcessedFieldMapValue { Id = defaultId.Value };
+                return new VocabularyValue { Id = defaultId.Value };
             }
 
-            return new ProcessedFieldMapValue
+            return new VocabularyValue
                 { Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val.ToString() };
         }
 
 
-        private ProcessedProject CreateProcessedProject(Project project)
+        private Lib.Models.Processed.Observation.Project CreateProcessedProject(Lib.Models.Verbatim.Artportalen.Project project)
         {
             if (project == null) return null;
 
-            return new ProcessedProject
+            return new Lib.Models.Processed.Observation.Project
             {
                 IsPublic = project.IsPublic,
                 Category = project.Category,
@@ -505,18 +505,18 @@ namespace SOS.Process.Processors.Artportalen
                 StartDate =  project.StartDate?.ToUniversalTime(),
                 SurveyMethod = project.SurveyMethod,
                 SurveyMethodUrl = project.SurveyMethodUrl,
-                ProjectParameters = project.ProjectParameters?.Select(CreateProcessedProjectParameter)
+                ProjectParameters = project.ProjectParameters?.Select(this.CreateProcessedProjectParameter)
             };
         }
 
-        private ProcessedProjectParameter CreateProcessedProjectParameter(ProjectParameter projectParameter)
+        private Lib.Models.Processed.Observation.ProjectParameter CreateProcessedProjectParameter(Lib.Models.Verbatim.Artportalen.ProjectParameter projectParameter)
         {
             if (projectParameter == null)
             {
                 return null;
             }
 
-            return new ProcessedProjectParameter
+            return new Lib.Models.Processed.Observation.ProjectParameter
             {
                 Value = projectParameter.Value,
                 DataType = projectParameter.DataType,
@@ -527,7 +527,7 @@ namespace SOS.Process.Processors.Artportalen
             };
         }
 
-        private string GetSamplingProtocol(IEnumerable<Project> projects)
+        private string GetSamplingProtocol(IEnumerable<Lib.Models.Verbatim.Artportalen.Project> projects)
         {
             if (!projects?.Any() ?? true) return null;
 
@@ -560,7 +560,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="hiddenByProvider"></param>
         /// <param name="protectedBySystem"></param>
         /// <returns></returns>
-        private int CalculateProtectionLevel(ProcessedTaxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
+        private int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon taxon, DateTime? hiddenByProvider, bool protectedBySystem)
         {
             if (string.IsNullOrEmpty(taxon?.ProtectionLevel))
             {
@@ -593,7 +593,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="taxa"></param>
         /// <returns></returns>
         private string GetSubstrateDescription(ArtportalenObservationVerbatim verbatimObservation,
-            IDictionary<int, ProcessedTaxon> taxa)
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
         {
             if (verbatimObservation == null)
             {
@@ -642,7 +642,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="verbatimObservation"></param>
         /// <param name="taxon"></param>
         /// <returns></returns>
-        public int? GetBirdNestActivityId(ArtportalenObservationVerbatim verbatimObservation, ProcessedTaxon taxon)
+        public int? GetBirdNestActivityId(ArtportalenObservationVerbatim verbatimObservation, Lib.Models.Processed.Observation.Taxon taxon)
         {
             if (verbatimObservation == null || taxon == null)
             {

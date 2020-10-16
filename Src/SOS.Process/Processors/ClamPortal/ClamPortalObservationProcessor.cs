@@ -56,19 +56,19 @@ namespace SOS.Process.Processors.ClamPortal
 
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
-            ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
+            ICollection<Observation> observations = new List<Observation>();
             var observationFactory = new ClamPortalObservationFactory(dataProvider, taxa);
 
             using var cursor = await _clamObservationVerbatimRepository.GetAllByCursorAsync();
             // Process and commit in batches.
             await cursor.ForEachAsync(async verbatimObservation =>
             {
-                ProcessedObservation processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
+                Observation processedObservation = observationFactory.CreateProcessedObservation(verbatimObservation);
                 _areaHelper.AddAreaDataToProcessedObservation(processedObservation);
                 observations.Add(processedObservation);
                 if (IsBatchFilledToLimit(observations.Count))

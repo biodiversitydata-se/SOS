@@ -46,7 +46,7 @@ namespace SOS.Process.Jobs
            
             var providerInfo = CreateProviderInfo(DataProviderType.Taxa, null, start, DateTime.Now,
                 success ? RunStatus.Success : RunStatus.Failed, taxaCount);
-            await SaveProcessInfo(nameof(ProcessedTaxon), start, taxaCount,
+            await SaveProcessInfo(nameof(Taxon), start, taxaCount,
                 success ? RunStatus.Success : RunStatus.Failed, new[] {providerInfo});
             _logger.LogDebug("Finish updating process info for taxa");
 

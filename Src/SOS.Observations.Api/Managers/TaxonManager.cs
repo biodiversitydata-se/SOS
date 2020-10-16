@@ -64,14 +64,14 @@ namespace SOS.Observations.Api.Managers
             return taxonTree;
         }
 
-        private async Task<IEnumerable<ProcessedBasicTaxon>> GetBasicTaxaAsync()
+        private async Task<IEnumerable<BasicTaxon>> GetBasicTaxaAsync()
         {
             try
             {
                 const int batchSize = 200000;
                 var skip = 0;
                 var tmpTaxa = await _processedTaxonRepository.GetBasicTaxonChunkAsync(skip, batchSize);
-                var taxa = new List<ProcessedBasicTaxon>();
+                var taxa = new List<BasicTaxon>();
 
                 while (tmpTaxa?.Any() ?? false)
                 {
@@ -89,14 +89,14 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        private async Task<IEnumerable<ProcessedTaxon>> GetTaxaAsync()
+        private async Task<IEnumerable<Taxon>> GetTaxaAsync()
         {
             try
             {
                 const int batchSize = 200000;
                 var skip = 0;
                 var tmpTaxa = await _processedTaxonRepository.GetChunkAsync(skip, batchSize);
-                var taxa = new List<ProcessedTaxon>();
+                var taxa = new List<Taxon>();
 
                 while (tmpTaxa?.Any() ?? false)
                 {

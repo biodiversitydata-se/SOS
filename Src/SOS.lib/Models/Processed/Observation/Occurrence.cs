@@ -8,7 +8,7 @@ namespace SOS.Lib.Models.Processed.Observation
     ///     Further information about the properties can
     ///     be found at http://rs.tdwg.org/dwc/terms/.
     /// </summary>
-    public class ProcessedOccurrence
+    public class Occurrence
     {
         /// <summary>
         ///     Activity property.
@@ -17,7 +17,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue
+        public VocabularyValue
             Activity { get; set; }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///    DiscoveryMethod from Artportalen
         /// </summary>
         [Object]
-        public ProcessedFieldMapValue DiscoveryMethod { get; set; }
+        public VocabularyValue DiscoveryMethod { get; set; }
 
         /// <summary>
         ///     The current state of a specimen with respect to the
@@ -96,7 +96,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue EstablishmentMeans { get; set; }
+        public VocabularyValue EstablishmentMeans { get; set; }
 
         /// <summary>
         ///     The number of individuals represented present
@@ -153,7 +153,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue LifeStage { get; set; }
+        public VocabularyValue LifeStage { get; set; }
         
         /// <summary>
         ///     An identifier for the Occurrence (as opposed to a
@@ -218,7 +218,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <remarks>
         ///     This value is field mapped.
         /// </remarks>
-        public ProcessedFieldMapValue OrganismQuantityUnit { get; set; }
+        public VocabularyValue OrganismQuantityUnit { get; set; }
 
         /// <summary>
         ///     A list (concatenated and separated) of preparations
@@ -257,7 +257,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue Gender { get; set; }
+        public VocabularyValue Gender { get; set; }
 
         /// <summary>
         ///     A statement about the presence or absence of a Taxon at a
@@ -268,7 +268,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue OccurrenceStatus { get; set; }
+        public VocabularyValue OccurrenceStatus { get; set; }
 
         /// <summary>
         ///     URL to occurrence

@@ -5,7 +5,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     /// <summary>
     ///     Repository for retrieving processd taxa.
     /// </summary>
-    public interface IProcessedTaxonRepository : IMongoDbProcessedRepositoryBase<ProcessedTaxon, int>
+    public interface IProcessedTaxonRepository : IMongoDbProcessedRepositoryBase<Taxon, int>
     {
     }
 }

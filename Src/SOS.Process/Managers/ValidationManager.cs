@@ -46,9 +46,9 @@ namespace SOS.Process.Managers
         }
 
         /// <inheritdoc />
-        public ICollection<InvalidObservation> ValidateObservations(ref ICollection<ProcessedObservation> observations)
+        public ICollection<InvalidObservation> ValidateObservations(ref ICollection<Observation> observations)
         {
-            var validItems = new List<ProcessedObservation>();
+            var validItems = new List<Observation>();
             var invalidItems = new List<InvalidObservation>();
 
             foreach (var observation in observations)
@@ -74,7 +74,7 @@ namespace SOS.Process.Managers
         /// </summary>
         /// <param name="observation"></param>
         /// <returns></returns>
-        public InvalidObservation ValidateObservation(ProcessedObservation observation)
+        public InvalidObservation ValidateObservation(Observation observation)
         {
             var observationValidation = new InvalidObservation(observation.DatasetId, observation.DatasetName, observation.Occurrence.OccurrenceId);
 

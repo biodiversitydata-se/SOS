@@ -394,13 +394,13 @@ namespace SOS.Export.Extensions
         }
 
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
-            IEnumerable<ProcessedObservation> processedObservations)
+            IEnumerable<Observation> processedObservations)
         {
             return processedObservations?.SelectMany(ToExtendedMeasurementOrFactRows);
         }
 
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
-            ProcessedObservation observation)
+            Observation observation)
         {
             IEnumerable<ExtendedMeasurementOrFactRow> occurrenceEmof = null;
             IEnumerable<ExtendedMeasurementOrFactRow> eventEmof = null;
@@ -427,7 +427,7 @@ namespace SOS.Export.Extensions
         }
 
         private static ExtendedMeasurementOrFactRow ToExtendedMeasurementOrFactRow(
-            this ProcessedExtendedMeasurementOrFact processedEmof, string eventId = null)
+            this ExtendedMeasurementOrFact processedEmof, string eventId = null)
         {
             return new ExtendedMeasurementOrFactRow
             {
@@ -448,13 +448,13 @@ namespace SOS.Export.Extensions
         }
 
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
-            IEnumerable<ProcessedProject> projects, string occurrenceId)
+            IEnumerable<Project> projects, string occurrenceId)
         {
             return projects?.SelectMany(project => ToExtendedMeasurementOrFactRows(project, occurrenceId));
         }
 
         private static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(
-            ProcessedProject project, string occurrenceId)
+            Project project, string occurrenceId)
         {
             if (project?.ProjectParameters == null || !project.ProjectParameters.Any())
             {
@@ -468,8 +468,8 @@ namespace SOS.Export.Extensions
 
         private static ExtendedMeasurementOrFactRow ToExtendedMeasurementOrFactRow(
             string occurrenceId,
-            ProcessedProject project,
-            ProcessedProjectParameter projectParameter)
+            Project project,
+            ProjectParameter projectParameter)
         {
             var row = new ExtendedMeasurementOrFactRow();
             row.OccurrenceID = occurrenceId;
@@ -491,7 +491,7 @@ namespace SOS.Export.Extensions
             return row;
         }
 
-        private static string GetMeasurementMethodDescription(ProcessedProject project)
+        private static string GetMeasurementMethodDescription(Project project)
         {
             if (string.IsNullOrEmpty(project.SurveyMethod) && string.IsNullOrEmpty(project.SurveyMethodUrl))
             {

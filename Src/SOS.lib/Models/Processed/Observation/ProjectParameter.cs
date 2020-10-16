@@ -3,7 +3,7 @@
     /// <summary>
     ///     Darwin Core Project Parameter.
     /// </summary>
-    public class ProcessedProjectParameter
+    public class ProjectParameter
     {
         //  "occurrenceID", "measurementType", "measurementValue", "measurementUnit" 
 

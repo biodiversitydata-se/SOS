@@ -13,7 +13,7 @@
     /// <example>
     ///     A specific bird. A specific wolf pack. A specific instance of a bacterial culture.
     /// </example>
-    public class ProcessedOrganism
+    public class Organism
     {
         /// <summary>
         ///     An identifier for the Organism instance (as opposed to a particular digital record of the Organism).

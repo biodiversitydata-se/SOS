@@ -6,7 +6,7 @@ namespace SOS.Lib.Models.Processed.Observation
     /// <summary>
     ///     This class contains location information about a species sighting location
     /// </summary>
-    public class ProcessedLocation
+    public class Location
     {
         /// <summary>
         ///     The name of the continent in which the Location occurs.
@@ -19,7 +19,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue Continent { get; set; }
+        public VocabularyValue Continent { get; set; }
 
         /// <summary>
         ///     A decimal representation of the precision of the coordinates
@@ -47,7 +47,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue Country { get; set; }
+        public VocabularyValue Country { get; set; }
 
         /// <summary>
         ///     Special handling of Kalmar/Öland
@@ -72,7 +72,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue County { get; set; }
+        public VocabularyValue County { get; set; }
 
         /// <summary>
         ///     Darwin Core term name: municipality.
@@ -84,7 +84,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue Municipality { get; set; }
+        public VocabularyValue Municipality { get; set; }
 
         /// <summary>
         ///     The original municipality value from data provider.
@@ -98,7 +98,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue Parish { get; set; }
+        public VocabularyValue Parish { get; set; }
  
         /// <summary>
         ///     Darwin Core term name: stateProvince.
@@ -111,7 +111,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue Province { get; set; }
+        public VocabularyValue Province { get; set; }
 
         /// <summary>
         ///     The original StateProvince value from data provider.

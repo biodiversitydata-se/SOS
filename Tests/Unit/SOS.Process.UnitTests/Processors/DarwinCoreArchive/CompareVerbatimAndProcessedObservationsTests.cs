@@ -47,7 +47,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var processedObservation = _fixture.DwcaObservationFactory.CreateProcessedObservation(dwcaObservation);
-            fieldMappingResolverHelper.ResolveFieldMappedValues(new List<ProcessedObservation> {processedObservation});
+            fieldMappingResolverHelper.ResolveFieldMappedValues(new List<Observation> {processedObservation});
             var compareResult = new CompareObservation
             {
                 VerbatimObservation = dwcaObservation,

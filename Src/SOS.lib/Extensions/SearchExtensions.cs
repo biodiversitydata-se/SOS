@@ -11,9 +11,9 @@ namespace SOS.Lib.Extensions
 {
     public static class SearchExtensions
     {
-        private static List<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> CreateTypedQuery(FilterBase filter)
+        private static List<Func<QueryContainerDescriptor<Observation>, QueryContainer>> CreateTypedQuery(FilterBase filter)
         {
-            var queryContainers = new List<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>>();
+            var queryContainers = new List<Func<QueryContainerDescriptor<Observation>, QueryContainer>>();
 
             if (filter.CountyIds?.Any() ?? false)
             {
@@ -401,7 +401,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> ToTypedProjectParameterQuery(
+        public static IEnumerable<Func<QueryContainerDescriptor<Observation>, QueryContainer>> ToTypedProjectParameterQuery(
             this FilterBase filter)
         {
             var query = CreateTypedQuery(filter);
@@ -442,12 +442,12 @@ namespace SOS.Lib.Extensions
             return CreateQuery(filter);
         }
 
-        public static IEnumerable<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>> ToTypedObservationQuery(
+        public static IEnumerable<Func<QueryContainerDescriptor<Observation>, QueryContainer>> ToTypedObservationQuery(
             this FilterBase filter)
         {
             if (!filter.IsFilterActive)
             {
-                return new List<Func<QueryContainerDescriptor<ProcessedObservation>, QueryContainer>>();
+                return new List<Func<QueryContainerDescriptor<Observation>, QueryContainer>>();
             }
 
             return CreateTypedQuery(filter);

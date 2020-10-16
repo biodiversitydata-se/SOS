@@ -166,8 +166,8 @@ namespace SOS.Process.Jobs
                 var providerInfoByDataProvider = new Dictionary<DataProvider, ProviderInfo>();
                 var metaDataProviderInfo = await GetProviderInfoAsync(new Dictionary<string, DataProviderType>
                 {
-                    {nameof(Area), DataProviderType.Areas},
-                    {nameof(ProcessedTaxon), DataProviderType.Taxa}
+                    {nameof(Lib.Models.Processed.Observation.Area), DataProviderType.Areas},
+                    {nameof(Taxon), DataProviderType.Taxa}
                 });
 
                 //------------------------------------------------------------------------

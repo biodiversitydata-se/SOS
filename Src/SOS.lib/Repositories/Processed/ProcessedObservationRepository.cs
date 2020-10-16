@@ -16,7 +16,7 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public class ProcessedObservationRepository : ProcessRepositoryBase<ProcessedObservation>,
+    public class ProcessedObservationRepository : ProcessRepositoryBase<Observation>,
         IProcessedObservationRepository
     {
         private const string ScrollTimeOut = "45s";
@@ -32,7 +32,7 @@ namespace SOS.Lib.Repositories.Processed
                     .NumberOfShards(6)
                     .NumberOfReplicas(0)
                 )
-                .Map<ProcessedObservation>(p => p
+                .Map<Observation>(p => p
                     .AutoMap()
                     .Properties(ps => ps
                         .GeoShape(gs => gs
@@ -79,7 +79,7 @@ namespace SOS.Lib.Repositories.Processed
 
 
         /// <inheritdoc />
-        public new async Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items)
+        public new async Task<int> AddManyAsync(IEnumerable<Observation> items)
         {
             // Save valid processed data
             Logger.LogDebug($"Start indexing batch for searching with {items.Count()} items");
@@ -131,7 +131,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 // Create the collection
-                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q => q
+                var res = await _elasticClient.DeleteByQueryAsync<Observation>(q => q
                     .Index(IndexName)
                     .Query(q => q
                         .Terms(t => t
@@ -156,7 +156,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 // Create the collection
-                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q => q
+                var res = await _elasticClient.DeleteByQueryAsync<Observation>(q => q
                     .Index(IndexName)
                     .Query(q => q
                         .Term(t => t
@@ -180,7 +180,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 // Create the collection
-                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q => q
+                var res = await _elasticClient.DeleteByQueryAsync<Observation>(q => q
                     .Index(IndexName)
                     .Query(q => q
                         .Term(t => t
@@ -210,7 +210,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                var res = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                var res = await _elasticClient.SearchAsync<Observation>(s => s
                     .Index(IndexName)
                     .Query(q => q
                         .Term(t => t
@@ -252,7 +252,7 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        private BulkAllObserver WriteToElastic(IEnumerable<ProcessedObservation> items)
+        private BulkAllObserver WriteToElastic(IEnumerable<Observation> items)
         {
             if (!items.Any())
             {
@@ -279,14 +279,14 @@ namespace SOS.Lib.Repositories.Processed
                     next => { Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}"); });
         }
 
-        private async Task<ScrollResult<ProcessedObservation>> ScrollObservationsAsync(int dataProviderId,
+        private async Task<ScrollResult<Observation>> ScrollObservationsAsync(int dataProviderId,
             string scrollId)
         {
-            ISearchResponse<ProcessedObservation> searchResponse;
+            ISearchResponse<Observation> searchResponse;
             if (string.IsNullOrEmpty(scrollId))
             {
                 searchResponse = await _elasticClient
-                    .SearchAsync<ProcessedObservation>(s => s
+                    .SearchAsync<Observation>(s => s
                         .Index(IndexName)
                         .Query(query => query.Term(term => term.Field(obs => obs.DataProviderId).Value(dataProviderId)))
                         .Scroll(ScrollTimeOut)
@@ -296,10 +296,10 @@ namespace SOS.Lib.Repositories.Processed
             else
             {
                 searchResponse = await _elasticClient
-                    .ScrollAsync<ProcessedObservation>(ScrollTimeOut, scrollId);
+                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
             }
 
-            return new ScrollResult<ProcessedObservation>
+            return new ScrollResult<Observation>
             {
                 Records = searchResponse.Documents,
                 ScrollId = searchResponse.ScrollId,

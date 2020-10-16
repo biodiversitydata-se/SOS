@@ -19,7 +19,7 @@ namespace SOS.Export.Repositories
     /// <summary>
     ///     Species data service
     /// </summary>
-    public class ProcessedObservationRepository : BaseRepository<ProcessedObservation, string>,
+    public class ProcessedObservationRepository : BaseRepository<Observation, string>,
         IProcessedObservationRepository
     {
         private const string ScrollTimeOut = "45s";
@@ -47,7 +47,7 @@ namespace SOS.Export.Repositories
                 : $"{elasticConfiguration.IndexPrefix.ToLower()}-{CollectionName.ToLower()}";
         }
 
-        public async Task<ScrollResult<ProcessedProject>> ScrollProjectParametersAsync(
+        public async Task<ScrollResult<Project>> ScrollProjectParametersAsync(
             FilterBase filter,
             string scrollId)
         {
@@ -76,11 +76,11 @@ namespace SOS.Export.Repositories
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
 
-            return new ScrollResult<ProcessedProject>
+            return new ScrollResult<Project>
             {
                 Records = searchResponse.Documents
                     .Select(po =>
-                        (ProcessedObservation) JsonConvert.DeserializeObject<ProcessedObservation>(
+                        (Observation) JsonConvert.DeserializeObject<Observation>(
                             JsonConvert.SerializeObject(po)))
                     .SelectMany(p => p.Projects),
                 ScrollId = searchResponse.ScrollId,
@@ -93,10 +93,10 @@ namespace SOS.Export.Repositories
             FilterBase filter,
             string scrollId)
         {
-            ISearchResponse<ProcessedObservation> searchResponse;
+            ISearchResponse<Observation> searchResponse;
             if (string.IsNullOrEmpty(scrollId))
             {
-                searchResponse = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                searchResponse = await _elasticClient.SearchAsync<Observation>(s => s
                     .Index(_indexName)
                     .Source(source => source
                         .Includes(i => i
@@ -113,7 +113,7 @@ namespace SOS.Export.Repositories
             else
             {
                 searchResponse = await _elasticClient
-                    .ScrollAsync<ProcessedObservation>(ScrollTimeOut, scrollId);
+                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
             }
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
@@ -127,23 +127,23 @@ namespace SOS.Export.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<ScrollResult<ProcessedObservation>> TypedScrollObservationsAsync(
+        public async Task<ScrollResult<Observation>> TypedScrollObservationsAsync(
             FilterBase filter,
             string scrollId)
         {
-            ISearchResponse<ProcessedObservation> searchResponse;
+            ISearchResponse<Observation> searchResponse;
             
             if (string.IsNullOrEmpty(scrollId))
             {
                 var query = filter.ToTypedObservationQuery();
-                var projection = new SourceFilterDescriptor<ProcessedObservation>()
+                var projection = new SourceFilterDescriptor<Observation>()
                     .Excludes(e => e.Fields(
                         f => f.Location.Point,
                         f => f.Location.PointLocation,
                         f => f.Location.PointWithBuffer));
 
                 searchResponse = await _elasticClient
-                    .SearchAsync<ProcessedObservation>(s => s
+                    .SearchAsync<Observation>(s => s
                         .Index(_indexName)
                         .Source(p => projection)
                         .Query(q => q
@@ -159,10 +159,10 @@ namespace SOS.Export.Repositories
             else
             {
                 searchResponse = await _elasticClient
-                    .ScrollAsync<ProcessedObservation>(ScrollTimeOut, scrollId);
+                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
             }
 
-            return new ScrollResult<ProcessedObservation>
+            return new ScrollResult<Observation>
             {
                 Records = searchResponse.Documents,
                 ScrollId = searchResponse.ScrollId,
@@ -172,7 +172,7 @@ namespace SOS.Export.Repositories
 
 
         /// <inheritdoc />
-        public async Task<ScrollResult<ProcessedObservation>> ScrollObservationsAsync(FilterBase filter,
+        public async Task<ScrollResult<Observation>> ScrollObservationsAsync(FilterBase filter,
             string scrollId)
         {
             ISearchResponse<dynamic> searchResponse;
@@ -204,11 +204,11 @@ namespace SOS.Export.Repositories
                     .ScrollAsync<dynamic>(ScrollTimeOut, scrollId);
             }
 
-            return new ScrollResult<ProcessedObservation>
+            return new ScrollResult<Observation>
             {
                 Records = searchResponse.Documents
                     .Select(po =>
-                        (ProcessedObservation) JsonConvert.DeserializeObject<ProcessedObservation>(
+                        (Observation) JsonConvert.DeserializeObject<Observation>(
                             JsonConvert.SerializeObject(po))),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value

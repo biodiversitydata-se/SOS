@@ -20,9 +20,9 @@ namespace SOS.Process.Processors.ClamPortal
     {
         private const string ValidatedObservationStringValue = "Godkänd";
         private readonly DataProvider _dataProvider;
-        private readonly IDictionary<int, ProcessedTaxon> _taxa;
+        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
 
-        public ClamPortalObservationFactory(DataProvider dataProvider, IDictionary<int, ProcessedTaxon> taxa)
+        public ClamPortalObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -33,7 +33,7 @@ namespace SOS.Process.Processors.ClamPortal
         /// </summary>
         /// <param name="verbatimObservations"></param>
         /// <returns></returns>
-        public IEnumerable<ProcessedObservation> CreateProcessedObservations(
+        public IEnumerable<Observation> CreateProcessedObservations(
             IEnumerable<ClamObservationVerbatim> verbatimObservations)
         {
             return verbatimObservations.Select(CreateProcessedObservation);
@@ -44,7 +44,7 @@ namespace SOS.Process.Processors.ClamPortal
         /// </summary>
         /// <param name="verbatimObservation"></param>
         /// <returns></returns>
-        public ProcessedObservation CreateProcessedObservation(ClamObservationVerbatim verbatimObservation)
+        public Observation CreateProcessedObservation(ClamObservationVerbatim verbatimObservation)
         {
             Point wgs84Point = null;
             if (verbatimObservation.DecimalLongitude > 0 && verbatimObservation.DecimalLatitude > 0)
@@ -55,21 +55,21 @@ namespace SOS.Process.Processors.ClamPortal
 
             _taxa.TryGetValue(verbatimObservation.DyntaxaTaxonId ?? -1, out var taxon);
 
-            return new ProcessedObservation
+            return new Observation
             {
                 DataProviderId = _dataProvider.Id,
                 AccessRights = GetAccessRightsIdFromString(verbatimObservation.AccessRights),
                 BasisOfRecord = GetBasisOfRecordIdFromString(verbatimObservation.BasisOfRecord),
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.ClamGateway}",
                 DatasetName = "Träd och musselportalen",
-                Event = new ProcessedEvent
+                Event = new Event
                 {
                     EndDate = verbatimObservation.ObservationDate.ToUniversalTime(),
                     SamplingProtocol = verbatimObservation.SurveyMethod,
                     StartDate = verbatimObservation.ObservationDate.ToUniversalTime(),
                     VerbatimEventDate = DwcFormatter.CreateDateString(verbatimObservation.ObservationDate)
                 },
-                Identification = new ProcessedIdentification
+                Identification = new Identification
                 {
                     Validated = verbatimObservation.IdentificationVerificationStatus.Equals(
                         ValidatedObservationStringValue, StringComparison.CurrentCultureIgnoreCase),
@@ -79,9 +79,9 @@ namespace SOS.Process.Processors.ClamPortal
                 },
                 InstitutionCode = GetOrganizationIdFromString(verbatimObservation.InstitutionCode),
                 Language = verbatimObservation.Language,
-                Location = new ProcessedLocation
+                Location = new Lib.Models.Processed.Observation.Location
                 {
-                    Continent = new ProcessedFieldMapValue {Id = (int) ContinentId.Europe},
+                    Continent = new VocabularyValue { Id = (int)ContinentId.Europe},
                     CoordinatePrecision = verbatimObservation.CoordinateUncertaintyInMeters,
                     CountryCode = verbatimObservation.CountryCode,
                     DecimalLatitude = verbatimObservation.DecimalLatitude,
@@ -101,7 +101,7 @@ namespace SOS.Process.Processors.ClamPortal
                     WaterBody = verbatimObservation.WaterBody
                 },
                 Modified = verbatimObservation.Modified?.ToUniversalTime() ?? DateTime.MinValue.ToUniversalTime(),
-                Occurrence = new ProcessedOccurrence
+                Occurrence = new Occurrence
                 {
                     CatalogNumber = verbatimObservation.CatalogNumber.ToString(),
                     OccurrenceId = verbatimObservation.OccurrenceId.Trim(),
@@ -122,7 +122,7 @@ namespace SOS.Process.Processors.ClamPortal
                     ? null
                     : new[]
                     {
-                        new ProcessedProject
+                        new Project
                         {
                             Name = verbatimObservation.ProjectName
                         }
@@ -134,20 +134,20 @@ namespace SOS.Process.Processors.ClamPortal
             };
         }
 
-        private ProcessedFieldMapValue GetBasisOfRecordIdFromString(string basisOfRecord)
+        private VocabularyValue GetBasisOfRecordIdFromString(string basisOfRecord)
         {
             if (string.IsNullOrEmpty(basisOfRecord)) return null;
 
             switch (basisOfRecord)
             {
                 case "Human observation":
-                    return new ProcessedFieldMapValue
+                    return new VocabularyValue
                     {
                         Id = (int) BasisOfRecordId.HumanObservation
                     };
 
                 default:
-                    return new ProcessedFieldMapValue
+                    return new VocabularyValue
                     {
                         Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
                         Value = basisOfRecord
@@ -155,20 +155,20 @@ namespace SOS.Process.Processors.ClamPortal
             }
         }
 
-        private ProcessedFieldMapValue GetAccessRightsIdFromString(string accessRights)
+        private VocabularyValue GetAccessRightsIdFromString(string accessRights)
         {
             if (string.IsNullOrEmpty(accessRights)) return null;
 
             switch (accessRights)
             {
                 case "FreeUsage":
-                    return new ProcessedFieldMapValue
+                    return new VocabularyValue
                     {
                         Id = (int) AccessRightsId.FreeUsage
                     };
 
                 default:
-                    return new ProcessedFieldMapValue
+                    return new VocabularyValue
                     {
                         Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
                         Value = accessRights
@@ -176,26 +176,26 @@ namespace SOS.Process.Processors.ClamPortal
             }
         }
 
-        private ProcessedFieldMapValue GetOccurrenceStatusIdFromString(string occurrenceStatus)
+        private VocabularyValue GetOccurrenceStatusIdFromString(string occurrenceStatus)
         {
             if (string.IsNullOrEmpty(occurrenceStatus)) return null;
 
             switch (occurrenceStatus)
             {
                 case "Present":
-                    return new ProcessedFieldMapValue
+                    return new VocabularyValue
                     {
                         Id = (int) OccurrenceStatusId.Present
                     };
 
                 case "Not rediscovered":
-                    return new ProcessedFieldMapValue
+                    return new VocabularyValue
                     {
                         Id = (int) OccurrenceStatusId.Absent
                     };
 
                 default:
-                    return new ProcessedFieldMapValue
+                    return new VocabularyValue
                     {
                         Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
                         Value = occurrenceStatus
@@ -203,20 +203,20 @@ namespace SOS.Process.Processors.ClamPortal
             }
         }
 
-        private ProcessedFieldMapValue GetOrganismQuantityUnitIdFromString(string quantityUnit)
+        private VocabularyValue GetOrganismQuantityUnitIdFromString(string quantityUnit)
         {
             if (string.IsNullOrEmpty(quantityUnit)) return null;
 
             switch (quantityUnit)
             {
                 case "Antal individer":
-                    return new ProcessedFieldMapValue
+                    return new VocabularyValue
                     {
                         Id = (int) UnitId.Individuals
                     };
 
                 default:
-                    return new ProcessedFieldMapValue
+                    return new VocabularyValue
                     {
                         Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
                         Value = quantityUnit
@@ -224,20 +224,20 @@ namespace SOS.Process.Processors.ClamPortal
             }
         }
 
-        private ProcessedFieldMapValue GetOrganizationIdFromString(string institutionCode)
+        private VocabularyValue GetOrganizationIdFromString(string institutionCode)
         {
             if (string.IsNullOrEmpty(institutionCode)) return null;
 
             switch (institutionCode)
             {
                 case "ArtDatabanken":
-                    return new ProcessedFieldMapValue
+                    return new VocabularyValue
                     {
                         Id = (int) OrganizationId.ArtDatabanken
                     };
 
                 default:
-                    return new ProcessedFieldMapValue
+                    return new VocabularyValue
                     {
                         Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
                         Value = institutionCode
@@ -245,7 +245,7 @@ namespace SOS.Process.Processors.ClamPortal
             }
         }
 
-        private ProcessedFieldMapValue GetLifeStageIdFromString(string lifeStage)
+        private VocabularyValue GetLifeStageIdFromString(string lifeStage)
         {
             if (string.IsNullOrEmpty(lifeStage)) return null;
             // Sample values from ClamPortal web service for LifeStage field:
@@ -253,7 +253,7 @@ namespace SOS.Process.Processors.ClamPortal
             // "Ant. lev:13,död:12"
 
             // todo - should we return null or NoMappingFoundCustomValueIsUsedId?
-            return new ProcessedFieldMapValue
+            return new VocabularyValue
             {
                 Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
                 Value = lifeStage
@@ -261,18 +261,18 @@ namespace SOS.Process.Processors.ClamPortal
             //return null; // no valid values for LifeStage
         }
 
-        private ProcessedFieldMapValue GetValidationStatusIdFromString(string validationStatus)
+        private VocabularyValue GetValidationStatusIdFromString(string validationStatus)
         {
             if (string.IsNullOrEmpty(validationStatus)) return null;
             if (validationStatus.Equals(ValidatedObservationStringValue, StringComparison.CurrentCultureIgnoreCase))
             {
-                return new ProcessedFieldMapValue
+                return new VocabularyValue
                 {
                     Id = (int) ValidationStatusId.ApprovedBasedOnReportersDocumentation
                 };
             }
 
-            return new ProcessedFieldMapValue
+            return new VocabularyValue
             {
                 Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId,
                 Value = validationStatus

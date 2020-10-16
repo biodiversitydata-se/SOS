@@ -10,7 +10,7 @@ namespace SOS.Lib.Models.Processed.Observation
     /// <summary>
     ///     This class contains information about a species sighting
     /// </summary>
-    public class ProcessedObservation : IEntity<string>
+    public class Observation : IEntity<string>
     {
         /// <summary>
         ///     List of defects found in harvest
@@ -24,7 +24,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     action that occurs at a place and during a period of time).
         /// </summary>
         [Object]
-        public ProcessedEvent Event { get; set; }
+        public Event Event { get; set; }
 
         
 
@@ -32,21 +32,21 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Geological information, such as stratigraphy, that qualifies a region or place.
         /// </summary>
         [Object]
-        public ProcessedGeologicalContext GeologicalContext { get; set; }
+        public GeologicalContext GeologicalContext { get; set; }
 
         /// <summary>
         ///     The category of information pertaining to taxonomic
         ///     determinations (the assignment of a scientific name).
         /// </summary>
         [Object]
-        public ProcessedIdentification Identification { get; set; }
+        public Identification Identification { get; set; }
 
         /// <summary>
         ///     A spatial region or named place. For Darwin Core,
         ///     a set of terms describing a place, whether named or not.
         /// </summary>
         [Object]
-        public ProcessedLocation Location { get; set; }
+        public Location Location { get; set; }
 
         /// <summary>
         ///     A physical result of a sampling (or subsampling) event. In biological collections,
@@ -57,7 +57,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     A soil sample. A marine microbial sample.
         /// </example>
         [Object]
-        public ProcessedMaterialSample MaterialSample { get; set; }
+        public MaterialSample MaterialSample { get; set; }
 
         /// <summary>
         ///     The category of information pertaining to evidence of
@@ -65,26 +65,26 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     dataset (specimen, observation, etc.).
         /// </summary>
         [Object]
-        public ProcessedOccurrence Occurrence { get; set; }
+        public Occurrence Occurrence { get; set; }
 
         /// <summary>
         ///     A particular organism or defined group of organisms considered to be taxonomically homogeneous.
         /// </summary>
         [Object]
-        public ProcessedOrganism Organism { get; set; }
+        public Organism Organism { get; set; }
 
         /// <summary>
         ///     Projects connected to sighting
         /// </summary>
         [Nested]
-        public IEnumerable<ProcessedProject> Projects { get; set; }
+        public IEnumerable<Project> Projects { get; set; }
 
         /// <summary>
         ///     The category of information pertaining to taxonomic names,
         ///     taxon name usages, or taxon concepts.
         /// </summary>
         [Object]
-        public ProcessedTaxon Taxon { get; set; }
+        public Taxon Taxon { get; set; }
 
         #region Record level
 
@@ -99,7 +99,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue AccessRights { get; set; }
+        public VocabularyValue AccessRights { get; set; }
 
         /// <summary>
         ///     The specific nature of the data record -
@@ -112,7 +112,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue BasisOfRecord { get; set; }
+        public VocabularyValue BasisOfRecord { get; set; }
 
         /// <summary>
         ///     A bibliographic reference for the resource as a statement
@@ -194,7 +194,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue InstitutionCode { get; set; }
+        public VocabularyValue InstitutionCode { get; set; }
 
         /// <summary>
         ///     Internal flag used in validation. must be true to be stored in processed data
@@ -284,7 +284,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue Type { get; set; }
+        public VocabularyValue Type { get; set; }
 
         /// <summary>
         /// Verbatim numeric id if applicable
@@ -302,13 +302,13 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Media linked to the observation
         /// </summary>
         [Nested]
-        public ICollection<ProcessedMultimedia> Media { get; set; }
+        public ICollection<Multimedia> Media { get; set; }
 
         /// <summary>
         ///     Measurement or fact linked to the observation.
         /// </summary>
         [Nested]
-        public ICollection<ProcessedExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
+        public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
 
         //public string VerbatimObservation { get; set; } // todo - this could be used to store the orginal verbatim observation.
     }

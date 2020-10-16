@@ -3,7 +3,7 @@
     /// <summary>
     ///     Represents a area
     /// </summary>
-    public class ProcessedArea
+    public class Area
     {
         /// <summary>
         ///     Id of area

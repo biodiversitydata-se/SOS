@@ -31,8 +31,8 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)
         {
-            var activeProcessedInfoId = $"{nameof(ProcessedObservation)}-{ActiveInstance}";
-            var inactiveProcessedInfoId = $"{nameof(ProcessedObservation)}-{InActiveInstance}";
+            var activeProcessedInfoId = $"{nameof(Observation)}-{ActiveInstance}";
+            var inactiveProcessedInfoId = $"{nameof(Observation)}-{InActiveInstance}";
             // Get data from active instance
             var source = await GetAsync(activeProcessedInfoId);
             var sourceProvider =

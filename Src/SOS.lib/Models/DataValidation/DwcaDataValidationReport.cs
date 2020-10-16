@@ -43,7 +43,7 @@ namespace SOS.Lib.Models.DataValidation
         public string Term { get; set; }
         public List<DistinctValuesSummaryItem> MappedValues { get; set; }
         public List<DistinctValuesSummaryItem> CustomValues { get; set; }
-        public List<ProcessedFieldMapValue> SosVocabulary { get; set; }
+        public List<VocabularyValue> SosVocabulary { get; set; }
     }
 
     public class DistinctValuesSummaryItem

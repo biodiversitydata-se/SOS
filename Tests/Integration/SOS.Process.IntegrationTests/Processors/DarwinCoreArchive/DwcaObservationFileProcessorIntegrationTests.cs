@@ -125,7 +125,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             return mock;
         }
 
-        private async Task<IDictionary<int, ProcessedTaxon>> GetTaxonDictionaryAsync()
+        private async Task<IDictionary<int, Taxon>> GetTaxonDictionaryAsync()
         {
             var processedTaxonRepository = CreateProcessedTaxonRepository();
             var taxa = await processedTaxonRepository.GetAllAsync();

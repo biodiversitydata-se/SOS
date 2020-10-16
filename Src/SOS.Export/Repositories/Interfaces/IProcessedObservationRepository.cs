@@ -7,7 +7,7 @@ namespace SOS.Export.Repositories.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IProcessedObservationRepository : IBaseRepository<ProcessedObservation, string>
+    public interface IProcessedObservationRepository : IBaseRepository<Observation, string>
     {
         /// <summary>
         ///     Get project parameters.
@@ -15,7 +15,7 @@ namespace SOS.Export.Repositories.Interfaces
         /// <param name="filter"></param>
         /// <param name="scrollId"></param>
         /// <returns></returns>
-        Task<ScrollResult<ProcessedProject>> ScrollProjectParametersAsync(FilterBase filter, string scrollId);
+        Task<ScrollResult<Project>> ScrollProjectParametersAsync(FilterBase filter, string scrollId);
 
         /// <summary>
         ///     Get observation by scroll
@@ -23,7 +23,7 @@ namespace SOS.Export.Repositories.Interfaces
         /// <param name="filter"></param>
         /// <param name="scrollId"></param>
         /// <returns></returns>
-        Task<ScrollResult<ProcessedObservation>> ScrollObservationsAsync(FilterBase filter, string scrollId);
+        Task<ScrollResult<Observation>> ScrollObservationsAsync(FilterBase filter, string scrollId);
 
         /// <summary>
         ///     Get observation by scroll. 
@@ -32,7 +32,7 @@ namespace SOS.Export.Repositories.Interfaces
         /// <param name="scrollId"></param>
         /// <remarks>To improve performance this method doesn't use the dynamic type.</remarks>
         /// <returns></returns>
-        Task<ScrollResult<ProcessedObservation>> TypedScrollObservationsAsync(
+        Task<ScrollResult<Observation>> TypedScrollObservationsAsync(
             FilterBase filter,
             string scrollId);
 

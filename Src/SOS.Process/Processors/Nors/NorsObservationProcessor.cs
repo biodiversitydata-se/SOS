@@ -57,12 +57,12 @@ namespace SOS.Process.Processors.Nors
         /// <inheritdoc />
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
-            ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
+            ICollection<Observation> observations = new List<Observation>();
             var observationFactory = new NorsObservationFactory(dataProvider, taxa);
 
             using var cursor = await _norsObservationVerbatimRepository.GetAllByCursorAsync();

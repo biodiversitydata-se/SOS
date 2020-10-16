@@ -10,7 +10,7 @@ namespace SOS.Export.Repositories
 {
     /// <summary>
     /// </summary>
-    public class ProcessedTaxonRepository : BaseRepository<ProcessedTaxon, int>, IProcessedTaxonRepository
+    public class ProcessedTaxonRepository : BaseRepository<Taxon, int>, IProcessedTaxonRepository
     {
         /// <summary>
         ///     Constructor
@@ -30,11 +30,11 @@ namespace SOS.Export.Repositories
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<ProcessedBasicTaxon>> GetBasicTaxonChunkAsync(int skip, int take)
+        public async Task<IEnumerable<BasicTaxon>> GetBasicTaxonChunkAsync(int skip, int take)
         {
             var res = await MongoCollection
                 .Find(x => true)
-                .Project(m => new ProcessedBasicTaxon
+                .Project(m => new BasicTaxon
                 {
                     DyntaxaTaxonId = m.DyntaxaTaxonId,
                     Id = m.Id,

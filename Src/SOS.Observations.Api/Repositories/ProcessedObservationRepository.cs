@@ -24,7 +24,7 @@ namespace SOS.Observations.Api.Repositories
     /// <summary>
     ///     Species data service
     /// </summary>
-    public class ProcessedObservationRepository : ProcessBaseRepository<ProcessedObservation, string>,
+    public class ProcessedObservationRepository : ProcessBaseRepository<Observation, string>,
         IProcessedObservationRepository
     {
         private const int ElasticSearchMaxRecords = 10000;
@@ -156,7 +156,7 @@ namespace SOS.Observations.Api.Repositories
         {
             var (query, excludeQuery) = GetCoreQueries(filter);
 
-            var sortDescriptor = sortBy.ToSortDescriptor<ProcessedObservation>(sortOrder);
+            var sortDescriptor = sortBy.ToSortDescriptor<Observation>(sortOrder);
             using var operation = _telemetry.StartOperation<DependencyTelemetry>("Observation_Search");
 
             operation.Telemetry.Properties["Filter"] = filter.ToString();
@@ -426,7 +426,7 @@ namespace SOS.Observations.Api.Repositories
         {
             try
             {
-                var res = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                var res = await _elasticClient.SearchAsync<Observation>(s => s
                     .Index(_indexName)
                     .Query(q => q
                         .Term(t => t

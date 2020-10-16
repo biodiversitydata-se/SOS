@@ -10,13 +10,13 @@ namespace SOS.Process.Helpers.Interfaces
         /// </summary>
         /// <param name="processedObservations"></param>
         /// <returns></returns>
-        void AddAreaDataToProcessedObservations(IEnumerable<ProcessedObservation> processedObservations);
+        void AddAreaDataToProcessedObservations(IEnumerable<Observation> processedObservations);
 
         /// <summary>
         ///     Add area data to processed observation model
         /// </summary>
         /// <param name="processedObservation"></param>
-        void AddAreaDataToProcessedObservation(ProcessedObservation processedObservation);
+        void AddAreaDataToProcessedObservation(Observation processedObservation);
 
         /// <summary>
         /// Clear area cache

@@ -122,14 +122,14 @@ namespace SOS.Import.IntegrationTests.Managers
         private JsonSerializerSettings CreateJsonSerializerSettings()
         {
             var jsonResolver = new IgnorableSerializerContractResolver { SetStringPropertyDefaultsToEmptyString = true}
-                .Ignore<ProcessedObservation>(obs => obs.Location.Point)
-                .Ignore<ProcessedObservation>(obs => obs.Location.PointWithBuffer)
-                .Ignore<ProcessedObservation>(obs => obs.IsInEconomicZoneOfSweden)
+                .Ignore<Observation>(obs => obs.Location.Point)
+                .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
+                .Ignore<Observation>(obs => obs.IsInEconomicZoneOfSweden)
                 .Ignore<DwcObservationVerbatim>(obs => obs.RecordId)
                 .Ignore<DwcObservationVerbatim>(obs => obs.Id)
                 .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderId)
                 .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderIdentifier)
-                .KeepTypeWithDefaultValue(typeof(ProcessedFieldMapValue));
+                .KeepTypeWithDefaultValue(typeof(VocabularyValue));
 
             var jsonSettings = new JsonSerializerSettings()
             {

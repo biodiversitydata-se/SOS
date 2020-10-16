@@ -62,7 +62,7 @@ namespace SOS.Process.IntegrationTests.TestHelpers
             return dwcaObservationFactory;
         }
 
-        private async Task<IDictionary<int, ProcessedTaxon>> GetTaxonDictionaryAsync()
+        private async Task<IDictionary<int, Taxon>> GetTaxonDictionaryAsync()
         {
             var processedTaxonRepository = CreateProcessedTaxonRepository();
             var taxa = await processedTaxonRepository.GetAllAsync();

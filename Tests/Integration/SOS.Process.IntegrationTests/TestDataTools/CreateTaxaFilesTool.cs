@@ -49,7 +49,7 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            IEnumerable<ProcessedTaxon> taxa = await taxonProcessedRepository.GetAllAsync();
+            IEnumerable<Taxon> taxa = await taxonProcessedRepository.GetAllAsync();
             var basicTaxa = taxa.ToProcessedBasicTaxa();
             var tree = TaxonTreeFactory.CreateTaxonTree(basicTaxa);
             var mammaliaTaxonIds = tree.GetUnderlyingTaxonIds(MammaliaTaxonId, true);
@@ -77,7 +77,7 @@ namespace SOS.Process.IntegrationTests.TestDataTools
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            IEnumerable<ProcessedTaxon> taxa = await taxonProcessedRepository.GetAllAsync();
+            IEnumerable<Taxon> taxa = await taxonProcessedRepository.GetAllAsync();
             var basicTaxa = taxa.ToProcessedBasicTaxa();
             var options = ContractlessStandardResolver.Options.WithCompression(MessagePackCompression.Lz4BlockArray);
             var bin = MessagePackSerializer.Serialize(basicTaxa, options);

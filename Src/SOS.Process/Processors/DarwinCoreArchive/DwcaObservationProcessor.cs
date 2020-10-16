@@ -79,7 +79,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
         public override async Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
@@ -133,7 +133,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         /// <returns></returns>
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
@@ -142,7 +142,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
 
         private async Task<int> ProcessObservationsSequential(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
@@ -151,7 +151,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 taxa,
                 _processedFieldMappingRepository,
                 _areaHelper);
-            ICollection<ProcessedObservation> sightings = new List<ProcessedObservation>();
+            ICollection<Observation> sightings = new List<Observation>();
             using var cursor = await _dwcaVerbatimRepository.GetAllByCursorAsync(dataProvider.Id, dataProvider.Identifier);
             int counter = 0;
             // Process and commit in batches.

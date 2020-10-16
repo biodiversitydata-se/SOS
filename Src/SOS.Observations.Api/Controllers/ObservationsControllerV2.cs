@@ -67,7 +67,7 @@ namespace SOS.Observations.Api.Controllers.V2
         /// properties that is read when created the swagger documentation.
         /// </remarks>
         [HttpPost("search")]
-        [ProducesResponseType(typeof(PagedResultDto<ProcessedObservation>), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetObservationsAsync(
