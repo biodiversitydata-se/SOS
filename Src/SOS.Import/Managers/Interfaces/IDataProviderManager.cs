@@ -57,6 +57,6 @@ namespace SOS.Import.Managers.Interfaces
         /// <param name="dataProviderId"></param>
         /// <param name="xmlDocument"></param>
         /// <returns></returns>
-        Task<bool> SetEmlMetadata(int dataProviderId, XDocument xmlDocument);
+        Task<bool> SetEmlMetadataAsync(int dataProviderId, XDocument xmlDocument);
     }
 }

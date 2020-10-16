@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Nest;
 using NLog.Web;
@@ -120,6 +121,16 @@ namespace SOS.Hangfire.JobServer
 
                     // Add the processing server as IHostedService
                     services.AddHangfireServer();
+
+                    // MongoDB conventions.
+                    ConventionRegistry.Register(
+                        "MongoDB Solution Conventions",
+                        new ConventionPack
+                        {
+                            new IgnoreExtraElementsConvention(true), 
+                            new IgnoreIfNullConvention(true)
+                        }, 
+                        t => true);
 
                     // Get configuration
                     _verbatimDbConfiguration = hostContext.Configuration.GetSection("ApplicationSettings")

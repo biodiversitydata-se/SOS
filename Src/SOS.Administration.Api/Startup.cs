@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using SOS.Lib.Configuration.Shared;
 
@@ -97,7 +98,17 @@ namespace SOS.Administration.Api
                 options.MultipartHeadersCountLimit = int.MaxValue;
                 options.MultipartHeadersLengthLimit = int.MaxValue;
             });
-            
+
+            // MongoDB conventions.
+            ConventionRegistry.Register(
+                "MongoDB Solution Conventions",
+                new ConventionPack
+                {
+                    new IgnoreExtraElementsConvention(true),
+                    new IgnoreIfNullConvention(true)
+                },
+                t => true);
+
             // Swagger
             services.AddSwaggerGen(
                 options =>

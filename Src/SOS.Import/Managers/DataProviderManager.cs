@@ -136,8 +136,9 @@ namespace SOS.Import.Managers
         /// <param name="dataProviderId"></param>
         /// <param name="xmlDocument"></param>
         /// <returns></returns>
-        public async Task<bool> SetEmlMetadata(int dataProviderId, XDocument xmlDocument)
+        public async Task<bool> SetEmlMetadataAsync(int dataProviderId, XDocument xmlDocument)
         {
+            if (xmlDocument == null || xmlDocument.Root?.Name.LocalName != "eml") return false;
             string jsonStr = JsonConvert.SerializeXNode(xmlDocument);
             BsonDocument bsonDoc = BsonDocument.Parse(jsonStr);
             var dataProvider = await _dataProviderRepository.GetAsync(dataProviderId);

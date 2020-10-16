@@ -113,7 +113,7 @@ namespace SOS.Administration.Api.Controllers
                         $"The file doesn't seem to be an EML XML file. The root should be eml, but is {xmlDocument.Root.Name.LocalName}");
                 }
 
-                var res = await _dataProviderManager.SetEmlMetadata(dataProvider.Id, xmlDocument);
+                var res = await _dataProviderManager.SetEmlMetadataAsync(dataProvider.Id, xmlDocument);
                 if (res == false)
                 {
                     return new StatusCodeResult((int)HttpStatusCode.InternalServerError);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using DwC_A;
 using Hangfire;
 using Hangfire.Server;
@@ -55,6 +56,18 @@ namespace SOS.Import.Harvesters.Observations
         }
 
         /// <summary>
+        /// Get EML XML document.
+        /// </summary>
+        /// <param name="archivePath"></param>
+        /// <returns></returns>
+        public XDocument GetEmlXmlDocument(string archivePath)
+        {
+            using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
+            var emlFile = archiveReader.GetEmlXmlDocument();
+            return emlFile;
+        }
+
+        /// <summary>
         ///     Harvest DwC Archive observations
         /// </summary>
         /// <returns></returns>
@@ -68,10 +81,6 @@ namespace SOS.Import.Harvesters.Observations
 
             try
             {
-                ConventionRegistry.Register("IgnoreIfNull",
-                    new ConventionPack {new IgnoreIfNullConvention(true)},
-                    t => true);
-
                 _logger.LogDebug("Start storing DwC-A observations");
                 await _dwcArchiveVerbatimRepository.ClearTempHarvestCollection(dataProvider);
                 var observationCount = 0;
@@ -133,10 +142,6 @@ namespace SOS.Import.Harvesters.Observations
             {
                 var occurrenceCollectionName = nameof(DwcObservationVerbatim);
                 var eventCollectionName = nameof(DwcEvent);
-                ConventionRegistry.Register("IgnoreIfNull",
-                    new ConventionPack {new IgnoreIfNullConvention(true)},
-                    t => true);
-
                 _logger.LogDebug("Start storing DwC-A observations");
                 if (emptyCollectionsBeforeHarvest)
                 {
