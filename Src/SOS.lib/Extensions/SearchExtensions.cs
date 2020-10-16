@@ -477,8 +477,9 @@ namespace SOS.Lib.Extensions
             {
                 projection.Excludes(e => e
                     .Field("defects")
-                    .Field("reportedByUserAlias")
-                    .Field("identification.identifiedByInternal")
+                    /*.Field("artportalenInternal.reportedByUserAlias")
+                    .Field("artportalenInternal.identifiedByInternal")*/
+                    .Field("artportalenInternal")
                     .Field("location.point")
                     .Field("location.pointLocation")
                     .Field("location.pointWithBuffer")

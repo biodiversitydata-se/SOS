@@ -257,12 +257,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string ReportedBy { get; set; }
 
         /// <summary>
-        ///     Alias for the reporter, internal use only
-        /// </summary>
-        [SwaggerExclude]
-        public string ReportedByUserAlias { get; set; }
-
-        /// <summary>
         ///     Date and time when the species observation was reported.
         /// </summary>
         [Date]

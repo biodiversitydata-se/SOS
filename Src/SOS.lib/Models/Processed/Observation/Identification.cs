@@ -74,12 +74,6 @@ namespace SOS.Lib.Models.Processed.Observation
         public string IdentifiedBy { get; set; }
 
         /// <summary>
-        ///     List of userids and aliases matching the IdentifiedBy string, internal use only
-        /// </summary>
-        [SwaggerExclude]
-        public IEnumerable<UserInternal> IdentifiedByInternal { get; set; }
-
-        /// <summary>
         ///     A list (concatenated and separated) of nomenclatural
         ///     types (type status, typified scientific name, publication)
         ///     applied to the subject.

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Swagger;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -77,6 +78,18 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     User id of the person that reported the species observation.
         /// </summary>
         public int? ReportedByUserId { get; set; }
+
+        /// <summary>
+        ///     List of userids and aliases matching the IdentifiedBy string, internal use only
+        /// </summary>
+        [SwaggerExclude]
+        public IEnumerable<UserInternal> IdentifiedByInternal { get; set; }
+
+        /// <summary>
+        ///     Alias for the reporter, internal use only
+        /// </summary>
+        [SwaggerExclude]
+        public string ReportedByUserAlias { get; set; }
 
         /// <summary>
         /// True if sighting was incremental harvested

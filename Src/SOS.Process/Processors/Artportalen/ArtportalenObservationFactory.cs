@@ -132,7 +132,6 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
                 obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
                 obs.ReportedBy = verbatimObservation.ReportedBy;
-                obs.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
                 obs.ReportedDate = verbatimObservation.ReportedDate?.ToUniversalTime();
                 obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
 
@@ -161,7 +160,6 @@ namespace SOS.Process.Processors.Artportalen
                 // Identification
                 obs.Identification = new Identification();
                 obs.Identification.IdentifiedBy = verbatimObservation.VerifiedBy;
-                obs.Identification.IdentifiedByInternal = verbatimObservation.VerifiedByInternal;
                 obs.Identification.Validated = new[] {60, 61, 62, 63, 64, 65}.Contains(verbatimObservation.ValidationStatus?.Id ?? 0);
                 obs.Identification.UncertainDetermination = verbatimObservation.UnsureDetermination;
 
@@ -240,7 +238,9 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
                 obs.ArtportalenInternal.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;
                 obs.ArtportalenInternal.SightingPublishTypeIds = verbatimObservation.SightingPublishTypeIds;
+                obs.ArtportalenInternal.IdentifiedByInternal = verbatimObservation.VerifiedByInternal;
                 obs.ArtportalenInternal.ReportedByUserId = verbatimObservation.ReportedByUserId;
+                obs.ArtportalenInternal.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
                 obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
                 obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.ObserversInternal;
                 obs.ArtportalenInternal.IncrementalHarvested = _incrementalMode;
