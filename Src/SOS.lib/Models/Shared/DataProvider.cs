@@ -133,6 +133,11 @@ namespace SOS.Lib.Models.Shared
         /// </summary>
         public string Identifier { get; set; }
 
+        /// <summary>
+        /// EML metadata.
+        /// </summary>
+        public BsonDocument EmlMetadata { get; set; }
+  
         public bool EqualsIdOrIdentifier(string idOrIdentifier)
         {
             if (int.TryParse(idOrIdentifier, out var id))

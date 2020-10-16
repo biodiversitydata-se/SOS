@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Models;
@@ -61,6 +65,87 @@ namespace SOS.Administration.Api.Controllers
                 _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
+        }
+
+        /// <summary>
+        ///     Import EML metadata for a data provider.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("ImportEmlMetadata")]
+        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ImportEmlMetadataAsync(
+            [FromForm] ImportEmlFileDto model)
+        {
+            try
+            {
+                var dataProvider =
+                    await _dataProviderManager.GetDataProviderByIdOrIdentifier(model.DataProviderIdOrIdentifier);
+                if (dataProvider == null)
+                {
+                    return new BadRequestObjectResult(
+                        $"No data provider exist with Id={model.DataProviderIdOrIdentifier}");
+                }
+
+                if (model.File == null || model.File.Length == 0)
+                {
+                    return new BadRequestObjectResult("No file is provided");
+                }
+
+                if (!model.File.FileName.EndsWith(".xml"))
+                {
+                    return new BadRequestObjectResult(
+                        $"Only XML files is supported. This file has the file extension {Path.GetExtension(model.File.FileName)}");
+                }
+
+                using var reader = new StreamReader(model.File.OpenReadStream());
+                var xmlDocument = XDocument.Load(reader);
+                if (xmlDocument.Root == null)
+                {
+                    return new BadRequestObjectResult(
+                        $"The file doesn't seem to be an XML file.");
+                }
+
+                if (xmlDocument.Root.Name.LocalName != "eml")
+                {
+                    return new BadRequestObjectResult(
+                        $"The file doesn't seem to be an EML XML file. The root should be eml, but is {xmlDocument.Root.Name.LocalName}");
+                }
+
+                var res = await _dataProviderManager.SetEmlMetadata(dataProvider.Id, xmlDocument);
+                if (res == false)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                }
+
+                return Ok($"Ok. The EML was updated for {dataProvider}");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        public static async Task<string> ReadFormFileAsync(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return await Task.FromResult((string)null);
+            }
+
+            using var reader = new StreamReader(file.OpenReadStream());
+            return await reader.ReadToEndAsync();
+        }
+
+        public static async Task<string> ReadAsStringAsync(IFormFile file)
+        {
+            var result = new StringBuilder();
+            using var reader = new StreamReader(file.OpenReadStream());
+            while (reader.Peek() >= 0)
+                result.AppendLine(await reader.ReadLineAsync());
+            return result.ToString();
         }
 
         /// <summary>

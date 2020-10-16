@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using Newtonsoft.Json;
 using SOS.Import.Managers.Interfaces;
 using SOS.Import.Repositories.Resource.Interfaces;
@@ -126,6 +128,21 @@ namespace SOS.Import.Managers
         public async Task<bool> UpdateHarvestInfo(int dataProviderId, HarvestInfo harvestInfo)
         {
             return await _dataProviderRepository.UpdateHarvestInfo(dataProviderId, harvestInfo);
+        }
+
+        /// <summary>
+        /// Set EML metadata for a data provider.
+        /// </summary>
+        /// <param name="dataProviderId"></param>
+        /// <param name="xmlDocument"></param>
+        /// <returns></returns>
+        public async Task<bool> SetEmlMetadata(int dataProviderId, XDocument xmlDocument)
+        {
+            string jsonStr = JsonConvert.SerializeXNode(xmlDocument);
+            BsonDocument bsonDoc = BsonDocument.Parse(jsonStr);
+            var dataProvider = await _dataProviderRepository.GetAsync(dataProviderId);
+            dataProvider.EmlMetadata = bsonDoc;
+            return await _dataProviderRepository.UpdateAsync(dataProviderId, dataProvider);
         }
 
         private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier,

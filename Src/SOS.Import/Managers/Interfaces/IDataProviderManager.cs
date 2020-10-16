@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using CSharpFunctionalExtensions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
@@ -49,5 +50,13 @@ namespace SOS.Import.Managers.Interfaces
         Task<DataProvider> GetDataProviderByType(DataProviderType type);
         Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(List<string> dataProviderIdOrIdentifiers);
         Task<bool> UpdateHarvestInfo(int dataProviderId, HarvestInfo harvestInfo);
+        
+        /// <summary>
+        /// Set EML metadata for a data provider.
+        /// </summary>
+        /// <param name="dataProviderId"></param>
+        /// <param name="xmlDocument"></param>
+        /// <returns></returns>
+        Task<bool> SetEmlMetadata(int dataProviderId, XDocument xmlDocument);
     }
 }
