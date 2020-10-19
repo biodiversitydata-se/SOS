@@ -5,8 +5,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.Processed.ProcessInfo;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Lib.Models.Shared
 {
@@ -92,36 +90,6 @@ namespace SOS.Lib.Models.Shared
         ///     Decides whether the data quality is approved.
         /// </summary>
         public bool DataQualityIsApproved { get; set; }
-
-        /// <summary>
-        ///     Latest harvest info. Currently used for testing purpose.
-        /// </summary>
-        public HarvestInfo
-            HarvestInfo
-        {
-            get;
-            set;
-        } 
-
-        /// <summary>
-        ///     Process info for instance 0. Currently used for testing purpose.
-        /// </summary>
-        public ProviderInfo
-            ProcessInfoInstance0
-        {
-            get;
-            set;
-        } 
-
-        /// <summary>
-        ///     Process info for instance 1. Currently used for testing purpose.
-        /// </summary>
-        public ProviderInfo
-            ProcessInfoInstance1
-        {
-            get;
-            set;
-        }
 
         /// <summary>
         ///     Id.

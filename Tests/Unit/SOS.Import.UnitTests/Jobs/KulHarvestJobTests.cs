@@ -23,19 +23,16 @@ namespace SOS.Import.UnitTests.Managers
         {
             _kulObservationHarvesterMock = new Mock<IKulObservationHarvester>();
             _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
-            _dataProviderManagerMock = new Mock<IDataProviderManager>();
             _loggerMock = new Mock<ILogger<KulHarvestJob>>();
         }
 
         private readonly Mock<IKulObservationHarvester> _kulObservationHarvesterMock;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
-        private readonly Mock<IDataProviderManager> _dataProviderManagerMock;
         private readonly Mock<ILogger<KulHarvestJob>> _loggerMock;
 
         private KulHarvestJob TestObject => new KulHarvestJob(
             _kulObservationHarvesterMock.Object,
             _harvestInfoRepositoryMock.Object,
-            _dataProviderManagerMock.Object,
             _loggerMock.Object);
 
         /// <summary>

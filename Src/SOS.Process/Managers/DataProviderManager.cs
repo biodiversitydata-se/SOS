@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Process.Managers.Interfaces;
@@ -99,11 +98,6 @@ namespace SOS.Process.Managers
             }
 
             return parsedDataProviders;
-        }
-
-        public async Task<bool> UpdateProcessInfo(int dataProviderId, string collectionName, ProviderInfo providerInfo)
-        {
-            return await _dataProviderRepository.UpdateProcessInfo(dataProviderId, collectionName, providerInfo);
         }
 
         private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier,

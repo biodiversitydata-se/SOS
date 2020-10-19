@@ -187,7 +187,7 @@ namespace SOS.Process.Jobs
 
                     // Get harvest info and create a provider info object that we can add processing info to later
                     var harvestInfoId = HarvestInfo.GetIdFromDataProvider(dataProvider);
-                    var harvestInfo = await GetHarvestInfoAsync(harvestInfoId); // todo - decide where we should store harvestInfo
+                    var harvestInfo = await GetHarvestInfoAsync(harvestInfoId); 
                     var providerInfo = CreateProviderInfo(dataProvider, harvestInfo, processStart);
                     providerInfo.MetadataInfo = metaDataProviderInfo
                         .Where(mdp => new[] { DataProviderType.Taxa }.Contains(mdp.DataProviderType)).ToArray();
@@ -213,15 +213,7 @@ namespace SOS.Process.Jobs
                 // 10. Save process info
                 //-----------------------------------------
                 _logger.LogInformation("Start updating process info for observations");
-                foreach (var dataProvider in dataProvidersToProcess)
-                {
-                    await _dataProviderManager.UpdateProcessInfo(
-                        dataProvider.Id,
-                        _processedObservationRepository.InactiveInstanceName,
-                        providerInfoByDataProvider[dataProvider]);
-                }
-
-                await SaveProcessInfo(
+               await SaveProcessInfo(
                     _processedObservationRepository.InactiveInstanceName,
                     processStart,
                     providerInfoByDataProvider.Sum(pi => pi.Value.ProcessCount ?? 0),

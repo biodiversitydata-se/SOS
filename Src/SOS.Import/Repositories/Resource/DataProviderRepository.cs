@@ -24,22 +24,6 @@ namespace SOS.Import.Repositories.Resource
         {
         }
 
-        public async Task<bool> UpdateHarvestInfo(int dataProviderId, HarvestInfo harvestInfo)
-        {
-            try
-            {
-                var filter = Builders<DataProvider>.Filter.Eq(dataProvider => dataProvider.Id, dataProviderId);
-                var update = Builders<DataProvider>.Update.Set(dataProvider => dataProvider.HarvestInfo, harvestInfo);
-                var updateResult = await MongoCollection.UpdateOneAsync(filter, update);
-                return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
-            }
-        }
-
         public override async Task<List<DataProvider>> GetAllAsync()
         {
             var allDataProviders = await base.GetAllAsync();

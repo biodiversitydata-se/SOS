@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Process.Managers.Interfaces
@@ -17,6 +16,5 @@ namespace SOS.Process.Managers.Interfaces
         Task<DataProvider> GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier);
         Task<DataProvider> GetDataProviderByIdentifier(string identifier);
         Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(List<string> dataProviderIdOrIdentifiers);
-        Task<bool> UpdateProcessInfo(int dataProviderId, string inactiveCollectionName, ProviderInfo providerInfo);
     }
 }

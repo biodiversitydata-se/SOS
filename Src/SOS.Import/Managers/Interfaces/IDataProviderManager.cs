@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Managers.Interfaces
 {
@@ -48,6 +47,5 @@ namespace SOS.Import.Managers.Interfaces
 
         Task<DataProvider> GetDataProviderByType(DataProviderType type);
         Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(List<string> dataProviderIdOrIdentifiers);
-        Task<bool> UpdateHarvestInfo(int dataProviderId, HarvestInfo harvestInfo);
     }
 }

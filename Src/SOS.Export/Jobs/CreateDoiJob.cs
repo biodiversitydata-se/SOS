@@ -66,7 +66,7 @@ namespace SOS.Export.Jobs
                 var descriptions = _doiConfiguration.Descriptions as List<DOIDescription> ?? new List<DOIDescription>();
                 descriptions.Add(new DOIDescription
                 {
-                    Description = JsonSerializer.Serialize(filter, new JsonSerializerOptions { IgnoreNullValues = true }),
+                    Description = $"Search query {JsonSerializer.Serialize(filter, new JsonSerializerOptions { IgnoreNullValues = true })}",
                     DescriptionType = DescriptionType.Other
                 });
 

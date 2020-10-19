@@ -23,19 +23,16 @@ namespace SOS.Import.UnitTests.Managers
         {
             _artportalenObservationHarvesterMock = new Mock<IArtportalenObservationHarvester>();
             _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
-            _dataProviderManagerMock = new Mock<IDataProviderManager>();
             _loggerMock = new Mock<ILogger<ArtportalenHarvestJob>>();
         }
 
         private readonly Mock<IArtportalenObservationHarvester> _artportalenObservationHarvesterMock;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
-        private readonly Mock<IDataProviderManager> _dataProviderManagerMock;
         private readonly Mock<ILogger<ArtportalenHarvestJob>> _loggerMock;
 
         private ArtportalenHarvestJob TestObject => new ArtportalenHarvestJob(
             _artportalenObservationHarvesterMock.Object,
             _harvestInfoRepositoryMock.Object,
-            _dataProviderManagerMock.Object,
             _loggerMock.Object);
 
         /// <summary>
@@ -132,8 +129,7 @@ namespace SOS.Import.UnitTests.Managers
                 .ReturnsAsync(new HarvestInfo("id", DataProviderType.Taxa, DateTime.Now) {Status = RunStatus.Success, Count = 1 });
 
             _harvestInfoRepositoryMock.Setup(ts => ts.AddOrUpdateAsync(It.IsAny<HarvestInfo>()));
-            _dataProviderManagerMock.Setup(dpm => dpm.UpdateHarvestInfo(It.IsAny<int>(), It.IsAny<HarvestInfo>()))
-                .ReturnsAsync(true);
+            
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------

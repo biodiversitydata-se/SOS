@@ -23,19 +23,16 @@ namespace SOS.Import.UnitTests.Managers
         {
             _virtualHerbariumObservationHarvesterMock = new Mock<IVirtualHerbariumObservationHarvester>();
             _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
-            _dataProviderManagerMock = new Mock<IDataProviderManager>();
             _loggerMock = new Mock<ILogger<VirtualHerbariumHarvestJob>>();
         }
 
         private readonly Mock<IVirtualHerbariumObservationHarvester> _virtualHerbariumObservationHarvesterMock;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
-        private readonly Mock<IDataProviderManager> _dataProviderManagerMock;
         private readonly Mock<ILogger<VirtualHerbariumHarvestJob>> _loggerMock;
 
         private VirtualHerbariumHarvestJob TestObject => new VirtualHerbariumHarvestJob(
             _virtualHerbariumObservationHarvesterMock.Object,
             _harvestInfoRepositoryMock.Object,
-            _dataProviderManagerMock.Object,
             _loggerMock.Object);
 
         /// <summary>
