@@ -118,7 +118,7 @@ namespace SOS.Import.IoC.Modules
             builder.RegisterType<DwcaDataValidationReportManager>().As<IDwcaDataValidationReportManager>().InstancePerLifetimeScope();
 
             // Repositories source
-            builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<Repositories.Source.Artportalen.AreaRepository>().As<Repositories.Source.Artportalen.Interfaces.IAreaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<MetadataRepository>().As<IMetadataRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectRepository>().As<IProjectRepository>().InstancePerLifetimeScope();
             builder.RegisterType<SightingRepository>().As<ISightingRepository>().InstancePerLifetimeScope();
@@ -135,7 +135,7 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
 
             // Repositories destination
-            builder.RegisterType<AreaProcessedRepository>().As<IAreaProcessedRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<Repositories.Destination.Area.AreaRepository>().As<Repositories.Destination.Area.Interfaces.IAreaRepository>().InstancePerLifetimeScope();
 
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();

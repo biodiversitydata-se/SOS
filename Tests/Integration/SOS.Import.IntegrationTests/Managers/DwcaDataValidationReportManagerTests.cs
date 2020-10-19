@@ -158,7 +158,7 @@ namespace SOS.Import.IntegrationTests.Managers
             var processClient = CreateProcessClient(GetProcessDbConfiguration());
             var processedFieldMappingRepository =
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
-            var areaHelper = new AreaHelper(new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()),
+            var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()),
                     processedFieldMappingRepository);
             var fieldMappingResolverHelper = new FieldMappingResolverHelper(processedFieldMappingRepository,
                 new FieldMappingConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });

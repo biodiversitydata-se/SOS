@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FluentAssertions;
-using SOS.Export.Extensions;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using Xunit;
 

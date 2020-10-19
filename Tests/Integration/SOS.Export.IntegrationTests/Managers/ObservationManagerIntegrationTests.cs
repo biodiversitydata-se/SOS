@@ -7,7 +7,6 @@ using Moq;
 using Nest;
 using SOS.Export.IO.DwcArchive;
 using SOS.Export.Managers;
-using SOS.Export.Repositories;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
@@ -18,9 +17,6 @@ using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Processed;
 using Xunit;
-using ProcessedObservationRepository = SOS.Export.Repositories.ProcessedObservationRepository;
-using ProcessedTaxonRepository = SOS.Export.Repositories.ProcessedTaxonRepository;
-using ProcessInfoRepository = SOS.Export.Repositories.ProcessInfoRepository;
 
 namespace SOS.Export.IntegrationTests.Managers
 {
@@ -55,15 +51,15 @@ namespace SOS.Export.IntegrationTests.Managers
             var observationManager = new ObservationManager(
                 dwcArchiveFileWriter,
                 new ProcessedObservationRepository(
-                    elasticClient,
                     exportClient,
+                    elasticClient,
                     new ElasticSearchConfiguration(),
                     new Mock<ILogger<ProcessedObservationRepository>>().Object),
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object),
                 new FileService(),
                 new Mock<IBlobStorageService>().Object,
                 new Mock<IZendToService>().Object,
-                new FileDestination {Path = exportConfiguration.FileDestination.Path}, 
+                new FileDestination { Path = exportConfiguration.FileDestination.Path}, 
                 new FilterManager(taxonManager, new AreaRepository(exportClient, new NullLogger<AreaRepository>())), 
                 new Mock<ILogger<ObservationManager>>().Object);
 

@@ -58,5 +58,11 @@ namespace SOS.Lib.Repositories.Processed
             target.Count = target.ProvidersInfo.Sum(pi => pi.ProcessCount ?? 0);
             return await AddOrUpdateAsync(target);
         }
+
+        /// <inheritdoc />
+        public async Task<ProcessInfo> GetProcessInfoAsync(bool current)
+        {
+            return await GetAsync($"ProcessedObservation-{(current ? ActiveInstance : ActiveInstance == 1 ? 0 : 1)}");
+        }
     }
 }

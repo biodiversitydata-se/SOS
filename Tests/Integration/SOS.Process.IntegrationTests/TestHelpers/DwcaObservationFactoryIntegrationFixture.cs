@@ -51,7 +51,7 @@ namespace SOS.Process.IntegrationTests.TestHelpers
             var processedFieldMappingRepository =
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
             var areaHelper =
-                new AreaHelper(new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()),
+                new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()),
                     processedFieldMappingRepository);
             var dwcaObservationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,

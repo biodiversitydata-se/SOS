@@ -34,21 +34,13 @@ using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Observations.Api.Repositories;
-using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Observations.Api.Services;
 using SOS.Observations.Api.Services.Interfaces;
 using SOS.Observations.Api.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using IProcessedFieldMappingRepository = SOS.Observations.Api.Repositories.Interfaces.IProcessedFieldMappingRepository;
 using IProcessedObservationRepository = SOS.Observations.Api.Repositories.Interfaces.IProcessedObservationRepository;
-using IProcessedTaxonRepository = SOS.Observations.Api.Repositories.Interfaces.IProcessedTaxonRepository;
-using IProcessInfoRepository = SOS.Observations.Api.Repositories.Interfaces.IProcessInfoRepository;
-using ProcessedFieldMappingRepository = SOS.Observations.Api.Repositories.ProcessedFieldMappingRepository;
 using ProcessedObservationRepository = SOS.Observations.Api.Repositories.ProcessedObservationRepository;
-using ProcessedTaxonRepository = SOS.Observations.Api.Repositories.ProcessedTaxonRepository;
-using ProcessInfoRepository = SOS.Observations.Api.Repositories.ProcessInfoRepository;
 
 namespace SOS.Observations.Api
 {

@@ -15,7 +15,7 @@ namespace SOS.Import.Repositories.Destination.Area
     /// <summary>
     ///     Area repository
     /// </summary>
-    public class AreaProcessedRepository : ResourceRepositoryBase<Lib.Models.Shared.Area, int>, IAreaProcessedRepository
+    public class AreaRepository : ResourceRepositoryBase<Lib.Models.Shared.Area, int>, IAreaRepository
     {
         private readonly GridFSBucket _gridFSBucket;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
@@ -25,9 +25,9 @@ namespace SOS.Import.Repositories.Destination.Area
         /// </summary>
         /// <param name="processClient"></param>
         /// <param name="logger"></param>
-        public AreaProcessedRepository(
+        public AreaRepository(
             IProcessClient processClient,
-            ILogger<AreaProcessedRepository> logger) : base(processClient, false, logger)
+            ILogger<AreaRepository> logger) : base(processClient, false, logger)
         {
             _jsonSerializerOptions = new JsonSerializerOptions();
             _jsonSerializerOptions.Converters.Add(new GeoShapeConverter());

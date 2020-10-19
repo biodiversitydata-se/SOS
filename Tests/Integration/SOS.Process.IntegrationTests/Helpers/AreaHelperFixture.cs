@@ -30,9 +30,9 @@ namespace SOS.Process.IntegrationTests.Helpers
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-            var processedAreaRepository = new ProcessedAreaRepository(
+            var processedAreaRepository = new AreaRepository(
                 processClient,
-                new Mock<ILogger<ProcessedAreaRepository>>().Object);
+                new Mock<ILogger<AreaRepository>>().Object);
             var processedFieldMappingRepository = new ProcessedFieldMappingRepository(
                 processClient,
                 new NullLogger<ProcessedFieldMappingRepository>());

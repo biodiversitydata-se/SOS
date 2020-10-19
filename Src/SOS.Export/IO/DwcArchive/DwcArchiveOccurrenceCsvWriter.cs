@@ -10,17 +10,15 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using NReco.Csv;
 using SOS.Export.IO.DwcArchive.Interfaces;
-using SOS.Export.Managers.Interfaces;
 using SOS.Export.Models;
-using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Export.IO.DwcArchive
 {

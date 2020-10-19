@@ -111,7 +111,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<ProcessedAreaRepository>().As<IProcessedAreaRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();
 
             // Add processors

@@ -7,14 +7,13 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Export.IntegrationTests.TestHelpers.Factories;
 using SOS.Export.IO.DwcArchive;
-using SOS.Export.Managers;
-using SOS.Export.Repositories;
 using SOS.Export.Services;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.IO.DwcArchive
@@ -85,7 +84,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository =
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
-            var processInfo = await processInfoRepository.GetAsync(processInfoRepository.CollectionName);
+            var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstanceName);
             var filename = FilenameHelper.CreateFilenameWithDate("sos_dwc_archive_with_all_data");
             //var filter = new AdvancedFilter();
             var filter = new SearchFilter {TaxonIds = new[] {102951}};
@@ -125,7 +124,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(exportClient);
             var processInfoRepository =
                 new ProcessInfoRepository(exportClient, new Mock<ILogger<ProcessInfoRepository>>().Object);
-            var processInfo = await processInfoRepository.GetAsync(processInfoRepository.CollectionName);
+            var processInfo = await processInfoRepository.GetAsync(processInfoRepository.ActiveInstanceName);
             var filename = FilenameHelper.CreateFilenameWithDate("sos_dwc_archive_with_ten_observations");
 
             //-----------------------------------------------------------------------------------------------------------

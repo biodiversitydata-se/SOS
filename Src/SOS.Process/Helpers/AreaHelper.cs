@@ -29,7 +29,7 @@ namespace SOS.Process.Helpers
             {AreaType.County, AreaType.Province, AreaType.Municipality, AreaType.Parish, AreaType.EconomicZoneOfSweden};
 
         private IDictionary<string, PositionLocation> _featureCache;
-        private readonly IProcessedAreaRepository _processedAreaRepository;
+        private readonly IAreaRepository _processedAreaRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly STRtree<IFeature> _strTree;
         private IDictionary<FieldMappingFieldId, Dictionary<int, FieldMappingValue>> _fieldMappingValueById;
@@ -40,7 +40,7 @@ namespace SOS.Process.Helpers
         /// <param name="processedAreaRepository"></param>
         /// <param name="processedFieldMappingRepository"></param>
         public AreaHelper(
-            IProcessedAreaRepository processedAreaRepository,
+            IAreaRepository processedAreaRepository,
             IProcessedFieldMappingRepository processedFieldMappingRepository)
         {
             _processedAreaRepository = processedAreaRepository ??

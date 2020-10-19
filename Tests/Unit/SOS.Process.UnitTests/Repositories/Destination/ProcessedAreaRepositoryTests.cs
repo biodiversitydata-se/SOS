@@ -16,11 +16,11 @@ namespace SOS.Process.UnitTests.Repositories.Destination
         public ProcessedAreaRepositoryTests()
         {
             _processClient = new Mock<IProcessClient>();
-            _loggerMock = new Mock<ILogger<ProcessedAreaRepository>>();
+            _loggerMock = new Mock<ILogger<AreaRepository>>();
         }
 
         private readonly Mock<IProcessClient> _processClient;
-        private readonly Mock<ILogger<ProcessedAreaRepository>> _loggerMock;
+        private readonly Mock<ILogger<AreaRepository>> _loggerMock;
 
         /// <summary>
         ///     Test constructor
@@ -28,17 +28,17 @@ namespace SOS.Process.UnitTests.Repositories.Destination
         [Fact]
         public void ConstructorTest()
         {
-            Action create = () => new ProcessedAreaRepository(
+            Action create = () => new AreaRepository(
                 _processClient.Object,
                 _loggerMock.Object);
             create.Should().Throw<NullReferenceException>();
 
-            create = () => new ProcessedAreaRepository(
+            create = () => new AreaRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
 
-            create = () => new ProcessedAreaRepository(
+            create = () => new AreaRepository(
                 _processClient.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");

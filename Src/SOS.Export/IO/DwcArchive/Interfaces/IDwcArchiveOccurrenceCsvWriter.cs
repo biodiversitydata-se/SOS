@@ -3,9 +3,9 @@ using System.IO;
 using System.Threading.Tasks;
 using Hangfire;
 using SOS.Export.Models;
-using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Export.IO.DwcArchive.Interfaces
 {

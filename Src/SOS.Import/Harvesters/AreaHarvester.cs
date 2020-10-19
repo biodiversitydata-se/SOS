@@ -20,8 +20,8 @@ namespace SOS.Import.Harvesters
     /// </summary>
     public class AreaHarvester : IAreaHarvester
     {
-        private readonly IAreaRepository _areaRepository;
-        private readonly IAreaProcessedRepository _areaProcessedRepository;
+        private readonly Repositories.Source.Artportalen.Interfaces.IAreaRepository _areaRepository;
+        private readonly Repositories.Destination.Area.Interfaces.IAreaRepository _areaProcessedRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly ILogger<AreaHarvester> _logger;
         private readonly AreaHarvestFactory _harvestFactory;
@@ -33,8 +33,8 @@ namespace SOS.Import.Harvesters
         /// <param name="areaVerbatimRepository"></param>
         /// <param name="logger"></param>
         public AreaHarvester(
-            IAreaRepository areaRepository,
-            IAreaProcessedRepository areaProcessedRepository,
+            Repositories.Source.Artportalen.Interfaces.IAreaRepository areaRepository,
+            Repositories.Destination.Area.Interfaces.IAreaRepository areaProcessedRepository,
             IAreaHelper areaHelper,
             ILogger<AreaHarvester> logger)
         {

@@ -10,5 +10,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     public interface IProcessInfoRepository : IMongoDbProcessedRepositoryBase<ProcessInfo, string>
     {
         Task<bool> CopyProviderDataAsync(DataProvider dataProvider);
+
+        /// <summary>
+        ///     Get process information
+        /// </summary>
+        /// <param name="current"></param>
+        /// <returns></returns>
+        Task<ProcessInfo> GetProcessInfoAsync(bool current);
     }
 }

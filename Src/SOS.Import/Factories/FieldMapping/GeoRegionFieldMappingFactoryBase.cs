@@ -15,7 +15,7 @@ namespace SOS.Import.Factories.FieldMapping
     /// </summary>
     public abstract class GeoRegionFieldMappingFactoryBase
     {
-        private readonly IAreaProcessedRepository _areaProcessedRepository;
+        private readonly IAreaRepository _areaProcessedRepository;
         private readonly ILogger<GeoRegionFieldMappingFactoryBase> _logger;
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace SOS.Import.Factories.FieldMapping
         /// <param name="areaProcessedRepository"></param>
         /// <param name="logger"></param>
         protected GeoRegionFieldMappingFactoryBase(
-            IAreaProcessedRepository areaProcessedRepository,
+            IAreaRepository areaProcessedRepository,
             ILogger<GeoRegionFieldMappingFactoryBase> logger)
         {
             _areaProcessedRepository =

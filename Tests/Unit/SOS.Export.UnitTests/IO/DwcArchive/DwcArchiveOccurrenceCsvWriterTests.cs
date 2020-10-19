@@ -10,20 +10,15 @@ using CsvHelper.Configuration;
 using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Export.IO.DwcArchive;
-using SOS.Export.Managers;
 using SOS.Export.UnitTests.TestHelpers.Builders;
 using SOS.Export.UnitTests.TestHelpers.Factories;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search;
-using SOS.Lib.Repositories.Processed;
 using Xunit;
-using ProcessedTaxonRepository = SOS.Export.Repositories.ProcessedTaxonRepository;
 
 namespace SOS.Export.UnitTests.IO.DwcArchive
 {

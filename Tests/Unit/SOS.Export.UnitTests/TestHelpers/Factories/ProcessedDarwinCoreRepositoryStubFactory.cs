@@ -4,9 +4,9 @@ using System.Reflection;
 using System.Text;
 using Moq;
 using Newtonsoft.Json;
-using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.TestHelpers.JsonConverters;
 
 namespace SOS.Export.UnitTests.TestHelpers.Factories

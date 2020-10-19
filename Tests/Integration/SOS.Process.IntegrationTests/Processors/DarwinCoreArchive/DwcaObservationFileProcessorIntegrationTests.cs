@@ -109,7 +109,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processedObservationRepository,
                 processedFieldMappingRepository,
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration()),
-                new AreaHelper(new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()),
+                new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()),
                     processedFieldMappingRepository),
                 processConfiguration, 
                 dwcArchiveFileWriterCoordinator,

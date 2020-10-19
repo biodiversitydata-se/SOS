@@ -8,11 +8,11 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Managers.Interfaces;
-using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Export.Managers
@@ -157,7 +157,7 @@ namespace SOS.Export.Managers
         {
             try
             {
-                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.CollectionName);
+                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.ActiveInstanceName);
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
 
                 var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
