@@ -62,12 +62,6 @@ namespace SOS.Process.Processors.Artportalen
             return verbatimObservations.Select(CreateProcessedObservation).Where(p=>p!=null).ToArray();
         }
 
-        // todo - This could be a way to check for invalid observation when converting from verbatim to processed.
-        public CreateProcessedObservationResult CreateProcessedObservationResult(ArtportalenObservationVerbatim verbatimObservation)
-        {
-            return Models.CreateProcessedObservationResult.Success(CreateProcessedObservation(verbatimObservation));
-        }
-
         /// <summary>
         ///     Cast verbatim observations to processed data model
         /// </summary>
@@ -247,7 +241,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
                 obs.ArtportalenInternal.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;
                 obs.ArtportalenInternal.SightingPublishTypeIds = verbatimObservation.SightingPublishTypeIds;
-                obs.ArtportalenInternal.IdentifiedByInternal = verbatimObservation.VerifiedByInternal;
+                obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.VerifiedByInternal;
                 obs.ArtportalenInternal.ReportedByUserId = verbatimObservation.ReportedByUserId;
                 obs.ArtportalenInternal.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
                 obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
@@ -353,7 +347,7 @@ namespace SOS.Process.Processors.Artportalen
                 return (0, 0);
             }
         }
-        private bool ShouldBeDiffused(ArtportalenObservationVerbatim observationVerbatim, ProcessedTaxon taxon)
+        private bool ShouldBeDiffused(ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
         {
             if (observationVerbatim.ProtectedBySystem)
             {
