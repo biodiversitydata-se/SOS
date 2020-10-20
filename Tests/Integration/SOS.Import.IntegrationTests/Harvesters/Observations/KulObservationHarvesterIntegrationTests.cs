@@ -5,11 +5,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Import.Harvesters.Observations;
-using SOS.Import.Repositories.Destination.Kul;
-using SOS.Import.Repositories.Destination.Kul.Interfaces;
 using SOS.Import.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
+using SOS.Lib.Repositories.Verbatim;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
 using Xunit;
 

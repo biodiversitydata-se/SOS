@@ -6,10 +6,10 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Harvesters.Observations;
-using SOS.Import.Repositories.Destination.VirtualHerbarium.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Harvesters.Observations

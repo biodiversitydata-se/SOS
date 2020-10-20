@@ -3,9 +3,9 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Harvesters.Interfaces;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Import.Jobs
 {

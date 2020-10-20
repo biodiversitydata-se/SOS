@@ -6,8 +6,8 @@ using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Newtonsoft.Json;
-using SOS.Import.Repositories.Destination.FieldMappings;
 using SOS.Lib.Database;
+using SOS.Lib.Repositories.Resource;
 using SOS.TestHelpers.JsonConverters;
 using Xunit;
 

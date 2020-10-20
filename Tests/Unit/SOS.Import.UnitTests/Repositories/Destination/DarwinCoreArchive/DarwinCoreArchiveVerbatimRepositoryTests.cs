@@ -3,8 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Database.Interfaces;
-using SOS.Import.Repositories.Destination.DarwinCoreArchive;
-using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Repositories.Verbatim;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Destination.DarwinCoreArchive

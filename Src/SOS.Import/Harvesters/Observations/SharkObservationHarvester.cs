@@ -4,15 +4,14 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Extensions;
 using SOS.Import.Factories.Harvest;
 using SOS.Import.Harvesters.Observations.Interfaces;
-using SOS.Import.Repositories.Destination.Shark.Interfaces;
 using SOS.Import.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Models.Verbatim.Shark;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Import.Harvesters.Observations
 {

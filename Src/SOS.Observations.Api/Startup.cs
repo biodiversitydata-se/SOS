@@ -31,6 +31,8 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Managers;
@@ -40,6 +42,8 @@ using SOS.Observations.Api.Services.Interfaces;
 using SOS.Observations.Api.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using DataProviderRepository = SOS.Lib.Repositories.Processed.DataProviderRepository;
+using IDataProviderRepository = SOS.Lib.Repositories.Processed.Interfaces.IDataProviderRepository;
 using IProcessedObservationRepository = SOS.Observations.Api.Repositories.Interfaces.IProcessedObservationRepository;
 using ProcessedObservationRepository = SOS.Observations.Api.Repositories.ProcessedObservationRepository;
 
@@ -254,7 +258,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddSingleton<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();
-            services.AddSingleton<IProcessedFieldMappingRepository, ProcessedFieldMappingRepository>();
+            services.AddSingleton<IFieldMappingRepository, FieldMappingRepository>();
 
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();

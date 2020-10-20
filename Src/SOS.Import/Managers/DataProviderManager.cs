@@ -10,9 +10,9 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using Newtonsoft.Json;
 using SOS.Import.Managers.Interfaces;
-using SOS.Import.Repositories.Resource.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Import.Managers
 {

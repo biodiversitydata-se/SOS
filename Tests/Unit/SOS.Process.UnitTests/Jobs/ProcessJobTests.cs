@@ -9,7 +9,9 @@ using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Process;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
@@ -19,7 +21,7 @@ using SOS.Lib.Models.Verbatim.ClamPortal;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Helpers.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Jobs;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
@@ -32,7 +34,6 @@ using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark.Interfaces;
 using SOS.Process.Processors.VirtualHerbarium.Interfaces;
-using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Jobs

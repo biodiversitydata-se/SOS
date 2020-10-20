@@ -15,6 +15,8 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 
@@ -65,7 +67,7 @@ namespace SOS.Export.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<Lib.Repositories.Processed.ProcessedFieldMappingRepository>().As<Lib.Repositories.Processed.Interfaces.IProcessedFieldMappingRepository>()
+            builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
 

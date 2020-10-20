@@ -4,19 +4,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using DwC_A;
 using Microsoft.Extensions.Logging;
-using SOS.Export.Extensions;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Helpers.Interfaces;
-using SOS.Process.Managers.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Process.Processors.DarwinCoreArchive;
 
 namespace SOS.Import.Managers
@@ -29,7 +28,7 @@ namespace SOS.Import.Managers
         private readonly IFieldMappingResolverHelper _fieldMappingResolverHelper;
         private readonly IDwcArchiveReader _dwcArchiveReader;
         private readonly IValidationManager _validationManager;
-        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
+        private readonly IFieldMappingRepository _processedFieldMappingRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly ILogger<DwcaDataValidationReportManager> _logger;
@@ -38,7 +37,7 @@ namespace SOS.Import.Managers
         private IDictionary<FieldMappingFieldId, FieldMapping> _fieldMappings;
 
         public DwcaDataValidationReportManager(IDwcArchiveReader dwcArchiveReader,
-            IProcessedFieldMappingRepository processedFieldMappingRepository,
+            IFieldMappingRepository processedFieldMappingRepository,
             IValidationManager validationManager,
             IAreaHelper areaHelper,
             IFieldMappingResolverHelper fieldMappingResolverHelper,

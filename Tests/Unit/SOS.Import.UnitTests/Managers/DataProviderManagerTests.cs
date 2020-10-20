@@ -4,8 +4,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Managers;
-using SOS.Import.Repositories.Resource.Interfaces;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Managers

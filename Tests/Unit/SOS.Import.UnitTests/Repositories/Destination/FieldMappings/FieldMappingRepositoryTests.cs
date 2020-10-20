@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Database.Interfaces;
-using SOS.Import.Repositories.Destination.FieldMappings;
+using SOS.Lib.Repositories.Resource;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Destination.FieldMappings

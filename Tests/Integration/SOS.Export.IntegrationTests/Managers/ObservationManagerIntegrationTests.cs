@@ -16,6 +16,7 @@ using SOS.Lib.Database;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Resource;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.Managers
@@ -38,7 +39,7 @@ namespace SOS.Export.IntegrationTests.Managers
                     new Mock<ILogger<ProcessedTaxonRepository>>().Object),
                 new Mock<ILogger<TaxonManager>>().Object);
             var processedFieldMappingRepository =
-                new ProcessedFieldMappingRepository(exportClient, new NullLogger<ProcessedFieldMappingRepository>());
+                new FieldMappingRepository(exportClient, new NullLogger<FieldMappingRepository>());
             var fieldMappingResolverHelper =
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration());
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(

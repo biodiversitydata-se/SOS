@@ -6,7 +6,7 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Lib.Helpers
 {
@@ -16,12 +16,12 @@ namespace SOS.Lib.Helpers
     public class FieldMappingResolverHelper : Interfaces.IFieldMappingResolverHelper
     {
         private readonly FieldMappingConfiguration _fieldMappingConfiguration;
-        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
+        private readonly IFieldMappingRepository _processedFieldMappingRepository;
         private Dictionary<string, Dictionary<FieldMappingFieldId, Dictionary<int, string>>>
             _valueMappingDictionariesByCultureCode;
 
         public FieldMappingResolverHelper(
-            IProcessedFieldMappingRepository processedFieldMappingRepository,
+            IFieldMappingRepository processedFieldMappingRepository,
             FieldMappingConfiguration fieldMappingConfiguration)
         {
             _processedFieldMappingRepository = processedFieldMappingRepository ??

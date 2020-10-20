@@ -270,6 +270,21 @@ namespace SOS.Lib.Repositories.Verbatim
         }
 
         /// <inheritdoc />
+        public async Task<TEntity> GetAsync(TKey id)
+        {
+            try
+            {
+                var searchFilter = Builders<TEntity>.Filter.Eq("_id", id);
+                return await MongoCollection.FindSync(searchFilter).FirstOrDefaultAsync();
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return default;
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<IEnumerable<TEntity>> GetBatchAsync(int skip)
         {
             return await GetBatchAsync(skip, MongoCollection);

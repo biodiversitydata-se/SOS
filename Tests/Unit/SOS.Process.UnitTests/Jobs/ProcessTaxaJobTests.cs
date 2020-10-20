@@ -1,18 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Jobs;
 using SOS.Process.Processors.Taxon.Interfaces;
-using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Jobs

@@ -6,8 +6,14 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Process;
+using SOS.Lib.Managers;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Verbatim;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Helpers;
 using SOS.Process.Helpers.Interfaces;
 using SOS.Process.Jobs;
@@ -37,10 +43,10 @@ using SOS.Process.Processors.Taxon;
 using SOS.Process.Processors.Taxon.Interfaces;
 using SOS.Process.Processors.VirtualHerbarium;
 using SOS.Process.Processors.VirtualHerbarium.Interfaces;
-using SOS.Process.Repositories.Source;
-using SOS.Process.Repositories.Source.Interfaces;
 using SOS.Process.Services;
 using SOS.Process.Services.Interfaces;
+using DataProviderRepository = SOS.Lib.Repositories.Processed.DataProviderRepository;
+using IDataProviderRepository = SOS.Lib.Repositories.Processed.Interfaces.IDataProviderRepository;
 
 
 namespace SOS.Process.IoC.Modules
@@ -83,7 +89,7 @@ namespace SOS.Process.IoC.Modules
             // Repositories source
             builder.RegisterType<ArtportalenVerbatimRepository>().As<IArtportalenVerbatimRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<DwcaVerbatimRepository>().As<IDwcaVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<DarwinCoreArchiveVerbatimRepository>().As<IDarwinCoreArchiveVerbatimRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<HarvestInfoRepository>().As<IHarvestInfoRepository>().InstancePerLifetimeScope();
@@ -109,7 +115,7 @@ namespace SOS.Process.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
             builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<ProcessedFieldMappingRepository>().As<IProcessedFieldMappingRepository>()
+            builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();
             builder.RegisterType<DataProviderRepository>().As<IDataProviderRepository>().InstancePerLifetimeScope();

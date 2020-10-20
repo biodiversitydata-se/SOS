@@ -3,8 +3,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Lib.Database;
-using SOS.Process.Helpers;
+using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Resource;
 
 namespace SOS.Process.IntegrationTests.Helpers
 {
@@ -33,9 +34,9 @@ namespace SOS.Process.IntegrationTests.Helpers
             var processedAreaRepository = new AreaRepository(
                 processClient,
                 new Mock<ILogger<AreaRepository>>().Object);
-            var processedFieldMappingRepository = new ProcessedFieldMappingRepository(
+            var processedFieldMappingRepository = new FieldMappingRepository(
                 processClient,
-                new NullLogger<ProcessedFieldMappingRepository>());
+                new NullLogger<FieldMappingRepository>());
             var areaHelper = new AreaHelper(
                 processedAreaRepository,
                 processedFieldMappingRepository);

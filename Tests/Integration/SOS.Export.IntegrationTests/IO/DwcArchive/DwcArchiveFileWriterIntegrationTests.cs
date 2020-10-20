@@ -14,6 +14,7 @@ using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Models.Shared;
 using Xunit;
 
@@ -47,7 +48,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
         private FieldMappingResolverHelper CreateFieldMappingResolverHelper(ProcessClient client)
         {
             var processedFieldMappingRepository =
-                new Lib.Repositories.Processed.ProcessedFieldMappingRepository(client, new NullLogger<Lib.Repositories.Processed.ProcessedFieldMappingRepository>());
+                new FieldMappingRepository(client, new NullLogger<FieldMappingRepository>());
             return new FieldMappingResolverHelper(processedFieldMappingRepository,
                 new FieldMappingConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
         }

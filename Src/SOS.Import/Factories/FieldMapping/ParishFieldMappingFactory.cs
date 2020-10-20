@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Factories.FieldMapping.Interfaces;
-using SOS.Import.Repositories.Destination.Area.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Import.Factories.FieldMapping
 {

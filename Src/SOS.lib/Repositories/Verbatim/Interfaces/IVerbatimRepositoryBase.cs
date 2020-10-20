@@ -132,6 +132,13 @@ namespace SOS.Lib.Repositories.Verbatim.Interfaces
         Task<bool> DeleteManyAsync(IEnumerable<TKey> ids, IMongoCollection<TEntity> mongoCollection);
 
         /// <summary>
+        /// Get item by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<TEntity> GetAsync(TKey id);
+
+        /// <summary>
         ///     Get entity batch
         /// </summary>
         /// <param name="skip"></param>
