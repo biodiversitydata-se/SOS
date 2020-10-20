@@ -10,12 +10,12 @@ namespace SOS.Process.UnitTests.TestHelpers.Factories
 {
     public static class ProcessedAreaRepositoryStubFactory
     {
-        public static Mock<IProcessedAreaRepository> Create(List<AreaWithGeometry> areasWithGeometry)
+        public static Mock<IAreaRepository> Create(List<AreaWithGeometry> areasWithGeometry)
         {
             var areaById = areasWithGeometry.ToDictionary(area => area.Id, area => area);
             var areas = GetAreas(areasWithGeometry);
 
-            var processedAreaRepositoryStub = new Mock<IProcessedAreaRepository>();
+            var processedAreaRepositoryStub = new Mock<IAreaRepository>();
             processedAreaRepositoryStub
                 .Setup(avm => avm.GetAllAsync())
                 .ReturnsAsync(areas);
@@ -39,7 +39,7 @@ namespace SOS.Process.UnitTests.TestHelpers.Factories
             return processedAreaRepositoryStub;
         }
 
-        public static Mock<IProcessedAreaRepository> Create(params AreaType[] areaTypes)
+        public static Mock<IAreaRepository> Create(params AreaType[] areaTypes)
         {
             var areas = AreasTestRepository.LoadAreas(areaTypes);
             return Create(areas.ToList());

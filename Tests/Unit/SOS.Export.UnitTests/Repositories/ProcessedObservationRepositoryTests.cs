@@ -3,9 +3,9 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Nest;
-using SOS.Export.Repositories;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Repositories.Processed;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Repositories
@@ -29,8 +29,8 @@ namespace SOS.Export.UnitTests.Repositories
         private readonly Mock<ILogger<ProcessedObservationRepository>> _loggerMock;
 
         private ProcessedObservationRepository TestObject => new ProcessedObservationRepository(
-            _elasticClient.Object,
             _exportClient.Object,
+            _elasticClient.Object,
             _elasticSearchConfiguration,
             _loggerMock.Object);
 
@@ -45,28 +45,28 @@ namespace SOS.Export.UnitTests.Repositories
 
             Action create = () => new ProcessedObservationRepository(
                 null,
+                _elasticClient.Object,
+                _elasticSearchConfiguration,
+                _loggerMock.Object);
+            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
+
+            create = () => new ProcessedObservationRepository(
                 _exportClient.Object,
+                null,
                 _elasticSearchConfiguration,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("elasticClient");
 
             create = () => new ProcessedObservationRepository(
-                _elasticClient.Object,
-                null,
-                _elasticSearchConfiguration,
-                _loggerMock.Object);
-            create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("exportClient");
-
-            create = () => new ProcessedObservationRepository(
-                _elasticClient.Object,
                 _exportClient.Object,
+                _elasticClient.Object,
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("elasticConfiguration");
 
             create = () => new ProcessedObservationRepository(
-                _elasticClient.Object,
                 _exportClient.Object,
+                _elasticClient.Object,
                 _elasticSearchConfiguration,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");

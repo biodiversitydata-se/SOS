@@ -2,11 +2,11 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
-using SOS.Export.Extensions;
-using SOS.Export.Repositories;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.Repositories
@@ -24,8 +24,8 @@ namespace SOS.Export.IntegrationTests.Repositories
                 processDbConfiguration.WriteBatchSize);
             var processedObservationRepository =
                 new ProcessedObservationRepository(
-                    elasticClient,
                     exportClient,
+                    elasticClient,
                     new ElasticSearchConfiguration(),
                     new NullLogger<ProcessedObservationRepository>());
 

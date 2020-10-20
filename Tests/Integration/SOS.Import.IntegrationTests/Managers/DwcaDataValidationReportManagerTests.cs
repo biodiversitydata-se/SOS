@@ -122,14 +122,14 @@ namespace SOS.Import.IntegrationTests.Managers
         private JsonSerializerSettings CreateJsonSerializerSettings()
         {
             var jsonResolver = new IgnorableSerializerContractResolver { SetStringPropertyDefaultsToEmptyString = true}
-                .Ignore<ProcessedObservation>(obs => obs.Location.Point)
-                .Ignore<ProcessedObservation>(obs => obs.Location.PointWithBuffer)
-                .Ignore<ProcessedObservation>(obs => obs.IsInEconomicZoneOfSweden)
+                .Ignore<Observation>(obs => obs.Location.Point)
+                .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
+                .Ignore<Observation>(obs => obs.IsInEconomicZoneOfSweden)
                 .Ignore<DwcObservationVerbatim>(obs => obs.RecordId)
                 .Ignore<DwcObservationVerbatim>(obs => obs.Id)
                 .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderId)
                 .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderIdentifier)
-                .KeepTypeWithDefaultValue(typeof(ProcessedFieldMapValue));
+                .KeepTypeWithDefaultValue(typeof(VocabularyValue));
 
             var jsonSettings = new JsonSerializerSettings()
             {
@@ -158,7 +158,7 @@ namespace SOS.Import.IntegrationTests.Managers
             var processClient = CreateProcessClient(GetProcessDbConfiguration());
             var processedFieldMappingRepository =
                 new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
-            var areaHelper = new AreaHelper(new ProcessedAreaRepository(processClient, new NullLogger<ProcessedAreaRepository>()),
+            var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()),
                     processedFieldMappingRepository);
             var fieldMappingResolverHelper = new FieldMappingResolverHelper(processedFieldMappingRepository,
                 new FieldMappingConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });

@@ -12,7 +12,7 @@ namespace SOS.Import.Factories.FieldMapping
     public class ProvinceFieldMappingFactory : GeoRegionFieldMappingFactoryBase, IFieldMappingCreatorFactory
     {
         public ProvinceFieldMappingFactory(
-            IAreaProcessedRepository areaProcessedRepository,
+            IAreaRepository areaProcessedRepository,
             ILogger<ProvinceFieldMappingFactory> logger) : base(areaProcessedRepository, logger)
         {
         }

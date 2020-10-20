@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Nest;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
@@ -9,7 +10,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     /// <summary>
     ///     Repository for retrieving processed areas.
     /// </summary>
-    public interface IProcessedAreaRepository : IMongoDbProcessedRepositoryBase<Area, int>
+    public interface IAreaRepository : IMongoDbProcessedRepositoryBase<Area, int>
     {
         /// <summary>
         ///     Create indexes
@@ -29,6 +30,17 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="areaId"></param>
         /// <returns></returns>
         Task<IGeoShape> GetGeometryAsync(int areaId);
+
+        /// <summary>
+        ///     Get all the areas, paged
+        /// </summary>
+        /// <param name="areaTypes">Skip this many</param>
+        /// <param name="searchString">Skip this many</param>
+        /// <param name="skip">Skip this many</param>
+        /// <param name="take">Take this many areas</param>
+        /// <returns></returns>
+        public Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip,
+            int take);
 
         Task<List<Area>> GetAsync(AreaType[] areaTypes);
     }

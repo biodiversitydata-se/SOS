@@ -20,9 +20,9 @@ namespace SOS.Process.Processors.Nors
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;
-        private readonly IDictionary<int, ProcessedTaxon> _taxa;
+        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
 
-        public NorsObservationFactory(DataProvider dataProvider, IDictionary<int, ProcessedTaxon> taxa)
+        public NorsObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -33,7 +33,7 @@ namespace SOS.Process.Processors.Nors
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public IEnumerable<ProcessedObservation> CreateProcessedObservations(
+        public IEnumerable<Observation> CreateProcessedObservations(
             IEnumerable<NorsObservationVerbatim> verbatims)
         {
             return verbatims.Select(CreateProcessedObservation);
@@ -44,7 +44,7 @@ namespace SOS.Process.Processors.Nors
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        public ProcessedObservation CreateProcessedObservation(NorsObservationVerbatim verbatim)
+        public Observation CreateProcessedObservation(NorsObservationVerbatim verbatim)
         {
             Point wgs84Point = null;
             if (verbatim.DecimalLongitude > 0 && verbatim.DecimalLatitude > 0)
@@ -55,23 +55,23 @@ namespace SOS.Process.Processors.Nors
 
             _taxa.TryGetValue(verbatim.DyntaxaTaxonId, out var taxon);
 
-            var obs = new ProcessedObservation
+            var obs = new Observation
             {
-                BasisOfRecord = new ProcessedFieldMapValue {Id = (int) BasisOfRecordId.HumanObservation},
+                BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.NORS}",
                 DatasetName = "NORS",
-                Event = new ProcessedEvent
+                Event = new Event
                 {
                     EndDate = verbatim.End.ToUniversalTime(),
                     StartDate = verbatim.Start.ToUniversalTime(),
                     VerbatimEventDate = DwcFormatter.CreateDateIntervalString(verbatim.Start, verbatim.End)
                 },
-                Identification = new ProcessedIdentification
+                Identification = new Identification
                 {
                     Validated = true,
                     UncertainDetermination = false
                 },
-                Location = new ProcessedLocation
+                Location = new Lib.Models.Processed.Observation.Location
                 {
                     CoordinateUncertaintyInMeters =
                         verbatim.CoordinateUncertaintyInMeters ?? DefaultCoordinateUncertaintyInMeters,
@@ -79,8 +79,8 @@ namespace SOS.Process.Processors.Nors
                     DecimalLatitude = verbatim.DecimalLatitude,
                     DecimalLongitude = verbatim.DecimalLongitude,
                     GeodeticDatum = GeodeticDatum.Wgs84,
-                    Continent = new ProcessedFieldMapValue {Id = (int) ContinentId.Europe},
-                    Country = new ProcessedFieldMapValue {Id = (int) CountryId.Sweden},
+                    Continent = new VocabularyValue { Id = (int)ContinentId.Europe},
+                    Country = new VocabularyValue { Id = (int)CountryId.Sweden},
                     Locality = verbatim.Locality,
                     Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
                     PointLocation = wgs84Point?.ToGeoLocation(),
@@ -90,7 +90,7 @@ namespace SOS.Process.Processors.Nors
                     VerbatimLongitude = verbatim.DecimalLongitude.ToString(CultureInfo.InvariantCulture)
                 },
                 Modified = verbatim.Modified?.ToUniversalTime(),
-                Occurrence = new ProcessedOccurrence
+                Occurrence = new Occurrence
                 {
                     CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
                     OccurrenceId = verbatim.OccurrenceId,
@@ -125,14 +125,14 @@ namespace SOS.Process.Processors.Nors
         ///     Gets the occurrence status. Set to Present if DyntaxaTaxonId from provider is greater than 0 and Absent if
         ///     DyntaxaTaxonId is 0
         /// </summary>
-        private ProcessedFieldMapValue GetOccurrenceStatusId(int dyntaxaTaxonId)
+        private VocabularyValue GetOccurrenceStatusId(int dyntaxaTaxonId)
         {
             if (dyntaxaTaxonId == 0)
             {
-                return new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Absent};
+                return new VocabularyValue {Id = (int) OccurrenceStatusId.Absent};
             }
 
-            return new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Present};
+            return new VocabularyValue {Id = (int) OccurrenceStatusId.Present};
         }
 
         /// <summary>

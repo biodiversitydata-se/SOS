@@ -26,14 +26,14 @@ namespace SOS.Import.UnitTests.Harvesters
         /// </summary>
         public AreaHarvesterTests()
         {
-            _areaRepositoryMock = new Mock<IAreaRepository>();
-            _areaProcessedRepository = new Mock<IAreaProcessedRepository>();
+            _areaRepositoryMock = new Mock<Import.Repositories.Source.Artportalen.Interfaces.IAreaRepository>();
+            _areaProcessedRepository = new Mock<Import.Repositories.Destination.Area.Interfaces.IAreaRepository>();
             _areaHelperMock = new Mock<IAreaHelper>();
             _loggerMock = new Mock<ILogger<AreaHarvester>>();
         }
 
-        private readonly Mock<IAreaRepository> _areaRepositoryMock;
-        private readonly Mock<IAreaProcessedRepository> _areaProcessedRepository;
+        private readonly Mock<Import.Repositories.Source.Artportalen.Interfaces.IAreaRepository> _areaRepositoryMock;
+        private readonly Mock<Import.Repositories.Destination.Area.Interfaces.IAreaRepository> _areaProcessedRepository;
         private readonly Mock<IAreaHelper> _areaHelperMock;
         private readonly Mock<ILogger<AreaHarvester>> _loggerMock;
 

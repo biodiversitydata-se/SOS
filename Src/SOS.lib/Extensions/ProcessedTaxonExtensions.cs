@@ -10,7 +10,7 @@ namespace SOS.Lib.Extensions
         ///     Cast ProcessedTaxon objects to ProcessedBasicTaxon objects.
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<ProcessedBasicTaxon> ToProcessedBasicTaxa(this IEnumerable<ProcessedTaxon> sourceTaxa)
+        public static IEnumerable<BasicTaxon> ToProcessedBasicTaxa(this IEnumerable<Taxon> sourceTaxa)
         {
             return sourceTaxa?.Select(m => m.ToProcessedBasicTaxon());
         }
@@ -20,9 +20,9 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="sourceTaxon"></param>
         /// <returns></returns>
-        public static ProcessedBasicTaxon ToProcessedBasicTaxon(this ProcessedTaxon sourceTaxon)
+        public static BasicTaxon ToProcessedBasicTaxon(this Taxon sourceTaxon)
         {
-            return new ProcessedBasicTaxon
+            return new BasicTaxon
             {
                 DyntaxaTaxonId = sourceTaxon.DyntaxaTaxonId,
                 ParentDyntaxaTaxonId = sourceTaxon.ParentDyntaxaTaxonId,

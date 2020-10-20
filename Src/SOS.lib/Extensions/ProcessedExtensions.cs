@@ -13,7 +13,7 @@ namespace SOS.Lib.Extensions
     {
         #region Event
 
-        public static DarwinCoreEvent ToDarwinCore(this ProcessedEvent source)
+        public static DarwinCoreEvent ToDarwinCore(this Event source)
         {
             if (source == null)
             {
@@ -47,7 +47,7 @@ namespace SOS.Lib.Extensions
 
         #region Identification
 
-        public static DarwinCoreIdentification ToDarwinCore(this ProcessedIdentification source)
+        public static DarwinCoreIdentification ToDarwinCore(this Identification source)
         {
             if (source == null)
             {
@@ -73,7 +73,7 @@ namespace SOS.Lib.Extensions
 
         #region Location
 
-        public static DarwinCoreLocation ToDarwinCore(this ProcessedLocation source)
+        public static DarwinCoreLocation ToDarwinCore(this Location source)
         {
             if (source == null)
             {
@@ -133,7 +133,7 @@ namespace SOS.Lib.Extensions
 
         #region Occurrence
 
-        public static DarwinCoreOccurrence ToDarwinCore(this ProcessedOccurrence source)
+        public static DarwinCoreOccurrence ToDarwinCore(this Occurrence source)
         {
             if (source == null)
             {
@@ -175,7 +175,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="taxon"></param>
         /// <returns></returns>
-        public static DarwinCoreTaxon ToDarwinCore(this ProcessedTaxon taxon)
+        public static DarwinCoreTaxon ToDarwinCore(this Taxon taxon)
         {
             return new DarwinCoreTaxon
             {
@@ -224,7 +224,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="processedObservation"></param>
         /// <returns></returns>
-        public static DarwinCore ToDarwinCore(this ProcessedObservation processedObservation)
+        public static DarwinCore ToDarwinCore(this Observation processedObservation)
         {
             if (processedObservation == null)
             {
@@ -264,7 +264,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="processedObservations"></param>
         /// <returns></returns>
-        public static IEnumerable<DarwinCore> ToDarwinCore(this IEnumerable<ProcessedObservation> processedObservations)
+        public static IEnumerable<DarwinCore> ToDarwinCore(this IEnumerable<Observation> processedObservations)
         {
             return processedObservations?
                 .Select(observation => observation.ToDarwinCore());

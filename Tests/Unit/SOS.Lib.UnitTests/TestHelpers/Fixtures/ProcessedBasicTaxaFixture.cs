@@ -13,11 +13,11 @@ namespace SOS.Lib.UnitTests.TestHelpers.Fixtures
     {
         public ProcessedBasicTaxaFixture()
         {
-            Taxa = MessagePackHelper.CreateListFromMessagePackFile<ProcessedBasicTaxon>(
+            Taxa = MessagePackHelper.CreateListFromMessagePackFile<BasicTaxon>(
                 @"Resources\AllProcessedBasicTaxa.msgpck");
         }
 
-        public IEnumerable<ProcessedBasicTaxon> Taxa { get; private set; }
+        public IEnumerable<BasicTaxon> Taxa { get; private set; }
 
         public void Dispose()
         {

@@ -13,8 +13,9 @@ namespace SOS.Lib.Jobs.Export
         /// Create a doi bys using provided filter
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="emailAddress"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<bool> RunAsync(ExportFilter filter, IJobCancellationToken cancellationToken);
+        Task<bool> RunAsync(ExportFilter filter, string emailAddress, IJobCancellationToken cancellationToken);
     }
 }

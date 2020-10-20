@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FluentAssertions;
-using SOS.Export.Extensions;
+using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using Xunit;
 
@@ -17,11 +15,11 @@ namespace SOS.Export.UnitTests.Extensions
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            List<ProcessedObservation> processedObservations = new List<ProcessedObservation>
+            List<Observation> processedObservations = new List<Observation>
             {
-                new ProcessedObservation {Projects = null, Taxon = new ProcessedTaxon(), Occurrence = new ProcessedOccurrence {OccurrenceId = "1"}},
-                new ProcessedObservation {Projects = new List<ProcessedProject>(), Taxon = new ProcessedTaxon(), Occurrence = new ProcessedOccurrence {OccurrenceId = "2"}},
-                new ProcessedObservation {Projects = new List<ProcessedProject> { new ProcessedProject {ProjectParameters = null}}, Taxon = new ProcessedTaxon(), Occurrence = new ProcessedOccurrence {OccurrenceId = "3"}}
+                new Observation {Projects = null, Taxon = new Taxon(), Occurrence = new Occurrence {OccurrenceId = "1"}},
+                new Observation {Projects = new List<Project>(), Taxon = new Taxon(), Occurrence = new Occurrence {OccurrenceId = "2"}},
+                new Observation {Projects = new List<Project> { new Project {ProjectParameters = null}}, Taxon = new Taxon(), Occurrence = new Occurrence {OccurrenceId = "3"}}
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -43,41 +41,41 @@ namespace SOS.Export.UnitTests.Extensions
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            List<ProcessedObservation> processedObservations = new List<ProcessedObservation>
+            List<Observation> processedObservations = new List<Observation>
             {
-                new ProcessedObservation {Projects = null, Taxon = new ProcessedTaxon(), Occurrence = new ProcessedOccurrence {OccurrenceId = "1"}},
-                new ProcessedObservation {Projects = new List<ProcessedProject>(), Taxon = new ProcessedTaxon(), Occurrence = new ProcessedOccurrence {OccurrenceId = "2"}},
-                new ProcessedObservation {Projects = new List<ProcessedProject> {new ProcessedProject {ProjectParameters = null}}, Taxon = new ProcessedTaxon(), Occurrence = new ProcessedOccurrence {OccurrenceId = "3"}},
-                new ProcessedObservation
+                new Observation {Projects = null, Taxon = new Taxon(), Occurrence = new Occurrence {OccurrenceId = "1"}},
+                new Observation {Projects = new List<Project>(), Taxon = new Taxon(), Occurrence = new Occurrence {OccurrenceId = "2"}},
+                new Observation {Projects = new List<Project> {new Project {ProjectParameters = null}}, Taxon = new Taxon(), Occurrence = new Occurrence {OccurrenceId = "3"}},
+                new Observation
                 {
-                    Projects = new List<ProcessedProject>
+                    Projects = new List<Project>
                     {
-                        new ProcessedProject
+                        new Project
                         {
-                            ProjectParameters = new List<ProcessedProjectParameter>
+                            ProjectParameters = new List<ProjectParameter>
                             {
-                                new ProcessedProjectParameter {Name = "Row1"},
-                                new ProcessedProjectParameter {Name = "Row2"}
+                                new ProjectParameter {Name = "Row1"},
+                                new ProjectParameter {Name = "Row2"}
                             }
                         }
                     },
-                    Taxon = new ProcessedTaxon(),
-                    Occurrence = new ProcessedOccurrence {OccurrenceId = "4"}
+                    Taxon = new Taxon(),
+                    Occurrence = new Occurrence {OccurrenceId = "4"}
                 },
-                new ProcessedObservation
+                new Observation
                 {
-                    Projects = new List<ProcessedProject>
+                    Projects = new List<Project>
                     {
-                        new ProcessedProject
+                        new Project
                         {
-                            ProjectParameters = new List<ProcessedProjectParameter>
+                            ProjectParameters = new List<ProjectParameter>
                             {
-                                new ProcessedProjectParameter {Name = "Row3"}
+                                new ProjectParameter {Name = "Row3"}
                             }
                         }
                     },
-                    Taxon = new ProcessedTaxon(),
-                    Occurrence = new ProcessedOccurrence {OccurrenceId = "5"}
+                    Taxon = new Taxon(),
+                    Occurrence = new Occurrence {OccurrenceId = "5"}
                 }
             };
 

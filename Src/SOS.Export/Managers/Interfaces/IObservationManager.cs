@@ -20,7 +20,7 @@ namespace SOS.Export.Managers.Interfaces
             IJobCancellationToken cancellationToken);
 
         /// <summary>
-        ///     Export a file and store it in blob storage
+        ///  Export a file and store it in blob storage, 
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="blobStorageContainer"></param>
@@ -29,5 +29,17 @@ namespace SOS.Export.Managers.Interfaces
         /// <returns></returns>
         Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName,
             IJobCancellationToken cancellationToken);
+
+        /// <summary>
+        /// Export a file and store it in blob storage, 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="blobStorageContainer"></param>
+        /// <param name="fileName"></param>
+        /// <param name="emailAddress"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName,
+            string emailAddress, IJobCancellationToken cancellationToken);
     }
 }

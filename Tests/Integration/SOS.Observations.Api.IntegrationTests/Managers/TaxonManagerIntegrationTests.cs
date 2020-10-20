@@ -1,9 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
-using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Repositories.Processed;
 using SOS.Observations.Api.Managers;
-using SOS.Observations.Api.Repositories;
 using Xunit;
 
 namespace SOS.Observations.Api.IntegrationTests.Managers
@@ -21,7 +20,7 @@ namespace SOS.Observations.Api.IntegrationTests.Managers
 
             var processedTaxonRepository = new ProcessedTaxonRepository(
                 processClient,
-                new NullLogger<ProcessBaseRepository<ProcessedTaxon, int>>());
+                new NullLogger<ProcessedTaxonRepository>());
             var taxonManager = new TaxonManager(processedTaxonRepository, new NullLogger<TaxonManager>());
             return taxonManager;
         }

@@ -17,7 +17,6 @@ namespace SOS.Import.Jobs
     public class ArtportalenHarvestJob : IArtportalenHarvestJob
     {
         private readonly IArtportalenObservationHarvester _artportalenObservationHarvester;
-        private readonly IDataProviderManager _dataProviderManager;
         private readonly IHarvestInfoRepository _harvestInfoRepository;
         private readonly ILogger<ArtportalenHarvestJob> _logger;
 
@@ -26,19 +25,16 @@ namespace SOS.Import.Jobs
         /// </summary>
         /// <param name="artportalenObservationHarvester"></param>
         /// <param name="harvestInfoRepository"></param>
-        /// <param name="dataProviderManager"></param>
         /// <param name="logger"></param>
         public ArtportalenHarvestJob(
             IArtportalenObservationHarvester artportalenObservationHarvester,
             IHarvestInfoRepository harvestInfoRepository,
-            IDataProviderManager dataProviderManager,
             ILogger<ArtportalenHarvestJob> logger)
         {
             _artportalenObservationHarvester = artportalenObservationHarvester ??
                                                throw new ArgumentNullException(nameof(artportalenObservationHarvester));
             _harvestInfoRepository =
                 harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
-            _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -54,18 +50,11 @@ namespace SOS.Import.Jobs
         public async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
             _logger.LogInformation("Start Artportalen Harvest Job");
-            var dataProvider =
-                await _dataProviderManager.GetDataProviderByType(DataProviderType.ArtportalenObservations);
             var harvestInfoResult = await _artportalenObservationHarvester.HarvestSightingsAsync(mode, cancellationToken);
             _logger.LogInformation($"End Artportalen Harvest Job. Status: {harvestInfoResult.Status}");
 
             // Save harvest info
             await _harvestInfoRepository.AddOrUpdateAsync(harvestInfoResult);
-
-            if (dataProvider != null)
-            {
-                await _dataProviderManager.UpdateHarvestInfo(dataProvider.Id, harvestInfoResult);
-            }
 
             return harvestInfoResult.Status.Equals(RunStatus.Failed)
                 ? throw new Exception("Artportalen Harvest Job failed")

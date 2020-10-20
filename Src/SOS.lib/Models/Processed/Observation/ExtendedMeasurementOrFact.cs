@@ -1,6 +1,6 @@
 ﻿namespace SOS.Lib.Models.Processed.Observation
 {
-    public class ProcessedExtendedMeasurementOrFact
+    public class ExtendedMeasurementOrFact
     {
         /// <summary>
         ///     An identifier for the MeasurementOrFact (information pertaining

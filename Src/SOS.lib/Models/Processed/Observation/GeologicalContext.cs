@@ -1,6 +1,6 @@
 ﻿namespace SOS.Lib.Models.Processed.Observation
 {
-    public class ProcessedGeologicalContext
+    public class GeologicalContext
     {
         /// <summary>
         ///     Darwin Core term name: bed.

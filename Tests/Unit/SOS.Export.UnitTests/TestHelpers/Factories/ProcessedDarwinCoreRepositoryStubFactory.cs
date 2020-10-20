@@ -4,9 +4,9 @@ using System.Reflection;
 using System.Text;
 using Moq;
 using Newtonsoft.Json;
-using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.TestHelpers.JsonConverters;
 
 namespace SOS.Export.UnitTests.TestHelpers.Factories
@@ -18,7 +18,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
         public static Mock<IProcessedObservationRepository> Create(string fileName)
         {
             var stub = new Mock<IProcessedObservationRepository>();
-            var observations = new ScrollResult<ProcessedObservation>
+            var observations = new ScrollResult<Observation>
             {
                 Records = LoadObservations(fileName)
             };
@@ -29,12 +29,12 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             return stub;
         }
 
-        public static Mock<IProcessedObservationRepository> Create(ProcessedObservation observation)
+        public static Mock<IProcessedObservationRepository> Create(Observation observation)
         {
             var stub = new Mock<IProcessedObservationRepository>();
             stub
                 .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
-                .ReturnsAsync(new ScrollResult<ProcessedObservation>
+                .ReturnsAsync(new ScrollResult<Observation>
                 {
                     Records = new[] {observation}
                 });
@@ -42,7 +42,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             return stub;
         }
 
-        private static IEnumerable<ProcessedObservation> LoadObservations(string fileName)
+        private static IEnumerable<Observation> LoadObservations(string fileName)
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
@@ -52,7 +52,7 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
                 Converters = new List<JsonConverter> {new ObjectIdConverter()}
             };
 
-            var observations = JsonConvert.DeserializeObject<List<ProcessedObservation>>(str, serializerSettings);
+            var observations = JsonConvert.DeserializeObject<List<Observation>>(str, serializerSettings);
             return observations;
         }
     }

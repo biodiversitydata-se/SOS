@@ -52,7 +52,7 @@ namespace SOS.Process.Processors
         /// <returns></returns>
         public virtual async Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
@@ -92,14 +92,14 @@ namespace SOS.Process.Processors
 
         protected abstract Task<int> ProcessObservations(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken);
 
 
         protected async Task<int> CommitBatchAsync(
             DataProvider dataProvider,
-            ICollection<ProcessedObservation> processedObservations)
+            ICollection<Observation> processedObservations)
         {
             try
             {
@@ -129,7 +129,7 @@ namespace SOS.Process.Processors
         /// <param name="batchId"></param>
         /// <returns></returns>
         protected async Task<bool> WriteObservationsToDwcaCsvFiles(
-            IEnumerable<ProcessedObservation> processedObservations,
+            IEnumerable<Observation> processedObservations,
             DataProvider dataProvider,
             string batchId = "")
         {

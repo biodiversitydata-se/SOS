@@ -10,9 +10,9 @@ using Newtonsoft.Json;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Models.Area;
-using SOS.Observations.Api.Repositories.Interfaces;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -44,7 +44,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                var area = await _areaRepository.GetAreaAsync(areaId);
+                var area = await _areaRepository.GetAsync(areaId);
 
                 if (area?.AreaType == AreaType.EconomicZoneOfSweden)
                 {

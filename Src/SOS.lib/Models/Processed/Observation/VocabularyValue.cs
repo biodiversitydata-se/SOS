@@ -3,23 +3,23 @@ using SOS.Lib.Constants;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
-    public class ProcessedFieldMapValue
+    public class VocabularyValue
     {
         public int Id { get; set; }
         public string Value { get; set; }
 
-        public static ProcessedFieldMapValue Create(int? val)
+        public static VocabularyValue Create(int? val)
         {
-            return !val.HasValue ? null : new ProcessedFieldMapValue {Id = val.Value};
+            return !val.HasValue ? null : new VocabularyValue {Id = val.Value};
         }
 
-        public static ProcessedFieldMapValue Create(string val)
+        public static VocabularyValue Create(string val)
         {
-            return new ProcessedFieldMapValue
+            return new VocabularyValue
                 {Id = FieldMappingConstants.NoMappingFoundCustomValueIsUsedId, Value = val};
         }
 
-        protected bool Equals(ProcessedFieldMapValue other)
+        protected bool Equals(VocabularyValue other)
         {
             return Id == other.Id && Value == other.Value;
         }
@@ -29,7 +29,7 @@ namespace SOS.Lib.Models.Processed.Observation
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((ProcessedFieldMapValue) obj);
+            return Equals((VocabularyValue) obj);
         }
 
         public override int GetHashCode()

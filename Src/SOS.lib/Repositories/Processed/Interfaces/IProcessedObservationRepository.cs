@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
@@ -9,7 +11,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     /// <summary>
     ///     Processed data class
     /// </summary>
-    public interface IProcessedObservationRepository : IProcessRepositoryBase<ProcessedObservation>
+    public interface IProcessedObservationRepository : IProcessRepositoryBase<Observation>
     {
         public string IndexName { get; }
 
@@ -20,7 +22,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <param name="observations"></param>
         /// <returns></returns>
-        new Task<int> AddManyAsync(IEnumerable<ProcessedObservation> observations);
+        new Task<int> AddManyAsync(IEnumerable<Observation> observations);
 
         /// <summary>
         ///     Copy provider data from active instance to inactive instance.
@@ -62,6 +64,44 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="providerId"></param>
         /// <returns></returns>
         Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId);
+
+        /// <summary>
+        ///     Get project parameters.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="scrollId"></param>
+        /// <returns></returns>
+        Task<ScrollResult<Project>> ScrollProjectParametersAsync(FilterBase filter, string scrollId);
+
+        /// <summary>
+        ///     Get observation by scroll
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="scrollId"></param>
+        /// <returns></returns>
+        Task<ScrollResult<Observation>> ScrollObservationsAsync(FilterBase filter, string scrollId);
+
+        /// <summary>
+        ///     Get observation by scroll. 
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="scrollId"></param>
+        /// <remarks>To improve performance this method doesn't use the dynamic type.</remarks>
+        /// <returns></returns>
+        Task<ScrollResult<Observation>> TypedScrollObservationsAsync(
+            FilterBase filter,
+            string scrollId);
+
+        /// <summary>
+        ///     Get project parameters.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="scrollId"></param>
+        /// <remarks>To improve performance this method doesn't use the dynamic type.</remarks>
+        /// <returns></returns>
+        Task<ScrollResult<ExtendedMeasurementOrFactRow>> TypedScrollProjectParametersAsync(
+            FilterBase filter,
+            string scrollId);
 
         /// <summary>
         /// Verify that collection exists

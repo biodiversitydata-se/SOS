@@ -20,9 +20,9 @@ namespace SOS.Process.Processors.Shark
     {
         private const int DefaultCoordinateUncertaintyInMeters = 500;
         private readonly DataProvider _dataProvider;
-        private readonly IDictionary<int, ProcessedTaxon> _taxa;
+        private readonly IDictionary<int, Lib.Models.Processed.Observation.Taxon> _taxa;
 
-        public SharkObservationFactory(DataProvider dataProvider, IDictionary<int, ProcessedTaxon> taxa)
+        public SharkObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa)
         {
             _dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
             _taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
@@ -33,7 +33,7 @@ namespace SOS.Process.Processors.Shark
         /// </summary>
         /// <param name="verbatims"></param>
         /// <returns></returns>
-        public IEnumerable<ProcessedObservation> CreateProcessedObservations(
+        public IEnumerable<Observation> CreateProcessedObservations(
             IEnumerable<SharkObservationVerbatim> verbatims)
         {
             return verbatims.Select(CreateProcessedObservation);
@@ -44,7 +44,7 @@ namespace SOS.Process.Processors.Shark
         /// </summary>
         /// <param name="verbatim"></param>
         /// <returns></returns>
-        public ProcessedObservation CreateProcessedObservation(SharkObservationVerbatim verbatim)
+        public Observation CreateProcessedObservation(SharkObservationVerbatim verbatim)
         {
             Point wgs84Point = null;
             if (verbatim.SampleLatitudeDd.HasValue && verbatim.SampleLongitudeDd.HasValue)
@@ -55,33 +55,33 @@ namespace SOS.Process.Processors.Shark
 
             _taxa.TryGetValue(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, out var taxon);
 
-            var obs = new ProcessedObservation
+            var obs = new Observation
             {
                 DataProviderId = _dataProvider.Id,
-                BasisOfRecord = new ProcessedFieldMapValue {Id = (int) BasisOfRecordId.HumanObservation},
+                BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation},
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.SHARK}",
                 DatasetName = verbatim.DatasetName,
-                Event = new ProcessedEvent
+                Event = new Event
                 {
                     EndDate = verbatim.SampleDate?.ToUniversalTime(),
                     StartDate = verbatim.SampleDate?.ToUniversalTime(),
                     VerbatimEventDate = DwcFormatter.CreateDateString(verbatim.SampleDate)
                 },
-                Identification = new ProcessedIdentification
+                Identification = new Identification
                 {
                     IdentifiedBy = verbatim.AnalysedBy,
                     Validated = true,
                     UncertainDetermination = false
                 },
-                Location = new ProcessedLocation
+                Location = new Lib.Models.Processed.Observation.Location
                 {
                     CoordinateUncertaintyInMeters = DefaultCoordinateUncertaintyInMeters,
                     CountryCode = CountryCode.Sweden,
                     DecimalLatitude = verbatim.SampleLatitudeDd,
                     DecimalLongitude = verbatim.SampleLongitudeDd,
                     GeodeticDatum = GeodeticDatum.Wgs84,
-                    Continent = new ProcessedFieldMapValue {Id = (int) ContinentId.Europe},
-                    Country = new ProcessedFieldMapValue {Id = (int) CountryId.Sweden},
+                    Continent = new VocabularyValue { Id = (int)ContinentId.Europe},
+                    Country = new VocabularyValue { Id = (int)CountryId.Sweden},
                     MaximumDepthInMeters = verbatim.WaterDepthM,
                     MinimumDepthInMeters = verbatim.WaterDepthM,
                     Point = (PointGeoShape) wgs84Point?.ToGeoShape(),
@@ -91,7 +91,7 @@ namespace SOS.Process.Processors.Shark
                     VerbatimLatitude = verbatim.SampleLatitudeDd?.ToString(),
                     VerbatimLongitude = verbatim.SampleLongitudeDd?.ToString()
                 },
-                Occurrence = new ProcessedOccurrence
+                Occurrence = new Occurrence
                 {
                     OccurrenceId = verbatim.SharkSampleId,
                     IsNaturalOccurrence = true,
@@ -134,14 +134,14 @@ namespace SOS.Process.Processors.Shark
         ///     Gets the occurrence status. Set to Present if DyntaxaTaxonId from provider is greater than 0 and Absent if
         ///     DyntaxaTaxonId is 0
         /// </summary>
-        private ProcessedFieldMapValue GetOccurrenceStatusId(int? dyntaxaTaxonId)
+        private VocabularyValue GetOccurrenceStatusId(int? dyntaxaTaxonId)
         {
             if (dyntaxaTaxonId == 0)
             {
-                return new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Absent};
+                return new VocabularyValue {Id = (int) OccurrenceStatusId.Absent};
             }
 
-            return new ProcessedFieldMapValue {Id = (int) OccurrenceStatusId.Present};
+            return new VocabularyValue {Id = (int) OccurrenceStatusId.Present};
         }
 
         /// <summary>

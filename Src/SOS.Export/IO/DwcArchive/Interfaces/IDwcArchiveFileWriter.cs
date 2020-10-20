@@ -3,12 +3,10 @@ using System.Threading.Tasks;
 using Hangfire;
 using SOS.Export.Enums;
 using SOS.Export.Models;
-using SOS.Export.Repositories.Interfaces;
-using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
-using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Export.IO.DwcArchive.Interfaces
 {
@@ -63,7 +61,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="filePathByFilePart"></param>
         /// <returns></returns>
         Task WriteHeaderlessDwcaFiles(
-            ICollection<ProcessedObservation> dwcObservations,
+            ICollection<Observation> dwcObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart);
 
         /// <summary>

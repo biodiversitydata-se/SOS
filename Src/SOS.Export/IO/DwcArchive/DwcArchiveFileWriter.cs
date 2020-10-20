@@ -7,19 +7,17 @@ using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
 using Ionic.Zip;
-using Ionic.Zlib;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Enums;
-using SOS.Export.Extensions;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Models;
-using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Export.IO.DwcArchive
@@ -158,7 +156,7 @@ namespace SOS.Export.IO.DwcArchive
         }
         
         public async Task WriteHeaderlessDwcaFiles(
-            ICollection<ProcessedObservation> processedObservations,
+            ICollection<Observation> processedObservations,
             Dictionary<DwcaFilePart, string> filePathByFilePart)
         {
             if (!processedObservations?.Any() ?? true)

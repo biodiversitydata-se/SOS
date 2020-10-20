@@ -20,14 +20,14 @@ namespace SOS.Process.Managers.Interfaces
         /// </summary>
         /// <param name="observations"></param>
         /// <returns>Invalid items</returns>
-        ICollection<InvalidObservation> ValidateObservations(ref ICollection<ProcessedObservation> observations);
+        ICollection<InvalidObservation> ValidateObservations(ref ICollection<Observation> observations);
 
         /// <summary>
         /// Checks if an observation is valid or not.
         /// </summary>
         /// <param name="observation"></param>
         /// <returns></returns>
-        public InvalidObservation ValidateObservation(ProcessedObservation observation);
+        public InvalidObservation ValidateObservation(Observation observation);
 
         /// <summary>
         /// Make sure we have a invalid items collection

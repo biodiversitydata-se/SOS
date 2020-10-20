@@ -2,8 +2,8 @@
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Export.Repositories;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Repositories.Processed;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Repositories

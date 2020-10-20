@@ -46,7 +46,7 @@ namespace SOS.Import.IntegrationTests.TestDataTools
                 verbatimDbConfiguration.WriteBatchSize);
 
             var areaVerbatimRepository =
-                new AreaProcessedRepository(importClient, new NullLogger<AreaProcessedRepository>());
+                new AreaRepository(importClient, new NullLogger<AreaRepository>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

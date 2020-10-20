@@ -29,7 +29,7 @@ namespace SOS.Process.Helpers
             {AreaType.County, AreaType.Province, AreaType.Municipality, AreaType.Parish, AreaType.EconomicZoneOfSweden};
 
         private IDictionary<string, PositionLocation> _featureCache;
-        private readonly IProcessedAreaRepository _processedAreaRepository;
+        private readonly IAreaRepository _processedAreaRepository;
         private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
         private readonly STRtree<IFeature> _strTree;
         private IDictionary<FieldMappingFieldId, Dictionary<int, FieldMappingValue>> _fieldMappingValueById;
@@ -40,7 +40,7 @@ namespace SOS.Process.Helpers
         /// <param name="processedAreaRepository"></param>
         /// <param name="processedFieldMappingRepository"></param>
         public AreaHelper(
-            IProcessedAreaRepository processedAreaRepository,
+            IAreaRepository processedAreaRepository,
             IProcessedFieldMappingRepository processedFieldMappingRepository)
         {
             _processedAreaRepository = processedAreaRepository ??
@@ -57,7 +57,7 @@ namespace SOS.Process.Helpers
 
 
         /// <inheritdoc />
-        public void AddAreaDataToProcessedObservations(IEnumerable<ProcessedObservation> processedObservations)
+        public void AddAreaDataToProcessedObservations(IEnumerable<Observation> processedObservations)
         {
             foreach (var processedObservation in processedObservations)
             {
@@ -66,7 +66,7 @@ namespace SOS.Process.Helpers
         }
 
         /// <inheritdoc />
-        public void AddAreaDataToProcessedObservation(ProcessedObservation processedObservation)
+        public void AddAreaDataToProcessedObservation(Observation processedObservation)
         {
             if (processedObservation.Location == null || !processedObservation.Location.DecimalLatitude.HasValue ||
                 !processedObservation.Location.DecimalLongitude.HasValue)
@@ -76,11 +76,11 @@ namespace SOS.Process.Helpers
 
             var positionLocation = GetPositionLocation(processedObservation.Location.DecimalLongitude.Value,
                 processedObservation.Location.DecimalLatitude.Value);
-            processedObservation.Location.County = ProcessedFieldMapValue.Create(positionLocation.County?.Id);
+            processedObservation.Location.County = VocabularyValue.Create(positionLocation.County?.Id);
             processedObservation.Location.Municipality =
-                ProcessedFieldMapValue.Create(positionLocation.Municipality?.Id);
-            processedObservation.Location.Parish = ProcessedFieldMapValue.Create(positionLocation.Parish?.Id);
-            processedObservation.Location.Province = ProcessedFieldMapValue.Create(positionLocation.Province?.Id);
+                VocabularyValue.Create(positionLocation.Municipality?.Id);
+            processedObservation.Location.Parish = VocabularyValue.Create(positionLocation.Parish?.Id);
+            processedObservation.Location.Province = VocabularyValue.Create(positionLocation.Province?.Id);
             processedObservation.IsInEconomicZoneOfSweden = positionLocation.EconomicZoneOfSweden;
             SetCountyPartIdByCoordinate(processedObservation);
             SetProvincePartIdByCoordinate(processedObservation);
@@ -190,7 +190,7 @@ namespace SOS.Process.Helpers
                         Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
                             out var areaType);
 
-                        var area = new ProcessedArea
+                        var area = new Lib.Models.Processed.Observation.Area
                         {
                             Id = id,
                             FeatureId = feature.Attributes.GetOptionalValue("featureId")?.ToString(),
@@ -226,7 +226,7 @@ namespace SOS.Process.Helpers
             return positionLocation;
         }
 
-        private static void SetProvincePartIdByCoordinate(ProcessedObservation processedObservation)
+        private static void SetProvincePartIdByCoordinate(Observation processedObservation)
         {
             // Set ProvincePartIdByCoordinate. Merge lappmarker into Lappland.
             processedObservation.Location.ProvincePartIdByCoordinate = processedObservation.Location.Province?.Id;
@@ -243,7 +243,7 @@ namespace SOS.Process.Helpers
             }
         }
 
-        private static void SetCountyPartIdByCoordinate(ProcessedObservation processedObservation)
+        private static void SetCountyPartIdByCoordinate(Observation processedObservation)
         {
             // Set CountyPartIdByCoordinate. Split Kalmar into Öland and Kalmar fastland.
             processedObservation.Location.CountyPartIdByCoordinate = processedObservation.Location.County?.Id;
@@ -279,7 +279,7 @@ namespace SOS.Process.Helpers
             return dic;
         }
 
-        public void AddValueDataToGeographicalFields(ProcessedObservation observation)
+        public void AddValueDataToGeographicalFields(Observation observation)
         {
             SetValue(observation?.Location?.County, _fieldMappingValueById[FieldMappingFieldId.County]);
             SetValue(observation?.Location?.Municipality, _fieldMappingValueById[FieldMappingFieldId.Municipality]);
@@ -287,7 +287,7 @@ namespace SOS.Process.Helpers
             SetValue(observation?.Location?.Parish, _fieldMappingValueById[FieldMappingFieldId.Parish]);
         }
 
-        private void SetValue(ProcessedFieldMapValue val, IDictionary<int, FieldMappingValue> fieldMappingValueById)
+        private void SetValue(VocabularyValue val, IDictionary<int, FieldMappingValue> fieldMappingValueById)
         {
             if (val == null) return;
             if (fieldMappingValueById.TryGetValue(val.Id, out var fieldMappingValue))

@@ -24,10 +24,10 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var observations = new List<ProcessedObservation>();
-            var observation = new ProcessedObservation
+            var observations = new List<Observation>();
+            var observation = new Observation
             {
-                Location = new ProcessedLocation
+                Location = new Location
                 {
                     DecimalLatitude = Coordinates.BorgholmMunicipality.Latitude,
                     DecimalLongitude = Coordinates.BorgholmMunicipality.Longitude
@@ -54,10 +54,10 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var observations = new List<ProcessedObservation>();
-            var observation = new ProcessedObservation
+            var observations = new List<Observation>();
+            var observation = new Observation
             {
-                Location = new ProcessedLocation
+                Location = new Location
                 {
                     DecimalLatitude = Coordinates.KalmarMunicipality.Latitude,
                     DecimalLongitude = Coordinates.KalmarMunicipality.Longitude
@@ -84,10 +84,10 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var observations = new List<ProcessedObservation>();
-            var observation = new ProcessedObservation
+            var observations = new List<Observation>();
+            var observation = new Observation
             {
-                Location = new ProcessedLocation
+                Location = new Location
                 {
                     DecimalLatitude = Coordinates.TranasMunicipality.Latitude,
                     DecimalLongitude = Coordinates.TranasMunicipality.Longitude
@@ -117,9 +117,9 @@ namespace SOS.Process.IntegrationTests.Helpers
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var observation = new ProcessedObservation
+            var observation = new Observation
             {
-                Location = new ProcessedLocation
+                Location = new Location
                 {
                     DecimalLatitude = Coordinates.KirunaMunicipality.Latitude,
                     DecimalLongitude = Coordinates.KirunaMunicipality.Longitude

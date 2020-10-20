@@ -4,9 +4,9 @@ using System.Reflection;
 using System.Text;
 using Moq;
 using Newtonsoft.Json;
-using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.TestHelpers.JsonConverters;
 
 namespace SOS.Export.IntegrationTests.TestHelpers.Factories
@@ -26,17 +26,17 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
             return stub;
         }
 
-        public static Mock<IProcessedObservationRepository> Create(ProcessedObservation observation)
+        public static Mock<IProcessedObservationRepository> Create(Observation observation)
         {
             var stub = new Mock<IProcessedObservationRepository>();
             stub
                 .Setup(pdcr => pdcr.ScrollObservationsAsync(It.IsAny<SearchFilter>(), null))
-                .ReturnsAsync(new ScrollResult<ProcessedObservation> {Records = new[] {observation}});
+                .ReturnsAsync(new ScrollResult<Observation> {Records = new[] {observation}});
 
             return stub;
         }
 
-        private static ScrollResult<ProcessedObservation> LoadObservations(string fileName)
+        private static ScrollResult<Observation> LoadObservations(string fileName)
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
@@ -46,8 +46,8 @@ namespace SOS.Export.IntegrationTests.TestHelpers.Factories
                 Converters = new List<JsonConverter> {new ObjectIdConverter()}
             };
 
-            var observations = JsonConvert.DeserializeObject<List<ProcessedObservation>>(str, serializerSettings);
-            return new ScrollResult<ProcessedObservation> {Records = observations};
+            var observations = JsonConvert.DeserializeObject<List<Observation>>(str, serializerSettings);
+            return new ScrollResult<Observation> {Records = observations};
         }
     }
 }

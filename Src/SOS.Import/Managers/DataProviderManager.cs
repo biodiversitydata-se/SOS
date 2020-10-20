@@ -13,7 +13,6 @@ using SOS.Import.Managers.Interfaces;
 using SOS.Import.Repositories.Resource.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Managers
 {
@@ -150,10 +149,6 @@ namespace SOS.Import.Managers
             return parsedDataProviders;
         }
 
-        public async Task<bool> UpdateHarvestInfo(int dataProviderId, HarvestInfo harvestInfo)
-        {
-            return await _dataProviderRepository.UpdateHarvestInfo(dataProviderId, harvestInfo);
-        }
 
         /// <summary>
         /// Set EML metadata for a data provider.

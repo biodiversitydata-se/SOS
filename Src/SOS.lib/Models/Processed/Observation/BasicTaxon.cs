@@ -7,7 +7,7 @@ namespace SOS.Lib.Models.Processed.Observation
     ///     This class contains basic taxon taxon information that can
     ///     be used for building a taxon tree.
     /// </summary>
-    public class ProcessedBasicTaxon : IEntity<int>, IBasicTaxon
+    public class BasicTaxon : IEntity<int>, IBasicTaxon
     {
         /// <summary>
         ///     Dyntaxa taxon id.

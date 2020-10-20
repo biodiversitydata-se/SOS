@@ -4,7 +4,6 @@ using System.Xml.Linq;
 using CSharpFunctionalExtensions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.Verbatim.Shared;
 
 namespace SOS.Import.Managers.Interfaces
 {

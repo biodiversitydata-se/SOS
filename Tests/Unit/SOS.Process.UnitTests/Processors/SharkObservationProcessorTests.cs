@@ -187,18 +187,18 @@ namespace SOS.Process.UnitTests.Processors
             _sharkObservationVerbatimRepositoryMock.Setup(r => r.GetAllByCursorAsync())
                 .ReturnsAsync(mockCursor.Object);
 
-            _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<ProcessedObservation>>()));
+            _areaHelper.Setup(r => r.AddAreaDataToProcessedObservations(It.IsAny<IEnumerable<Observation>>()));
 
             _processedObservationRepositoryMock.Setup(r => r.DeleteProviderDataAsync(It.IsAny<DataProvider>()))
                 .ReturnsAsync(true);
 
             _processedObservationRepositoryMock
-                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<ProcessedObservation>>()))
+                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
                 .ReturnsAsync(1);
 
-            var taxa = new Dictionary<int, ProcessedTaxon>
+            var taxa = new Dictionary<int, Taxon>
             {
-                {0, new ProcessedTaxon {Id = 0, TaxonId = "taxon:0", ScientificName = "Biota"}}
+                {0, new Taxon {Id = 0, TaxonId = "taxon:0", ScientificName = "Biota"}}
             };
 
             var dataProvider = CreateDataProvider();

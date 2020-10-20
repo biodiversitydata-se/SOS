@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Nest;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.JsonConverters;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
@@ -17,7 +19,7 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Repository for retrieving processed areas.
     /// </summary>
-    public class ProcessedAreaRepository : MongoDbProcessedRepositoryBase<Area, int>, IProcessedAreaRepository
+    public class AreaRepository : MongoDbProcessedRepositoryBase<Area, int>, IAreaRepository
     {
         private readonly GridFSBucket _gridFSBucket;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
@@ -27,9 +29,9 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
-        public ProcessedAreaRepository(
+        public AreaRepository(
             IProcessClient client,
-            ILogger<ProcessedAreaRepository> logger)
+            ILogger<AreaRepository> logger)
             : base(client, false, logger)
         {
             _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions {BucketName = nameof(Area)});
@@ -72,6 +74,46 @@ namespace SOS.Lib.Repositories.Processed
             var filter = Builders<Area>.Filter.In(y => y.AreaType, areaTypes);
             var res = await (await MongoCollection.FindAsync(filter)).ToListAsync();
             return res;
+        }
+
+        /// <inheritdoc />
+        public async Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString,
+            int skip, int take)
+        {
+            var filters = new List<FilterDefinition<Area>>();
+
+            if (areaTypes?.Any() ?? false)
+            {
+                filters.Add(Builders<Area>.Filter.In(a => a.AreaType, areaTypes));
+            }
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                filters.Add(Builders<Area>.Filter
+                    .Where(f => f
+                        .Name.ToLower()
+                        .Contains(searchString.ToLower())));
+            }
+
+            var filter = filters.Count == 0 ? Builders<Area>.Filter.Empty : Builders<Area>.Filter.And(filters);
+
+            var total = await MongoCollection
+                .Find(filter)
+                .CountDocumentsAsync();
+
+            var result = await MongoCollection
+                .Find(filter)
+                .Skip(skip)
+                .Limit(take)
+                .ToListAsync();
+
+            return new PagedResult<Area>
+            {
+                Records = result,
+                Skip = skip,
+                Take = take,
+                TotalCount = total
+            };
         }
     }
 }

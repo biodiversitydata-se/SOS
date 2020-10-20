@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Nest;
+using Newtonsoft.Json;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Extensions;
+using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
@@ -16,7 +19,7 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public class ProcessedObservationRepository : ProcessRepositoryBase<ProcessedObservation>,
+    public class ProcessedObservationRepository : ProcessRepositoryBase<Observation>,
         IProcessedObservationRepository
     {
         private const string ScrollTimeOut = "45s";
@@ -32,7 +35,7 @@ namespace SOS.Lib.Repositories.Processed
                     .NumberOfShards(6)
                     .NumberOfReplicas(0)
                 )
-                .Map<ProcessedObservation>(p => p
+                .Map<Observation>(p => p
                     .AutoMap()
                     .Properties(ps => ps
                         .GeoShape(gs => gs
@@ -79,7 +82,7 @@ namespace SOS.Lib.Repositories.Processed
 
 
         /// <inheritdoc />
-        public new async Task<int> AddManyAsync(IEnumerable<ProcessedObservation> items)
+        public new async Task<int> AddManyAsync(IEnumerable<Observation> items)
         {
             // Save valid processed data
             Logger.LogDebug($"Start indexing batch for searching with {items.Count()} items");
@@ -131,7 +134,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 // Create the collection
-                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q => q
+                var res = await _elasticClient.DeleteByQueryAsync<Observation>(q => q
                     .Index(IndexName)
                     .Query(q => q
                         .Terms(t => t
@@ -156,7 +159,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 // Create the collection
-                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q => q
+                var res = await _elasticClient.DeleteByQueryAsync<Observation>(q => q
                     .Index(IndexName)
                     .Query(q => q
                         .Term(t => t
@@ -180,7 +183,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 // Create the collection
-                var res = await _elasticClient.DeleteByQueryAsync<ProcessedObservation>(q => q
+                var res = await _elasticClient.DeleteByQueryAsync<Observation>(q => q
                     .Index(IndexName)
                     .Query(q => q
                         .Term(t => t
@@ -210,7 +213,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                var res = await _elasticClient.SearchAsync<ProcessedObservation>(s => s
+                var res = await _elasticClient.SearchAsync<Observation>(s => s
                     .Index(IndexName)
                     .Query(q => q
                         .Term(t => t
@@ -233,6 +236,173 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
+        public async Task<ScrollResult<Project>> ScrollProjectParametersAsync(
+           FilterBase filter,
+           string scrollId)
+        {
+            ISearchResponse<dynamic> searchResponse;
+            if (string.IsNullOrEmpty(scrollId))
+            {
+                searchResponse = await _elasticClient.SearchAsync<dynamic>(s => s
+                    .Index(IndexName)
+                    .Source(s => s
+                        .Includes(i => i
+                            .Field("projects")))
+                    .Query(q => q
+                        .Bool(b => b
+                            .Filter(filter.ToProjectParameterQuery())
+                        )
+                    )
+                    .Scroll(ScrollTimeOut)
+                    .Size(BatchSize)
+                );
+            }
+            else
+            {
+                searchResponse = await _elasticClient
+                    .ScrollAsync<dynamic>(ScrollTimeOut, scrollId);
+            }
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            return new ScrollResult<Project>
+            {
+                Records = searchResponse.Documents
+                    .Select(po =>
+                        (Observation)JsonConvert.DeserializeObject<Observation>(
+                            JsonConvert.SerializeObject(po)))
+                    .SelectMany(p => p.Projects),
+                ScrollId = searchResponse.ScrollId,
+                TotalCount = searchResponse.HitsMetadata.Total.Value
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<ScrollResult<ExtendedMeasurementOrFactRow>> TypedScrollProjectParametersAsync(
+            FilterBase filter,
+            string scrollId)
+        {
+            ISearchResponse<Observation> searchResponse;
+            if (string.IsNullOrEmpty(scrollId))
+            {
+                searchResponse = await _elasticClient.SearchAsync<Observation>(s => s
+                    .Index(IndexName)
+                    .Source(source => source
+                        .Includes(i => i
+                            .Field(f => f.Projects)))
+                    .Query(query => query
+                        .Bool(boolQueryDescriptor => boolQueryDescriptor
+                            .Filter(filter.ToTypedProjectParameterQuery())
+                        )
+                    )
+                    .Scroll(ScrollTimeOut)
+                    .Size(BatchSize)
+                );
+            }
+            else
+            {
+                searchResponse = await _elasticClient
+                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
+            }
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            return new ScrollResult<ExtendedMeasurementOrFactRow>
+            {
+                Records = searchResponse.Documents.ToExtendedMeasurementOrFactRows(),
+                ScrollId = searchResponse.ScrollId,
+                TotalCount = searchResponse.HitsMetadata.Total.Value
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<ScrollResult<Observation>> TypedScrollObservationsAsync(
+            FilterBase filter,
+            string scrollId)
+        {
+            ISearchResponse<Observation> searchResponse;
+
+            if (string.IsNullOrEmpty(scrollId))
+            {
+                var query = filter.ToTypedObservationQuery();
+                var projection = new SourceFilterDescriptor<Observation>()
+                    .Excludes(e => e.Fields(
+                        f => f.Location.Point,
+                        f => f.Location.PointLocation,
+                        f => f.Location.PointWithBuffer));
+
+                searchResponse = await _elasticClient
+                    .SearchAsync<Observation>(s => s
+                        .Index(IndexName)
+                        .Source(p => projection)
+                        .Query(q => q
+                            .Bool(b => b
+                                .Filter(query)
+                            )
+                        )
+                        .Scroll(ScrollTimeOut)
+                        .Size(BatchSize)
+                    );
+
+            }
+            else
+            {
+                searchResponse = await _elasticClient
+                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
+            }
+
+            return new ScrollResult<Observation>
+            {
+                Records = searchResponse.Documents,
+                ScrollId = searchResponse.ScrollId,
+                TotalCount = searchResponse.HitsMetadata.Total.Value
+            };
+        }
+
+
+        /// <inheritdoc />
+        public async Task<ScrollResult<Observation>> ScrollObservationsAsync(FilterBase filter,
+            string scrollId)
+        {
+            ISearchResponse<dynamic> searchResponse;
+            if (string.IsNullOrEmpty(scrollId))
+            {
+                var projection = new SourceFilterDescriptor<dynamic>()
+                    .Excludes(e => e
+                        .Field("location.point")
+                        .Field("location.pointLocation")
+                        .Field("location.pointWithBuffer")
+                    );
+
+                searchResponse = await _elasticClient
+                    .SearchAsync<dynamic>(s => s
+                        .Index(IndexName)
+                        .Source(p => projection)
+                        /* .Query(q => q
+                             .Bool(b => b
+                                 .Filter(filter.ToQuery())
+                             )
+                         )*/
+                        .Scroll(ScrollTimeOut)
+                        .Size(BatchSize)
+                    );
+            }
+            else
+            {
+                searchResponse = await _elasticClient
+                    .ScrollAsync<dynamic>(ScrollTimeOut, scrollId);
+            }
+
+            return new ScrollResult<Observation>
+            {
+                Records = searchResponse.Documents
+                    .Select(po =>
+                        (Observation)JsonConvert.DeserializeObject<Observation>(
+                            JsonConvert.SerializeObject(po))),
+                ScrollId = searchResponse.ScrollId,
+                TotalCount = searchResponse.HitsMetadata.Total.Value
+            };
+        }
 
         /// <inheritdoc />
         public async Task<bool> VerifyCollectionAsync()
@@ -252,7 +422,7 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         /// <param name="items"></param>
         /// <returns></returns>
-        private BulkAllObserver WriteToElastic(IEnumerable<ProcessedObservation> items)
+        private BulkAllObserver WriteToElastic(IEnumerable<Observation> items)
         {
             if (!items.Any())
             {
@@ -279,14 +449,14 @@ namespace SOS.Lib.Repositories.Processed
                     next => { Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}"); });
         }
 
-        private async Task<ScrollResult<ProcessedObservation>> ScrollObservationsAsync(int dataProviderId,
+        private async Task<ScrollResult<Observation>> ScrollObservationsAsync(int dataProviderId,
             string scrollId)
         {
-            ISearchResponse<ProcessedObservation> searchResponse;
+            ISearchResponse<Observation> searchResponse;
             if (string.IsNullOrEmpty(scrollId))
             {
                 searchResponse = await _elasticClient
-                    .SearchAsync<ProcessedObservation>(s => s
+                    .SearchAsync<Observation>(s => s
                         .Index(IndexName)
                         .Query(query => query.Term(term => term.Field(obs => obs.DataProviderId).Value(dataProviderId)))
                         .Scroll(ScrollTimeOut)
@@ -296,10 +466,10 @@ namespace SOS.Lib.Repositories.Processed
             else
             {
                 searchResponse = await _elasticClient
-                    .ScrollAsync<ProcessedObservation>(ScrollTimeOut, scrollId);
+                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
             }
 
-            return new ScrollResult<ProcessedObservation>
+            return new ScrollResult<Observation>
             {
                 Records = searchResponse.Documents,
                 ScrollId = searchResponse.ScrollId,

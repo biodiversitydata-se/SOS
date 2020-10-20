@@ -23,19 +23,16 @@ namespace SOS.Import.UnitTests.Managers
         {
             _clamPortalObservationHarvesterMock = new Mock<IClamPortalObservationHarvester>();
             _harvestInfoRepositoryMock = new Mock<IHarvestInfoRepository>();
-            _dataProviderManagerMock = new Mock<IDataProviderManager>();
             _loggerMock = new Mock<ILogger<ClamPortalHarvestJob>>();
         }
 
         private readonly Mock<IClamPortalObservationHarvester> _clamPortalObservationHarvesterMock;
         private readonly Mock<IHarvestInfoRepository> _harvestInfoRepositoryMock;
-        private readonly Mock<IDataProviderManager> _dataProviderManagerMock;
         private readonly Mock<ILogger<ClamPortalHarvestJob>> _loggerMock;
 
         private ClamPortalHarvestJob TestObject => new ClamPortalHarvestJob(
             _clamPortalObservationHarvesterMock.Object,
             _harvestInfoRepositoryMock.Object,
-            _dataProviderManagerMock.Object,
             _loggerMock.Object);
 
         /// <summary>

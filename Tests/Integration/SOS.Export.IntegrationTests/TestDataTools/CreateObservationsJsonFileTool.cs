@@ -6,10 +6,10 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Nest;
 using Newtonsoft.Json;
-using SOS.Export.Repositories;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed;
 using SOS.TestHelpers.JsonConverters;
 using Xunit;
 
@@ -36,8 +36,8 @@ namespace SOS.Export.IntegrationTests.TestDataTools
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var processedObservationRepository = new ProcessedObservationRepository(
-                elasticClient,
                 exportClient,
+                elasticClient,
                 new ElasticSearchConfiguration(),
                 new Mock<ILogger<ProcessedObservationRepository>>().Object);
 

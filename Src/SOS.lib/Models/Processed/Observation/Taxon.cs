@@ -10,7 +10,7 @@ namespace SOS.Lib.Models.Processed.Observation
     ///     Further information about the properties can
     ///     be found at http://rs.tdwg.org/dwc/terms/
     /// </summary>
-    public class ProcessedTaxon : IEntity<int>, IBasicTaxon
+    public class Taxon : IEntity<int>, IBasicTaxon
     {
         /// <summary>
         ///     Vernacular names.

@@ -51,7 +51,7 @@ namespace SOS.Export.IO.DwcArchive
         /// <param name="batchId">If the processing is done in parallel for a data provider, use the batchId to identify the specific batch that was processed.</param>
         /// <returns></returns>
         public async Task<bool> WriteObservations(
-            IEnumerable<ProcessedObservation> processedObservations, 
+            IEnumerable<Observation> processedObservations, 
             DataProvider dataProvider,
             string batchId = "")
         {

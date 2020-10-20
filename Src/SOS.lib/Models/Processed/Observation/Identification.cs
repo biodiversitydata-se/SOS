@@ -9,7 +9,7 @@ namespace SOS.Lib.Models.Processed.Observation
     /// <summary>
     ///     This class contains identification information about sighting identification
     /// </summary>
-    public class ProcessedIdentification
+    public class Identification
     {
         /// <summary>
         ///     The date on which the subject was identified as
@@ -64,7 +64,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue ValidationStatus { get; set; }
+        public VocabularyValue ValidationStatus { get; set; }
 
         /// <summary>
         ///     A list (concatenated and separated) of names of people,
@@ -72,12 +72,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     subject.
         /// </summary>
         public string IdentifiedBy { get; set; }
-
-        /// <summary>
-        ///     List of userids and aliases matching the IdentifiedBy string, internal use only
-        /// </summary>
-        [SwaggerExclude]
-        public IEnumerable<UserInternal> IdentifiedByInternal { get; set; }
 
         /// <summary>
         ///     A list (concatenated and separated) of nomenclatural
@@ -95,6 +89,6 @@ namespace SOS.Lib.Models.Processed.Observation
         ///    Method used in species determination
         /// </summary>
         [Object]
-        public ProcessedFieldMapValue DeterminationMethod { get; set; }
+        public VocabularyValue DeterminationMethod { get; set; }
     }
 }

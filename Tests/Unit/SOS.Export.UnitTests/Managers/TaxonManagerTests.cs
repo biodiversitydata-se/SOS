@@ -3,8 +3,8 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Export.Managers;
-using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Managers
@@ -65,7 +65,7 @@ namespace SOS.Export.UnitTests.Managers
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             _processedTaxonRepositoryMock.Setup(pir => pir.GetBasicTaxonChunkAsync(It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(new ProcessedBasicTaxon[0]);
+                .ReturnsAsync(new BasicTaxon[0]);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -91,10 +91,10 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             _processedTaxonRepositoryMock
                 .Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i == 0), It.IsAny<int>()))
-                .ReturnsAsync(new[] {new ProcessedBasicTaxon()});
+                .ReturnsAsync(new[] {new BasicTaxon()});
             _processedTaxonRepositoryMock
                 .Setup(pir => pir.GetBasicTaxonChunkAsync(It.Is<int>(i => i != 0), It.IsAny<int>()))
-                .ReturnsAsync(new ProcessedBasicTaxon[0]);
+                .ReturnsAsync(new BasicTaxon[0]);
 
             //-----------------------------------------------------------------------------------------------------------
             // Act

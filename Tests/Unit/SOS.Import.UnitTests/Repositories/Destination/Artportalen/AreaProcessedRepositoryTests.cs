@@ -19,13 +19,13 @@ namespace SOS.Import.UnitTests.Repositories.Destination.Artportalen
         public AreaProcessedRepositoryTests()
         {
             _importClient = new Mock<IProcessClient>();
-            _loggerMock = new Mock<ILogger<AreaProcessedRepository>>();
+            _loggerMock = new Mock<ILogger<AreaRepository>>();
         }
 
         private readonly Mock<IProcessClient> _importClient;
-        private readonly Mock<ILogger<AreaProcessedRepository>> _loggerMock;
+        private readonly Mock<ILogger<AreaRepository>> _loggerMock;
 
-        private AreaProcessedRepository TestObject => new AreaProcessedRepository(
+        private AreaRepository TestObject => new AreaRepository(
             _importClient.Object,
             _loggerMock.Object);
 
@@ -37,12 +37,12 @@ namespace SOS.Import.UnitTests.Repositories.Destination.Artportalen
         {
             TestObject.Should().NotBeNull();
 
-            Action create = () => new AreaProcessedRepository(
+            Action create = () => new AreaRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
 
-            create = () => new AreaProcessedRepository(
+            create = () => new AreaRepository(
                 _importClient.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");

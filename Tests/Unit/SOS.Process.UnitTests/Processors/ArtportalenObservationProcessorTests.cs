@@ -189,7 +189,7 @@ namespace SOS.Process.UnitTests.Processors
                 });
 
             _processedObservationRepositoryMock
-                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<ProcessedObservation>>()))
+                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>()))
                 .ReturnsAsync(1);
 
             var dataProvider = new DataProvider
@@ -198,9 +198,9 @@ namespace SOS.Process.UnitTests.Processors
                 Type = DataProviderType.ArtportalenObservations
             };
 
-            var taxa = new Dictionary<int, ProcessedTaxon>
+            var taxa = new Dictionary<int, Taxon>
             {
-                {0, new ProcessedTaxon {Id = 0, TaxonId = "0", ScientificName = "Biota"}}
+                {0, new Taxon {Id = 0, TaxonId = "0", ScientificName = "Biota"}}
             };
 
             var fieldMappingById = new Dictionary<int, FieldMapping>

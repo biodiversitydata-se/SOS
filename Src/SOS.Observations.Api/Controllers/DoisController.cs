@@ -66,7 +66,7 @@ namespace SOS.Observations.Api.Controllers
                 // Validate creators, title, publisher, publicationYear, resourceTypeGeneral
 
                 var jobId = BackgroundJob.Enqueue<ICreateDoiJob>(job =>
-                    job.RunAsync(filter, JobCancellationToken.Null));
+                    job.RunAsync(filter, creatorEmail, JobCancellationToken.Null));
 
                 return new OkObjectResult(new { jobId });
             }

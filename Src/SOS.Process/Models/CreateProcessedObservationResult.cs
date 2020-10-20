@@ -6,10 +6,10 @@ namespace SOS.Process.Models
     public class CreateProcessedObservationResult
     {
         public bool Succeeded { get; set; }
-        public ProcessedObservation ProcessedObservation { get; set; }
+        public Observation ProcessedObservation { get; set; }
         public InvalidObservation InvalidObservation { get; set; }
 
-        public static CreateProcessedObservationResult Success(ProcessedObservation observation)
+        public static CreateProcessedObservationResult Success(Observation observation)
         {
             return new CreateProcessedObservationResult()
             {

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SOS.Export.Managers.Interfaces;
-using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Export.Managers
 {
@@ -48,7 +48,7 @@ namespace SOS.Export.Managers
             {
                 foreach (var areaId in preparedFilter.AreaIds)
                 {
-                    var area = await _areaRepository.GetAreaAsync(areaId);
+                    var area = await _areaRepository.GetAsync(areaId);
 
                     if (area != null)
                     {

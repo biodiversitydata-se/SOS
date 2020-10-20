@@ -79,7 +79,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <returns></returns>
         protected override async Task<int> ProcessObservations(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
@@ -94,7 +94,7 @@ namespace SOS.Process.Processors.Artportalen
 
         private async Task<int> ProcessObservationsParallel(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
@@ -201,14 +201,14 @@ namespace SOS.Process.Processors.Artportalen
 
         private async Task<int> ProcessObservationsSequential(
             DataProvider dataProvider,
-            IDictionary<int, ProcessedTaxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             var verbatimCount = 0;
             var observationFactory =
                 await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository, mode != JobRunModes.Full);
-            ICollection<ProcessedObservation> observations = new List<ProcessedObservation>();
+            ICollection<Observation> observations = new List<Observation>();
             _artportalenVerbatimRepository.Mode = mode;
             using var cursor = await _artportalenVerbatimRepository.GetAllByCursorAsync();
             var batchId = 0;
@@ -234,7 +234,7 @@ namespace SOS.Process.Processors.Artportalen
 
         private async Task<int> ValidateAndStoreObservations(
             DataProvider dataProvider,
-            ICollection<ProcessedObservation> observations,
+            ICollection<Observation> observations,
             JobRunModes mode, 
             int batchId,
             IJobCancellationToken cancellationToken)

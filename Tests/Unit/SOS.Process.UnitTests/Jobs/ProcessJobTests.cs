@@ -537,9 +537,9 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(true);
 
             _taxonProcessedRepository.Setup(r => r.GetAllAsync())
-                .ReturnsAsync(new List<ProcessedTaxon>
+                .ReturnsAsync(new List<Taxon>
                 {
-                    new ProcessedTaxon {Id = 100024, ScientificName = "Canus Lupus"}
+                    new Taxon {Id = 100024, ScientificName = "Canus Lupus"}
                 });
 
             _darwinCoreRepository.Setup(r => r.VerifyCollectionAsync());
@@ -549,7 +549,7 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(new HarvestInfo(nameof(ArtportalenObservationVerbatim),
                     DataProviderType.ArtportalenObservations, DateTime.Now));
             _artportalenProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobRunModes.Full, JobCancellationToken.Null))
+                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(), JobRunModes.Full, JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.Artportalen,
                     DataProviderType.ArtportalenObservations, DateTime.Now, DateTime.Now, 1));
 
@@ -557,7 +557,7 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(new HarvestInfo(nameof(ClamObservationVerbatim), DataProviderType.ClamPortalObservations,
                     DateTime.Now));
             _clamPortalProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobRunModes.Full, JobCancellationToken.Null))
+                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(), JobRunModes.Full, JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.ClamGateway,
                     DataProviderType.ClamPortalObservations, DateTime.Now, DateTime.Now, 1));
 
@@ -565,7 +565,7 @@ namespace SOS.Process.UnitTests.Jobs
                 .ReturnsAsync(new HarvestInfo(nameof(KulObservationVerbatim), DataProviderType.KULObservations,
                     DateTime.Now));
             _kulProcessor.Setup(r =>
-                    r.ProcessAsync(null, It.IsAny<IDictionary<int, ProcessedTaxon>>(), JobRunModes.Full, JobCancellationToken.Null))
+                    r.ProcessAsync(null, It.IsAny<IDictionary<int, Taxon>>(), JobRunModes.Full, JobCancellationToken.Null))
                 .ReturnsAsync(ProcessingStatus.Success(DataProviderIdentifiers.KUL, DataProviderType.KULObservations,
                     DateTime.Now, DateTime.Now, 1));
 

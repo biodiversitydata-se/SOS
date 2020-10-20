@@ -7,7 +7,7 @@ namespace SOS.Lib.Models.Processed.Observation
     /// <summary>
     ///     This class contains event information about a species observation
     /// </summary>
-    public class ProcessedEvent
+    public class Event
     {
         /// <summary>
         ///     Biotope.
@@ -16,7 +16,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue Biotope { get; set; }
+        public VocabularyValue Biotope { get; set; }
 
         /// <summary>
         ///     Description of biotope
@@ -117,7 +117,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     This value is field mapped.
         /// </remarks>
         [Object]
-        public ProcessedFieldMapValue Substrate { get; set; }
+        public VocabularyValue Substrate { get; set; }
 
         /// <summary>
         ///     Description of substrate
@@ -154,12 +154,12 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Multimedia linked to the event
         /// </summary>
         [Nested]
-        public ICollection<ProcessedMultimedia> Media { get; set; }
+        public ICollection<Multimedia> Media { get; set; }
 
         /// <summary>
         ///     Measurement or facts linked to the event.
         /// </summary>
         [Nested]
-        public ICollection<ProcessedExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
+        public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Server;
@@ -6,11 +8,11 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Managers.Interfaces;
-using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Services.Interfaces;
 
@@ -93,7 +95,14 @@ namespace SOS.Export.Managers
 
         /// <inheritdoc />
         public async Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName,
-           IJobCancellationToken cancellationToken)
+            IJobCancellationToken cancellationToken)
+        {
+            return await ExportAndStoreAsync(filter, blobStorageContainer, fileName, null, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> ExportAndStoreAsync(ExportFilter filter, string blobStorageContainer, string fileName, string emailAddress,
+            IJobCancellationToken cancellationToken)
         {
             var zipFilePath = "";
             try
@@ -107,8 +116,21 @@ namespace SOS.Export.Managers
                 // Make sure container exists
                 await _blobStorageService.CreateContainerAsync(blobStorageContainer);
 
-                // Upload file to blob storage
-                var success = await _blobStorageService.UploadBlobAsync(zipFilePath, blobStorageContainer);
+                var tasks = new List<Task<bool>>
+                {
+                    // Upload file to blob storage
+                    _blobStorageService.UploadBlobAsync(zipFilePath, blobStorageContainer),
+                };
+
+                if (!string.IsNullOrEmpty(emailAddress))
+                {
+                    // Send file to user
+                    tasks.Add(_zendToService.SendFile(emailAddress, JsonConvert.SerializeObject(filter), zipFilePath));
+                }
+
+                await Task.WhenAll(tasks);
+
+                var success = tasks.All(t => t.Result);
 
                 return success;
             }
@@ -136,7 +158,7 @@ namespace SOS.Export.Managers
         {
             try
             {
-                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.CollectionName);
+                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.ActiveInstanceName);
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
                 var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                     DataProvider.FilterSubsetDataProvider,

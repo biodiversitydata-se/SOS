@@ -10,9 +10,9 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class DarwinCoreTaxonExtensions
     {
-        public static ProcessedTaxon ToProcessedTaxon(this DarwinCoreTaxon sourceTaxon)
+        public static Taxon ToProcessedTaxon(this DarwinCoreTaxon sourceTaxon)
         {
-            return new ProcessedTaxon
+            return new Taxon
             {
                 DyntaxaTaxonId = sourceTaxon.DynamicProperties?.DyntaxaTaxonId ?? 0,
                 ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties?.ParentDyntaxaTaxonId,
@@ -72,9 +72,9 @@ namespace SOS.Lib.Extensions
             };
         }
 
-        public static ProcessedBasicTaxon ToProcessedBasicTaxon(this DarwinCoreTaxon sourceTaxon)
+        public static BasicTaxon ToProcessedBasicTaxon(this DarwinCoreTaxon sourceTaxon)
         {
-            return new ProcessedBasicTaxon
+            return new BasicTaxon
             {
                 DyntaxaTaxonId = sourceTaxon.DynamicProperties.DyntaxaTaxonId,
                 ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties.ParentDyntaxaTaxonId,

@@ -7,7 +7,7 @@ namespace SOS.Import.Repositories.Destination.Area.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IAreaProcessedRepository : IResourceRepositoryBase<SOS.Lib.Models.Shared.Area, int>
+    public interface IAreaRepository : IResourceRepositoryBase<SOS.Lib.Models.Shared.Area, int>
     {
         /// <summary>
         ///     Delete all geometries stored in Gridfs

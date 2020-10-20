@@ -1,5 +1,4 @@
 ﻿using Moq;
-using SOS.Export.Repositories.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.TestHelpers.Helpers;

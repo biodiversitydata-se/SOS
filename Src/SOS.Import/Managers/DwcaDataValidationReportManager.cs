@@ -33,7 +33,7 @@ namespace SOS.Import.Managers
         private readonly IAreaHelper _areaHelper;
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly ILogger<DwcaDataValidationReportManager> _logger;
-        private Dictionary<int, ProcessedTaxon> _taxonById;
+        private Dictionary<int, Taxon> _taxonById;
         private IDictionary<FieldMappingFieldId, IDictionary<object, int>> _dwcaFieldMappings;
         private IDictionary<FieldMappingFieldId, FieldMapping> _fieldMappings;
 
@@ -69,7 +69,7 @@ namespace SOS.Import.Managers
                 true);
         }
 
-        public async Task<DwcaDataValidationReport<DwcObservationVerbatim, ProcessedObservation>>
+        public async Task<DwcaDataValidationReport<DwcObservationVerbatim, Observation>>
             CreateDataValidationSummary(ArchiveReader archiveReader,
                 int maxNrObservationsToRead = 100000,
                 int nrValidObservationsInReport = 100, 
@@ -93,19 +93,19 @@ namespace SOS.Import.Managers
                 archiveReader,
                 dataProvider);
 
-            var validObservations = new List<ValidObservationTuple<DwcObservationVerbatim, ProcessedObservation>>();
+            var validObservations = new List<ValidObservationTuple<DwcObservationVerbatim, Observation>>();
             var invalidObservations = new List<InvalidObservationTuple<DwcObservationVerbatim>>();
             int nrProcessedObservations = 0;
             int nrValidObservations = 0;
             int nrInvalidObservations = 0;
             var validationRemarksBuilder = new DwcaValidationRemarksBuilder();
             var observationDefects = new Dictionary<string, int>();
-            var processedFieldValues = new Dictionary<FieldMappingFieldId, Dictionary<ProcessedFieldMapValue, int>>();
-            var verbatimFieldValues = new Dictionary<FieldMappingFieldId, Dictionary<ProcessedFieldMapValue, HashSet<string>>>();
+            var processedFieldValues = new Dictionary<FieldMappingFieldId, Dictionary<VocabularyValue, int>>();
+            var verbatimFieldValues = new Dictionary<FieldMappingFieldId, Dictionary<VocabularyValue, HashSet<string>>>();
             foreach (FieldMappingFieldId fieldMappingFieldId in (FieldMappingFieldId[])Enum.GetValues(typeof(FieldMappingFieldId)))
             {
-                processedFieldValues.Add(fieldMappingFieldId, new Dictionary<ProcessedFieldMapValue, int>());
-                verbatimFieldValues.Add(fieldMappingFieldId, new Dictionary<ProcessedFieldMapValue, HashSet<string>>());
+                processedFieldValues.Add(fieldMappingFieldId, new Dictionary<VocabularyValue, int>());
+                verbatimFieldValues.Add(fieldMappingFieldId, new Dictionary<VocabularyValue, HashSet<string>>());
             }
             HashSet<string> nonMatchingScientificNames = new HashSet<string>();
             await foreach (var observationsBatch in observationsBatches)
@@ -116,7 +116,7 @@ namespace SOS.Import.Managers
                     if (nrProcessedObservations >= maxNrObservationsToRead) continue;
                     var processedObservation = dwcaObservationFactory.CreateProcessedObservation(verbatimObservation);
                     nrProcessedObservations++;
-                    _fieldMappingResolverHelper.ResolveFieldMappedValues(new List<ProcessedObservation>
+                    _fieldMappingResolverHelper.ResolveFieldMappedValues(new List<Observation>
                         {processedObservation});
                     dwcaObservationFactory.ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);
                     UpdateTermDictionaryValueSummary(processedObservation, verbatimObservation, processedFieldValues, verbatimFieldValues);
@@ -136,7 +136,7 @@ namespace SOS.Import.Managers
                                     ExtendedMeasurementOrFacts = emofRows
                                 }
                             };
-                            validObservations.Add(new ValidObservationTuple<DwcObservationVerbatim, ProcessedObservation>
+                            validObservations.Add(new ValidObservationTuple<DwcObservationVerbatim, Observation>
                             {
                                 VerbatimObservation = verbatimObservation,
                                 ProcessedObservation = processedObservation,
@@ -198,7 +198,7 @@ namespace SOS.Import.Managers
                             Count = valuePair.Value,
                             Comment = "-1 is the Id for custom values. No matching value or synonyme were found in SOS term dictionary."
                         } ).ToList(),
-                    SosVocabulary = _fieldMappings[pair.Key].Values.Select(v => new ProcessedFieldMapValue() {Id = v.Id, Value = v.Value}).ToList()
+                    SosVocabulary = _fieldMappings[pair.Key].Values.Select(v => new VocabularyValue() {Id = v.Id, Value = v.Value}).ToList()
                 }).ToList();
 
             var remarks = validationRemarksBuilder.CreateRemarks();
@@ -206,7 +206,7 @@ namespace SOS.Import.Managers
             {
                 remarks.Add("No remarks.");
             }
-            return new DwcaDataValidationReport<DwcObservationVerbatim, ProcessedObservation>
+            return new DwcaDataValidationReport<DwcObservationVerbatim, Observation>
             {
                 Settings = new { MaxNrObservationsToProcess = maxNrObservationsToRead, NrValidObservationsInReport = nrValidObservationsInReport, NrInvalidObservationsInReport = nrInvalidObservationsInReport},
                 Summary = new DwcaDataValidationReportSummary
@@ -227,10 +227,10 @@ namespace SOS.Import.Managers
         }
 
         private void UpdateTermDictionaryValueSummary(
-            ProcessedObservation processedObservation,
+            Observation processedObservation,
             DwcObservationVerbatim verbatimObservation,
-            Dictionary<FieldMappingFieldId, Dictionary<ProcessedFieldMapValue, int>> processedFieldValues,
-            Dictionary<FieldMappingFieldId, Dictionary<ProcessedFieldMapValue, HashSet<string>>> verbatimFieldValues)
+            Dictionary<FieldMappingFieldId, Dictionary<VocabularyValue, int>> processedFieldValues,
+            Dictionary<FieldMappingFieldId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues)
         {
             UpdateTermDictionaryValue(FieldMappingFieldId.LifeStage, verbatimObservation.LifeStage, processedObservation.Occurrence.LifeStage, processedFieldValues, verbatimFieldValues);
             UpdateTermDictionaryValue(FieldMappingFieldId.AccessRights, verbatimObservation.AccessRights, processedObservation.AccessRights, processedFieldValues, verbatimFieldValues);
@@ -245,9 +245,9 @@ namespace SOS.Import.Managers
 
         private void UpdateTermDictionaryValue(FieldMappingFieldId fieldMappingFieldId,
             string verbatimValue,
-            ProcessedFieldMapValue processedFieldMapValue,
-            Dictionary<FieldMappingFieldId, Dictionary<ProcessedFieldMapValue, int>> processedFieldValues,
-            Dictionary<FieldMappingFieldId, Dictionary<ProcessedFieldMapValue, HashSet<string>>> verbatimFieldValues)
+            VocabularyValue processedFieldMapValue,
+            Dictionary<FieldMappingFieldId, Dictionary<VocabularyValue, int>> processedFieldValues,
+            Dictionary<FieldMappingFieldId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues)
         {
             if (processedFieldMapValue != null)
             {
@@ -271,7 +271,7 @@ namespace SOS.Import.Managers
 
     public static class ProcessedFieldMapValueExtension
     {
-        public static bool IsCustomValue(this ProcessedFieldMapValue processedFieldMapValue)
+        public static bool IsCustomValue(this VocabularyValue processedFieldMapValue)
         {
             return processedFieldMapValue != null && processedFieldMapValue.Id == -1;
         }

@@ -12,7 +12,7 @@ namespace SOS.Import.Factories.FieldMapping
     public class ParishFieldMappingFactory : GeoRegionFieldMappingFactoryBase, IFieldMappingCreatorFactory
     {
         public ParishFieldMappingFactory(
-            IAreaProcessedRepository areaProcessedRepository,
+            IAreaRepository areaProcessedRepository,
             ILogger<ParishFieldMappingFactory> logger) : base(areaProcessedRepository, logger)
         {
         }

@@ -4,8 +4,6 @@ using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Export.Jobs;
 using SOS.Export.Managers;
 using SOS.Export.Managers.Interfaces;
-using SOS.Export.Repositories;
-using SOS.Export.Repositories.Interfaces;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
@@ -15,6 +13,8 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Export;
+using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 
