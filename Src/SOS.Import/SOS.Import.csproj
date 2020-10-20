@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <Folder Include="Resources\FieldMappings\" />
+    <Folder Include="Resources\EmlMetadata\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -115,6 +116,9 @@
 
   <ItemGroup>
     <None Update="Resources\DefaultDataProviders.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\EmlMetadata\Artportalen.eml.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\FieldMappings\AccessRightsFieldMapping.json">

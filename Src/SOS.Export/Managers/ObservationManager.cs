@@ -11,6 +11,7 @@ using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Export.Managers
@@ -137,8 +138,8 @@ namespace SOS.Export.Managers
             {
                 var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.CollectionName);
                 var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
-
                 var zipFilePath = await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                    DataProvider.FilterSubsetDataProvider,
                     filter,
                     fileName,
                     _processedObservationRepository,

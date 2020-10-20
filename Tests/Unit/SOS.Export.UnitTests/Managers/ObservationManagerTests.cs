@@ -12,6 +12,7 @@ using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Services.Interfaces;
 using Xunit;
 
@@ -202,6 +203,7 @@ namespace SOS.Export.UnitTests.Managers
                 .ReturnsAsync(new ProcessInfo("id", DateTime.Now));
 
             _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
+                    DataProvider.FilterSubsetDataProvider,
                     It.IsAny<FilterBase>(),
                     It.IsAny<string>(),
                     _processedObservationRepositoryMock.Object,
@@ -241,6 +243,7 @@ namespace SOS.Export.UnitTests.Managers
                 .ReturnsAsync(new ProcessInfo("id", DateTime.Now));
 
             _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
+                    DataProvider.FilterSubsetDataProvider, 
                     It.IsAny<FilterBase>(),
                     It.IsAny<string>(),
                     _processedObservationRepositoryMock.Object,
@@ -306,6 +309,7 @@ namespace SOS.Export.UnitTests.Managers
                 .ReturnsAsync(new ProcessInfo("id", DateTime.Now));
 
             _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
+                    DataProvider.FilterSubsetDataProvider,
                     It.IsAny<FilterBase>(),
                     It.IsAny<string>(),
                     _processedObservationRepositoryMock.Object,
@@ -348,6 +352,7 @@ namespace SOS.Export.UnitTests.Managers
                 .ReturnsAsync(new ProcessInfo("id", DateTime.Now));
 
             _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
+                    DataProvider.FilterSubsetDataProvider, 
                     It.IsAny<FilterBase>(),
                     It.IsAny<string>(),
                     _processedObservationRepositoryMock.Object,

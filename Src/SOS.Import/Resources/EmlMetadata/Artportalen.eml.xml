@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+        packageId="38b4c89f-584c-41bb-bd8f-cd1def33e92f"  system="http://gbif.org" scope="system"
+  xml:lang="en">
+	<dataset>
+		<alternateIdentifier>38b4c89f-584c-41bb-bd8f-cd1def33e92f</alternateIdentifier>		
+		<title>Artportalen (Swedish Species Observation System)</title>
+		<creator>
+			<organizationName>SLU Swedish Species Information Centre</organizationName>
+			<address>
+				<city>Uppsala</city>
+				<country>SE</country>
+			</address>
+			<electronicMailAddress>webservices@artdatabanken.se</electronicMailAddress>
+		</creator>
+		<metadataProvider>
+			<organizationName>SLU Swedish Species Information Centre</organizationName>
+			<address>
+				<city>Uppsala</city>
+				<country>SE</country>
+			</address>
+		</metadataProvider>		
+		<pubDate>      
+		</pubDate>
+		<language>ENGLISH</language>
+		<abstract>
+			<para>Artportalen (Swedish Species Observation System) – formerly recognized as Artdata - is a website for reporting and retrieving information on observations of Sweden’s plants, animals and fungi. Observations are entered individually or into several thousand subsets/projects (some of which are individually searchable) by individuals and NGOs (95% of data), by public authorities or agencies, and by corporate enterprises. An observation may include not only the species identity, reporter identity, location and date but additional information such as habitat type and weather can also be entered. Ca. 93% of all data contained in the dataset is unrestricted, the remainder requiring special log-in credentials.
+Artportalen (Swedish Species Observation System) covers 30 000 Swedish species out of approximately 60 000 in total recorded in the country, including plants (12% of data representing flowering plants and mosses), vertebrates (3 % fishes and herptiles, 74% birds, 0.2% mammals), invertebrates (7%) and fungi (4%). 80% of all data represent observations made from 2001-present, and almost all remaining observations refer to the period 1951-2000. Taxa, nomenclature and hierarchy are sourced from the Swedish Taxonomic Database (Dyntaxa).  
+Artportalen is developed and operated by the Swedish Species Information Centre (ArtDatabanken) at the Swedish University of Agricultural Sciences, on behalf of the Swedish Environmental Protection Agency</para>
+		</abstract>
+		<keywordSet>
+			<keyword>Occurrence</keyword>
+			<keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+		</keywordSet>
+		<keywordSet>
+			<keyword>Observation</keyword>
+			<keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+		</keywordSet>
+		<intellectualRights>
+			<para>To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+					<citetitle>Public Domain (CC0 1.0)</citetitle>
+				</ulink>. Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.</para>
+		</intellectualRights>
+		<coverage>
+			<geographicCoverage>
+				<geographicDescription>This resource covers Sweden.</geographicDescription>
+				<boundingCoordinates>
+					<westBoundingCoordinate>10.13</westBoundingCoordinate>
+					<eastBoundingCoordinate>24.59</eastBoundingCoordinate>
+					<northBoundingCoordinate>69.3</northBoundingCoordinate>
+					<southBoundingCoordinate>55.11</southBoundingCoordinate>
+				</boundingCoordinates>
+			</geographicCoverage>
+		</coverage>
+		<maintenance>
+			<description>
+				<para/>
+			</description>
+			<maintenanceUpdateFrequency>unkown</maintenanceUpdateFrequency>
+		</maintenance>
+		<contact>
+			<organizationName>SLU Swedish Species Information Centre</organizationName>
+			<address>
+				<city>Uppsala</city>
+				<country>SE</country>
+			</address>
+		</contact>
+	</dataset>
+</eml:eml>

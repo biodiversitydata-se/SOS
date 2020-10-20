@@ -59,6 +59,7 @@ namespace SOS.Import.Managers
             var filePath = Path.Combine(assemblyPath, @"Resources\DefaultDataProviders.json");
             var dataProviders =
                 JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
+            AddEmlMetadata(dataProviders);
             await _dataProviderRepository.DeleteCollectionAsync();
             await _dataProviderRepository.AddCollectionAsync();
             await _dataProviderRepository.AddManyAsync(dataProviders);
@@ -66,6 +67,30 @@ namespace SOS.Import.Managers
                 ? "DataProvider collection was created and initialized with default data providers. Existing data were overwritten."
                 : "DataProvider collection was created and initialized with default data providers.";
             return Result.Success(returnDescription);
+        }
+
+        /// <summary>
+        /// Add EML data from the ~/Resources/EmlMetadata/ folder.
+        /// </summary>
+        /// <param name="dataProviders"></param>
+        private void AddEmlMetadata(List<DataProvider> dataProviders)
+        {
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var emlDirectory = Path.Combine(assemblyPath, @"Resources\EmlMetadata\");
+            var filePaths = Directory.GetFiles(emlDirectory, "*.xml");
+            foreach (var filePath in filePaths)
+            {
+                var fileName = Path.GetFileName(filePath)
+                    .Replace(".eml","", StringComparison.OrdinalIgnoreCase)
+                    .Replace(".xml","", StringComparison.OrdinalIgnoreCase);
+                var dataProvider =
+                    dataProviders.FirstOrDefault(m => m.Identifier.Equals(fileName, StringComparison.OrdinalIgnoreCase));
+                if (dataProvider != null)
+                {
+                    var bsonDoc = GetEmlBsonDocument(filePath);
+                    dataProvider.EmlMetadata = bsonDoc;
+                }
+            }
         }
 
         public async Task<DataProvider> GetDataProviderByIdAsync(int id)
@@ -144,6 +169,14 @@ namespace SOS.Import.Managers
             var dataProvider = await _dataProviderRepository.GetAsync(dataProviderId);
             dataProvider.EmlMetadata = bsonDoc;
             return await _dataProviderRepository.UpdateAsync(dataProviderId, dataProvider);
+        }
+
+        private BsonDocument GetEmlBsonDocument(string filePath)
+        {
+            XDocument xmlDocument = XDocument.Load(filePath);
+            string jsonStr = JsonConvert.SerializeXNode(xmlDocument);
+            BsonDocument bsonDoc = BsonDocument.Parse(jsonStr);
+            return bsonDoc;
         }
 
         private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier,

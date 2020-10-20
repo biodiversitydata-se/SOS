@@ -95,10 +95,9 @@ namespace SOS.Export.IO.DwcArchive
             {
                 if (!_dwcaFilesCreationConfiguration.IsEnabled) return null;
                 var dwcaCreationTasks = new List<Task<string>>();
-                foreach (var dwcaFileCreationInfo in _dwcaFilePartsInfoByDataProvider.Values)
+                foreach (var pair in _dwcaFilePartsInfoByDataProvider)
                 {
-                    dwcaCreationTasks.Add(_dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
-                        _dwcaFilesCreationConfiguration.FolderPath, dwcaFileCreationInfo));
+                    dwcaCreationTasks.Add(_dwcArchiveFileWriter.CreateDwcArchiveFileAsync(pair.Key, _dwcaFilesCreationConfiguration.FolderPath, pair.Value));
                 }
 
                 dwcaCreationTasks.Add(_dwcArchiveFileWriter.CreateCompleteDwcArchiveFileAsync(_dwcaFilesCreationConfiguration.FolderPath,

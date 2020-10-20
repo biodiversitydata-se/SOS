@@ -7,55 +7,61 @@
          system="http://gbif.org" scope="system"
          xml:lang="eng">
     <dataset>
-        <title xml:lang="eng">Swedish LifeWatch</title>
-        <creator>
-            <individualName>
-                <givenName>.</givenName>
-                <surName>.</surName>
-            </individualName>
-        </creator>
-        <pubDate>
-            2018-04-07
-        </pubDate>
-        <language>eng</language>
-        <abstract>
-            <para>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce malesuada vulputate sem. Duis pharetra posuere consequat. Praesent vitae tempus libero. Sed eu congue sem. Sed euismod urna convallis pretium hendrerit. Nullam sit amet lorem vitae enim fringilla ornare egestas in lorem. Nam in diam semper, imperdiet massa eget, rhoncus augue. Maecenas tincidunt, neque nec imperdiet accumsan, felis leo dignissim mauris, eget tempus mauris ex ac mi. Phasellus sed tellus condimentum, aliquet justo eget, ullamcorper nisl. Sed vulputate risus sit amet mollis tristique. In est lorem, ultricies in arcu eu, bibendum tempor magna. Quisque sed pharetra tortor. Nullam condimentum sem sed arcu condimentum varius. Praesent posuere nulla sit amet elit condimentum dictum. Etiam ipsum lectus, pretium ac felis sed, aliquam sagittis diam.
-            </para>
-        </abstract>
-        <keywordSet>
-            <keyword>Occurrence</keyword>
-            <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
-        </keywordSet>
-        <keywordSet>
-            <keyword>Observation</keyword>
-            <keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
-        </keywordSet>
-        <intellectualRights>
-            <para>
-                To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the
-                <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
-                    <citetitle>Public Domain (CC0 1.0)</citetitle>
-                </ulink>
-                . Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
-            </para>
-        </intellectualRights>
-        <coverage>
-            <geographicCoverage>
-                <geographicDescription>This resource covers Sweden.</geographicDescription>
-                <boundingCoordinates>
-                    <westBoundingCoordinate>10.13</westBoundingCoordinate>
-                    <eastBoundingCoordinate>24.59</eastBoundingCoordinate>
-                    <northBoundingCoordinate>69.3</northBoundingCoordinate>
-                    <southBoundingCoordinate>55.11</southBoundingCoordinate>
-                </boundingCoordinates>
-            </geographicCoverage>
-        </coverage>
-        <maintenance>
-            <description>
-                <para></para>
-            </description>
-            <maintenanceUpdateFrequency>unknown</maintenanceUpdateFrequency>
-        </maintenance>
+      <title xml:lang="eng"></title>
+      <creator>
+        <individualName>
+          <givenName></givenName>
+          <surName></surName>
+        </individualName>
+        <organizationName></organizationName>
+        <electronicMailAddress></electronicMailAddress>
+        <!--<positionName></positionName>-->
+        <!--<address>
+          <city></city>
+          <country></country>
+        </address>-->
+      </creator>
+      <pubDate></pubDate>
+      <language>eng</language>
+      <abstract>
+          <para>
+          </para>
+      </abstract>
+      <keywordSet>
+          <keyword>Occurrence</keyword>
+          <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+      </keywordSet>
+      <keywordSet>
+          <keyword>Observation</keyword>
+          <keywordThesaurus>GBIF Dataset Subtype Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_subtype.xml</keywordThesaurus>
+      </keywordSet>
+      <intellectualRights>
+          <para>
+              To the extent possible under law, the publisher has waived all rights to these data and has dedicated them to the
+              <ulink url="http://creativecommons.org/publicdomain/zero/1.0/legalcode">
+                  <citetitle>Public Domain (CC0 1.0)</citetitle>
+              </ulink>
+              . Users may copy, modify, distribute and use the work, including for commercial purposes, without restriction.
+          </para>
+      </intellectualRights>
+      <distribution scope="document">
+        <online>
+          <url function="information"></url>
+        </online>
+      </distribution>
+      <coverage>
+          <geographicCoverage>
+              <geographicDescription>This resource covers Sweden.</geographicDescription>
+              <boundingCoordinates>
+                  <westBoundingCoordinate>10.13</westBoundingCoordinate>
+                  <eastBoundingCoordinate>24.59</eastBoundingCoordinate>
+                  <northBoundingCoordinate>69.3</northBoundingCoordinate>
+                  <southBoundingCoordinate>55.11</southBoundingCoordinate>
+              </boundingCoordinates>
+          </geographicCoverage>
+      </coverage>
+      <maintenance>
+        <maintenanceUpdateFrequency>unknown</maintenanceUpdateFrequency>
+      </maintenance>
     </dataset>
 </eml:eml>

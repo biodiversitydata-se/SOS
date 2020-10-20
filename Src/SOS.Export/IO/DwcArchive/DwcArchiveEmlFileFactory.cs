@@ -4,47 +4,80 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.XPath;
+using MongoDB.Bson;
+using MongoDB.Bson.IO;
+using MongoDB.Bson.Serialization;
+using Newtonsoft.Json;
+using SOS.Lib.Models.Shared;
+using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace SOS.Export.IO.DwcArchive
 {
     /// <summary>
-    ///     Creates an eml file based on existing eml that is used as an template.
-    ///     The created eml will get an updated publish date.
+    ///     This class creates EML files.
     /// </summary>
     public static class DwCArchiveEmlFileFactory
     {
         /// <summary>
-        ///     Creates an eml xml file with an updated publish date.
-        ///     The xml declaration is omitted.
-        ///     The new updated file is written to the outstream.
+        ///     Creates an EML XML file.
         /// </summary>
-        /// <param name="outstream"></param>
-        /// <returns></returns>
-        public static async Task CreateEmlXmlFileAsync(Stream outstream)
+        public static async Task CreateEmlXmlFileAsync(Stream outstream, DataProvider dataProvider)
+        {
+            if (dataProvider.EmlMetadata == null)
+            {
+                await CreateEmlXmlFileByTemplate(outstream, dataProvider);
+            }
+            else
+            {
+                await CreateEmlXmlFileByEmlMetadata(outstream, dataProvider.EmlMetadata);
+            }
+        }
+
+        private static async Task CreateEmlXmlFileByEmlMetadata(Stream outStream, BsonDocument emlMetadata)
+        {
+            var jsonWriterSettings = new JsonWriterSettings { OutputMode = JsonOutputMode.CanonicalExtendedJson }; // key part
+            string strJson = emlMetadata.ToJson(jsonWriterSettings);
+            XDocument xDoc = JsonConvert.DeserializeXNode(strJson);
+            SetPubDateToCurrentDate(xDoc.Root.Element("dataset"));
+            var emlString = xDoc.ToString();
+            var emlBytes = Encoding.UTF8.GetBytes(emlString);
+            await outStream.WriteAsync(emlBytes, 0, emlBytes.Length);
+        }
+
+        private static async Task CreateEmlXmlFileByTemplate(Stream outStream, DataProvider dataProvider)
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var emlTemplatePath = Path.Combine(assemblyPath, @"Resources\DarwinCore\eml.xml");
-            var emlString = CreateEmlXmlString(emlTemplatePath);
-            var emlBytes = Encoding.UTF8.GetBytes(emlString);
-            await outstream.WriteAsync(emlBytes, 0, emlBytes.Length);
-        }
-
-        /// <summary>
-        ///     Creates an eml xml string with an updated publish date. The xml declaration is omitted.
-        /// </summary>
-        /// <param name="emlSourcePath"></param>
-        /// <returns></returns>
-        public static string CreateEmlXmlString(string emlSourcePath)
-        {
-            var xDoc = XDocument.Load(emlSourcePath);
-            UpdateDynamicElements(xDoc); // Change date to current date
-            return xDoc.ToString();
-        }
-
-        private static void UpdateDynamicElements(XDocument doc)
-        {
-            var dataset = doc.Root.Element("dataset");
+            var xDoc = XDocument.Load(emlTemplatePath);
+            var dataset = xDoc.Root.Element("dataset");
             SetPubDateToCurrentDate(dataset);
+            SetTitle(dataset, dataProvider.Name);
+            SetCreator(dataset, dataProvider.ContactPerson, dataProvider.Organization);
+            SetUrl(dataset, dataProvider.Url);
+            SetAbstract(dataset, dataProvider.Description);
+            var emlString = xDoc.ToString();
+            var emlBytes = Encoding.UTF8.GetBytes(emlString);
+            await outStream.WriteAsync(emlBytes, 0, emlBytes.Length);
+        }
+
+        private static void SetUrl(XElement dataset, string url)
+        {
+            dataset.XPathSelectElement("distribution/online/url").SetValue(url);
+        }
+
+        private static void SetAbstract(XElement dataset, string description)
+        {
+            dataset.XPathSelectElement("abstract/para").SetValue(description);
+        }
+
+        private static void SetCreator(XElement dataset, ContactPerson contactPerson, string organization)
+        {
+            var creator = dataset.Element("creator");
+            creator.XPathSelectElement("individualName/givenName").SetValue(contactPerson.FirstName);
+            creator.XPathSelectElement("individualName/surName").SetValue(contactPerson.LastName);
+            creator.XPathSelectElement("organizationName").SetValue(organization);
+            creator.XPathSelectElement("electronicMailAddress").SetValue(contactPerson.Email);
         }
 
         /// <summary>
@@ -54,7 +87,17 @@ namespace SOS.Export.IO.DwcArchive
         private static void SetPubDateToCurrentDate(XElement dataset)
         {
             var pubDate = dataset.Element("pubDate");
+            if (pubDate == null)
+            { 
+                pubDate = new XElement("pubDate");
+                dataset.Add(pubDate);
+            }
             pubDate.SetValue(DateTime.Now.ToString("yyyy-MM-dd"));
+        }
+
+        private static void SetTitle(XElement dataset, string title)
+        {
+            dataset.XPathSelectElement("title").SetValue(title);
         }
     }
 }

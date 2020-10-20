@@ -19,6 +19,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         ///     The file is stored in a random generated name in the exportPath folder.
         ///     The full path is returned by this function.
         /// </summary>
+        /// <param name="dataProvider"></param>
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
         /// <param name="processedObservationRepository">The repository to read observation data from.</param>
@@ -26,8 +27,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
-        Task<string> CreateDwcArchiveFileAsync(
-            FilterBase filter,
+        Task<string> CreateDwcArchiveFileAsync(DataProvider dataProvider, FilterBase filter,
             string fileName,
             IProcessedObservationRepository processedObservationRepository,
             ProcessInfo processInfo,
@@ -39,6 +39,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         ///     The file is stored in a random generated name in the exportPath folder.
         ///     The full path is returned by this function.
         /// </summary>
+        /// <param name="dataProvider"></param>
         /// <param name="filter"></param>
         /// <param name="fileName"></param>
         /// <param name="processedObservationRepository">The repository to read observation data from.</param>
@@ -47,8 +48,7 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
-        Task<string> CreateDwcArchiveFileAsync(
-            FilterBase filter,
+        Task<string> CreateDwcArchiveFileAsync(DataProvider dataProvider, FilterBase filter,
             string fileName,
             IProcessedObservationRepository processedObservationRepository,
             IEnumerable<FieldDescription> fieldDescriptions,
@@ -69,10 +69,12 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <summary>
         /// Create a DwC-A file for a data provider.
         /// </summary>
+        /// <param name="dataProvider"></param>
         /// <param name="exportFolderPath"></param>
         /// <param name="dwcaFilePartsInfo"></param>
         /// <returns></returns>
-        Task<string> CreateDwcArchiveFileAsync(string exportFolderPath, DwcaFilePartsInfo dwcaFilePartsInfo);
+        Task<string> CreateDwcArchiveFileAsync(DataProvider dataProvider, string exportFolderPath,
+            DwcaFilePartsInfo dwcaFilePartsInfo);
 
         /// <summary>
         /// Create a DwC-A file for all data providers.
