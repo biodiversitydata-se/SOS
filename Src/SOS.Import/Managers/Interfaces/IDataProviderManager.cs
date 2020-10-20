@@ -48,8 +48,7 @@ namespace SOS.Import.Managers.Interfaces
 
         Task<DataProvider> GetDataProviderByType(DataProviderType type);
         Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(List<string> dataProviderIdOrIdentifiers);
-        Task<bool> UpdateHarvestInfo(int dataProviderId, HarvestInfo harvestInfo);
-        
+
         /// <summary>
         /// Set EML metadata for a data provider.
         /// </summary>

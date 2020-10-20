@@ -6,6 +6,7 @@ using SOS.Export.Models;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Export.IO.DwcArchive.Interfaces
@@ -25,7 +26,9 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
-        Task<string> CreateDwcArchiveFileAsync(DataProvider dataProvider, FilterBase filter,
+        Task<string> CreateDwcArchiveFileAsync(
+            DataProvider dataProvider, 
+            FilterBase filter,
             string fileName,
             IProcessedObservationRepository processedObservationRepository,
             ProcessInfo processInfo,
@@ -46,7 +49,9 @@ namespace SOS.Export.IO.DwcArchive.Interfaces
         /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
         /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
         /// <returns>The file path to the generated DwC-A file.</returns>
-        Task<string> CreateDwcArchiveFileAsync(DataProvider dataProvider, FilterBase filter,
+        Task<string> CreateDwcArchiveFileAsync(
+            DataProvider dataProvider, 
+            FilterBase filter,
             string fileName,
             IProcessedObservationRepository processedObservationRepository,
             IEnumerable<FieldDescription> fieldDescriptions,
