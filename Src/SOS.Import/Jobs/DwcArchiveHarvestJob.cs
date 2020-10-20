@@ -62,6 +62,17 @@ namespace SOS.Import.Jobs
 
                 var harvestInfoResult =
                     await _dwcObservationHarvester.HarvestObservationsAsync(archivePath, dataProvider, cancellationToken);
+
+                try
+                {
+                    var emlDocument = _dwcObservationHarvester.GetEmlXmlDocument(archivePath);
+                    await _dataProviderManager.SetEmlMetadataAsync(dataProviderId, emlDocument);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, $"Error when writing EML file for {dataProvider}");
+                }
+                
                 _logger.LogInformation($"End DwC-A Harvest Job. Status: {harvestInfoResult.Status}");
 
                 // Save harvest info

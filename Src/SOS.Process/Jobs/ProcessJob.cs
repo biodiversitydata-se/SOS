@@ -115,7 +115,7 @@ namespace SOS.Process.Jobs
                 //--------------------------------------
                 // 4. Get taxonomy
                 //--------------------------------------
-                _logger.LogInformation("Start getting processed taxa");
+                 _logger.LogInformation("Start getting processed taxa");
                 var taxa = await _processedTaxonRepository.GetAllAsync();
                 if (!taxa?.Any() ?? true)
                 {

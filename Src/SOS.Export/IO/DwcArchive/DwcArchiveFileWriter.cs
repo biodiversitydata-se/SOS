@@ -18,6 +18,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Models.Shared;
 
 namespace SOS.Export.IO.DwcArchive
 {
@@ -52,6 +53,7 @@ namespace SOS.Export.IO.DwcArchive
 
         /// <inheritdoc />
         public async Task<string> CreateDwcArchiveFileAsync(
+            DataProvider dataProvider, 
             FilterBase filter,
             string fileName,
             IProcessedObservationRepository processedObservationRepository,
@@ -62,6 +64,7 @@ namespace SOS.Export.IO.DwcArchive
             IEnumerable<FieldDescription> fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions();
 
             return await CreateDwcArchiveFileAsync(
+                dataProvider, 
                 filter,
                 fileName,
                 processedObservationRepository,
@@ -73,6 +76,7 @@ namespace SOS.Export.IO.DwcArchive
 
         /// <inheritdoc />
         public async Task<string> CreateDwcArchiveFileAsync(
+            DataProvider dataProvider, 
             FilterBase filter,
             string fileName,
             IProcessedObservationRepository processedObservationRepository,
@@ -124,7 +128,7 @@ namespace SOS.Export.IO.DwcArchive
                 // Create eml.xml
                 using (var fileStream = File.Create(emlXmlFilePath))
                 {
-                    await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(fileStream);
+                    await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(fileStream, dataProvider);
                 }
 
                 // Create processinfo.xml
@@ -189,7 +193,10 @@ namespace SOS.Export.IO.DwcArchive
             // todo
         }
 
-        public async Task<string> CreateDwcArchiveFileAsync(string exportFolderPath, DwcaFilePartsInfo dwcaFilePartsInfo)
+        public async Task<string> CreateDwcArchiveFileAsync(
+            DataProvider dataProvider, 
+            string exportFolderPath,
+            DwcaFilePartsInfo dwcaFilePartsInfo)
         {
             string tempFilePath = null;
             try
@@ -198,7 +205,7 @@ namespace SOS.Export.IO.DwcArchive
                 var filePath = Path.Combine(exportFolderPath, $"{dwcaFilePartsInfo.DataProvider.Identifier}.dwca.zip");
                 
                 // Create the DwC-A file
-                await CreateDwcArchiveFileAsync(dwcaFilePartsInfo, tempFilePath);
+                await CreateDwcArchiveFileAsync(dataProvider, dwcaFilePartsInfo, tempFilePath);
 
                 File.Move(tempFilePath, filePath, true);
                 _logger.LogInformation($"A new .zip({filePath}) was created.");
@@ -225,7 +232,7 @@ namespace SOS.Export.IO.DwcArchive
                 var filePath = Path.Combine(exportFolderPath, "sos.dwca.zip");
 
                 // Create the DwC-A file
-                await CreateDwcArchiveFileAsync(dwcaFilePartsInfos, tempFilePath);
+                await CreateDwcArchiveFileAsync(DataProvider.CompleteSosDataProvider, dwcaFilePartsInfos, tempFilePath);
 
                 File.Move(tempFilePath, filePath, true);
                 _logger.LogInformation($"A new .zip({filePath}) was created.");
@@ -243,12 +250,14 @@ namespace SOS.Export.IO.DwcArchive
             }
         }
 
-        private async Task CreateDwcArchiveFileAsync(DwcaFilePartsInfo dwcaFilePartsInfo, string tempFilePath)
+        private async Task CreateDwcArchiveFileAsync(DataProvider dataProvider, DwcaFilePartsInfo dwcaFilePartsInfo,
+            string tempFilePath)
         {
-            await CreateDwcArchiveFileAsync(new[] { dwcaFilePartsInfo }, tempFilePath);
+            await CreateDwcArchiveFileAsync(dataProvider, new[] { dwcaFilePartsInfo }, tempFilePath);
         }
 
-        private async Task CreateDwcArchiveFileAsync(IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos, string tempFilePath)
+        private async Task CreateDwcArchiveFileAsync(DataProvider dataProvider,
+            IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos, string tempFilePath)
         {
             var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().ToList();
             await using var stream = File.Create(tempFilePath);
@@ -260,7 +269,7 @@ namespace SOS.Export.IO.DwcArchive
 
             // Create eml.xml
             compressedFileStream.PutNextEntry("eml.xml");
-            await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(compressedFileStream);
+            await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(compressedFileStream, dataProvider);
 
             // Create occurrence.csv
             compressedFileStream.PutNextEntry("occurrence.csv");

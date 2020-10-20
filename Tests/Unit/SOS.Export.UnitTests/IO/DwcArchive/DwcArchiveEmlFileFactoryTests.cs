@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using FluentAssertions;
 using SOS.Export.IO.DwcArchive;
+using SOS.Lib.Models.Shared;
 using Xunit;
 
 namespace SOS.Export.UnitTests.IO.DwcArchive
@@ -25,7 +26,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(memoryStream);
+            await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(memoryStream, DataProvider.FilterSubsetDataProvider);
 
             ////-----------------------------------------------------------------------------------------------------------
             //// Assert - Read XML

@@ -59,13 +59,7 @@ namespace SOS.Process.Processors.Artportalen
         public ICollection<Observation> CreateProcessedObservations(
             IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
         {
-            return verbatimObservations.Select(CreateProcessedObservation).ToArray();
-        }
-
-        // todo - This could be a way to check for invalid observation when converting from verbatim to processed.
-        public CreateProcessedObservationResult CreateProcessedObservationResult(ArtportalenObservationVerbatim verbatimObservation)
-        {
-            return Models.CreateProcessedObservationResult.Success(CreateProcessedObservation(verbatimObservation));
+            return verbatimObservations.Select(CreateProcessedObservation).Where(p=>p!=null).ToArray();
         }
 
         /// <summary>
@@ -88,8 +82,17 @@ namespace SOS.Process.Processors.Artportalen
                     taxon.IndividualId = verbatimObservation.URL;
                 }
 
-                //Diffuse the observation depending on the protectionlevel                
-                verbatimObservation = DiffuseObservation(verbatimObservation, taxon);
+                if (ShouldBeDiffused(verbatimObservation, taxon))
+                {
+                    //If it is a protected sighting it should not be possible to find it in the current month
+                    if((verbatimObservation?.StartDate.Value.Year == DateTime.Now.Year || verbatimObservation?.EndDate.Value.Year == DateTime.Now.Year) &&
+                        (verbatimObservation?.StartDate.Value.Month == DateTime.Now.Month || verbatimObservation?.EndDate.Value.Month == DateTime.Now.Month))
+                    {
+                        return null;
+                    }
+                    //Diffuse the observation depending on the protectionlevel                
+                    verbatimObservation = DiffuseObservation(verbatimObservation, taxon);
+                }
 
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
                                   (verbatimObservation.Site?.YCoord ?? 0) > 0;
@@ -238,7 +241,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
                 obs.ArtportalenInternal.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;
                 obs.ArtportalenInternal.SightingPublishTypeIds = verbatimObservation.SightingPublishTypeIds;
-                obs.ArtportalenInternal.IdentifiedByInternal = verbatimObservation.VerifiedByInternal;
+                obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.VerifiedByInternal;
                 obs.ArtportalenInternal.ReportedByUserId = verbatimObservation.ReportedByUserId;
                 obs.ArtportalenInternal.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
                 obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
@@ -343,6 +346,22 @@ namespace SOS.Process.Processors.Artportalen
             {
                 return (0, 0);
             }
+        }
+        private bool ShouldBeDiffused(ArtportalenObservationVerbatim observationVerbatim, Lib.Models.Processed.Observation.Taxon taxon)
+        {
+            if (observationVerbatim.ProtectedBySystem)
+            {
+                var regex = new Regex(@"^\d");
+
+                if (int.TryParse(regex.Match(taxon.ProtectionLevel).Value, out var protectionLevel))
+                {
+                    if(protectionLevel > 2)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         /// <summary>
         /// Diffuse the point dependent on the sightings protection level

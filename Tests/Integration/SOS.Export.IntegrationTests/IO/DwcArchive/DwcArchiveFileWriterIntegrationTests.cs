@@ -14,6 +14,7 @@ using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Models.Shared;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.IO.DwcArchive
@@ -93,6 +94,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                DataProvider.FilterSubsetDataProvider,
                 filter,
                 filename,
                 processedObservationRepository,
@@ -131,6 +133,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
             // Act
             //-----------------------------------------------------------------------------------------------------------
             var zipFilePath = await dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
+                DataProvider.FilterSubsetDataProvider,
                 new SearchFilter(),
                 filename,
                 processedDarwinCoreRepositoryStub.Object,

@@ -64,7 +64,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         ///     Contact person.
         /// </summary>
-        public string ContactPerson { get; set; }
+        public ContactPerson ContactPerson { get; set; }
 
         /// <summary>
         ///     Contact person E-mail.
@@ -101,6 +101,11 @@ namespace SOS.Lib.Models.Shared
         /// </summary>
         public string Identifier { get; set; }
 
+        /// <summary>
+        /// EML metadata.
+        /// </summary>
+        public BsonDocument EmlMetadata { get; set; }
+  
         public bool EqualsIdOrIdentifier(string idOrIdentifier)
         {
             if (int.TryParse(idOrIdentifier, out var id))
@@ -133,5 +138,53 @@ namespace SOS.Lib.Models.Shared
         {
             return Id;
         }
+
+        /// <summary>
+        /// Data provider for all data providers combined.
+        /// </summary>
+        public static DataProvider CompleteSosDataProvider =>
+            new DataProvider
+            {
+                Id = -1,
+                Identifier = "SosDataProvidersCombined",
+                Name = "",
+                SwedishName = "",
+                Organization = "",
+                SwedishOrganization = "",
+                ContactPerson = new ContactPerson
+                {
+                    FirstName = "",
+                    LastName = "",
+                    Email = ""
+                },
+                Description = "This is the DwC-A for all available data providers in Species Observation System (SOS)",
+                SwedishDescription = "",
+                Url = "",
+                DownloadUrl = ""
+            };
+
+        /// <summary>
+        /// Data provider for a subset of observations created by a filter.
+        /// </summary>
+        public static DataProvider FilterSubsetDataProvider =>
+            new DataProvider()
+            {
+                Id = -2,
+                Identifier = "SosFilterSubset",
+                Name ="",
+                SwedishName = "",
+                Organization = "",
+                SwedishOrganization = "",
+                ContactPerson = new ContactPerson
+                {
+                    FirstName = "",
+                    LastName = "",
+                    Email = ""
+                },
+                Description = "This data has been produced with a filter and is a subset of the data available in Species Observation System (SOS)",
+                SwedishDescription = "",
+                Url = "",
+                DownloadUrl = ""
+            };
     }
 }

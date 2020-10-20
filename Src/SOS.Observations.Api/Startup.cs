@@ -20,6 +20,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Nest;
 using NLog.Web;
@@ -87,6 +88,16 @@ namespace SOS.Observations.Api
         {
             services.AddControllers()
                 .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter()); });
+
+            // MongoDB conventions.
+            ConventionRegistry.Register(
+                "MongoDB Solution Conventions",
+                new ConventionPack
+                {
+                    new IgnoreExtraElementsConvention(true),
+                    new IgnoreIfNullConvention(true)
+                },
+                t => true);
 
             // Identity service configuration
             var identityServerConfiguration = Configuration.GetSection("IdentityServer").Get<IdentityServerConfiguration>();
