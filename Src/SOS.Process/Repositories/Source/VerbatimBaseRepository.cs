@@ -46,12 +46,7 @@ namespace SOS.Process.Repositories.Source
             ILogger<VerbatimBaseRepository<TEntity, TKey>> logger
         )
         {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-
-            Client = client;
+            Client = client ?? throw new ArgumentNullException(nameof(client));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Database = client.GetDatabase();

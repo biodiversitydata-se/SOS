@@ -8,13 +8,13 @@ using Moq;
 using SOS.Import.Containers.Interfaces;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Harvesters.Observations;
-using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Harvesters.Observations
@@ -34,7 +34,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _projectRepositoryMock = new Mock<IProjectRepository>();
             _sightingRepositoryMock = new Mock<ISightingRepository>();
             _siteRepositoryMockMock = new Mock<ISiteRepository>();
-            _sightingVerbatimRepository = new Mock<ISightingVerbatimRepository>();
+            _artportalenVerbatimRepositoryMock = new Mock<IArtportalenVerbatimRepository>();
             _personRepository = new Mock<IPersonRepository>();
             _organizationRepository = new Mock<IOrganizationRepository>();
             _sightingRelationRepository = new Mock<ISightingRelationRepository>();
@@ -48,7 +48,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
         private readonly Mock<IProjectRepository> _projectRepositoryMock;
         private readonly Mock<ISightingRepository> _sightingRepositoryMock;
         private readonly Mock<ISiteRepository> _siteRepositoryMockMock;
-        private readonly Mock<ISightingVerbatimRepository> _sightingVerbatimRepository;
+        private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepositoryMock;
         private readonly Mock<IPersonRepository> _personRepository;
         private readonly Mock<IOrganizationRepository> _organizationRepository;
         private readonly Mock<ISightingRelationRepository> _sightingRelationRepository;
@@ -63,7 +63,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _projectRepositoryMock.Object,
             _sightingRepositoryMock.Object,
             _siteRepositoryMockMock.Object,
-            _sightingVerbatimRepository.Object,
+            _artportalenVerbatimRepositoryMock.Object,
             _personRepository.Object,
             _organizationRepository.Object,
             _sightingRelationRepository.Object,
@@ -146,11 +146,11 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _siteRepositoryMockMock.Setup(sr => sr.GetAsync())
                 .ReturnsAsync(new[] {new SiteEntity {Id = 1, Name = "Site"}});
 
-            _sightingVerbatimRepository.Setup(tr => tr.DeleteCollectionAsync())
+            _artportalenVerbatimRepositoryMock.Setup(tr => tr.DeleteCollectionAsync())
                 .ReturnsAsync(true);
-            _sightingVerbatimRepository.Setup(tr => tr.AddCollectionAsync())
+            _artportalenVerbatimRepositoryMock.Setup(tr => tr.AddCollectionAsync())
                 .ReturnsAsync(true);
-            _sightingVerbatimRepository
+            _artportalenVerbatimRepositoryMock
                 .Setup(tr => tr.AddManyAsync(It.IsAny<IEnumerable<ArtportalenObservationVerbatim>>()))
                 .ReturnsAsync(true);
             //-----------------------------------------------------------------------------------------------------------
@@ -178,7 +178,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 _projectRepositoryMock.Object,
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
-                _sightingVerbatimRepository.Object,
+                _artportalenVerbatimRepositoryMock.Object,
                 _personRepository.Object,
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
@@ -194,7 +194,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 null,
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
-                _sightingVerbatimRepository.Object,
+                _artportalenVerbatimRepositoryMock.Object,
                 _personRepository.Object,
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
@@ -210,7 +210,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 _projectRepositoryMock.Object,
                 null,
                 _siteRepositoryMockMock.Object,
-                _sightingVerbatimRepository.Object,
+                _artportalenVerbatimRepositoryMock.Object,
                 _personRepository.Object,
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
@@ -226,7 +226,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 _projectRepositoryMock.Object,
                 _sightingRepositoryMock.Object,
                 null,
-                _sightingVerbatimRepository.Object,
+                _artportalenVerbatimRepositoryMock.Object,
                 _personRepository.Object,
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
@@ -258,7 +258,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 _projectRepositoryMock.Object,
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
-                _sightingVerbatimRepository.Object,
+                _artportalenVerbatimRepositoryMock.Object,
                 _personRepository.Object,
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
@@ -274,7 +274,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 _projectRepositoryMock.Object,
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
-                _sightingVerbatimRepository.Object,
+                _artportalenVerbatimRepositoryMock.Object,
                 _personRepository.Object,
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,
@@ -290,7 +290,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
                 _projectRepositoryMock.Object,
                 _sightingRepositoryMock.Object,
                 _siteRepositoryMockMock.Object,
-                _sightingVerbatimRepository.Object,
+                _artportalenVerbatimRepositoryMock.Object,
                 _personRepository.Object,
                 _organizationRepository.Object,
                 _sightingRelationRepository.Object,

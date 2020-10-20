@@ -2,8 +2,8 @@ using System;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Repositories.Destination.Artportalen;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Repositories.Verbatim;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Destination.Artportalen
@@ -19,13 +19,13 @@ namespace SOS.Import.UnitTests.Repositories.Destination.Artportalen
         public SightingVerbatimRepositoryTests()
         {
             _importClient = new Mock<IVerbatimClient>();
-            _loggerMock = new Mock<ILogger<SightingVerbatimRepository>>();
+            _loggerMock = new Mock<ILogger<ArtportalenVerbatimRepository>>();
         }
 
         private readonly Mock<IVerbatimClient> _importClient;
-        private readonly Mock<ILogger<SightingVerbatimRepository>> _loggerMock;
+        private readonly Mock<ILogger<ArtportalenVerbatimRepository>> _loggerMock;
 
-        private SightingVerbatimRepository TestObject => new SightingVerbatimRepository(
+        private ArtportalenVerbatimRepository TestObject => new ArtportalenVerbatimRepository(
             _importClient.Object,
             _loggerMock.Object);
 
@@ -37,12 +37,12 @@ namespace SOS.Import.UnitTests.Repositories.Destination.Artportalen
         {
             TestObject.Should().NotBeNull();
 
-            Action create = () => new SightingVerbatimRepository(
+            Action create = () => new ArtportalenVerbatimRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("importClient");
 
-            create = () => new SightingVerbatimRepository(
+            create = () => new ArtportalenVerbatimRepository(
                 _importClient.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");

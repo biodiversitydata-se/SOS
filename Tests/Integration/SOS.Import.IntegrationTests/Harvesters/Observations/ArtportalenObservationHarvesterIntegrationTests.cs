@@ -16,6 +16,7 @@ using SOS.Import.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Verbatim;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Harvesters.Observations
@@ -42,7 +43,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
                 verbatimDbConfiguration.ReadBatchSize,
                 verbatimDbConfiguration.WriteBatchSize);
             var sightingVerbatimRepository =
-                new SightingVerbatimRepository(importClient, new Mock<ILogger<SightingVerbatimRepository>>().Object);
+                new ArtportalenVerbatimRepository(importClient, new Mock<ILogger<ArtportalenVerbatimRepository>>().Object);
             var metadataRepository =
                 new MetadataRepository(artportalenDataService, new Mock<ILogger<MetadataRepository>>().Object);
             var projectRepository =
@@ -99,7 +100,7 @@ namespace SOS.Import.IntegrationTests.Harvesters.Observations
             importConfiguration.ArtportalenConfiguration.ChunkSize = 125000;
             importConfiguration.ArtportalenConfiguration.MaxNumberOfSightingsHarvested = 100000;
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
-            var sightingVerbatimRepositoryMock = new Mock<ISightingVerbatimRepository>();
+            var sightingVerbatimRepositoryMock = new Mock<ArtportalenVerbatimRepository>();
             IMetadataRepository metadataRepository =
                 new MetadataRepository(artportalenDataService, new Mock<ILogger<MetadataRepository>>().Object);
             IProjectRepository projectRepository =

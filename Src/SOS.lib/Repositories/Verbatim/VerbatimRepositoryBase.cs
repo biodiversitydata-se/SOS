@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 
-namespace SOS.Import.Repositories.Destination
+namespace SOS.Lib.Repositories.Verbatim
 {
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public class VerbatimRepository<TEntity, TKey> : IVerbatimRepository<TEntity, TKey> where TEntity : IEntity<TKey>
+    public class VerbatimRepositoryBase<TEntity, TKey> : IVerbatimRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
     {
         private readonly int _batchSize;
 
@@ -41,17 +41,17 @@ namespace SOS.Import.Repositories.Destination
         /// <summary>
         ///     Logger
         /// </summary>
-        protected readonly ILogger<VerbatimRepository<TEntity, TKey>> Logger;
+        protected readonly ILogger<VerbatimRepositoryBase<TEntity, TKey>> Logger;
 
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="importClient"></param>
+        /// <param name="client"></param>
         /// <param name="logger"></param>
-        protected VerbatimRepository(
+        protected VerbatimRepositoryBase(
             IVerbatimClient client,
-            ILogger<VerbatimRepository<TEntity, TKey>> logger
+            ILogger<VerbatimRepositoryBase<TEntity, TKey>> logger
         )
         {
             Client = client ?? throw new ArgumentNullException(nameof(client)); ;

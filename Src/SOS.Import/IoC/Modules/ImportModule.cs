@@ -49,6 +49,8 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Verbatim;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 
@@ -153,7 +155,7 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationVerbatimRepository>().As<ISharkObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<SightingVerbatimRepository>().As<ISightingVerbatimRepository>()
+            builder.RegisterType<ArtportalenVerbatimRepository>().As<IArtportalenVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>()
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();

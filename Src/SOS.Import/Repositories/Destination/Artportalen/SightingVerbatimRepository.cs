@@ -11,17 +11,17 @@ namespace SOS.Import.Repositories.Destination.Artportalen
     /// <summary>
     ///     Species data service
     /// </summary>
-    public class SightingVerbatimRepository : VerbatimRepository<ArtportalenObservationVerbatim, int>,
-        ISightingVerbatimRepository
+    public class SightingVerbatimRepositoryOld : VerbatimRepository<ArtportalenObservationVerbatim, int>,
+        ISightingVerbatimRepositoryOld
     {
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="importClient"></param>
         /// <param name="logger"></param>
-        public SightingVerbatimRepository(
+        public SightingVerbatimRepositoryOld(
             IVerbatimClient importClient,
-            ILogger<SightingVerbatimRepository> logger) : base(importClient, logger)
+            ILogger<SightingVerbatimRepositoryOld> logger) : base(importClient, logger)
         {
         }
 

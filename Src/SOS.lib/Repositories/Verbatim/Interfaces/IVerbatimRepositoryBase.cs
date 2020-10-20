@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Import.Repositories.Destination.Interfaces
+namespace SOS.Lib.Repositories.Verbatim.Interfaces
 {
     /// <summary>
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TKey"></typeparam>
-    public interface IVerbatimRepository<TEntity, TKey> : IDisposable where TEntity : IEntity<TKey>
+    public interface IVerbatimRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IEntity<TKey>
     {
         /// <summary>
         ///     Add collection if not exists

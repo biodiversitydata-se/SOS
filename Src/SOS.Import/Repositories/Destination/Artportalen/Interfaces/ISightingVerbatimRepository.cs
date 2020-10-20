@@ -6,7 +6,7 @@ namespace SOS.Import.Repositories.Destination.Artportalen.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface ISightingVerbatimRepository : IVerbatimRepository<ArtportalenObservationVerbatim, int>
+    public interface ISightingVerbatimRepositoryOld : IVerbatimRepository<ArtportalenObservationVerbatim, int>
     {
         Task<int> GetMaxIdAsync();
     }
