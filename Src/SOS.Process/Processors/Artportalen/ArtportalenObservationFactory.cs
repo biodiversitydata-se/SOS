@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define INCLUDE_DIFFUSED_OBSERVATIONS
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -81,6 +82,8 @@ namespace SOS.Process.Processors.Artportalen
 
                 if (ShouldBeDiffused(verbatimObservation, taxon))
                 {
+                    return null;
+#if INCLUDE_DIFFUSED_OBSERVATIONS
                     //If it is a protected sighting it should not be possible to find it in the current month
                     if((verbatimObservation?.StartDate.Value.Year == DateTime.Now.Year || verbatimObservation?.EndDate.Value.Year == DateTime.Now.Year) &&
                         (verbatimObservation?.StartDate.Value.Month == DateTime.Now.Month || verbatimObservation?.EndDate.Value.Month == DateTime.Now.Month))
@@ -89,6 +92,7 @@ namespace SOS.Process.Processors.Artportalen
                     }
                     //Diffuse the observation depending on the protectionlevel                
                     verbatimObservation = DiffuseObservation(verbatimObservation, taxon);
+#endif
                 }
 
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
