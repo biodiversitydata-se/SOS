@@ -48,6 +48,42 @@ namespace SOS.Lib.Extensions
             };
         }
 
+        public static IEnumerable<SimpleMultimediaRow> ToSimpleMultimediaRows(this
+            IEnumerable<Observation> processedObservations)
+        {
+            return processedObservations?.SelectMany(ToSimpleMultimediaRows) ?? Enumerable.Empty<SimpleMultimediaRow>();
+        }
+
+        public static IEnumerable<SimpleMultimediaRow> ToSimpleMultimediaRows(this
+            Observation observation)
+        {
+            return observation?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Occurrence.OccurrenceId)) ?? Enumerable.Empty<SimpleMultimediaRow>();
+        }
+
+        private static SimpleMultimediaRow ToSimpleMultimediaRow(
+            this Multimedia multimedia, string occurrenceId)
+        {
+            return new SimpleMultimediaRow
+            {
+                GbifID = occurrenceId,
+                Type = multimedia.Type,
+                Format = multimedia.Format,
+                Identifier = multimedia.Identifier,
+                References = multimedia.References,
+                Title = multimedia.Title,
+                Description = multimedia.Description,
+                Created = multimedia.Created,
+                Creator = multimedia.Creator,
+                Contributor = multimedia.Contributor,
+                Publisher = multimedia.Publisher,
+                Audience = multimedia.Audience,
+                Source = multimedia.Source,
+                License = multimedia.License,
+                RightsHolder = multimedia.RightsHolder,
+                DatasetID = multimedia.DatasetID
+            };
+        }
+
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this
             IEnumerable<Observation> processedObservations)
         {

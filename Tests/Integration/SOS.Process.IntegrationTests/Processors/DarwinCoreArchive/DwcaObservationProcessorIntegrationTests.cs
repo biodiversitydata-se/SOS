@@ -183,6 +183,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                     fieldMappingResolverHelper,
                     new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
                 new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>()
             ), new FileService(), new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" }, new NullLogger<DwcArchiveFileWriterCoordinator>());

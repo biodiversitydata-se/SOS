@@ -45,7 +45,8 @@ namespace SOS.Export.IntegrationTests.Managers
                 new DwcArchiveOccurrenceCsvWriter(
                     fieldMappingResolverHelper,
                     new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
-                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()),
+                new ExtendedMeasurementOrFactCsvWriter(new NullLogger<ExtendedMeasurementOrFactCsvWriter>()), 
+                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()), 
                 new FileService(),
                 new NullLogger<DwcArchiveFileWriter>());
             var observationManager = new ObservationManager(

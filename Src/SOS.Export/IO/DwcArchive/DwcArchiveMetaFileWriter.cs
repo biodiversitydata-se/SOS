@@ -39,6 +39,7 @@ namespace SOS.Export.IO.DwcArchive
             var archiveNode = CreateArchiveNode(doc);
             CreateCoreNode(fieldDescriptions, doc, archiveNode);
             AppendExtension(doc, archiveNode, ExtensionMetadata.EmofFactory.Create());
+            AppendExtension(doc, archiveNode, ExtensionMetadata.SimpleMultimediaFactory.Create());
             doc.Save(stream);
         }
 

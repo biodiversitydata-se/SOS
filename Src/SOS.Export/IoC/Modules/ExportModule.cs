@@ -88,6 +88,8 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<DwcArchiveOccurrenceCsvWriter>().As<IDwcArchiveOccurrenceCsvWriter>().InstancePerLifetimeScope();
             builder.RegisterType<ExtendedMeasurementOrFactCsvWriter>().As<IExtendedMeasurementOrFactCsvWriter>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<SimpleMultimediaCsvWriter>().As<ISimpleMultimediaCsvWriter>()
+                .InstancePerLifetimeScope();
 
             // Helpers, static data => single instance 
             builder.RegisterType<FieldMappingResolverHelper>().As<IFieldMappingResolverHelper>().SingleInstance();

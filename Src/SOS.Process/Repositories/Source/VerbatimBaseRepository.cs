@@ -77,7 +77,7 @@ namespace SOS.Process.Repositories.Source
             var exists = await (await Database
                     .ListCollectionNamesAsync(new ListCollectionNamesOptions
                     {
-                        Filter = new BsonDocument("name", _collectionName)
+                        Filter = new BsonDocument("name", collectionName)
                     }))
                 .AnyAsync();
 

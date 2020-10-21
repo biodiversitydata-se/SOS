@@ -39,6 +39,7 @@ namespace SOS.Export.IntegrationTests.IO.DwcArchive
                     CreateFieldMappingResolverHelper(CreateExportClient(processDbConfiguration)),
                     new NullLogger<DwcArchiveOccurrenceCsvWriter>()),
                 new ExtendedMeasurementOrFactCsvWriter(new Mock<ILogger<ExtendedMeasurementOrFactCsvWriter>>().Object),
+                new SimpleMultimediaCsvWriter(new NullLogger<SimpleMultimediaCsvWriter>()),
                 new FileService(),
                 new Mock<ILogger<DwcArchiveFileWriter>>().Object);
             return dwcArchiveFileWriter;
