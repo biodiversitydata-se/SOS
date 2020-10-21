@@ -1,11 +1,11 @@
-﻿using System;
+﻿//#define INCLUDE_DIFFUSED_OBSERVATIONS
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Nest;
-using NetTopologySuite.Operation.Buffer;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
@@ -15,9 +15,7 @@ using SOS.Lib.Models.DarwinCore.Vocabulary;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Models;
-using SOS.Process.Repositories.Source;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
 using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
 
@@ -48,7 +46,7 @@ namespace SOS.Process.Processors.Artportalen
         public static async Task<ArtportalenObservationFactory> CreateAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IProcessedFieldMappingRepository processedFieldMappingRepository,
+            IFieldMappingRepository processedFieldMappingRepository,
             bool incrementalMode)
         {
             var allFieldMappings = await processedFieldMappingRepository.GetAllAsync();
@@ -84,6 +82,8 @@ namespace SOS.Process.Processors.Artportalen
 
                 if (ShouldBeDiffused(verbatimObservation, taxon))
                 {
+                    return null;
+#if INCLUDE_DIFFUSED_OBSERVATIONS
                     //If it is a protected sighting it should not be possible to find it in the current month
                     if((verbatimObservation?.StartDate.Value.Year == DateTime.Now.Year || verbatimObservation?.EndDate.Value.Year == DateTime.Now.Year) &&
                         (verbatimObservation?.StartDate.Value.Month == DateTime.Now.Month || verbatimObservation?.EndDate.Value.Month == DateTime.Now.Month))
@@ -92,6 +92,7 @@ namespace SOS.Process.Processors.Artportalen
                     }
                     //Diffuse the observation depending on the protectionlevel                
                     verbatimObservation = DiffuseObservation(verbatimObservation, taxon);
+#endif
                 }
 
                 var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&

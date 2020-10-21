@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Import.Entities.Artportalen;
 using SOS.Import.Factories.Harvest;
 using SOS.Import.Harvesters.Observations.Interfaces;
-using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
@@ -17,6 +16,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SOS.Import.Containers.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Import.Harvesters.Observations
 {
@@ -33,7 +33,7 @@ namespace SOS.Import.Harvesters.Observations
         private readonly SemaphoreSlim _semaphore;
         private readonly ISightingRelationRepository _sightingRelationRepository;
         private readonly ISightingRepository _sightingRepository;
-        private readonly ISightingVerbatimRepository _sightingVerbatimRepository;
+        private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly ISiteRepository _siteRepository;
         private readonly ISpeciesCollectionItemRepository _speciesCollectionRepository;
         private readonly IProcessedObservationRepository _processedObservationRepository;
@@ -227,7 +227,7 @@ namespace SOS.Import.Harvesters.Observations
                 _logger.LogDebug($"Start storing batch ({batchIndex})");
                 // Add sightings to mongodb
 
-                await _sightingVerbatimRepository.AddManyAsync(verbatimObservations);
+                await _artportalenVerbatimRepository.AddManyAsync(verbatimObservations);
                 _logger.LogDebug($"Finish storing batch ({batchIndex})");
 
                 return verbatimObservations?.Count() ?? 0;
@@ -334,7 +334,7 @@ namespace SOS.Import.Harvesters.Observations
             IProjectRepository projectRepository,
             ISightingRepository sightingRepository,
             ISiteRepository siteRepository,
-            ISightingVerbatimRepository sightingVerbatimRepository,
+            IArtportalenVerbatimRepository artportalenVerbatimRepository,
             IPersonRepository personRepository,
             IOrganizationRepository organizationRepository,
             ISightingRelationRepository sightingRelationRepository,
@@ -349,8 +349,8 @@ namespace SOS.Import.Harvesters.Observations
             _projectRepository = projectRepository ?? throw new ArgumentNullException(nameof(projectRepository));
             _sightingRepository = sightingRepository ?? throw new ArgumentNullException(nameof(sightingRepository));
             _siteRepository = siteRepository ?? throw new ArgumentNullException(nameof(siteRepository));
-            _sightingVerbatimRepository = sightingVerbatimRepository ??
-                                          throw new ArgumentNullException(nameof(sightingVerbatimRepository));
+            _artportalenVerbatimRepository = artportalenVerbatimRepository ??
+                                             throw new ArgumentNullException(nameof(artportalenVerbatimRepository));
             _personRepository = personRepository ?? throw new ArgumentNullException(nameof(personRepository));
             _organizationRepository =
                 organizationRepository ?? throw new ArgumentNullException(nameof(organizationRepository));
@@ -431,12 +431,12 @@ namespace SOS.Import.Harvesters.Observations
                 };
                 _logger.LogDebug("Finsih creating factory");
 
-                _sightingVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
+                _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
 
                 // Make sure we have an empty collection
                 _logger.LogDebug("Empty collection");
-                await _sightingVerbatimRepository.DeleteCollectionAsync();
-                await _sightingVerbatimRepository.AddCollectionAsync();
+                await _artportalenVerbatimRepository.DeleteCollectionAsync();
+                await _artportalenVerbatimRepository.AddCollectionAsync();
 
                 var nrSightingsHarvested = mode == JobRunModes.Full ?
                     await HarvestAllAsync(harvestFactory, cancellationToken)

@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Resource;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Repositories
@@ -16,13 +16,13 @@ namespace SOS.Export.UnitTests.Repositories
         public ProcessedTaxonRepositoryTests()
         {
             _exportClient = new Mock<IProcessClient>();
-            _loggerMock = new Mock<ILogger<ProcessedTaxonRepository>>();
+            _loggerMock = new Mock<ILogger<TaxonRepository>>();
         }
 
         private readonly Mock<IProcessClient> _exportClient;
-        private readonly Mock<ILogger<ProcessedTaxonRepository>> _loggerMock;
+        private readonly Mock<ILogger<TaxonRepository>> _loggerMock;
 
-        private ProcessedTaxonRepository TestObject => new ProcessedTaxonRepository(
+        private TaxonRepository TestObject => new TaxonRepository(
             _exportClient.Object,
             _loggerMock.Object);
 
@@ -35,12 +35,12 @@ namespace SOS.Export.UnitTests.Repositories
         {
             TestObject.Should().NotBeNull();
 
-            Action create = () => new ProcessedTaxonRepository(
+            Action create = () => new TaxonRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("exportClient");
 
-            create = () => new ProcessedTaxonRepository(
+            create = () => new TaxonRepository(
                 _exportClient.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");

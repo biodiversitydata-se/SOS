@@ -9,14 +9,14 @@ using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Helpers.Interfaces;
-using SOS.Process.Managers.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Processors.Artportalen;
-using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors
@@ -33,7 +33,7 @@ namespace SOS.Process.UnitTests.Processors
         {
             _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
             _processedObservationRepositoryMock = new Mock<IProcessedObservationRepository>();
-            _processedFieldMappingRepositoryMock = new Mock<IProcessedFieldMappingRepository>();
+            _processedFieldMappingRepositoryMock = new Mock<IFieldMappingRepository>();
             _fieldMappingResolverHelperMock = new Mock<IFieldMappingResolverHelper>();
             _processConfiguration = new ProcessConfiguration();
             _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
@@ -43,7 +43,7 @@ namespace SOS.Process.UnitTests.Processors
 
         private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
         private readonly Mock<IProcessedObservationRepository> _processedObservationRepositoryMock;
-        private readonly Mock<IProcessedFieldMappingRepository> _processedFieldMappingRepositoryMock;
+        private readonly Mock<IFieldMappingRepository> _processedFieldMappingRepositoryMock;
         private readonly Mock<IFieldMappingResolverHelper> _fieldMappingResolverHelperMock;
         private readonly ProcessConfiguration _processConfiguration;
         private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;

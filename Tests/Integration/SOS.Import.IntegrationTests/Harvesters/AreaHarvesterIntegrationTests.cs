@@ -3,14 +3,12 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Harvesters;
-using SOS.Import.Repositories.Destination.Area;
-using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
-using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Helpers;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Harvesters
@@ -28,18 +26,18 @@ namespace SOS.Import.IntegrationTests.Harvesters
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
 
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var areaVerbatimRepository = new Import.Repositories.Destination.Area.AreaRepository(
+            var areaVerbatimRepository = new Lib.Repositories.Resource.AreaRepository(
                 new ProcessClient(
                     verbatimDbConfiguration.GetMongoDbSettings(),
                     verbatimDbConfiguration.DatabaseName,
                     verbatimDbConfiguration.ReadBatchSize,
                     verbatimDbConfiguration.WriteBatchSize),
-                new Mock<ILogger<Import.Repositories.Destination.Area.AreaRepository>>().Object);
+                new Mock<ILogger<Lib.Repositories.Resource.AreaRepository>>().Object);
 
             var areaHarvester = new AreaHarvester(
                 new Import.Repositories.Source.Artportalen.AreaRepository(artportalenDataService, new Mock<ILogger<Import.Repositories.Source.Artportalen.AreaRepository>>().Object),
                 areaVerbatimRepository,
-                new AreaHelper(new Mock<IAreaRepository>().Object, new Mock<IProcessedFieldMappingRepository>().Object), 
+                new AreaHelper(new Mock<IAreaRepository>().Object, new Mock<IFieldMappingRepository>().Object), 
                 new Mock<ILogger<AreaHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------
@@ -63,18 +61,18 @@ namespace SOS.Import.IntegrationTests.Harvesters
             var importConfiguration = GetImportConfiguration();
             var artportalenDataService = new ArtportalenDataService(importConfiguration.ArtportalenConfiguration);
             var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var areaVerbatimRepository = new Import.Repositories.Destination.Area.AreaRepository(
+            var areaVerbatimRepository = new Lib.Repositories.Resource.AreaRepository(
                 new ProcessClient(
                     verbatimDbConfiguration.GetMongoDbSettings(),
                     verbatimDbConfiguration.DatabaseName,
                     verbatimDbConfiguration.ReadBatchSize,
                     verbatimDbConfiguration.WriteBatchSize),
-                new Mock<ILogger<Import.Repositories.Destination.Area.AreaRepository>>().Object);
+                new Mock<ILogger<Lib.Repositories.Resource.AreaRepository>>().Object);
 
             var areaHarvester = new AreaHarvester(
                 new Import.Repositories.Source.Artportalen.AreaRepository(artportalenDataService, new Mock<ILogger<Import.Repositories.Source.Artportalen.AreaRepository>>().Object),
                 areaVerbatimRepository,
-                new AreaHelper(new Mock<IAreaRepository>().Object, new Mock<IProcessedFieldMappingRepository>().Object),
+                new AreaHelper(new Mock<IAreaRepository>().Object, new Mock<IFieldMappingRepository>().Object),
                 new Mock<ILogger<AreaHarvester>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

@@ -16,6 +16,7 @@ using SOS.Lib.Database;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Resource;
 using Xunit;
 
 namespace SOS.Export.IntegrationTests.Managers
@@ -34,11 +35,11 @@ namespace SOS.Export.IntegrationTests.Managers
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var taxonManager = new TaxonManager(
-                new ProcessedTaxonRepository(exportClient,
-                    new Mock<ILogger<ProcessedTaxonRepository>>().Object),
+                new TaxonRepository(exportClient,
+                    new Mock<ILogger<TaxonRepository>>().Object),
                 new Mock<ILogger<TaxonManager>>().Object);
             var processedFieldMappingRepository =
-                new ProcessedFieldMappingRepository(exportClient, new NullLogger<ProcessedFieldMappingRepository>());
+                new FieldMappingRepository(exportClient, new NullLogger<FieldMappingRepository>());
             var fieldMappingResolverHelper =
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration());
             var dwcArchiveFileWriter = new DwcArchiveFileWriter(

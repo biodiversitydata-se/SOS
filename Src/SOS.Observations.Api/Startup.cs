@@ -31,6 +31,8 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Managers;
@@ -253,8 +255,8 @@ namespace SOS.Observations.Api
             services.AddSingleton<IDataProviderRepository, DataProviderRepository>();
             services.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddSingleton<IProcessInfoRepository, ProcessInfoRepository>();
-            services.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();
-            services.AddSingleton<IProcessedFieldMappingRepository, ProcessedFieldMappingRepository>();
+            services.AddSingleton<ITaxonRepository, TaxonRepository>();
+            services.AddSingleton<IFieldMappingRepository, FieldMappingRepository>();
 
             // Add services
             services.AddSingleton<IBlobStorageService, BlobStorageService>();

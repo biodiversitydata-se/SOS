@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using DwC_A;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
-using MongoDB.Driver.Core.Operations;
 using Moq;
 using Newtonsoft.Json;
 using SOS.Import.DarwinCore;
@@ -13,13 +12,12 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Json;
-using SOS.Lib.Models.DataValidation;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Helpers;
-using SOS.Process.Managers;
+using SOS.Lib.Repositories.Resource;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Managers
@@ -36,7 +34,7 @@ namespace SOS.Import.IntegrationTests.Managers
                 processDbConfiguration.WriteBatchSize);
 
             var processedFieldMappingRepository =
-                new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
+                new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>());
             return new FieldMappingResolverHelper(processedFieldMappingRepository,
                 new FieldMappingConfiguration {LocalizationCultureCode = "sv-SE", ResolveValues = true});
         }
@@ -157,14 +155,14 @@ namespace SOS.Import.IntegrationTests.Managers
         {
             var processClient = CreateProcessClient(GetProcessDbConfiguration());
             var processedFieldMappingRepository =
-                new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
+                new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>());
             var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()),
                     processedFieldMappingRepository);
             var fieldMappingResolverHelper = new FieldMappingResolverHelper(processedFieldMappingRepository,
                 new FieldMappingConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
-            var processedTaxonRepository = new ProcessedTaxonRepository(
+            var processedTaxonRepository = new TaxonRepository(
                 processClient,
-                new NullLogger<ProcessedTaxonRepository>());
+                new NullLogger<TaxonRepository>());
             var validationReportManager = new DwcaDataValidationReportManager(
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 processedFieldMappingRepository,

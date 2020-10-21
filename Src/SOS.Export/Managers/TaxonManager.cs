@@ -8,7 +8,7 @@ using SOS.Lib.Factories;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Export.Managers
 {
@@ -19,7 +19,7 @@ namespace SOS.Export.Managers
     {
         private static readonly object InitLock = new object();
         private readonly ILogger<TaxonManager> _logger;
-        private readonly IProcessedTaxonRepository _processedTaxonRepository;
+        private readonly ITaxonRepository _processedTaxonRepository;
         private TaxonTree<IBasicTaxon> _taxonTree;
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace SOS.Export.Managers
         /// <param name="processedTaxonRepository"></param>
         /// <param name="logger"></param>
         public TaxonManager(
-            IProcessedTaxonRepository processedTaxonRepository,
+            ITaxonRepository processedTaxonRepository,
             ILogger<TaxonManager> logger)
         {
             _processedTaxonRepository = processedTaxonRepository ??

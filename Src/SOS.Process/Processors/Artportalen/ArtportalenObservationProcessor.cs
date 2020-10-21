@@ -11,12 +11,13 @@ using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Managers.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
-using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Processors.Artportalen
 {
@@ -28,7 +29,7 @@ namespace SOS.Process.Processors.Artportalen
     {
         private readonly IArtportalenVerbatimRepository _artportalenVerbatimRepository;
         private readonly ProcessConfiguration _processConfiguration;
-        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
+        private readonly IFieldMappingRepository _processedFieldMappingRepository;
         private readonly SemaphoreSlim _semaphore;
 
         /// <summary>
@@ -44,7 +45,7 @@ namespace SOS.Process.Processors.Artportalen
         /// <param name="logger"></param>
         public ArtportalenObservationProcessor(IArtportalenVerbatimRepository artportalenVerbatimRepository,
             IProcessedObservationRepository processedObservationRepository,
-            IProcessedFieldMappingRepository processedFieldMappingRepository,
+            IFieldMappingRepository processedFieldMappingRepository,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
             ProcessConfiguration processConfiguration,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
@@ -102,7 +103,7 @@ namespace SOS.Process.Processors.Artportalen
                 await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository, mode != JobRunModes.Full);
             // Get min and max id from db
 
-            _artportalenVerbatimRepository.Mode = mode;
+            _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
             (await _artportalenVerbatimRepository.GetIdSpanAsync())
                 .Deconstruct(out var batchStartId, out var maxId);
             var processBatchTasks = new List<Task<int>>();
@@ -111,7 +112,7 @@ namespace SOS.Process.Processors.Artportalen
             {
                 await _semaphore.WaitAsync();
 
-                var batchEndId = batchStartId + _processedFieldMappingRepository.BatchSize - 1;
+                var batchEndId = batchStartId + _processedFieldMappingRepository.BatchSizeWrite - 1;
                 processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, mode, observationFactory,
                     cancellationToken));
                 batchStartId = batchEndId + 1;
@@ -209,7 +210,7 @@ namespace SOS.Process.Processors.Artportalen
             var observationFactory =
                 await ArtportalenObservationFactory.CreateAsync(dataProvider, taxa, _processedFieldMappingRepository, mode != JobRunModes.Full);
             ICollection<Observation> observations = new List<Observation>();
-            _artportalenVerbatimRepository.Mode = mode;
+            _artportalenVerbatimRepository.IncrementalMode = mode != JobRunModes.Full;
             using var cursor = await _artportalenVerbatimRepository.GetAllByCursorAsync();
             var batchId = 0;
            

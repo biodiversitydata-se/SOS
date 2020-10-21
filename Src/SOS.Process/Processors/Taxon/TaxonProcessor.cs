@@ -8,9 +8,8 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Process.Enums;
 using SOS.Process.Processors.Taxon.Interfaces;
 using SOS.Process.Services.Interfaces;
@@ -21,7 +20,7 @@ namespace SOS.Process.Processors.Taxon
     {
         private readonly ITaxonAttributeService _taxonAttributeService;
         private readonly ITaxonService _taxonService;
-        private readonly IProcessedTaxonRepository _processedTaxonRepository;
+        private readonly ITaxonRepository _processedTaxonRepository;
         private readonly ILogger<TaxonProcessor> _logger;
         private readonly SemaphoreSlim _semaphore;
 
@@ -182,7 +181,7 @@ namespace SOS.Process.Processors.Taxon
         public TaxonProcessor(
             ITaxonService taxonService,
             ITaxonAttributeService taxonAttributeService,
-            IProcessedTaxonRepository processedTaxonRepository,
+            ITaxonRepository processedTaxonRepository,
             ILogger<TaxonProcessor> logger)
         {
            

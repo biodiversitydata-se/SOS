@@ -11,11 +11,11 @@ using Newtonsoft.Json;
 using SOS.Import.Factories.FieldMapping;
 using SOS.Import.Factories.FieldMapping.Interfaces;
 using SOS.Import.Harvesters.Interfaces;
-using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Extensions;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Import.Harvesters
 {

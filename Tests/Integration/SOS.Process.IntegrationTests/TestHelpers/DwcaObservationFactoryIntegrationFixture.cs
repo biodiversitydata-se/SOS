@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Lib.Database;
+using SOS.Lib.Helpers;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Helpers;
-using SOS.Process.Managers;
+using SOS.Lib.Repositories.Resource;
 using SOS.Process.Processors.DarwinCoreArchive;
 
 namespace SOS.Process.IntegrationTests.TestHelpers
@@ -49,7 +50,7 @@ namespace SOS.Process.IntegrationTests.TestHelpers
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var processedFieldMappingRepository =
-                new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
+                new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>());
             var areaHelper =
                 new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()),
                     processedFieldMappingRepository);
@@ -69,7 +70,7 @@ namespace SOS.Process.IntegrationTests.TestHelpers
             return taxa.ToDictionary(taxon => taxon.Id, taxon => taxon);
         }
 
-        private ProcessedTaxonRepository CreateProcessedTaxonRepository()
+        private TaxonRepository CreateProcessedTaxonRepository()
         {
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
@@ -78,9 +79,9 @@ namespace SOS.Process.IntegrationTests.TestHelpers
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
 
-            return new ProcessedTaxonRepository(
+            return new TaxonRepository(
                 processClient,
-                new NullLogger<ProcessedTaxonRepository>());
+                new NullLogger<TaxonRepository>());
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Managers
@@ -16,7 +16,7 @@ namespace SOS.Observations.Api.Managers
     public class FieldMappingManager : IFieldMappingManager
     {
         private readonly ILogger<FieldMappingManager> _logger;
-        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
+        private readonly IFieldMappingRepository _processedFieldMappingRepository;
         private Dictionary<FieldMappingFieldId, Dictionary<int, string>> _nonLocalizedTranslationDictionary;
         
         /// <summary>
@@ -31,7 +31,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="processedFieldMappingRepository"></param>
         /// <param name="logger"></param>
         public FieldMappingManager(
-            IProcessedFieldMappingRepository processedFieldMappingRepository,
+            IFieldMappingRepository processedFieldMappingRepository,
             ILogger<FieldMappingManager> logger)
         {
             _processedFieldMappingRepository = processedFieldMappingRepository ??

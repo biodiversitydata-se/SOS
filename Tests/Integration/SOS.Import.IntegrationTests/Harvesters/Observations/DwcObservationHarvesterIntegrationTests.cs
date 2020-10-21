@@ -4,11 +4,11 @@ using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Import.DarwinCore;
 using SOS.Import.Harvesters.Observations;
-using SOS.Import.Repositories.Destination.DarwinCoreArchive;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Verbatim;
 using Xunit;
 
 namespace SOS.Import.IntegrationTests.Harvesters.Observations

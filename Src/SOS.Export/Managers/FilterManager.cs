@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Export.Managers
 {

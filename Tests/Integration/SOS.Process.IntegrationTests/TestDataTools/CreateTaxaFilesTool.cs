@@ -9,15 +9,14 @@ using SOS.Lib.Database;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Repositories.Processed;
-using SOS.Process.Repositories.Source;
+using SOS.Lib.Repositories.Resource;
 using Xunit;
 
 namespace SOS.Process.IntegrationTests.TestDataTools
 {
     public class CreateTaxaFilesTool : TestBase
     {
-        private ProcessedTaxonRepository CreateTaxonProcessedRepository()
+        private TaxonRepository CreateTaxonProcessedRepository()
         {
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
@@ -26,7 +25,7 @@ namespace SOS.Process.IntegrationTests.TestDataTools
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var processedTaxonRepository =
-                new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
+                new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
             return processedTaxonRepository;
         }
 

@@ -12,32 +12,6 @@ using SOS.Import.Harvesters.Observations.Interfaces;
 using SOS.Import.Jobs;
 using SOS.Import.Managers;
 using SOS.Import.Managers.Interfaces;
-using SOS.Import.Repositories.Destination;
-using SOS.Import.Repositories.Destination.Area;
-using SOS.Import.Repositories.Destination.Area.Interfaces;
-using SOS.Import.Repositories.Destination.Artportalen;
-using SOS.Import.Repositories.Destination.Artportalen.Interfaces;
-using SOS.Import.Repositories.Destination.ClamPortal;
-using SOS.Import.Repositories.Destination.ClamPortal.Interfaces;
-using SOS.Import.Repositories.Destination.DarwinCoreArchive;
-using SOS.Import.Repositories.Destination.DarwinCoreArchive.Interfaces;
-using SOS.Import.Repositories.Destination.FieldMappings;
-using SOS.Import.Repositories.Destination.FieldMappings.Interfaces;
-using SOS.Import.Repositories.Destination.FishData;
-using SOS.Import.Repositories.Destination.FishData.Interfaces;
-using SOS.Import.Repositories.Destination.Interfaces;
-using SOS.Import.Repositories.Destination.Kul;
-using SOS.Import.Repositories.Destination.Kul.Interfaces;
-using SOS.Import.Repositories.Destination.Mvm;
-using SOS.Import.Repositories.Destination.Mvm.Interfaces;
-using SOS.Import.Repositories.Destination.Nors;
-using SOS.Import.Repositories.Destination.Nors.Interfaces;
-using SOS.Import.Repositories.Destination.Sers;
-using SOS.Import.Repositories.Destination.Sers.Interfaces;
-using SOS.Import.Repositories.Destination.Shark;
-using SOS.Import.Repositories.Destination.Shark.Interfaces;
-using SOS.Import.Repositories.Destination.VirtualHerbarium;
-using SOS.Import.Repositories.Destination.VirtualHerbarium.Interfaces;
 using SOS.Import.Repositories.Source.Artportalen;
 using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Import.Services;
@@ -49,6 +23,10 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Verbatim;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 
@@ -135,7 +113,7 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
 
             // Repositories destination
-            builder.RegisterType<Repositories.Destination.Area.AreaRepository>().As<Repositories.Destination.Area.Interfaces.IAreaRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<Lib.Repositories.Resource.AreaRepository>().As<Lib.Repositories.Resource.Interfaces.IAreaRepository>().InstancePerLifetimeScope();
 
             builder.RegisterType<ClamObservationVerbatimRepository>().As<IClamObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
@@ -153,7 +131,7 @@ namespace SOS.Import.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<SharkObservationVerbatimRepository>().As<ISharkObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<SightingVerbatimRepository>().As<ISightingVerbatimRepository>()
+            builder.RegisterType<ArtportalenVerbatimRepository>().As<IArtportalenVerbatimRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>()
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
@@ -162,7 +140,7 @@ namespace SOS.Import.IoC.Modules
                .InstancePerLifetimeScope();
 
             // Repositories resource
-            builder.RegisterType<Repositories.Resource.DataProviderRepository>().As<Repositories.Resource.Interfaces.IDataProviderRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<Lib.Repositories.Resource.DataProviderRepository>().As<Lib.Repositories.Resource.Interfaces.IDataProviderRepository>().InstancePerLifetimeScope();
 
             // Add harvesters
             builder.RegisterType<AreaHarvester>().As<IAreaHarvester>().InstancePerLifetimeScope();

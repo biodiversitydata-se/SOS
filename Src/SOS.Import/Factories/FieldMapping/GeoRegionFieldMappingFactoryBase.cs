@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Repositories.Destination.Area.Interfaces;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Import.Factories.FieldMapping
 {

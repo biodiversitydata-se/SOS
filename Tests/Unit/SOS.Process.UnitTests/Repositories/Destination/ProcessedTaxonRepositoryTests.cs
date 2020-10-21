@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Resource;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Repositories.Destination
@@ -16,11 +16,11 @@ namespace SOS.Process.UnitTests.Repositories.Destination
         public ProcessedTaxonRepositoryTests()
         {
             _processClient = new Mock<IProcessClient>();
-            _loggerMock = new Mock<ILogger<ProcessedTaxonRepository>>();
+            _loggerMock = new Mock<ILogger<TaxonRepository>>();
         }
 
         private readonly Mock<IProcessClient> _processClient;
-        private readonly Mock<ILogger<ProcessedTaxonRepository>> _loggerMock;
+        private readonly Mock<ILogger<TaxonRepository>> _loggerMock;
 
         /// <summary>
         ///     Test constructor
@@ -28,17 +28,17 @@ namespace SOS.Process.UnitTests.Repositories.Destination
         [Fact]
         public void ConstructorTest()
         {
-            Action create = () => new ProcessedTaxonRepository(
+            Action create = () => new TaxonRepository(
                 _processClient.Object,
                 _loggerMock.Object);
             create.Should().Throw<NullReferenceException>();
 
-            create = () => new ProcessedTaxonRepository(
+            create = () => new TaxonRepository(
                 null,
                 _loggerMock.Object);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("client");
 
-            create = () => new ProcessedTaxonRepository(
+            create = () => new TaxonRepository(
                 _processClient.Object,
                 null);
             create.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("logger");

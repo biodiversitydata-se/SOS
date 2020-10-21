@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Jobs;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Managers

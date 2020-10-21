@@ -12,7 +12,6 @@ using MongoDB.Driver;
 using Moq;
 using Nest;
 using SOS.Export.IO.DwcArchive;
-using SOS.Export.Managers;
 using SOS.Export.Services;
 using SOS.Import.DarwinCore;
 using SOS.Lib.Configuration.Export;
@@ -21,18 +20,17 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Helpers;
-using SOS.Process.Managers;
+using SOS.Lib.Repositories.Resource;
+using SOS.Lib.Repositories.Verbatim;
 using SOS.Process.Processors.DarwinCoreArchive;
-using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
 using Xunit.Abstractions;
-using TaxonManager = SOS.Export.Managers.TaxonManager;
 
 namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
 {
@@ -75,7 +73,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 .SetupSequence(_ => _.MoveNextAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(true))
                 .Returns(Task.FromResult(false));
-            var dwcaVerbatimRepository = new Mock<IDwcaVerbatimRepository>();
+            var dwcaVerbatimRepository = new Mock<DarwinCoreArchiveVerbatimRepository>();
             dwcaVerbatimRepository.Setup(m => m.GetAllByCursorAsync(It.IsAny<int>(), It.IsAny<string>()))
                 .ReturnsAsync(mockCursor.Object);
             var invalidObservationRepository =
@@ -93,7 +91,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             }
 
             var processedFieldMappingRepository =
-                new ProcessedFieldMappingRepository(processClient, new NullLogger<ProcessedFieldMappingRepository>());
+                new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>());
             var fieldMappingResolverHelper =
                 new FieldMappingResolverHelper(processedFieldMappingRepository, new FieldMappingConfiguration());
             var dwcArchiveFileWriterCoordinator = new DwcArchiveFileWriterCoordinator(new DwcArchiveFileWriter(
@@ -133,7 +131,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             return taxa.ToDictionary(taxon => taxon.Id, taxon => taxon);
         }
 
-        private ProcessedTaxonRepository CreateProcessedTaxonRepository()
+        private TaxonRepository CreateProcessedTaxonRepository()
         {
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
@@ -142,9 +140,9 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
 
-            return new ProcessedTaxonRepository(
+            return new TaxonRepository(
                 processClient,
-                new NullLogger<ProcessedTaxonRepository>());
+                new NullLogger<TaxonRepository>());
         }
 
         [Fact]

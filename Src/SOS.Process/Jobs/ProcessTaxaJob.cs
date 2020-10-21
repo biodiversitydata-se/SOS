@@ -6,8 +6,8 @@ using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Processors.Taxon.Interfaces;
-using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Jobs
 {

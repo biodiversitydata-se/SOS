@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Database;
-using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Resource;
 using SOS.Observations.Api.Managers;
 using Xunit;
 
@@ -18,9 +18,9 @@ namespace SOS.Observations.Api.IntegrationTests.Managers
                 mongoDbConfiguration.ReadBatchSize,
                 mongoDbConfiguration.WriteBatchSize);
 
-            var processedTaxonRepository = new ProcessedTaxonRepository(
+            var processedTaxonRepository = new TaxonRepository(
                 processClient,
-                new NullLogger<ProcessedTaxonRepository>());
+                new NullLogger<TaxonRepository>());
             var taxonManager = new TaxonManager(processedTaxonRepository, new NullLogger<TaxonManager>());
             return taxonManager;
         }

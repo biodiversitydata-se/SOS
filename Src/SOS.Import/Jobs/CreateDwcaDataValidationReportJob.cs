@@ -1,26 +1,17 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using DwC_A;
 using Hangfire;
-using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson.Serialization.Conventions;
 using Newtonsoft.Json;
-using SOS.Import.Harvesters.Interfaces;
 using SOS.Import.Managers.Interfaces;
-using SOS.Import.Repositories.Destination.Interfaces;
 using SOS.Lib.Configuration.Import;
-using SOS.Lib.Enums;
-using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Json;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Import.Jobs
 {
@@ -42,7 +33,7 @@ namespace SOS.Import.Jobs
         /// <param name="processedTaxonRepository"></param>
         public CreateDwcaDataValidationReportJob(IDwcaDataValidationReportManager dwcaDataValidationReportManager,
             DwcaConfiguration dwcaConfiguration,
-            ILogger<CreateDwcaDataValidationReportJob> logger, IProcessedTaxonRepository processedTaxonRepository)
+            ILogger<CreateDwcaDataValidationReportJob> logger, ITaxonRepository processedTaxonRepository)
         {
             _dwcaDataValidationReportManager = dwcaDataValidationReportManager ?? throw new ArgumentNullException(nameof(dwcaDataValidationReportManager));
             _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));

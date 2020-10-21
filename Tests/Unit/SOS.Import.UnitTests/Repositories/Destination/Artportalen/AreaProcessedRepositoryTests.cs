@@ -2,8 +2,8 @@ using System;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SOS.Import.Repositories.Destination.Area;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Repositories.Resource;
 using Xunit;
 
 namespace SOS.Import.UnitTests.Repositories.Destination.Artportalen

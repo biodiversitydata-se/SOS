@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Repositories.Processed.Interfaces;
 

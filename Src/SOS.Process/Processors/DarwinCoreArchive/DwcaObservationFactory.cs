@@ -14,13 +14,13 @@ using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Helpers.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
 
 namespace SOS.Process.Processors.DarwinCoreArchive
@@ -69,7 +69,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
         public static async Task<DwcaObservationFactory> CreateAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IProcessedFieldMappingRepository processedFieldMappingRepository,
+            IFieldMappingRepository processedFieldMappingRepository,
             IAreaHelper areaHelper)
         {
             var allFieldMappings = await processedFieldMappingRepository.GetAllAsync();

@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Import.Factories.Harvest;
 using SOS.Import.Harvesters.Interfaces;
-using SOS.Import.Repositories.Destination.Area.Interfaces;
-using SOS.Import.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
-using SOS.Process.Helpers.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
+
 
 namespace SOS.Import.Harvesters
 {
@@ -21,7 +21,7 @@ namespace SOS.Import.Harvesters
     public class AreaHarvester : IAreaHarvester
     {
         private readonly Repositories.Source.Artportalen.Interfaces.IAreaRepository _areaRepository;
-        private readonly Repositories.Destination.Area.Interfaces.IAreaRepository _areaProcessedRepository;
+        private readonly IAreaRepository _areaProcessedRepository;
         private readonly IAreaHelper _areaHelper;
         private readonly ILogger<AreaHarvester> _logger;
         private readonly AreaHarvestFactory _harvestFactory;
@@ -34,7 +34,7 @@ namespace SOS.Import.Harvesters
         /// <param name="logger"></param>
         public AreaHarvester(
             Repositories.Source.Artportalen.Interfaces.IAreaRepository areaRepository,
-            Repositories.Destination.Area.Interfaces.IAreaRepository areaProcessedRepository,
+            IAreaRepository areaProcessedRepository,
             IAreaHelper areaHelper,
             ILogger<AreaHarvester> logger)
         {

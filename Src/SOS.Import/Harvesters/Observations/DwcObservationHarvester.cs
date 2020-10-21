@@ -6,16 +6,15 @@ using DwC_A;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson.Serialization.Conventions;
 using SOS.Import.DarwinCore.Interfaces;
 using SOS.Import.Harvesters.Observations.Interfaces;
-using SOS.Import.Repositories.Destination.DarwinCoreArchive.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Import.Harvesters.Observations
 {

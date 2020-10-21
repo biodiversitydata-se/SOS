@@ -10,14 +10,13 @@ using Moq;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Kul;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Helpers.Interfaces;
-using SOS.Process.Managers.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Processors.Kul;
-using SOS.Process.Repositories.Source.Interfaces;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors

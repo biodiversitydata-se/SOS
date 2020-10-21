@@ -9,16 +9,19 @@ using Microsoft.Extensions.Logging;
 using SOS.Export.IO.DwcArchive.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Process.Helpers.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
 using SOS.Process.Processors.ClamPortal.Interfaces;
@@ -30,7 +33,6 @@ using SOS.Process.Processors.Nors.Interfaces;
 using SOS.Process.Processors.Sers.Interfaces;
 using SOS.Process.Processors.Shark.Interfaces;
 using SOS.Process.Processors.VirtualHerbarium.Interfaces;
-using SOS.Process.Repositories.Source.Interfaces;
 
 namespace SOS.Process.Jobs
 {
@@ -46,7 +48,7 @@ namespace SOS.Process.Jobs
         private readonly IValidationManager _validationManager;
         private readonly ILogger<ProcessJob> _logger;
         private readonly IProcessedObservationRepository _processedObservationRepository;
-        private readonly IProcessedTaxonRepository _processedTaxonRepository;
+        private readonly ITaxonRepository _processedTaxonRepository;
         private readonly Dictionary<DataProviderType, IProcessor> _processorByType;
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly string _exportContainer;
@@ -362,7 +364,7 @@ namespace SOS.Process.Jobs
             ISharkObservationProcessor sharkObservationProcessor,
             IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor,
             IDwcaObservationProcessor dwcaObservationProcessor,
-            IProcessedTaxonRepository processedTaxonRepository,
+            ITaxonRepository processedTaxonRepository,
             IDataProviderManager dataProviderManager,
             IInstanceManager instanceManager,
             IValidationManager validationManager,

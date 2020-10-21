@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Lib.Database.Interfaces;
-using SOS.Process.Repositories.Source;
+using SOS.Lib.Repositories.Verbatim;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Repositories.Source

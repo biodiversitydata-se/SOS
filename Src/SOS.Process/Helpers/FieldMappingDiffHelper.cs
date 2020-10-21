@@ -11,17 +11,17 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Process.Helpers.Interfaces;
 
 namespace SOS.Process.Helpers
 {
     public class FieldMappingDiffHelper : IFieldMappingDiffHelper
     {
-        private readonly IProcessedFieldMappingRepository _processedFieldMappingRepository;
+        private readonly IFieldMappingRepository _processedFieldMappingRepository;
 
         public FieldMappingDiffHelper(
-            IProcessedFieldMappingRepository processedFieldMappingRepository)
+            IFieldMappingRepository processedFieldMappingRepository)
         {
             _processedFieldMappingRepository = processedFieldMappingRepository ??
                                                throw new ArgumentNullException(nameof(processedFieldMappingRepository));
