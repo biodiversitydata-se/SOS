@@ -26,6 +26,15 @@ namespace SOS.Export.IO.DwcArchive
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <summary>
+        /// Writes Emof rows to file.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="stream"></param>
+        /// <param name="fieldDescriptions"></param>
+        /// <param name="processedObservationRepository"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>True if any records is written to the file; otherwise false.</returns>
         public async Task<bool> CreateCsvFileAsync(
             FilterBase filter,
             Stream stream,
@@ -36,6 +45,9 @@ namespace SOS.Export.IO.DwcArchive
             try
             {
                 var scrollResult = await processedObservationRepository.TypedScrollProjectParametersAsync(filter, null);
+                var hasRecords = scrollResult?.Records?.Any() ?? false;
+                if (!hasRecords) return false;
+
                 await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
                 var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
 

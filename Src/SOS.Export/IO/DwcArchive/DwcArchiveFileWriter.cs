@@ -96,10 +96,12 @@ namespace SOS.Export.IO.DwcArchive
                 _fileService.CreateFolder(temporaryZipExportFolderPath);
                 var occurrenceCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "occurrence.csv");
                 var emofCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "extendedMeasurementOrFact.csv");
-                var multimediaFilePath = Path.Combine(temporaryZipExportFolderPath, "multimedia.csv");
+                var multimediaCsvFilePath = Path.Combine(temporaryZipExportFolderPath, "multimedia.csv");
                 var metaXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "meta.xml");
                 var emlXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "eml.xml");
                 var processInfoXmlFilePath = Path.Combine(temporaryZipExportFolderPath, "processinfo.xml");
+                bool emofFileCreated = false;
+                bool multimediaFileCreated = false;
 
                 // Create Occurrence.csv
                 using (var fileStream = File.Create(occurrenceCsvFilePath, 128 * 1024))
@@ -115,7 +117,7 @@ namespace SOS.Export.IO.DwcArchive
                 // Create ExtendedMeasurementOrFact.csv
                 using (var fileStream = File.Create(emofCsvFilePath))
                 {
-                    await _extendedMeasurementOrFactCsvWriter.CreateCsvFileAsync(
+                    emofFileCreated = await _extendedMeasurementOrFactCsvWriter.CreateCsvFileAsync(
                         filter,
                         fileStream,
                         fieldDescriptions,
@@ -124,9 +126,9 @@ namespace SOS.Export.IO.DwcArchive
                 }
 
                 // Create multimedia.csv
-                using (var fileStream = File.Create(multimediaFilePath))
+                using (var fileStream = File.Create(multimediaCsvFilePath))
                 {
-                    await _simpleMultimediaCsvWriter.CreateCsvFileAsync(
+                    multimediaFileCreated = await _simpleMultimediaCsvWriter.CreateCsvFileAsync(
                         filter,
                         fileStream,
                         fieldDescriptions,
@@ -134,10 +136,17 @@ namespace SOS.Export.IO.DwcArchive
                         cancellationToken);
                 }
 
+                // Delete extension files if not used.
+                if (!emofFileCreated && File.Exists(emofCsvFilePath)) File.Delete(emofCsvFilePath);
+                if (!multimediaFileCreated && File.Exists(multimediaCsvFilePath)) File.Delete(multimediaCsvFilePath);
+
                 // Create meta.xml
                 using (var fileStream = File.Create(metaXmlFilePath))
                 {
-                    DwcArchiveMetaFileWriter.CreateMetaXmlFile(fileStream, fieldDescriptions.ToList());
+                    var dwcExtensions = new List<DwcaFilePart>();
+                    if (emofFileCreated) dwcExtensions.Add(DwcaFilePart.Emof);
+                    if (multimediaFileCreated) dwcExtensions.Add(DwcaFilePart.Multimedia);
+                    DwcArchiveMetaFileWriter.CreateMetaXmlFile(fileStream, fieldDescriptions.ToList(), dwcExtensions);
                 }
 
                 // Create eml.xml
@@ -285,60 +294,67 @@ namespace SOS.Export.IO.DwcArchive
             await using var compressedFileStream = new ZipOutputStream(stream, true) { EnableZip64 = Zip64Option.AsNecessary };
 
             // Create meta.xml
+            var dwcExtensions = new List<DwcaFilePart>();
+            
+            // Create occurrence.csv
+            var occurrenceFilePaths = GetFilePaths(dwcaFilePartsInfos, "occurrence*");
+            compressedFileStream.PutNextEntry("occurrence.csv");
+            await WriteOccurrenceHeaderRow(compressedFileStream);
+            foreach (var filePath in occurrenceFilePaths)
+            {
+                await using var readStream = File.OpenRead(filePath);
+                await readStream.CopyToAsync(compressedFileStream);
+            }
+            
+            // Create emof.csv
+            var emofFilePaths = GetFilePaths(dwcaFilePartsInfos, "emof*");
+            if (emofFilePaths.Any())
+            {
+                dwcExtensions.Add(DwcaFilePart.Emof);
+                compressedFileStream.PutNextEntry("extendedMeasurementOrFact.csv");
+                await WriteEmofHeaderRow(compressedFileStream);
+                foreach (var filePath in emofFilePaths)
+                {
+                    await using var readStream = File.OpenRead(filePath);
+                    await readStream.CopyToAsync(compressedFileStream);
+                }
+            }
+            
+            // Create multimedia.csv
+            var multimediaFilePaths = GetFilePaths(dwcaFilePartsInfos, "multimedia*");
+            if (multimediaFilePaths.Any())
+            {
+                dwcExtensions.Add(DwcaFilePart.Multimedia);
+                compressedFileStream.PutNextEntry("multimedia.csv");
+                await WriteMultimediaHeaderRow(compressedFileStream);
+                foreach (var filePath in multimediaFilePaths)
+                {
+                    await using var readStream = File.OpenRead(filePath);
+                    await readStream.CopyToAsync(compressedFileStream);
+                }
+            }
+
+            // Create meta.xml
             compressedFileStream.PutNextEntry("meta.xml");
-            DwcArchiveMetaFileWriter.CreateMetaXmlFile(compressedFileStream, fieldDescriptions.ToList());
+            DwcArchiveMetaFileWriter.CreateMetaXmlFile(compressedFileStream, fieldDescriptions.ToList(), dwcExtensions);
 
             // Create eml.xml
             compressedFileStream.PutNextEntry("eml.xml");
             await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(compressedFileStream, dataProvider);
+        }
 
-            // Create occurrence.csv
-            compressedFileStream.PutNextEntry("occurrence.csv");
-            await WriteOccurrenceHeaderRow(compressedFileStream);
+        private ICollection<string> GetFilePaths(IEnumerable<DwcaFilePartsInfo> dwcaFilePartsInfos, string searchPattern)
+        {
+            var filePaths = new List<string>();
             foreach (var dwcaFilePartsInfo in dwcaFilePartsInfos)
             {
-                foreach (var occurrenceFile in Directory.EnumerateFiles(
+                filePaths.AddRange(Directory.EnumerateFiles(
                     dwcaFilePartsInfo.ExportFolder,
-                    "occurrence*",
-                    SearchOption.TopDirectoryOnly)
-                )
-                {
-                    await using var readStream = File.OpenRead(occurrenceFile);
-                    await readStream.CopyToAsync(compressedFileStream);
-                }
+                    searchPattern,
+                    SearchOption.TopDirectoryOnly));
             }
 
-            // Create emof.csv
-            compressedFileStream.PutNextEntry("extendedMeasurementOrFact.csv");
-            await WriteEmofHeaderRow(compressedFileStream);
-            foreach (var dwcaFilePartsInfo in dwcaFilePartsInfos)
-            {
-                foreach (var emofFile in Directory.EnumerateFiles(
-                    dwcaFilePartsInfo.ExportFolder,
-                    "emof*",
-                    SearchOption.TopDirectoryOnly)
-                )
-                {
-                    await using var readStream = File.OpenRead(emofFile);
-                    await readStream.CopyToAsync(compressedFileStream);
-                }
-            }
-
-            // Create multimedia.csv
-            compressedFileStream.PutNextEntry("multimedia.csv");
-            await WriteMultimediaHeaderRow(compressedFileStream);
-            foreach (var dwcaFilePartsInfo in dwcaFilePartsInfos)
-            {
-                foreach (var multimediaFile in Directory.EnumerateFiles(
-                    dwcaFilePartsInfo.ExportFolder,
-                    "multimedia*",
-                    SearchOption.TopDirectoryOnly)
-                )
-                {
-                    await using var readStream = File.OpenRead(multimediaFile);
-                    await readStream.CopyToAsync(compressedFileStream);
-                }
-            }
+            return filePaths;
         }
 
         private async Task WriteOccurrenceHeaderRow(ZipOutputStream compressedFileStream)

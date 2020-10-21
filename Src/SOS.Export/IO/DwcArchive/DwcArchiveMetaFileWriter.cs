@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using SOS.Export.Enums;
 using SOS.Export.Models;
 using SOS.Lib.Enums;
 
@@ -21,7 +22,8 @@ namespace SOS.Export.IO.DwcArchive
         /// </summary>
         /// <param name="stream">The stream to write the meta file to.</param>
         /// <param name="fieldDescriptions">The field descriptions.</param>
-        public static void CreateMetaXmlFile(Stream stream, IList<FieldDescription> fieldDescriptions)
+        /// <param name="dwcExtensions">The DwC-A extensions that is used.</param>
+        public static void CreateMetaXmlFile(Stream stream, IList<FieldDescription> fieldDescriptions, ICollection<DwcaFilePart> dwcExtensions)
         {
             if (fieldDescriptions == null || fieldDescriptions.Count == 0)
             {
@@ -38,8 +40,8 @@ namespace SOS.Export.IO.DwcArchive
             CreateHeaderNode(doc);
             var archiveNode = CreateArchiveNode(doc);
             CreateCoreNode(fieldDescriptions, doc, archiveNode);
-            AppendExtension(doc, archiveNode, ExtensionMetadata.EmofFactory.Create());
-            AppendExtension(doc, archiveNode, ExtensionMetadata.SimpleMultimediaFactory.Create());
+            if (dwcExtensions.Contains(DwcaFilePart.Emof)) AppendExtension(doc, archiveNode, ExtensionMetadata.EmofFactory.Create());
+            if (dwcExtensions.Contains(DwcaFilePart.Multimedia)) AppendExtension(doc, archiveNode, ExtensionMetadata.SimpleMultimediaFactory.Create());
             doc.Save(stream);
         }
 
