@@ -9,7 +9,7 @@ namespace SOS.Lib.Repositories.Verbatim
     /// <summary>
     ///     Clam verbatim repository
     /// </summary>
-    public class ClamObservationVerbatimRepository : VerbatimRepositoryBase<ClamObservationVerbatim, ObjectId>,
+    public class ClamObservationVerbatimRepository : RepositoryBase<ClamObservationVerbatim, ObjectId>,
         IClamObservationVerbatimRepository
     {
         /// <summary>

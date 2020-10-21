@@ -8,7 +8,7 @@ namespace SOS.Lib.Repositories.Verbatim
     /// <summary>
     ///     Species data service
     /// </summary>
-    public class ArtportalenVerbatimRepository : VerbatimRepositoryBase<ArtportalenObservationVerbatim, int>,
+    public class ArtportalenVerbatimRepository : RepositoryBase<ArtportalenObservationVerbatim, int>,
         IArtportalenVerbatimRepository
     {
         /// <summary>

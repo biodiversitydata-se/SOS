@@ -7,12 +7,13 @@ using MongoDB.Driver;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.Lib.Repositories.Interfaces;
 
 namespace SOS.Lib.Repositories.Verbatim.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IDarwinCoreArchiveVerbatimRepository : IVerbatimRepositoryBase<DwcObservationVerbatim, ObjectId>
+    public interface IDarwinCoreArchiveVerbatimRepository : IRepositoryBase<DwcObservationVerbatim, ObjectId>
     {
         Task<bool> AddCollectionAsync(IIdIdentifierTuple idIdentifierTuple);
         Task<bool> AddManyAsync(IEnumerable<DwcObservationVerbatim> items, IIdIdentifierTuple idIdentifierTuple);

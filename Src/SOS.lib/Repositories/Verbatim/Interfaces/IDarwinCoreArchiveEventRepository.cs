@@ -3,12 +3,13 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.Lib.Repositories.Interfaces;
 
 namespace SOS.Lib.Repositories.Verbatim.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IDarwinCoreArchiveEventRepository : IVerbatimRepositoryBase<DwcEvent, ObjectId>
+    public interface IDarwinCoreArchiveEventRepository : IRepositoryBase<DwcEvent, ObjectId>
     {
         Task<bool> DeleteCollectionAsync(IIdIdentifierTuple idIdentifierTuple);
         Task<bool> AddCollectionAsync(IIdIdentifierTuple idIdentifierTuple);

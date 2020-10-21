@@ -5,12 +5,13 @@ using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Interfaces;
 
 namespace SOS.Lib.Repositories.Resource.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IAreaRepository : IResourceRepositoryBase<Models.Shared.Area, int>
+    public interface IAreaRepository : IRepositoryBase<Area, int>
     {
         /// <summary>
         ///     Create indexes

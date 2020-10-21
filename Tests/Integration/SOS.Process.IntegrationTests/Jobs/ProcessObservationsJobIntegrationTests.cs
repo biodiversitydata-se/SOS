@@ -34,7 +34,6 @@ using SOS.Process.Processors.Sers;
 using SOS.Process.Processors.Shark;
 using SOS.Process.Processors.VirtualHerbarium;
 using Xunit;
-using DataProviderRepository = SOS.Lib.Repositories.Processed.DataProviderRepository;
 
 namespace SOS.Process.IntegrationTests.Jobs
 {
@@ -71,7 +70,7 @@ namespace SOS.Process.IntegrationTests.Jobs
                 new FieldMappingRepository(processClient, new NullLogger<FieldMappingRepository>()));
            
             var taxonProcessedRepository =
-                new ProcessedTaxonRepository(processClient, new NullLogger<ProcessedTaxonRepository>());
+                new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
             var invalidObservationRepository =
                 new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var validationManager = new ValidationManager(invalidObservationRepository, new NullLogger<ValidationManager>());

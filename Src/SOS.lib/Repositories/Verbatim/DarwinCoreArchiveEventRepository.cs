@@ -13,7 +13,7 @@ namespace SOS.Lib.Repositories.Verbatim
     /// <summary>
     ///     DwC-A event repository
     /// </summary>
-    public class DarwinCoreArchiveEventRepository : VerbatimRepositoryBase<DwcEvent, ObjectId>,
+    public class DarwinCoreArchiveEventRepository : RepositoryBase<DwcEvent, ObjectId>,
         IDarwinCoreArchiveEventRepository
     {
         /// <summary>

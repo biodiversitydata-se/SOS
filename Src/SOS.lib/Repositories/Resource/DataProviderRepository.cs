@@ -9,7 +9,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Lib.Repositories.Resource
 {
-    public class DataProviderRepository : ResourceRepositoryBase<DataProvider, int>, IDataProviderRepository
+    public class DataProviderRepository : RepositoryBase<DataProvider, int>, IDataProviderRepository
     {
         /// <summary>
         ///     Constructor
@@ -18,7 +18,7 @@ namespace SOS.Lib.Repositories.Resource
         /// <param name="logger"></param>
         public DataProviderRepository(
             IProcessClient processClient,
-            ILogger<DataProviderRepository> logger) : base(processClient, false, logger)
+            ILogger<DataProviderRepository> logger) : base(processClient, logger)
         {
         }
 

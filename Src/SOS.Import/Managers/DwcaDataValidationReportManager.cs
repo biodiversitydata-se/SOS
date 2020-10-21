@@ -30,7 +30,7 @@ namespace SOS.Import.Managers
         private readonly IValidationManager _validationManager;
         private readonly IFieldMappingRepository _processedFieldMappingRepository;
         private readonly IAreaHelper _areaHelper;
-        private readonly IProcessedTaxonRepository _processedTaxonRepository;
+        private readonly ITaxonRepository _processedTaxonRepository;
         private readonly ILogger<DwcaDataValidationReportManager> _logger;
         private Dictionary<int, Taxon> _taxonById;
         private IDictionary<FieldMappingFieldId, IDictionary<object, int>> _dwcaFieldMappings;
@@ -41,7 +41,7 @@ namespace SOS.Import.Managers
             IValidationManager validationManager,
             IAreaHelper areaHelper,
             IFieldMappingResolverHelper fieldMappingResolverHelper,
-            IProcessedTaxonRepository processedTaxonRepository,
+            ITaxonRepository processedTaxonRepository,
             ILogger<DwcaDataValidationReportManager> logger)
         {
             _fieldMappingResolverHelper = fieldMappingResolverHelper ?? throw new ArgumentNullException(nameof(fieldMappingResolverHelper));

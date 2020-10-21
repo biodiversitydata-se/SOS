@@ -5,7 +5,7 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Lib.Repositories.Verbatim
 {
-    public class HarvestInfoRepository : VerbatimRepositoryBase<HarvestInfo, string>, IHarvestInfoRepository
+    public class HarvestInfoRepository : RepositoryBase<HarvestInfo, string>, IHarvestInfoRepository
     {
         /// <summary>
         ///     Constructor

@@ -162,7 +162,7 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
             return taxa.ToDictionary(taxon => taxon.Id, taxon => taxon);
         }
 
-        private ProcessedTaxonRepository CreateProcessedTaxonRepository()
+        private TaxonRepository CreateProcessedTaxonRepository()
         {
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
@@ -170,9 +170,9 @@ namespace SOS.Process.IntegrationTests.Processors.Artportalen
                 processDbConfiguration.DatabaseName,
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
-            return new ProcessedTaxonRepository(
+            return new TaxonRepository(
                 processClient,
-                new NullLogger<ProcessedTaxonRepository>());
+                new NullLogger<TaxonRepository>());
         }
     }
 }

@@ -20,6 +20,7 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Process.Managers.Interfaces;
 using SOS.Process.Processors.Artportalen.Interfaces;
@@ -47,7 +48,7 @@ namespace SOS.Process.Jobs
         private readonly IValidationManager _validationManager;
         private readonly ILogger<ProcessJob> _logger;
         private readonly IProcessedObservationRepository _processedObservationRepository;
-        private readonly IProcessedTaxonRepository _processedTaxonRepository;
+        private readonly ITaxonRepository _processedTaxonRepository;
         private readonly Dictionary<DataProviderType, IProcessor> _processorByType;
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly string _exportContainer;
@@ -363,7 +364,7 @@ namespace SOS.Process.Jobs
             ISharkObservationProcessor sharkObservationProcessor,
             IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor,
             IDwcaObservationProcessor dwcaObservationProcessor,
-            IProcessedTaxonRepository processedTaxonRepository,
+            ITaxonRepository processedTaxonRepository,
             IDataProviderManager dataProviderManager,
             IInstanceManager instanceManager,
             IValidationManager validationManager,

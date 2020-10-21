@@ -45,9 +45,6 @@ using SOS.Process.Processors.VirtualHerbarium;
 using SOS.Process.Processors.VirtualHerbarium.Interfaces;
 using SOS.Process.Services;
 using SOS.Process.Services.Interfaces;
-using DataProviderRepository = SOS.Lib.Repositories.Processed.DataProviderRepository;
-using IDataProviderRepository = SOS.Lib.Repositories.Processed.Interfaces.IDataProviderRepository;
-
 
 namespace SOS.Process.IoC.Modules
 {
@@ -114,7 +111,7 @@ namespace SOS.Process.IoC.Modules
             builder.RegisterType<InvalidObservationRepository>().As<IInvalidObservationRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<ProcessInfoRepository>().As<IProcessInfoRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<ProcessedTaxonRepository>().As<IProcessedTaxonRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonRepository>().As<ITaxonRepository>().InstancePerLifetimeScope();
             builder.RegisterType<FieldMappingRepository>().As<IFieldMappingRepository>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<AreaRepository>().As<IAreaRepository>().InstancePerLifetimeScope();

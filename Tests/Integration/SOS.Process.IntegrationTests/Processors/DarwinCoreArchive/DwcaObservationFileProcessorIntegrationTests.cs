@@ -130,7 +130,7 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
             return taxa.ToDictionary(taxon => taxon.Id, taxon => taxon);
         }
 
-        private ProcessedTaxonRepository CreateProcessedTaxonRepository()
+        private TaxonRepository CreateProcessedTaxonRepository()
         {
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
@@ -139,9 +139,9 @@ namespace SOS.Process.IntegrationTests.Processors.DarwinCoreArchive
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
 
-            return new ProcessedTaxonRepository(
+            return new TaxonRepository(
                 processClient,
-                new NullLogger<ProcessedTaxonRepository>());
+                new NullLogger<TaxonRepository>());
         }
 
         [Fact]

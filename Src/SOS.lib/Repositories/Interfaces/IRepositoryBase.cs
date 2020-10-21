@@ -4,26 +4,15 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Lib.Repositories.Verbatim.Interfaces
+namespace SOS.Lib.Repositories.Interfaces
 {
     /// <summary>
+    /// Repository base
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TKey"></typeparam>
-    public interface IVerbatimRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IEntity<TKey>
+    public interface IRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IEntity<TKey>
     {
-        /// <summary>
-        ///     Add collection if not exists
-        /// </summary>
-        /// <remarks>Uses typeof(TEntity).Name as MongoDb collection name.</remarks>
-        Task<bool> AddCollectionAsync();
-
-        /// <summary>
-        ///     Add collection if not exists
-        /// </summary>
-        /// <returns></returns>
-        Task<bool> AddCollectionAsync(string collectionName);
-
         /// <summary>
         ///     Add entity.
         /// </summary>
@@ -41,6 +30,17 @@ namespace SOS.Lib.Repositories.Verbatim.Interfaces
         Task<bool> AddAsync(TEntity item, IMongoCollection<TEntity> mongoCollection);
 
         /// <summary>
+        ///     Add collection if not exists
+        /// </summary>
+        /// <remarks>Uses typeof(TEntity).Name as MongoDb collection name.</remarks>
+        Task<bool> AddCollectionAsync();
+
+        ///     Add collection if not exists
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> AddCollectionAsync(string collectionName);
+
+        /// <summary>
         ///     Add many items
         /// </summary>
         /// <param name="items"></param>
@@ -55,6 +55,7 @@ namespace SOS.Lib.Repositories.Verbatim.Interfaces
         /// <param name="mongoCollection"></param>
         /// <returns></returns>
         Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection);
+
 
         /// <summary>
         ///     Add or update existing entity
@@ -71,6 +72,16 @@ namespace SOS.Lib.Repositories.Verbatim.Interfaces
         /// <param name="mongoCollection"></param>
         /// <returns></returns>
         Task<bool> AddOrUpdateAsync(TEntity item, IMongoCollection<TEntity> mongoCollection);
+
+        /// <summary>
+        /// Batch size when read
+        /// </summary>
+        int BatchSizeRead { get; set; }
+
+        /// <summary>
+        /// Batch size when write
+        /// </summary>
+        int BatchSizeWrite { get; set; }
 
         /// <summary>
         ///     Checks if the collection exists.

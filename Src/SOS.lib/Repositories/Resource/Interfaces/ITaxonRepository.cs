@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Repositories.Interfaces;
 
-namespace SOS.Lib.Repositories.Processed.Interfaces
+namespace SOS.Lib.Repositories.Resource.Interfaces
 {
     /// <summary>
     ///     Repository for retrieving processd taxa.
     /// </summary>
-    public interface IProcessedTaxonRepository : IMongoDbProcessedRepositoryBase<Taxon, int>
+    public interface ITaxonRepository : IRepositoryBase<Taxon, int>
     {
         /// <summary>
         ///     Get chunk of ProcessedBasicTaxon objects from repository.

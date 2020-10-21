@@ -4,24 +4,24 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
-namespace SOS.Lib.Repositories.Processed
+namespace SOS.Lib.Repositories.Resource
 {
     /// <summary>
     ///     Repository for retrieving processd taxa.
     /// </summary>
-    public class ProcessedTaxonRepository : MongoDbProcessedRepositoryBase<Taxon, int>, IProcessedTaxonRepository
+    public class TaxonRepository : RepositoryBase<Taxon, int>, ITaxonRepository
     {
         /// <summary>
         ///     Constructor.
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
-        public ProcessedTaxonRepository(
+        public TaxonRepository(
             IProcessClient client,
-            ILogger<ProcessedTaxonRepository> logger)
-            : base(client, false, logger)
+            ILogger<TaxonRepository> logger)
+            : base(client, logger)
         {
         }
 

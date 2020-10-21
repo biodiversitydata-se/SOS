@@ -42,8 +42,6 @@ using SOS.Observations.Api.Services.Interfaces;
 using SOS.Observations.Api.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using DataProviderRepository = SOS.Lib.Repositories.Processed.DataProviderRepository;
-using IDataProviderRepository = SOS.Lib.Repositories.Processed.Interfaces.IDataProviderRepository;
 using IProcessedObservationRepository = SOS.Observations.Api.Repositories.Interfaces.IProcessedObservationRepository;
 using ProcessedObservationRepository = SOS.Observations.Api.Repositories.ProcessedObservationRepository;
 
@@ -257,7 +255,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IDataProviderRepository, DataProviderRepository>();
             services.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddSingleton<IProcessInfoRepository, ProcessInfoRepository>();
-            services.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();
+            services.AddSingleton<ITaxonRepository, TaxonRepository>();
             services.AddSingleton<IFieldMappingRepository, FieldMappingRepository>();
 
             // Add services

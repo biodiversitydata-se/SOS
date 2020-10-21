@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Export.Managers;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Managers
@@ -19,11 +19,11 @@ namespace SOS.Export.UnitTests.Managers
         /// </summary>
         public TaxonManagerTests()
         {
-            _processedTaxonRepositoryMock = new Mock<IProcessedTaxonRepository>();
+            _processedTaxonRepositoryMock = new Mock<ITaxonRepository>();
             _loggerMock = new Mock<ILogger<TaxonManager>>();
         }
 
-        private readonly Mock<IProcessedTaxonRepository> _processedTaxonRepositoryMock;
+        private readonly Mock<ITaxonRepository> _processedTaxonRepositoryMock;
         private readonly Mock<ILogger<TaxonManager>> _loggerMock;
 
         /// <summary>

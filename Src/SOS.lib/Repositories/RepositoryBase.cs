@@ -8,23 +8,81 @@ using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Lib.Repositories.Interfaces;
 
-namespace SOS.Lib.Repositories.Verbatim
+namespace SOS.Lib.Repositories
 {
+
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public class VerbatimRepositoryBase<TEntity, TKey> : IVerbatimRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
+    public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
     {
-        private readonly int _batchSize;
-
         private readonly string _collectionName;
 
         /// <summary>
         ///     Disposed
         /// </summary>
         private bool _disposed;
+
+        /// <summary>
+        /// </summary>
+        /// <param name="batch"></param>
+        /// <returns></returns>
+        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
+        {
+            return await AddBatchAsync(batch, MongoCollection);
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="batch"></param>
+        /// <param name="mongoCollection"></param>
+        /// <returns></returns>
+        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch, IMongoCollection<TEntity> mongoCollection)
+        {
+            var items = batch?.ToArray();
+            try
+            {
+                await mongoCollection.InsertManyAsync(batch,
+                    new InsertManyOptions { IsOrdered = false, BypassDocumentValidation = true });
+                return true;
+            }
+            catch (MongoCommandException e)
+            {
+                switch (e.Code)
+                {
+                    case 16500: //Request Rate too Large
+                        // If attempt failed, try split items in half and try again
+                        var batchCount = batch.Count() / 2;
+
+                        // If we are down to less than 10 items something must be wrong
+                        if (batchCount > 5)
+                        {
+                            var addTasks = new List<Task<bool>>
+                            {
+                                AddBatchAsync(batch.Take(batchCount)),
+                                AddBatchAsync(batch.Skip(batchCount))
+                            };
+
+                            // Run all tasks async
+                            await Task.WhenAll(addTasks);
+                            return addTasks.All(t => t.Result);
+                        }
+
+                        break;
+                }
+
+                Logger.LogError(e.ToString());
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
+        }
 
         /// <summary>
         /// Name of collection
@@ -41,25 +99,49 @@ namespace SOS.Lib.Repositories.Verbatim
         /// <summary>
         ///     Logger
         /// </summary>
-        protected readonly ILogger<VerbatimRepositoryBase<TEntity, TKey>> Logger;
+        protected readonly ILogger<RepositoryBase<TEntity, TKey>> Logger;
 
+        protected IMongoCollection<TEntity> GetMongoCollection(string collectionName)
+        {
+            return Database.GetCollection<TEntity>(collectionName)
+                .WithWriteConcern(new WriteConcern(1, journal: true));
+        }
+
+        /// <summary>
+        ///     Dispose
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+            }
+
+            _disposed = true;
+        }
 
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="client"></param>
         /// <param name="logger"></param>
-        protected VerbatimRepositoryBase(
-            IVerbatimClient client,
-            ILogger<VerbatimRepositoryBase<TEntity, TKey>> logger
+        protected RepositoryBase(
+            IMongoDbClient client,
+            ILogger<RepositoryBase<TEntity, TKey>> logger
         )
         {
-            Client = client ?? throw new ArgumentNullException(nameof(client)); ;
+            Client = client ?? throw new ArgumentNullException(nameof(client));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             Database = client.GetDatabase();
 
-            _batchSize = client.WriteBatchSize;
+            BatchSizeRead = client.ReadBatchSize;
+            BatchSizeWrite = client.WriteBatchSize;
 
             // Clean name from non alfa numeric chats
             _collectionName = typeof(TEntity).Name.UntilNonAlfanumeric();
@@ -99,55 +181,6 @@ namespace SOS.Lib.Repositories.Verbatim
         }
 
         /// <inheritdoc />
-        public async Task<bool> AddManyAsync(IEnumerable<TEntity> items)
-        {
-            return await AddManyAsync(items, MongoCollection);
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection)
-        {
-            var entities = items?.ToArray();
-            if (!entities?.Any() ?? true)
-            {
-                return false;
-            }
-
-            var success = true;
-            var count = 0;
-            var batch = entities.Skip(0).Take(_batchSize)?.ToArray();
-
-            while (batch?.Any() ?? false)
-            {
-                success = success && await AddBatchAsync(batch, mongoCollection);
-                count++;
-                batch = entities.Skip(_batchSize * count).Take(_batchSize)?.ToArray();
-            }
-
-            return success;
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> AddOrUpdateAsync(TEntity item)
-        {
-            return await AddOrUpdateAsync(item, MongoCollection);
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> AddOrUpdateAsync(TEntity item, IMongoCollection<TEntity> mongoCollection)
-        {
-            var filter = Builders<TEntity>.Filter.Eq("_id", item.Id);
-
-            var entity = await mongoCollection.Find(filter).FirstOrDefaultAsync();
-            if (entity == null)
-            {
-                return await AddAsync(item);
-            }
-
-            return await UpdateAsync(item.Id, item);
-        }
-
-        /// <inheritdoc />
         public async Task<bool> AddCollectionAsync()
         {
             return await AddCollectionAsync(CollectionName);
@@ -171,9 +204,65 @@ namespace SOS.Lib.Repositories.Verbatim
         }
 
         /// <inheritdoc />
+        public async Task<bool> AddManyAsync(IEnumerable<TEntity> items)
+        {
+            return await AddManyAsync(items, MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection)
+        {
+            var entities = items?.ToArray();
+            if (!entities?.Any() ?? true)
+            {
+                return false;
+            }
+
+            var success = true;
+            var count = 0;
+            var batch = entities.Skip(0).Take(BatchSizeWrite)?.ToArray();
+
+            while (batch?.Any() ?? false)
+            {
+                success = success && await AddBatchAsync(batch, mongoCollection);
+                count++;
+                batch = entities.Skip(BatchSizeWrite * count).Take(BatchSizeWrite)?.ToArray();
+            }
+
+            return success;
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> AddOrUpdateAsync(TEntity item)
+        {
+            
+            return await AddOrUpdateAsync(item, MongoCollection);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> AddOrUpdateAsync(TEntity item, IMongoCollection<TEntity> mongoCollection)
+        {
+            var filter = Builders<TEntity>.Filter.Eq("_id", item.Id);
+
+            var entity = await mongoCollection.Find(filter).FirstOrDefaultAsync();
+            if (entity == null)
+            {
+                return await AddAsync(item);
+            }
+
+            return await UpdateAsync(item.Id, item);
+        }
+
+        /// <inheritdoc />
+        public int BatchSizeRead { get; set; }
+
+        /// <inheritdoc />
+        public int BatchSizeWrite { get; set; }
+
+        /// <inheritdoc />
         public async Task<bool> CheckIfCollectionExistsAsync()
         {
-            return await CheckIfCollectionExistsAsync(_collectionName);
+            return await CheckIfCollectionExistsAsync(CollectionName);
         }
 
         /// <inheritdoc />
@@ -183,7 +272,7 @@ namespace SOS.Lib.Repositories.Verbatim
             var exists = await (await Database
                     .ListCollectionNamesAsync(new ListCollectionNamesOptions
                     {
-                        Filter = new BsonDocument("name", _collectionName)
+                        Filter = new BsonDocument("name", collectionName)
                     }))
                 .AnyAsync();
 
@@ -270,6 +359,13 @@ namespace SOS.Lib.Repositories.Verbatim
         }
 
         /// <inheritdoc />
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <inheritdoc />
         public async Task<TEntity> GetAsync(TKey id)
         {
             try
@@ -299,7 +395,7 @@ namespace SOS.Lib.Repositories.Verbatim
                     .Find(FilterDefinition<TEntity>.Empty)
                     //.Sort(Builders<TEntity>.Sort.Descending("id"))
                     .Skip(skip)
-                    .Limit(_batchSize)
+                    .Limit(BatchSizeRead)
                     .ToListAsync();
 
                 return res;
@@ -313,7 +409,7 @@ namespace SOS.Lib.Repositories.Verbatim
         }
 
         /// <inheritdoc />
-        public async Task<List<TEntity>> GetAllAsync()
+        public virtual async Task<List<TEntity>> GetAllAsync()
         {
             return await GetAllAsync(MongoCollection);
         }
@@ -329,15 +425,7 @@ namespace SOS.Lib.Repositories.Verbatim
         /// <inheritdoc />
         public async Task<IAsyncCursor<TEntity>> GetAllByCursorAsync()
         {
-            try
-            {
-                return await GetAllByCursorAsync(MongoCollection);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error when executing GetAllByCursorAsync()");
-                throw;
-            }
+            return await GetAllByCursorAsync(MongoCollection);
         }
 
         /// <inheritdoc />
@@ -432,7 +520,7 @@ namespace SOS.Lib.Repositories.Verbatim
                 var updateResult = await mongoCollection.ReplaceOneAsync(
                     x => x.Id.Equals(id),
                     entity,
-                    new ReplaceOptions {IsUpsert = true});
+                    new ReplaceOptions { IsUpsert = true });
                 return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
             }
             catch (Exception e)
@@ -442,96 +530,6 @@ namespace SOS.Lib.Repositories.Verbatim
             }
         }
 
-        /// <summary>
-        ///     Dispose
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected IMongoCollection<TEntity> GetMongoCollection(string collectionName)
-        {
-            return Database.GetCollection<TEntity>(collectionName)
-                .WithWriteConcern(new WriteConcern(1, journal: true));
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="batch"></param>
-        /// <returns></returns>
-        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch)
-        {
-            return await AddBatchAsync(batch, MongoCollection);
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="batch"></param>
-        /// <param name="mongoCollection"></param>
-        /// <returns></returns>
-        private async Task<bool> AddBatchAsync(IEnumerable<TEntity> batch, IMongoCollection<TEntity> mongoCollection)
-        {
-            var items = batch?.ToArray();
-            try
-            {
-                await mongoCollection.InsertManyAsync(batch,
-                    new InsertManyOptions {IsOrdered = false, BypassDocumentValidation = true});
-                return true;
-            }
-            catch (MongoCommandException e)
-            {
-                switch (e.Code)
-                {
-                    case 16500: //Request Rate too Large
-                        // If attempt failed, try split items in half and try again
-                        var batchCount = batch.Count() / 2;
-
-                        // If we are down to less than 10 items something must be wrong
-                        if (batchCount > 5)
-                        {
-                            var addTasks = new List<Task<bool>>
-                            {
-                                AddBatchAsync(batch.Take(batchCount)),
-                                AddBatchAsync(batch.Skip(batchCount))
-                            };
-
-                            // Run all tasks async
-                            await Task.WhenAll(addTasks);
-                            return addTasks.All(t => t.Result);
-                        }
-
-                        break;
-                }
-
-                Logger.LogError(e.ToString());
-
-                return false;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
-            }
-        }
-
-        /// <summary>
-        ///     Dispose
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-            }
-
-            _disposed = true;
-        }
+       
     }
 }

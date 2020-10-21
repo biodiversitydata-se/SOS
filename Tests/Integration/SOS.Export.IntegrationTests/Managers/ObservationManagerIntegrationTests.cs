@@ -35,8 +35,8 @@ namespace SOS.Export.IntegrationTests.Managers
                 processDbConfiguration.ReadBatchSize,
                 processDbConfiguration.WriteBatchSize);
             var taxonManager = new TaxonManager(
-                new ProcessedTaxonRepository(exportClient,
-                    new Mock<ILogger<ProcessedTaxonRepository>>().Object),
+                new TaxonRepository(exportClient,
+                    new Mock<ILogger<TaxonRepository>>().Object),
                 new Mock<ILogger<TaxonManager>>().Object);
             var processedFieldMappingRepository =
                 new FieldMappingRepository(exportClient, new NullLogger<FieldMappingRepository>());

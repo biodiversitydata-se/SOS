@@ -7,7 +7,7 @@ using SOS.Lib.Factories;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Managers
@@ -19,7 +19,7 @@ namespace SOS.Observations.Api.Managers
     {
         private static readonly object InitLock = new object();
         private readonly ILogger<TaxonManager> _logger;
-        private readonly IProcessedTaxonRepository _processedTaxonRepository;
+        private readonly ITaxonRepository _processedTaxonRepository;
         private TaxonTree<IBasicTaxon> _taxonTree;
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="processedTaxonRepository"></param>
         /// <param name="logger"></param>
         public TaxonManager(
-            IProcessedTaxonRepository processedTaxonRepository,
+            ITaxonRepository processedTaxonRepository,
             ILogger<TaxonManager> logger)
         {
             _processedTaxonRepository = processedTaxonRepository ??

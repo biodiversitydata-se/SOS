@@ -112,7 +112,7 @@ namespace SOS.Process.Processors.Artportalen
             {
                 await _semaphore.WaitAsync();
 
-                var batchEndId = batchStartId + _processedFieldMappingRepository.BatchSize - 1;
+                var batchEndId = batchStartId + _processedFieldMappingRepository.BatchSizeWrite - 1;
                 processBatchTasks.Add(ProcessBatchAsync(dataProvider, batchStartId, batchEndId, mode, observationFactory,
                     cancellationToken));
                 batchStartId = batchEndId + 1;

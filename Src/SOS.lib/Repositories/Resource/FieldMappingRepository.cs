@@ -9,7 +9,7 @@ namespace SOS.Lib.Repositories.Resource
     /// <summary>
     ///     Field mapping repository.
     /// </summary>
-    public class FieldMappingRepository : ResourceRepositoryBase<FieldMapping, FieldMappingFieldId>, IFieldMappingRepository
+    public class FieldMappingRepository : RepositoryBase<FieldMapping, FieldMappingFieldId>, IFieldMappingRepository
     {
         /// <summary>
         ///     Constructor
@@ -18,7 +18,7 @@ namespace SOS.Lib.Repositories.Resource
         /// <param name="logger"></param>
         public FieldMappingRepository(
             IProcessClient processClient,
-            ILogger<FieldMappingRepository> logger) : base(processClient, false, logger)
+            ILogger<FieldMappingRepository> logger) : base(processClient, logger)
         {
         }
     }

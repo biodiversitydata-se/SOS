@@ -160,9 +160,9 @@ namespace SOS.Import.IntegrationTests.Managers
                     processedFieldMappingRepository);
             var fieldMappingResolverHelper = new FieldMappingResolverHelper(processedFieldMappingRepository,
                 new FieldMappingConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
-            var processedTaxonRepository = new ProcessedTaxonRepository(
+            var processedTaxonRepository = new TaxonRepository(
                 processClient,
-                new NullLogger<ProcessedTaxonRepository>());
+                new NullLogger<TaxonRepository>());
             var validationReportManager = new DwcaDataValidationReportManager(
                 new DwcArchiveReader(new NullLogger<DwcArchiveReader>()),
                 processedFieldMappingRepository,

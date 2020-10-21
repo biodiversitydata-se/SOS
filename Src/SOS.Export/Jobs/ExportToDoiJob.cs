@@ -11,7 +11,7 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.DataCite;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Export.Jobs

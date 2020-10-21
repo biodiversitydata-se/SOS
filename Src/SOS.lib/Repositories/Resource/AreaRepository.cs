@@ -20,7 +20,7 @@ namespace SOS.Lib.Repositories.Resource
     /// <summary>
     ///     Area repository
     /// </summary>
-    public class AreaRepository : ResourceRepositoryBase<Area, int>, IAreaRepository
+    public class AreaRepository : RepositoryBase<Area, int>, IAreaRepository
     {
         private readonly GridFSBucket _gridFSBucket;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
@@ -32,7 +32,7 @@ namespace SOS.Lib.Repositories.Resource
         /// <param name="logger"></param>
         public AreaRepository(
             IProcessClient processClient,
-            ILogger<AreaRepository> logger) : base(processClient, false, logger)
+            ILogger<AreaRepository> logger) : base(processClient, logger)
         {
             _jsonSerializerOptions = new JsonSerializerOptions();
             _jsonSerializerOptions.Converters.Add(new GeoShapeConverter());

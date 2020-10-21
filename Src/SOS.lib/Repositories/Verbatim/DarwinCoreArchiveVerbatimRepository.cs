@@ -17,7 +17,7 @@ namespace SOS.Lib.Repositories.Verbatim
     /// <summary>
     ///     DwC-A observation repository
     /// </summary>
-    public class DarwinCoreArchiveVerbatimRepository : VerbatimRepositoryBase<DwcObservationVerbatim, ObjectId>,
+    public class DarwinCoreArchiveVerbatimRepository : RepositoryBase<DwcObservationVerbatim, ObjectId>,
         IDarwinCoreArchiveVerbatimRepository
     {
         /// <summary>

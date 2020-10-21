@@ -11,7 +11,7 @@ using SOS.Lib.Jobs.Import;
 using SOS.Lib.Json;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.DarwinCore;
-using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Import.Jobs
 {
@@ -33,7 +33,7 @@ namespace SOS.Import.Jobs
         /// <param name="processedTaxonRepository"></param>
         public CreateDwcaDataValidationReportJob(IDwcaDataValidationReportManager dwcaDataValidationReportManager,
             DwcaConfiguration dwcaConfiguration,
-            ILogger<CreateDwcaDataValidationReportJob> logger, IProcessedTaxonRepository processedTaxonRepository)
+            ILogger<CreateDwcaDataValidationReportJob> logger, ITaxonRepository processedTaxonRepository)
         {
             _dwcaDataValidationReportManager = dwcaDataValidationReportManager ?? throw new ArgumentNullException(nameof(dwcaDataValidationReportManager));
             _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));

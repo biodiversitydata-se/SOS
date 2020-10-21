@@ -7,7 +7,7 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 namespace SOS.Lib.Repositories.Verbatim
 {
     public class VirtualHerbariumObservationVerbatimRepository :
-        VerbatimRepositoryBase<VirtualHerbariumObservationVerbatim, ObjectId>,
+        RepositoryBase<VirtualHerbariumObservationVerbatim, ObjectId>,
         IVirtualHerbariumObservationVerbatimRepository
     {
         public VirtualHerbariumObservationVerbatimRepository(
