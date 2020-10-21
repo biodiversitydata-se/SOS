@@ -176,16 +176,58 @@ namespace SOS.Hangfire.JobServer
             sb.AppendLine("Import settings:");
             sb.AppendLine("================");
             sb.AppendLine(
-                $"[KULSettings].[StartHarvestYear]: {_importConfiguration.KulServiceConfiguration.StartHarvestYear}");
+                $"[ArtportalenSettings].[ConnectionStringBackup]: {_importConfiguration.ArtportalenConfiguration.ConnectionStringBackup}");
             sb.AppendLine(
-                $"[KULSettings].[MaxNumberOfSightingsHarvested]: {_importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested}");
+                $"[ArtportalenSettings].[ConnectionStringLive]: {_importConfiguration.ArtportalenConfiguration.ConnectionStringLive}");
             sb.AppendLine(
                 $"[ArtportalenSettings].[MaxNumberOfSightingsHarvested]: {_importConfiguration.ArtportalenConfiguration.MaxNumberOfSightingsHarvested}");
             sb.AppendLine(
                 $"[ArtportalenSettings].[ChunkSize]: {_importConfiguration.ArtportalenConfiguration.ChunkSize}");
-            sb.AppendLine(
-                $"[ArtportalenSettings].[ConnectionString]: {_importConfiguration.ArtportalenConfiguration.ConnectionStringBackup}");
+            sb.AppendLine("");
+
             sb.AppendLine($"[ClamService].[Address]: {_importConfiguration.ClamServiceConfiguration.BaseAddress}");
+            sb.AppendLine($"[ClamService].[MaxNumberOfSightingsHarvested]: {_importConfiguration.ClamServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            sb.AppendLine($"[ClamService].[MaxReturnedChangesInOnePage]: {_importConfiguration.ClamServiceConfiguration.MaxReturnedChangesInOnePage}");
+            sb.AppendLine("");
+
+            sb.AppendLine($"[FishDataServiceConfiguration].[BaseAddress]: {_importConfiguration.FishDataServiceConfiguration.BaseAddress}");
+            sb.AppendLine($"[FishDataServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.FishDataServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            sb.AppendLine($"[FishDataServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.FishDataServiceConfiguration.MaxReturnedChangesInOnePage}");
+            sb.AppendLine($"[FishDataServiceConfiguration].[StartHarvestYear]: {_importConfiguration.FishDataServiceConfiguration.StartHarvestYear}");
+            sb.AppendLine("");
+
+            sb.AppendLine($"[KulServiceConfiguration].[BaseAddress]: {_importConfiguration.KulServiceConfiguration.BaseAddress}");
+            sb.AppendLine($"[KulServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.KulServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            sb.AppendLine($"[KulServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.KulServiceConfiguration.MaxReturnedChangesInOnePage}");
+            sb.AppendLine($"[KulServiceConfiguration].[StartHarvestYear]: {_importConfiguration.KulServiceConfiguration.StartHarvestYear}");
+            sb.AppendLine("");
+
+            sb.AppendLine($"[MvmServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.MvmServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            sb.AppendLine($"[MvmServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.MvmServiceConfiguration.MaxReturnedChangesInOnePage}"); 
+            sb.AppendLine("");
+
+            sb.AppendLine($"[NorsServiceConfiguration].[BaseAddress]: {_importConfiguration.NorsServiceConfiguration.BaseAddress}");
+            sb.AppendLine($"[NorsServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.NorsServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            sb.AppendLine($"[NorsServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.NorsServiceConfiguration.MaxReturnedChangesInOnePage}");
+            sb.AppendLine($"[NorsServiceConfiguration].[StartHarvestYear]: {_importConfiguration.NorsServiceConfiguration.StartHarvestYear}");
+            sb.AppendLine("");
+
+            sb.AppendLine($"[SersServiceConfiguration].[BaseAddress]: {_importConfiguration.SersServiceConfiguration.BaseAddress}");
+            sb.AppendLine($"[SersServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.SersServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            sb.AppendLine($"[SersServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.SersServiceConfiguration.MaxReturnedChangesInOnePage}");
+            sb.AppendLine($"[SersServiceConfiguration].[StartHarvestYear]: {_importConfiguration.SersServiceConfiguration.StartHarvestYear}");
+            sb.AppendLine("");
+
+            sb.AppendLine($"[SharkServiceConfiguration].[BaseAddress]: {_importConfiguration.SharkServiceConfiguration.BaseAddress}");
+            sb.AppendLine($"[SharkServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.SharkServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            sb.AppendLine($"[SharkServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.SharkServiceConfiguration.MaxReturnedChangesInOnePage}");
+            sb.AppendLine("");
+
+            sb.AppendLine($"[VirtualHerbariumServiceConfiguration].[BaseAddress]: {_importConfiguration.VirtualHerbariumServiceConfiguration.BaseAddress}");
+            sb.AppendLine($"[VirtualHerbariumServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.VirtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested}");
+            sb.AppendLine($"[VirtualHerbariumServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.VirtualHerbariumServiceConfiguration.MaxReturnedChangesInOnePage}");
+            sb.AppendLine("");
+
             sb.AppendLine(
                 $"[MongoDb].[Servers]: {string.Join(", ", _verbatimDbConfiguration.Hosts.Select(x => x.Name))}");
             sb.AppendLine($"[MongoDb].[DatabaseName]: {_verbatimDbConfiguration.DatabaseName}");
@@ -214,6 +256,21 @@ namespace SOS.Hangfire.JobServer
                 $"[MongoDb].[Servers]: {string.Join(", ", _searchDbConfiguration.Hosts.Select(x => x))}");
             sb.AppendLine($"[MongoDb].[DatabaseName]: {_processDbConfiguration.DatabaseName}");
             sb.AppendLine($"[FileDestination].[Path]: {_exportConfiguration.FileDestination.Path}");
+            sb.AppendLine($"[DwcaFilesCreation].[FolderPath]: {_exportConfiguration.DwcaFilesCreationConfiguration.FolderPath}");
+            sb.AppendLine($"[DwcaFilesCreation].[IsEnabled]: {_exportConfiguration.DwcaFilesCreationConfiguration.IsEnabled}");
+            sb.AppendLine($"[ZendToConfiguration].[EmailSubject]: {_exportConfiguration.ZendToConfiguration.EmailSubject}");
+            sb.AppendLine($"[ZendToConfiguration].[SenderName]: {_exportConfiguration.ZendToConfiguration.SenderName}");
+            sb.AppendLine($"[ZendToConfiguration].[SenderOrganization]: {_exportConfiguration.ZendToConfiguration.SenderOrganization}");
+
+            sb.AppendLine("");
+
+            sb.AppendLine("DOI settings:");
+            sb.AppendLine("================");
+            sb.AppendLine(
+                $"[DataCite].[BaseAddress]: {_dataCiteServiceConfiguration.BaseAddress}");
+            sb.AppendLine(
+                $"[DataCite].[DoiPrefix]: {_dataCiteServiceConfiguration.DoiPrefix}");
+
 
             logger.LogInformation(sb.ToString());
         }
