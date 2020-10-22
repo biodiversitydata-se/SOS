@@ -126,7 +126,7 @@ namespace SOS.Import.Harvesters.Observations
             IJobCancellationToken cancellationToken)
         {
             // Make sure incremental mode is true to get max id from live instance
-            _processedObservationRepository.Mode = mode;
+            _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
             harvestFactory.IncrementalMode = true;
             _sightingRepository.Live = true;
 

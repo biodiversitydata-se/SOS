@@ -59,7 +59,6 @@ namespace SOS.Import.Jobs
                 var jobId = BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(
                     processProviders.Select(dataProvider => dataProvider.Identifier).ToList(),
                     mode,
-                    mode.Equals(JobRunModes.IncrementalInactiveInstance),
                     cancellationToken));
 
                 _logger.LogInformation($"Process Job ({mode}) with Id={ jobId } was enqueued");

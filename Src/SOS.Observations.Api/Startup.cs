@@ -245,17 +245,17 @@ namespace SOS.Observations.Api
             services.AddSingleton<IDataProviderManager, DataProviderManager>();
             services.AddSingleton<IBlobStorageManager, BlobStorageManager>();
             services.AddSingleton<IFieldMappingManager, FieldMappingManager>();
-            services.AddSingleton<IObservationManager, ObservationManager>();
-            services.AddSingleton<IProcessInfoManager, ProcessInfoManager>();
-            services.AddSingleton<ITaxonManager, TaxonManager>();
+            services.AddScoped<IObservationManager, ObservationManager>();
+            services.AddScoped<IProcessInfoManager, ProcessInfoManager>();
+            services.AddScoped<ITaxonManager, TaxonManager>();
             services.AddSingleton<IFilterManager, FilterManager>();
 
             // Add repositories
             services.AddSingleton<IAreaRepository, AreaRepository>();
             services.AddSingleton<IDataProviderRepository, DataProviderRepository>();
-            services.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
-            services.AddSingleton<IProcessInfoRepository, ProcessInfoRepository>();
-            services.AddSingleton<ITaxonRepository, TaxonRepository>();
+            services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
+            services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
+            services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddSingleton<IFieldMappingRepository, FieldMappingRepository>();
 
             // Add services

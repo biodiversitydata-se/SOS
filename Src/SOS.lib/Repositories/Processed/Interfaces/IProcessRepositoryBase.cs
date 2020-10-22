@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using SOS.Lib.Enums;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces
 {
@@ -13,11 +12,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Batch size
         /// </summary>
         int BatchSize { get; }
-
-        /// <summary>
-        /// Run mode
-        /// </summary>
-        JobRunModes Mode { get; set; }
 
         /// <summary>
         ///     Get 0 or 1 depending of witch instance to update
@@ -43,6 +37,11 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Current instance
         /// </summary>
         string CurrentInstanceName { get; }
+
+        /// <summary>
+        /// Run mode
+        /// </summary>
+        bool LiveMode { get; set; }
 
         /// <summary>
         /// Set active instance

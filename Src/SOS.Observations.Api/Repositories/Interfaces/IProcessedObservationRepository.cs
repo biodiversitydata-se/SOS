@@ -5,12 +5,13 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Observations.Api.Repositories.Interfaces
 {
     /// <summary>
     /// </summary>
-    public interface IProcessedObservationRepository : IBaseRepository<Observation, string>
+    public interface IProcessedObservationRepository : IProcessRepositoryBase<Observation>
     {
         /// <summary>
         /// Max number of aggregation buckets in ElasticSearch.
