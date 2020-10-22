@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using FluentAssertions;
+using SOS.Export.Enums;
 using SOS.Export.IO.DwcArchive;
 using SOS.Lib.Helpers;
 using Xunit;
@@ -28,7 +30,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            Action act = () => DwcArchiveMetaFileWriter.CreateMetaXmlFile(memoryStream, fieldDescriptions);
+            Action act = () => DwcArchiveMetaFileWriter.CreateMetaXmlFile(memoryStream, fieldDescriptions, new List<DwcaFilePart>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -52,7 +54,7 @@ namespace SOS.Export.UnitTests.IO.DwcArchive
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            DwcArchiveMetaFileWriter.CreateMetaXmlFile(memoryStream, fieldDescriptions.ToList());
+            DwcArchiveMetaFileWriter.CreateMetaXmlFile(memoryStream, fieldDescriptions.ToList(), new List<DwcaFilePart>());
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert - Read XML
