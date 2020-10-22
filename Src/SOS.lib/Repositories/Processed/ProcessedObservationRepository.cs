@@ -288,8 +288,9 @@ namespace SOS.Lib.Repositories.Processed
                 searchResponse = await _elasticClient.SearchAsync<Observation>(s => s
                     .Index(IndexName)
                     .Source(source => source
-                        .Includes(i => i
-                            .Field(f => f.Projects)))
+                        .Includes(fieldsDescriptor => fieldsDescriptor
+                            .Field(observation => observation.Occurrence.OccurrenceId)
+                            .Field(observation => observation.Projects)))
                     .Query(query => query
                         .Bool(boolQueryDescriptor => boolQueryDescriptor
                             .Filter(filter.ToTypedProjectParameterQuery())
@@ -310,6 +311,45 @@ namespace SOS.Lib.Repositories.Processed
             return new ScrollResult<ExtendedMeasurementOrFactRow>
             {
                 Records = searchResponse.Documents.ToExtendedMeasurementOrFactRows(),
+                ScrollId = searchResponse.ScrollId,
+                TotalCount = searchResponse.HitsMetadata.Total.Value
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<ScrollResult<SimpleMultimediaRow>> ScrollMultimediaAsync(
+            FilterBase filter,
+            string scrollId)
+        {
+            ISearchResponse<Observation> searchResponse;
+            if (string.IsNullOrEmpty(scrollId))
+            {
+                searchResponse = await _elasticClient.SearchAsync<Observation>(s => s
+                    .Index(IndexName)
+                    .Source(source => source
+                        .Includes(fieldsDescriptor => fieldsDescriptor
+                            .Field(observation => observation.Occurrence.OccurrenceId)
+                            .Field(observation => observation.Media)))
+                    .Query(query => query
+                        .Bool(boolQueryDescriptor => boolQueryDescriptor
+                            .Filter(filter.ToMultimediaQuery())
+                        )
+                    )
+                    .Scroll(ScrollTimeOut)
+                    .Size(BatchSize)
+                );
+            }
+            else
+            {
+                searchResponse = await _elasticClient
+                    .ScrollAsync<Observation>(ScrollTimeOut, scrollId);
+            }
+
+            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+
+            return new ScrollResult<SimpleMultimediaRow>
+            {
+                Records = searchResponse.Documents.ToSimpleMultimediaRows(),
                 ScrollId = searchResponse.ScrollId,
                 TotalCount = searchResponse.HitsMetadata.Total.Value
             };

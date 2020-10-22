@@ -101,7 +101,7 @@ namespace SOS.Lib.Extensions
                 occurrenceEmof = observation.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow());
             }
 
-            if (observation.Event.MeasurementOrFacts != null)
+            if (observation.Event?.MeasurementOrFacts != null)
             {
                 eventEmof = observation.Event.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(observation.Event.EventId));
             }
