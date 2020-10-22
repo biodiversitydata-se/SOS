@@ -14,6 +14,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Repositories.Processed;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Models.AggregatedResult;
 using SOS.Observations.Api.Repositories.Interfaces;
@@ -24,7 +25,7 @@ namespace SOS.Observations.Api.Repositories
     /// <summary>
     ///     Species data service
     /// </summary>
-    public class ProcessedObservationRepository : ProcessBaseRepository<Observation, string>,
+    public class ProcessedObservationRepository : ProcessRepositoryBase<Observation>,
         IProcessedObservationRepository
     {
         private const int ElasticSearchMaxRecords = 10000;
@@ -132,8 +133,8 @@ namespace SOS.Observations.Api.Repositories
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
 
             _indexName = string.IsNullOrEmpty(elasticConfiguration.IndexPrefix)
-                ? $"{CollectionName.ToLower()}"
-                : $"{elasticConfiguration.IndexPrefix.ToLower()}-{CollectionName.ToLower()}";
+                ? $"{CurrentInstanceName.ToLower()}"
+                : $"{elasticConfiguration.IndexPrefix.ToLower()}-{CurrentInstanceName.ToLower()}";
 
             _telemetry = telemetry ?? throw new ArgumentNullException(nameof(telemetry)); ;
         }

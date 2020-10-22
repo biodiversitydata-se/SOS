@@ -77,7 +77,6 @@ namespace SOS.Process.Jobs
             JobRunModes mode,
             bool cleanStart,
             bool copyFromActiveOnFail,
-            bool toggleInstanceOnSuccess,
             IJobCancellationToken cancellationToken)
         {
             try
@@ -87,7 +86,7 @@ namespace SOS.Process.Jobs
                 //-----------------
 
                 var processStart = DateTime.Now;
-                _processedObservationRepository.Mode = mode;
+                _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
 
                 //-----------------
                 // 2. Validation
@@ -287,7 +286,8 @@ namespace SOS.Process.Jobs
                         }
                     }
 
-                    if (toggleInstanceOnSuccess)
+                    // Toogle active instance if it's a full harvest and incremental update not should run after, or after the incremental update has run
+                    if (mode == JobRunModes.Full && !_runIncrementalAfterFull || mode == JobRunModes.IncrementalInactiveInstance)
                     {
                         _logger.LogInformation("Toggle instance");
                         await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
@@ -421,20 +421,9 @@ namespace SOS.Process.Jobs
 
 
         /// <inheritdoc />
-        [DisplayName("Process verbatim observations for passed providers")]
-        public async Task<bool> RunAsync(
-        List<string> dataProviderIdOrIdentifiers,
-        JobRunModes mode,
-        IJobCancellationToken cancellationToken)
-        {
-            return await RunAsync(dataProviderIdOrIdentifiers, mode, mode == JobRunModes.Full, cancellationToken);
-        }
-
-        /// <inheritdoc />
         public async Task<bool> RunAsync(
             List<string> dataProviderIdOrIdentifiers,
             JobRunModes mode,
-            bool toggleInstanceOnSuccess,
             IJobCancellationToken cancellationToken)
         {
             var allDataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
@@ -453,8 +442,7 @@ namespace SOS.Process.Jobs
                 mode,
                 mode == JobRunModes.Full,
                 false,
-                toggleInstanceOnSuccess,
-            cancellationToken);
+                cancellationToken);
         }
 
         /// <inheritdoc />
@@ -462,7 +450,6 @@ namespace SOS.Process.Jobs
         public async Task<bool> RunAsync(
             bool cleanStart,
             bool copyFromActiveOnFail,
-            bool toggleInstanceOnSuccess,
             IJobCancellationToken cancellationToken)
         {
             var dataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
@@ -472,7 +459,6 @@ namespace SOS.Process.Jobs
                 JobRunModes.Full,
                 true,
                 copyFromActiveOnFail,
-                toggleInstanceOnSuccess,
                 cancellationToken);
         }
     }

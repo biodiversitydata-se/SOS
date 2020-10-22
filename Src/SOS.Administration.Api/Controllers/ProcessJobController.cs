@@ -44,7 +44,6 @@ namespace SOS.Administration.Api.Controllers
         public IActionResult ScheduleDailyProcessJob(
             [FromQuery] bool cleanStart = true,
             [FromQuery] bool copyFromActiveOnFail = false,
-            [FromQuery] bool toggleInstanceOnSuccess = true,
             [FromQuery] int hour = 0,
             [FromQuery] int minute = 0)
         {
@@ -54,7 +53,6 @@ namespace SOS.Administration.Api.Controllers
                     nameof(IProcessJob), job => job.RunAsync(
                         cleanStart,
                         copyFromActiveOnFail,
-                        toggleInstanceOnSuccess,
                         JobCancellationToken.Null),
                     $"0 {minute} {hour} * * ?", TimeZoneInfo.Local);
 
@@ -74,8 +72,7 @@ namespace SOS.Administration.Api.Controllers
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> RunProcessJob(
             [FromQuery] bool cleanStart = true,
-            [FromQuery] bool copyFromActiveOnFail = false,
-            [FromQuery] bool toggleInstanceOnSuccess = true)
+            [FromQuery] bool copyFromActiveOnFail = false)
         {
             try
             {
@@ -87,7 +84,7 @@ namespace SOS.Administration.Api.Controllers
                 }
 
                 BackgroundJob.Enqueue<IProcessJob>(job => job.RunAsync(cleanStart, copyFromActiveOnFail,
-                    toggleInstanceOnSuccess, JobCancellationToken.Null));
+                    JobCancellationToken.Null));
                 return new OkObjectResult(
                     $"Process job was enqueued to Hangfire with the following data providers:{Environment.NewLine}{string.Join(Environment.NewLine, dataProvidersToProcess.Select(dataProvider => " -" + dataProvider))}.");
             }

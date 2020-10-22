@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Enums;
+
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -140,6 +140,9 @@ namespace SOS.Lib.Repositories.Processed
             BatchSize = _client.WriteBatchSize;
             // Init config
             InitializeConfiguration();
+
+            // Default use live instance
+            LiveMode = true;
         }
 
         /// <inheritdoc />
@@ -155,9 +158,6 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public JobRunModes Mode { get; set; }
-
-        /// <inheritdoc />
         public byte ActiveInstance => GetConfiguration()?.ActiveInstance ?? 1;
 
         /// <inheritdoc />
@@ -170,7 +170,10 @@ namespace SOS.Lib.Repositories.Processed
         public string InactiveInstanceName => GetInstanceName(InActiveInstance);
 
         /// <inheritdoc />
-        public string CurrentInstanceName=> Mode == JobRunModes.IncrementalActiveInstance ? ActiveInstanceName : InactiveInstanceName;
+        public string CurrentInstanceName=> LiveMode ? ActiveInstanceName : InactiveInstanceName;
+
+        /// <inheritdoc />
+        public bool LiveMode { get; set; }
 
         /// <inheritdoc />
         public async Task<bool> SetActiveInstanceAsync(byte instance)

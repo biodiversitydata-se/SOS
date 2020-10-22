@@ -27,12 +27,14 @@ namespace SOS.Lib.Repositories.Processed
         {
         }
 
+        private string InstanceName(int instance) => $"{nameof(Observation)}-{instance}";
 
         /// <inheritdoc />
         public async Task<bool> CopyProviderDataAsync(DataProvider dataProvider)
         {
-            var activeProcessedInfoId = $"{nameof(Observation)}-{ActiveInstance}";
-            var inactiveProcessedInfoId = $"{nameof(Observation)}-{InActiveInstance}";
+            var activeProcessedInfoId = InstanceName(ActiveInstance);
+            var inactiveProcessedInfoId = InstanceName(InActiveInstance);
+
             // Get data from active instance
             var source = await GetAsync(activeProcessedInfoId);
             var sourceProvider =
@@ -62,7 +64,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<ProcessInfo> GetProcessInfoAsync(bool current)
         {
-            return await GetAsync($"ProcessedObservation-{(current ? ActiveInstance : ActiveInstance == 1 ? 0 : 1)}");
+            return await GetAsync(InstanceName(current ? ActiveInstance : ActiveInstance == 1 ? 0 : 1));
         }
     }
 }

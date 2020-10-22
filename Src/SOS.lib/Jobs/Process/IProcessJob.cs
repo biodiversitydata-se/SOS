@@ -20,31 +20,15 @@ namespace SOS.Lib.Jobs.Process
             IJobCancellationToken cancellationToken);
 
         /// <summary>
-        /// Run process job
-        /// </summary>
-        /// <param name="dataProviderIdOrIdentifiers"></param>
-        /// <param name="mode"></param>
-        /// <param name="toggleInstanceOnSuccess"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        Task<bool> RunAsync(
-            List<string> dataProviderIdOrIdentifiers,
-            JobRunModes mode,
-            bool toggleInstanceOnSuccess,
-            IJobCancellationToken cancellationToken);
-
-        /// <summary>
         /// Run full process job
         /// </summary>
         /// <param name="cleanStart"></param>
         /// <param name="copyFromActiveOnFail"></param>
-        /// <param name="toggleInstanceOnSuccess"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<bool> RunAsync(
             bool cleanStart,
             bool copyFromActiveOnFail,
-            bool toggleInstanceOnSuccess,
             IJobCancellationToken cancellationToken);
     }
 }

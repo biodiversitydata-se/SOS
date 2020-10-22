@@ -15,11 +15,10 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="cleanStart"></param>
         /// <param name="copyFromActiveOnFail"></param>
-        /// <param name="toggleInstanceOnSuccess"></param>
         /// <param name="hour"></param>
         /// <param name="minute"></param>
         /// <returns></returns>
-        IActionResult ScheduleDailyProcessJob(bool cleanStart, bool copyFromActiveOnFail, bool toggleInstanceOnSuccess,
+        IActionResult ScheduleDailyProcessJob(bool cleanStart, bool copyFromActiveOnFail,
             int hour, int minute);
 
         /// <summary>
@@ -27,9 +26,8 @@ namespace SOS.Administration.Api.Controllers.Interfaces
         /// </summary>
         /// <param name="cleanStart"></param>
         /// <param name="copyFromActiveOnFail"></param>
-        /// <param name="toggleInstanceOnSuccess"></param>
         /// <returns></returns>
-        Task<IActionResult> RunProcessJob(bool cleanStart, bool copyFromActiveOnFail, bool toggleInstanceOnSuccess);
+        Task<IActionResult> RunProcessJob(bool cleanStart, bool copyFromActiveOnFail);
 
         /// <summary>
         /// Run process job for selected data providers
