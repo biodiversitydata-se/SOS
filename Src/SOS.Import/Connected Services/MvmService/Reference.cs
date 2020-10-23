@@ -1684,14 +1684,14 @@ namespace MvmService
         /// <param name="serviceEndpoint">The endpoint to configure</param>
         /// <param name="clientCredentials">The client credentials</param>
         static partial void ConfigureEndpoint(System.ServiceModel.Description.ServiceEndpoint serviceEndpoint, System.ServiceModel.Description.ClientCredentials clientCredentials);
-        
-        public SpeciesObservationChangeServiceClient() : 
-                base(SpeciesObservationChangeServiceClient.GetDefaultBinding(), SpeciesObservationChangeServiceClient.GetDefaultEndpointAddress())
+
+        public SpeciesObservationChangeServiceClient() :
+            base(SpeciesObservationChangeServiceClient.GetDefaultBinding(), SpeciesObservationChangeServiceClient.GetDefaultEndpointAddress())
         {
             this.Endpoint.Name = EndpointConfiguration.BasicHttpBinding_ISpeciesObservationChangeService.ToString();
             ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
         }
-        
+
         public SpeciesObservationChangeServiceClient(EndpointConfiguration endpointConfiguration) : 
                 base(SpeciesObservationChangeServiceClient.GetBindingForEndpoint(endpointConfiguration), SpeciesObservationChangeServiceClient.GetEndpointAddress(endpointConfiguration))
         {
@@ -1837,6 +1837,41 @@ namespace MvmService
                 result.ReaderQuotas = System.Xml.XmlDictionaryReaderQuotas.Max;
                 result.MaxReceivedMessageSize = int.MaxValue;
                 result.AllowCookies = true;
+                result.Security.Mode = System.ServiceModel.BasicHttpSecurityMode.Transport;
+                return result;
+            }
+            if ((endpointConfiguration == EndpointConfiguration.WSHttpBinding_ISpeciesObservationChangeService))
+            {
+                System.ServiceModel.Channels.CustomBinding result = new System.ServiceModel.Channels.CustomBinding();
+                System.ServiceModel.Channels.TextMessageEncodingBindingElement textBindingElement = new System.ServiceModel.Channels.TextMessageEncodingBindingElement();
+                result.Elements.Add(textBindingElement);
+                System.ServiceModel.Channels.HttpsTransportBindingElement httpsBindingElement = new System.ServiceModel.Channels.HttpsTransportBindingElement();
+                httpsBindingElement.AllowCookies = true;
+                httpsBindingElement.MaxBufferSize = int.MaxValue;
+                httpsBindingElement.MaxReceivedMessageSize = int.MaxValue;
+                result.Elements.Add(httpsBindingElement);
+                return result;
+            }
+            if ((endpointConfiguration == EndpointConfiguration.BasicHttpBinding_ISpeciesObservationChangeService1))
+            {
+                System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding();
+                result.MaxBufferSize = int.MaxValue;
+                result.ReaderQuotas = System.Xml.XmlDictionaryReaderQuotas.Max;
+                result.MaxReceivedMessageSize = int.MaxValue;
+                result.AllowCookies = true;
+                result.Security.Mode = System.ServiceModel.BasicHttpSecurityMode.Transport;
+                return result;
+            }
+            if ((endpointConfiguration == EndpointConfiguration.WSHttpBinding_ISpeciesObservationChangeService1))
+            {
+                System.ServiceModel.Channels.CustomBinding result = new System.ServiceModel.Channels.CustomBinding();
+                System.ServiceModel.Channels.TextMessageEncodingBindingElement textBindingElement = new System.ServiceModel.Channels.TextMessageEncodingBindingElement();
+                result.Elements.Add(textBindingElement);
+                System.ServiceModel.Channels.HttpsTransportBindingElement httpsBindingElement = new System.ServiceModel.Channels.HttpsTransportBindingElement();
+                httpsBindingElement.AllowCookies = true;
+                httpsBindingElement.MaxBufferSize = int.MaxValue;
+                httpsBindingElement.MaxReceivedMessageSize = int.MaxValue;
+                result.Elements.Add(httpsBindingElement);
                 return result;
             }
             throw new System.InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
@@ -1846,25 +1881,43 @@ namespace MvmService
         {
             if ((endpointConfiguration == EndpointConfiguration.BasicHttpBinding_ISpeciesObservationChangeService))
             {
-                return new System.ServiceModel.EndpointAddress("http://miljodata.slu.se/mvm/ws/SpeciesObservationChangeService.svc/soap11");
+                return new System.ServiceModel.EndpointAddress("https://miljodata.slu.se/MVM/ws/SpeciesObservationChangeService.svc/soap11");
+            }
+            if ((endpointConfiguration == EndpointConfiguration.WSHttpBinding_ISpeciesObservationChangeService))
+            {
+                return new System.ServiceModel.EndpointAddress("https://miljodata.slu.se/MVM/ws/SpeciesObservationChangeService.svc/soap12");
+            }
+            if ((endpointConfiguration == EndpointConfiguration.BasicHttpBinding_ISpeciesObservationChangeService1))
+            {
+                return new System.ServiceModel.EndpointAddress("https://miljodata.slu.se/MVM/ws/SpeciesObservationChangeService.svc/soap11");
+            }
+            if ((endpointConfiguration == EndpointConfiguration.WSHttpBinding_ISpeciesObservationChangeService1))
+            {
+                return new System.ServiceModel.EndpointAddress("https://miljodata.slu.se/MVM/ws/SpeciesObservationChangeService.svc/soap12");
             }
             throw new System.InvalidOperationException(string.Format("Could not find endpoint with name \'{0}\'.", endpointConfiguration));
         }
-        
+
         private static System.ServiceModel.Channels.Binding GetDefaultBinding()
         {
             return SpeciesObservationChangeServiceClient.GetBindingForEndpoint(EndpointConfiguration.BasicHttpBinding_ISpeciesObservationChangeService);
         }
-        
+
         private static System.ServiceModel.EndpointAddress GetDefaultEndpointAddress()
         {
             return SpeciesObservationChangeServiceClient.GetEndpointAddress(EndpointConfiguration.BasicHttpBinding_ISpeciesObservationChangeService);
         }
-        
+
         public enum EndpointConfiguration
         {
             
             BasicHttpBinding_ISpeciesObservationChangeService,
+            
+            WSHttpBinding_ISpeciesObservationChangeService,
+            
+            BasicHttpBinding_ISpeciesObservationChangeService1,
+            
+            WSHttpBinding_ISpeciesObservationChangeService1,
         }
     }
 }
