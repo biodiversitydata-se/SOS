@@ -5,9 +5,7 @@ using Elasticsearch.Net;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
-using SOS.Lib.Extensions;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Repositories.Processed;
@@ -17,6 +15,46 @@ namespace SOS.Export.IntegrationTests.Repositories
 {
     public class ProcessedDwcRepositoryIntegrationTests : TestBase
     {
+        [Fact]
+        public async Task Multimedia_is_fetched_from_ProcessedObservationRepository()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var processedObservationRepository = GetProcessedObservationRepository();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await processedObservationRepository.ScrollMultimediaAsync(new SearchFilter(), null);
+            IEnumerable<SimpleMultimediaRow> multimediaRows = result.Records;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            multimediaRows.Should().NotBeEmpty();
+        }
+
+        [Fact]
+        public async Task MeasurementOrFacts_is_fetched_from_ProcessedDarwinCoreRepository()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var processedObservationRepository = GetProcessedObservationRepository();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = await processedObservationRepository.ScrollMeasurementOrFactsAsync(new SearchFilter(), null);
+            var projectParameters = result.Records;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            projectParameters.Should().NotBeEmpty();
+        }
+
         private ProcessedObservationRepository GetProcessedObservationRepository()
         {
             var processDbConfiguration = GetProcessDbConfiguration();
@@ -45,87 +83,5 @@ namespace SOS.Export.IntegrationTests.Repositories
             return processedObservationRepository;
         }
 
-        [Fact]
-        public async Task DarwinCoreProject_objects_is_converted_to_ExtendedMeasurementOrFactRow_objects()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var processedObservationRepository = GetProcessedObservationRepository();
-            var result = await processedObservationRepository.ScrollProjectParametersAsync(new SearchFilter(), null);
-            var projectParameters = result.Records;
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var extendedMeasurementOrFactRows = projectParameters.ToExtendedMeasurementOrFactRows(null);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            extendedMeasurementOrFactRows.Should().NotBeEmpty();
-        }
-
-
-        [Fact]
-        public async Task Multimedia_is_fetched_from_ProcessedObservationRepository()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var processedObservationRepository = GetProcessedObservationRepository();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await processedObservationRepository.ScrollMultimediaAsync(new SearchFilter(), null);
-            IEnumerable<SimpleMultimediaRow> multimediaRows = result.Records;
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            multimediaRows.Should().NotBeEmpty();
-        }
-
-        [Fact]
-        public async Task Emof_rows_is_fetched_from_ProcessedDarwinCoreRepository()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var processedObservationRepository = GetProcessedObservationRepository();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await processedObservationRepository.TypedScrollProjectParametersAsync(new SearchFilter(), null);
-            IEnumerable<ExtendedMeasurementOrFactRow> emofRows = result.Records;
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            emofRows.Should().NotBeEmpty();
-        }
-
-
-        [Fact]
-        public async Task Project_parameters_is_fetched_from_ProcessedDarwinCoreRepository()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var processedObservationRepository = GetProcessedObservationRepository();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await processedObservationRepository.ScrollProjectParametersAsync(new SearchFilter(), null);
-            var projectParameters = result.Records;
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            projectParameters.Should().NotBeEmpty();
-        }
     }
 }

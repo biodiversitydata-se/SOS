@@ -43,7 +43,7 @@ namespace SOS.Export.IO.DwcArchive
         {
             try
             {
-                var scrollResult = await processedObservationRepository.TypedScrollProjectParametersAsync(filter, null);
+                var scrollResult = await processedObservationRepository.ScrollMeasurementOrFactsAsync(filter, null);
                 var hasRecords = scrollResult?.Records?.Any() ?? false;
                 if (!hasRecords) return false;
 
@@ -68,7 +68,7 @@ namespace SOS.Export.IO.DwcArchive
                     await streamWriter.FlushAsync();
 
                     // Get next batch of observations.
-                    scrollResult = await processedObservationRepository.TypedScrollProjectParametersAsync(filter, scrollResult.ScrollId);
+                    scrollResult = await processedObservationRepository.ScrollMeasurementOrFactsAsync(filter, scrollResult.ScrollId);
                 }
 
                 return true;

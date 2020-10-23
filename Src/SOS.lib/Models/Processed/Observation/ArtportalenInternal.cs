@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Nest;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
 
@@ -95,5 +96,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// True if sighting was incremental harvested
         /// </summary>
         public bool IncrementalHarvested { get; set; }
+
+        /// <summary>
+        ///     Projects connected to sighting
+        /// </summary>
+        [Nested]
+        public IEnumerable<Project> Projects { get; set; }
     }
 }

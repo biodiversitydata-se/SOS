@@ -396,34 +396,6 @@ namespace SOS.Lib.Extensions
             return query;
         }
 
-        /// <summary>
-        ///     Create project parameter filter.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        public static IEnumerable<Func<QueryContainerDescriptor<Observation>, QueryContainer>> ToTypedProjectParameterQuery(
-            this FilterBase filter)
-        {
-            var query = CreateTypedQuery(filter);
-            query.Add(q => q
-                .Nested(n => n
-                    .Path(p => p.Projects)
-                    .Query(q => q
-                        .Nested(n => n
-                            .Path("projects.projectParameters")
-                            .Query(q => q
-                                .Exists(e => e
-                                    .Field("projects.projectParameters")
-                                )
-                            )
-                        )
-                    )
-                )
-            );
-
-            return query;
-        }
-
         public static IEnumerable<Func<QueryContainerDescriptor<Observation>, QueryContainer>> ToMultimediaQuery(
             this FilterBase filter)
         {
@@ -440,6 +412,21 @@ namespace SOS.Lib.Extensions
             return query;
         }
 
+        public static IEnumerable<Func<QueryContainerDescriptor<Observation>, QueryContainer>> ToMeasurementOrFactsQuery(
+            this FilterBase filter)
+        {
+            var query = CreateTypedQuery(filter);
+            query.Add(q => q
+                .Nested(n => n
+                    .Path(observation => observation.MeasurementOrFacts)
+                    .Query(nq => nq
+                        .Exists(e => e
+                            .Field(observation => observation.MeasurementOrFacts))
+                    ))
+            );
+
+            return query;
+        }
 
         /// <summary>
         ///     Create search filter

@@ -95,7 +95,6 @@ namespace SOS.Lib.Extensions
         {
             IEnumerable<ExtendedMeasurementOrFactRow> occurrenceEmof = null;
             IEnumerable<ExtendedMeasurementOrFactRow> eventEmof = null;
-            IEnumerable<ExtendedMeasurementOrFactRow> projectEmof = null;
             if (observation.MeasurementOrFacts != null)
             {
                 occurrenceEmof = observation.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow());
@@ -106,15 +105,8 @@ namespace SOS.Lib.Extensions
                 eventEmof = observation.Event.MeasurementOrFacts.Select(m => m.ToExtendedMeasurementOrFactRow(observation.Event.EventId));
             }
 
-            if (observation.Projects != null)
-            {
-                projectEmof = observation.Projects.SelectMany(project =>
-                    ToExtendedMeasurementOrFactRows(project, observation.Occurrence.OccurrenceId));
-            }
-
             return (occurrenceEmof ?? Enumerable.Empty<ExtendedMeasurementOrFactRow>())
-                .Union(eventEmof ?? Enumerable.Empty<ExtendedMeasurementOrFactRow>())
-                .Union(projectEmof ?? Enumerable.Empty<ExtendedMeasurementOrFactRow>());
+                .Union(eventEmof ?? Enumerable.Empty<ExtendedMeasurementOrFactRow>());
         }
 
         public static IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(this

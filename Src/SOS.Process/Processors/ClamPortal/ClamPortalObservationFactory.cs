@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Nest;
 using NetTopologySuite.Geometries;
+using Newtonsoft.Json;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.FieldMappingValues;
@@ -118,15 +119,9 @@ namespace SOS.Process.Processors.ClamPortal
                     OccurrenceRemarks = verbatimObservation.OccurrenceRemarks,
                     OccurrenceStatus = GetOccurrenceStatusIdFromString(verbatimObservation.OccurrenceStatus)
                 },
-                Projects = string.IsNullOrEmpty(verbatimObservation.ProjectName)
+                DynamicProperties = string.IsNullOrEmpty(verbatimObservation.ProjectName)
                     ? null
-                    : new[]
-                    {
-                        new Project
-                        {
-                            Name = verbatimObservation.ProjectName
-                        }
-                    },
+                    : JsonConvert.SerializeObject(new {ProjectName = verbatimObservation.ProjectName}),
                 ReportedBy = verbatimObservation.ReportedBy,
                 ReportedDate = verbatimObservation.ReportedDate.ToUniversalTime(),
                 RightsHolder = verbatimObservation.RightsHolder,
