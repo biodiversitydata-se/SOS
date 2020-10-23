@@ -28,6 +28,17 @@ namespace SOS.Lib.Configuration.Shared
         public int MaxNrAggregationBuckets { get; set; } = 65535;
 
         /// <summary>
+        ///     Password
+        /// </summary>
+        public string Password { get; set; }
+
+        /// <summary>
+        ///     User name
+        /// </summary>
+        public string UserName { get; set; }
+
+
+        /// <summary>
         ///     dev, st or at. prod is empty
         /// </summary>
         public string IndexPrefix

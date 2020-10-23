@@ -99,10 +99,9 @@ namespace SOS.Import.Jobs
                 _logger.LogInformation("Finish observasions harvest jobs");
 
                 //---------------------------------------------------------------------------------------------------------
-                // 3. If Artportalen harvest was successful, go on with enqueuing processing job to Hangfire
+                // 3. Make sure mandatory providers where successful
                 //---------------------------------------------------------------------------------------------------------
-                return  harvestTaskByDataProvider
-                    .Single(pair => pair.Key.Identifier == DataProviderIdentifiers.Artportalen).Value.Result;
+                return harvestTaskByDataProvider.Where(dp => dp.Key.HarvestFailPreventProcessing).All(r => r.Value.Result);
             }
             catch (JobAbortedException)
             {
