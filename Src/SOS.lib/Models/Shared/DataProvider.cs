@@ -105,7 +105,12 @@ namespace SOS.Lib.Models.Shared
         /// EML metadata.
         /// </summary>
         public BsonDocument EmlMetadata { get; set; }
-  
+
+        /// <summary>
+        /// Indicates that failure in harvest for this provider will stop job from processing
+        /// </summary>
+        public bool HarvestFailPreventProcessing { get; set; }
+
         public bool EqualsIdOrIdentifier(string idOrIdentifier)
         {
             if (int.TryParse(idOrIdentifier, out var id))

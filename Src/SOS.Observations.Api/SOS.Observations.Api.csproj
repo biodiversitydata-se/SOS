@@ -17,7 +17,7 @@
         <PackageReference Include="HangFire.Autofac" Version="2.3.1" />
         <PackageReference Include="Hangfire.Mongo" Version="0.7.12" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.14.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.9" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="4.1.1" />
         <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.2.2" />

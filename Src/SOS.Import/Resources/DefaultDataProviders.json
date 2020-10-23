@@ -24,7 +24,8 @@
         "ProcessInfoInstance1": null,
         "Id": 1,
         "Identifier": "Artportalen",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing":  true
     },
     {
         "Type": "ClamPortalObservations",
@@ -51,7 +52,8 @@
         "ProcessInfoInstance1": null,
         "Id": 2,
         "Identifier": "ClamGateway",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     },
     {
         "Type": "KULObservations",
@@ -78,7 +80,8 @@
         "ProcessInfoInstance1": null,
         "Id": 3,
         "Identifier": "KUL",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     },
     {
         "Type": "MvmObservations",
@@ -105,7 +108,8 @@
         "ProcessInfoInstance1": null,
         "Id": 4,
         "Identifier": "MVM",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     },
     {
         "Type": "NorsObservations",
@@ -132,7 +136,8 @@
         "ProcessInfoInstance1": null,
         "Id": 5,
         "Identifier": "NORS",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     },
     {
         "Type": "SersObservations",
@@ -159,7 +164,8 @@
         "ProcessInfoInstance1": null,
         "Id": 6,
         "Identifier": "SERS",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     },
     {
         "Type": "VirtualHerbariumObservations",
@@ -186,7 +192,8 @@
         "ProcessInfoInstance1": null,
         "Id": 7,
         "Identifier": "VirtualHerbarium",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     },
     {
         "Type": "SharkObservations",
@@ -213,7 +220,8 @@
         "ProcessInfoInstance1": null,
         "Id": 8,
         "Identifier": "SHARK",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     },
     {
         "Type": "DwcA",
@@ -240,7 +248,8 @@
         "ProcessInfoInstance1": null,
         "Id": 9,
         "Identifier": "BirdRingingCentre",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     },
     {
         "Type": "DwcA",
@@ -267,7 +276,8 @@
         "ProcessInfoInstance1": null,
         "Id": 10,
         "Identifier": "EntomologicalCollection",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     },
     {
         "Type": "DwcA",
@@ -294,7 +304,8 @@
         "ProcessInfoInstance1": null,
         "Id": 11,
         "Identifier": "MalaiseTrap",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     },
     {
         "Type": "DwcA",
@@ -321,7 +332,8 @@
         "ProcessInfoInstance1": null,
         "Id": 12,
         "Identifier": "Porpoises",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     },
     {
         "Type": "DwcA",
@@ -348,7 +360,8 @@
         "ProcessInfoInstance1": null,
         "Id": 13,
         "Identifier": "ButterflyMonitoring",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     },
     {
         "Type": "DwcA",
@@ -375,6 +388,7 @@
         "ProcessInfoInstance1": null,
         "Id": 14,
         "Identifier": "SharkZooplankton",
-        "EmlMetadata": null
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     }
 ]

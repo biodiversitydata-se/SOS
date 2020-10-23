@@ -153,7 +153,9 @@ namespace SOS.Hangfire.JobServer
                     //setup the elastic search configuration
                     var uris = _searchDbConfiguration.Hosts.Select(u => new Uri(u));
                     services.AddSingleton<IElasticClient>(
-                        new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))));
+                        new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))
+                            .BasicAuthentication(_searchDbConfiguration.UserName, _searchDbConfiguration.Password)
+                            ));
                     services.AddSingleton(_searchDbConfiguration);
                 })
                 .UseServiceProviderFactory(hostContext =>
