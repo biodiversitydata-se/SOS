@@ -35,31 +35,33 @@ namespace SOS.Export.IO.DwcArchive
         {
             try
             {
-                // todo - implement for multimedia.
-                //var scrollResult = await processedObservationRepository.TypedScrollProjectParametersAsync(filter, null);
-                //await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
-                //var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
+                var scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter, null);
+                var hasRecords = scrollResult?.Records?.Any() ?? false;
+                if (!hasRecords) return false;
 
-                //// Write header row
-                //WriteHeaderRow(csvWriter);
+                await using var streamWriter = new StreamWriter(stream, Encoding.UTF8);
+                var csvWriter = new NReco.Csv.CsvWriter(streamWriter, "\t");
 
-                //while (scrollResult?.Records?.Any() ?? false)
-                //{
-                //    cancellationToken?.ThrowIfCancellationRequested();
+                // Write header row
+                WriteHeaderRow(csvWriter);
 
-                //    // Fetch observations from ElasticSearch.
-                //    var emofRows = scrollResult.Records.ToArray();
+                while (scrollResult?.Records?.Any() ?? false)
+                {
+                    cancellationToken?.ThrowIfCancellationRequested();
 
-                //    // Write occurrence rows to CSV file.
-                //    foreach (var emofRow in emofRows)
-                //    {
-                //        WriteSimpleMultimediaRow(csvWriter, emofRow);
-                //    }
-                //    await streamWriter.FlushAsync();
+                    // Fetch observations from ElasticSearch.
+                    var multimediaRows = scrollResult.Records.ToArray();
 
-                //    // Get next batch of observations.
-                //    scrollResult = await processedObservationRepository.TypedScrollProjectParametersAsync(filter, scrollResult.ScrollId);
-                //}
+                    // Write occurrence rows to CSV file.
+                    foreach (var row in multimediaRows)
+                    {
+                        WriteSimpleMultimediaRow(csvWriter, row);
+                    }
+                    await streamWriter.FlushAsync();
+
+                    // Get next batch of observations.
+                    scrollResult = await processedObservationRepository.ScrollMultimediaAsync(filter, scrollResult.ScrollId);
+                }
 
                 return true;
             }

@@ -29,5 +29,18 @@ namespace SOS.Export.IntegrationTests
             var exportConfiguration = config.GetSection("ApplicationSettings").GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
             return exportConfiguration;
         }
+
+        protected ElasticSearchConfiguration GetElasticConfiguration()
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .AddUserSecrets<TestBase>()
+                .Build();
+
+            var elasticConfiguration = config.GetSection("ApplicationSettings").GetSection("SearchDbConfiguration")
+                .Get<ElasticSearchConfiguration>();
+            return elasticConfiguration;
+        }
     }
 }

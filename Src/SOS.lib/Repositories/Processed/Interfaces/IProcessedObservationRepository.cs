@@ -104,6 +104,16 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             string scrollId);
 
         /// <summary>
+        ///     Get multimedia.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="scrollId"></param>
+        /// <returns></returns>
+        Task<ScrollResult<SimpleMultimediaRow>> ScrollMultimediaAsync(
+            FilterBase filter,
+            string scrollId);
+
+        /// <summary>
         /// Verify that collection exists
         /// </summary>
         /// <returns></returns>

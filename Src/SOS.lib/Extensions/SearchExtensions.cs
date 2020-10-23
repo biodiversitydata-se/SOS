@@ -424,6 +424,21 @@ namespace SOS.Lib.Extensions
             return query;
         }
 
+        public static IEnumerable<Func<QueryContainerDescriptor<Observation>, QueryContainer>> ToMultimediaQuery(
+            this FilterBase filter)
+        {
+            var query = CreateTypedQuery(filter);
+            query.Add(q => q
+                .Nested(n => n
+                    .Path(observation => observation.Media)
+                    .Query(nq => nq
+                        .Exists(e => e
+                            .Field(observation => observation.Media))
+                    ))
+            );
+
+            return query;
+        }
 
 
         /// <summary>
