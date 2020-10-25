@@ -16,6 +16,7 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Swagger;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
 
 namespace SOS.Observations.Api.Controllers
@@ -102,7 +103,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(PagedResult<Observation>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        [ApiExplorerSettings(IgnoreApi = true)]
+        [InternalApi]
         public async Task<IActionResult> GetChunkInternalAsync([FromBody] SearchFilterInternal filter,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
@@ -132,7 +133,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(PagedResult<Observation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [ApiExplorerSettings(IgnoreApi = true)]
+        [InternalApi]
         public async Task<IActionResult> GetChunkAggregatedInternalAsync([FromBody] SearchFilterInternal filter,
             [FromQuery] AggregationType aggregationType,
             [FromQuery] int skip = 0,
@@ -253,7 +254,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [ApiExplorerSettings(IgnoreApi = true)]
+        [InternalApi]
         public async Task<IActionResult> GeogridSearchTileBasedAggregationAsGeoJsonAsync(
             [FromBody] SearchFilterDto filter,
             [FromQuery] int zoom = 1,
