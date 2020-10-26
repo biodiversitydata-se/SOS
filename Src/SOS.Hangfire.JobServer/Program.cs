@@ -25,6 +25,7 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Extensions;
 using SOS.Process.IoC.Modules;
 
 namespace SOS.Hangfire.JobServer
@@ -152,10 +153,7 @@ namespace SOS.Hangfire.JobServer
                     
                     //setup the elastic search configuration
                     var uris = _searchDbConfiguration.Hosts.Select(u => new Uri(u));
-                    services.AddSingleton<IElasticClient>(
-                        new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))
-                            .BasicAuthentication(_searchDbConfiguration.UserName, _searchDbConfiguration.Password)
-                            ));
+                    services.AddSingleton<IElasticClient>(_searchDbConfiguration.ToClient());
                     services.AddSingleton(_searchDbConfiguration);
                 })
                 .UseServiceProviderFactory(hostContext =>

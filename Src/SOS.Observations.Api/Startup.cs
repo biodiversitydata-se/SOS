@@ -28,6 +28,7 @@ using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Extensions;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -219,12 +220,8 @@ namespace SOS.Observations.Api
             //setup the elastic search configuration
             var elasticConfiguration = observationApiConfiguration.SearchDbConfiguration;
             var uris = elasticConfiguration.Hosts.Select(u => new Uri(u));
-            services.AddSingleton<IElasticClient>(
-                new ElasticClient(new ConnectionSettings(new StaticConnectionPool(uris))
-                        .BasicAuthentication(elasticConfiguration.UserName, elasticConfiguration.Password)
-                //.DisableDirectStreaming().EnableDebugMode().PrettyJson() // Uncomment this line when debugging ES-query. Req and Resp is in result.DebugInformation in ProcessedObservationRepository.cs.
-                ));
-
+            services.AddSingleton<IElasticClient>(elasticConfiguration.ToClient());
+            
             // Processed Mongo Db
             var processedDbConfiguration = observationApiConfiguration.ProcessDbConfiguration;
             var processedSettings = processedDbConfiguration.GetMongoDbSettings();

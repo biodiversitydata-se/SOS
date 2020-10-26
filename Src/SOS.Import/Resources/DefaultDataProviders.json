@@ -17,7 +17,7 @@
         "ContactEmail": "stephen.coulson@slu.se",
         "DownloadUrl": null,
         "IncludeInScheduledHarvest": true,
-        "SupportIncrementalHarvest": false,
+        "SupportIncrementalHarvest": true,
         "DataQualityIsApproved": true,
         "HarvestInfo": null,
         "ProcessInfoInstance0": null,
