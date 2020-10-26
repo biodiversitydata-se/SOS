@@ -33,8 +33,13 @@ namespace SOS.Lib.Extensions
             var uris = configuration.Hosts.Select(u => new Uri(u));
             
             var connectionPool = new StaticConnectionPool(uris);
-            var settings = new ConnectionSettings(connectionPool)
-                .BasicAuthentication(configuration.UserName, configuration.Password);
+            var settings = new ConnectionSettings(connectionPool);
+
+            if (!string.IsNullOrEmpty(configuration.UserName) && !string.IsNullOrEmpty(configuration.Password))
+            {
+                settings.BasicAuthentication(configuration.UserName, configuration.Password);
+            }
+               
               //  .ServerCertificateValidationCallback(CertificateValidations.AuthorityIsRoot(cert));
             //.DisableDirectStreaming().EnableDebugMode().PrettyJson() // Uncomment this line when debugging ES-query. Req and Resp is in result.DebugInformation in ProcessedObservationRepository.cs.
 

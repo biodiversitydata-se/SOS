@@ -10,6 +10,11 @@ namespace SOS.Lib.Configuration.Shared
     public class MongoDbConfiguration
     {
         /// <summary>
+        /// Database where the user account exists
+        /// </summary>
+        public string AuthenticationDb { get; set; }
+
+        /// <summary>
         ///     Host
         /// </summary>
         public MongoDbServer[] Hosts { get; set; }
@@ -55,29 +60,25 @@ namespace SOS.Lib.Configuration.Shared
         /// <returns></returns>
         public MongoClientSettings GetMongoDbSettings()
         {
-            MongoInternalIdentity identity = null;
-            PasswordEvidence evidence = null;
-            if (!(string.IsNullOrEmpty(DatabaseName) ||
-                  string.IsNullOrEmpty(UserName) ||
-                  string.IsNullOrEmpty(Password)))
-            {
-                identity = new MongoInternalIdentity(DatabaseName, UserName);
-                evidence = new PasswordEvidence(Password);
-            }
 
             var mongoSettings = new MongoClientSettings
             {
                 UseTls = UseTls,
-                SslSettings = UseTls
-                    ? new SslSettings
+                SslSettings = UseTls ? new SslSettings
                     {
                         EnabledSslProtocols = SslProtocols.Tls12
                     }
-                    : null,
-                Credential = identity != null && evidence != null
-                    ? new MongoCredential("SCRAM-SHA-1", identity, evidence)
                     : null
             };
+
+            
+            if (!(string.IsNullOrEmpty(DatabaseName) ||
+                        string.IsNullOrEmpty(UserName) ||
+                        string.IsNullOrEmpty(Password)))
+            {
+
+                mongoSettings.Credential = MongoCredential.CreateCredential(AuthenticationDb, UserName, Password);
+            }
 
             if (Hosts.Length == 1)
             {
