@@ -202,7 +202,6 @@ namespace SOS.Export.IO.DwcArchive
             // Create EMOF CSV file
             string emofCsvFilePath = filePathByFilePart[DwcaFilePart.Emof];
             var emofRows = processedObservations.ToExtendedMeasurementOrFactRows();
-
             if (emofRows != null && emofRows.Any())
             {
                 await using StreamWriter emofFileStream = File.AppendText(emofCsvFilePath);

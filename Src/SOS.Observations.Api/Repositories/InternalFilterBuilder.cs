@@ -30,10 +30,10 @@ namespace SOS.Observations.Api.Repositories
                 {
                     queryInternal.Add(q => q
                         .Nested(n => n
-                            .Path("projects")
+                            .Path("artportalenInternal.projects")
                             .Query(q => q
                                 .Terms(t => t
-                                    .Field("projects.id")
+                                    .Field("artportalenInternal.projects.id")
                                     .Terms(internalFilter.ProjectIds)
                                 )
                             )));

@@ -13,6 +13,7 @@ using SOS.Observations.Api.Dtos;
 using SOS.Observations.Api.Dtos.Filter;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Swagger;
 
 namespace SOS.Observations.Api.Controllers.V2
 {
@@ -67,9 +68,9 @@ namespace SOS.Observations.Api.Controllers.V2
         /// properties that is read when created the swagger documentation.
         /// </remarks>
         [HttpPost("search")]
-        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetObservationsAsync(
             [FromBody] SearchFilterDto filter,
             [FromQuery] int skip = 0,
@@ -110,7 +111,7 @@ namespace SOS.Observations.Api.Controllers.V2
             catch (Exception e)
             {
                 _logger.LogError(e, "Error getting batch of sightings");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 

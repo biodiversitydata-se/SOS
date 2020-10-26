@@ -14,11 +14,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
@@ -41,7 +41,6 @@ using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Services;
 using SOS.Observations.Api.Services.Interfaces;
 using SOS.Observations.Api.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using IProcessedObservationRepository = SOS.Observations.Api.Repositories.Interfaces.IProcessedObservationRepository;
 using ProcessedObservationRepository = SOS.Observations.Api.Repositories.ProcessedObservationRepository;
@@ -53,6 +52,10 @@ namespace SOS.Observations.Api
     /// </summary>
     public class Startup
     {
+        private const string InternalApiName = "InternalSosObservations";
+        private const string PublicApiName = "PublicSosObservations";
+        private const string InternalApiPrefix = "Internal";
+        private const string PublicApiPrefix = "Public";
         private readonly string _environment;
 
         /// <summary>
@@ -140,16 +143,39 @@ namespace SOS.Observations.Api
                 {
                     // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
                     // note: the specified format code will format the version as "'v'major[.minor][-status]"
-                    options.GroupNameFormat = "'v'VVV";
+                    options.GroupNameFormat = "'v'VV";
 
                     // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
                     // can also be used to control the format of the API version in route templates
                     options.SubstituteApiVersionInUrl = true;
                 });
-            services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
+            var apiVersionDescriptionProvider =
+                services.BuildServiceProvider().GetService<IApiVersionDescriptionProvider>();
             services.AddSwaggerGen(
                 swagger =>
                 {
+                    foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
+                    {
+                        swagger.SwaggerDoc(
+                            $"{InternalApiName}{description.GroupName}",
+                            new OpenApiInfo()
+                            {
+                                Title = $"SOS Observations API (Internal) {description.GroupName.ToUpperInvariant()}",
+                                Version = description.ApiVersion.ToString(),
+                                Description = "Species Observation System (SOS) - Observations API. Internal API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
+                            });
+
+                        swagger.SwaggerDoc(
+                            $"{PublicApiName}{description.GroupName}",
+                            new OpenApiInfo()
+                            {
+                                Title = $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}",
+                                Version = description.ApiVersion.ToString(),
+                                Description = "Species Observation System (SOS) - Observations API. Public API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
+                            });
+                    }
+
                     // add a custom operation filter which sets default values
                     swagger.OperationFilter<SwaggerDefaultValues>();
 
@@ -165,6 +191,17 @@ namespace SOS.Observations.Api
                     });
 
                     swagger.SchemaFilter<SwaggerIgnoreFilter>();
+
+                    swagger.DocInclusionPredicate((documentName, apiDescription) =>
+                    {
+                        var apiVersions = GetApiVersions(apiDescription);
+                        bool isEndpointInternalApi = apiDescription.ActionDescriptor.EndpointMetadata.Any(x => x.GetType() == typeof(InternalApiAttribute));
+                        if (isEndpointInternalApi && !documentName.StartsWith(InternalApiPrefix)) return false;
+                        return apiVersions.Any(v =>
+                                   $"{InternalApiName}v{v}" == documentName) ||
+                               apiVersions.Any(v =>
+                                   $"{PublicApiName}v{v}" == documentName);
+                    });
 
                     swagger.AddSecurityDefinition("Bearer", //Name the security scheme
                         new OpenApiSecurityScheme
@@ -267,7 +304,8 @@ namespace SOS.Observations.Api
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
+        /// <param name="apiVersionDescriptionProvider"></param>
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider)
         {
             NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config");
             if (new[] {"dev", "local"}.Contains(env.EnvironmentName.ToLower()))
@@ -285,10 +323,16 @@ namespace SOS.Observations.Api
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(options => {
-
-                foreach (var description in provider.ApiVersionDescriptions)
+                foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
                 {
-                    options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                    options.SwaggerEndpoint(
+                        $"/swagger/{InternalApiName}{description.GroupName}/swagger.json",
+                        $"SOS Observations API (Internal) {description.GroupName.ToUpperInvariant()}");
+
+                    options.SwaggerEndpoint(
+                        $"/swagger/{PublicApiName}{description.GroupName}/swagger.json",
+                        $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}");
+
                     options.DocExpansion(DocExpansion.None);
                 }
             });
@@ -307,6 +351,17 @@ namespace SOS.Observations.Api
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        }
+
+        private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)
+        {
+            var actionApiVersionModel = apiDescription.ActionDescriptor
+                .GetApiVersionModel(ApiVersionMapping.Explicit | ApiVersionMapping.Implicit);
+
+            var apiVersions = actionApiVersionModel.DeclaredApiVersions.Any()
+                ? actionApiVersionModel.DeclaredApiVersions
+                : actionApiVersionModel.ImplementedApiVersions;
+            return apiVersions;
         }
     }
 

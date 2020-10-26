@@ -18,6 +18,7 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using FieldMapping = SOS.Lib.Models.Shared.FieldMapping;
 using Language = SOS.Lib.Models.DarwinCore.Vocabulary.Language;
+using Project = SOS.Lib.Models.Verbatim.Artportalen.Project;
 
 namespace SOS.Process.Processors.Artportalen
 {
@@ -133,12 +134,10 @@ namespace SOS.Process.Processors.Artportalen
                 obs.Modified = verbatimObservation.EditDate.ToUniversalTime();
                 obs.Type = null;
                 obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Artdatabanken";
-                obs.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
                 obs.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
                 obs.ReportedBy = verbatimObservation.ReportedBy;
                 obs.ReportedDate = verbatimObservation.ReportedDate?.ToUniversalTime();
                 obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
-
 
                 // Event
                 obs.Event = new Event();
@@ -247,6 +246,7 @@ namespace SOS.Process.Processors.Artportalen
                 obs.ArtportalenInternal.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
                 obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion;
                 obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.ObserversInternal;
+                obs.ArtportalenInternal.Projects = verbatimObservation.Projects?.Select(CreateProcessedProject);
                 obs.ArtportalenInternal.IncrementalHarvested = _incrementalMode;
 
                 // Set dependent properties
@@ -271,6 +271,7 @@ namespace SOS.Process.Processors.Artportalen
                     (int) UnitId.Individuals); // todo - if verbatimObservation.Unit is null, should the value be set to "Individuals"? This is how it works in SSOS.
                 obs.Occurrence.DiscoveryMethod = GetSosIdFromMetadata(verbatimObservation?.DiscoveryMethod, _fieldMappings[FieldMappingFieldId.DiscoveryMethod]);
                 obs.Identification.DeterminationMethod = GetSosIdFromMetadata(verbatimObservation?.DeterminationMethod, _fieldMappings[FieldMappingFieldId.DeterminationMethod]);
+                CreateMeasurementOrFactsFromProjects(obs.Occurrence.OccurrenceId, verbatimObservation.Projects);
 
                 return obs;
             }
@@ -279,6 +280,76 @@ namespace SOS.Process.Processors.Artportalen
                 throw new Exception($"Error when processing Artportalen verbatim observation with Id={verbatimObservation.Id}, SightingId={verbatimObservation.SightingId}", e);
             }
         }
+
+        private List<ExtendedMeasurementOrFact> CreateMeasurementOrFactsFromProjects(string occurrenceId, IEnumerable<Project> projects)
+        {
+            if (projects == null || !projects.Any()) return null;
+            var emofCollection = new List<ExtendedMeasurementOrFact>();
+
+            foreach (var project in projects)
+            {
+                foreach (var projectParameter in project.ProjectParameters)
+                {
+                    var emof = new ExtendedMeasurementOrFact();
+                    emof.OccurrenceID = occurrenceId;
+                    emof.MeasurementID = $"{project.Id}-{projectParameter.Id}";
+                    emof.MeasurementType = projectParameter.Name;
+                    emof.MeasurementValue = projectParameter.Value;
+                    emof.MeasurementUnit = projectParameter.Unit;
+                    emof.MeasurementDeterminedDate = DwcFormatter.CreateDateIntervalString(project.StartDate, project.EndDate);
+                    emof.MeasurementMethod = GetMeasurementMethodDescription(project);
+                    emof.MeasurementRemarks = GetMeasurementRemarks(projectParameter, project);
+
+                    emofCollection.Add(emof);
+                }
+            }
+
+            if (!emofCollection.Any()) return null;
+            return emofCollection;
+        }
+
+        private string GetMeasurementMethodDescription(Project project)
+        {
+            if (string.IsNullOrEmpty(project.SurveyMethod) && string.IsNullOrEmpty(project.SurveyMethodUrl))
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(project.SurveyMethodUrl))
+            {
+                return project.SurveyMethod;
+            }
+
+            if (string.IsNullOrEmpty(project.SurveyMethod))
+            {
+                return project.SurveyMethodUrl;
+            }
+
+            return $"{project.SurveyMethod} [{project.SurveyMethodUrl}]";
+        }
+
+        private string GetMeasurementRemarks(Lib.Models.Verbatim.Artportalen.ProjectParameter projectParameter, Project project)
+        {
+            if (string.IsNullOrWhiteSpace(projectParameter.Description) && string.IsNullOrWhiteSpace(project.Name))
+            {
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(projectParameter.Description))
+            {
+                return $"Artportalen project=\"{project.Name}\"";
+            }
+
+            if (projectParameter.Description.EndsWith("."))
+            {
+                return $"{projectParameter.Description} Artportalen project=\"{project.Name}\"";
+            }
+            else
+            {
+                return $"{projectParameter.Description}. Artportalen project=\"{project.Name}\"";
+            }
+        }
+
         /// <summary>
         /// Diffuse the observation data depending on the protectionlevel
         /// </summary>

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Observations.Api.Dtos;
+using SOS.Observations.Api.Swagger;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -46,6 +47,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("")]
         [ProducesResponseType(typeof(EnvironmentInformationDto), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
+        [InternalApi]
         public IActionResult GetEnvironmentInformation()
         {
             try
