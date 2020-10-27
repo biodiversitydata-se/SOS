@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.Authentication;
 using MongoDB.Driver;
 
@@ -72,8 +73,8 @@ namespace SOS.Lib.Configuration.Shared
             };
 
             if (!(string.IsNullOrEmpty(AuthenticationDb) ||
-                        string.IsNullOrEmpty(UserName) ||
-                        string.IsNullOrEmpty(Password)))
+                  string.IsNullOrEmpty(UserName) ||
+                  string.IsNullOrEmpty(Password)))
             {
 
                 mongoSettings.Credential = MongoCredential.CreateCredential(AuthenticationDb, UserName, Password);
