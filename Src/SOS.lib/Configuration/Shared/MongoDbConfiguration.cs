@@ -71,8 +71,7 @@ namespace SOS.Lib.Configuration.Shared
                     : null
             };
 
-            
-            if (!(string.IsNullOrEmpty(DatabaseName) ||
+            if (!(string.IsNullOrEmpty(AuthenticationDb) ||
                         string.IsNullOrEmpty(UserName) ||
                         string.IsNullOrEmpty(Password)))
             {
