@@ -28,6 +28,7 @@ namespace SOS.Administration.Api
     /// </summary>
     public class Startup
     {
+        private bool _isDevelopment;
         /// <summary>
         ///     Start up
         /// </summary>
@@ -42,8 +43,9 @@ namespace SOS.Administration.Api
                 .AddJsonFile($"appsettings.{environment}.json", true)
                 .AddEnvironmentVariables();
 
+            _isDevelopment = environment.Equals("local");
             //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
-            if (environment == "local")
+            if (_isDevelopment)
             {
                 builder.AddUserSecrets<Startup>();
             }
@@ -175,7 +177,7 @@ namespace SOS.Administration.Api
         {
             AutofacContainer = app.ApplicationServices.GetAutofacRoot();
 
-            if (new[] { "dev", "local" }.Contains(env.EnvironmentName.ToLower()))
+            if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
             }

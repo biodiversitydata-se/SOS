@@ -56,7 +56,7 @@ namespace SOS.Observations.Api
         private const string InternalApiPrefix = "Internal";
         private const string PublicApiPrefix = "Public";
         private readonly string _environment;
-
+        private bool _isDevelopment;
         /// <summary>
         ///     Start up
         /// </summary>
@@ -71,7 +71,8 @@ namespace SOS.Observations.Api
                 .AddJsonFile($"appsettings.{_environment}.json", true)
                 .AddEnvironmentVariables();
 
-            if (_environment.Equals("local"))
+            _isDevelopment = _environment.Equals("local");
+            if (_isDevelopment)
             {
                 //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
                 builder.AddUserSecrets<Startup>();
@@ -306,7 +307,7 @@ namespace SOS.Observations.Api
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider)
         {
             NLogBuilder.ConfigureNLog($"nlog.{env.EnvironmentName}.config");
-            if (new[] {"dev", "local"}.Contains(env.EnvironmentName.ToLower()))
+            if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -334,7 +335,6 @@ namespace SOS.Observations.Api
                     options.DocExpansion(DocExpansion.None);
                 }
             });
-
 
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
