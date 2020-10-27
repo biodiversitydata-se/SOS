@@ -255,7 +255,6 @@ namespace SOS.Observations.Api
 
             //setup the elastic search configuration
             var elasticConfiguration = observationApiConfiguration.SearchDbConfiguration;
-            var uris = elasticConfiguration.Hosts.Select(u => new Uri(u));
             services.AddSingleton<IElasticClient>(elasticConfiguration.ToClient());
             
             // Processed Mongo Db
