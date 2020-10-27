@@ -51,11 +51,11 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpPost("search")]
+        [HttpPost("Search")]
         [ProducesResponseType(typeof(PagedResultDto<Observation>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetObservationsAsync(
+        public async Task<IActionResult> SearchAsync(
             [FromBody] SearchFilterDto filter,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
@@ -76,35 +76,19 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error getting batch of sightings");
+                _logger.LogError(e, "Search error");
                 return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
-        [HttpGet("TermDictionary")]
-        [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetFieldMappingAsync()
-        {
-            try
-            {
-                return new OkObjectResult(await _fieldMappingManager.GetFieldMappingsAsync());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting field mappings");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
-        [HttpPost("searchinternal")]
-        [ProducesResponseType(typeof(PagedResult<Observation>), (int) HttpStatusCode.OK)]
+        [HttpPost("SearchInternal")]
+        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> GetChunkInternalAsync([FromBody] SearchFilterInternal filter,
+        public async Task<IActionResult> SearchInternalAsync(
+            [FromBody] SearchFilterInternalDto filter,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100,
             [FromQuery] string sortBy = "",
@@ -112,29 +96,30 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var validateResult = ValidateFilter(filter, skip, take);
-                if (!validateResult.Item1)
-                {
-                    return BadRequest(string.Join(". ", validateResult.Item2));
-                }
+                var pagingArgumentsValidation = ValidateSearchPagingArgumentsInternal(skip, take);
+                var searchFilterValidation = ValidateSearchFilterInternal(filter);
+                var validationResult = Result.Combine(pagingArgumentsValidation, searchFilterValidation);
+                if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-                return new OkObjectResult(
-                    await _observationManager.GetChunkAsync(filter, skip, take, sortBy, sortOrder));
+                var result = await _observationManager.GetChunkAsync(filter.ToSearchFilterInternal(), skip, take, sortBy, sortOrder);
+                PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
+                return new OkObjectResult(dto);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error getting batch of sightings");
+                _logger.LogError(e, "SearchInternal error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
 
         /// <inheritdoc />
-        [HttpPost("searchaggregatedinternal")]
-        [ProducesResponseType(typeof(PagedResult<Observation>), (int)HttpStatusCode.OK)]
+        [HttpPost("SearchAggregatedInternal")]
+        [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> GetChunkAggregatedInternalAsync([FromBody] SearchFilterInternal filter,
+        public async Task<IActionResult> SearchAggregatedInternalAsync(
+            [FromBody] SearchFilterInternalDto filter,
             [FromQuery] AggregationType aggregationType,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 100, 
@@ -144,19 +129,21 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var (isValid, validationErrors) = ValidateFilter(filter, 0, 1);
-                if (!isValid)
+                var filterValidation = ValidateSearchFilterInternal(filter);
+                var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
+                var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation);
+                if (paramsValidationResult.IsFailure)
                 {
-                    return BadRequest(string.Join(". ", validationErrors));
+                    return BadRequest(paramsValidationResult.Error);
                 }
 
-                var result = await _observationManager.GetAggregatedChunkAsync(filter, aggregationType, skip, take, sortBy, sortOrder);
-
-                return new OkObjectResult(result);
+                var result = await _observationManager.GetAggregatedChunkAsync(filter.ToSearchFilterInternal(), aggregationType, skip, take, sortBy, sortOrder);
+                PagedResultDto<dynamic> dto = result.ToPagedResultDto(result.Records);
+                return new OkObjectResult(dto);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error getting batch of aggregated sightings");
+                _logger.LogError(e, "SearchAggregatedInternal error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -225,6 +212,86 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilter(), zoom, bboxOrError.Value);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                GeoGridResultDto dto = result.Value.ToGeoGridResultDto();
+                return new OkObjectResult(dto);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "GeoGridAggregation error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Aggregates observations into grid cells. Each grid cell contains the number
+        /// of observations and the number of unique taxa (usually species) in the grid cell.
+        /// The grid cells are squares in WGS84 coordinate system which means that they also
+        /// will be squares in the WGS84 Web Mercator coordinate system.
+        /// </summary>
+        /// <remarks>
+        /// The following table shows the approximate grid cell size (width) in different
+        /// coordinate systems for the different zoom levels.
+        /// | Zoom level | WGS84    | Web Mercator  |  SWEREF99TM(Southern Sweden) |  SWEREF99TM(North Sweden) |
+        /// |------------|----------|---------------|:----------------------------:|:-------------------------:|
+        /// | 1          |      180 |       20000km |                       8000km |                   12000km |
+        /// | 2          |       90 |       10000km |                       4000km |                    6000km |
+        /// | 3          |       45 |        5000km |                       2000km |                    3000km |
+        /// | 4          |     22.5 |        2500km |                       1000km |                    1500km |
+        /// | 5          |    11.25 |        1250km |                        500km |                     750km |
+        /// | 6          |    5.625 |         600km |                        250km |                     360km |
+        /// | 7          |   2.8125 |         300km |                        120km |                     180km |
+        /// | 8          | 1.406250 |         150km |                         60km |                      90km |
+        /// | 9          | 0.703125 |          80km |                         30km |                      45km |
+        /// | 10         | 0.351563 |          40km |                         15km |                      23km |
+        /// | 11         | 0.175781 |          20km |                          8km |                      11km |
+        /// | 12         | 0.087891 |          10km |                          4km |                       6km |
+        /// | 13         | 0.043945 |           5km |                          2km |                       3km |
+        /// | 14         | 0.021973 |         2500m |                        1000m |                     1400m |
+        /// | 15         | 0.010986 |         1200m |                         500m |                      700m |
+        /// | 16         | 0.005493 |          600m |                         240m |                      350m |
+        /// | 17         | 0.002747 |          300m |                         120m |                      180m |
+        /// | 18         | 0.001373 |          150m |                          60m |                       90m |
+        /// | 19         | 0.000687 |           80m |                          30m |                       45m |
+        /// | 20         | 0.000343 |           40m |                          15m |                       22m |
+        /// | 21         | 0.000172 |           19m |                           7m |                       11m |
+        /// </remarks>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="zoom">A zoom level between 1 and 21.</param>
+        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
+        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
+        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
+        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
+        /// <returns></returns>
+        [HttpPost("GeoGridAggregationInternal")]
+        [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> InternalGeogridSearchTileBasedAggregationAsync(
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] int zoom = 1,
+            [FromQuery] double? bboxLeft = null,
+            [FromQuery] double? bboxTop = null,
+            [FromQuery] double? bboxRight = null,
+            [FromQuery] double? bboxBottom = null)
+        {
+            try
+            {
+                var filterValidation = ValidateSearchFilterInternal(filter);
+                var zoomOrError = ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21);
+                var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
+                var paramsValidationResult = Result.Combine(filterValidation, zoomOrError, bboxOrError);
+                if (paramsValidationResult.IsFailure)
+                {
+                    return BadRequest(paramsValidationResult.Error);
+                }
+
+                var result = await _observationManager.GetGeogridTileAggregationAsync(filter.ToSearchFilterInternal(), zoom, bboxOrError.Value);
                 if (result.IsFailure)
                 {
                     return BadRequest(result.Error);
@@ -342,6 +409,59 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Aggregates observation by taxon. Each item contains the number of observations for the specific taxon.
+        /// </summary>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="skip">Start index of returned records. Skip+Take must be less than or equal to 65535.</param>
+        /// <param name="take">End index of returned records. Skip+Take must be less than or equal to 65535.</param>
+        /// <param name="bboxLeft">Bounding box left (longitude) coordinate in WGS84.</param>
+        /// <param name="bboxTop">Bounding box top (latitude) coordinate in WGS84.</param>
+        /// <param name="bboxRight">Bounding box right (longitude) coordinate in WGS84.</param>
+        /// <param name="bboxBottom">Bounding box bottom (latitude) coordinate in WGS84.</param>
+        /// <returns></returns>
+        [HttpPost("TaxonAggregationInternal")]
+        [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> TaxonAggregationInternalAsync(
+            [FromBody] SearchFilterInternalDto filter,
+            [FromQuery] int skip = 0,
+            [FromQuery] int take = 100,
+            [FromQuery] double? bboxLeft = null,
+            [FromQuery] double? bboxTop = null,
+            [FromQuery] double? bboxRight = null,
+            [FromQuery] double? bboxBottom = null)
+        {
+            try
+            {
+                var filterValidation = ValidateSearchFilterInternal(filter);
+                var pagingArgumentsValidation = ValidatePagingArguments(skip, take);
+                var bboxOrError = LatLonBoundingBox.Create(bboxLeft, bboxTop, bboxRight, bboxBottom);
+                var paramsValidationResult = Result.Combine(filterValidation, pagingArgumentsValidation, bboxOrError);
+                if (paramsValidationResult.IsFailure)
+                {
+                    return BadRequest(paramsValidationResult.Error);
+                }
+
+                var result = await _observationManager.GetTaxonAggregationAsync(filter.ToSearchFilterInternal(), bboxOrError.Value, skip, take);
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }
+
+                PagedResultDto<TaxonAggregationItemDto> dto = result.Value.ToPagedResultDto(result.Value.Records.ToTaxonAggregationItemDtos());
+                return new OkObjectResult(dto);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "TaxonAggregation error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+
         [HttpGet("Provider/{providerId}/lastmodified")]
         [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -447,15 +567,47 @@ namespace SOS.Observations.Api.Controllers
             return Result.Success();
         }
 
+        private Result ValidateSearchFilterInternal(SearchFilterInternalDto filter)
+        {
+            var errors = new List<string>();
+
+            // No culture code, set default
+            if (string.IsNullOrEmpty(filter?.TranslationCultureCode))
+            {
+                filter.TranslationCultureCode = "sv-SE";
+            }
+
+            if (!new[] { "sv-SE", "en-GB" }.Contains(filter.TranslationCultureCode,
+                StringComparer.CurrentCultureIgnoreCase))
+            {
+                errors.Add("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
+            }
+
+            if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
+            return Result.Success();
+        }
+
         private Result ValidateSearchPagingArguments(int skip, int take)
         {
             var errors = new List<string>();
 
-            //Remove the limitations if we use the internal functions
             if (skip < 0 || take <= 0 || take > MaxBatchSize)
             {
                 errors.Add($"You can't take more than {MaxBatchSize} at a time.");
             }
+
+            if (skip + take > ElasticSearchMaxRecords)
+            {
+                errors.Add($"Skip + take can't be greater than { ElasticSearchMaxRecords }");
+            }
+
+            if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
+            return Result.Success();
+        }
+
+        private Result ValidateSearchPagingArgumentsInternal(int skip, int take)
+        {
+            var errors = new List<string>();
 
             if (skip + take > ElasticSearchMaxRecords)
             {
