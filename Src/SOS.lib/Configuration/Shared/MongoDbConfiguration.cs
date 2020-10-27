@@ -72,16 +72,9 @@ namespace SOS.Lib.Configuration.Shared
                     : null
             };
 
-            if (string.IsNullOrEmpty(UserName) ||
-                string.IsNullOrEmpty(Password))
-            {
-                UserName = "mongoadmin";
-                Password = "***REMOVED***";
-            }
-           
             if (!(string.IsNullOrEmpty(AuthenticationDb) ||
-                        string.IsNullOrEmpty(UserName) ||
-                        string.IsNullOrEmpty(Password)))
+                  string.IsNullOrEmpty(UserName) ||
+                  string.IsNullOrEmpty(Password)))
             {
 
                 mongoSettings.Credential = MongoCredential.CreateCredential(AuthenticationDb, UserName, Password);
