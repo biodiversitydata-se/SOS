@@ -40,12 +40,5 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         /// <param name="providerId"></param>
         /// <returns></returns>
         Task<IActionResult> GetLatestModifiedDateForProviderAsync(int providerId);
-
-        /// <summary>
-        ///     Term dictionary are used for properties with multiple acceptable fixed values. E.g gender can have the values: male, female...
-        ///     Term dictionary also describe the different possible query parameters available in searches.
-        /// </summary>
-        /// <returns>List of term dicionaries.</returns>
-        Task<IActionResult> GetFieldMappingAsync();
     }
 }
