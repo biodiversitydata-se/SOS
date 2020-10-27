@@ -82,23 +82,6 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <inheritdoc />
-        [HttpGet("TermDictionary")]
-        [ProducesResponseType(typeof(IEnumerable<FieldMapping>), (int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetFieldMappingAsync()
-        {
-            try
-            {
-                return new OkObjectResult(await _fieldMappingManager.GetFieldMappingsAsync());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting field mappings");
-                return new StatusCodeResult((int) HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <inheritdoc />
         [HttpPost("SearchInternal")]
         [ProducesResponseType(typeof(PagedResultDto<Observation>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
