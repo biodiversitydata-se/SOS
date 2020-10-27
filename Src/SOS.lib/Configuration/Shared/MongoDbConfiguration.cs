@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.Authentication;
 using MongoDB.Driver;
 
@@ -71,6 +72,13 @@ namespace SOS.Lib.Configuration.Shared
                     : null
             };
 
+            if (string.IsNullOrEmpty(UserName) ||
+                string.IsNullOrEmpty(Password))
+            {
+                UserName = "mongoadmin";
+                Password = "artdataroot";
+            }
+           
             if (!(string.IsNullOrEmpty(AuthenticationDb) ||
                         string.IsNullOrEmpty(UserName) ||
                         string.IsNullOrEmpty(Password)))
