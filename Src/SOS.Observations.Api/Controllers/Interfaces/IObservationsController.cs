@@ -31,7 +31,7 @@ namespace SOS.Observations.Api.Controllers.Interfaces
         ///     "usePointAccuracy": false
         ///     }
         /// </example>
-        Task<IActionResult> GetObservationsAsync(SearchFilterDto filter, int skip, int take, string sortBy,
+        Task<IActionResult> SearchAsync(SearchFilterDto filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder);
 
         /// <summary>
