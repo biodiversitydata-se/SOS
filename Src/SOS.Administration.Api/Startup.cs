@@ -44,9 +44,7 @@ namespace SOS.Administration.Api
                 .AddEnvironmentVariables();
 
             //Add secrets stored on developer machine (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
-            if (env.IsDevelopment() ||
-                environment == "dev" ||
-                environment == "local")
+            if (environment == "local")
             {
                 builder.AddUserSecrets<Startup>();
             }
