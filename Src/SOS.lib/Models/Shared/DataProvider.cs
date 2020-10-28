@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
@@ -17,7 +17,7 @@ namespace SOS.Lib.Models.Shared
         ///     The harvest data format.
         /// </summary>
         [BsonRepresentation(BsonType.String)]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public DataProviderType Type { get; set; }
 
         /// <summary>
@@ -104,6 +104,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         /// EML metadata.
         /// </summary>
+        [JsonIgnore] // Ignore since swagger crach when it's enabled. Todo custom converter?
         public BsonDocument EmlMetadata { get; set; }
 
         /// <summary>
