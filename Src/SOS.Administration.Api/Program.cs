@@ -76,12 +76,9 @@ namespace SOS.Administration.Api
                 })
                 .UseServiceProviderFactory(hostContext =>
                     {
-                        _verbatimDbConfiguration = hostContext.Configuration.GetSection("ApplicationSettings")
-                            .GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
-                        _processDbConfiguration = hostContext.Configuration.GetSection("ApplicationSettings")
-                            .GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
-                        _importConfiguration = hostContext.Configuration.GetSection("ApplicationSettings")
-                            .GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
+                        _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+                        _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+                        _importConfiguration = hostContext.Configuration.GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
 
                         return new AutofacServiceProviderFactory(builder =>
                             builder

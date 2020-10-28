@@ -136,8 +136,7 @@ namespace SOS.Administration.Api
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Hangfire
-            var hangfireDbConfiguration = Configuration.GetSection("ApplicationSettings")
-                .GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+            var hangfireDbConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
 
             services.AddHangfire(configuration =>
                 configuration

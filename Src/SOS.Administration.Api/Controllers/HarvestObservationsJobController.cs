@@ -10,11 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Administration.Api.Models;
-using SOS.Import.Managers.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Administration.Api.Controllers
 {

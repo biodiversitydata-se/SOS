@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Models;
-using SOS.Import.Managers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Administration.Api.Controllers
@@ -152,14 +152,14 @@ namespace SOS.Administration.Api.Controllers
         ///     Get all data providers.
         /// </summary>
         /// <returns></returns>
-        [HttpGet("")]
-        [ProducesResponseType(typeof(List<DataProvider>), (int) HttpStatusCode.OK)]
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<DataProvider>), (int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetDataProvidersAsync()
         {
             try
             {
-                var dataProviders = await _dataProviderManager.GetAllDataProviders();
+                var dataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
                 //var dtos = dataProviders.Select(DataProviderDto.Create).ToList(); // todo - use DTO?
                 return Ok(dataProviders);
             }
@@ -181,7 +181,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                var allDataProviders = await _dataProviderManager.GetAllDataProviders();
+                var allDataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
                 var harvestProcessSettings = new DataProviderHarvestAndProcessSettingsDto
                 {
                     IncludedInScheduledHarvest = allDataProviders

@@ -288,6 +288,11 @@ namespace SOS.Process.Processors.Artportalen
 
             foreach (var project in projects)
             {
+                if (!project?.ProjectParameters?.Any() ?? true)
+                {
+                    continue;
+                }
+
                 foreach (var projectParameter in project.ProjectParameters)
                 {
                     var emof = new ExtendedMeasurementOrFact();

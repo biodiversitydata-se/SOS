@@ -5,7 +5,7 @@ using CSharpFunctionalExtensions;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Import.Managers.Interfaces
+namespace SOS.Lib.Managers.Interfaces
 {
     public interface IDataProviderManager
     {
@@ -23,8 +23,8 @@ namespace SOS.Import.Managers.Interfaces
         /// <returns></returns>
         Task<Result<string>> InitDefaultDataProviders(bool forceOverwriteIfCollectionExist);
 
-        Task<List<DataProvider>> GetAllDataProviders();
-
+        Task<List<DataProvider>> GetAllDataProvidersAsync();
+        
         /// <summary>
         ///     Get data provider by Id.
         /// </summary>

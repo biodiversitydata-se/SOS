@@ -27,7 +27,6 @@ using SOS.Lib.Configuration.ObservationApi;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Extensions;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -233,7 +232,7 @@ namespace SOS.Observations.Api
                 .Get<ObservationApiConfiguration>();
 
             // Hangfire
-            var mongoConfiguration = observationApiConfiguration.HangfireDbConfiguration;
+            var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
 
             services.AddHangfire(configuration =>
                 configuration
@@ -255,11 +254,11 @@ namespace SOS.Observations.Api
             );
 
             //setup the elastic search configuration
-            var elasticConfiguration = observationApiConfiguration.SearchDbConfiguration;
-            services.AddSingleton<IElasticClient>(elasticConfiguration.ToClient());
+            var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+            services.AddSingleton<IElasticClient>(elasticConfiguration.GetClient());
             
             // Processed Mongo Db
-            var processedDbConfiguration = observationApiConfiguration.ProcessDbConfiguration;
+            var processedDbConfiguration = Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
             var processedSettings = processedDbConfiguration.GetMongoDbSettings();
             var processClient = new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
                 processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
@@ -272,7 +271,7 @@ namespace SOS.Observations.Api
             services.AddSingleton(observationApiConfiguration);
             services.AddSingleton(blobStorageConfiguration);
             services.AddSingleton(elasticConfiguration);
-            services.AddSingleton(observationApiConfiguration.UserServiceConfiguration);
+            services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<RestServiceConfiguration>());
 
             // Add managers
             services.AddSingleton<IAreaManager, AreaManager>();

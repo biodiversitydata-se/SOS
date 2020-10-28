@@ -5,8 +5,8 @@ using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
-using SOS.Import.Managers.Interfaces;
 using SOS.Lib.Jobs.Process;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Administration.Api.Controllers
 {

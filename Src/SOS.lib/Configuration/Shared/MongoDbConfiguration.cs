@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Security.Authentication;
 using MongoDB.Driver;
 
@@ -61,7 +60,7 @@ namespace SOS.Lib.Configuration.Shared
         /// <returns></returns>
         public MongoClientSettings GetMongoDbSettings()
         {
-
+            // Create settings object
             var mongoSettings = new MongoClientSettings
             {
                 UseTls = UseTls,
@@ -72,14 +71,15 @@ namespace SOS.Lib.Configuration.Shared
                     : null
             };
 
+            // Add authentication if requested
             if (!(string.IsNullOrEmpty(AuthenticationDb) ||
                   string.IsNullOrEmpty(UserName) ||
                   string.IsNullOrEmpty(Password)))
             {
-
                 mongoSettings.Credential = MongoCredential.CreateCredential(AuthenticationDb, UserName, Password);
             }
 
+            // Set server/s and connection mode based on number of hosts 
             if (Hosts.Length == 1)
             {
                 mongoSettings.Server =

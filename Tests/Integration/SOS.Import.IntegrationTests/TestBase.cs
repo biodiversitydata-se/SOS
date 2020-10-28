@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using SOS.Lib.Configuration.Import;
-using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 
 namespace SOS.Import.IntegrationTests
@@ -27,8 +26,7 @@ namespace SOS.Import.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var verbatimDbConfiguration = config.GetSection("ApplicationSettings")
-                .GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+            var verbatimDbConfiguration = config.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
             return verbatimDbConfiguration;
         }
 
@@ -40,7 +38,7 @@ namespace SOS.Import.IntegrationTests
                 .AddUserSecrets<TestBase>()
                 .Build();
 
-            var exportConfiguration = config.GetSection("ApplicationSettings").GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            var exportConfiguration = config.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
             return exportConfiguration;
         }
     }
