@@ -7,8 +7,6 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
-using Newtonsoft.Json;
 using SOS.Lib.Models.Shared;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
 
