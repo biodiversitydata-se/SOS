@@ -390,5 +390,33 @@
         "Identifier": "SharkZooplankton",
         "EmlMetadata": null,
         "HarvestFailPreventProcessing": false
+    },
+    {
+        "Type": "FishDataObservations",
+        "IsActive": true,
+        "Name": "The database for sea fishing",
+        "SwedishName": "Havsfiskelaboratoriet",
+        "Organization": "Department of Aquatic Resources, Institute of Coastal Research, SLU",
+        "SwedishOrganization": "Kustlaboratoriet, Institutionen för akvatiska resurser, SLU",
+        "Description": "",
+        "SwedishDescription": "",
+        "Url": "https://www.slu.se/institutioner/akvatiska-resurser/kontakt/havsfiskelaboratoriet",
+        "ContactPerson": {
+            "FirstName": "Sofia",
+            "LastName": "Bureborn",
+            "Email": "sofia.bureborn@slu.se"
+        },
+        "ContactEmail": "sofia.bureborn@slu.se",
+        "DownloadUrl": "",
+        "IncludeInScheduledHarvest": true,
+        "SupportIncrementalHarvest": false,
+        "DataQualityIsApproved": true,
+        "HarvestInfo": null,
+        "ProcessInfoInstance0": null,
+        "ProcessInfoInstance1": null,
+        "Id": 15,
+        "Identifier": "FishData",
+        "EmlMetadata": null,
+        "HarvestFailPreventProcessing": false
     }
 ]

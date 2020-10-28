@@ -9,12 +9,12 @@ using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using Newtonsoft.Json;
-using SOS.Import.Managers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
-namespace SOS.Import.Managers
+namespace SOS.Lib.Managers
 {
     public class DataProviderManager : IDataProviderManager
     {
@@ -99,7 +99,7 @@ namespace SOS.Import.Managers
             return dataProvider;
         }
 
-        public async Task<List<DataProvider>> GetAllDataProviders()
+        public async Task<List<DataProvider>> GetAllDataProvidersAsync()
         {
             return await _dataProviderRepository.GetAllAsync();
         }

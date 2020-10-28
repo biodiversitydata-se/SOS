@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq;
+using Elasticsearch.Net;
+using Nest;
 
 namespace SOS.Lib.Configuration.Shared
 {
@@ -7,6 +10,8 @@ namespace SOS.Lib.Configuration.Shared
     /// </summary>
     public class ElasticSearchConfiguration
     {
+        private string _indexPrefix;
+
         /// <summary>
         ///     How many items to read in a time when scrolling
         /// </summary>
@@ -57,6 +62,30 @@ namespace SOS.Lib.Configuration.Shared
             set => _indexPrefix = value;
         }
 
-        private string _indexPrefix;
+       
+        /// <summary>
+        /// Get client created with cuurent configuration
+        /// </summary>
+        /// <returns></returns>
+        public ElasticClient GetClient()
+        {
+            var uris = Hosts.Select(u => new Uri(u));
+
+            var connectionPool = new StaticConnectionPool(uris);
+            var settings = new ConnectionSettings(connectionPool);
+
+            if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
+            {
+                settings.BasicAuthentication(UserName, Password);
+                settings.SniffOnStartup(false);
+                settings.SniffOnConnectionFault(false);
+                settings.ServerCertificateValidationCallback(CertificateValidations.AllowAll);
+            }
+
+            //  .ServerCertificateValidationCallback(CertificateValidations.AuthorityIsRoot(cert));
+            //.DisableDirectStreaming().EnableDebugMode().PrettyJson() // Uncomment this line when debugging ES-query. Req and Resp is in result.DebugInformation in ProcessedObservationRepository.cs.
+
+            return new ElasticClient(settings);
+        }
     }
 }

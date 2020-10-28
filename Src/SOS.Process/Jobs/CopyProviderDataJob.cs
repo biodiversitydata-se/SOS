@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Jobs.Process;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Process.Managers.Interfaces;
 
 namespace SOS.Process.Jobs

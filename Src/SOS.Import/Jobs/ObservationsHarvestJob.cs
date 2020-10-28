@@ -7,11 +7,10 @@ using CSharpFunctionalExtensions;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using SOS.Import.Managers.Interfaces;
-using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Jobs.Process;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Import.Jobs
@@ -226,7 +225,7 @@ namespace SOS.Import.Jobs
         [DisplayName("Harvest and process observations from active providers")]
         public async Task<bool> RunAsync(JobRunModes mode, IJobCancellationToken cancellationToken)
         {
-            var providers = (await _dataProviderManager.GetAllDataProviders()).Where(dp =>
+            var providers = (await _dataProviderManager.GetAllDataProvidersAsync()).Where(dp =>
                 dp.IsActive &&
                 dp.IncludeInScheduledHarvest && 
                 (

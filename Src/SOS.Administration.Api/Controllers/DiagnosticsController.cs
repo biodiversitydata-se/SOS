@@ -19,7 +19,6 @@ namespace SOS.Administration.Api.Controllers
     [Route("[controller]")]
     public class DiagnosticsController : ControllerBase, IDiagnosticsController
     {
-        private readonly IAreaHarvester _areaHarvester;
         private readonly IFieldMappingDiffHelper _fieldMappingDiffHelper;
         private readonly IFieldMappingHarvester _fieldMappingHarvester;
         private readonly ILogger<DiagnosticsController> _logger;
@@ -42,7 +41,6 @@ namespace SOS.Administration.Api.Controllers
                 fieldMappingHarvester ?? throw new ArgumentNullException(nameof(fieldMappingHarvester));
             _fieldMappingDiffHelper =
                 fieldMappingDiffHelper ?? throw new ArgumentNullException(nameof(fieldMappingDiffHelper));
-            _areaHarvester = areaHarvester ?? throw new ArgumentNullException(nameof(areaHarvester));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

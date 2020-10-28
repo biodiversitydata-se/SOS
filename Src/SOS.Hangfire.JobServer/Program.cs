@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Elasticsearch.Net;
 using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
@@ -25,7 +24,6 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Extensions;
 using SOS.Process.IoC.Modules;
 
 namespace SOS.Hangfire.JobServer
@@ -95,8 +93,7 @@ namespace SOS.Hangfire.JobServer
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var hangfireDbConfiguration = hostContext.Configuration.GetSection("ApplicationSettings")
-                        .GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+                    var hangfireDbConfiguration = hostContext.Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
 
                     services.AddHangfire(configuration =>
                         configuration
@@ -134,12 +131,9 @@ namespace SOS.Hangfire.JobServer
                         t => true);
 
                     // Get configuration
-                    _verbatimDbConfiguration = hostContext.Configuration.GetSection("ApplicationSettings")
-                        .GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
-                    _processDbConfiguration = hostContext.Configuration.GetSection("ApplicationSettings")
-                        .GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
-                    _searchDbConfiguration = hostContext.Configuration.GetSection("ApplicationSettings")
-                        .GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+                    _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+                    _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+                    _searchDbConfiguration = hostContext.Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
                     _importConfiguration = hostContext.Configuration.GetSection(nameof(ImportConfiguration))
                         .Get<ImportConfiguration>();
                     _processConfiguration = hostContext.Configuration.GetSection(nameof(ProcessConfiguration))
@@ -153,7 +147,7 @@ namespace SOS.Hangfire.JobServer
                     
                     //setup the elastic search configuration
                     var uris = _searchDbConfiguration.Hosts.Select(u => new Uri(u));
-                    services.AddSingleton<IElasticClient>(_searchDbConfiguration.ToClient());
+                    services.AddSingleton<IElasticClient>(_searchDbConfiguration.GetClient());
                     services.AddSingleton(_searchDbConfiguration);
                 })
                 .UseServiceProviderFactory(hostContext =>

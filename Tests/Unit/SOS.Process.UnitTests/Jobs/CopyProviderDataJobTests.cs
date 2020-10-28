@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Process.Jobs;
 using SOS.Process.Managers.Interfaces;

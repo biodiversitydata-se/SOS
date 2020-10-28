@@ -1,17 +1,7 @@
-﻿using SOS.Lib.Configuration.Shared;
-
-namespace SOS.Lib.Configuration.ObservationApi
+﻿namespace SOS.Lib.Configuration.ObservationApi
 {
     public class ObservationApiConfiguration
     {
-        public int  ExportObservationsLimit { get; set; } 
-
-        public MongoDbConfiguration ProcessDbConfiguration { get; set; }
-
-        public HangfireDbConfiguration HangfireDbConfiguration { get; set; }
-
-        public ElasticSearchConfiguration SearchDbConfiguration { get; set; }
-
-        public UserServiceConfiguration UserServiceConfiguration { get; set; }
+        public int  ExportObservationsLimit { get; set; }
     }
 }

@@ -8,9 +8,9 @@ using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
-using SOS.Import.Managers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Process;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -76,7 +76,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
-                var dataProvidersToProcess = (await _dataProviderManager.GetAllDataProviders())
+                var dataProvidersToProcess = (await _dataProviderManager.GetAllDataProvidersAsync())
                     .Where(dataProvider => dataProvider.IsActive).ToList();
                 if (!dataProvidersToProcess.Any())
                 {
