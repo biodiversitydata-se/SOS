@@ -86,7 +86,7 @@ namespace SOS.Import.Harvesters.Observations
 
                     nrSightingsHarvested += verbatims.Count();
 
-                    _logger.LogInformation($"{ nrSightingsHarvested } NORS observations harvested");
+                    _logger.LogDebug($"{ nrSightingsHarvested } NORS observations harvested");
 
                     var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
 

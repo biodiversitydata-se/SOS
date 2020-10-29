@@ -85,7 +85,7 @@ namespace SOS.Import.Harvesters.Observations
 
                     nrSightingsHarvested += verbatims.Count();
 
-                    _logger.LogInformation($"{ nrSightingsHarvested } Fish Data observations harvested");
+                    _logger.LogDebug($"{ nrSightingsHarvested } Fish Data observations harvested");
 
                     cancellationToken?.ThrowIfCancellationRequested();
                     if (_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
