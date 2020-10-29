@@ -195,7 +195,7 @@ namespace SOS.Import.Containers
             Genders = CastMetdataEntityToVerbatim(genders)?.ToConcurrentDictionary(g => g.Id, g => g);
             OrganizationById = CastOrganizationEntityToVerbatim(organizationById)?.ToConcurrentDictionary(o => o.Id, o => o);
             Organizations = CastMetdataEntityToVerbatim(organizations)?.ToConcurrentDictionary(o => o.Id, o => o);
-            PersonByUserId = CastPersonEntityToVerbatim(personByUserId)?.ToConcurrentDictionary(p => p.Id, p => p);
+            PersonByUserId = CastPersonEntityToVerbatim(personByUserId)?.ToConcurrentDictionary(p => p.UserId, p => p);
             Projects = CastProjectEntitiesToVerbatim(projectEntities).ToConcurrentDictionary(p => p.Id, p => p);
             Stages = CastMetdataEntityToVerbatim(stages)?.ToConcurrentDictionary(s => s.Id, s => s);
             Substrates = CastMetdataEntityToVerbatim(substrates)?.ToConcurrentDictionary(s => s.Id, s => s);

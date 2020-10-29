@@ -26,14 +26,16 @@ namespace SOS.Lib.Repositories.Processed
         private readonly IElasticClient _elasticClient;
         private readonly string _indexPrefix;
         private readonly int _scrollBatchSize;
+        private readonly int _numberOfShards;
+        private readonly int _numberOfReplicas;
 
         private async Task<bool> AddCollectionAsync()
         {
             var createIndexResponse = await _elasticClient.Indices.CreateAsync(IndexName, s => s
                 .IncludeTypeName(false)
                 .Settings(s => s
-                    .NumberOfShards(6)
-                    .NumberOfReplicas(0)
+                    .NumberOfShards(_numberOfShards)
+                    .NumberOfReplicas(_numberOfReplicas)
                 )
                 .Map<Observation>(p => p
                     .AutoMap()
@@ -74,6 +76,8 @@ namespace SOS.Lib.Repositories.Processed
             _elasticClient = elasticClient ?? throw new ArgumentNullException(nameof(elasticClient));
             _indexPrefix = elasticConfiguration?.IndexPrefix ?? throw new ArgumentNullException(nameof(elasticConfiguration));
             _scrollBatchSize = client.ReadBatchSize;
+            _numberOfReplicas = elasticConfiguration.NumberOfReplicas;
+            _numberOfShards = elasticConfiguration.NumberOfShards;
         }
 
         public string IndexName => string.IsNullOrEmpty(_indexPrefix)

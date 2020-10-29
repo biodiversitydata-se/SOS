@@ -33,6 +33,16 @@ namespace SOS.Lib.Configuration.Shared
         public int MaxNrAggregationBuckets { get; set; } = 65535;
 
         /// <summary>
+        /// Number of shards
+        /// </summary>
+        public int NumberOfShards { get; set; } = 6;
+
+        /// <summary>
+        /// Number of replicas
+        /// </summary>
+        public int NumberOfReplicas { get; set; }
+
+        /// <summary>
         ///     Password
         /// </summary>
         public string Password { get; set; }
