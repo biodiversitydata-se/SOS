@@ -93,6 +93,7 @@ namespace SOS.Process.Processors.Shark
                 },
                 Occurrence = new Occurrence
                 {
+                    CatalogNumber = verbatim.SharkSampleId,
                     OccurrenceId = verbatim.SharkSampleId,
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),

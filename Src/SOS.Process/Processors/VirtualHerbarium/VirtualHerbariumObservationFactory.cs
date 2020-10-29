@@ -103,6 +103,7 @@ namespace SOS.Process.Processors.VirtualHerbarium
                 },
                 Occurrence = new Occurrence
                 {
+                    CatalogNumber = verbatim.AccessionNo,
                     OccurrenceId = verbatim.AccessionNo,
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaId),

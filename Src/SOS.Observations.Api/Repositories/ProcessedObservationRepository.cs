@@ -602,7 +602,7 @@ namespace SOS.Observations.Api.Repositories
             );
             if (!searchResponse.IsValid)
             {
-                if (searchResponse.ServerError.Error.CausedBy.Type == "too_many_buckets_exception")
+                if (searchResponse.ServerError?.Error?.CausedBy?.Type == "too_many_buckets_exception")
                 {
                     return Result.Failure<GeoGridResult>($"The number of cells that will be returned is too large. The limit is {maxNrReturnedBuckets} cells. Try using lower precision or a smaller bounding box.");
                 }
@@ -682,7 +682,7 @@ namespace SOS.Observations.Api.Repositories
             
             if (!searchResponse.IsValid)
             {
-                if (searchResponse.ServerError.Error?.CausedBy.Type == "too_many_buckets_exception")
+                if (searchResponse.ServerError?.Error?.CausedBy?.Type == "too_many_buckets_exception")
                 {
                     return Result.Failure<GeoGridTileResult>($"The number of cells that will be returned is too large. The limit is {maxNrReturnedBuckets} cells. Try using lower zoom or a smaller bounding box.");
                 }
@@ -690,7 +690,7 @@ namespace SOS.Observations.Api.Repositories
                 throw new InvalidOperationException(searchResponse.DebugInformation);
             }
 
-            var nrOfGridCells = (int?)searchResponse.Aggregations.Filter("geotile_filter").GeoTile("geotile_grid").Buckets?.Count ?? 0;
+            var nrOfGridCells = (int?)searchResponse.Aggregations?.Filter("geotile_filter")?.GeoTile("geotile_grid")?.Buckets?.Count ?? 0;
             if (nrOfGridCells > maxNrReturnedBuckets)
             {
                 return Result.Failure<GeoGridTileResult>($"The number of cells that will be returned is too large. The limit is {maxNrReturnedBuckets} cells. Try using lower zoom or a smaller bounding box.");
