@@ -101,11 +101,11 @@ namespace SOS.Import.Harvesters.Observations
 
                     var dataSetName = row[datasetNameIndex];
 
-                    _logger.LogInformation($"Start getting file: {dataSetName}");
+                    _logger.LogDebug($"Start getting file: {dataSetName}");
 
                     var data = await _sharkObservationService.GetAsync(dataSetName);
 
-                    _logger.LogInformation($"Finish getting file: {dataSetName}");
+                    _logger.LogDebug($"Finish getting file: {dataSetName}");
 
                     if (data == null)
                     {
