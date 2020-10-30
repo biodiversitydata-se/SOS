@@ -155,7 +155,7 @@ namespace SOS.Lib.Extensions
         {
             var row = new ExtendedMeasurementOrFactRow();
             row.OccurrenceID = occurrenceId;
-            row.MeasurementID = project.Id; // Should this be ProjectId or ProjectParameterId?
+            row.MeasurementID = project.Id.ToString(); // Should this be ProjectId or ProjectParameterId?
             //row.MeasurementID = projectParameter.ProjectParameterId.ToString(); // Should this be ProjectId or ProjectParameterId?
             row.MeasurementType = projectParameter.Name;
             row.MeasurementValue = projectParameter.Value;
