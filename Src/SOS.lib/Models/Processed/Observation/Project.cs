@@ -49,7 +49,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     (Globally unique identifier).
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         ///     Not defined in Darwin Core.

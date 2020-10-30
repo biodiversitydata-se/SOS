@@ -668,7 +668,7 @@ namespace SOS.Process.Processors.DarwinCoreArchive
                 Category = project.Category,
                 Description = project.Description,
                 EndDate = project.EndDate?.ToUniversalTime(),
-                Id = project.Id.ToString(),
+                Id = project.Id,
                 Name = project.Name,
                 Owner = project.Owner,
                 StartDate = project.StartDate?.ToUniversalTime(),
