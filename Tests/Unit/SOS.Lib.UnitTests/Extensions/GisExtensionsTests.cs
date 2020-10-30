@@ -13,7 +13,7 @@ namespace SOS.Lib.UnitTests.Extensions
             //-----------------------------------------------------------------------------------------------------------
             // Act, Assert
             //-----------------------------------------------------------------------------------------------------------
-           var point = new Point(55.77695, 12.92257);
+           var point = new Point(12.92257, 55.77695);
 
            var transformedPoint = point.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
         }
